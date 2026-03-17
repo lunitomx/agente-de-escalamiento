@@ -1,0 +1,32 @@
+# === RaiSE Development Governance ===
+governance/
+work/
+.raise/
+AGENTS.md
+
+# === RaiSE Development Skills ===
+# Keep scaleup-* skills, exclude rai-* development skills
+.claude/skills/rai-*/
+
+# === Source Materials ===
+*.pdf
+
+# === Build Artifacts ===
+build/
+dist/
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+
+# === Environment & Secrets ===
+.env
+.env.*
+
+# === OS Files ===
+.DS_Store
+Thumbs.db
+
+# === IDE ===
+.vscode/
+.idea/
