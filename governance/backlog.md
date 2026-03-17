@@ -22,7 +22,7 @@
 | S3.1 | CLAUDE.md del producto — Identidad, instrucciones base, routing a skills | M | draft |
 | S3.2 | .gitignore + limpieza — Excluir archivos de desarrollo RaiSE, PDF, build artifacts | S | done |
 | S3.3 | README.md — Instrucciones de instalación, qué es, cómo usar | M | draft |
-| S3.4 | Estructura de directorios del usuario — `.scaleup/` con company-profile vacío y defaults | S | draft |
+| S3.4 | Estructura de directorios del usuario — `.scaleup/` con company-profile vacío y defaults | S | done |
 | S3.5 | Skill triggers en CLAUDE.md — Mapear slash commands a skills del producto | S | draft |
 
 ## E4: Validación — Testing end-to-end
