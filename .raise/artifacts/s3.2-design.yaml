@@ -1,0 +1,39 @@
+artifact_type: story-design
+version: 1
+skill: rai-story-design
+created: '2026-03-17T03:45:00Z'
+story: 'S3.2'
+epic: 'E3'
+content:
+  summary: 'Create .gitignore to exclude development files from public repo distribution'
+  complexity: simple
+  acceptance_criteria:
+    - id: AC1
+      description: '.gitignore exists at repo root'
+      verifiable: true
+    - id: AC2
+      description: 'governance/, work/, .raise/ are git-ignored'
+      verifiable: true
+    - id: AC3
+      description: 'rai-* skills ignored, scaleup-* skills tracked'
+      verifiable: true
+    - id: AC4
+      description: 'PDF, build artifacts, env files ignored'
+      verifiable: true
+    - id: AC5
+      description: 'End-user files (.scaleup/, CLAUDE.md, templates/, scaleup-* skills) remain tracked'
+      verifiable: true
+  integration_points:
+    - module: 'repo-root'
+      change_type: update
+      files: ['.gitignore']
+  decisions:
+    - id: D1
+      choice: 'Use .gitignore pattern .claude/skills/rai-* for selective skill exclusion'
+      rationale: 'Exclude 31 rai-* dev skills while keeping 18 scaleup-* product skills without negation complexity'
+      alternatives_considered: ['Move rai skills out of .claude/skills/', 'Separate repos for dev vs product']
+refs:
+  epic_scope: 'work/epics/e3-agent-framework/scope.md'
+  story: 'work/epics/e3-agent-framework/stories/s3.2-story.md'
+  scope: 'work/epics/e3-agent-framework/stories/s3.2-scope.md'
+metadata: {}
