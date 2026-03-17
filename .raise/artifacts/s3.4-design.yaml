@@ -1,0 +1,61 @@
+artifact_type: story-design
+version: 1
+skill: rai-story-design
+created: '2026-03-17T08:00:00Z'
+story: 'S3.4'
+epic: 'E3'
+content:
+  summary: 'Create .scaleup/my-company/ user workspace with template files and directory README for end-user orientation'
+  complexity: simple
+  acceptance_criteria:
+    - id: AC1
+      description: 'Company profile template exists at .scaleup/my-company/profile.md with placeholder instructions'
+      verifiable: true
+    - id: AC2
+      description: 'Template contains zero real company data'
+      verifiable: true
+    - id: AC3
+      description: 'Directory structure has three intuitive top-level concerns (my-company, agent, knowledge)'
+      verifiable: true
+    - id: AC4
+      description: 'E6 placeholder files exist (annual-goal.md, quarterly-focus.md, tasks.md)'
+      verifiable: true
+    - id: AC5
+      description: 'README.md explains the directory structure'
+      verifiable: true
+  integration_points:
+    - module: '.scaleup/my-company'
+      change_type: create
+      files:
+        - '.scaleup/my-company/profile.md'
+        - '.scaleup/my-company/annual-goal.md'
+        - '.scaleup/my-company/quarterly-focus.md'
+        - '.scaleup/my-company/tasks.md'
+    - module: '.scaleup'
+      change_type: create
+      files:
+        - '.scaleup/README.md'
+  decisions:
+    - id: D1
+      choice: 'Use .scaleup/my-company/ as user workspace directory'
+      rationale: 'Clear mental model — three concerns: user data (my-company), agent config (agent), methodology (knowledge)'
+      alternatives_considered:
+        - 'Flat profile at .scaleup/profile.md'
+        - 'Generic name like .scaleup/workspace/'
+    - id: D2
+      choice: 'Templates use instructional placeholder text, not empty files'
+      rationale: 'Placeholder instructions teach the user what information is needed and reduce friction'
+      alternatives_considered:
+        - 'Empty files with separate README'
+        - 'YAML templates'
+    - id: D3
+      choice: 'Keep agent/memory/company-profile.yaml as agent runtime format alongside my-company/profile.md'
+      rationale: 'Existing YAML is referenced by agent configs. Two files serve different audiences: Markdown for human, YAML for agent'
+      alternatives_considered:
+        - 'Delete YAML, use only Markdown'
+        - 'Auto-sync Markdown to YAML'
+refs:
+  epic_scope: 'work/epics/e3-agent-framework/scope.md'
+  story: 'work/epics/e3-agent-framework/stories/s3.4-story.md'
+  scope: 'work/epics/e3-agent-framework/stories/s3.4-scope.md'
+metadata: {}
