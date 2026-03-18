@@ -1,0 +1,41 @@
+artifact_type: story-design
+version: 1
+skill: rai-story-design
+created: '2026-03-17T12:00:00Z'
+story: 'S3.1+S3.5'
+epic: 'E3'
+content:
+  summary: 'Replace RaiSE CLAUDE.md with product CLAUDE.md that defines ScaleUp coach identity and routes 19 slash commands'
+  complexity: moderate
+  acceptance_criteria:
+    - id: AC1
+      description: 'CLAUDE.md de producto en raíz define identidad ScaleUp (no RaiSE)'
+      verifiable: true
+    - id: AC2
+      description: '19 slash commands listados con descripción y agrupados por decisión'
+      verifiable: true
+    - id: AC3
+      description: '/scaleup-welcome documentado como punto de entrada'
+      verifiable: true
+    - id: AC4
+      description: 'Referencia a .scaleup/my-company/ para datos de empresa'
+      verifiable: true
+    - id: AC5
+      description: 'Referencia a .scaleup/knowledge/ para base de conocimiento'
+      verifiable: true
+  integration_points:
+    - module: 'claude-md-product'
+      change_type: modification
+      files: ['CLAUDE.md']
+  decisions:
+    - id: D1
+      choice: 'Reemplazar CLAUDE.md de raíz con identidad ScaleUp'
+      rationale: 'El CLAUDE.md de desarrollo ya vive en .claude/ como project instructions — el de raíz es el del producto'
+      alternatives_considered: ['Crear archivo separado (no funciona — Claude Code lee CLAUDE.md de raíz)']
+    - id: D2
+      choice: 'U-shaped structure: identidad arriba, commands abajo'
+      rationale: 'PAT-BASE-055: LLMs atienden más al inicio y final del prompt'
+      alternatives_considered: ['Commands al inicio', 'Todo mezclado']
+refs:
+  epic_scope: 'work/epics/e3-agent-framework/scope.md'
+metadata: {}
