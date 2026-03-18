@@ -30,7 +30,7 @@ Hacer que el repo `lunitomx/scaleupagent` sea instalable: un empresario clona, a
 
 ## Done Criteria
 
-- [ ] Un directorio clonado contiene todo lo necesario para que Claude Code funcione como agente ScaleUp
-- [ ] No hay archivos de desarrollo (RaiSE governance, build/, PDF) en el producto final
-- [ ] Los 19 skills son invocables via slash commands documentados
-- [ ] README explica en < 1 minuto de lectura cómo instalar y usar
+- [x] Un directorio clonado contiene todo lo necesario para que Claude Code funcione como agente ScaleUp
+- [x] No hay archivos de desarrollo (RaiSE governance, build/, PDF) en el producto final
+- [x] Los 19 skills son invocables via slash commands documentados
+- [x] README explica en < 1 minuto de lectura cómo instalar y usar
