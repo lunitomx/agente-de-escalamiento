@@ -1,0 +1,28 @@
+id: tool-opsp
+type: tool
+name: One-Page Strategic Plan (OPSP)
+name_es: Plan Estrategico de Una Pagina (OPSP)
+decision: strategy
+summary: >
+  The central tool of Scaling Up. Consolidates the company's vision, strategy,
+  and execution plan onto a single page. Covers core values, purpose, BHAG,
+  brand promises, key thrusts, capabilities, profit per X, 3-5 year targets,
+  annual priorities, and quarterly rocks.
+source:
+  book_chapter: "THE ONE-PAGE STRATEGIC PLAN"
+  book_line: 3944
+  workbook: strategy_workbook.md
+relationships:
+  - type: belongs-to
+    target: decision-strategy
+  - type: requires
+    target: tool-core-values
+  - type: feeds-into
+    target: tool-priorities-rocks
+  - type: requires
+    target: tool-7-strata
+tags: [strategy, planning, quarterly, annual, alignment]
+metadata:
+  difficulty: advanced
+  time_estimate: "4-8 hours first time, 2-4 hours quarterly update"
+  frequency: quarterly

@@ -1,0 +1,15 @@
+id: decision-people
+type: decision
+name: People
+name_es: Personas
+summary: >
+  Right people doing the right things right. Focuses on attracting, developing,
+  and retaining A-players, clarifying accountability, and building a values-driven culture.
+source:
+  book_chapter: "SCALING UP PEOPLE"
+  book_line: 1109
+relationships: []
+tags: [people, hiring, culture, accountability, leadership]
+metadata:
+  key_question: "Would you enthusiastically rehire everyone on your team?"
+  chapter_range: "Chapters: The Leaders, The Team, The Managers"

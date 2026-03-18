@@ -1,0 +1,23 @@
+id: metric-employee-satisfaction
+type: metric
+name: Employee Net Promoter Score (eNPS)
+name_es: Indice de Satisfaccion del Empleado (eNPS)
+decision: people
+summary: >
+  Measures how likely employees are to recommend the company as a place to work.
+  A leading indicator of retention, engagement, and culture health.
+  Scaling Up recommends gathering employee feedback weekly through
+  a simple "start/stop/keep" format.
+source:
+  book_chapter: "THE DATA"
+  book_line: 5076
+relationships:
+  - type: belongs-to
+    target: decision-people
+  - type: measured-by
+    target: concept-right-people-right-seats
+tags: [people, metric, engagement, satisfaction, retention]
+metadata:
+  unit: score
+  direction: higher_better
+  benchmark: "Above 50 is excellent, above 30 is good"
