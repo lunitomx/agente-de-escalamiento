@@ -23,11 +23,10 @@ Hacer que el repo `lunitomx/scaleupagent` sea instalable: un empresario clona, a
 
 | ID | Story | Size |
 |----|-------|------|
-| S3.1 | CLAUDE.md del producto — Identidad, instrucciones, routing | M |
+| S3.1+S3.5 | CLAUDE.md del producto — Identidad + slash commands | M | done |
 | S3.2 | .gitignore + limpieza del repo | S | done |
-| S3.3 | README.md — Quick start para el empresario | M |
+| S3.3 | README.md — Quick start para el empresario | M | done |
 | S3.4 | Estructura `.scaleup/` con defaults para usuario final | S | done |
-| S3.5 | Skill triggers — Mapear slash commands en CLAUDE.md | S |
 
 ## Done Criteria
 
