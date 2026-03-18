@@ -1,0 +1,88 @@
+# ScaleUp Ontology — Node Type Definitions
+# Each node type defines required and optional fields
+
+node_types:
+  decision:
+    description: "The 4 core decisions of Scaling Up"
+    required: [id, type, name, name_es, summary, relationships]
+    optional: [source, tags, metadata]
+    metadata_fields:
+      - key_question: "The central question this decision answers"
+      - chapter_range: "Book chapters covering this decision"
+
+  concept:
+    description: "Principles, frameworks, and ideas from the methodology"
+    required: [id, type, name, name_es, decision, summary, relationships]
+    optional: [source, tags, metadata]
+    metadata_fields:
+      - difficulty: "beginner | intermediate | advanced"
+      - application: "When/how to apply this concept"
+
+  tool:
+    description: "Actionable frameworks, checklists, and processes"
+    required: [id, type, name, name_es, decision, summary, relationships]
+    optional: [source, tags, metadata]
+    metadata_fields:
+      - difficulty: "beginner | intermediate | advanced"
+      - time_estimate: "Time for first-time completion"
+      - frequency: "How often to revisit (daily | weekly | monthly | quarterly | annually)"
+
+  worksheet:
+    description: "Completable templates with specific fields"
+    required: [id, type, name, name_es, decision, summary, relationships]
+    optional: [source, tags, metadata]
+    metadata_fields:
+      - fields: "List of completable fields/sections"
+      - output: "What the completed worksheet produces"
+      - difficulty: "beginner | intermediate | advanced"
+      - time_estimate: "Time for first-time completion"
+      - frequency: "How often to update"
+
+  stage:
+    description: "Business maturity stages"
+    required: [id, type, name, name_es, summary, relationships]
+    optional: [source, tags, metadata]
+    metadata_fields:
+      - revenue_range: "Typical revenue range"
+      - employee_range: "Typical employee count"
+      - characteristics: "Key characteristics of this stage"
+
+  metric:
+    description: "Measurable KPIs and indicators"
+    required: [id, type, name, name_es, decision, summary, relationships]
+    optional: [source, tags, metadata]
+    metadata_fields:
+      - unit: "Unit of measurement (days, percentage, score, etc.)"
+      - direction: "higher_better | lower_better"
+      - benchmark: "Industry benchmark or target"
+
+relationship_types:
+  belongs-to:
+    description: "Node belongs to a decision area"
+    valid_sources: [concept, tool, worksheet, metric]
+    valid_targets: [decision]
+
+  requires:
+    description: "Prerequisite — complete A before B"
+    valid_sources: [concept, tool, worksheet]
+    valid_targets: [concept, tool, worksheet]
+
+  feeds-into:
+    description: "Output of A is input to B"
+    valid_sources: [concept, tool, worksheet]
+    valid_targets: [concept, tool, worksheet]
+
+  measured-by:
+    description: "How success of this node is measured"
+    valid_sources: [concept, tool]
+    valid_targets: [metric]
+
+  prerequisite-of:
+    description: "Inverse of requires — A is prerequisite of B"
+    valid_sources: [concept, tool, worksheet]
+    valid_targets: [concept, tool, worksheet]
+
+  implements:
+    description: "Worksheet makes concept actionable"
+    valid_sources: [worksheet]
+    valid_targets: [concept, tool]

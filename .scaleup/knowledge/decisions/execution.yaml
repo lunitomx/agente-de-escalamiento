@@ -1,0 +1,15 @@
+id: decision-execution
+type: decision
+name: Execution
+name_es: Ejecucion
+summary: >
+  Driving flawless execution through meeting rhythms, priorities, data/KPIs,
+  and the Rockefeller Habits. Eliminates organizational drag and aligns the team.
+source:
+  book_chapter: "SCALING UP EXECUTION"
+  book_line: 4497
+relationships: []
+tags: [execution, priorities, meetings, kpis, accountability, habits]
+metadata:
+  key_question: "Are all processes running without drama and driving industry-leading profitability?"
+  chapter_range: "Chapters: The Priority, The Data, The Meeting Rhythm"
