@@ -1,0 +1,11 @@
+{
+  "name": "cumbre-board",
+  "version": "1.0.0",
+  "description": "CUMBRE — Consejo Directivo Virtual de 4 voces (Veterano, Retador, Conector, Financiero) con regla NIEBLA y Protocolo de Honestidad. Para dueños de negocio que no quieren decidir solos.",
+  "author": {
+    "name": "Eduardo Muñoz Luna",
+    "email": "eduardoluna@mhservices.mx"
+  },
+  "keywords": ["board", "consejo", "decisiones", "empresarios", "scaling"],
+  "license": "Inspirado en principios probados de gestión empresarial. No reproduce metodologías con marca registrada."
+}
