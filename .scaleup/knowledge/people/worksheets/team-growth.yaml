@@ -1,0 +1,31 @@
+id: worksheet-team-growth
+type: worksheet
+name: Team Growth Assessment Worksheet
+name_es: Hoja de Evaluacion de Crecimiento del Equipo
+decision: people
+summary: >
+  A dual-rating worksheet where the leader scores both company effectiveness and their
+  own personal leadership (1=weak, 5=strong) in three growth areas: onboarding new team
+  members, regular one-on-one coaching, and ongoing learning and development. The average
+  score per area surfaces the biggest gap. The worksheet then prompts a quarterly priority
+  to address the weakest area with a specific, concrete action.
+source:
+  file: "metodologias_parsed/people_workbook.txt"
+  file_line: 1837
+relationships:
+  - type: belongs-to
+    target: decision-people
+  - type: implements
+    target: tool-team-assessment
+tags: [people, worksheet, team-development, onboarding, coaching, learning]
+metadata:
+  fields:
+    - "Onboarding new team members — Company score (1-5) / Personal score (1-5)"
+    - "Regular one-on-one coaching — Company score (1-5) / Personal score (1-5)"
+    - "Ongoing learning and development — Company score (1-5) / Personal score (1-5)"
+    - "Average per area"
+    - "Quarterly priority: specific action to improve weakest area"
+  output: "Gap analysis of team development practice + one concrete quarterly action"
+  difficulty: beginner
+  time_estimate: "15 minutes"
+  frequency: quarterly

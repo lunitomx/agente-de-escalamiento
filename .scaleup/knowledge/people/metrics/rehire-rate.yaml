@@ -1,0 +1,25 @@
+id: metric-rehire-rate
+type: metric
+name: Rehire Rate
+name_es: Tasa de Recontratacion
+decision: people
+summary: >
+  The percentage of current employees whom the leadership team would "enthusiastically
+  rehire" if starting over today. Scaling Up's central diagnostic question for team quality:
+  "Would you enthusiastically rehire everyone on your team?" A high rehire rate signals
+  strong hiring practices and values alignment. A low rate signals a talent or culture
+  problem that is costing growth. Target: 90%+ enthusiastic rehires.
+source:
+  book_chapter: "SCALING UP PEOPLE"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 667
+relationships:
+  - type: belongs-to
+    target: decision-people
+  - type: measured-by
+    target: tool-topgrading
+tags: [people, metric, hiring, quality, talent, topgrading]
+metadata:
+  unit: percentage
+  direction: higher_better
+  benchmark: "90%+ is target; below 70% indicates urgent talent problem"

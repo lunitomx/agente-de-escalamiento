@@ -11,6 +11,8 @@ summary: >
 source:
   book_chapter: "THE DATA"
   book_line: 5076
+  file: "scaling_up_llamaparse.txt"
+  file_line: 5076
 relationships:
   - type: belongs-to
     target: decision-people
