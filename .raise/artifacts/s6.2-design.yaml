@@ -1,0 +1,90 @@
+artifact_type: story-design
+version: 1
+skill: rai-story-design
+created: '2026-04-20T16:42:00Z'
+story: 'S6.2'
+epic: 'E6'
+content:
+  summary: >
+    Populate the People decision ontology from LlamaParse source (people_workbook.txt +
+    scaling_up_llamaparse.txt) creating 15 new YAML nodes across 4 types (concepts, tools,
+    worksheets, metrics) with intra-People relationships wired. Enables deterministic
+    retrieval of all People methodology knowledge.
+  complexity: moderate
+  acceptance_criteria:
+    - id: AC1
+      description: "All 15 new nodes created, conforming to node-types.yaml required fields"
+      verifiable: true
+    - id: AC2
+      description: "tool-face and tool-pace exist with correct relationship chain (face → implements worksheet-face, face → feeds-into pace)"
+      verifiable: true
+    - id: AC3
+      description: "Every node has at least one belongs-to → decision-people relationship"
+      verifiable: true
+    - id: AC4
+      description: "decision-people.yaml relationships array updated (was empty [])"
+      verifiable: true
+    - id: AC5
+      description: "people/tools/ and people/worksheets/ directories created with node files"
+      verifiable: true
+  integration_points:
+    - module: '.scaleup.knowledge.people.concepts'
+      change_type: modification
+      files:
+        - '.scaleup/knowledge/people/concepts/right-people-right-seats.yaml'
+        - '.scaleup/knowledge/people/concepts/core-values.yaml'
+        - '.scaleup/knowledge/people/concepts/culture.yaml'
+        - '.scaleup/knowledge/people/concepts/disc-assessment.yaml'
+        - '.scaleup/knowledge/people/concepts/love-loathe.yaml'
+        - '.scaleup/knowledge/people/concepts/employee-engagement.yaml'
+    - module: '.scaleup.knowledge.people.tools'
+      change_type: new
+      files:
+        - '.scaleup/knowledge/people/tools/face.yaml'
+        - '.scaleup/knowledge/people/tools/pace.yaml'
+        - '.scaleup/knowledge/people/tools/topgrading.yaml'
+        - '.scaleup/knowledge/people/tools/oppp.yaml'
+        - '.scaleup/knowledge/people/tools/five-manager-activities.yaml'
+        - '.scaleup/knowledge/people/tools/team-assessment.yaml'
+    - module: '.scaleup.knowledge.people.worksheets'
+      change_type: new
+      files:
+        - '.scaleup/knowledge/people/worksheets/face.yaml'
+        - '.scaleup/knowledge/people/worksheets/love-loathe.yaml'
+        - '.scaleup/knowledge/people/worksheets/oppp.yaml'
+        - '.scaleup/knowledge/people/worksheets/team-growth.yaml'
+    - module: '.scaleup.knowledge.people.metrics'
+      change_type: modification
+      files:
+        - '.scaleup/knowledge/people/metrics/employee-satisfaction.yaml'
+        - '.scaleup/knowledge/people/metrics/rehire-rate.yaml'
+        - '.scaleup/knowledge/people/metrics/role-fit-score.yaml'
+        - '.scaleup/knowledge/people/metrics/values-alignment-score.yaml'
+    - module: '.scaleup.knowledge.decisions'
+      change_type: modification
+      files:
+        - '.scaleup/knowledge/decisions/people.yaml'
+  decisions:
+    - id: D1
+      choice: "Add 'contains' relationship type in decision node to list all child nodes"
+      rationale: "Makes retrieval trivial: traverse decision-people → contains → all nodes"
+      alternatives_considered: ["No relationship in decision (filter by decision field)", "Index file"]
+    - id: D2
+      choice: "Separate tools/ and worksheets/ subdirectories under people/"
+      rationale: "Mirrors node type hierarchy; ls people/tools/ is a valid retrieval primitive"
+      alternatives_considered: ["Flat people/ directory"]
+    - id: D3
+      choice: "Update existing nodes to add source.file field"
+      rationale: "Consistent LlamaParse provenance tracking across all nodes"
+      alternatives_considered: ["Leave existing nodes unchanged"]
+refs:
+  epic_scope: 'work/epics/e6-knowledge-ontology/scope.md'
+  story: 'work/epics/e6-knowledge-ontology/stories/s6.2-story.md'
+  schema: '.scaleup/knowledge/ontology/node-types.yaml'
+  sources:
+    - 'metodologias_parsed/people_workbook.txt'
+    - 'scaling_up_llamaparse.txt'
+metadata:
+  node_count_new: 15
+  node_count_updated: 2
+  new_directories: ['.scaleup/knowledge/people/tools/', '.scaleup/knowledge/people/worksheets/']
