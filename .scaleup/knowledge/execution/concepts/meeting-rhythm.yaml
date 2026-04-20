@@ -1,0 +1,37 @@
+id: concept-meeting-rhythm
+type: concept
+name: Meeting Rhythm
+name_es: Ritmo de Reuniones
+decision: execution
+summary: >
+  A structured cadence of five meeting types that replace ad-hoc, unproductive meetings
+  with purposeful communication rhythms: Daily Huddle (15 min), Weekly Team Meeting
+  (60-90 min), Monthly Management Meeting (half day), Quarterly Planning Session (1-2 days),
+  Annual Planning Session (2-3 days). Each serves a distinct purpose: daily for tactical
+  updates, weekly for accountability, monthly for learning and adjustments, quarterly for
+  strategy refresh, annually for the full OPSP reset. The rhythm eliminates the need for
+  impromptu meetings that disrupt deep work.
+source:
+  book_chapter: "THE MEETING RHYTHM"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 494
+  workbook_file: "metodologias_parsed/execution_workbook.txt"
+  workbook_line: 455
+relationships:
+  - type: belongs-to
+    target: decision-execution
+  - type: requires
+    target: tool-daily-huddle
+  - type: requires
+    target: tool-weekly-meeting
+  - type: requires
+    target: tool-quarterly-planning
+  - type: requires
+    target: tool-annual-planning
+tags: [execution, meetings, rhythm, cadence, daily-huddle, weekly, quarterly, annual]
+metadata:
+  difficulty: beginner
+  application: >
+    Implement in order: Daily Huddle first (lowest resistance, highest daily impact),
+    then Weekly Meeting, then Quarterly Planning. Annual Planning last — it requires
+    the others to be functioning well first. Don't try to implement all five at once.

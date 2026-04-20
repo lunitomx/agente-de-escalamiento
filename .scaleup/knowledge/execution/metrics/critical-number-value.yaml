@@ -1,0 +1,25 @@
+id: metric-critical-number-value
+type: metric
+name: Critical Number Value
+name_es: Valor del Numero Critico
+decision: execution
+summary: >
+  The actual measured value of the quarter's Critical Number vs. the target set in the
+  Quarterly Planning session. Tracked weekly in every team meeting and on the scoreboard.
+  At quarter end, the actual vs. target gap determines whether the Quarterly Theme
+  celebration is triggered. The Critical Number is the single most important execution
+  metric each quarter — everything else is context.
+source:
+  book_chapter: "THE DATA"
+  file: "metodologias_parsed/execution_workbook.txt"
+  file_line: 496
+relationships:
+  - type: belongs-to
+    target: decision-execution
+  - type: measured-by
+    target: concept-critical-number
+tags: [execution, metric, critical-number, quarterly, KPI]
+metadata:
+  unit: "varies by quarter (revenue, %, days, units — defined at planning session)"
+  direction: higher_better
+  benchmark: "Target set in Quarterly Planning; celebration triggered at 100% of target"

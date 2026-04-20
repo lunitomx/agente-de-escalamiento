@@ -1,0 +1,31 @@
+id: worksheet-meeting-agenda
+type: worksheet
+name: Meeting Agenda Templates
+name_es: Plantillas de Agenda de Reuniones
+decision: execution
+summary: >
+  Standard agenda templates for each meeting type in the Scaling Up rhythm. Provides
+  consistent structure so meetings start on time, stay focused, and end with clear
+  actions. Templates exist for: Daily Huddle (15 min), Weekly Team Meeting (90 min),
+  Monthly Management Meeting (half day). Having a standard agenda eliminates the "what
+  do we talk about?" problem and ensures critical data is reviewed every time.
+source:
+  file: "scaling_up_llamaparse.txt"
+  file_line: 910
+relationships:
+  - type: belongs-to
+    target: decision-execution
+  - type: implements
+    target: tool-weekly-meeting
+tags: [execution, worksheet, meeting-agenda, daily-huddle, weekly, templates]
+metadata:
+  fields:
+    - "Daily Huddle (15 min): What's up? | Numbers — on/off track? | Where stuck?"
+    - "Weekly Meeting (90 min): Good news (2m) | Numbers (5m) | Rock status (15m) | Customer/employee insights (10m) | Learning topic (15m) | Priority discussion (30m) | Commitments (5m) | Feedback on meeting (3m)"
+    - "Monthly Meeting (half day): KPI review | SWT update | Strategic issue deep-dive | Team development topic"
+    - "Meeting norms: start on time, standing for huddle, no phones, rotate facilitator"
+    - "Action items: owner + deadline for each"
+  output: "Standard meeting agendas + norms that make every meeting productive by default"
+  difficulty: beginner
+  time_estimate: "15 min to customize once; then reused every meeting"
+  frequency: daily

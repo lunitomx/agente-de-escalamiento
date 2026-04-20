@@ -1,0 +1,34 @@
+id: worksheet-kpi-development
+type: worksheet
+name: KPI Development Worksheet
+name_es: Hoja de Desarrollo de KPIs
+decision: execution
+summary: >
+  A structured worksheet for identifying the right 1-2 KPIs per role — one leading
+  indicator and one lagging indicator. Guides the user from role description to
+  outcome definition to leading activity identification. The output is a KPI card
+  for each team member: their lagging metric (what they're ultimately accountable for)
+  and 1-2 leading metrics (activities they track daily/weekly to predict the outcome).
+source:
+  file: "metodologias_parsed/execution_workbook.txt"
+  file_line: 1045
+relationships:
+  - type: belongs-to
+    target: decision-execution
+  - type: implements
+    target: concept-leading-indicators
+tags: [execution, worksheet, KPI, leading-indicator, lagging-indicator, roles]
+metadata:
+  fields:
+    - "Role: person name and function"
+    - "Lagging KPI: the outcome metric (revenue, satisfaction score, units produced)"
+    - "Leading KPI 1: the activity that predicts the lagging result (calls made, on-time %, etc.)"
+    - "Leading KPI 2: secondary predictor (optional)"
+    - "Measurement frequency: daily / weekly"
+    - "Current baseline value"
+    - "Target value for the quarter"
+    - "Where tracked: daily huddle / weekly meeting / scoreboard"
+  output: "KPI card per role: 1 lagging + 1-2 leading indicators with baseline and target"
+  difficulty: intermediate
+  time_estimate: "30-60 min per role"
+  frequency: quarterly

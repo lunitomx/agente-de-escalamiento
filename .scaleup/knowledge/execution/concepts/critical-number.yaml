@@ -1,0 +1,32 @@
+id: concept-critical-number
+type: concept
+name: Critical Number
+name_es: Numero Critico
+decision: execution
+summary: >
+  The single most important metric that, if improved this quarter, will have the greatest
+  impact on the company's performance. The Critical Number focuses the entire organization
+  on one thing at a time. It can be a financial metric (gross margin %) or an operational
+  metric (days to delivery). Every team member should know the company's Critical Number
+  and have a personal Critical Number aligned with it — creating clear line of sight from
+  individual work to company outcome. Tracked weekly, tied to the Quarterly Theme.
+source:
+  book_chapter: "THE DATA"
+  file: "metodologias_parsed/execution_workbook.txt"
+  file_line: 496
+relationships:
+  - type: belongs-to
+    target: decision-execution
+  - type: feeds-into
+    target: concept-quarterly-theme
+  - type: measured-by
+    target: metric-critical-number-value
+  - type: feeds-into
+    target: tool-scoreboard
+tags: [execution, critical-number, KPI, focus, quarterly, alignment]
+metadata:
+  difficulty: beginner
+  application: >
+    At the start of each quarter, identify one Critical Number. Post it everywhere.
+    Every weekly meeting opens with the Critical Number update. Each team member
+    defines their personal Critical Number that feeds the company's.

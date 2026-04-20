@@ -1,0 +1,30 @@
+id: tool-daily-huddle
+type: tool
+name: Daily Huddle
+name_es: Reunion Diaria (Daily Huddle)
+decision: execution
+summary: >
+  A standing 15-minute daily meeting where each team member answers three questions:
+  (1) What's up? (brief personal check-in, 1 sentence), (2) Daily metrics — are they
+  on track or off track? (3) Where are you stuck? (one blocker the team can help with).
+  No problem-solving in the huddle — stuck items get a follow-up meeting with the
+  relevant people only. The daily huddle replaces dozens of ad-hoc interruptions
+  throughout the day. Conducted at the same time, standing up, every business day.
+source:
+  book_chapter: "THE MEETING RHYTHM"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 323
+  workbook_file: "metodologias_parsed/execution_workbook.txt"
+  workbook_line: 501
+relationships:
+  - type: belongs-to
+    target: decision-execution
+  - type: requires
+    target: concept-meeting-rhythm
+  - type: feeds-into
+    target: concept-leading-indicators
+tags: [execution, daily-huddle, meeting, standup, communication, rhythm]
+metadata:
+  difficulty: beginner
+  time_estimate: "15 minutes max, daily"
+  frequency: daily
