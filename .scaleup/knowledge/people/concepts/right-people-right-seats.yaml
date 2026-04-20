@@ -19,7 +19,7 @@ relationships:
   - type: measured-by
     target: metric-employee-satisfaction
   - type: feeds-into
-    target: tool-fac
+    target: tool-face
 tags: [people, hiring, culture, alignment, topgrading]
 metadata:
   difficulty: beginner
