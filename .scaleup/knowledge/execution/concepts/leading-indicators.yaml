@@ -1,0 +1,32 @@
+id: concept-leading-indicators
+type: concept
+name: Leading and Lagging Indicators
+name_es: Indicadores Adelantados y Rezagados
+decision: execution
+summary: >
+  Lagging indicators measure outcomes already achieved (revenue, profit, NPS). Leading
+  indicators measure activities that predict future outcomes (calls made, proposals sent,
+  on-time delivery rate). Scaling Up emphasizes leading indicators because they are
+  actionable — you can change them today. Each role should have 1-2 leading KPIs that
+  predict performance on their lagging metric. The goal: replace reactive management
+  (watching what happened) with proactive management (tracking what will happen).
+source:
+  book_chapter: "THE DATA"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 708
+  workbook_file: "metodologias_parsed/execution_workbook.txt"
+  workbook_line: 1045
+relationships:
+  - type: belongs-to
+    target: decision-execution
+  - type: feeds-into
+    target: tool-scoreboard
+  - type: implements
+    target: worksheet-kpi-development
+tags: [execution, KPI, leading-indicator, lagging-indicator, data, metrics]
+metadata:
+  difficulty: intermediate
+  application: >
+    For each role: identify 1 lagging KPI (what they're ultimately measured on) and
+    1-2 leading KPIs (activities that predict the lagging result). Track leading KPIs
+    in the daily huddle; review lagging KPIs in the weekly team meeting.
