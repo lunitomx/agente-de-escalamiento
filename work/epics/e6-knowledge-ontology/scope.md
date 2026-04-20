@@ -27,7 +27,7 @@ Convertir el contenido extraído de Scaling Up (LlamaParse) en una ontología de
 |----|-------|------|
 | S6.1 | Ontology schema design — tipos de nodo, relaciones, formato YAML | M | done |
 | S6.2 | People decision — ontology population desde LlamaParse | M | done ✓ — 17 nodes, ~75m |
-| S6.3 | Strategy decision — ontology population desde LlamaParse | M |
+| S6.3 | Strategy decision — ontology population desde LlamaParse | M | done ✓ — 18 nodes, ~55m |
 | S6.4 | Execution decision — ontology population desde LlamaParse | M |
 | S6.5 | Cash decision — ontology population desde LlamaParse | M |
 | S6.6 | Cross-decision relationships + worksheet registry | S |
