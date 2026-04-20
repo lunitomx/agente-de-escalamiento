@@ -1,0 +1,36 @@
+id: concept-brand-promise
+type: concept
+name: Brand Promise
+name_es: Promesa de Marca
+decision: strategy
+summary: >
+  A 10-20 word statement of the specific, measurable, and kept promise the company
+  makes to its Core Customer. Not an aspiration — a commitment that can be verified.
+  The best brand promises have a guarantee mechanism (catalytic mechanism) that triggers
+  if the promise is broken, e.g., "delivered in 30 minutes or it's free." In the 7 Strata,
+  brand promises are the second component: they must fill the Core Customer's NEED (not
+  want) and be uniquely deliverable by the company's Differentiating Activities.
+source:
+  book_chapter: "THE 7 STRATA OF STRATEGY"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 822
+  workbook_file: "metodologias_parsed/strategy_workbook.txt"
+  workbook_line: 1284
+relationships:
+  - type: belongs-to
+    target: decision-strategy
+  - type: requires
+    target: concept-core-customer
+  - type: feeds-into
+    target: concept-differentiating-activities
+  - type: feeds-into
+    target: tool-opsp
+  - type: measured-by
+    target: metric-brand-promise-kept-rate
+tags: [strategy, brand, promise, differentiation, customer, guarantee]
+metadata:
+  difficulty: intermediate
+  application: >
+    Test your brand promise: does it fill the Core Customer's NEED (not just a want)?
+    Is it measurable — can you track whether you kept it? Does your Guarantee create
+    real financial risk if broken? If not, it's marketing copy, not a brand promise.

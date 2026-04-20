@@ -1,0 +1,30 @@
+id: tool-x-factor
+type: tool
+name: X-Factor
+name_es: Factor X (Ventaja Subyacente 10x-100x)
+decision: strategy
+summary: >
+  The sixth stratum: a 10x to 100x underlying structural advantage that competitors
+  cannot easily replicate. The X-Factor is not a competitive feature — it is a
+  fundamental asymmetry in the business model, access, or position. Classic example:
+  Outback Steakhouse's X-Factor was dinner-only hours, allowing them to use smaller
+  kitchens profitably. Identifying the X-Factor forces leadership to ask: "What do we
+  have that would take a competitor 10 years and unlimited capital to replicate?"
+source:
+  book_chapter: "THE 7 STRATA OF STRATEGY"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 836
+  workbook_file: "metodologias_parsed/strategy_workbook.txt"
+  workbook_line: 362
+relationships:
+  - type: belongs-to
+    target: decision-strategy
+  - type: feeds-into
+    target: tool-7-strata
+  - type: feeds-into
+    target: tool-opsp
+tags: [strategy, X-Factor, competitive-advantage, moat, differentiation, 7-strata]
+metadata:
+  difficulty: advanced
+  time_estimate: "2-4 hours leadership deep work"
+  frequency: annually

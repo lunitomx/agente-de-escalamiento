@@ -1,0 +1,28 @@
+id: tool-sandbox
+type: tool
+name: Sandbox
+name_es: Caja de Arena Estrategica
+decision: strategy
+summary: >
+  Defines the geographic and demographic boundaries within which the company will
+  compete — WHO you will sell to and WHERE. The Sandbox prevents strategic overreach:
+  companies that try to serve everyone end up serving no one well. A well-defined
+  sandbox is specific enough to be winnable (e.g., "B2B SaaS companies in Mexico City
+  with 50-200 employees") and large enough to achieve the BHAG. In the 7 Strata,
+  sandbox appears in the fourth column of the OPSP alongside differentiating activities.
+source:
+  book_chapter: "THE 7 STRATA OF STRATEGY"
+  file: "metodologias_parsed/strategy_workbook.txt"
+  file_line: 1998
+relationships:
+  - type: belongs-to
+    target: decision-strategy
+  - type: requires
+    target: concept-core-customer
+  - type: feeds-into
+    target: tool-opsp
+tags: [strategy, sandbox, geography, targeting, focus, market]
+metadata:
+  difficulty: intermediate
+  time_estimate: "1-2 hours"
+  frequency: annually
