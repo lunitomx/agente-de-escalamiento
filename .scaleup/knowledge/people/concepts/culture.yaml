@@ -1,0 +1,29 @@
+id: concept-culture
+type: concept
+name: Culture
+name_es: Cultura Organizacional
+decision: people
+summary: >
+  The sum of shared habits, rituals, stories, and symbols that reinforce Core Values.
+  Culture is not a set of rules — it is what people do when no one is watching.
+  Built through consistent actions: onboarding rituals, recognition practices,
+  "actions to live by" for Core Purpose and BHAG. Elements include: symbols,
+  slogans, stories, systems, strategies, staff, and skills.
+source:
+  book_chapter: "THE CORE"
+  file: "metodologias_parsed/people_workbook.txt"
+  file_line: 731
+relationships:
+  - type: belongs-to
+    target: decision-people
+  - type: requires
+    target: concept-core-values
+  - type: measured-by
+    target: metric-employee-satisfaction
+tags: [people, culture, values, onboarding, rituals]
+metadata:
+  difficulty: intermediate
+  application: >
+    Audit culture quarterly: are the stories being told, symbols visible,
+    and rituals practiced? Identify 3 "actions to live by" for Core Purpose
+    and BHAG, then build them into onboarding.
