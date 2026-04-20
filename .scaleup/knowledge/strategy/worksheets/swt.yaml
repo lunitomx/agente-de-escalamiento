@@ -1,0 +1,31 @@
+id: worksheet-swt
+type: worksheet
+name: SWT Analysis Worksheet
+name_es: Hoja de Trabajo de Analisis SWT
+decision: strategy
+summary: >
+  The SWT worksheet guides the leadership team through a structured analysis of
+  internal strengths and weaknesses, and external trends. Unlike SWOT, SWT drops
+  Opportunities (derived from Trends × Strengths) and focuses on what's real now.
+  Output feeds the bottom strip of the OPSP. Usually completed in the annual planning
+  session before setting the year's priorities.
+source:
+  file: "scaling_up_llamaparse.txt"
+  file_line: 3818
+relationships:
+  - type: belongs-to
+    target: decision-strategy
+  - type: implements
+    target: tool-swt
+tags: [strategy, worksheet, SWT, analysis, planning, annual]
+metadata:
+  fields:
+    - "Strengths: top 3-5 internal capabilities that differentiate us"
+    - "Weaknesses: top 3-5 internal gaps that limit growth or create risk"
+    - "Trends: top 3-5 external forces shaping industry (macro, competitive, tech)"
+    - "Key insight: which trends amplify strengths? which expose weaknesses?"
+    - "OPSP input: top 1-2 items per category for the OPSP bottom strip"
+  output: "SWT summary for OPSP + informed annual priorities"
+  difficulty: intermediate
+  time_estimate: "2-3 hours leadership session"
+  frequency: annually

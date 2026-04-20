@@ -1,0 +1,30 @@
+id: concept-core-purpose
+type: concept
+name: Core Purpose
+name_es: Proposito Central
+decision: strategy
+summary: >
+  The fundamental reason the company exists beyond making money — the "why" that
+  keeps hearts engaged. The Core Purpose is the top leader's stump speech: a short,
+  emotionally resonant statement that never changes regardless of market conditions.
+  Distinct from Core Values (the "how") and BHAG (the "what"). A strong Core Purpose
+  answers: "If we disappeared tomorrow, what would the world lose?" In the OPSP,
+  Core Purpose anchors the first column and grounds all strategic decisions.
+source:
+  book_chapter: "THE CORE"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 1496
+relationships:
+  - type: belongs-to
+    target: decision-strategy
+  - type: feeds-into
+    target: tool-opsp
+  - type: feeds-into
+    target: concept-bhag
+tags: [strategy, purpose, mission, why, culture, identity]
+metadata:
+  difficulty: advanced
+  application: >
+    The CEO should be able to deliver the Core Purpose in 60 seconds and have every
+    employee repeat it accurately. If it takes a slide deck to explain, it's not a
+    Core Purpose yet — it's a mission statement. Simplify until it's visceral.

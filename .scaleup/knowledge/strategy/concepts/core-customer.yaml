@@ -1,0 +1,35 @@
+id: concept-core-customer
+type: concept
+name: Core Customer
+name_es: Cliente Central
+decision: strategy
+summary: >
+  A precise, 10-20 word description of the specific real person (not a segment or
+  demographic) who is the ideal buyer for your product or service. The Core Customer
+  has specific wants, needs, and fears — and your product is designed for them, not
+  for everyone. Getting the Core Customer wrong leads to misaligned brand promises,
+  wrong differentiating activities, and a sandbox that is too broad to win in.
+  In the 7 Strata, Core Customer is the first component — it defines who everything
+  else is designed for.
+source:
+  book_chapter: "THE 7 STRATA OF STRATEGY"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 819
+  workbook_file: "metodologias_parsed/strategy_workbook.txt"
+  workbook_line: 767
+relationships:
+  - type: belongs-to
+    target: decision-strategy
+  - type: feeds-into
+    target: concept-brand-promise
+  - type: feeds-into
+    target: tool-sandbox
+  - type: feeds-into
+    target: tool-7-strata
+tags: [strategy, customer, target, persona, segmentation, 7-strata]
+metadata:
+  difficulty: intermediate
+  application: >
+    List your top 5 core customers as real individuals. Extract the 3-5 attributes
+    they share. Draft a 10-20 word description. Test it: does your marketing speak
+    directly to this person? If you're trying to serve everyone, you're serving nobody.

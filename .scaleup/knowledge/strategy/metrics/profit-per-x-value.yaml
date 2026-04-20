@@ -1,0 +1,25 @@
+id: metric-profit-per-x-value
+type: metric
+name: Profit per X Value
+name_es: Valor de Beneficio por X
+decision: strategy
+summary: >
+  The actual measured value of the company's chosen economic engine (Profit per X).
+  Once the "X" is identified (e.g., profit per customer, per location, per transaction),
+  this metric tracks whether the economic engine is improving over time. Rising Profit
+  per X signals that the strategy is producing scalable, efficient growth. Declining
+  Profit per X signals structural deterioration that volume growth may temporarily mask.
+source:
+  book_chapter: "THE 7 STRATA OF STRATEGY"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 3759
+relationships:
+  - type: belongs-to
+    target: decision-strategy
+  - type: measured-by
+    target: tool-profit-per-x
+tags: [strategy, metric, profit-per-X, economic-engine, efficiency, Collins]
+metadata:
+  unit: "currency / X unit (varies by company)"
+  direction: higher_better
+  benchmark: "Compare to industry average Profit per X; target improvement of 10%+ annually"

@@ -1,0 +1,34 @@
+id: worksheet-7-strata
+type: worksheet
+name: 7 Strata of Strategy Worksheet
+name_es: Hoja de Trabajo de los 7 Estratos de Estrategia
+decision: strategy
+summary: >
+  The completable 7 Strata template: seven rows, one per stratum, guiding the
+  leadership team from Core Customer definition all the way to BHAG. Each row
+  includes the stratum description, examples, and blank fields to complete.
+  Completing this worksheet reveals whether the strategy is genuinely differentiated
+  or derivative. The output feeds directly into OPSP columns 2-3.
+source:
+  file: "scaling_up_llamaparse.txt"
+  file_line: 3755
+relationships:
+  - type: belongs-to
+    target: decision-strategy
+  - type: implements
+    target: tool-7-strata
+tags: [strategy, worksheet, 7-strata, differentiation, planning]
+metadata:
+  fields:
+    - "Stratum 1: Core Customer (10-20 word description)"
+    - "Stratum 2: Brand Promises (2-3 promises, each measurable)"
+    - "Stratum 2b: Brand Promise Guarantee (catalytic mechanism)"
+    - "Stratum 3: Differentiating Activities (3-5 unique delivery methods)"
+    - "Stratum 4: One-Phrase Strategy (the overriding strategic theme)"
+    - "Stratum 5: X-Factor (10x-100x underlying advantage)"
+    - "Stratum 6: Profit per X (economic engine metric)"
+    - "Stratum 7: BHAG (10-25 year audacious goal)"
+  output: "Completed strategy definition ready to transfer to OPSP columns 2-3"
+  difficulty: advanced
+  time_estimate: "Full day for leadership team, first time"
+  frequency: annually
