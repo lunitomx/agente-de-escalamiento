@@ -1,0 +1,30 @@
+id: concept-employee-engagement
+type: concept
+name: Employee Engagement
+name_es: Compromiso del Empleado
+decision: people
+summary: >
+  The degree to which employees are emotionally invested in and committed to the
+  company's goals. Gallup data shows managers account for 70% of variance in engagement
+  scores. The two key engagement questions in Scaling Up: "Are they happy?" and
+  "Would you enthusiastically rehire them?" Engagement is the output of great management,
+  clear values, meaningful work, and regular coaching.
+source:
+  book_chapter: "THE MANAGERS (COACHES)"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 3060
+relationships:
+  - type: belongs-to
+    target: decision-people
+  - type: measured-by
+    target: metric-employee-satisfaction
+  - type: requires
+    target: tool-five-manager-activities
+tags: [people, engagement, retention, management, satisfaction]
+metadata:
+  difficulty: beginner
+  application: >
+    Measure weekly via a simple pulse question. Review eNPS quarterly.
+    Engage the Five Manager Activities framework to address root causes
+    of low engagement (usually: unclear expectations, no recognition,
+    wrong role fit, or poor manager behavior).

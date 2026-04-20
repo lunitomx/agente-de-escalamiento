@@ -1,0 +1,31 @@
+id: tool-face
+type: tool
+name: "FACe — Function Accountability Chart"
+name_es: "Grafico de Responsabilidad Funcional (FACe)"
+decision: people
+summary: >
+  A one-page chart that lists every business function (Head of Company, Sales, Finance,
+  Operations, HR, IT, Customer Advocacy, etc.), names one person accountable for each,
+  and defines the leading KPIs for that function. Forces clarity on ownership. The "e"
+  stands for the energy and entrepreneurial spirit the accountable person must bring.
+  Rule: one person per function. If you can't name one person, you have an accountability gap.
+source:
+  book_chapter: "THE LEADERS"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 686
+  workbook_file: "metodologias_parsed/people_workbook.txt"
+  workbook_line: 1217
+relationships:
+  - type: belongs-to
+    target: decision-people
+  - type: requires
+    target: concept-right-people-right-seats
+  - type: implements
+    target: worksheet-face
+  - type: feeds-into
+    target: tool-pace
+tags: [people, accountability, structure, FACe, leadership, functions]
+metadata:
+  difficulty: beginner
+  time_estimate: "2-4 hours first time"
+  frequency: quarterly

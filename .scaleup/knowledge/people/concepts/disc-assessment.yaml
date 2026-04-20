@@ -1,0 +1,29 @@
+id: concept-disc-assessment
+type: concept
+name: DiSC Behavioral Assessment
+name_es: Evaluacion de Comportamiento DiSC
+decision: people
+summary: >
+  A behavioral framework that maps individuals across four dimensions: Dominance (direct,
+  results-driven), Influence (outgoing, enthusiastic), Steadiness (patient, consistent),
+  and Conscientiousness (analytical, precise). Used in Scaling Up to build self-awareness,
+  improve team communication, and design complementary leadership teams. Each style brings
+  distinct value — effective teams need all four.
+source:
+  book_chapter: "THE TEAM"
+  file: "metodologias_parsed/people_workbook.txt"
+  file_line: 1923
+relationships:
+  - type: belongs-to
+    target: decision-people
+  - type: feeds-into
+    target: concept-love-loathe
+  - type: feeds-into
+    target: tool-team-assessment
+tags: [people, assessment, behavior, communication, teamwork, DiSC]
+metadata:
+  difficulty: beginner
+  application: >
+    Complete DiSC for each leadership team member. Use results in one-on-ones
+    to adapt coaching style. Reference when designing team composition and
+    assigning roles that fit natural strengths.

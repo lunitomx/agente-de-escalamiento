@@ -11,13 +11,15 @@ summary: >
 source:
   book_chapter: "THE TEAM"
   book_line: 1972
+  file: "scaling_up_llamaparse.txt"
+  file_line: 667
 relationships:
   - type: belongs-to
     target: decision-people
   - type: measured-by
     target: metric-employee-satisfaction
   - type: feeds-into
-    target: tool-fac
+    target: tool-face
 tags: [people, hiring, culture, alignment, topgrading]
 metadata:
   difficulty: beginner
