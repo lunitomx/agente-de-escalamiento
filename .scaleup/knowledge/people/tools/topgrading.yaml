@@ -1,0 +1,29 @@
+id: tool-topgrading
+type: tool
+name: Topgrading
+name_es: Topgrading — Contratacion de A-Players
+decision: people
+summary: >
+  A rigorous hiring methodology developed by Brad Smart focused on identifying and
+  attracting A-players — the top 10% of talent available at a given compensation level.
+  Core practice: the Topgrading Interview, a chronological deep-dive through a candidate's
+  entire career asking consistent questions about each role (responsibilities, successes,
+  failures, relationships with managers). Reduces mis-hires by forcing candidates to be
+  truthful about their track record. Pair with reference checks from managers the candidate
+  reports to, not just peers.
+source:
+  book_chapter: "THE TEAM"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 739
+relationships:
+  - type: belongs-to
+    target: decision-people
+  - type: requires
+    target: concept-core-values
+  - type: measured-by
+    target: metric-rehire-rate
+tags: [people, hiring, topgrading, A-players, interview, talent]
+metadata:
+  difficulty: advanced
+  time_estimate: "3-4 hours per candidate interview"
+  frequency: "per hire"

@@ -1,0 +1,25 @@
+id: tool-pace
+type: tool
+name: "PACe — Process Accountability Chart"
+name_es: "Grafico de Responsabilidad de Procesos (PACe)"
+decision: people
+summary: >
+  A companion to FACe that maps horizontal business processes — the workflows that cut
+  across functional silos. Lists each key process, the person accountable for the end-to-end
+  outcome, and the process KPIs. While FACe shows vertical accountability (who owns each
+  function), PACe reveals horizontal accountability (who owns each value-creating flow).
+  The "e" stands for the same energy as in FACe.
+source:
+  book_chapter: "THE LEADERS"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 719
+relationships:
+  - type: belongs-to
+    target: decision-people
+  - type: requires
+    target: tool-face
+tags: [people, accountability, processes, PACe, workflow, cross-functional]
+metadata:
+  difficulty: intermediate
+  time_estimate: "3-5 hours first time"
+  frequency: quarterly
