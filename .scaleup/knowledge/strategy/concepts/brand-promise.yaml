@@ -27,6 +27,8 @@ relationships:
     target: tool-opsp
   - type: measured-by
     target: metric-brand-promise-kept-rate
+  - type: measured-by
+    target: metric-days-sales-outstanding
 tags: [strategy, brand, promise, differentiation, customer, guarantee]
 metadata:
   difficulty: intermediate

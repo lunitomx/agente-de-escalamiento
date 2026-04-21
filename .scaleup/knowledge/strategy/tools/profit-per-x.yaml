@@ -25,6 +25,10 @@ relationships:
     target: tool-opsp
   - type: measured-by
     target: metric-profit-per-x-value
+  - type: requires
+    target: concept-gross-margin
+  - type: requires
+    target: concept-revenue-per-employee
 tags: [strategy, profit-per-X, economic-engine, Collins, BHAG, 7-strata]
 metadata:
   difficulty: advanced

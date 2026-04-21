@@ -1,0 +1,220 @@
+id: registry-worksheets
+type: registry
+name: Worksheet Registry
+name_es: Registro de Hojas de Trabajo
+description: >
+  Central index of all 15 worksheets across the 4 Scaling Up decisions.
+  Enables deterministic lookup by decision, prerequisite, or output type.
+total_worksheets: 15
+worksheets:
+
+  # ── PEOPLE (4) ─────────────────────────────────────────────────────────────
+
+  - id: worksheet-face
+    decision: people
+    name: FACE Worksheet
+    node_path: people/worksheets/face.yaml
+    prerequisites: []
+    outputs:
+      - role-fit-score
+      - values-alignment-score
+    difficulty: intermediate
+    time_estimate: "2-4 hours per role"
+    frequency: quarterly
+    tags: [people, hiring, fit, accountability]
+
+  - id: worksheet-love-loathe
+    decision: people
+    name: Love/Loathe Worksheet
+    node_path: people/worksheets/love-loathe.yaml
+    prerequisites: [worksheet-face]
+    outputs:
+      - role-redesign recommendations
+      - delegation candidates
+    difficulty: beginner
+    time_estimate: "1-2 hours per person"
+    frequency: semi-annual
+    tags: [people, energy, delegation, role-design]
+
+  - id: worksheet-oppp
+    decision: people
+    name: One-Page Personal Plan (OPPP) Worksheet
+    node_path: people/worksheets/oppp.yaml
+    prerequisites: [worksheet-face, worksheet-love-loathe]
+    outputs:
+      - personal-development plan per employee
+      - quarterly personal rocks
+    difficulty: intermediate
+    time_estimate: "2-3 hours per employee"
+    frequency: quarterly
+    tags: [people, development, personal-plan, accountability]
+
+  - id: worksheet-team-growth
+    decision: people
+    name: Team Growth Assessment Worksheet
+    node_path: people/worksheets/team-growth.yaml
+    prerequisites: [worksheet-face]
+    outputs:
+      - team maturity score
+      - hiring priorities
+    difficulty: intermediate
+    time_estimate: "2 hours"
+    frequency: annual
+    tags: [people, team, growth, hiring]
+
+  # ── STRATEGY (4) ───────────────────────────────────────────────────────────
+
+  - id: worksheet-opsp
+    decision: strategy
+    name: One-Page Strategic Plan (OPSP) Worksheet
+    node_path: strategy/worksheets/opsp.yaml
+    prerequisites:
+      - worksheet-face
+      - worksheet-swt
+    outputs:
+      - completed OPSP with BHAG, 3-5 year targets, annual priorities
+      - company Rocks for the quarter
+    difficulty: advanced
+    time_estimate: "4-8 hours first time; 2-4 hours quarterly update"
+    frequency: quarterly
+    tags: [strategy, planning, alignment, BHAG, OPSP]
+
+  - id: worksheet-swt
+    decision: strategy
+    name: SWT Analysis Worksheet
+    node_path: strategy/worksheets/swt.yaml
+    prerequisites: []
+    outputs:
+      - strengths inventory
+      - weaknesses to address
+      - trends affecting the business
+    difficulty: intermediate
+    time_estimate: "2-4 hours"
+    frequency: annual
+    tags: [strategy, SWT, strengths, weaknesses, trends]
+
+  - id: worksheet-7-strata
+    decision: strategy
+    name: 7 Strata of Strategy Worksheet
+    node_path: strategy/worksheets/7-strata.yaml
+    prerequisites: [worksheet-swt]
+    outputs:
+      - completed 7-strata map
+      - brand promise with guarantee
+      - differentiating activities identified
+    difficulty: advanced
+    time_estimate: "Full day"
+    frequency: annual
+    tags: [strategy, differentiation, brand-promise, competitive-moat]
+
+  - id: worksheet-core-customer
+    decision: strategy
+    name: Core Customer Worksheet
+    node_path: strategy/worksheets/core-customer.yaml
+    prerequisites: []
+    outputs:
+      - core customer profile
+      - demographic and psychographic data
+      - key needs and decision drivers
+    difficulty: intermediate
+    time_estimate: "2-3 hours"
+    frequency: annual
+    tags: [strategy, customer, segmentation, targeting]
+
+  # ── EXECUTION (4) ──────────────────────────────────────────────────────────
+
+  - id: worksheet-rockefeller-habits
+    decision: execution
+    name: Rockefeller Habits Checklist Worksheet
+    node_path: execution/worksheets/rockefeller-habits.yaml
+    prerequisites: [worksheet-opsp]
+    outputs:
+      - habits score (0-10 per habit)
+      - priority habit to improve this quarter
+    difficulty: beginner
+    time_estimate: "30 minutes"
+    frequency: quarterly
+    tags: [execution, habits, alignment, accountability, checklist]
+
+  - id: worksheet-quarterly-priorities
+    decision: execution
+    name: Quarterly Priorities and Rocks Worksheet
+    node_path: execution/worksheets/quarterly-priorities.yaml
+    prerequisites: [worksheet-opsp, worksheet-rockefeller-habits]
+    outputs:
+      - company Critical Number for the quarter
+      - 3-5 company Rocks with owners and deadlines
+      - Quarterly Theme
+    difficulty: intermediate
+    time_estimate: "2-4 hours (quarterly planning session)"
+    frequency: quarterly
+    tags: [execution, rocks, priorities, critical-number, planning]
+
+  - id: worksheet-kpi-development
+    decision: execution
+    name: KPI Development Worksheet
+    node_path: execution/worksheets/kpi-development.yaml
+    prerequisites: [worksheet-quarterly-priorities]
+    outputs:
+      - 1-2 KPIs per role (leading + lagging)
+      - scoreboard template
+    difficulty: intermediate
+    time_estimate: "1-2 hours per team"
+    frequency: annual or when roles change
+    tags: [execution, KPI, metrics, leading-indicators, scoreboard]
+
+  - id: worksheet-meeting-agenda
+    decision: execution
+    name: Meeting Rhythm Agenda Templates Worksheet
+    node_path: execution/worksheets/meeting-agenda.yaml
+    prerequisites: [worksheet-rockefeller-habits]
+    outputs:
+      - daily huddle agenda (15 min)
+      - weekly meeting agenda (60-90 min)
+      - monthly meeting agenda (half day)
+    difficulty: beginner
+    time_estimate: "1-2 hours to customize"
+    frequency: one-time setup; review quarterly
+    tags: [execution, meetings, rhythm, huddle, agenda]
+
+  # ── CASH (3) ───────────────────────────────────────────────────────────────
+
+  - id: worksheet-ccc
+    decision: cash
+    name: Cash Conversion Cycle Worksheet
+    node_path: cash/worksheets/ccc-worksheet.yaml
+    prerequisites: []
+    outputs:
+      - total CCC in days
+      - breakdown by sub-cycle (sales, delivery, collection)
+    difficulty: intermediate
+    time_estimate: "1-2 hours"
+    frequency: quarterly
+    tags: [cash, CCC, cycle, optimization]
+
+  - id: worksheet-power-of-one
+    decision: cash
+    name: Power of One Worksheet
+    node_path: cash/worksheets/power-of-one.yaml
+    prerequisites: [worksheet-ccc]
+    outputs:
+      - ranked lever impact table
+      - selected focus lever for the quarter
+    difficulty: intermediate
+    time_estimate: "2-3 hours"
+    frequency: quarterly
+    tags: [cash, power-of-one, levers, EBIT, impact]
+
+  - id: worksheet-cash-flow-forecast
+    decision: cash
+    name: 13-Week Cash Flow Forecast Worksheet
+    node_path: cash/worksheets/cash-flow-forecast.yaml
+    prerequisites: [worksheet-ccc, worksheet-power-of-one]
+    outputs:
+      - 13-week cash projection
+      - identified cash gap weeks
+      - action plan for low-cash periods
+    difficulty: advanced
+    time_estimate: "3-4 hours initial; 30 min weekly update"
+    frequency: weekly
+    tags: [cash, forecast, cash-flow, planning, 13-week]

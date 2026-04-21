@@ -23,6 +23,8 @@ relationships:
     target: metric-critical-number-value
   - type: feeds-into
     target: tool-scoreboard
+  - type: requires
+    target: tool-power-of-one
 tags: [execution, critical-number, KPI, focus, quarterly, alignment]
 metadata:
   difficulty: beginner

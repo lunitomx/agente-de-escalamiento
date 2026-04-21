@@ -20,6 +20,8 @@ relationships:
     target: metric-employee-satisfaction
   - type: feeds-into
     target: tool-face
+  - type: feeds-into
+    target: concept-priorities-rocks
 tags: [people, hiring, culture, alignment, topgrading]
 metadata:
   difficulty: beginner

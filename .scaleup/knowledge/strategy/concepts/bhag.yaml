@@ -23,6 +23,8 @@ relationships:
     target: tool-opsp
   - type: measured-by
     target: metric-revenue-growth-rate
+  - type: feeds-into
+    target: concept-priorities-rocks
 tags: [strategy, BHAG, vision, long-term, Collins, purpose]
 metadata:
   difficulty: advanced
