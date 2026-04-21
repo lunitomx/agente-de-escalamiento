@@ -29,6 +29,10 @@ relationships:
     target: tool-swt
   - type: implements
     target: worksheet-opsp
+  - type: requires
+    target: concept-right-people-right-seats
+  - type: feeds-into
+    target: tool-quarterly-planning
 tags: [strategy, planning, quarterly, annual, alignment, OPSP]
 metadata:
   difficulty: advanced

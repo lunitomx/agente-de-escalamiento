@@ -23,6 +23,8 @@ relationships:
     target: worksheet-rockefeller-habits
   - type: measured-by
     target: metric-meeting-health-score
+  - type: requires
+    target: tool-face
 tags: [execution, rockefeller-habits, checklist, accountability, alignment]
 metadata:
   difficulty: beginner

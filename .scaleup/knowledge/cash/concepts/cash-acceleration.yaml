@@ -24,6 +24,8 @@ relationships:
     target: concept-ccc
   - type: feeds-into
     target: tool-ar-optimization
+  - type: requires
+    target: concept-priorities-rocks
 tags: [cash, acceleration, CCC, collection, pricing, business-model]
 metadata:
   difficulty: advanced

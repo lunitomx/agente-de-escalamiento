@@ -23,6 +23,8 @@ relationships:
     target: tool-scoreboard
   - type: implements
     target: worksheet-kpi-development
+  - type: feeds-into
+    target: metric-gross-margin-percentage
 tags: [execution, KPI, leading-indicator, lagging-indicator, data, metrics]
 metadata:
   difficulty: intermediate

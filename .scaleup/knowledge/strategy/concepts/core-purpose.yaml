@@ -21,6 +21,8 @@ relationships:
     target: tool-opsp
   - type: feeds-into
     target: concept-bhag
+  - type: feeds-into
+    target: concept-culture
 tags: [strategy, purpose, mission, why, culture, identity]
 metadata:
   difficulty: advanced
