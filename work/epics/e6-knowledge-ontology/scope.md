@@ -31,7 +31,7 @@ Convertir el contenido extraído de Scaling Up (LlamaParse) en una ontología de
 | S6.4 | Execution decision — ontology population desde LlamaParse | M | done ✓ — 18 nodes, ~50m |
 | S6.5 | Cash decision — ontology population desde LlamaParse | M | done ✓ — 17 nodes, ~45m |
 | S6.6 | Cross-decision relationships + worksheet registry | S | done ✓ — 12 edges, 15 worksheets, 79 IDs |
-| S6.7 | Deterministic retrieval engine | M |
+| S6.7 | Deterministic retrieval engine | M | done ✓ — KnowledgeGraph, 301 edges, all queries verified |
 
 ## Done Criteria
 
