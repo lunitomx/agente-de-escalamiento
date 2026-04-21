@@ -10,7 +10,10 @@ summary: >
 source:
   book_chapter: "Cash Conversion Cycle (CCC)"
   book_line: 5960
-  workbook: cash_workbook.md
+  file: "scaling_up_llamaparse.txt"
+  file_line: 5960
+  workbook_file: "metodologias_parsed/cash_workbook.txt"
+  workbook_line: 608
 relationships:
   - type: belongs-to
     target: decision-cash

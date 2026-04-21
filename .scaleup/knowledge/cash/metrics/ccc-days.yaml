@@ -1,0 +1,25 @@
+id: metric-ccc-days
+type: metric
+name: CCC Days
+name_es: Dias del Ciclo de Conversion de Efectivo
+decision: cash
+summary: >
+  Total days in the Cash Conversion Cycle: Sales Cycle days + Delivery Cycle days +
+  Billing & Payment Cycle days. The single most important cash efficiency metric.
+  World-class companies achieve zero or negative CCC (customers pay before costs are
+  incurred). Every 10-day reduction in CCC frees working capital equal to 10 days of
+  revenue — often hundreds of thousands of dollars that can fund growth without borrowing.
+source:
+  book_chapter: "SCALING UP CASH"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 1029
+relationships:
+  - type: belongs-to
+    target: decision-cash
+  - type: measured-by
+    target: concept-ccc
+tags: [cash, metric, CCC, days, working-capital, efficiency]
+metadata:
+  unit: days
+  direction: lower_better
+  benchmark: "Industry-leading: 0-15 days; average: 30-60 days; over 90 days signals serious cash risk"

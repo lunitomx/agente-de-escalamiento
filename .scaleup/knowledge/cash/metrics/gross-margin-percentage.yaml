@@ -1,0 +1,26 @@
+id: metric-gross-margin-percentage
+type: metric
+name: Gross Margin Percentage
+name_es: Porcentaje de Margen Bruto
+decision: cash
+summary: >
+  Gross profit divided by revenue, expressed as a percentage. The Simple Numbers
+  framework treats gross margin % as the key structural health indicator: if GM% is
+  declining, the business model is deteriorating regardless of revenue growth. Every
+  pricing decision, cost reduction, and product mix change affects GM%. Growing
+  companies must protect GM% as they scale — operational efficiency gains should
+  flow to the bottom line, not be consumed by revenue growth costs.
+source:
+  book_chapter: "SCALING UP CASH"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 1627
+relationships:
+  - type: belongs-to
+    target: decision-cash
+  - type: measured-by
+    target: concept-gross-margin
+tags: [cash, metric, gross-margin, profitability, Simple-Numbers, health]
+metadata:
+  unit: percentage
+  direction: higher_better
+  benchmark: "Varies by industry: SaaS 70%+, professional services 50%+, manufacturing 30%+, retail 25%+"

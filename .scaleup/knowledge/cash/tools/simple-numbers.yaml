@@ -1,0 +1,28 @@
+id: tool-simple-numbers
+type: tool
+name: Simple Numbers Framework
+name_es: Marco de Numeros Simples (Simple Numbers)
+decision: cash
+summary: >
+  A financial management framework by Greg Crabtree (co-author of Scaling Up Cash
+  chapter) that simplifies business finance to four key numbers: Revenue, Gross Margin,
+  Operating Expenses, and Net Profit (EBIT). The framework strips out non-operating
+  noise and focuses leaders on labor efficiency: labor as a percentage of gross margin
+  dollars. Simple Numbers also establishes the 10% pre-tax profit rule: any business
+  that cannot sustain 10% pre-tax profit is structurally broken and cannot fund growth.
+source:
+  book_chapter: "SCALING UP CASH"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 8291
+relationships:
+  - type: belongs-to
+    target: decision-cash
+  - type: requires
+    target: concept-gross-margin
+  - type: requires
+    target: concept-revenue-per-employee
+tags: [cash, Simple-Numbers, Crabtree, profit, gross-margin, labor-efficiency, EBIT]
+metadata:
+  difficulty: intermediate
+  time_estimate: "Half day to restructure P&L into Simple Numbers format"
+  frequency: monthly
