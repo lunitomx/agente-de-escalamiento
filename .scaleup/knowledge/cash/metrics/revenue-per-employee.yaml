@@ -1,0 +1,25 @@
+id: metric-revenue-per-employee
+type: metric
+name: Revenue per Employee
+name_es: Ingresos por Empleado
+decision: cash
+summary: >
+  Total annualized revenue divided by total headcount (full-time equivalents).
+  A proxy for labor productivity and scaling efficiency. Declining revenue per employee
+  means the company is hiring faster than it is growing — a leading indicator of
+  future cash pressure. Simple Numbers uses this metric alongside gross margin per
+  employee to diagnose whether growth is value-creating or value-destroying.
+source:
+  book_chapter: "SCALING UP CASH"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 3132
+relationships:
+  - type: belongs-to
+    target: decision-cash
+  - type: measured-by
+    target: concept-revenue-per-employee
+tags: [cash, metric, revenue-per-employee, efficiency, headcount, scaling]
+metadata:
+  unit: "currency / employee (annual)"
+  direction: higher_better
+  benchmark: "Varies: services $150K+, SaaS $200K+, manufacturing $250K+. Trend matters more than absolute."

@@ -1,0 +1,28 @@
+id: tool-ar-optimization
+type: tool
+name: Accounts Receivable Optimization
+name_es: Optimizacion de Cuentas por Cobrar
+decision: cash
+summary: >
+  A set of practices to reduce the number of days customers take to pay (DSO — Days
+  Sales Outstanding). Key levers: (1) require deposits or upfront payment before
+  starting work, (2) invoice immediately upon delivery (not end of month), (3) offer
+  early-payment discounts (e.g., 2% net-10), (4) automate payment reminders at day 15,
+  30, 45, (5) implement ACH/credit card payment to eliminate check delays. Every 10-day
+  reduction in DSO frees significant working capital — often more than a revenue increase.
+source:
+  book_chapter: "SCALING UP CASH"
+  file: "metodologias_parsed/cash_workbook.txt"
+  file_line: 963
+relationships:
+  - type: belongs-to
+    target: decision-cash
+  - type: requires
+    target: concept-cash-acceleration
+  - type: measured-by
+    target: metric-days-sales-outstanding
+tags: [cash, accounts-receivable, DSO, collection, working-capital, optimization]
+metadata:
+  difficulty: beginner
+  time_estimate: "1-2 hours to identify improvements; ongoing implementation"
+  frequency: monthly

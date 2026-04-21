@@ -1,0 +1,34 @@
+id: concept-ccc
+type: concept
+name: Cash Conversion Cycle (CCC)
+name_es: Ciclo de Conversion de Efectivo (CCC)
+decision: cash
+summary: >
+  The number of days between when the company spends a dollar and when it gets that
+  dollar back. Broken into three sub-cycles: Sales Cycle (first contact to signed deal),
+  Delivery Cycle (start of work to delivery), and Billing & Payment Cycle (invoice to
+  cash received). The goal is to minimize total CCC days — ideally to zero or negative
+  (collect before you deliver). A shorter CCC means the business generates its own
+  growth capital without external financing.
+source:
+  book_chapter: "SCALING UP CASH"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 1029
+  workbook_file: "metodologias_parsed/cash_workbook.txt"
+  workbook_line: 608
+relationships:
+  - type: belongs-to
+    target: decision-cash
+  - type: measured-by
+    target: metric-ccc-days
+  - type: implements
+    target: worksheet-ccc
+  - type: feeds-into
+    target: tool-power-of-one
+tags: [cash, CCC, cash-conversion-cycle, days, working-capital, acceleration]
+metadata:
+  difficulty: intermediate
+  application: >
+    Map your CCC quarterly: sales cycle days + delivery cycle days + billing days.
+    Focus improvement on the longest sub-cycle first. Target: reduce total CCC by
+    10+ days per quarter until you reach industry-leading performance.
