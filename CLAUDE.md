@@ -69,6 +69,12 @@ Cada decisión se evalúa en escala 1-5:
 
 ## Comandos disponibles
 
+### Sesión
+| Comando | Qué hace |
+|---------|----------|
+| `/scaleup-start` | Carga contexto de empresa, sesiones recientes y tareas abiertas |
+| `/scaleup-close` | Cierra la sesión y guarda registro con lo trabajado |
+
 ### Inicio
 | Comando | Qué hace |
 |---------|----------|

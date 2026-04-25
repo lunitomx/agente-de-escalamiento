@@ -1,0 +1,57 @@
+---
+name: scaleup-close-capture
+description: 'Collect session activity data from user. Sub-skill of /scaleup-close.'
+---
+
+# Capture Session Activity
+
+## Purpose
+
+Ask the user what was accomplished during the session and collect structured data. Sub-skill of `/scaleup-close`.
+
+## Steps
+
+### Step 1: Ask About Decision Focus
+
+Ask conversationally:
+
+> "¿En qué decisión trabajamos hoy? (People / Strategy / Execution / Cash)"
+
+Accept the answer. If unclear, infer from the tools/worksheets used during the session.
+
+### Step 2: Ask About Worksheets
+
+> "¿Trabajamos algún worksheet o herramienta específica?"
+
+Examples: Core Values, OPSP, CCC, Rockefeller Habits, etc.
+
+### Step 3: Ask About Tasks
+
+> "¿Creamos tareas nuevas? ¿Completamos alguna existente?"
+
+Collect task descriptions for created and completed tasks.
+
+### Step 4: Ask About Duration
+
+> "¿Cuánto tiempo llevó la sesión aproximadamente? (en minutos)"
+
+If the user doesn't know, estimate based on conversation length.
+
+### Step 5: Produce Structured Output
+
+Compile into structured data:
+
+```yaml
+decision_focus: people
+duration_minutes: 45
+worksheets_completed: [core-values-worksheet]
+tasks_created: [validar-valores-con-equipo]
+tasks_completed: []
+notes:
+  - Discussed core values candidates
+  - Identified 3 potential values
+```
+
+## Output
+
+Structured capture data for the session log writer.
