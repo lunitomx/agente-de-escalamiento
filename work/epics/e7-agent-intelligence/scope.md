@@ -95,11 +95,11 @@ S7.3 y S7.6 son independientes entre sí y de S7.4. Pueden ejecutarse en paralel
 | Story | Size | Status | Started | Completed | Notes |
 |-------|------|--------|---------|-----------|-------|
 | S7.1 | M | done | 2026-04-25 | 2026-04-25 | Walking skeleton, 11 components, 18 tests |
-| S7.2 | M | pending | — | — | — |
-| S7.4 | M | pending | — | — | — |
-| S7.3 | S | pending | — | — | — |
-| S7.5 | M | pending | — | — | — |
-| S7.6 | S | pending | — | — | — |
+| S7.2 | M | done | 2026-04-25 | 2026-04-25 | YAML source of truth, markdown renderer, 13 tests |
+| S7.4 | M | done | 2026-04-25 | 2026-04-25 | Task board, ontology links, overdue detection, 10 tests |
+| S7.3 | S | done | 2026-04-25 | 2026-04-25 | SMART goal skill |
+| S7.5 | M | done | 2026-04-25 | 2026-04-25 | Accountability loop in session start |
+| S7.6 | S | done | 2026-04-25 | 2026-04-25 | Company knowledge graph, 4 context categories |
 
 ### Sequencing Risks
 
@@ -111,9 +111,18 @@ S7.3 y S7.6 son independientes entre sí y de S7.4. Pueden ejecutarse en paralel
 
 ## Done Criteria
 
-- [ ] Agente recuerda contexto de empresa entre sesiones sin re-preguntar
-- [ ] Session start carga contexto completo en < 5 segundos
-- [ ] Task board persiste entre sesiones, trackea decisión por tarea
-- [ ] Meta anual visible en toda interacción de coaching
-- [ ] Accountability loop se activa automáticamente al iniciar sesión
-- [ ] Knowledge graph de empresa almacena hechos estructurados
+- [x] Agente recuerda contexto de empresa entre sesiones sin re-preguntar
+- [x] Session start carga contexto completo en < 5 segundos
+- [x] Task board persiste entre sesiones, trackea decisión por tarea
+- [x] Meta anual visible en toda interacción de coaching
+- [x] Accountability loop se activa automáticamente al iniciar sesión
+- [x] Knowledge graph de empresa almacena hechos estructurados
+
+## Epic Closed
+
+**Date:** 2026-04-25
+**Duration:** 1 session
+**Stories:** 6/6 done
+**Tests:** 41 passing
+**Components:** 16 skills, 3 Python validators, 4 context files
+**Pattern:** Orchestration (ADR-0) proven — skills as focused units, quality gates in code

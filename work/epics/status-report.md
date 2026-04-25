@@ -10,8 +10,8 @@
 ```
 E3 Agent Framework          ████████████████████ DONE
 E6 Knowledge Ontology       ████████████████████ DONE (7/7)
-E7 Agent Intelligence       ░░░░░░░░░░░░░░░░░░░ IN PROGRESS
-E8 Coaching Engine           ░░░░░░░░░░░░░░░░░░░ planned
+E7 Agent Intelligence       ████████████████████ DONE (6/6)
+E8 Coaching Engine           ░░░░░░░░░░░░░░░░░░░ NEXT
 E9 Value-Add Features        ░░░░░░░░░░░░░░░░░░░ planned
 E4 Validation & Testing      ░░░░░░░░░░░░░░░░░░░ planned
 E5 Distribution              ░░░░░░░░░░░░░░░░░░░ planned
@@ -37,16 +37,18 @@ E5 Distribution              ░░░░░░░░░░░░░░░░░
 
 ## En progreso
 
-### E7 — Agent Intelligence (0/6 stories)
+### E7 — Agent Intelligence (DONE — 6/6 stories)
 
 | Story | Qué | Size | Status |
 |-------|-----|------|--------|
-| S7.1 | Session lifecycle (`/scaleup-start`, `/scaleup-close`) | M | pending |
-| S7.2 | Persistent memory (perfil, scores, worksheets, historial) | M | pending |
-| S7.3 | SMART annual goal como filtro estratégico | S | pending |
-| S7.4 | Task board (kanban en markdown) | M | pending |
-| S7.5 | Accountability loop (seguimiento de compromisos) | M | pending |
-| S7.6 | Company knowledge graph | S | pending |
+| S7.1 | Session lifecycle — orchestrator + sub-skills + validators | M | done |
+| S7.2 | Persistent memory — YAML source of truth + markdown renderer | M | done |
+| S7.3 | SMART annual goal como filtro estratégico | S | done |
+| S7.4 | Task board — kanban con ontology links + code validators | M | done |
+| S7.5 | Accountability loop — auto-review overdue tasks | M | done |
+| S7.6 | Company knowledge graph — structured facts by category | S | done |
+
+**Delivered:** 16 skills, 3 Python validator modules, 41 tests, orchestration pattern (ADR-0) proven.
 
 ## Principios de arquitectura
 
