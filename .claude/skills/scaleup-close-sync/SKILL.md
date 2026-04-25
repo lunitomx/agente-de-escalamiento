@@ -1,34 +1,46 @@
 ---
 name: scaleup-close-sync
-description: 'Ensure session infrastructure exists. Sub-skill of /scaleup-close. STUB — full sync in S7.2.'
+description: 'Sync YAML to markdown views on session close. Sub-skill of /scaleup-close.'
 ---
 
-# Sync Session State (STUB)
+# Sync State to Markdown Views
 
 ## Purpose
 
-Verify that session infrastructure is in place after writing the log. Sub-skill of `/scaleup-close`.
-
-**Note:** This is a stub for S7.1. Full YAML-to-markdown rendering of company profile and state files is deferred to S7.2 (Persistent Memory).
+Generate human-readable markdown files from YAML source of truth. Sub-skill of `/scaleup-close`.
 
 ## Steps
 
-### Step 1: Verify Sessions Directory
+### Step 1: Render Company Profile
+
+Run the Python renderer:
 
 ```bash
-ls -la .scaleup/my-company/sessions/ 2>/dev/null
+python3 -c "
+import sys, pathlib
+sys.path.insert(0, str(pathlib.Path('.scaleup/agent')))
+from validators.memory import render_profile_markdown
+md = render_profile_markdown(pathlib.Path('.scaleup/agent/memory/company-profile.yaml'))
+pathlib.Path('.scaleup/my-company/profile.md').write_text(md)
+print('Profile rendered')
+"
 ```
 
-Confirm the directory exists and contains the session log just written.
+This overwrites `.scaleup/my-company/profile.md` with a clean render from the YAML.
 
-### Step 2: Verify Log File
+### Step 2: Verify Files
 
-Confirm the session log file exists and is non-empty.
+Confirm that the following files exist and are non-empty:
+- `.scaleup/my-company/profile.md` — rendered from YAML
+- `.scaleup/my-company/sessions/` — contains at least today's session log
 
 ### Step 3: Report
 
-Report that session data has been saved successfully.
+Report which files were synced.
 
 ## Output
 
-Confirmation that session log was persisted.
+| Item | Destination |
+|------|-------------|
+| Company profile markdown | `.scaleup/my-company/profile.md` |
+| Verification | Files exist and are non-empty |
