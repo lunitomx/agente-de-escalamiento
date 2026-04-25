@@ -1,0 +1,55 @@
+---
+description: 'Sub-agente Strategy. Guía la decisión de Estrategia: core values, BHAG,
+  brand promise, OPSP, 7 Strata.'
+name: scaleup-strategy
+---
+
+# ScaleUp Strategy
+
+## Purpose
+
+Entry point del sub-agente de Strategy. Evalúa madurez estratégica, verifica prerequisitos y guía hacia la herramienta correcta.
+
+## Context
+
+**When to use:** Cuando el diagnóstico ruta a Strategy, o el usuario quiere trabajar en estrategia.
+
+## Steps
+
+### Step 1: Load Context
+
+Leer:
+- `.scaleup/agent/sub-agents/strategy.md`
+- `.scaleup/agent/memory/company-profile.yaml`
+- `.scaleup/knowledge/strategy/overview.md`
+
+### Step 2: Check Existing Work & Prerequisites
+
+```bash
+ls work/strategy/ 2>/dev/null
+ls work/people/ 2>/dev/null
+```
+
+Verificar que People tiene base mínima (score >= 2). Si no, sugerir volver a People primero.
+
+### Step 3: Recommend Next Tool
+
+| Estado | Recomendación |
+|--------|--------------|
+| Sin Core Values | `/scaleup-people-values` primero (prerequisito) |
+| Core Values listos, sin OPSP | `/scaleup-strategy-opsp` — One-Page Strategic Plan |
+| OPSP básico listo | `/scaleup-strategy-7strata` — profundizar diferenciación |
+| Todo hecho | SWOT/SWT para refinar |
+
+El OPSP es la pieza central de Strategy. Todo lo demás alimenta al OPSP.
+
+### Step 4: Guide
+
+Siempre conectar: "La estrategia debe caber en una página. Si no puedes explicarla simple, no está clara."
+
+## Output
+
+| Item | Destination |
+|------|-------------|
+| Work artifacts | `work/strategy/` |
+| Next | Skill específico de Strategy |

@@ -10,6 +10,11 @@ AGENTS.md
 
 # === Source Materials ===
 *.pdf
+*.docx
+*.pptx
+
+# === Client Data (never commit) ===
+data/
 
 # === Build Artifacts ===
 build/
@@ -30,3 +35,9 @@ Thumbs.db
 # === IDE ===
 .vscode/
 .idea/
+
+# === Claude Code local settings (per-developer) ===
+.claude/settings.local.json
+
+# RaiSE personal directory (per-developer, not shared)
+.raise/rai/personal/

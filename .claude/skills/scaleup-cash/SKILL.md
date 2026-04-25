@@ -1,0 +1,52 @@
+---
+description: 'Sub-agente Cash. Guía la decisión de Cash: Cash Conversion Cycle, Power
+  of One, cash acceleration strategies.'
+name: scaleup-cash
+---
+
+# ScaleUp Cash
+
+## Purpose
+
+Entry point del sub-agente de Cash. Evalúa salud financiera operativa y guía optimización del flujo de efectivo.
+
+## Context
+
+**When to use:** Cuando el diagnóstico ruta a Cash, o el usuario quiere optimizar flujo de efectivo.
+
+## Steps
+
+### Step 1: Load Context
+
+Leer:
+- `.scaleup/agent/sub-agents/cash.md`
+- `.scaleup/agent/memory/company-profile.yaml`
+- `.scaleup/knowledge/cash/overview.md`
+
+### Step 2: Check Existing Work
+
+```bash
+ls work/cash/ 2>/dev/null
+```
+
+### Step 3: Recommend Next Tool
+
+| Estado | Recomendación |
+|--------|--------------|
+| Sin trabajo previo | `/scaleup-cash-ccc` — mapear Cash Conversion Cycle |
+| CCC mapeado | `/scaleup-cash-power1` — análisis Power of One |
+| Power of One hecho | `/scaleup-cash-acceleration` — estrategias de aceleración |
+| Todo hecho | Re-mapear CCC, medir mejoras |
+
+### Step 4: Guide
+
+Enfatizar: "El cash es el oxígeno del crecimiento. El crecimiento chupa cash — si no lo gestionas, el éxito mismo puede matarte."
+
+Nota: Este sub-agente NO da asesoría financiera. Guía el análisis operativo del ciclo de cash usando las herramientas de Scaling Up.
+
+## Output
+
+| Item | Destination |
+|------|-------------|
+| Work artifacts | `work/cash/` |
+| Next | Skill específico de Cash |

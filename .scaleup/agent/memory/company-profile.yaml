@@ -1,0 +1,21 @@
+# Company Profile — filled during /scaleup-welcome
+company:
+  name: ""
+  industry: ""
+  employees: 0
+  revenue_range: ""
+  growth_stage: ""  # startup | scaleup | established | enterprise
+  years_in_business: 0
+  current_challenges: []
+
+scores:
+  people: 0
+  strategy: 0
+  execution: 0
+  cash: 0
+  last_diagnosis: ""
+
+focus:
+  current_decision: ""
+  current_tool: ""
+  last_session: ""
