@@ -1,0 +1,6 @@
+# Organizational Structure — filled during coaching sessions
+facts: []
+# Each fact: {description: "...", added: "YYYY-MM-DD", source: "session|manual"}
+# Examples:
+#   - {description: "CFO reports directly to CEO", added: "2026-04-25", source: "session"}
+#   - {description: "Sales team has 5 people, no dedicated manager", added: "2026-04-25", source: "session"}

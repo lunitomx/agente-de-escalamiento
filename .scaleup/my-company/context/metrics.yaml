@@ -1,0 +1,6 @@
+# Key Metrics — filled during coaching sessions
+facts: []
+# Each fact: {description: "...", added: "YYYY-MM-DD", source: "session|manual"}
+# Examples:
+#   - {description: "Revenue Q1 2026: $1.2M", added: "2026-04-25", source: "session"}
+#   - {description: "Gross margin: 42%", added: "2026-04-25", source: "session"}

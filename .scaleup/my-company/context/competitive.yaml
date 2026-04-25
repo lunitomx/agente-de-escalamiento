@@ -1,0 +1,6 @@
+# Competitive Landscape — filled during coaching sessions
+facts: []
+# Each fact: {description: "...", added: "YYYY-MM-DD", source: "session|manual"}
+# Examples:
+#   - {description: "Main competitor: AcmeCo, 3x our size, weak in service", added: "2026-04-25", source: "session"}
+#   - {description: "Market growing 15% YoY in LATAM", added: "2026-04-25", source: "session"}
