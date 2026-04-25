@@ -1,5 +1,29 @@
 # Epic Design: E7 — Agent Intelligence
 
+## Orchestration Pattern (ADR-0)
+
+**Context:** Emilio Osorio (2026-04-25) — un skill grande con muchas fases produce baja calidad. El LLM "hace patito para cumplir" cuando tiene demasiadas responsabilidades en un solo contexto.
+
+**Decision:** Toda funcionalidad de E7 se construye con el patrón:
+
+```
+Orchestrator Skill (secuencial)
+  ├── subagent: step-1  → artefacto verificable
+  │     └── quality gate (código, no LLM)
+  ├── subagent: step-2  → artefacto verificable
+  │     └── quality gate
+  └── resultado final
+```
+
+**Reglas:**
+1. Cada skill hace UNA cosa, produce UN artefacto
+2. Quality gates son validadores en código (Python), NO el LLM evaluándose a sí mismo
+3. Cada fase se lanza como subagente con su propio contexto de inferencia
+4. El orquestador solo secuencia, valida artefactos y pasa contexto mínimo al siguiente paso
+5. Primero skill de orquestación (probar ~1 semana), después convertir a YAML config para engine
+
+**Implicación para skills existentes:** Los 20 skills actuales (welcome, diagnose, etc.) NO se tocan en E7. Se adaptan en una épica futura (E10) una vez que el patrón esté probado.
+
 ## Gemba Findings
 
 ### Current State
@@ -7,52 +31,34 @@
 1. **Dual profile storage (conflict):**
    - `.scaleup/my-company/profile.md` — markdown template, user-facing, empty
    - `.scaleup/agent/memory/company-profile.yaml` — YAML with scores, agent-facing, empty
-   - `/scaleup-welcome` writes to YAML only. User never sees their data in readable format.
-   - **Decision:** Unify. YAML is source of truth (agent reads). Markdown is generated view (human reads). One write, two outputs.
+   - **Decision:** YAML es source of truth. Markdown se genera como vista.
 
 2. **Existing templates (reuse):**
-   - `my-company/profile.md` — company info (needs filling logic)
-   - `my-company/annual-goal.md` — SMART goal with 4-decision connection
-   - `my-company/quarterly-focus.md` — rocks, critical number, theme
-   - `my-company/tasks.md` — kanban board (En Progreso / Próximo / Completado)
-   - All have HTML comment placeholders — good structure, just need a write mechanism.
+   - `my-company/profile.md`, `annual-goal.md`, `quarterly-focus.md`, `tasks.md`
+   - Todos con HTML comment placeholders — buena estructura, falta write mechanism.
 
 3. **No session infrastructure:**
    - No `my-company/sessions/` directory
    - No session log format
-   - No "last session" tracking beyond `company-profile.yaml.focus.last_session`
+   - No "last session" tracking
 
 4. **KnowledgeGraph ready (E6):**
-   - `retrieval.py` with query/traverse/path/worksheets API
+   - `retrieval.py` — query/traverse/path/worksheets API
    - 70 nodes, 301 edges, worksheet registry
-   - Ready to link tasks → methodology nodes
 
-5. **Skills don't load context on start:**
-   - Each skill reads its own files independently
-   - No shared "context loader" across skills
-
-### Patterns to Follow
-
-- YAML for machine data, markdown for human-readable views
-- HTML comments as placeholder instructions (PAT-L-001)
-- Keep everything in `.scaleup/my-company/` — user's data stays in user's space
-- Agent config in `.scaleup/agent/` — separated concerns (PAT-L-002)
+5. **Skills don't share context:**
+   - Each skill loads its own files independently
+   - No shared context loader
 
 ## Architecture Decisions
 
 ### ADR-1: Single Source of Truth for Company Data
 
-**Context:** Two files store company info. Skills write to different ones.
-
-**Decision:** `company-profile.yaml` is the single source. Skills read/write YAML. On session close, generate markdown views into `my-company/*.md` for human readability.
-
-**Rationale:** YAML is parseable, merge-friendly, queryable. Markdown is for the entrepreneur to read in GitHub/editor.
+`company-profile.yaml` is the single source. Skills read/write YAML. On session close, generate markdown views for human readability.
 
 ### ADR-2: Session Log Format
 
-**Context:** Need to track what happened across sessions for accountability loop.
-
-**Decision:** One file per session: `.scaleup/my-company/sessions/YYYY-MM-DD.md` with structured frontmatter (YAML) + free-form notes.
+One file per session: `.scaleup/my-company/sessions/YYYY-MM-DD.md`
 
 ```yaml
 ---
@@ -66,64 +72,134 @@ score_changes: {people: "2→3"}
 ---
 ## Session Notes
 - Discussed core values exercise
-- Identified 3 candidate values
 - Next: validate with leadership team
 ```
 
-**Rationale:** File-per-session = easy to list, sort, and load recent. YAML frontmatter = machine-parseable. Markdown body = human-readable.
-
 ### ADR-3: Task Identity and Linking
 
-**Context:** Tasks need to link to decisions and methodology nodes.
-
-**Decision:** Tasks live in `my-company/tasks.md` as markdown list items with inline metadata:
+Tasks in `my-company/tasks.md` with inline HTML comment metadata:
 
 ```markdown
 ## En Progreso
-- [ ] Completar ejercicio de Core Values <!-- decision:people node:core-values-worksheet due:2026-05-01 -->
+- [ ] Completar Core Values <!-- decision:people node:core-values-worksheet due:2026-05-01 -->
 ```
 
-**Rationale:** Readable in any editor. HTML comments carry metadata without cluttering the view. Matches PAT-L-001.
+### ADR-4: Context Loading as Pipeline
 
-### ADR-4: Context Loading Strategy
+Context loading is itself a pipeline of subagents:
 
-**Context:** Multiple skills need company context. Loading is scattered.
+```
+/scaleup-start (orchestrator)
+  ├── load-profile     → context.yaml (company data + scores)
+  ├── load-sessions    → recent-sessions.yaml (last 3)
+  ├── load-tasks       → open-tasks.yaml (pending items)
+  ├── quality gate     → ¿profile exists? ¿tasks parseable?
+  └── present-context  → formatted summary to user
+```
 
-**Decision:** Create a shared context loader function in the session start skill that reads: company-profile.yaml + annual-goal + quarterly-focus + last 3 sessions + open tasks. Present as structured context block.
+### ADR-5: Validators in Code
 
-**Rationale:** One load path = consistent context. Skills reference loaded context, don't reload independently.
+Quality gates are Python functions, not LLM prompts:
 
-## Story Refinement (post-gemba)
+```python
+def validate_profile(profile_path: Path) -> bool:
+    """Check company-profile.yaml has required fields filled."""
+    data = yaml.safe_load(profile_path.read_text())
+    return bool(data.get("company", {}).get("name"))
 
-| ID | Story | Size | Gemba Impact |
-|----|-------|------|-------------|
-| S7.1 | Session lifecycle | M | Must unify profile storage. Session log format (ADR-2). Context loader (ADR-4). |
-| S7.2 | Persistent memory | M | YAML source of truth (ADR-1). Generate markdown views. Diagnosis history tracking. |
-| S7.3 | SMART annual goal | S | Template exists. Add read/write logic to skills. Filter mechanism in recommendations. |
-| S7.4 | Task board | M | Template exists. Add metadata format (ADR-3). Link to ontology nodes. CRUD operations. |
-| S7.5 | Accountability loop | M | Depends on S7.1 (sessions) + S7.4 (tasks). Auto-review on session start. |
-| S7.6 | Company knowledge graph | S | Extend company-profile.yaml with structured facts. Org chart, key metrics, competitive notes. |
+def validate_session_log(log_path: Path) -> bool:
+    """Check session log has valid frontmatter."""
+    # parse YAML frontmatter, verify required keys
+    ...
+```
+
+## Story Decomposition (orchestration-aware)
+
+### S7.1 — Session Lifecycle Pipeline
+
+**Orchestrator:** `/scaleup-start` and `/scaleup-close`
+**Sub-skills:**
+- `scaleup-start-load` — read YAML files, build context bundle
+- `scaleup-start-review` — analyze context, detect signals (stale tasks, score changes, time since last session)
+- `scaleup-start-present` — present summary to user, propose focus
+- `scaleup-close-capture` — collect session artifacts
+- `scaleup-close-log` — write session log file
+- `scaleup-close-sync` — generate markdown views from YAML
+
+**Validators:** profile exists, session log format valid, context bundle complete
+
+### S7.2 — Persistent Memory
+
+**Sub-skills:**
+- `scaleup-memory-write` — write structured data to YAML
+- `scaleup-memory-read` — read and merge company data sources
+- `scaleup-memory-render` — generate markdown views from YAML
+
+**Validators:** YAML schema validation, required fields check
+
+### S7.3 — SMART Annual Goal
+
+**Sub-skills:**
+- `scaleup-goal-set` — guided goal creation, write to annual-goal.yaml
+- `scaleup-goal-filter` — given a recommendation, evaluate against goal alignment
+
+**Validators:** goal has all SMART components, KPI has numeric target
+
+### S7.4 — Task Board
+
+**Sub-skills:**
+- `scaleup-task-add` — create task with decision/node metadata
+- `scaleup-task-update` — move task between states
+- `scaleup-task-list` — render current board
+
+**Validators:** task has decision tag, no duplicate IDs, dates parseable
+
+### S7.5 — Accountability Loop
+
+**Orchestrator:** runs inside `scaleup-start-review`
+**Sub-skills:**
+- `scaleup-accountability-scan` — find overdue/stale tasks
+- `scaleup-accountability-prompt` — generate follow-up questions
+
+**Validators:** all open tasks have dates, overdue detection is date-math not LLM
+
+### S7.6 — Company Knowledge Graph
+
+**Sub-skills:**
+- `scaleup-context-add` — add structured fact (org, metric, competitor)
+- `scaleup-context-query` — retrieve facts by category
+
+**Validators:** fact has category tag, no contradicting facts
 
 ## Dependency Graph
 
 ```
-S7.1 Session lifecycle
+S7.1 Session lifecycle (orchestrator + 6 sub-skills)
   ↓
-S7.2 Persistent memory ──→ S7.3 SMART goal (parallel with S7.4)
-  ↓                              ↓
-S7.4 Task board ←────────────────┘
+S7.2 Persistent memory (3 sub-skills)
+  ├──→ S7.3 SMART goal (2 sub-skills)
+  └──→ S7.4 Task board (3 sub-skills)
+         ↓
+       S7.5 Accountability loop (2 sub-skills, embedded in S7.1)
   ↓
-S7.5 Accountability loop
-  ↓
-S7.6 Company knowledge graph (can start after S7.2)
+S7.6 Company knowledge graph (2 sub-skills)
 ```
 
 Critical path: S7.1 → S7.2 → S7.4 → S7.5
+
+## Parking Lot
+
+- **E10 (future):** Adapt existing 20 skills to orchestration pattern
+  - `/scaleup-welcome` → pipeline: intake → validate → save → present
+  - `/scaleup-diagnose` → pipeline: load-context → assess-people → assess-strategy → assess-execution → assess-cash → generate-report → route
+  - Each assessment as its own subagent with focused context
+  - Quality gates: score validation, routing logic in code
 
 ## Risks
 
 | Risk | Likelihood | Impact | Mitigation |
 |------|-----------|--------|-----------|
-| Context loading too slow with many sessions | Low | Medium | Only load last 3 sessions + summary of older ones |
-| Task board gets cluttered | Medium | Low | Auto-archive completed tasks older than 30 days |
-| YAML/markdown sync drift | Medium | Medium | Generate markdown on session close only, never edit markdown directly |
+| Over-engineering sub-skills for simple operations | Medium | Medium | If a step is < 20 lines of logic, inline it in orchestrator |
+| Context loading too slow with many sessions | Low | Medium | Only load last 3 sessions |
+| Subagent overhead for trivial tasks | Medium | Low | Only use subagents when context isolation improves quality |
+| YAML/markdown sync drift | Medium | Medium | Generate markdown on session close only |
