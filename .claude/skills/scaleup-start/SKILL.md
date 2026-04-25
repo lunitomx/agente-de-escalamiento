@@ -64,6 +64,37 @@ Parse the three sections:
 
 If all sections are empty, note "Sin tareas registradas".
 
+### Step 4b: Accountability Check
+
+Run the overdue detection gate:
+
+```bash
+python3 -c "
+import sys, pathlib
+sys.path.insert(0, str(pathlib.Path('.scaleup/agent')))
+from validators.tasks import find_overdue
+overdue = find_overdue(pathlib.Path('.scaleup/my-company/tasks.md'))
+for t in overdue:
+    print(f'OVERDUE: {t[\"description\"]} (due: {t[\"due\"]})')
+if not overdue:
+    print('NO_OVERDUE')
+"
+```
+
+If overdue tasks exist, flag them prominently in the presentation:
+
+```
+⚠️ Tareas vencidas:
+- {task} (vencida desde {due_date})
+```
+
+For each overdue task, ask:
+- "¿La completaste? → mover a Completado"
+- "¿Sigue en progreso? → actualizar fecha"
+- "¿Ya no aplica? → eliminar"
+
+This is the accountability loop — the agent follows up on commitments from previous sessions.
+
 ### Step 5: Present Context & Propose Focus
 
 Display:
