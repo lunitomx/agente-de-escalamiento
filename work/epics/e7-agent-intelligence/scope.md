@@ -23,14 +23,16 @@ Darle al agente ScaleUp memoria persistente, continuidad de sesión, gestión de
 
 ## Planned Stories
 
-| ID | Story | Size | Status |
-|----|-------|------|--------|
-| S7.1 | Session lifecycle — `/scaleup-start` y `/scaleup-close` | M | pending |
-| S7.2 | Persistent memory — perfil, scores, worksheets, historial | M | pending |
-| S7.3 | SMART annual goal como filtro estratégico | S | pending |
-| S7.4 | Task board (kanban en markdown) | M | pending |
-| S7.5 | Accountability loop (seguimiento de compromisos) | M | pending |
-| S7.6 | Company knowledge graph (hechos de la empresa) | S | pending |
+| ID | Story | Size | Status | Depends |
+|----|-------|------|--------|---------|
+| S7.1 | Session lifecycle — context loader + session log | M | pending | — |
+| S7.2 | Persistent memory — YAML source of truth + markdown views | M | pending | S7.1 |
+| S7.3 | SMART annual goal como filtro estratégico | S | pending | S7.2 |
+| S7.4 | Task board — kanban con metadata y links a ontología | M | pending | S7.2 |
+| S7.5 | Accountability loop — auto-review al iniciar sesión | M | pending | S7.1, S7.4 |
+| S7.6 | Company knowledge graph (hechos de la empresa) | S | pending | S7.2 |
+
+Critical path: S7.1 → S7.2 → S7.4 → S7.5
 
 ## Dependencies
 
