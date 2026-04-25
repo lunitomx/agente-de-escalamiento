@@ -19,3 +19,6 @@ focus:
   current_decision: ""
   current_tool: ""
   last_session: ""
+
+diagnosis_history: []
+# Each entry: {date: YYYY-MM-DD, people: N, strategy: N, execution: N, cash: N}
