@@ -94,7 +94,7 @@ S7.3 y S7.6 son independientes entre sí y de S7.4. Pueden ejecutarse en paralel
 
 | Story | Size | Status | Started | Completed | Notes |
 |-------|------|--------|---------|-----------|-------|
-| S7.1 | M | pending | — | — | — |
+| S7.1 | M | done | 2026-04-25 | 2026-04-25 | Walking skeleton, 11 components, 18 tests |
 | S7.2 | M | pending | — | — | — |
 | S7.4 | M | pending | — | — | — |
 | S7.3 | S | pending | — | — | — |
