@@ -20,7 +20,7 @@ Adapter delgado. Core logic en `.scaleup/coaching/progress/`.
 ```bash
 echo '{"base_path": "."}' | python3 -c "
 import sys, json; sys.path.insert(0, '.')
-from scaleup.coaching.progress import run
+from coaching.progress import run
 print(json.dumps(run(json.loads(sys.stdin.read())), indent=2, ensure_ascii=False))
 "
 ```

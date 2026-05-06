@@ -12,31 +12,11 @@ DIAGNOSE_QUESTIONS = {
         "label": "People — Personas",
         "summary": "Right people doing the right things right.",
         "questions": [
-            {
-                "id": "people_q1",
-                "text": "¿Podrías re-contratar con entusiasmo a todos en tu equipo de liderazgo?",
-                "concept": "concept-right-people-right-seats",
-            },
-            {
-                "id": "people_q2",
-                "text": "¿Tus empleados pueden articular los core values de la empresa?",
-                "concept": "concept-core-values",
-            },
-            {
-                "id": "people_q3",
-                "text": "¿Cada persona sabe exactamente qué se espera de ella y cómo se mide su éxito?",
-                "concept": "tool-face",
-            },
-            {
-                "id": "people_q4",
-                "text": "¿Tu proceso de contratación predice consistentemente buenos resultados?",
-                "concept": "tool-topgrading",
-            },
-            {
-                "id": "people_q5",
-                "text": "¿Tienes un plan de desarrollo para tu equipo de liderazgo?",
-                "concept": "tool-five-manager-activities",
-            },
+            {"id": "people_q1", "text": "¿Podrías re-contratar con entusiasmo a todos en tu equipo de liderazgo?", "concept": "concept-right-people-right-seats"},
+            {"id": "people_q2", "text": "¿Tus empleados pueden articular los core values de la empresa?", "concept": "concept-core-values"},
+            {"id": "people_q3", "text": "¿Cada persona sabe exactamente qué se espera de ella y cómo se mide su éxito?", "concept": "tool-face"},
+            {"id": "people_q4", "text": "¿Tu proceso de contratación predice consistentemente buenos resultados?", "concept": "tool-topgrading"},
+            {"id": "people_q5", "text": "¿Tienes un plan de desarrollo para tu equipo de liderazgo?", "concept": "tool-five-manager-activities"},
         ],
     },
     "strategy": {
@@ -44,31 +24,11 @@ DIAGNOSE_QUESTIONS = {
         "label": "Strategy — Estrategia",
         "summary": "Creating a differentiated strategy that drives sustainable revenue growth.",
         "questions": [
-            {
-                "id": "strategy_q1",
-                "text": "¿Puedes articular tu estrategia en una sola página (OPSP)?",
-                "concept": "tool-opsp",
-            },
-            {
-                "id": "strategy_q2",
-                "text": "¿Tu equipo puede explicar qué hace diferente a tu empresa en 30 segundos?",
-                "concept": "tool-7-strata",
-            },
-            {
-                "id": "strategy_q3",
-                "text": "¿Tienes una Brand Promise medible que tus clientes valoran?",
-                "concept": "concept-brand-promise",
-            },
-            {
-                "id": "strategy_q4",
-                "text": "¿Sabes cuál es tu Profit per X (el motor económico de tu negocio)?",
-                "concept": "tool-profit-per-x",
-            },
-            {
-                "id": "strategy_q5",
-                "text": "¿Tienes un BHAG que inspira a todo el equipo?",
-                "concept": "concept-bhag",
-            },
+            {"id": "strategy_q1", "text": "¿Puedes articular tu estrategia en una sola página (OPSP)?", "concept": "tool-opsp"},
+            {"id": "strategy_q2", "text": "¿Tu equipo puede explicar qué hace diferente a tu empresa en 30 segundos?", "concept": "tool-7-strata"},
+            {"id": "strategy_q3", "text": "¿Tienes una Brand Promise medible que tus clientes valoran?", "concept": "concept-brand-promise"},
+            {"id": "strategy_q4", "text": "¿Sabes cuál es tu Profit per X (el motor económico de tu negocio)?", "concept": "tool-profit-per-x"},
+            {"id": "strategy_q5", "text": "¿Tienes un BHAG que inspira a todo el equipo?", "concept": "concept-bhag"},
         ],
     },
     "execution": {
@@ -76,31 +36,11 @@ DIAGNOSE_QUESTIONS = {
         "label": "Execution — Ejecución",
         "summary": "Discipline of execution through rhythms, priorities, and data.",
         "questions": [
-            {
-                "id": "execution_q1",
-                "text": "¿Tu equipo tiene un daily huddle de 15 minutos o menos?",
-                "concept": "tool-daily-huddle",
-            },
-            {
-                "id": "execution_q2",
-                "text": "¿Cada empleado tiene 1-2 KPIs que revisa diariamente?",
-                "concept": "tool-scoreboard",
-            },
-            {
-                "id": "execution_q3",
-                "text": "¿Tienen prioridades trimestrales claras con un Critical Number?",
-                "concept": "concept-critical-number",
-            },
-            {
-                "id": "execution_q4",
-                "text": "¿Cada compromiso tiene un Who-What-When asignado?",
-                "concept": "concept-priorities-rocks",
-            },
-            {
-                "id": "execution_q5",
-                "text": "¿El feedback de clientes y empleados se recolecta y actúa sistemáticamente?",
-                "concept": "tool-rockefeller-habits",
-            },
+            {"id": "execution_q1", "text": "¿Tu equipo tiene un daily huddle de 15 minutos o menos?", "concept": "tool-daily-huddle"},
+            {"id": "execution_q2", "text": "¿Cada empleado tiene 1-2 KPIs que revisa diariamente?", "concept": "tool-scoreboard"},
+            {"id": "execution_q3", "text": "¿Tienen prioridades trimestrales claras con un Critical Number?", "concept": "concept-critical-number"},
+            {"id": "execution_q4", "text": "¿Cada compromiso tiene un Who-What-When asignado?", "concept": "concept-priorities-rocks"},
+            {"id": "execution_q5", "text": "¿El feedback de clientes y empleados se recolecta y actúa sistemáticamente?", "concept": "tool-rockefeller-habits"},
         ],
     },
     "cash": {
@@ -108,31 +48,11 @@ DIAGNOSE_QUESTIONS = {
         "label": "Cash — Efectivo",
         "summary": "Cash flow as the fuel for growth.",
         "questions": [
-            {
-                "id": "cash_q1",
-                "text": "¿Sabes cuántos días tarda tu empresa en convertir una inversión en cash de vuelta (CCC)?",
-                "concept": "concept-ccc",
-            },
-            {
-                "id": "cash_q2",
-                "text": "¿Conoces tu Cash Conversion Cycle completo (ventas → entrega → cobro)?",
-                "concept": "tool-ccc-analysis",
-            },
-            {
-                "id": "cash_q3",
-                "text": "¿Has calculado el impacto de mejorar 1% el precio, volumen o costos (Power of One)?",
-                "concept": "tool-power-of-one",
-            },
-            {
-                "id": "cash_q4",
-                "text": "¿Tu crecimiento se auto-financia o dependes de deuda/inversión externa?",
-                "concept": "concept-working-capital",
-            },
-            {
-                "id": "cash_q5",
-                "text": "¿Conoces tu ingreso por empleado y cómo se compara con tu industria?",
-                "concept": "metric-revenue-per-employee",
-            },
+            {"id": "cash_q1", "text": "¿Sabes cuántos días tarda tu empresa en convertir una inversión en cash de vuelta (CCC)?", "concept": "concept-ccc"},
+            {"id": "cash_q2", "text": "¿Conoces tu Cash Conversion Cycle completo (ventas → entrega → cobro)?", "concept": "tool-ccc-analysis"},
+            {"id": "cash_q3", "text": "¿Has calculado el impacto de mejorar 1% el precio, volumen o costos (Power of One)?", "concept": "tool-power-of-one"},
+            {"id": "cash_q4", "text": "¿Tu crecimiento se auto-financia o dependes de deuda/inversión externa?", "concept": "concept-working-capital"},
+            {"id": "cash_q5", "text": "¿Conoces tu ingreso por empleado y cómo se compara con tu industria?", "concept": "metric-revenue-per-employee"},
         ],
     },
 }
@@ -187,8 +107,8 @@ def run(context: dict) -> dict:
     Returns:
         dict with output, artifacts, errors
     """
-    base = Path(context.get("base_path", ".scaleup"))
-    profile_path = base / "agent" / "memory" / "company-profile.yaml"
+    base = Path(context.get("base_path", "."))
+    profile_path = base / ".scaleup" / "agent" / "memory" / "company-profile.yaml"
     profile = read_yaml(profile_path)
 
     answers = context.get("answers", {})
@@ -209,7 +129,6 @@ def run(context: dict) -> dict:
             errors.append(f"Unknown decision: {dec_key}")
             continue
         qs = DIAGNOSE_QUESTIONS[dec_key]["questions"]
-        dec_answers = [answers.get(q["id"]) for q in qs]
         missing = [q["id"] for q in qs if answers.get(q["id"]) is None]
         invalid = [q["id"] for q in qs if answers.get(q["id"]) is not None and (not isinstance(answers[q["id"]], int) or answers[q["id"]] < 1 or answers[q["id"]] > 5)]
 
@@ -259,7 +178,6 @@ def run(context: dict) -> dict:
         "",
     ])
 
-    # Sort remaining decisions by score (ascending)
     remaining = [(k, v) for k, v in new_scores.items() if k != priority and v and v > 0]
     remaining.sort(key=lambda x: x[1])
     for dec_key, score in remaining:

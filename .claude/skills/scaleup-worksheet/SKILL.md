@@ -20,7 +20,7 @@ Adapter delgado. Core logic en `.scaleup/coaching/worksheet/`.
 ```bash
 echo '{"action": "list", "base_path": "."}' | python3 -c "
 import sys, json; sys.path.insert(0, '.')
-from scaleup.coaching.worksheet import run
+from coaching.worksheet import run
 print(json.dumps(run(json.loads(sys.stdin.read())), indent=2, ensure_ascii=False))
 "
 ```
@@ -30,7 +30,7 @@ print(json.dumps(run(json.loads(sys.stdin.read())), indent=2, ensure_ascii=False
 ```bash
 echo '{"action": "start", "worksheet_name": "face", "base_path": "."}' | python3 -c "
 import sys, json; sys.path.insert(0, '.')
-from scaleup.coaching.worksheet import run
+from coaching.worksheet import run
 print(json.dumps(run(json.loads(sys.stdin.read())), indent=2, ensure_ascii=False))
 "
 ```
@@ -42,7 +42,7 @@ Después de cada respuesta del usuario:
 ```bash
 echo '{"action": "step", "worksheet_name": "face", "fields": {"funciones": "CEO, Ventas, Operaciones, Finanzas"}, "base_path": "."}' | python3 -c "
 import sys, json; sys.path.insert(0, '.')
-from scaleup.coaching.worksheet import run
+from coaching.worksheet import run
 print(json.dumps(run(json.loads(sys.stdin.read())), indent=2, ensure_ascii=False))
 "
 ```
@@ -52,7 +52,7 @@ print(json.dumps(run(json.loads(sys.stdin.read())), indent=2, ensure_ascii=False
 ```bash
 echo '{"action": "save", "worksheet_name": "face", "base_path": "."}' | python3 -c "
 import sys, json; sys.path.insert(0, '.')
-from scaleup.coaching.worksheet import run
+from coaching.worksheet import run
 print(json.dumps(run(json.loads(sys.stdin.read())), indent=2, ensure_ascii=False))
 "
 ```
@@ -70,7 +70,7 @@ Si el usuario vuelve a un worksheet en progreso:
 ```bash
 echo '{"action": "resume", "worksheet_name": "face", "base_path": "."}' | python3 -c "
 import sys, json; sys.path.insert(0, '.')
-from scaleup.coaching.worksheet import run
+from coaching.worksheet import run
 print(json.dumps(run(json.loads(sys.stdin.read())), indent=2, ensure_ascii=False))
 "
 ```

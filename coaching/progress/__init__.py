@@ -5,8 +5,6 @@ from pathlib import Path
 from ..core import read_yaml
 
 DECISIONS = ["people", "strategy", "execution", "cash"]
-REGISTRY_PATH = Path(".scaleup/knowledge/registry/worksheets.yaml")
-COMPLETED_DIR = Path(".scaleup/my-company/worksheets")
 
 DECISION_LABELS = {
     "people": "People — Personas",
@@ -20,7 +18,8 @@ DECISION_ORDER = ["people", "strategy", "execution", "cash"]
 
 def _get_worksheets(base_path: Path) -> tuple[list[dict], dict[str, dict]]:
     """Load all worksheets and completed ones."""
-    registry = read_yaml(REGISTRY_PATH)
+    registry_path = base_path / ".scaleup" / "knowledge" / "registry" / "worksheets.yaml"
+    registry = read_yaml(registry_path)
     all_ws = registry.get("worksheets", [])
 
     wdir = base_path / ".scaleup" / "my-company" / "worksheets"
@@ -53,37 +52,18 @@ def run(context: dict) -> dict:
 
     all_ws, completed = _get_worksheets(base)
 
-    errors = []
-
     if not all_ws:
-        return {
-            "output": "No hay worksheets registrados en la ontología. Verifica E6.",
-            "artifacts": {},
-            "errors": ["Empty worksheet registry"],
-        }
+        return {"output": "No hay worksheets registrados en la ontología. Verifica E6.", "artifacts": {}, "errors": ["Empty worksheet registry"]}
 
     if not scores:
-        return {
-            "output": "Aún no tienes diagnóstico. Corre `/scaleup-diagnose` primero para establecer tus scores base.",
-            "artifacts": {},
-            "errors": ["No diagnosis scores found"],
-        }
+        return {"output": "Aún no tienes diagnóstico. Corre `/scaleup-diagnose` primero para establecer tus scores base.", "artifacts": {}, "errors": ["No diagnosis scores found"]}
 
-    lines = [
-        "## 📊 Dashboard de Progreso",
-        "",
-        "### Scores por Decisión",
-        "",
-        "| Decisión | Score | Nivel |",
-        "|----------|-------|-------|",
-    ]
-
+    lines = ["## 📊 Dashboard de Progreso", "", "### Scores por Decisión", "", "| Decisión | Score | Nivel |", "|----------|-------|-------|"]
     level_labels = {1: "🔴 No iniciado", 2: "🟠 Ad hoc", 3: "🟡 Emergente", 4: "🟢 Establecido", 5: "⭐ Optimizado"}
 
     for dec_key in DECISION_ORDER:
         score = scores.get(dec_key, 0)
-        label = level_labels.get(score, "—")
-        lines.append(f"| {DECISION_LABELS.get(dec_key, dec_key)} | {score} | {label} |")
+        lines.append(f"| {DECISION_LABELS.get(dec_key, dec_key)} | {score} | {level_labels.get(score, '—')} |")
 
     lines.extend(["", "### Worksheets por Decisión", ""])
 
@@ -92,36 +72,22 @@ def run(context: dict) -> dict:
         total = len(dec_ws)
         done = sum(1 for w in dec_ws if w["id"] in completed)
         pct = round((done / total * 100)) if total > 0 else 0
-
         lines.append(f"**{DECISION_LABELS.get(dec_key, dec_key)}:** {done}/{total} ({pct}%)")
         lines.append("")
         for w in dec_ws:
-            status = "✅" if w["id"] in completed else "⬜"
-            lines.append(f"- {status} {w['name']}")
+            lines.append(f"- {'✅' if w['id'] in completed else '⬜'} {w['name']}")
         lines.append("")
 
-    # Suggest next worksheet
-    lowest_decision = min(
-        [d for d in DECISION_ORDER if scores.get(d, 0) > 0],
-        key=lambda d: scores.get(d, 0),
-        default=None,
-    )
+    lowest_decision = min([d for d in DECISION_ORDER if scores.get(d, 0) > 0], key=lambda d: scores.get(d, 0), default=None)
 
     if lowest_decision:
         dec_ws = [w for w in all_ws if w.get("decision") == lowest_decision and w["id"] not in completed]
         if dec_ws:
             next_ws = dec_ws[0]
-            lines.extend([
-                "### Siguiente Sugerido",
-                f"- {next_ws['name']} (`{next_ws['id']}`) en {DECISION_LABELS.get(lowest_decision, lowest_decision)}",
-                f"- Dificultad: {next_ws.get('difficulty', '—')} | Tiempo: {next_ws.get('time_estimate', '—')}",
-                f"- Usa `/scaleup-worksheet {next_ws['id']}` para empezar",
-                "",
-            ])
+            lines.extend(["### Siguiente Sugerido", f"- {next_ws['name']} (`{next_ws['id']}`) en {DECISION_LABELS.get(lowest_decision, lowest_decision)}", f"- Dificultad: {next_ws.get('difficulty', '—')} | Tiempo: {next_ws.get('time_estimate', '—')}", f"- Usa `/scaleup-worksheet {next_ws['id']}` para empezar", ""])
 
     lines.append("> Actualiza tu diagnóstico con `/scaleup-diagnose` para mantener scores al día.")
 
-    # Calculate totals
     total_all = sum(len([w for w in all_ws if w.get("decision") == d]) for d in DECISION_ORDER)
     done_all = sum(1 for w in all_ws if w["id"] in completed)
     overall_pct = round((done_all / total_all * 100)) if total_all > 0 else 0
@@ -132,14 +98,7 @@ def run(context: dict) -> dict:
             "total_worksheets": total_all,
             "completed_worksheets": done_all,
             "completion_pct": overall_pct,
-            "per_decision": {
-                d: {
-                    "score": scores.get(d, 0),
-                    "total": len([w for w in all_ws if w.get("decision") == d]),
-                    "completed": sum(1 for w in all_ws if w.get("decision") == d and w["id"] in completed),
-                }
-                for d in DECISION_ORDER
-            },
+            "per_decision": {d: {"score": scores.get(d, 0), "total": len([w for w in all_ws if w.get("decision") == d]), "completed": sum(1 for w in all_ws if w.get("decision") == d and w["id"] in completed)} for d in DECISION_ORDER},
         },
         "errors": [],
     }

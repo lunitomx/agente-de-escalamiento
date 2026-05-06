@@ -47,10 +47,10 @@ Para cada respuesta, anotar el score como entero 1-5.
 Construir JSON con answers y ejecutar:
 
 ```bash
-echo '{"answers": {"people_q1": 3, "people_q2": 2, "people_q3": 4, "people_q4": 2, "people_q5": 3, "strategy_q1": 2, "strategy_q2": 3, "strategy_q3": 1, "strategy_q4": 2, "strategy_q5": 3, "execution_q1": 4, "execution_q2": 3, "execution_q3": 2, "execution_q4": 3, "execution_q5": 2, "cash_q1": 1, "cash_q2": 2, "cash_q3": 1, "cash_q4": 3, "cash_q5": 2}, "base_path": ".scaleup", "mode": "full"}' | python3 -c "
+echo '{"answers": {"people_q1": 3, "people_q2": 2, "people_q3": 4, "people_q4": 2, "people_q5": 3, "strategy_q1": 2, "strategy_q2": 3, "strategy_q3": 1, "strategy_q4": 2, "strategy_q5": 3, "execution_q1": 4, "execution_q2": 3, "execution_q3": 2, "execution_q4": 3, "execution_q5": 2, "cash_q1": 1, "cash_q2": 2, "cash_q3": 1, "cash_q4": 3, "cash_q5": 2}, "base_path": ".", "mode": "full"}' | python3 -c "
 import sys, json
 sys.path.insert(0, '.')
-from scaleup.coaching.diagnose import run
+from coaching.diagnose import run
 ctx = json.loads(sys.stdin.read())
 result = run(ctx)
 print(json.dumps(result, indent=2, ensure_ascii=False))
@@ -72,9 +72,9 @@ Mostrar el `output` del core module. Si hay routing a sub-agente, preguntar si e
 Para re-evaluar solo una decisión:
 
 ```bash
-echo '{"answers": {"people_q1": 4, "people_q2": 3, "people_q3": 4, "people_q4": 3, "people_q5": 4}, "decisions": ["people"], "mode": "partial", "base_path": ".scaleup"}' | python3 -c "
+echo '{"answers": {"people_q1": 4, "people_q2": 3, "people_q3": 4, "people_q4": 3, "people_q5": 4}, "decisions": ["people"], "mode": "partial", "base_path": "."}' | python3 -c "
 import sys, json; sys.path.insert(0, '.')
-from scaleup.coaching.diagnose import run
+from coaching.diagnose import run
 print(json.dumps(run(json.loads(sys.stdin.read())), indent=2, ensure_ascii=False))
 "
 ```

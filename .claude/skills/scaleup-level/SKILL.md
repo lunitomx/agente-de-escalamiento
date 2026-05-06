@@ -20,7 +20,7 @@ Adapter delgado. Core logic en `.scaleup/coaching/level/`.
 ```bash
 echo '{"action": "detect", "base_path": "."}' | python3 -c "
 import sys, json; sys.path.insert(0, '.')
-from scaleup.coaching.level import run
+from coaching.level import run
 print(json.dumps(run(json.loads(sys.stdin.read())), indent=2, ensure_ascii=False))
 "
 ```
@@ -30,7 +30,7 @@ print(json.dumps(run(json.loads(sys.stdin.read())), indent=2, ensure_ascii=False
 ```bash
 echo '{"action": "set", "level": "ha", "base_path": "."}' | python3 -c "
 import sys, json; sys.path.insert(0, '.')
-from scaleup.coaching.level import run
+from coaching.level import run
 print(json.dumps(run(json.loads(sys.stdin.read())), indent=2, ensure_ascii=False))
 "
 ```
@@ -40,7 +40,7 @@ print(json.dumps(run(json.loads(sys.stdin.read())), indent=2, ensure_ascii=False
 ```bash
 echo '{"action": "get", "base_path": "."}' | python3 -c "
 import sys, json; sys.path.insert(0, '.')
-from scaleup.coaching.level import run
+from coaching.level import run
 print(json.dumps(run(json.loads(sys.stdin.read())), indent=2, ensure_ascii=False))
 "
 ```

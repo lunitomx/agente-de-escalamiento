@@ -20,7 +20,7 @@ def load_context() -> dict:
 def run_and_print(module_name: str, context: dict) -> None:
     """Dynamically import a coaching module and run it, printing JSON result."""
     import importlib
-    mod = importlib.import_module(f".scaleup.coaching.{module_name}")
+    mod = importlib.import_module(f"coaching.{module_name}")
     result = mod.run(context)
     print(json.dumps(result, indent=2, ensure_ascii=False))
 

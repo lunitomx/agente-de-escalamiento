@@ -14,13 +14,13 @@ def run(context: dict) -> dict:
         - industry: str
         - employees: int
         - entry_methodology: str (lean-canvas | bmc | skip)
-        - base_path: str (path to .scaleup dir)
+        - base_path: str (path to project root)
 
     Returns:
         dict with output, artifacts, errors
     """
-    base = Path(context.get("base_path", ".scaleup"))
-    profile_path = base / "agent" / "memory" / "company-profile.yaml"
+    base = Path(context.get("base_path", "."))
+    profile_path = base / ".scaleup" / "agent" / "memory" / "company-profile.yaml"
 
     name = context.get("company_name", "").strip()
     industry = context.get("industry", "").strip()

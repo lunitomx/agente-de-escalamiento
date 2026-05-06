@@ -39,10 +39,10 @@ Preguntar de forma conversacional:
 ### Step 3: Invoke Core Module
 
 ```bash
-echo '{"company_name": "Nombre", "industry": "Sector", "employees": 15, "entry_methodology": "lean-canvas", "base_path": ".scaleup"}' | python3 -c "
+echo '{"company_name": "Nombre", "industry": "Sector", "employees": 15, "entry_methodology": "lean-canvas", "base_path": "."}' | python3 -c "
 import sys, json
 sys.path.insert(0, '.')
-from scaleup.coaching.welcome import run
+from coaching.welcome import run
 ctx = json.loads(sys.stdin.read())
 result = run(ctx)
 print(json.dumps(result, indent=2, ensure_ascii=False))

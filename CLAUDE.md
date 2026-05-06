@@ -69,7 +69,7 @@ Cada decisión se evalúa en escala 1-5:
 
 ## Coaching Engine (E8)
 
-Los skills de coaching usan la **arquitectura cross-platform**: core Python en `.scaleup/coaching/` con adapters delgados en SKILL.md. Esto permite portar los skills a Hermes Agent y Codex sin reescribir lógica de negocio.
+Los skills de coaching usan la **arquitectura cross-platform**: core Python en `coaching/` con adapters delgados en SKILL.md. Esto permite portar los skills a Hermes Agent y Codex sin reescribir lógica de negocio.
 
 | Componente | Core Python | Adapter SKILL.md |
 |------------|-------------|------------------|
