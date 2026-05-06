@@ -1,7 +1,5 @@
 ---
-description: 'Diagnóstico completo de la empresa en las 4 decisiones de Scaling Up
-  (People, Strategy, Execution, Cash). Master agent que evalúa y ruta al sub-agente
-  correcto.'
+description: 'Diagnóstico completo de la empresa en las 4 decisiones (People, Strategy, Execution, Cash) usando el core Python cross-platform.'
 name: scaleup-diagnose
 ---
 
@@ -9,95 +7,81 @@ name: scaleup-diagnose
 
 ## Purpose
 
-Evaluar el estado actual de la empresa en las 4 decisiones de Scaling Up mediante preguntas guiadas. Generar un reporte de diagnóstico y recomendar por dónde empezar.
+Evaluar el estado de la empresa en las 4 decisiones mediante preguntas guiadas. Generar reporte con scores y priorización. Usa el core module en `.scaleup/coaching/diagnose/`.
 
-## Context
+## Architecture
 
-**When to use:** Al inicio del journey con ScaleUp, o cuando el usuario quiere re-evaluar su progreso.
-
-**When to skip:** Si el usuario ya sabe exactamente en qué decisión quiere trabajar → ir directo al sub-agente.
-
-**Inputs:** `.scaleup/agent/memory/company-profile.yaml` debe tener datos de la empresa.
+Este skill es un **adapter delgado**. La lógica de scoring, priorización y persistencia vive en Python.
 
 ## Steps
 
 ### Step 1: Load Context
 
-Leer `.scaleup/agent/memory/company-profile.yaml` y `.scaleup/agent/identity/core.md`.
-
-Si company profile está vacío → redirigir a `/scaleup-welcome` primero.
-
-### Step 2: People Assessment
-
-Leer `.scaleup/agent/sub-agents/people.md` para las preguntas clave.
-
-Hacer 5 preguntas sobre People. Escuchar respuestas. Asignar score 1-5.
-
-Escala:
-- 1 = No existe proceso formal
-- 2 = Ad hoc, algo de conciencia
-- 3 = Frameworks básicos en lugar
-- 4 = Sistemático y medido
-- 5 = Optimizado, ventaja competitiva
-
-### Step 3: Strategy Assessment
-
-Leer `.scaleup/agent/sub-agents/strategy.md`.
-
-Hacer 5 preguntas sobre Strategy. Score 1-5.
-
-### Step 4: Execution Assessment
-
-Leer `.scaleup/agent/sub-agents/execution.md`.
-
-Hacer 5 preguntas sobre Execution. Score 1-5.
-
-### Step 5: Cash Assessment
-
-Leer `.scaleup/agent/sub-agents/cash.md`.
-
-Hacer 5 preguntas sobre Cash. Score 1-5.
-
-### Step 6: Generate Report
-
-Usar template `templates/diagnosis-report.md` para generar el reporte.
-
-Guardar en `work/diagnosis/{date}-report.md`.
-
-Actualizar scores en `.scaleup/agent/memory/company-profile.yaml`.
-
-### Step 7: Route to Priority
-
-Aplicar routing logic del master agent:
-
-```
-if all scores < 2 → People (fundacional)
-elif people < 3 → /scaleup-people
-elif strategy < 3 → /scaleup-strategy
-elif execution < 3 → /scaleup-execution
-elif cash < 3 → /scaleup-cash
-else → mostrar dashboard, usuario elige
+```bash
+test -f .scaleup/agent/memory/company-profile.yaml && echo "EXISTS" || echo "NO_PROFILE"
 ```
 
-Presentar recomendación con razón clara.
+| Result | Action |
+|--------|--------|
+| NO_PROFILE | Redirect to `/scaleup-welcome` |
+| EXISTS | Continue |
 
-<verification>
-Reporte guardado. Scores actualizados. Recomendación presentada.
-</verification>
+Leer el perfil actual para ver si ya hay scores.
+
+### Step 2: Assess Each Decision
+
+Hacer 5 preguntas por decisión (20 total). Usar escala 1-5:
+
+| Score | Nivel |
+|-------|-------|
+| 1 | No iniciado |
+| 2 | Ad hoc |
+| 3 | Emergente |
+| 4 | Establecido |
+| 5 | Optimizado |
+
+Para cada respuesta, anotar el score como entero 1-5.
+
+### Step 3: Invoke Core Module
+
+Construir JSON con answers y ejecutar:
+
+```bash
+echo '{"answers": {"people_q1": 3, "people_q2": 2, "people_q3": 4, "people_q4": 2, "people_q5": 3, "strategy_q1": 2, "strategy_q2": 3, "strategy_q3": 1, "strategy_q4": 2, "strategy_q5": 3, "execution_q1": 4, "execution_q2": 3, "execution_q3": 2, "execution_q4": 3, "execution_q5": 2, "cash_q1": 1, "cash_q2": 2, "cash_q3": 1, "cash_q4": 3, "cash_q5": 2}, "base_path": ".scaleup", "mode": "full"}' | python3 -c "
+import sys, json
+sys.path.insert(0, '.')
+from scaleup.coaching.diagnose import run
+ctx = json.loads(sys.stdin.read())
+result = run(ctx)
+print(json.dumps(result, indent=2, ensure_ascii=False))
+"
+```
+
+### Step 4: Quality Gate
+
+```bash
+python3 .scaleup/agent/validators/diagnose.py .scaleup/agent/memory/company-profile.yaml
+```
+
+### Step 5: Present Results
+
+Mostrar el `output` del core module. Si hay routing a sub-agente, preguntar si el usuario quiere ir ahora.
+
+### Step 6: Partial Re-diagnosis
+
+Para re-evaluar solo una decisión:
+
+```bash
+echo '{"answers": {"people_q1": 4, "people_q2": 3, "people_q3": 4, "people_q4": 3, "people_q5": 4}, "decisions": ["people"], "mode": "partial", "base_path": ".scaleup"}' | python3 -c "
+import sys, json; sys.path.insert(0, '.')
+from scaleup.coaching.diagnose import run
+print(json.dumps(run(json.loads(sys.stdin.read())), indent=2, ensure_ascii=False))
+"
+```
 
 ## Output
 
 | Item | Destination |
 |------|-------------|
-| Diagnosis report | `work/diagnosis/{date}-report.md` |
-| Updated scores | `.scaleup/agent/memory/company-profile.yaml` |
-| Next | Sub-agente recomendado |
-
-## Quality Checklist
-
-- [ ] Company profile cargado antes de preguntar
-- [ ] 5 preguntas por decisión (20 total)
-- [ ] Scores basados en respuestas, no inventados
-- [ ] Reporte usa template estándar
-- [ ] Routing sigue la secuencia del libro (People → Strategy → Execution → Cash)
-- [ ] Razón clara de por qué se recomienda esa decisión primero
+| Scores actualizados | `.scaleup/agent/memory/company-profile.yaml` |
+| Próximo paso | Sub-agente recomendado |

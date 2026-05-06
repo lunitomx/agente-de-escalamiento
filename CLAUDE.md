@@ -49,14 +49,14 @@ La base de conocimiento está en `.scaleup/knowledge/`, organizada por las 4 dec
 
 ## Sub-agentes especializados
 
-Orquesto 4 sub-agentes, cada uno experto en su decisión:
+Orquesto 4 sub-agentes, cada uno experto en su decisión. El routing es determinístico (core Python en `.scaleup/coaching/router/`):
 
 | Sub-agente | Decisión | Cuándo se activa |
 |------------|----------|-----------------|
-| People | Personas correctas, accountability | Score People < 3 o solicitud directa |
-| Strategy | Core values, BHAG, brand promise | Score Strategy < 3 o solicitud directa |
-| Execution | Ritmos, prioridades, Rockefeller Habits | Score Execution < 3 o solicitud directa |
-| Cash | CCC, Power of One, aceleración | Score Cash < 3 o solicitud directa |
+| People | Personas correctas, accountability | Score más bajo o solicitud directa |
+| Strategy | Core values, BHAG, brand promise | Score más bajo o solicitud directa |
+| Execution | Ritmos, prioridades, Rockefeller Habits | Score más bajo o solicitud directa |
+| Cash | CCC, Power of One, aceleración | Score más bajo o solicitud directa |
 
 ## Scoring de diagnóstico
 
@@ -67,6 +67,21 @@ Cada decisión se evalúa en escala 1-5:
 - **4** = Establecido (sistemático, medido)
 - **5** = Optimizado (refinado, ventaja competitiva)
 
+## Coaching Engine (E8)
+
+Los skills de coaching usan la **arquitectura cross-platform**: core Python en `.scaleup/coaching/` con adapters delgados en SKILL.md. Esto permite portar los skills a Hermes Agent y Codex sin reescribir lógica de negocio.
+
+| Componente | Core Python | Adapter SKILL.md |
+|------------|-------------|------------------|
+| Welcome | `.scaleup/coaching/welcome/` | `.claude/skills/scaleup-welcome/` |
+| Diagnóstico | `.scaleup/coaching/diagnose/` | `.claude/skills/scaleup-diagnose/` |
+| Worksheets | `.scaleup/coaching/worksheet/` | `.claude/skills/scaleup-worksheet/` |
+| Progreso | `.scaleup/coaching/progress/` | `.claude/skills/scaleup-progress/` |
+| Nivel coaching | `.scaleup/coaching/level/` | `.claude/skills/scaleup-level/` |
+| Router | `.scaleup/coaching/router/` | Integrado en CLAUDE.md |
+
+Los quality gates en `.scaleup/agent/validators/` validan en código Python, no con LLM.
+
 ## Comandos disponibles
 
 ### Sesión
@@ -75,12 +90,14 @@ Cada decisión se evalúa en escala 1-5:
 | `/scaleup-start` | Carga contexto de empresa, sesiones recientes y tareas abiertas |
 | `/scaleup-close` | Cierra la sesión y guarda registro con lo trabajado |
 
-### Inicio
+### Inicio y Coaching
 | Comando | Qué hace |
 |---------|----------|
-| `/scaleup-welcome` | Primera sesión: crea tu perfil y hace tu primer diagnóstico |
-| `/scaleup-diagnose` | Diagnóstico completo de las 4 decisiones — te dice dónde enfocarte |
-| `/scaleup-progress` | Dashboard de progreso mostrando scores y trabajo completado |
+| `/scaleup-welcome` | Primera sesión: crea tu perfil (core Python) |
+| `/scaleup-diagnose` | Diagnóstico completo de las 4 decisiones con scoring estructurado (core Python) |
+| `/scaleup-progress` | Dashboard de progreso mostrando scores y work completado (core Python) |
+| `/scaleup-worksheet [nombre]` | Guía paso a paso de cualquier worksheet desde la ontología (core Python) |
+| `/scaleup-level [--set shu/ha/ri]` | Muestra o cambia el nivel de coaching adaptativo |
 
 ### People — Personas
 | Comando | Qué hace |

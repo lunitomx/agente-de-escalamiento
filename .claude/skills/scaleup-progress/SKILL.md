@@ -1,6 +1,5 @@
 ---
-description: 'Dashboard de progreso mostrando scores de madurez en las 4 decisiones
-  de Scaling Up y trabajo completado.'
+description: 'Dashboard de progreso mostrando scores, worksheets completados y próxima acción sugerida. Core Python cross-platform.'
 name: scaleup-progress
 ---
 
@@ -8,47 +7,38 @@ name: scaleup-progress
 
 ## Purpose
 
-Mostrar un dashboard visual del progreso de la empresa en las 4 decisiones de Scaling Up.
+Mostrar el progreso del usuario en las 4 decisiones: scores actuales, worksheets completados vs pendientes, y sugerencia del siguiente paso.
+
+## Architecture
+
+Adapter delgado. Core logic en `.scaleup/coaching/progress/`.
 
 ## Steps
 
-### Step 1: Load Data
-
-Leer `.scaleup/agent/memory/company-profile.yaml` para scores.
-
-### Step 2: Check Work Artifacts
+### Step 1: Invoke Core Module
 
 ```bash
-ls work/diagnosis/ work/people/ work/strategy/ work/execution/ work/cash/ 2>/dev/null
+echo '{"base_path": "."}' | python3 -c "
+import sys, json; sys.path.insert(0, '.')
+from scaleup.coaching.progress import run
+print(json.dumps(run(json.loads(sys.stdin.read())), indent=2, ensure_ascii=False))
+"
 ```
 
-### Step 3: Display Dashboard
+### Step 2: Quality Gate
 
-```
-═══════════════════════════════════════════
-  ScaleUp Progress — {company_name}
-═══════════════════════════════════════════
-
-  People    ████░░░░░░  {score}/5  {artifacts done}
-  Strategy  ██████░░░░  {score}/5  {artifacts done}
-  Execution ██░░░░░░░░  {score}/5  {artifacts done}
-  Cash      ████████░░  {score}/5  {artifacts done}
-
-  Overall:  {avg}/5
-  Last diagnosis: {date}
-
-  Recommended focus: {decision}
-  Suggested next: /{next_skill}
-═══════════════════════════════════════════
+```bash
+python3 .scaleup/agent/validators/progress.py
 ```
 
-### Step 4: Suggest Re-diagnosis
+### Step 3: Present Dashboard
 
-Si han pasado más de 30 días desde el último diagnóstico, sugerir `/scaleup-diagnose` para re-evaluar.
+Mostrar el `output` del core module al usuario. Si hay un siguiente worksheet sugerido, ofrecer `/scaleup-worksheet {id}`.
 
 ## Output
 
-| Item | Destination |
+| Item | Description |
 |------|-------------|
-| Dashboard | Displayed to user |
-| Next | Skill recomendado |
+| Scores table | Scores actuales por decisión con nivel |
+| Worksheet progress | Completados vs pendientes por decisión |
+| Next suggestion | Siguiente worksheet recomendado |

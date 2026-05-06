@@ -4,6 +4,10 @@ work/
 .raise/
 AGENTS.md
 
+# === RaiSE Temp Artifacts ===
+.rai-state/
+.rai-worktrees/
+
 # === RaiSE Development Skills ===
 # Keep scaleup-* skills, exclude rai-* development skills
 .claude/skills/rai-*/

@@ -1,6 +1,5 @@
 ---
-description: 'Onboarding para ScaleUp Agent AI. Recoge perfil de la empresa y prepara
-  el framework para su primera sesión de diagnóstico.'
+description: 'Onboarding para ScaleUp Agent AI. Recoge perfil de empresa y prepara contexto para diagnóstico.'
 name: scaleup-welcome
 ---
 
@@ -8,69 +7,62 @@ name: scaleup-welcome
 
 ## Purpose
 
-Dar la bienvenida al usuario, recoger información de su empresa y preparar el contexto para el diagnóstico inicial. Primera interacción con el framework.
+Dar la bienvenida, recoger info de la empresa y guardar el perfil usando el core Python cross-platform.
 
-## Context
+## Architecture
 
-**When to use:** Primera vez que un usuario interactúa con ScaleUp Agent AI.
-
-**When to skip:** Si `.scaleup/agent/memory/company-profile.yaml` ya tiene datos (empresa ya registrada).
+Este skill es un **adapter delgado** que invoca el core module en `.scaleup/coaching/welcome/`.
+La lógica de negocio (validación, stage detection, persistencia) vive en Python, no en SKILL.md.
 
 ## Steps
 
-### Step 1: Verify Framework
+### Step 1: Check Existing Profile
 
 ```bash
-ls .scaleup/agent/identity/core.md 2>/dev/null && echo "FRAMEWORK_EXISTS" || echo "NO_FRAMEWORK"
+test -f .scaleup/agent/memory/company-profile.yaml && echo "EXISTS" || echo "NEW"
 ```
 
 | Result | Action |
 |--------|--------|
-| FRAMEWORK_EXISTS | Continue |
-| NO_FRAMEWORK | Stop: "Instala ScaleUp Agent AI primero." |
+| EXISTS | Show existing profile, offer `/scaleup-diagnose` |
+| NEW | Continue to Step 2 |
 
 ### Step 2: Company Intake
 
-Preguntar de forma conversacional (no formulario):
-
+Preguntar de forma conversacional:
 1. **Nombre de la empresa**
 2. **Industria / sector**
 3. **Número de empleados** (aproximado)
-4. **Rango de ingresos anuales** (opcional)
-5. **Años en operación**
-6. **Etapa de crecimiento:** startup | scaleup | establecida | enterprise
-7. **Principales retos actuales** (en sus palabras)
+4. **Etapa:** startup / growth / scaling / expansion
+5. **Metodología de entrada:** lean-canvas (startup/reinventando) o bmc (crecimiento)
 
-<verification>
-Toda la información básica de la empresa recolectada.
-</verification>
+### Step 3: Invoke Core Module
 
-### Step 3: Save Company Profile
-
-Guardar en `.scaleup/agent/memory/company-profile.yaml` con los datos recolectados.
-
-<verification>
-company-profile.yaml actualizado con datos reales.
-</verification>
-
-### Step 4: Welcome Message
-
+```bash
+echo '{"company_name": "Nombre", "industry": "Sector", "employees": 15, "entry_methodology": "lean-canvas", "base_path": ".scaleup"}' | python3 -c "
+import sys, json
+sys.path.insert(0, '.')
+from scaleup.coaching.welcome import run
+ctx = json.loads(sys.stdin.read())
+result = run(ctx)
+print(json.dumps(result, indent=2, ensure_ascii=False))
+"
 ```
-¡Bienvenido a ScaleUp Agent AI, {company_name}!
 
-Tu empresa: {employees} empleados en {industry}, etapa {stage}
+### Step 4: Quality Gate
 
-ScaleUp te guiará a escalar tu empresa usando la metodología Scaling Up
-de Verne Harnish, enfocándose en 4 decisiones críticas:
-
-  1. People — Las personas correctas en los asientos correctos
-  2. Strategy — Estrategia clara en una página
-  3. Execution — Ejecución disciplinada con ritmos y datos
-  4. Cash — Cash flow como combustible del crecimiento
-
-Siguiente paso: /scaleup-diagnose
-→ Evaluaremos tu empresa en las 4 decisiones para saber por dónde empezar.
+```bash
+python3 .scaleup/agent/validators/welcome.py .scaleup/agent/memory/company-profile.yaml
 ```
+
+| Result | Action |
+|--------|--------|
+| VALIDATION PASSED | Present welcome message |
+| VALIDATION FAILED | Show errors, ask user to correct |
+
+### Step 5: Present Result
+
+Mostrar el `output` del core module al usuario.
 
 ## Output
 
