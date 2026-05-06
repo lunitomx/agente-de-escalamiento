@@ -11,51 +11,44 @@ from pathlib import Path
 # T1 — Basic return contract + trend mapping
 # ---------------------------------------------------------------------------
 
-def test_run_returns_dict():
-    from coaching.pulse import run
-    result = run({"answers": {"people": 1, "strategy": 0, "execution": -1, "cash": 0, "overall": 0}})
+def test_run_returns_dict(tmp_path):
+    result = run_with_base({"answers": {"people": 1, "strategy": 0, "execution": -1, "cash": 0, "overall": 0}}, tmp_path)
     assert isinstance(result, dict)
     assert result.get("success") is True
 
 
-def test_run_includes_output_artifacts_errors():
-    from coaching.pulse import run
-    result = run({"answers": {"people": 1, "strategy": 0, "execution": -1, "cash": 0, "overall": 0}})
+def test_run_includes_output_artifacts_errors(tmp_path):
+    result = run_with_base({"answers": {"people": 1, "strategy": 0, "execution": -1, "cash": 0, "overall": 0}}, tmp_path)
     assert "output" in result
     assert "artifacts" in result
     assert "errors" in result
 
 
-def test_run_includes_trends():
-    from coaching.pulse import run
-    result = run({"answers": {"people": 1, "strategy": 0, "execution": -1, "cash": 0, "overall": 0}})
+def test_run_includes_trends(tmp_path):
+    result = run_with_base({"answers": {"people": 1, "strategy": 0, "execution": -1, "cash": 0, "overall": 0}}, tmp_path)
     assert "trends" in result.get("artifacts", {})
 
 
-def test_trend_improving():
-    from coaching.pulse import run
-    result = run({"answers": {"people": 1, "strategy": 1, "execution": 1, "cash": 1, "overall": 1}})
+def test_trend_improving(tmp_path):
+    result = run_with_base({"answers": {"people": 1, "strategy": 1, "execution": 1, "cash": 1, "overall": 1}}, tmp_path)
     trends = result["artifacts"]["trends"]
     assert all(v == "improving" for v in trends.values())
 
 
-def test_trend_stalling():
-    from coaching.pulse import run
-    result = run({"answers": {"people": 0, "strategy": 0, "execution": 0, "cash": 0, "overall": 0}})
+def test_trend_stalling(tmp_path):
+    result = run_with_base({"answers": {"people": 0, "strategy": 0, "execution": 0, "cash": 0, "overall": 0}}, tmp_path)
     trends = result["artifacts"]["trends"]
     assert all(v == "stalling" for v in trends.values())
 
 
-def test_trend_regressing():
-    from coaching.pulse import run
-    result = run({"answers": {"people": -1, "strategy": -1, "execution": -1, "cash": -1, "overall": -1}})
+def test_trend_regressing(tmp_path):
+    result = run_with_base({"answers": {"people": -1, "strategy": -1, "execution": -1, "cash": -1, "overall": -1}}, tmp_path)
     trends = result["artifacts"]["trends"]
     assert all(v == "regressing" for v in trends.values())
 
 
-def test_trend_all_decisions_present():
-    from coaching.pulse import run
-    result = run({"answers": {"people": 1, "strategy": 0, "execution": -1, "cash": 0, "overall": 0}})
+def test_trend_all_decisions_present(tmp_path):
+    result = run_with_base({"answers": {"people": 1, "strategy": 0, "execution": -1, "cash": 0, "overall": 0}}, tmp_path)
     trends = result["artifacts"]["trends"]
     assert set(trends.keys()) == {"people", "strategy", "execution", "cash", "overall"}
 
