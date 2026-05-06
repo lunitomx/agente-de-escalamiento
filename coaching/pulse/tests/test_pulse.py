@@ -127,7 +127,7 @@ def test_course_corrections_for_regressing(tmp_path):
     base = tmp_path
     result = run_with_base({"answers": {"people": 1, "strategy": 0, "execution": -1, "cash": 0, "overall": 0}}, base)
     corrections = result["artifacts"]["course_corrections"]
-    assert any("execution" in c.lower() or "Execution" in c for c in corrections)
+    assert "Execution regressing → run /scaleup-execution" in corrections
 
 
 def test_no_course_corrections_when_none_regressing(tmp_path):

@@ -40,11 +40,15 @@ def _trend(answer: int) -> str:
 
 
 def _validate_answers(answers: dict) -> list[str]:
-    """Return list of error strings for invalid answer values."""
+    """Return list of error strings for missing or invalid answer values."""
     errors = []
     for decision in DECISIONS:
         val = answers.get(decision)
-        if val is not None and val not in VALID_ANSWER_VALUES:
+        if val is None:
+            errors.append(
+                f"Missing answer for '{decision}'. Must be -1, 0, or 1."
+            )
+        elif val not in VALID_ANSWER_VALUES:
             errors.append(
                 f"Invalid answer for '{decision}': {val!r}. Must be -1, 0, or 1."
             )
