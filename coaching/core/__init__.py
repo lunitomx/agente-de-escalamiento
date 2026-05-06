@@ -48,6 +48,29 @@ def write_yaml(path: Path, data: dict) -> None:
     path.write_text(yaml.dump(data, default_flow_style=False, allow_unicode=True, sort_keys=False))
 
 
+# ---------------------------------------------------------------------------
+# Decision constants (shared across pulse, diagnose, export)
+# ---------------------------------------------------------------------------
+
+PRIORITY_ORDER = ["people", "strategy", "execution", "cash"]
+
+DECISION_LABELS = {
+    "people": "People",
+    "strategy": "Strategy",
+    "execution": "Execution",
+    "cash": "Cash",
+    "overall": "Overall",
+}
+
+ROUTING_RULES = {
+    "people": "/scaleup-people",
+    "strategy": "/scaleup-strategy",
+    "execution": "/scaleup-execution",
+    "cash": "/scaleup-cash",
+    "overall": "/scaleup-diagnose",
+}
+
+
 GROWTH_STAGES = {
     "startup": {"label": "Startup", "employees_max": 10, "description": "Buscando product-market fit"},
     "growth": {"label": "Growth", "employees_max": 50, "description": "Escalando el negocio"},
