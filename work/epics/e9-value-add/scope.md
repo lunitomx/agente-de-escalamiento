@@ -25,7 +25,7 @@ Entregar exportación, pulse diagnóstico, dashboard histórico y resumen de ses
 | ID | Story | Size | Status | Depends |
 |----|-------|------|--------|---------|
 | S9.1 | Action Plan Export — `/scaleup-export` | M | **done** ✓ | E8 |
-| S9.2 | Quarterly Pulse — `/scaleup-pulse` | M | planned | S9.1 |
+| S9.2 | Quarterly Pulse — `/scaleup-pulse` | M | **done** ✓ | S9.1 |
 | S9.3 | Progress Dashboard — `/scaleup-dashboard` | M | planned | S9.2 |
 | S9.4 | Coaching Session Summary — auto-generado al cerrar sesión | S | planned | E7, E8 |
 
