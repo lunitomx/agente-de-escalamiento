@@ -309,6 +309,30 @@ def test_no_pulse_history_graceful():
     assert output.count("No pulse data") >= 1
 
 
+def test_scores_null_treated_as_no_diagnosis(tmp_path):
+    """scores: null in YAML → no crash, shows placeholder."""
+    profile_dir = tmp_path / ".scaleup" / "agent" / "memory"
+    profile_dir.mkdir(parents=True)
+    (profile_dir / "company-profile.yaml").write_text("scores: null\n")
+
+    from coaching.dashboard import run
+    result = run({"base_path": str(tmp_path)})
+    assert result["success"] is True
+    assert "No diagnosis yet" in result["output"]
+
+
+def test_pulses_null_graceful(tmp_path):
+    """pulses: null in YAML → no crash, shows placeholder in pulse sections."""
+    pulse_dir = tmp_path / ".scaleup" / "my-company"
+    pulse_dir.mkdir(parents=True)
+    (pulse_dir / "pulse-history.yaml").write_text("pulses: null\n")
+
+    from coaching.dashboard import run
+    result = run({"base_path": str(tmp_path)})
+    assert result["success"] is True
+    assert "No pulse data" in result["output"]
+
+
 def test_pulse_count_in_artifacts(tmp_path):
     """artifacts["pulse_count"] equals number of pulse entries."""
     pulse_dir = _make_pulse_dir(tmp_path)

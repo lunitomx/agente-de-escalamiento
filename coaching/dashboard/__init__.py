@@ -31,7 +31,6 @@ SCORE_LEVELS = {
     5: "Optimizado",
 }
 
-DECISIONS = ["people", "strategy", "execution", "cash", "overall"]
 HISTORY_REL_PATH = ".scaleup/my-company/pulse-history.yaml"
 
 
@@ -43,7 +42,7 @@ def _read_scores(base: Path) -> dict:
     """Return diagnosis scores from company-profile.yaml, or empty dict."""
     yaml_path = base / ".scaleup" / "agent" / "memory" / "company-profile.yaml"
     profile = read_yaml(yaml_path)
-    return profile.get("scores", {})
+    return profile.get("scores") or {}
 
 
 def _scores_table(scores: dict) -> str:
@@ -80,7 +79,7 @@ def _read_pulse_history(base: Path) -> list[dict]:
     """Read pulse history from pulse-history.yaml. Returns list of pulses."""
     history_path = base / HISTORY_REL_PATH
     data = read_yaml(history_path)
-    return data.get("pulses", [])
+    return data.get("pulses") or []
 
 
 def _format_trend(trend: str) -> str:
