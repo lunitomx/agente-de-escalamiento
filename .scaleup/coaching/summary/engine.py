@@ -25,5 +25,5 @@ def build_summary(data: dict) -> dict:
         "tasks_created": list(data.get("tasks_created") or []),
         "tasks_completed": list(data.get("tasks_completed") or []),
         "notes": list(data.get("notes") or []),
-        "scores_before": data.get("scores_before"),
+        # scores_before deferred to future score-delta story (S9.x)
     }

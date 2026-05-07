@@ -170,9 +170,7 @@ class TestFormatSummary:
 
     def test_omits_score_change_section_when_scores_before_null(self):
         result = self._formatter()(self._build(FULL_CONTEXT))
-        # No score-delta heading when scores_before is None
-        assert "Score" not in result or "score" not in result.lower() or \
-               "Score Changes" not in result
+        assert "Score Changes" not in result
 
     def test_contains_date(self):
         result = self._formatter()(self._build(FULL_CONTEXT))

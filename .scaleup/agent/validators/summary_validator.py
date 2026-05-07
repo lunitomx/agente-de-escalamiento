@@ -1,6 +1,7 @@
 """Quality gate: validate Session Summary section in session log file.
 
-Checks that a '## Session Summary' section header is present.
+Checks that a '## Session Summary' section header is present as a
+top-level markdown heading (anchored at start of line).
 
 Usage:
     python .scaleup/agent/validators/summary_validator.py <path-to-session-log>
@@ -9,10 +10,12 @@ Exit codes:
     0 — file is valid (## Session Summary present)
     1 — section missing, file not found, or read error
 """
+import re
 import sys
 from pathlib import Path
 
 REQUIRED_SECTION = "## Session Summary"
+_SECTION_RE = re.compile(r"^## Session Summary", re.MULTILINE)
 
 
 def validate_summary(log_path: str) -> list[str]:
@@ -35,7 +38,7 @@ def validate_summary(log_path: str) -> list[str]:
     except Exception as exc:
         return [f"Could not read file: {exc}"]
 
-    if REQUIRED_SECTION not in content:
+    if not _SECTION_RE.search(content):
         errors.append(f"Missing section: {REQUIRED_SECTION}")
 
     return errors
