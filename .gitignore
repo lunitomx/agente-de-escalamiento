@@ -45,3 +45,10 @@ Thumbs.db
 
 # RaiSE personal directory (per-developer, not shared)
 .raise/rai/personal/
+
+# === Agent directories (auto-synced, not project source) ===
+.agent/
+.hermes/
+
+# === Generated user data (exports, not source) ===
+.scaleup/my-company/exports/
