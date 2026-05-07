@@ -11,7 +11,7 @@ Close the coaching session by capturing what was accomplished, writing a structu
 
 ## Pipeline
 
-This skill orchestrates 3 phases + 1 quality gate.
+This skill orchestrates 3 phases + 1 quality gate + 1 summary generation step.
 
 ## Steps
 
@@ -89,6 +89,39 @@ print('PASS')
 |--------|--------|
 | PASS (0 errors) | Continue to Step 4 |
 | FAIL | Show errors, ask user to clarify, rewrite the log |
+
+### Step 3.5: Generate Session Summary
+
+After Step 3 quality gate passes, invoke the summary module with the session
+data collected in Step 1:
+
+```bash
+echo '{
+  "base_path": ".",
+  "log_file_path": "{log_file_path}",
+  "date": "{YYYY-MM-DD}",
+  "duration_minutes": {N},
+  "decision_focus": "{decision}",
+  "worksheets_completed": [{worksheets}],
+  "tasks_created": [{tasks_created}],
+  "tasks_completed": [{tasks_completed}],
+  "notes": [{notes}],
+  "scores_before": null
+}' | python3 -m coaching.summary
+```
+
+- Capture the returned JSON. If `errors` is non-empty, surface errors to user and abort.
+- Then run the summary quality gate:
+  ```bash
+  python3 .scaleup/agent/validators/summary_validator.py {log_file_path}
+  ```
+  Must exit 0. If it exits 1, surface the error and abort.
+- Continue to Step 4 only when both checks pass.
+
+**Adapter rules:**
+- MUST NOT contain business logic — only JSON assembly and subprocess invocation.
+- MUST NOT re-ask the user any questions (all data already collected in Step 1).
+- Step 4 confirmation text is unchanged.
 
 ### Step 4: Sync (Stub)
 
