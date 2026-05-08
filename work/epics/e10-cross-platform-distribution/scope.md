@@ -141,12 +141,12 @@ Script `scaleup-install` que:
 
 ## Done Criteria
 
-- [ ] Los 6 coaching engines construidos y testeados (welcome, diagnose, worksheet, progress, level, router)
-- [ ] `scaleup-install` instala exitosamente en Claude Code global
-- [ ] `scaleup-install` instala exitosamente en Hermes
-- [ ] Ejecutar `/scaleup-welcome` desde un proyecto vacío (fuera de este repo) funciona
-- [ ] Ejecutar `/scaleup-diagnose` en Hermes produce el mismo output que en Claude Code
-- [ ] Retrospectiva completada
+- [x] Los 6 coaching engines construidos y testeados (welcome, diagnose, worksheet, progress, level, router)
+- [x] `scaleup-install` instala exitosamente en Claude Code global
+- [x] `scaleup-install` instala exitosamente en Hermes
+- [x] Ejecutar `/scaleup-welcome` desde un proyecto vacío (fuera de este repo) funciona
+- [x] Ejecutar `/scaleup-diagnose` en Hermes produce el mismo output que en Claude Code
+- [x] Retrospectiva completada
 
 ## Risks
 
@@ -259,19 +259,19 @@ S10.4 (Worksheet) está fuera del critical path — puede retrasarse sin bloquea
 
 | Story | Status | Started | Completed | Notes |
 |-------|--------|---------|-----------|-------|
-| S10.1: Discovery | pending | — | — | |
-| S10.2: Welcome Engine | pending | — | — | |
-| S10.3: Diagnose Engine | pending | — | — | |
-| S10.4: Worksheet Engine | pending | — | — | Paralelo con S10.3 |
-| S10.5: Progress + Level | pending | — | — | |
-| S10.6: Router Engine | pending | — | — | |
-| S10.7: Claude Global Installer | pending | — | — | |
-| S10.8: Hermes Adapter | pending | — | — | |
-| S10.9: Unified Installer | pending | — | — | |
+| S10.1: Discovery | done | 2026-05-07 | 2026-05-07 | Compatibility matrix produced |
+| S10.2: Welcome Engine | done | 2026-05-07 | 2026-05-07 | 19 tests, walking skeleton validated |
+| S10.3: Diagnose Engine | done | 2026-05-07 | 2026-05-07 | 15 tests |
+| S10.4: Worksheet Engine | done | 2026-05-07 | 2026-05-07 | 18 tests, parallel with S10.3 |
+| S10.5: Progress + Level | done | 2026-05-07 | 2026-05-07 | 25 tests (11+14) |
+| S10.6: Router Engine | done | 2026-05-07 | 2026-05-07 | 12 tests |
+| S10.7: Claude Global Installer | done | 2026-05-07 | 2026-05-07 | 39 skills installed |
+| S10.8: Hermes Adapter | done | 2026-05-07 | 2026-05-07 | 39 skills installed |
+| S10.9: Unified Installer | done | 2026-05-07 | 2026-05-07 | install.sh --target all works |
 
 | Milestone | Target | Status |
 |-----------|--------|--------|
-| M1: Walking Skeleton | — | pending |
-| M2: Engines Complete | — | pending |
-| M3: E2E Cross-Platform | — | pending |
-| M4: Epic Complete | — | pending |
+| M1: Walking Skeleton | 2026-05-07 | done |
+| M2: Engines Complete | 2026-05-07 | done |
+| M3: E2E Cross-Platform | 2026-05-07 | done |
+| M4: Epic Complete | 2026-05-07 | done |
