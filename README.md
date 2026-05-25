@@ -57,6 +57,37 @@ Una vez instalado, puedes usar cualquiera de estos comandos desde tu terminal de
 - `/escala-level` — Nivel de coaching (Shu/Ha/Ri)
 - `/escala-export` — Plan de Acción exportable
 
+## 🚀 Primeros pasos
+
+1. **Instala** el agente siguiendo las instrucciones arriba
+2. **Abre tu terminal de IA** (Claude Code, Hermes o Codex)
+3. **Ejecuta** `/escala-welcome` para crear tu perfil de empresa
+4. **Ejecuta** `/escala-diagnose` para obtener tu diagnóstico inicial
+5. El agente te guiará al área que más necesita atención
+
+### Flujo recomendado
+
+```
+/escala-welcome → /escala-diagnose → [sub-agente recomendado] → /escala-pulse (seguimiento)
+```
+
+## ❓ Preguntas frecuentes
+
+**¿Necesito saber programar?**
+No. El agente se usa desde la terminal de IA con comandos simples como `/escala-diagnose`.
+
+**¿Funciona en cualquier proyecto?**
+Sí. Los skills se instalan globalmente en tu perfil y están disponibles en cualquier proyecto.
+
+**¿Puedo usarlo con cualquier modelo de IA?**
+Funciona con Claude Code, Hermes Agent y Codex CLI. Cada plataforma usa su propio modelo base.
+
+**¿Qué hago si un skill no funciona?**
+Verifica que ejecutaste `install.sh` desde la carpeta del repositorio. Si persiste el problema, abre un issue en GitHub.
+
+**¿Los datos de mi empresa son privados?**
+Sí. Todo se guarda localmente en tu máquina en `my-company/`. Nada se sube a ningún servidor externo.
+
 ## 📁 Estructura del proyecto
 
 ```
