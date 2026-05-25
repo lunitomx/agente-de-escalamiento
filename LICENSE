@@ -1,21 +1,13 @@
-MIT License
+# Agente de Escalamiento — Aviso de Uso Educativo
 
-Copyright (c) 2026 Agente de Escalamiento
+Este material se comparte exclusivamente con fines educativos y de aprendizaje.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Todo el contenido aquí presente está **inspirado en metodologías, conceptos y aprendizajes de dominio público**, así como en la experiencia práctica acumulada en escalamiento de negocios. No se reclama propiedad sobre las metodologías subyacentes.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+**No está autorizado el uso comercial** de este material ni su incorporación en productos o servicios con fines de lucro sin la debida atribución a los autores originales de las metodologías referenciadas.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Para atribuciones completas, consulta [ATTRIBUTIONS.md](ATTRIBUTIONS.md).
+
+---
+
+*Este proyecto no tiene una licencia formal. Se comparte como recurso educativo abierto. Si tienes dosis sobre su uso, contacta al autor.*

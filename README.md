@@ -70,10 +70,12 @@ agente-de-escalamiento/
 └── README.md
 ```
 
-## 📄 Licencia
+## 📄 Licencia y atribuciones
 
-MIT — libre para uso educativo y comercial.
+**Uso educativo exclusivamente.** Este material está inspirado en metodologías, conceptos y aprendizajes de dominio público sobre escalamiento de negocios. No se reclama propiedad sobre las metodologías subyacentes.
 
-## 🙏 Atribuciones
+No está autorizado el uso comercial sin la debida atribución a los autores originales. Consulta [ATTRIBUTIONS.md](ATTRIBUTIONS.md) para la lista completa de referencias.
 
-Este proyecto se inspira en metodologías desarrolladas por líderes del escalamiento de negocios. Consulta [ATTRIBUTIONS.md](ATTRIBUTIONS.md) para la lista completa de referencias y autores.
+---
+
+*Creado como recurso educativo para estudiantes de licenciatura. Inspirado en contenido público y aprendizajes previos en escalamiento de negocios.*
