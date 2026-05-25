@@ -144,7 +144,7 @@ S11.1 → S11.2 → S11.3 → S11.4 → S11.5 → S11.6
 | Story | Status | Started | Completed | Notes |
 |-------|--------|---------|-----------|-------|
 | S11.1: Crear repo y estructura | Done | 2026-05-24 | 2026-05-24 | Repo creado, LICENSE corregido, README listo |
-| S11.2: Anonimización profunda | Pending | — | — | |
+| S11.2: Anonimización profunda | Done | 2026-05-24 | 2026-05-24 | 39 skills migrados y anonimizados |
 | S11.3: Sistema de atribución | Pending | — | — | |
 | S11.4: Instalabilidad multiplataforma | Pending | — | — | |
 | S11.5: Documentación | Pending | — | — | |
