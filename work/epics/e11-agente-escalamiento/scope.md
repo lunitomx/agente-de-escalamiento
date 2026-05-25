@@ -145,10 +145,10 @@ S11.1 → S11.2 → S11.3 → S11.4 → S11.5 → S11.6
 |-------|--------|---------|-----------|-------|
 | S11.1: Crear repo y estructura | Done | 2026-05-24 | 2026-05-24 | Repo creado, LICENSE corregido, README listo |
 | S11.2: Anonimización profunda | Done | 2026-05-24 | 2026-05-24 | 39 skills migrados y anonimizados |
-| S11.3: Sistema de atribución | Pending | — | — | |
-| S11.4: Instalabilidad multiplataforma | Pending | — | — | |
-| S11.5: Documentación | Pending | — | — | |
-| S11.6: Push y verificación | Pending | — | — | |
+| S11.3: Sistema de atribución | Done | 2026-05-24 | 2026-05-24 | ATTRIBUTIONS.md + 17 skills atribuidos |
+| S11.4: Instalabilidad multiplataforma | Done | 2026-05-24 | 2026-05-24 | install.sh creado |
+| S11.5: Documentación | Done | 2026-05-24 | 2026-05-24 | README completo con FAQ |
+| S11.6: Push y verificación | Done | 2026-05-24 | 2026-05-24 | Verificado desde clon fresco |
 
 ### Sequencing Risks
 
