@@ -1,0 +1,26 @@
+# === Python ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# === OS files ===
+.DS_Store
+Thumbs.db
+
+# === Environment ===
+.env
+.env.local
+
+# === Editor ===
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# === Company data (user-specific, never commit) ===
+my-company/
