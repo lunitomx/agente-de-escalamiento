@@ -50,6 +50,8 @@ copy_skills() {
 
 copy_engine() {
     local dst="$1"
+    # Clean slate: remove old coaching engine to avoid orphaned files (engine.py, formatter.py, summary/)
+    rm -rf "$dst/coaching"
     mkdir -p "$dst/coaching"
     # Copy Python modules
     for mod in core dashboard diagnose export level progress pulse router welcome worksheet; do
@@ -64,7 +66,7 @@ copy_engine() {
         fi
     done
     cp "$COACHING_DIR/__init__.py" "$dst/coaching/" 2>/dev/null || true
-    info "Copied coaching engine to $dst/coaching/"
+    info "Copied coaching engine to $dst/coaching/ (clean install)"
 }
 
 copy_knowledge() {
