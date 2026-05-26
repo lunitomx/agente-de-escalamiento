@@ -18,7 +18,7 @@ VERSION="0.0.0"
 
 # Source directories
 SKILLS_DIR="$(dirname "$SCRIPT_DIR")/.claude/skills"
-COACHING_DIR="$SCRIPT_DIR/coaching"
+COACHING_DIR="$(dirname "$SCRIPT_DIR")/coaching"
 KNOWLEDGE_DIR="$SCRIPT_DIR/knowledge"
 AGENT_DIR="$SCRIPT_DIR/agent"
 
@@ -52,7 +52,7 @@ copy_engine() {
     local dst="$1"
     mkdir -p "$dst/coaching"
     # Copy Python modules
-    for mod in summary welcome diagnose worksheet progress level router; do
+    for mod in core dashboard diagnose export level progress pulse router welcome worksheet; do
         if [[ -d "$COACHING_DIR/$mod" ]]; then
             mkdir -p "$dst/coaching/$mod"
             cp "$COACHING_DIR/$mod/"*.py "$dst/coaching/$mod/" 2>/dev/null || true
