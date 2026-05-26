@@ -14,7 +14,7 @@ BOARD_TEMPLATE = """# Tareas y Compromisos
 
 ## En Progreso
 
-- [ ] Completar Core Values <!-- decision:people node:core-values-worksheet due:2026-05-01 -->
+- [ ] Completar Core Values <!-- decision:people node:core-values-worksheet due:2099-01-01 -->
 - [ ] Revisar CCC <!-- decision:cash due:2026-04-20 -->
 
 ## Próximo
@@ -43,7 +43,7 @@ class TestParseTasks:
         t = tasks["En Progreso"][0]
         assert t["decision"] == "people"
         assert t["node"] == "core-values-worksheet"
-        assert t["due"] == "2026-05-01"
+        assert t["due"] == "2099-01-01"
 
     def test_missing_file(self, tmp_path: pathlib.Path) -> None:
         p = tmp_path / "missing.md"
