@@ -17,6 +17,8 @@ chmod +x install.sh
 
 El instalador detecta automáticamente qué plataforma tienes instalada (Claude Code, Hermes Agent, Codex CLI) y configura los skills correspondientes.
 
+> **Codex CLI:** El archivo `CODEX.md` en la raíz del repo le da contexto a Codex para que funcione como coach de escalamiento. Codex lo lee automáticamente al iniciar en este directorio.
+
 ## 📋 Comandos disponibles
 
 Una vez instalado, puedes usar cualquiera de estos comandos desde tu terminal de IA:
@@ -56,6 +58,7 @@ Una vez instalado, puedes usar cualquiera de estos comandos desde tu terminal de
 - `/escala-dashboard` — Progress Dashboard
 - `/escala-level` — Nivel de coaching (Shu/Ha/Ri)
 - `/escala-export` — Plan de Acción exportable
+- `/escala-update` — Actualizar skills desde GitHub
 
 ## 🚀 Primeros pasos
 
@@ -85,6 +88,9 @@ Funciona con Claude Code, Hermes Agent y Codex CLI. Cada plataforma usa su propi
 **¿Qué hago si un skill no funciona?**
 Verifica que ejecutaste `install.sh` desde la carpeta del repositorio. Si persiste el problema, abre un issue en GitHub.
 
+**¿Cómo actualizo los skills?**
+Ejecuta `/escala-update` desde tu terminal de IA, o corre `./update.sh` desde la carpeta del repositorio. Ambos hacen `git pull` y reinstalan los skills automáticamente.
+
 **¿Los datos de mi empresa son privados?**
 Sí. Todo se guarda localmente en tu máquina en `my-company/`. Nada se sube a ningún servidor externo.
 
@@ -97,6 +103,8 @@ agente-de-escalamiento/
 ├── coaching/            # Motores Python de coaching
 ├── validators/          # Validadores Python
 ├── install.sh           # Instalador multiplataforma
+├── update.sh            # Actualizador desde GitHub
+├── CODEX.md             # Contexto para Codex CLI
 ├── ATTRIBUTIONS.md      # Atribuciones a autores originales
 └── README.md
 ```

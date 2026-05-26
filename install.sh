@@ -93,6 +93,15 @@ for p in "${PLATAFORMAS[@]}"; do
     esac
 done
 
+# ----------------------
+# Guardar ruta del repo
+# ----------------------
+CONFIG_DIR="$HOME/.config/agente-de-escalamiento"
+mkdir -p "$CONFIG_DIR"
+echo "$SCRIPT_DIR" > "$CONFIG_DIR/repo-path"
+echo "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$CONFIG_DIR/last-update"
+echo -e "  ${VERDE}✓${NC} Ruta guardada: ${CONFIG_DIR}/repo-path"
+
 echo ""
 echo -e "${VERDE}╔══════════════════════════════════════════════╗${NC}"
 echo -e "${VERDE}║   Instalación completada exitosamente        ║${NC}"
@@ -106,5 +115,6 @@ echo "  para crear tu perfil de empresa."
 echo ""
 echo "  Para ver todos los comandos disponibles, consulta el README."
 echo ""
-echo -e "  ${AMARILLO}Nota:${NC} Si mueves el repositorio de carpeta, vuelve a ejecutar install.sh"
-echo "  para actualizar las rutas."
+echo -e "  ${AMARILLO}Nota:${NC} Para actualizar más tarde, ejecuta:"
+echo "    ./update.sh          (si tienes el repo)"
+echo "    /escala-update       (desde tu terminal de IA)"
