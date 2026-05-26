@@ -11,7 +11,7 @@ Mostrar el progreso del usuario en las 4 decisiones: scores actuales, worksheets
 
 ## Architecture
 
-Adapter delgado. Core logic en `.scaleup/coaching/progress/`.
+Adapter delgado. Core logic en `coaching.progress`.
 
 ## Steps
 

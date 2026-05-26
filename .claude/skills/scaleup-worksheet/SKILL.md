@@ -11,7 +11,7 @@ Guiar al usuario a través de cualquier worksheet de Scaling Up, cargado desde l
 
 ## Architecture
 
-Adapter delgado. Core logic en `.scaleup/coaching/worksheet/`.
+Adapter delgado. Core logic en `coaching.worksheet`.
 
 ## Steps
 

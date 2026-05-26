@@ -11,7 +11,7 @@ Dar la bienvenida, recoger info de la empresa y guardar el perfil usando el core
 
 ## Architecture
 
-Este skill es un **adapter delgado** que invoca el core module en `.scaleup/coaching/welcome/`.
+Este skill es un **adapter delgado** que invoca el core module `coaching.welcome`.
 La lógica de negocio (validación, stage detection, persistencia) vive en Python, no en SKILL.md.
 
 ## Steps

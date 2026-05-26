@@ -7,7 +7,7 @@ name: scaleup-diagnose
 
 ## Purpose
 
-Evaluar el estado de la empresa en las 4 decisiones mediante preguntas guiadas. Generar reporte con scores y priorización. Usa el core module en `.scaleup/coaching/diagnose/`.
+Evaluar el estado de la empresa en las 4 decisiones mediante preguntas guiadas. Generar reporte con scores y priorización. Usa el core Python module `coaching.diagnose`.
 
 ## Architecture
 

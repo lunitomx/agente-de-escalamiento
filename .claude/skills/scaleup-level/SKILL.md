@@ -11,7 +11,7 @@ Detectar automáticamente el nivel de coaching del usuario (Shu/Ha/Ri) basado en
 
 ## Architecture
 
-Adapter delgado. Core logic en `.scaleup/coaching/level/`.
+Adapter delgado. Core logic en `coaching.level`.
 
 ## Steps
 
