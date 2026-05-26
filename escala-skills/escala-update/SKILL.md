@@ -55,11 +55,17 @@ else
 fi
 ```
 
-### Paso 4: Reinstalar skills
+### Paso 4: Reinstalar skills + paquete Python
 
 ```bash
 bash install.sh
 ```
+
+El instalador se encarga de:
+- Actualizar symlinks de skills
+- Actualizar el paquete Python (`pip install -e .`)
+- Verificar que los módulos importan correctamente
+- Guardar versión y timestamp
 
 ### Paso 5: Guardar timestamp
 
@@ -79,5 +85,7 @@ echo "✓ Última actualización: $(cat $HOME/.config/agente-de-escalamiento/las
 ## Notas
 
 - Requiere haber ejecutado `install.sh` al menos una vez (guarda la ruta)
+- Skills instalados como symlinks → después de `update.sh` o git pull manual, los skills se actualizan automáticamente sin necesidad de reinstalar
+- El paquete Python `escala-coaching` se instala con `pip install -e .` para que los imports funcionen desde cualquier directorio
 - Si moviste el repo de carpeta, ejecuta `install.sh` de nuevo para actualizar la ruta
 - El repo debe estar clonado con HTTPS (git clone), no descargado como ZIP

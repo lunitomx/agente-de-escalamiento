@@ -1,0 +1,32 @@
+id: tool-scoreboard
+type: tool
+name: Scoreboard
+name_es: Marcador de Desempeno
+decision: execution
+summary: >
+  A visible, real-time display of the Critical Number, KPIs, and Rock status posted
+  throughout the company (physical or digital). Scoreboards make progress transparent
+  to every employee without requiring a meeting. The best scoreboards are updated weekly,
+  include both the current value and the target, and show trend direction. Companies with
+  visible scoreboards see 2x the focus on Key metrics vs those that share data only in
+  meetings. The scoreboard is the physical embodiment of the Quarterly Theme.
+source:
+  book_chapter: "THE DATA"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 1007
+  workbook_file: "metodologias_parsed/execution_workbook.txt"
+  workbook_line: 538
+relationships:
+  - type: belongs-to
+    target: decision-execution
+  - type: requires
+    target: concept-critical-number
+  - type: requires
+    target: concept-quarterly-theme
+  - type: requires
+    target: concept-leading-indicators
+tags: [execution, scoreboard, transparency, KPI, visibility, culture]
+metadata:
+  difficulty: beginner
+  time_estimate: "2-4 hours to design; 15 min/week to update"
+  frequency: weekly

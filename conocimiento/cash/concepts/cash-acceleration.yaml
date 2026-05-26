@@ -1,0 +1,35 @@
+id: concept-cash-acceleration
+type: concept
+name: Cash Acceleration Strategies
+name_es: Estrategias de Aceleracion de Efectivo
+decision: cash
+summary: >
+  Operational and commercial techniques for shortening the Cash Conversion Cycle and
+  generating cash internally. Key strategies: (1) get paid before you deliver (deposits,
+  subscriptions, retainers), (2) shorten the sales cycle (reduce decision time),
+  (3) speed up delivery (reduce WIP), (4) collect faster (automated invoicing, early-pay
+  discounts, upfront payments), (5) extend payables strategically (pay on due date,
+  not early). The best cash strategy is to redesign the business model so cash arrives
+  before costs are incurred.
+source:
+  book_chapter: "SCALING UP CASH"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 8286
+  workbook_file: "metodologias_parsed/cash_workbook.txt"
+  workbook_line: 704
+relationships:
+  - type: belongs-to
+    target: decision-cash
+  - type: requires
+    target: concept-ccc
+  - type: feeds-into
+    target: tool-ar-optimization
+  - type: requires
+    target: concept-priorities-rocks
+tags: [cash, acceleration, CCC, collection, pricing, business-model]
+metadata:
+  difficulty: advanced
+  application: >
+    Run a CCC workshop: for each sub-cycle (sales, delivery, billing), brainstorm
+    3 operational changes that could reduce cycle time by 20%. Pick the highest-impact
+    change per cycle and implement in the next 90 days.

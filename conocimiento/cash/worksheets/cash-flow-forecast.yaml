@@ -1,0 +1,35 @@
+id: worksheet-cash-flow-forecast
+type: worksheet
+name: 13-Week Cash Flow Forecast
+name_es: Proyeccion de Flujo de Efectivo a 13 Semanas
+decision: cash
+summary: >
+  A rolling 13-week (one quarter) cash flow projection that shows week-by-week cash
+  inflows, outflows, and ending cash balance. The 13-week horizon is short enough to
+  be accurate and long enough to catch a cash crisis before it hits. Updated weekly —
+  the act of updating forces awareness of upcoming large payments and collection gaps.
+  Companies that run 13-week forecasts never get blindsided by cash shortfalls.
+source:
+  book_chapter: "SCALING UP CASH"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 8286
+relationships:
+  - type: belongs-to
+    target: decision-cash
+  - type: requires
+    target: concept-working-capital
+tags: [cash, worksheet, forecast, 13-week, planning, cash-flow]
+metadata:
+  fields:
+    - "Week number and date range (13 weeks)"
+    - "Opening cash balance"
+    - "Inflows: customer payments (by invoice), other income"
+    - "Outflows: payroll, rent, vendor payments, debt service, taxes"
+    - "Net cash flow (inflows minus outflows)"
+    - "Ending cash balance"
+    - "Minimum cash buffer: 3 months operating expenses"
+    - "Alert trigger: if ending balance drops below minimum buffer"
+  output: "13-week cash visibility — identifies shortfalls 4-8 weeks before they occur"
+  difficulty: intermediate
+  time_estimate: "3-4 hours to set up; 30 min/week to update"
+  frequency: weekly

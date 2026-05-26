@@ -1,0 +1,29 @@
+id: tool-annual-planning
+type: tool
+name: Annual Planning Session
+name_es: Sesion de Planeacion Anual
+decision: execution
+summary: >
+  A 2-3 day session held before year-end to refresh the full OPSP, set annual priorities
+  (Chapters), update the BHAG progress, run a fresh SWT analysis, and define Q1 Rocks.
+  The annual session is the most strategic of the five meeting types — it connects
+  day-to-day execution back to the 25-year BHAG. Leadership team attends in full.
+  Output: updated OPSP, 3-5 annual priorities (Chapters), Q1 Critical Number and Rocks.
+source:
+  book_chapter: "THE MEETING RHYTHM"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 494
+  workbook_file: "metodologias_parsed/execution_workbook.txt"
+  workbook_line: 890
+relationships:
+  - type: belongs-to
+    target: decision-execution
+  - type: requires
+    target: concept-meeting-rhythm
+  - type: feeds-into
+    target: tool-quarterly-planning
+tags: [execution, annual-planning, OPSP, strategy, rhythm, offsite]
+metadata:
+  difficulty: advanced
+  time_estimate: "2-3 days"
+  frequency: annually

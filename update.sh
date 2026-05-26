@@ -98,6 +98,8 @@ fi
 echo -e "  ${CYAN}Reinstalando skills...${NC}"
 bash install.sh
 
+# --- El install.sh ya actualiza el paquete Python ---
+
 # --- Guardar timestamp ---
 mkdir -p "$CONFIG_DIR"
 date -u +%Y-%m-%dT%H:%M:%SZ > "$CONFIG_DIR/last-update"
@@ -108,6 +110,10 @@ echo -e "${VERDE}║   Actualización completada exitosamente     ║${NC}"
 echo -e "${VERDE}╚══════════════════════════════════════════════╝${NC}"
 echo ""
 echo "  Última actualización: $(cat $CONFIG_DIR/last-update)"
+echo "  Versión: $(cat $CONFIG_DIR/version 2>/dev/null || echo 'desconocida')"
 echo ""
 echo -e "  ${AMARILLO}Nota:${NC} Desde tu terminal de IA también puedes usar:"
 echo "    /escala-update"
+echo ""
+echo -e "  Para verificar que todo funciona:"
+echo "    /escala-health"

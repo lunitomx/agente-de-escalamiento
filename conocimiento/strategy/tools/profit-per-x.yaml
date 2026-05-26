@@ -1,0 +1,36 @@
+id: tool-profit-per-x
+type: tool
+name: Profit per X
+name_es: Beneficio por X (Motor Economico)
+decision: strategy
+summary: >
+  The seventh stratum: the single economic denominator that best represents how the
+  business generates profit — the "X" in "Profit per X." Borrowed from Jim Collins'
+  "Good to Great." Examples: profit per customer, profit per location, profit per
+  employee, profit per transaction. Identifying the right X clarifies resource
+  allocation decisions and reveals the true economic engine of the business. Used
+  alongside the BHAG in the OPSP's strategic column.
+source:
+  book_chapter: "THE 7 STRATA OF STRATEGY"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 838
+  workbook_file: "metodologias_parsed/strategy_workbook.txt"
+  workbook_line: 362
+relationships:
+  - type: belongs-to
+    target: decision-strategy
+  - type: feeds-into
+    target: tool-7-strata
+  - type: feeds-into
+    target: tool-opsp
+  - type: measured-by
+    target: metric-profit-per-x-value
+  - type: requires
+    target: concept-gross-margin
+  - type: requires
+    target: concept-revenue-per-employee
+tags: [strategy, profit-per-X, economic-engine, Collins, BHAG, 7-strata]
+metadata:
+  difficulty: advanced
+  time_estimate: "1-2 hours to identify X; ongoing tracking"
+  frequency: quarterly

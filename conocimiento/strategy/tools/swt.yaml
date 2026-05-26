@@ -1,0 +1,30 @@
+id: tool-swt
+type: tool
+name: "SWT — Strengths, Weaknesses, Trends"
+name_es: "SWT — Fortalezas, Debilidades, Tendencias"
+decision: strategy
+summary: >
+  An augmented strategic analysis tool that replaces the traditional SWOT. SWT drops
+  Opportunities (which are obvious from Trends) and focuses on: Strengths (internal
+  capabilities to leverage), Weaknesses (internal gaps to address), and Trends
+  (external forces shaping the industry — macro, competitive, technological). The key
+  insight: opportunities are derived from the intersection of your strengths and
+  favorable trends. SWT output feeds the bottom of the OPSP and informs annual priorities.
+source:
+  book_chapter: "THE ONE-PAGE STRATEGIC PLAN"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 804
+  workbook_file: "metodologias_parsed/strategy_workbook.txt"
+  workbook_line: 348
+relationships:
+  - type: belongs-to
+    target: decision-strategy
+  - type: feeds-into
+    target: tool-opsp
+  - type: implements
+    target: worksheet-swt
+tags: [strategy, SWT, SWOT, analysis, strengths, weaknesses, trends]
+metadata:
+  difficulty: intermediate
+  time_estimate: "2-3 hours leadership team session"
+  frequency: annually

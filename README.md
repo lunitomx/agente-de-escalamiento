@@ -59,6 +59,7 @@ Una vez instalado, puedes usar cualquiera de estos comandos desde tu terminal de
 - `/escala-level` — Nivel de coaching (Shu/Ha/Ri)
 - `/escala-export` — Plan de Acción exportable
 - `/escala-update` — Actualizar skills desde GitHub
+- `/escala-health` — Verificar instalación (skills, paquete Python, imports)
 
 ## 🚀 Primeros pasos
 
@@ -98,13 +99,15 @@ Sí. Todo se guarda localmente en tu máquina en `my-company/`. Nada se sube a n
 
 ```
 agente-de-escalamiento/
-├── escala-skills/       # Skills del agente (instalables)
+├── escala-skills/       # Skills del agente (instalables como symlinks)
+├── coaching/            # Motor Python de coaching
 ├── conocimiento/        # Base de conocimiento estructurada
-├── coaching/            # Motores Python de coaching
 ├── validators/          # Validadores Python
-├── install.sh           # Instalador multiplataforma
+├── install.sh           # Instalador: skills + paquete Python
 ├── update.sh            # Actualizador desde GitHub
+├── uninstall.sh         # Desinstalador completo
 ├── CODEX.md             # Contexto para Codex CLI
+├── pyproject.toml       # Paquete Python escala-coaching
 ├── ATTRIBUTIONS.md      # Atribuciones a autores originales
 └── README.md
 ```

@@ -1,0 +1,27 @@
+id: concept-love-loathe
+type: concept
+name: Love/Loathe Exercise
+name_es: Ejercicio Amor/Odio
+decision: people
+summary: >
+  A role optimization framework: each person lists their most important weekly tasks
+  and marks each as "love" (energizing, strength-based) or "loathe" (draining, but
+  possibly skilled). Tasks that are loathed and non-core to the role become candidates
+  for delegation, automation, or elimination. The goal: maximize time doing work that
+  energizes. People are most productive when doing what they love.
+source:
+  book_chapter: "THE TEAM"
+  file: "metodologias_parsed/people_workbook.txt"
+  file_line: 2154
+relationships:
+  - type: belongs-to
+    target: decision-people
+  - type: implements
+    target: worksheet-love-loathe
+tags: [people, role-fit, delegation, productivity, strengths]
+metadata:
+  difficulty: beginner
+  application: >
+    Do this exercise individually for each team member each quarter.
+    Identify top "loathe" task and create an action to delegate, automate,
+    or abdicate it. Add to quarterly personal priority.

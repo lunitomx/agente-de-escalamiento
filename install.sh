@@ -13,7 +13,7 @@ VERSION="1.0.0"
 VERDE='\033[0;32m'
 AMARILLO='\033[1;33m'
 CYAN='\033[0;36m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
 echo -e "${CYAN}"
 echo "╔══════════════════════════════════════════════╗"
@@ -36,7 +36,6 @@ if command -v hermes &>/dev/null; then
     echo -e "  ${VERDE}✓${NC} Hermes Agent detectado"
 fi
 
-# Codex CLI puede estar como 'codex' o como parte del PATH
 if command -v codex &>/dev/null; then
     PLATAFORMAS+=("codex")
     echo -e "  ${VERDE}✓${NC} Codex CLI detectado"
@@ -53,7 +52,7 @@ if [ ${#PLATAFORMAS[@]} -eq 0 ]; then
 fi
 
 # ----------------------
-# Función de instalación
+# Función de instalación (SYMLINKS)
 # ----------------------
 instalar_en() {
     local plataforma="$1"
@@ -64,34 +63,70 @@ instalar_en() {
 
     mkdir -p "$destino"
 
-    # Copiar skills
+    # Primero eliminar symlinks viejos (por si cambió la ruta del repo)
+    for link in "$destino"/escala-*; do
+        if [ -L "$link" ]; then
+            rm "$link"
+        fi
+    done
+
+    # Crear symlinks en lugar de copiar
     local count=0
     for skill_dir in "$SCRIPT_DIR/escala-skills"/escala-*/; do
         local skill_name
         skill_name=$(basename "$skill_dir")
-        cp -r "$skill_dir" "$destino/$skill_name"
+        ln -sfn "$skill_dir" "$destino/$skill_name"
         count=$((count + 1))
     done
 
-    echo -e "    ${VERDE}✓${NC} $count skills instalados en ${destino}"
+    echo -e "    ${VERDE}✓${NC} $count skills instalados (symlinks) en ${destino}"
 }
 
 # ----------------------
-# Ejecutar instalación
+# Función de instalación para skills viejos (migración cp→symlink)
 # ----------------------
+echo ""
+echo -e "  ${CYAN}Instalando skills como symlinks...${NC}"
 for p in "${PLATAFORMAS[@]}"; do
     case "$p" in
-        claude)
-            instalar_en "Claude Code" "$HOME/.claude/skills"
-            ;;
-        hermes)
-            instalar_en "Hermes Agent" "$HOME/.hermes/skills"
-            ;;
-        codex)
-            instalar_en "Codex CLI" "$HOME/.codex/skills"
-            ;;
+        claude)  instalar_en "Claude Code" "$HOME/.claude/skills" ;;
+        hermes)  instalar_en "Hermes Agent" "$HOME/.hermes/skills" ;;
+        codex)   instalar_en "Codex CLI" "$HOME/.codex/skills" ;;
     esac
 done
+
+# ----------------------
+# Instalar paquete Python (coaching + validators)
+# ----------------------
+echo ""
+echo -e "  ${CYAN}Instalando paquete Python...${NC}"
+
+# Detectar pip (python3 -m pip es más portable que pip)
+PYTHON_PIP="python3 -m pip"
+
+# Verificar si ya está instalado y actualizar
+if $PYTHON_PIP show escala-coaching &>/dev/null; then
+    $PYTHON_PIP install -e "$SCRIPT_DIR" --quiet 2>&1 | tail -1 || true
+    echo -e "    ${VERDE}✓${NC} Paquete Python actualizado: escala-coaching"
+else
+    $PYTHON_PIP install -e "$SCRIPT_DIR" --quiet 2>&1 | tail -1 || {
+        echo -e "    ${AMARILLO}⚠ No se pudo instalar el paquete Python.${NC}"
+        echo "      Puedes instalarlo manualmente con:"
+        echo "      cd $SCRIPT_DIR && pip install -e ."
+    }
+    echo -e "    ${VERDE}✓${NC} Paquete Python instalado: escala-coaching"
+fi
+
+# Verificar que los módulos importan
+python3 -c "
+from coaching.diagnose import run as d
+from coaching.level import run as l
+from coaching.progress import run as p
+from coaching.welcome import run as w
+from coaching.worksheet import run as ws
+from validators.tasks import find_overdue
+from validators.session import validate_session_log
+" 2>/dev/null && echo -e "    ${VERDE}✓${NC} Todos los módulos Python funcionan" || echo -e "    ${AMARILLO}⚠ Error en algún módulo Python${NC}"
 
 # ----------------------
 # Guardar ruta del repo
@@ -99,9 +134,19 @@ done
 CONFIG_DIR="$HOME/.config/agente-de-escalamiento"
 mkdir -p "$CONFIG_DIR"
 echo "$SCRIPT_DIR" > "$CONFIG_DIR/repo-path"
+echo "v$VERSION" > "$CONFIG_DIR/version"
 echo "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$CONFIG_DIR/last-update"
 echo -e "  ${VERDE}✓${NC} Ruta guardada: ${CONFIG_DIR}/repo-path"
+echo -e "  ${VERDE}✓${NC} Versión: v$VERSION"
 
+# ----------------------
+# Hacer ejecutables los scripts
+# ----------------------
+chmod +x "$SCRIPT_DIR/update.sh" "$SCRIPT_DIR/uninstall.sh" 2>/dev/null || true
+
+# ----------------------
+# Resumen final
+# ----------------------
 echo ""
 echo -e "${VERDE}╔══════════════════════════════════════════════╗${NC}"
 echo -e "${VERDE}║   Instalación completada exitosamente        ║${NC}"
@@ -109,12 +154,20 @@ echo -e "${VERDE}╚════════════════════
 echo ""
 echo "  Plataformas configuradas: ${PLATAFORMAS[*]}"
 echo "  Skills instalados: $(ls -d "$SCRIPT_DIR/escala-skills"/escala-* 2>/dev/null | wc -l)"
+echo "  Paquete Python: escala-coaching v$VERSION"
 echo ""
 echo "  Próximo paso: Abre tu terminal de IA y ejecuta /escala-welcome"
 echo "  para crear tu perfil de empresa."
 echo ""
-echo "  Para ver todos los comandos disponibles, consulta el README."
-echo ""
-echo -e "  ${AMARILLO}Nota:${NC} Para actualizar más tarde, ejecuta:"
-echo "    ./update.sh          (si tienes el repo)"
+echo "  Para actualizar más tarde:"
+echo "    ./update.sh          (terminal)"
 echo "    /escala-update       (desde tu terminal de IA)"
+echo ""
+echo "  Para verificar instalación:"
+echo "    /escala-health       (desde tu terminal de IA)"
+echo ""
+echo "  Para desinstalar:"
+echo "    ./uninstall.sh       (terminal)"
+echo ""
+echo -e "  ${AMARILLO}Importante:${NC} Skills instalados como symlinks."
+echo "  Cuando hagas git pull, los skills se actualizan automáticamente."

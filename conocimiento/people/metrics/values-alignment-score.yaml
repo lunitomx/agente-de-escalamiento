@@ -1,0 +1,25 @@
+id: metric-values-alignment-score
+type: metric
+name: Values Alignment Score
+name_es: Puntuacion de Alineacion de Valores
+decision: people
+summary: >
+  Measures the degree to which each team member's behavior consistently reflects the
+  company's Core Values. Assessed quarterly during performance reviews using a simple
+  rating per value (consistently demonstrates / sometimes demonstrates / rarely demonstrates).
+  A person can be highly competent but values-misaligned — that person must eventually
+  exit. Core Values alignment is non-negotiable; skill gaps can be trained, values cannot.
+source:
+  book_chapter: "THE CORE"
+  file: "metodologias_parsed/people_workbook.txt"
+  file_line: 541
+relationships:
+  - type: belongs-to
+    target: decision-people
+  - type: measured-by
+    target: concept-core-values
+tags: [people, metric, values, culture, alignment, performance]
+metadata:
+  unit: score (1-3 per value)
+  direction: higher_better
+  benchmark: "All team members should consistently demonstrate all Core Values; any 'rarely' triggers coaching or exit"

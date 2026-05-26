@@ -1,0 +1,31 @@
+id: worksheet-face
+type: worksheet
+name: FACe Worksheet
+name_es: Hoja de Trabajo FACe
+decision: people
+summary: >
+  The completable FACe template: a table listing each business function, the person
+  accountable, their leading KPIs, and the P&L line item they own. Forces one name
+  per function. Complete by taking the P&L, Balance Sheet, and Cash Flow statement
+  and assigning a person to each line — then derive the appropriate results/outcomes
+  for each function.
+source:
+  file: "metodologias_parsed/people_workbook.txt"
+  file_line: 1217
+relationships:
+  - type: belongs-to
+    target: decision-people
+  - type: implements
+    target: tool-face
+tags: [people, worksheet, accountability, FACe, functions, KPIs]
+metadata:
+  fields:
+    - "Functions list (Head of Company, Sales, Finance, Operations, HR, IT, Customer Advocacy, Business Units)"
+    - "Person Accountable (one name per function)"
+    - "Leading Indicators / KPIs per function"
+    - "Results/Outcomes (P&L line items)"
+    - "Four questions per person: right person? right seat? happy? would you rehire?"
+  output: "Complete accountability map — who owns what, measured by what"
+  difficulty: beginner
+  time_estimate: "2-4 hours first time"
+  frequency: quarterly

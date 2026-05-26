@@ -1,0 +1,33 @@
+id: tool-power-of-one
+type: tool
+name: Power of One
+name_es: El Poder del Uno (7 Palancas Financieras)
+decision: cash
+summary: >
+  A scenario analysis tool showing the cash and EBIT impact of improving each of seven
+  financial levers by just 1%: (1) Price, (2) Volume, (3) Cost of Goods Sold,
+  (4) Operating Expenses, (5) Accounts Receivable days, (6) Accounts Payable days,
+  (7) Inventory days. The tool reveals which 1% change produces the largest cash impact
+  in the specific business. Almost always, a 1% price increase has 5-10x more impact
+  than a 1% increase in volume — because volume growth consumes cash while price
+  improvement does not.
+source:
+  book_chapter: "THE POWER OF ONE"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 1042
+  workbook_file: "metodologias_parsed/cash_workbook.txt"
+  workbook_line: 838
+relationships:
+  - type: belongs-to
+    target: decision-cash
+  - type: requires
+    target: concept-ccc
+  - type: requires
+    target: concept-gross-margin
+  - type: implements
+    target: worksheet-power-of-one
+tags: [cash, power-of-one, levers, price, volume, COGS, AR, AP, inventory]
+metadata:
+  difficulty: intermediate
+  time_estimate: "2-3 hours to build model; recurring analysis quarterly"
+  frequency: quarterly

@@ -1,0 +1,26 @@
+id: stage-growth
+type: stage
+name: Growth
+name_es: Crecimiento
+summary: 'The company has found product-market fit and is growing revenue consistently.
+  The founder is transitioning from doing everything to delegating. Infrastructure
+  and processes start to matter. The team grows beyond what one person can manage.
+
+  '
+source:
+  book_chapter: THE OVERVIEW
+  book_line: 229
+relationships: []
+tags:
+- stage
+- growth
+- delegation
+- infrastructure
+metadata:
+  revenue_range: $1M - $10M
+  employee_range: 10 - 50
+  characteristics:
+  - Founder begins delegating key functions
+  - First layer of middle management
+  - Processes needed to avoid chaos
+  - Culture starts to dilute without intentional effort

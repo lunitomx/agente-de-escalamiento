@@ -1,0 +1,28 @@
+id: tool-oppp
+type: tool
+name: One-Page Personal Plan (OPPP)
+name_es: Plan Personal de Una Pagina (OPPP)
+decision: people
+summary: >
+  A personal planning tool that mirrors the One-Page Strategic Plan (OPSP) at the individual
+  level. Four columns covering: personal purpose (long-term vision), roles and relationships
+  (key relationships to nurture), goals (1-year and 3-year personal targets), and actions
+  (quarterly priorities). The 5Fs — Faith, Family, Friends, Fitness, Finance — serve as
+  reminders of life dimensions to balance. Used to align personal and professional goals
+  so individuals feel their work serves their whole life.
+source:
+  book_chapter: "THE LEADERS"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 1721
+relationships:
+  - type: belongs-to
+    target: decision-people
+  - type: implements
+    target: worksheet-oppp
+  - type: measured-by
+    target: metric-role-fit-score
+tags: [people, personal-plan, OPPP, alignment, goals, 5Fs]
+metadata:
+  difficulty: beginner
+  time_estimate: "1-2 hours first time"
+  frequency: quarterly

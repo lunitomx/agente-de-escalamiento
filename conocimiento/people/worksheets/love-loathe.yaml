@@ -1,0 +1,32 @@
+id: worksheet-love-loathe
+type: worksheet
+name: Love/Loathe Worksheet
+name_es: Hoja de Trabajo Amor/Odio
+decision: people
+summary: >
+  Individual worksheet where each team member lists their 5 most important recurring
+  weekly tasks ranked by importance, then marks each as "love" (energizing, strength-based)
+  or "loathe" (draining). Tasks that are loathed and non-core to the role are candidates
+  for delegation, automation, or elimination. Results inform role redesign and quarterly
+  personal priorities. Pair with DiSC and Gallup StrengthsFinder for deeper insight.
+source:
+  file: "metodologias_parsed/people_workbook.txt"
+  file_line: 2227
+relationships:
+  - type: belongs-to
+    target: decision-people
+  - type: implements
+    target: concept-love-loathe
+tags: [people, worksheet, role-fit, delegation, productivity, strengths]
+metadata:
+  fields:
+    - "Name and Date"
+    - "Tasks I LOVE (ranked 1-5 by importance)"
+    - "Tasks I LOATHE (ranked 1-5 by importance)"
+    - "Circle CORE tasks in each column (non-delegable)"
+    - "Top LOATHE action: delegation / automation / abdication plan"
+    - "Quarterly priority: reassignment action item"
+  output: "Role optimization plan with specific delegation candidates and quarterly action"
+  difficulty: beginner
+  time_estimate: "30 minutes"
+  frequency: quarterly

@@ -1,0 +1,25 @@
+id: metric-brand-promise-kept-rate
+type: metric
+name: Brand Promise Kept Rate
+name_es: Tasa de Cumplimiento de la Promesa de Marca
+decision: strategy
+summary: >
+  The percentage of customer interactions in which the Brand Promise was fully kept.
+  A brand promise is only a strategy when it is consistently delivered — otherwise it
+  is marketing copy. Tracked via customer feedback, NPS, or specific guarantee triggers.
+  A strong Brand Promise Guarantee (catalytic mechanism) makes measurement automatic:
+  if the guarantee triggers, the promise was broken. Target: 95%+ kept rate.
+source:
+  book_chapter: "THE 7 STRATA OF STRATEGY"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 825
+relationships:
+  - type: belongs-to
+    target: decision-strategy
+  - type: measured-by
+    target: concept-brand-promise
+tags: [strategy, metric, brand-promise, customer, NPS, quality]
+metadata:
+  unit: percentage
+  direction: higher_better
+  benchmark: "95%+ is target; below 90% signals operational failure to deliver strategy"

@@ -1,0 +1,33 @@
+id: worksheet-oppp
+type: worksheet
+name: One-Page Personal Plan (OPPP) Worksheet
+name_es: Hoja de Trabajo Plan Personal de Una Pagina
+decision: people
+summary: >
+  The OPPP template: four columns covering personal purpose, key relationships, goals,
+  and quarterly priorities. Uses the 5Fs (Faith, Family, Friends, Fitness, Finance) as
+  life-dimension reminders. Long-term thinking (25-year vision) feeds medium-term targets
+  (3-year), which feed annual goals, which feed quarterly actions. Completed by every
+  team member to align personal and professional purpose.
+source:
+  file: "scaling_up_llamaparse.txt"
+  file_line: 1962
+relationships:
+  - type: belongs-to
+    target: decision-people
+  - type: implements
+    target: tool-oppp
+tags: [people, worksheet, personal-plan, OPPP, alignment, goals, 5Fs]
+metadata:
+  fields:
+    - "Name and Date"
+    - "Column 1 — Personal Purpose: long-term vision (25 years), 3-year picture"
+    - "Column 2 — Roles and Relationships: key people to nurture (family, mentors, team)"
+    - "Column 3 — Goals: 1-year targets across 5Fs (Faith, Family, Friends, Fitness, Finance)"
+    - "Column 4 — Priorities: this quarter's 3-5 personal rocks"
+    - "Achievements: define what 'making a difference' looks like"
+    - "Stop doing: time/energy drains to eliminate"
+  output: "Personal strategic plan aligned with company direction and individual purpose"
+  difficulty: beginner
+  time_estimate: "1-2 hours first time, 30 min quarterly update"
+  frequency: quarterly
