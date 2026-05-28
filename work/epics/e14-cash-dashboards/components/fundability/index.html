@@ -501,8 +501,10 @@ function buildSummaryTable(data) {
   var table = el('div', {
     cls: 'fundability-table',
     role: 'table',
-    aria: 'Criterios de Fundability'
+    aria: 'Criterios de Fundability',
+    data: { rowcount: String(data.criteria.length) }
   });
+  table.setAttribute('aria-rowcount', String(data.criteria.length));
 
   data.criteria.forEach(function(c) {
     var label = el('div', {
