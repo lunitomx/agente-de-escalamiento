@@ -695,9 +695,11 @@ function statusFor(cfImpact, ebitImpact, revenue) {
 
 /**
  * Aggregate status for summary row.
- * Green: both totals positive. Red: both negative. Yellow: mixed or near zero.
+ * Uses directional logic (sign-based), not the per-row ±5% threshold.
+ * Intentional divergence: per-row status measures magnitude relative to revenue;
+ * summary row measures overall direction (both up = green, both down = red, mixed = yellow).
  */
-function aggregateStatus(totalCF, totalEBIT, revenue) {
+function aggregateStatus(totalCF, totalEBIT) {
   if (totalCF === 0 && totalEBIT === 0) return 'semaforo-gray';
   if (totalCF > 0 && totalEBIT >= 0) return 'semaforo-green';
   if (totalCF < 0 && totalEBIT <= 0) return 'semaforo-red';
@@ -913,7 +915,7 @@ function buildVariableRow(key, varData, impact, revenue) {
  * Builds the TOTAL IMPACTO summary/footer row.
  */
 function buildSummaryRow(totalCF, totalEBIT, revenue) {
-  var status = aggregateStatus(totalCF, totalEBIT, revenue);
+  var status = aggregateStatus(totalCF, totalEBIT);
   var rowBg  = rowBgClass(status);
 
   // Col 1: Label
@@ -1027,10 +1029,6 @@ function buildTable(data) {
     }
   }
 
-  // Log for verification
-  console.log('[Power of One] Impacts:', impacts);
-  console.log('[Power of One] Totals:', totals);
-  console.log('[Power of One] Revenue:', revenue, '| Daily:', revenue / 365);
 }
 
 
