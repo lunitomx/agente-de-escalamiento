@@ -1,0 +1,324 @@
+/* =============================================================================
+   ScaleUp Dashboard — Base Styles
+   Shared token system for E14–E17 visual dashboards
+   Single source of truth: all color, spacing, typography, and component tokens
+   ============================================================================= */
+
+/* ---------------------------------------------------------------------------
+   CSS Custom Properties (Design Tokens)
+   --------------------------------------------------------------------------- */
+:root {
+  /* Semáforo color palette */
+  --color-green:        #16a34a;
+  --color-green-light:  #dcfce7;
+  --color-green-text:   #14532d;
+  --color-yellow:       #d97706;
+  --color-yellow-light: #fef9c3;
+  --color-yellow-text:  #78350f;
+  --color-orange:       #ea580c;
+  --color-orange-light: #ffedd5;
+  --color-orange-text:  #7c2d12;
+  --color-red:          #dc2626;
+  --color-red-light:    #fee2e2;
+  --color-red-text:     #7f1d1d;
+  --color-gray:         #94a3b8;
+  --color-gray-light:   #f1f5f9;
+  --color-gray-text:    #475569;
+
+  /* Strategy column accent colors */
+  --color-shorten:      #2563eb;   /* Acortar — blue */
+  --color-shorten-light:#dbeafe;
+  --color-eliminate:    #9333ea;   /* Eliminar — purple */
+  --color-eliminate-light:#f3e8ff;
+  --color-improve:      #0891b2;   /* Mejorar — teal */
+  --color-improve-light:#cffafe;
+
+  /* Surface & text */
+  --color-bg:           #f8fafc;
+  --color-surface:      #ffffff;
+  --color-surface-2:    #f8fafc;
+  --color-border:       #e2e8f0;
+  --color-border-strong:#cbd5e1;
+  --color-text-primary: #0f172a;
+  --color-text-secondary:#64748b;
+  --color-text-muted:   #94a3b8;
+
+  /* Brand accent */
+  --color-brand:        #1e40af;
+  --color-brand-light:  #dbeafe;
+
+  /* Typography */
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --font-mono: "SF Mono", "Fira Code", "Cascadia Code", Consolas, monospace;
+
+  /* Spacing scale */
+  --space-xs:  4px;
+  --space-sm:  8px;
+  --space-md:  16px;
+  --space-lg:  24px;
+  --space-xl:  32px;
+  --space-2xl: 48px;
+
+  /* Border radius */
+  --radius-sm:  4px;
+  --radius-md:  8px;
+  --radius-lg:  12px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+
+  /* Transitions */
+  --transition: 0.2s ease;
+}
+
+/* ---------------------------------------------------------------------------
+   Reset & Base
+   --------------------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-text-primary);
+  background-color: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------------------------------------------------------------------
+   Typography Utilities
+   --------------------------------------------------------------------------- */
+.dash-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.dash-subtitle {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.metric-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.metric-value-lg {
+  font-size: 40px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.metric-label {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ---------------------------------------------------------------------------
+   Semáforo — Traffic Light System
+   --------------------------------------------------------------------------- */
+
+/* Dot indicator (circular badge) */
+.semaforo-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.semaforo-dot-lg {
+  width: 18px;
+  height: 18px;
+}
+
+.semaforo-dot-xl {
+  width: 24px;
+  height: 24px;
+}
+
+/* Color states */
+.semaforo-green  { background-color: var(--color-green);  box-shadow: 0 0 0 3px var(--color-green-light); }
+.semaforo-yellow { background-color: var(--color-yellow); box-shadow: 0 0 0 3px var(--color-yellow-light); }
+.semaforo-orange { background-color: var(--color-orange); box-shadow: 0 0 0 3px var(--color-orange-light); }
+.semaforo-red    { background-color: var(--color-red);    box-shadow: 0 0 0 3px var(--color-red-light); }
+.semaforo-gray   { background-color: var(--color-gray);   box-shadow: 0 0 0 3px var(--color-gray-light); }
+
+/* Badge variant (pill label) */
+.semaforo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.semaforo-badge.semaforo-green  { background: var(--color-green-light);  color: var(--color-green-text); }
+.semaforo-badge.semaforo-yellow { background: var(--color-yellow-light); color: var(--color-yellow-text); }
+.semaforo-badge.semaforo-orange { background: var(--color-orange-light); color: var(--color-orange-text); }
+.semaforo-badge.semaforo-red    { background: var(--color-red-light);    color: var(--color-red-text); }
+.semaforo-badge.semaforo-gray   { background: var(--color-gray-light);   color: var(--color-gray-text); }
+
+/* Row highlight (for table rows) */
+.row-green  { background-color: color-mix(in srgb, var(--color-green) 4%, white); }
+.row-yellow { background-color: color-mix(in srgb, var(--color-yellow) 4%, white); }
+.row-orange { background-color: color-mix(in srgb, var(--color-orange) 4%, white); }
+.row-red    { background-color: color-mix(in srgb, var(--color-red) 5%, white); }
+.row-gray   { background-color: var(--color-surface); }
+
+/* ---------------------------------------------------------------------------
+   Progress Bar
+   --------------------------------------------------------------------------- */
+.progress-bar-track {
+  width: 100%;
+  height: 8px;
+  background-color: var(--color-border);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progress-bar-track.progress-sm { height: 6px; }
+.progress-bar-track.progress-lg { height: 12px; }
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.4s ease;
+  min-width: 4px;
+}
+
+/* Fill colors using semáforo semantic */
+.fill-green  { background-color: var(--color-green); }
+.fill-yellow { background-color: var(--color-yellow); }
+.fill-orange { background-color: var(--color-orange); }
+.fill-red    { background-color: var(--color-red); }
+.fill-gray   { background-color: var(--color-gray); }
+
+/* ---------------------------------------------------------------------------
+   Card
+   --------------------------------------------------------------------------- */
+.dashboard-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.dashboard-card-elevated {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-md);
+}
+
+/* ---------------------------------------------------------------------------
+   Grid Utilities
+   --------------------------------------------------------------------------- */
+.dashboard-grid {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+/* Flex utilities */
+.flex { display: flex; }
+.flex-center { display: flex; align-items: center; }
+.flex-between { display: flex; align-items: center; justify-content: space-between; }
+.gap-xs { gap: var(--space-xs); }
+.gap-sm { gap: var(--space-sm); }
+.gap-md { gap: var(--space-md); }
+
+/* ---------------------------------------------------------------------------
+   Dashboard Header
+   --------------------------------------------------------------------------- */
+.dashboard-header {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-lg) var(--space-xl);
+}
+
+.dashboard-header-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-lg);
+}
+
+/* ---------------------------------------------------------------------------
+   Section divider
+   --------------------------------------------------------------------------- */
+.section-divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: var(--space-lg) 0;
+}
+
+/* ---------------------------------------------------------------------------
+   Responsive — Mobile collapse (≤ 768px)
+   --------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .dashboard-header {
+    padding: var(--space-md);
+  }
+
+  .dashboard-header-inner {
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .grid-2,
+  .grid-3,
+  .grid-4 {
+    grid-template-columns: 1fr;
+  }
+
+  .dash-title { font-size: 18px; }
+  .metric-value-lg { font-size: 28px; }
+}
+
+/* ---------------------------------------------------------------------------
+   Print
+   --------------------------------------------------------------------------- */
+@media print {
+  body { background: white; }
+  .dashboard-card,
+  .dashboard-card-elevated { box-shadow: none; border: 1px solid #ccc; }
+}

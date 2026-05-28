@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'">
+  <title>CASh — Cash Acceleration Strategies | ScaleUp</title>
+  <link rel="stylesheet" href="../shared/styles/dashboard-base.css">
+  <!--
+    Chart.js v4 — vendored locally at ../shared/vendor/chart.umd.min.js
+    Required by S14.2 (bar) and S14.4 (radar). Included here to establish
+    the vendor pattern for all E14-E17 dashboards. Not used in S14.1 layout.
+    See: work/epics/e14-cash-dashboards/adr-visualization-framework.md
+  -->
+  <script src="../shared/vendor/chart.umd.min.js"></script>
+
+  <style>
+    /* =====================================================================
+       CASh Board — Component-specific layout styles
+       (Base tokens come from ../shared/styles/dashboard-base.css)
+       ===================================================================== */
+
+    /* ── Page layout ─────────────────────────────────────────────────── */
+    .page-wrapper {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .page-content {
+      flex: 1;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+      padding: var(--space-xl);
+    }
+
+    /* ── Dashboard header ─────────────────────────────────────────────── */
+    .board-header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e40af 100%);
+      color: white;
+      padding: var(--space-lg) var(--space-xl);
+    }
+
+    .board-header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: var(--space-lg);
+      align-items: center;
+    }
+
+    .board-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #93c5fd;
+      margin-bottom: var(--space-xs);
+    }
+
+    .board-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: white;
+      line-height: 1.15;
+    }
+
+    .board-title-accent {
+      color: #93c5fd;
+    }
+
+    .board-meta-text {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-top: var(--space-xs);
+    }
+
+    .board-ccc-summary {
+      text-align: right;
+    }
+
+    .ccc-total-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #94a3b8;
+      margin-bottom: 4px;
+    }
+
+    .ccc-value-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    .ccc-total-value {
+      font-size: 48px;
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      color: white;
+    }
+
+    .ccc-total-unit {
+      font-size: 16px;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-left: 4px;
+    }
+
+    .ccc-target-line {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    .ccc-target-value {
+      color: #94a3b8;
+      font-weight: 600;
+    }
+
+    /* ── Column headers ───────────────────────────────────────────────── */
+    .strategy-header-row {
+      display: grid;
+      grid-template-columns: 220px 1fr 1fr 1fr;
+      gap: 0;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-bottom: 2px solid var(--color-border-strong);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      overflow: hidden;
+      margin-top: var(--space-xl);
+    }
+
+    .col-label-header {
+      padding: var(--space-md);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-text-secondary);
+      border-right: 1px solid var(--color-border);
+      display: flex;
+      align-items: flex-end;
+    }
+
+    .strategy-col-header {
+      padding: var(--space-md);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+      border-right: 1px solid var(--color-border);
+    }
+
+    .strategy-col-header:last-child {
+      border-right: none;
+    }
+
+    .strategy-name-primary {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .strategy-name-secondary {
+      font-size: 11px;
+      font-weight: 500;
+      opacity: 0.7;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .col-shorten   { color: var(--color-shorten);   background: color-mix(in srgb, var(--color-shorten) 5%, white); }
+    .col-eliminate { color: var(--color-eliminate); background: color-mix(in srgb, var(--color-eliminate) 5%, white); }
+    .col-improve   { color: var(--color-improve);   background: color-mix(in srgb, var(--color-improve) 5%, white); }
+
+    /* ── Cycle rows ───────────────────────────────────────────────────── */
+    .cycle-rows-wrapper {
+      border: 1px solid var(--color-border);
+      border-top: none;
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .cycle-row {
+      display: grid;
+      grid-template-columns: 220px 1fr 1fr 1fr;
+      gap: 0;
+      border-bottom: 1px solid var(--color-border);
+      transition: background var(--transition);
+    }
+
+    .cycle-row:last-child {
+      border-bottom: none;
+    }
+
+    .cycle-row:hover {
+      filter: brightness(0.98);
+    }
+
+    /* ── Cycle label cell ─────────────────────────────────────────────── */
+    .cycle-label-cell {
+      padding: var(--space-md);
+      border-right: 2px solid var(--color-border-strong);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      background: var(--color-surface);
+    }
+
+    .cycle-name-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .cycle-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+    }
+
+    .cycle-name-secondary {
+      font-size: 11px;
+      color: var(--color-text-secondary);
+      margin-top: 1px;
+    }
+
+    .cycle-days-row {
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-xs);
+    }
+
+    .cycle-days-value {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .cycle-days-unit {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      font-weight: 500;
+    }
+
+    .cycle-bar-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .cycle-bar-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--color-text-muted);
+    }
+
+    /* ── Strategy cells ───────────────────────────────────────────────── */
+    .strategy-cell {
+      padding: var(--space-md);
+      border-right: 1px solid var(--color-border);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    .strategy-cell:last-child {
+      border-right: none;
+    }
+
+    .strategy-cell.col-shorten   { border-left: 3px solid var(--color-shorten); }
+    .strategy-cell.col-eliminate { border-left: 3px solid var(--color-eliminate); }
+    .strategy-cell.col-improve   { border-left: 3px solid var(--color-improve); }
+
+    .strategy-description {
+      font-size: 13px;
+      color: var(--color-text-primary);
+      line-height: 1.5;
+      flex: 1;
+    }
+
+    .strategy-potential {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      margin-top: auto;
+    }
+
+    .potential-icon {
+      font-size: 12px;
+      color: var(--color-text-muted);
+    }
+
+    .potential-label {
+      font-size: 11px;
+      color: var(--color-text-secondary);
+    }
+
+    .potential-value-positive {
+      font-size: 13px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: var(--color-green);
+    }
+
+    .potential-value-empty {
+      font-size: 13px;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+      color: var(--color-text-muted);
+    }
+
+    /* ── Grand total footer row ───────────────────────────────────────── */
+    .ccc-footer {
+      margin-top: var(--space-md);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg) var(--space-xl);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-lg);
+      align-items: center;
+    }
+
+    .footer-block-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-xs);
+    }
+
+    .footer-block-value {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      color: var(--color-text-primary);
+    }
+
+    .footer-block-unit {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      margin-left: 3px;
+    }
+
+    .footer-block-note {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      margin-top: 4px;
+    }
+
+    .footer-indicator-block {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    /* ── Legend ───────────────────────────────────────────────────────── */
+    .legend {
+      margin-top: var(--space-lg);
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      flex-wrap: wrap;
+    }
+
+    .legend-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      font-size: 12px;
+      color: var(--color-text-secondary);
+    }
+
+    /* ── Placeholder notice ─────────────────────────────────────────── */
+    .placeholder-notice {
+      display: none;
+      background: var(--color-gray-light);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-sm) var(--space-md);
+      font-size: 12px;
+      color: var(--color-gray-text);
+      margin-top: var(--space-md);
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .placeholder-notice.visible {
+      display: flex;
+    }
+
+    /* ── Responsive ───────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .board-header-inner {
+        grid-template-columns: 1fr;
+      }
+
+      .board-ccc-summary {
+        text-align: left;
+        padding-top: var(--space-md);
+        border-top: 1px solid rgba(255,255,255,0.1);
+      }
+
+      .ccc-total-value { font-size: 36px; }
+
+      .ccc-value-row { justify-content: flex-start; }
+
+      .page-content {
+        padding: var(--space-md);
+      }
+
+      /* On mobile, hide the column header row — labels shown inline via CSS */
+      .strategy-header-row {
+        display: none;
+      }
+
+      .cycle-rows-wrapper {
+        border: none;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-md);
+        margin-top: var(--space-md);
+      }
+
+      .cycle-row {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+      }
+
+      .cycle-label-cell {
+        border-right: none;
+        border-bottom: 2px solid var(--color-border-strong);
+        background: var(--color-surface-2);
+      }
+
+      .strategy-cell {
+        border-right: none;
+        border-bottom: 1px solid var(--color-border);
+        border-left-width: 4px;
+      }
+
+      .ccc-footer {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-md);
+        padding: var(--space-md);
+      }
+
+      .footer-block-value { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <!-- ================================================================
+       DASHBOARD HEADER
+       ================================================================ -->
+  <header class="board-header">
+    <div class="board-header-inner">
+      <div>
+        <p class="board-eyebrow">ScaleUp · Cash Decision</p>
+        <h1 class="board-title">
+          <span class="board-title-accent">CASh</span> — Cash Acceleration Strategies
+        </h1>
+        <p class="board-meta-text" id="board-meta"></p>
+      </div>
+      <div class="board-ccc-summary">
+        <p class="ccc-total-label">Cash Conversion Cycle</p>
+        <div class="ccc-value-row">
+          <span class="ccc-total-value" id="header-ccc-value">—</span>
+          <span class="ccc-total-unit">días</span>
+          <span class="semaforo-dot semaforo-dot-xl" id="header-ccc-dot"></span>
+        </div>
+        <p class="ccc-target-line">
+          Meta Scaling Up: <span class="ccc-target-value" id="header-target-value">—</span> días
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================================================================
+       MAIN CONTENT
+       ================================================================ -->
+  <main class="page-content">
+
+    <!-- Strategy column headers (desktop only) -->
+    <div class="strategy-header-row" role="row" aria-label="Estrategias de aceleración de efectivo">
+      <div class="col-label-header">Ciclo CCC</div>
+      <div class="strategy-col-header col-shorten" role="columnheader">
+        <span class="strategy-name-primary">Acortar</span>
+        <span class="strategy-name-secondary">Shorten</span>
+      </div>
+      <div class="strategy-col-header col-eliminate" role="columnheader">
+        <span class="strategy-name-primary">Eliminar</span>
+        <span class="strategy-name-secondary">Eliminate</span>
+      </div>
+      <div class="strategy-col-header col-improve" role="columnheader">
+        <span class="strategy-name-primary">Mejorar</span>
+        <span class="strategy-name-secondary">Improve</span>
+      </div>
+    </div>
+
+    <!-- Cycle rows — populated by JS -->
+    <div class="cycle-rows-wrapper" id="cycle-rows" role="table" aria-label="Ciclos del Cash Conversion Cycle"></div>
+
+    <!-- Grand total / CCC footer -->
+    <div class="ccc-footer" id="ccc-footer" role="region" aria-label="Resumen CCC Total">
+      <div>
+        <p class="footer-block-label">CCC Total actual</p>
+        <div>
+          <span class="footer-block-value" id="footer-current">—</span>
+          <span class="footer-block-unit">días</span>
+        </div>
+        <p class="footer-block-note" id="footer-vs-target"></p>
+      </div>
+      <div>
+        <p class="footer-block-label">Meta Scaling Up</p>
+        <div>
+          <span class="footer-block-value" id="footer-target">—</span>
+          <span class="footer-block-unit">días</span>
+        </div>
+        <p class="footer-block-note">benchmark metodología</p>
+      </div>
+      <div>
+        <p class="footer-block-label">Ahorro potencial</p>
+        <div>
+          <span class="footer-block-value" id="footer-potential">—</span>
+          <span class="footer-block-unit">días</span>
+        </div>
+        <p class="footer-block-note">si se ejecutan estrategias</p>
+      </div>
+      <div class="footer-indicator-block">
+        <span class="semaforo-dot semaforo-dot-xl" id="footer-dot"></span>
+        <span class="semaforo-badge" id="footer-badge"></span>
+      </div>
+    </div>
+
+    <!-- Semáforo legend -->
+    <div class="legend" aria-label="Leyenda de semáforo">
+      <span class="legend-title">Semáforo</span>
+      <span class="legend-item">
+        <span class="semaforo-dot semaforo-green" aria-hidden="true"></span>
+        Verde = dentro del benchmark
+      </span>
+      <span class="legend-item">
+        <span class="semaforo-dot semaforo-yellow" aria-hidden="true"></span>
+        Amarillo = atención necesaria
+      </span>
+      <span class="legend-item">
+        <span class="semaforo-dot semaforo-orange" aria-hidden="true"></span>
+        Naranja = sobre benchmark
+      </span>
+      <span class="legend-item">
+        <span class="semaforo-dot semaforo-red" aria-hidden="true"></span>
+        Rojo = crítico, acelerar
+      </span>
+      <span class="legend-item">
+        <span class="semaforo-dot semaforo-gray" aria-hidden="true"></span>
+        Gris = sin datos aún
+      </span>
+    </div>
+
+    <!-- Placeholder notice (visible when all days = 0) -->
+    <div class="placeholder-notice" id="placeholder-notice" role="status">
+      <span aria-hidden="true">ℹ</span>
+      <span>
+        Los días actuales están en cero — usa
+        <strong>/scaleup-cash-ccc</strong>
+        para medir tus ciclos reales.
+      </span>
+    </div>
+
+  </main>
+</div>
+
+<script>
+/* =========================================================================
+   CASh Board — Data & Rendering Engine
+   ScaleUp · Story s14.1-cash-visual · 2026-05-27
+
+   Architecture:
+   - window.CASH_DATA  : inline data object (replace with real data from coaching skill)
+   - getTrafficLight() : per-cycle semáforo logic (per design §6 thresholds)
+   - getTotalLight()   : grand-total 4-state scale
+   - buildCycleRow()   : DOM construction (no innerHTML — uses createElement + textContent)
+   - renderDashboard() : orchestrates full render
+   ========================================================================= */
+
+'use strict';
+
+// ─── 1. INLINE DATA ─────────────────────────────────────────────────────────
+// Intentionally mixed demo values so traffic lights show multiple colors.
+// Sales=45d (yellow), Production=12d (green), Delivery=18d (red), Billing=38d (yellow)
+
+window.CASH_DATA = {
+  company: "Empresa Demo S.A.",
+  date: "2026-Q2",
+  cycles: [
+    {
+      id: "sales",
+      label: "Sales Cycle",
+      label_es: "Ciclo de Ventas",
+      current_days: 45,
+      benchmark_days: 30,
+      strategies: {
+        shorten:   { description: "Calificar prospectos más rápido; automatizar propuestas y cotizaciones.", potential_days_saved: 10 },
+        eliminate: { description: "Remover prospectos no calificados temprano; eliminar aprobaciones redundantes.", potential_days_saved: 8 },
+        improve:   { description: "Disciplina de pipeline en CRM con revisiones semanales del embudo.", potential_days_saved: 7 }
+      }
+    },
+    {
+      id: "production",
+      label: "Production Cycle",
+      label_es: "Ciclo de Producción",
+      current_days: 12,
+      benchmark_days: 14,
+      strategies: {
+        shorten:   { description: "Inventario lean, entrega just-in-time; reducir tiempos de configuración.", potential_days_saved: 2 },
+        eliminate: { description: "Cortar pasos sin valor agregado; eliminar re-trabajo por defectos.", potential_days_saved: 3 },
+        improve:   { description: "Trabajo estándar y gestión visual del piso de producción.", potential_days_saved: 2 }
+      }
+    },
+    {
+      id: "delivery",
+      label: "Delivery Cycle",
+      label_es: "Ciclo de Entrega",
+      current_days: 18,
+      benchmark_days: 7,
+      strategies: {
+        shorten:   { description: "Facturar el mismo día de entrega; confirmar recepción digitalmente.", potential_days_saved: 5 },
+        eliminate: { description: "Eliminar retrasos en confirmación de entrega y firmas de aceptación.", potential_days_saved: 4 },
+        improve:   { description: "Comprobante digital de entrega con auto-factura al confirmar recepción.", potential_days_saved: 4 }
+      }
+    },
+    {
+      id: "billing",
+      label: "Billing & Collection Cycle",
+      label_es: "Ciclo de Facturación y Cobro",
+      current_days: 38,
+      benchmark_days: 30,
+      strategies: {
+        shorten:   { description: "Descuentos por pronto pago; reducir términos de pago de 60 a 30 días.", potential_days_saved: 8 },
+        eliminate: { description: "Eliminar disputas por facturas tardías; digitalizar proceso de cobranza.", potential_days_saved: 5 },
+        improve:   { description: "Revisión semanal de cartera vencida con proceso de escalación automático.", potential_days_saved: 6 }
+      }
+    }
+  ],
+  totals: {
+    current_ccc_days: 0,   // computed in JS
+    target_ccc_days: 81,   // Scaling Up benchmark: 30+14+7+30
+    potential_improvement_days: 0  // computed in JS
+  }
+};
+
+
+// ─── 2. SEMÁFORO LOGIC ──────────────────────────────────────────────────────
+
+/** Per-cycle thresholds from design §6 */
+var CYCLE_THRESHOLDS = {
+  sales:      { green: 30, yellow: 60 },
+  production: { green: 14, yellow: 30 },
+  delivery:   { green: 7,  yellow: 14 },
+  billing:    { green: 30, yellow: 45 }
+};
+
+/** Returns semáforo CSS class for a cycle. days===0 → gray (not measured). */
+function getTrafficLight(cycleId, days) {
+  if (days <= 0) return 'semaforo-gray';
+  var t = CYCLE_THRESHOLDS[cycleId];
+  if (!t) return 'semaforo-gray';
+  if (days <= t.green)  return 'semaforo-green';
+  if (days <= t.yellow) return 'semaforo-yellow';
+  return 'semaforo-red';
+}
+
+/** Returns semáforo class for grand total CCC — 4-state scale per design §6. */
+function getTotalLight(totalDays) {
+  if (totalDays === 0)   return 'semaforo-gray';
+  if (totalDays <= 30)   return 'semaforo-green';
+  if (totalDays <= 81)   return 'semaforo-yellow';
+  if (totalDays <= 120)  return 'semaforo-orange';
+  return 'semaforo-red';
+}
+
+/** Human label for a semáforo class. */
+function statusLabel(cls) {
+  return { 'semaforo-green': 'Verde', 'semaforo-yellow': 'Amarillo',
+           'semaforo-orange': 'Naranja', 'semaforo-red': 'Rojo',
+           'semaforo-gray': 'Sin datos' }[cls] || '—';
+}
+
+/** Row background class from semáforo class. */
+function rowBgClass(cls) {
+  return cls.replace('semaforo-', 'row-');
+}
+
+/** Progress bar fill class from semáforo class. */
+function fillClass(cls) {
+  return cls.replace('semaforo-', 'fill-');
+}
+
+/** Color CSS variable name from semáforo class. */
+function colorVar(cls) {
+  return 'var(--color-' + cls.replace('semaforo-', '') + ')';
+}
+
+/** Bar width as percent string, capped at 100%. */
+function barWidth(current, benchmark) {
+  if (current === 0 || benchmark === 0) return '0%';
+  return Math.min((current / benchmark) * 100, 100).toFixed(1) + '%';
+}
+
+
+// ─── 3. DOM BUILDER HELPER ──────────────────────────────────────────────────
+/**
+ * Creates an element with optional class, textContent, style, attributes,
+ * and appended children. Never uses innerHTML.
+ */
+function el(tag, opts, children) {
+  var e = document.createElement(tag);
+  if (opts) {
+    if (opts.cls)   e.className = opts.cls;
+    if (opts.text !== undefined) e.textContent = opts.text;
+    if (opts.style) e.style.cssText = opts.style;
+    if (opts.role)  e.setAttribute('role', opts.role);
+    if (opts.title) e.setAttribute('title', opts.title);
+    if (opts.aria)  e.setAttribute('aria-label', opts.aria);
+    if (opts.id)    e.id = opts.id;
+  }
+  if (children) {
+    for (var i = 0; i < children.length; i++) {
+      if (children[i]) e.appendChild(children[i]);
+    }
+  }
+  return e;
+}
+
+
+
+// ─── 4. BUILD CYCLE ROW (DOM-only, no innerHTML) ────────────────────────────
+
+function buildStrategyCellContent(stratKey, stratData, colorClass) {
+  var potential = stratData.potential_days_saved || 0;
+
+  var desc    = el('p', { cls: 'strategy-description', text: stratData.description });
+
+  var icon    = el('span', { cls: 'potential-icon', text: potential > 0 ? '↓' : '·' });
+  var lbl     = el('span', { cls: 'potential-label', text: 'Potencial:' });
+  var valCls  = potential > 0 ? 'potential-value-positive' : 'potential-value-empty';
+  var valTxt  = potential > 0 ? ('−' + potential + ' días') : '—';
+  var val     = el('span', { cls: valCls, text: valTxt });
+  var pot     = el('div', { cls: 'strategy-potential' }, [icon, lbl, val]);
+
+  return el('div', { cls: 'strategy-cell ' + colorClass, role: 'cell' }, [desc, pot]);
+}
+
+function buildCycleRow(cycle) {
+  var status    = getTrafficLight(cycle.id, cycle.current_days);
+  var rowBg     = rowBgClass(status);
+  var width     = barWidth(cycle.current_days, cycle.benchmark_days);
+  var fill      = fillClass(status);
+  var daysText  = cycle.current_days === 0 ? '—' : String(cycle.current_days);
+  var color     = colorVar(status);
+
+  // ── Left: cycle label cell ──────────────────────────────────────────
+  var dot = el('span', {
+    cls: 'semaforo-dot ' + status,
+    title: statusLabel(status)
+  });
+
+  var namePrimary   = el('div', { cls: 'cycle-name',           text: cycle.label });
+  var nameSecondary = el('div', { cls: 'cycle-name-secondary', text: cycle.label_es });
+  var nameStack     = el('div', {}, [namePrimary, nameSecondary]);
+  var nameRow       = el('div', { cls: 'cycle-name-row' }, [dot, nameStack]);
+
+  var daysVal  = el('span', { cls: 'cycle-days-value', text: daysText, style: 'color:' + color });
+  var daysUnit = el('span', { cls: 'cycle-days-unit', text: 'días actuales' });
+  var daysRow  = el('div',  { cls: 'cycle-days-row' }, [daysVal, daysUnit]);
+
+  var barFill  = el('div', { cls: 'progress-bar-fill ' + fill, style: 'width:' + width });
+  barFill.setAttribute('role', 'progressbar');
+  barFill.setAttribute('aria-valuenow', String(cycle.current_days));
+  barFill.setAttribute('aria-valuemin', '0');
+  barFill.setAttribute('aria-valuemax', String(cycle.benchmark_days));
+  barFill.setAttribute('title', cycle.current_days + ' / ' + cycle.benchmark_days + ' días');
+
+  var track    = el('div', { cls: 'progress-bar-track' }, [barFill]);
+  var blLeft   = el('span', { text: '0' });
+  var blRight  = el('span', { text: 'Meta: ' + cycle.benchmark_days + 'd' });
+  var barLbls  = el('div', { cls: 'cycle-bar-labels' }, [blLeft, blRight]);
+  var barWrap  = el('div', { cls: 'cycle-bar-wrapper' }, [track, barLbls]);
+
+  var labelCell = el('div', { cls: 'cycle-label-cell' }, [nameRow, daysRow, barWrap]);
+
+  // ── Strategy cells ───────────────────────────────────────────────────
+  var shortenCell   = buildStrategyCellContent('shorten',   cycle.strategies.shorten,   'col-shorten');
+  var eliminateCell = buildStrategyCellContent('eliminate', cycle.strategies.eliminate, 'col-eliminate');
+  var improveCell   = buildStrategyCellContent('improve',   cycle.strategies.improve,   'col-improve');
+
+  // ── Assemble row ─────────────────────────────────────────────────────
+  var row = el('div', {
+    cls:  'cycle-row ' + rowBg,
+    role: 'row',
+    aria: cycle.label_es
+  }, [labelCell, shortenCell, eliminateCell, improveCell]);
+
+  return row;
+}
+
+
+// ─── 5. COMPUTE TOTALS ──────────────────────────────────────────────────────
+
+function computeTotals(data) {
+  var current   = 0;
+  var potential = 0;
+  data.cycles.forEach(function(c) {
+    current += c.current_days;
+    potential += (c.strategies.shorten.potential_days_saved   || 0)
+               + (c.strategies.eliminate.potential_days_saved || 0)
+               + (c.strategies.improve.potential_days_saved   || 0);
+  });
+  return { current: current, target: data.totals.target_ccc_days, potential: potential };
+}
+
+
+// ─── 6. RENDER DASHBOARD ────────────────────────────────────────────────────
+
+function setText(id, text) {
+  var e = document.getElementById(id);
+  if (e) e.textContent = text;
+}
+
+function renderDashboard(data) {
+  var totals    = computeTotals(data);
+  var allZero   = data.cycles.every(function(c) { return c.current_days === 0; });
+  var totalCls  = getTotalLight(totals.current);
+
+  // ── Header ──
+  setText('board-meta', data.company + '  ·  ' + data.date);
+  setText('header-ccc-value', allZero ? '—' : String(totals.current));
+  setText('header-target-value', String(totals.target));
+
+  var hDot = document.getElementById('header-ccc-dot');
+  if (hDot) hDot.className = 'semaforo-dot semaforo-dot-xl ' + totalCls;
+
+  // ── Cycle rows ──
+  var rowsContainer = document.getElementById('cycle-rows');
+  if (rowsContainer) {
+    rowsContainer.textContent = ''; // clear safely
+    data.cycles.forEach(function(cycle) {
+      rowsContainer.appendChild(buildCycleRow(cycle));
+    });
+  }
+
+  // ── Footer ──
+  setText('footer-current',  allZero ? '—' : String(totals.current));
+  setText('footer-target',   String(totals.target));
+  setText('footer-potential', totals.potential > 0 ? String(totals.potential) : '—');
+
+  var fDot = document.getElementById('footer-dot');
+  if (fDot) fDot.className = 'semaforo-dot semaforo-dot-xl ' + totalCls;
+
+  var fBadge = document.getElementById('footer-badge');
+  if (fBadge) {
+    fBadge.className = 'semaforo-badge ' + totalCls;
+    fBadge.textContent = statusLabel(totalCls);
+  }
+
+  // Versus target note
+  var vsNote = document.getElementById('footer-vs-target');
+  if (vsNote && !allZero) {
+    var diff = totals.current - totals.target;
+    if (diff > 0) {
+      vsNote.textContent = '+' + diff + ' días sobre meta';
+      vsNote.style.color = 'var(--color-orange)';
+    } else if (diff < 0) {
+      vsNote.textContent = diff + ' días bajo meta';
+      vsNote.style.color = 'var(--color-green)';
+    } else {
+      vsNote.textContent = 'exactamente en la meta';
+    }
+  }
+
+  // ── Placeholder notice ──
+  var notice = document.getElementById('placeholder-notice');
+  if (notice) {
+    if (allZero) {
+      notice.classList.add('visible');
+    } else {
+      notice.classList.remove('visible');
+    }
+  }
+}
+
+
+// ─── 7. BOOT ────────────────────────────────────────────────────────────────
+
+document.addEventListener('DOMContentLoaded', function() {
+  try {
+    renderDashboard(window.CASH_DATA);
+  } catch (err) {
+    console.error('[CASh Board] Render error:', err);
+    // Build error banner via DOM only — no innerHTML
+    var errDiv   = document.createElement('div');
+    errDiv.style.cssText = 'background:#fee2e2;color:#7f1d1d;padding:16px;font-family:monospace;font-size:13px;';
+    var errLabel = document.createElement('strong');
+    errLabel.textContent = 'Error al cargar el dashboard: ';
+    var errMsg   = document.createTextNode(err.message);
+    errDiv.appendChild(errLabel);
+    errDiv.appendChild(errMsg);
+    document.body.prepend(errDiv);
+  }
+});
+</script>
+</body>
+</html>
