@@ -248,6 +248,23 @@
         font-size: 12px;
       }
     }
+
+    /* ── Print ────────────────────────────────────────────────────────── */
+    @media print {
+      .board-header {
+        background: #0f172a !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .chart-wrapper,
+      .fundability-table {
+        box-shadow: none;
+        border: 1px solid #ccc;
+      }
+      .placeholder-notice {
+        display: none !important;
+      }
+    }
   </style>
 </head>
 <body>
