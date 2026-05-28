@@ -58,5 +58,5 @@ Crear dashboards visuales para las herramientas de la decisión Cash del sistema
 |-------|--------|--------|--------|----------|-------|
 | S14.1 — CASh Board | M | Done | 1 session | M | Walking skeleton, framework defined (ADR-001) |
 | S14.2 — Power of One | L | Done | 1 session | L | Category A/B calc engine, injection guard |
-| S14.4 — Fundability Radar | M | Pending | — | — | Introduce chart library |
+| S14.4 — Fundability Radar | M | Done | 1 session | M | Chart.js v4 radar, mapping fallback consistency |
 | S14.3 — Recurring Revenue | M | Pending | — | — | Cierre, más simple |
