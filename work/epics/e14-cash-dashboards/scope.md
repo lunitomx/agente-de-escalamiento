@@ -56,7 +56,7 @@ Crear dashboards visuales para las herramientas de la decisión Cash del sistema
 
 | Story | Tamaño | Status | Actual | Velocity | Notes |
 |-------|--------|--------|--------|----------|-------|
-| S14.1 — CASh Board | M | Pending | — | — | Walking skeleton, define framework |
+| S14.1 — CASh Board | M | Done | 1 session | M | Walking skeleton, framework defined (ADR-001) |
 | S14.2 — Power of One | L | Pending | — | — | Depende de S14.1 |
 | S14.4 — Fundability Radar | M | Pending | — | — | Introduce chart library |
 | S14.3 — Recurring Revenue | M | Pending | — | — | Cierre, más simple |
