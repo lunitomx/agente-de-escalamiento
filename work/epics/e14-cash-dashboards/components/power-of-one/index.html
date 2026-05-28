@@ -519,7 +519,11 @@
 
 window.CASH_DATA = window.CASH_DATA || {};
 
-window.CASH_DATA.powerOfOne = {
+// The || guard below ensures real data injected by /scaleup-cash-power1 is never
+// overwritten. When the coaching tool replaces this inline block with real data,
+// this line becomes a no-op — the DEFAULT_POWER_OF_ONE fallback then serves as
+// last-resort placeholder if the injection is absent entirely.
+window.CASH_DATA.powerOfOne = window.CASH_DATA.powerOfOne || {
   company: "Acme Corp",
   period: "Q2 2026",
   variables: {
@@ -573,7 +577,7 @@ window.CASH_DATA.powerOfOne = {
       adjusted: 35
     }
   }
-};
+};  // end window.CASH_DATA.powerOfOne || {...}
 
 
 // ─── 2. DEFAULT FALLBACK DATA ────────────────────────────────────────────────
