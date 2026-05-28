@@ -289,13 +289,13 @@
     </div>
 
     <!-- Summary table — populated by buildSummaryTable() -->
-    <p class="fundability-table-title" id="table-title-el">Criterios</p>
+    <p class="fundability-table-title">Criterios</p>
     <div id="fundability-table-container"></div>
 
     <!-- Placeholder notice (visible when data is absent) -->
     <div class="placeholder-notice" id="placeholder-notice" role="status">
       <span aria-hidden="true">i</span>
-      <span id="placeholder-msg">Datos de ejemplo — usa <strong>/scaleup-cash</strong> para ingresar tu perfil de fundability.</span>
+      <span>Datos de ejemplo — usa <strong>/scaleup-cash</strong> para ingresar tu perfil de fundability.</span>
     </div>
 
     <!-- Zone legend -->
@@ -413,7 +413,6 @@ function el(tag, opts, children) {
     if (opts.title)          e.setAttribute('title', opts.title);
     if (opts.aria)           e.setAttribute('aria-label', opts.aria);
     if (opts.id)             e.id = opts.id;
-    if (opts['aria-hidden']) e.setAttribute('aria-hidden', opts['aria-hidden']);
     if (opts.data) {
       var keys = Object.keys(opts.data);
       for (var k = 0; k < keys.length; k++) {
@@ -518,8 +517,7 @@ function buildSummaryTable(data) {
   var table = el('div', {
     cls: 'fundability-table',
     role: 'table',
-    aria: 'Criterios de Fundability',
-    data: { rowcount: String(data.criteria.length) }
+    aria: 'Criterios de Fundability'
   });
   table.setAttribute('aria-rowcount', String(data.criteria.length));
 
