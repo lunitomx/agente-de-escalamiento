@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "cash-dashboard",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "7777", "--directory", "work/epics/e14-cash-dashboards"],
+      "port": 7777
+    }
+  ]
+}
