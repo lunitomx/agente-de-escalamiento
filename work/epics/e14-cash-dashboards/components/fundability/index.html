@@ -506,7 +506,9 @@ function buildRadar(data) {
  * Weak → red (needs work).
  */
 function ratingClass(rating) {
-  return { Great: 'semaforo-green', Solid: 'semaforo-yellow', Weak: 'semaforo-red' }[rating] || 'semaforo-gray';
+  // Default to 'semaforo-red' (Weak) for unknown/malformed ratings —
+  // consistent with RATING_MAP fallback of 1 (Weak) used in buildRadar().
+  return { Great: 'semaforo-green', Solid: 'semaforo-yellow', Weak: 'semaforo-red' }[rating] || 'semaforo-red';
 }
 
 /**
