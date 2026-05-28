@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'">
+  <title>Power of One — Impacto por Palanca | ScaleUp</title>
+  <link rel="stylesheet" href="../shared/styles/dashboard-base.css">
+  <!--
+    Chart.js v4 — vendored locally at ../shared/vendor/chart.umd.min.js
+    Included to establish the vendor pattern for E14-E17 dashboards.
+    Not used for charts in S14.2 (table-based layout).
+    See: work/epics/e14-cash-dashboards/adr-visualization-framework.md
+  -->
+  <script src="../shared/vendor/chart.umd.min.js"></script>
+
+  <style>
+    /* =====================================================================
+       Power of One — Component-specific layout styles
+       (Base tokens come from ../shared/styles/dashboard-base.css)
+       ===================================================================== */
+
+    /* ── Page layout ─────────────────────────────────────────────────── */
+    .page-wrapper {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .page-content {
+      flex: 1;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+      padding: var(--space-xl);
+    }
+
+    /* ── Dashboard header ─────────────────────────────────────────────── */
+    .board-header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e40af 100%);
+      color: white;
+      padding: var(--space-lg) var(--space-xl);
+    }
+
+    .board-header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-lg);
+      align-items: center;
+    }
+
+    .board-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #93c5fd;
+      margin-bottom: var(--space-xs);
+    }
+
+    .board-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: white;
+      line-height: 1.15;
+    }
+
+    .board-title-accent {
+      color: #93c5fd;
+    }
+
+    .board-meta-text {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-top: var(--space-xs);
+    }
+
+    /* ── Column header row ────────────────────────────────────────────── */
+    .po1-header-row {
+      display: grid;
+      grid-template-columns: 200px 120px 120px 160px 160px 120px;
+      gap: 0;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-bottom: 2px solid var(--color-border-strong);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      overflow: hidden;
+      margin-top: var(--space-xl);
+    }
+
+    .po1-col-header {
+      padding: var(--space-md);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-text-secondary);
+      border-right: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+    }
+
+    .po1-col-header:last-child {
+      border-right: none;
+    }
+
+    /* ── Rows wrapper ─────────────────────────────────────────────────── */
+    .po1-rows-wrapper {
+      border: 1px solid var(--color-border);
+      border-top: none;
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+      overflow: hidden;
+    }
+
+    /* ── Variable row ─────────────────────────────────────────────────── */
+    .po1-row {
+      display: grid;
+      grid-template-columns: 200px 120px 120px 160px 160px 120px;
+      gap: 0;
+      border-bottom: 1px solid var(--color-border);
+      transition: background var(--transition);
+    }
+
+    .po1-row:last-child {
+      border-bottom: none;
+    }
+
+    .po1-row:not(.po1-summary-row):hover {
+      filter: brightness(0.98);
+    }
+
+    /* ── Cells ────────────────────────────────────────────────────────── */
+    .po1-cell {
+      padding: var(--space-md);
+      border-right: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .po1-cell:last-child {
+      border-right: none;
+    }
+
+    .po1-label-cell {
+      padding: var(--space-md);
+      border-right: 2px solid var(--color-border-strong);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      background: var(--color-surface);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+    }
+
+    .po1-value-cell {
+      font-size: 13px;
+      color: var(--color-text-primary);
+    }
+
+    .po1-impact-positive {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--color-green);
+    }
+
+    .po1-impact-negative {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--color-red);
+    }
+
+    .po1-impact-neutral {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+    }
+
+    .po1-dash {
+      font-size: 13px;
+      color: var(--color-text-muted);
+    }
+
+    /* ── Status cell ──────────────────────────────────────────────────── */
+    .po1-status-cell {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-md);
+      border-right: none;
+    }
+
+    /* ── Category pill ────────────────────────────────────────────────── */
+    .po1-category-pill {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-left: var(--space-xs);
+    }
+
+    .pill-revenue { background: #dbeafe; color: #1e40af; }
+    .pill-cost    { background: #fce7f3; color: #9d174d; }
+    .pill-wc      { background: #cffafe; color: #164e63; }
+
+    /* ── Summary row ──────────────────────────────────────────────────── */
+    .po1-summary-row {
+      background: var(--color-surface-2);
+      border-top: 2px solid var(--color-border-strong);
+    }
+
+    .po1-summary-row .po1-label-cell {
+      background: var(--color-surface-2);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--color-text-primary);
+    }
+
+    .po1-summary-row .po1-value-cell,
+    .po1-summary-row .po1-impact-positive,
+    .po1-summary-row .po1-impact-negative,
+    .po1-summary-row .po1-impact-neutral {
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    /* ── Legend ───────────────────────────────────────────────────────── */
+    .legend {
+      margin-top: var(--space-lg);
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      flex-wrap: wrap;
+    }
+
+    .legend-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      font-size: 12px;
+      color: var(--color-text-secondary);
+    }
+
+    /* ── Category legend ──────────────────────────────────────────────── */
+    .category-legend {
+      margin-top: var(--space-md);
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      flex-wrap: wrap;
+      padding: var(--space-sm) var(--space-md);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+    }
+
+    .category-legend-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+    }
+
+    .category-legend-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      font-size: 12px;
+      color: var(--color-text-secondary);
+    }
+
+    /* ── Placeholder notice ─────────────────────────────────────────── */
+    .placeholder-notice {
+      display: none;
+      background: var(--color-gray-light);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-sm) var(--space-md);
+      font-size: 12px;
+      color: var(--color-gray-text);
+      margin-top: var(--space-md);
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .placeholder-notice.visible {
+      display: flex;
+    }
+
+    /* ── Responsive ───────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+
+      .board-header {
+        padding: var(--space-md);
+      }
+
+      .board-header-inner {
+        grid-template-columns: 1fr;
+      }
+
+      .page-content {
+        padding: var(--space-md);
+      }
+
+      /* Hide desktop column header row — labels shown via data-label */
+      .po1-header-row {
+        display: none;
+      }
+
+      /* Rows become stacked cards */
+      .po1-rows-wrapper {
+        border: none;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-md);
+        margin-top: var(--space-md);
+      }
+
+      .po1-row {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+      }
+
+      .po1-row.po1-summary-row {
+        border: 2px solid var(--color-border-strong);
+      }
+
+      .po1-label-cell {
+        border-right: none;
+        border-bottom: 2px solid var(--color-border-strong);
+        background: var(--color-surface-2);
+        padding: var(--space-md);
+      }
+
+      .po1-cell {
+        border-right: none;
+        border-bottom: 1px solid var(--color-border);
+        padding: var(--space-sm) var(--space-md);
+        justify-content: space-between;
+      }
+
+      .po1-cell:last-child {
+        border-bottom: none;
+      }
+
+      /* Show column label as pseudo-element */
+      .po1-cell::before {
+        content: attr(data-label);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--color-text-muted);
+        flex-shrink: 0;
+        margin-right: var(--space-sm);
+      }
+
+      .po1-status-cell {
+        border-right: none;
+        border-bottom: none;
+        padding: var(--space-sm) var(--space-md);
+        justify-content: space-between;
+      }
+
+      .po1-status-cell::before {
+        content: attr(data-label);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--color-text-muted);
+        flex-shrink: 0;
+        margin-right: var(--space-sm);
+      }
+
+      .legend {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-sm);
+      }
+
+      .category-legend {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-sm);
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <!-- ================================================================
+       DASHBOARD HEADER
+       ================================================================ -->
+  <header class="board-header">
+    <div class="board-header-inner">
+      <div>
+        <p class="board-eyebrow">ScaleUp · Cash Decision</p>
+        <h1 class="board-title">
+          <span class="board-title-accent">Power of One</span> — Impacto por Palanca
+        </h1>
+        <p class="board-meta-text" id="board-meta"></p>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================================================================
+       MAIN CONTENT
+       ================================================================ -->
+  <main class="page-content">
+
+    <!-- Column headers (desktop only) -->
+    <div class="po1-header-row" role="row" aria-label="Power of One — palancas financieras">
+      <div class="po1-col-header">Variable</div>
+      <div class="po1-col-header">Actual</div>
+      <div class="po1-col-header">Ajustado</div>
+      <div class="po1-col-header">Impacto Flujo Caja</div>
+      <div class="po1-col-header">Impacto EBIT</div>
+      <div class="po1-col-header">Estado</div>
+    </div>
+
+    <!-- Variable rows — populated by JS -->
+    <div class="po1-rows-wrapper" id="po1-rows" role="table" aria-label="Palancas Power of One"></div>
+
+    <!-- Semáforo legend -->
+    <div class="legend" aria-label="Leyenda de semáforo">
+      <span class="legend-title">Semáforo</span>
+      <span class="legend-item">
+        <span class="semaforo-dot semaforo-green" aria-hidden="true"></span>
+        Verde = mejora neta positiva
+      </span>
+      <span class="legend-item">
+        <span class="semaforo-dot semaforo-yellow" aria-hidden="true"></span>
+        Amarillo = impacto neutro (±5%)
+      </span>
+      <span class="legend-item">
+        <span class="semaforo-dot semaforo-red" aria-hidden="true"></span>
+        Rojo = impacto negativo
+      </span>
+      <span class="legend-item">
+        <span class="semaforo-dot semaforo-gray" aria-hidden="true"></span>
+        Gris = sin datos aún
+      </span>
+    </div>
+
+    <!-- Category legend -->
+    <div class="category-legend" aria-label="Leyenda de categorías">
+      <span class="category-legend-title">Categorías</span>
+      <span class="category-legend-item">
+        <span class="po1-category-pill pill-revenue" aria-hidden="true">Rev</span>
+        Ingresos — afecta Flujo Caja y EBIT
+      </span>
+      <span class="category-legend-item">
+        <span class="po1-category-pill pill-cost" aria-hidden="true">Costo</span>
+        Costos — afecta Flujo Caja y EBIT
+      </span>
+      <span class="category-legend-item">
+        <span class="po1-category-pill pill-wc" aria-hidden="true">WC</span>
+        Capital Trabajo — afecta solo Flujo Caja
+      </span>
+    </div>
+
+    <!-- Placeholder notice (visible when data is absent or all zeros) -->
+    <div class="placeholder-notice" id="placeholder-notice" role="status">
+      <span aria-hidden="true">ℹ</span>
+      <span>
+        Datos no disponibles — usa
+        <strong>/scaleup-cash-power1</strong>
+        para ingresar tus palancas.
+      </span>
+    </div>
+
+  </main>
+</div>
+
+<script>
+/* =========================================================================
+   Power of One Dashboard — Data & Rendering Engine
+   ScaleUp · Story s14.2-power-of-one-visual · 2026-05-27
+
+   Architecture:
+   - window.CASH_DATA.powerOfOne : inline data object (extend from S14.1)
+   - calcImpacts()     : monetary impact formulas per variable category
+   - calcTotals()      : aggregate CF and EBIT totals
+   - statusFor()       : per-row traffic light logic (±5% threshold)
+   - el()              : DOM helper (no innerHTML — createElement + textContent)
+   - buildVariableRow(): builds a 6-column DOM row for each variable
+   - buildTable()      : orchestrates full table render
+   - renderDashboard() : boot render function
+   ========================================================================= */
+
+'use strict';
+
+// ─── 1. INLINE DATA ─────────────────────────────────────────────────────────
+// Acme Corp example — intentionally all-improving to show green rows.
+// Replace with real data from /scaleup-cash-power1 coaching output.
+
+window.CASH_DATA = window.CASH_DATA || {};
+
+// The || guard below ensures real data injected by /scaleup-cash-power1 is never
+// overwritten. When the coaching tool replaces this inline block with real data,
+// this line becomes a no-op — the DEFAULT_POWER_OF_ONE fallback then serves as
+// last-resort placeholder if the injection is absent entirely.
+window.CASH_DATA.powerOfOne = window.CASH_DATA.powerOfOne || {
+  company: "Acme Corp",
+  period: "Q2 2026",
+  variables: {
+    price: {
+      label: "Precio por Unidad",
+      category: "revenue",
+      unit: "$",
+      current: 100,
+      adjusted: 105
+    },
+    volume: {
+      label: "Volumen (unidades)",
+      category: "revenue",
+      unit: "u",
+      current: 1000,
+      adjusted: 1050
+    },
+    cogs: {
+      label: "COGS %",
+      category: "cost",
+      unit: "%",
+      current: 60,
+      adjusted: 58
+    },
+    overheads: {
+      label: "Gastos Generales",
+      category: "cost",
+      unit: "$",
+      current: 20000,
+      adjusted: 19000
+    },
+    ar_days: {
+      label: "Días A/R",
+      category: "working_capital",
+      unit: "d",
+      current: 45,
+      adjusted: 35
+    },
+    inv_days: {
+      label: "Días Inventario",
+      category: "working_capital",
+      unit: "d",
+      current: 30,
+      adjusted: 25
+    },
+    ap_days: {
+      label: "Días A/P",
+      category: "working_capital",
+      unit: "d",
+      current: 30,
+      adjusted: 35
+    }
+  }
+};  // end window.CASH_DATA.powerOfOne || {...}
+
+
+// ─── 2. DEFAULT FALLBACK DATA ────────────────────────────────────────────────
+// Used when window.CASH_DATA.powerOfOne is absent (data-fallback mode).
+
+var DEFAULT_POWER_OF_ONE = {
+  company: "Tu Empresa",
+  period: "—",
+  variables: {
+    price:     { label: "Precio por Unidad",    category: "revenue",        unit: "$", current: 0, adjusted: 0 },
+    volume:    { label: "Volumen (unidades)",    category: "revenue",        unit: "u", current: 0, adjusted: 0 },
+    cogs:      { label: "COGS %",               category: "cost",           unit: "%", current: 0, adjusted: 0 },
+    overheads: { label: "Gastos Generales",      category: "cost",           unit: "$", current: 0, adjusted: 0 },
+    ar_days:   { label: "Días A/R",             category: "working_capital", unit: "d", current: 0, adjusted: 0 },
+    inv_days:  { label: "Días Inventario",       category: "working_capital", unit: "d", current: 0, adjusted: 0 },
+    ap_days:   { label: "Días A/P",             category: "working_capital", unit: "d", current: 0, adjusted: 0 }
+  }
+};
+
+// Variable order — ensures consistent rendering order
+var VARIABLE_KEYS = ['price', 'volume', 'cogs', 'overheads', 'ar_days', 'inv_days', 'ap_days'];
+
+
+// ─── 3. CALCULATION ENGINE ───────────────────────────────────────────────────
+
+/**
+ * Computes CF and EBIT monetary impact for all 7 Power of One variables.
+ * Returns array of { key, cfImpact, ebitImpact } objects.
+ *
+ * Category A (revenue/cost) — affects both EBIT and CF:
+ *   Price:     (adjPrice − curPrice) × curVolume
+ *   Volume:    (adjVol − curVol) × curPrice
+ *   COGS %:    −(adjCOGS − curCOGS)/100 × revenue
+ *   Overheads: −(adjOverheads − curOverheads)
+ *
+ * Category B (working_capital) — affects CF only; EBIT = 0:
+ *   A/R Days:  −(adjAR − curAR) × dailyRevenue
+ *   Inv Days:  −(adjInv − curInv) × dailyRevenue
+ *   A/P Days:  +(adjAP − curAP) × dailyRevenue
+ */
+function calcImpacts(vars) {
+  var revenue      = vars.price.current * vars.volume.current;
+  var dailyRevenue = revenue / 365;
+
+  var impacts = [];
+
+  VARIABLE_KEYS.forEach(function(key) {
+    var v = vars[key];
+    var cfImpact   = 0;
+    var ebitImpact = 0;
+
+    switch (key) {
+      case 'price':
+        cfImpact   = (v.adjusted - v.current) * vars.volume.current;
+        ebitImpact = cfImpact;
+        break;
+      case 'volume':
+        cfImpact   = (v.adjusted - v.current) * vars.price.current;
+        ebitImpact = cfImpact;
+        break;
+      case 'cogs':
+        cfImpact   = -((v.adjusted - v.current) / 100) * revenue;
+        ebitImpact = cfImpact;
+        break;
+      case 'overheads':
+        cfImpact   = -(v.adjusted - v.current);
+        ebitImpact = cfImpact;
+        break;
+      case 'ar_days':
+        cfImpact   = -((v.adjusted - v.current) * dailyRevenue);
+        ebitImpact = 0;
+        break;
+      case 'inv_days':
+        cfImpact   = -((v.adjusted - v.current) * dailyRevenue);
+        ebitImpact = 0;
+        break;
+      case 'ap_days':
+        cfImpact   = (v.adjusted - v.current) * dailyRevenue;
+        ebitImpact = 0;
+        break;
+    }
+
+    impacts.push({ key: key, cfImpact: cfImpact, ebitImpact: ebitImpact });
+  });
+
+  return impacts;
+}
+
+/**
+ * Sums all CF and EBIT impacts into totals.
+ * Returns { totalCF, totalEBIT }.
+ */
+function calcTotals(impacts) {
+  var totalCF   = 0;
+  var totalEBIT = 0;
+  impacts.forEach(function(imp) {
+    totalCF   += imp.cfImpact;
+    totalEBIT += imp.ebitImpact;
+  });
+  return { totalCF: totalCF, totalEBIT: totalEBIT };
+}
+
+
+// ─── 4. TRAFFIC LIGHT LOGIC ─────────────────────────────────────────────────
+
+/**
+ * Returns semáforo CSS class for a variable row.
+ * Threshold: ±5% of base revenue (combinedImpact = cfImpact + ebitImpact).
+ * Gray when revenue = 0 or both impacts = 0.
+ */
+function statusFor(cfImpact, ebitImpact, revenue) {
+  if (revenue === 0 || (cfImpact === 0 && ebitImpact === 0)) return 'semaforo-gray';
+  var combined  = cfImpact + ebitImpact;
+  var threshold = Math.abs(revenue) * 0.05;
+  if (combined > threshold)  return 'semaforo-green';
+  if (combined < -threshold) return 'semaforo-red';
+  return 'semaforo-yellow';
+}
+
+/**
+ * Aggregate status for summary row.
+ * Uses directional logic (sign-based), not the per-row ±5% threshold.
+ * Intentional divergence: per-row status measures magnitude relative to revenue;
+ * summary row measures overall direction (both up = green, both down = red, mixed = yellow).
+ */
+function aggregateStatus(totalCF, totalEBIT) {
+  if (totalCF === 0 && totalEBIT === 0) return 'semaforo-gray';
+  if (totalCF > 0 && totalEBIT >= 0) return 'semaforo-green';
+  if (totalCF < 0 && totalEBIT <= 0) return 'semaforo-red';
+  return 'semaforo-yellow';
+}
+
+/** Human label for a semáforo class. */
+function statusLabel(cls) {
+  var labels = {
+    'semaforo-green':  'Mejora',
+    'semaforo-yellow': 'Neutral',
+    'semaforo-red':    'Retroceso',
+    'semaforo-gray':   'Sin datos'
+  };
+  return labels[cls] || '—';
+}
+
+/** Row background class from semáforo class. */
+function rowBgClass(cls) {
+  return cls.replace('semaforo-', 'row-');
+}
+
+
+// ─── 5. FORMATTING HELPERS ───────────────────────────────────────────────────
+
+/**
+ * Formats a monetary value with currency symbol.
+ * Signed: prepends '+' for positive, '-' is native.
+ */
+function formatCurrency(n, signed) {
+  var abs = Math.abs(n);
+  var formatted = abs.toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0
+  });
+  if (signed) {
+    return n > 0 ? '+' + formatted : (n < 0 ? '-' + formatted : formatted);
+  }
+  return formatted;
+}
+
+/**
+ * Formats a variable value with appropriate unit.
+ * $: prefix. %: suffix. d/u: suffix with space.
+ */
+function formatValue(v, unit) {
+  if (unit === '$') {
+    return v.toLocaleString('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: 0
+    });
+  }
+  if (unit === '%') {
+    return v.toFixed(1) + '%';
+  }
+  // 'd' (days) or 'u' (units)
+  return v.toLocaleString('en-US') + unit;
+}
+
+/** Category pill class from category string. */
+function categoryPillClass(category) {
+  if (category === 'revenue') return 'pill-revenue';
+  if (category === 'cost')    return 'pill-cost';
+  return 'pill-wc';
+}
+
+/** Short category label for pill. */
+function categoryPillLabel(category) {
+  if (category === 'revenue') return 'Rev';
+  if (category === 'cost')    return 'Costo';
+  return 'WC';
+}
+
+
+// ─── 6. DOM BUILDER HELPER ──────────────────────────────────────────────────
+/**
+ * Creates an element with optional class, textContent, style, attributes,
+ * and appended children. Never uses innerHTML.
+ */
+function el(tag, opts, children) {
+  var e = document.createElement(tag);
+  if (opts) {
+    if (opts.cls)   e.className = opts.cls;
+    if (opts.text !== undefined) e.textContent = opts.text;
+    if (opts.style) e.style.cssText = opts.style;
+    if (opts.role)  e.setAttribute('role', opts.role);
+    if (opts.title) e.setAttribute('title', opts.title);
+    if (opts.aria)  e.setAttribute('aria-label', opts.aria);
+    if (opts.id)    e.id = opts.id;
+    if (opts.data)  {
+      var keys = Object.keys(opts.data);
+      for (var k = 0; k < keys.length; k++) {
+        e.setAttribute('data-' + keys[k], opts.data[keys[k]]);
+      }
+    }
+  }
+  if (children) {
+    for (var i = 0; i < children.length; i++) {
+      if (children[i]) e.appendChild(children[i]);
+    }
+  }
+  return e;
+}
+
+
+// ─── 7. BUILD VARIABLE ROW ──────────────────────────────────────────────────
+
+/**
+ * Builds a 6-column DOM row for one Power of One variable.
+ * No innerHTML anywhere — all via el() helper.
+ */
+function buildVariableRow(key, varData, impact, revenue) {
+  var status   = statusFor(impact.cfImpact, impact.ebitImpact, revenue);
+  var rowBg    = rowBgClass(status);
+  var isWC     = varData.category === 'working_capital';
+
+  // ── Column 1: Variable label + category pill ──────────────────────────
+  var pill     = el('span', {
+    cls:  'po1-category-pill ' + categoryPillClass(varData.category),
+    text: categoryPillLabel(varData.category)
+  });
+  var labelCell = el('div', {
+    cls:  'po1-label-cell',
+    role: 'cell',
+    data: { label: 'Variable' }
+  }, [
+    el('span', { text: varData.label }),
+    pill
+  ]);
+
+  // ── Column 2: Current value ───────────────────────────────────────────
+  var currentCell = el('div', {
+    cls:  'po1-cell po1-value-cell',
+    role: 'cell',
+    data: { label: 'Actual' },
+    text: formatValue(varData.current, varData.unit)
+  });
+
+  // ── Column 3: Adjusted value ──────────────────────────────────────────
+  var adjustedCell = el('div', {
+    cls:  'po1-cell po1-value-cell',
+    role: 'cell',
+    data: { label: 'Ajustado' },
+    text: formatValue(varData.adjusted, varData.unit)
+  });
+
+  // ── Column 4: CF Impact ───────────────────────────────────────────────
+  var cfText    = formatCurrency(impact.cfImpact, true);
+  var cfClass   = impact.cfImpact > 0 ? 'po1-impact-positive'
+                : impact.cfImpact < 0 ? 'po1-impact-negative'
+                : 'po1-impact-neutral';
+  var cfCell    = el('div', {
+    cls:  'po1-cell ' + cfClass,
+    role: 'cell',
+    data: { label: 'Impacto Flujo Caja' },
+    text: cfText
+  });
+
+  // ── Column 5: EBIT Impact ─────────────────────────────────────────────
+  var ebitCell;
+  if (isWC) {
+    // Working capital — EBIT not affected; show dash
+    ebitCell = el('div', {
+      cls:  'po1-cell po1-dash',
+      role: 'cell',
+      data: { label: 'Impacto EBIT' },
+      text: '—'
+    });
+  } else {
+    var ebitText  = formatCurrency(impact.ebitImpact, true);
+    var ebitClass = impact.ebitImpact > 0 ? 'po1-impact-positive'
+                  : impact.ebitImpact < 0 ? 'po1-impact-negative'
+                  : 'po1-impact-neutral';
+    ebitCell = el('div', {
+      cls:  'po1-cell ' + ebitClass,
+      role: 'cell',
+      data: { label: 'Impacto EBIT' },
+      text: ebitText
+    });
+  }
+
+  // ── Column 6: Status indicator ────────────────────────────────────────
+  var dot   = el('span', {
+    cls:   'semaforo-dot ' + status,
+    title: statusLabel(status)
+  });
+  var badge = el('span', {
+    cls:  'semaforo-badge ' + status,
+    text: statusLabel(status)
+  });
+  var statusCell = el('div', {
+    cls:  'po1-status-cell',
+    role: 'cell',
+    data: { label: 'Estado' }
+  }, [dot, badge]);
+
+  // ── Assemble row ──────────────────────────────────────────────────────
+  var row = el('div', {
+    cls:  'po1-row ' + rowBg,
+    role: 'row',
+    aria: varData.label
+  }, [labelCell, currentCell, adjustedCell, cfCell, ebitCell, statusCell]);
+
+  return row;
+}
+
+
+// ─── 8. BUILD SUMMARY ROW ───────────────────────────────────────────────────
+
+/**
+ * Builds the TOTAL IMPACTO summary/footer row.
+ */
+function buildSummaryRow(totalCF, totalEBIT, revenue) {
+  var status = aggregateStatus(totalCF, totalEBIT);
+  var rowBg  = rowBgClass(status);
+
+  // Col 1: Label
+  var labelCell = el('div', {
+    cls:  'po1-label-cell',
+    role: 'cell',
+    data: { label: 'Variable' },
+    text: 'TOTAL IMPACTO'
+  });
+
+  // Col 2-3: empty dashes
+  var emptyA = el('div', {
+    cls:  'po1-cell po1-dash',
+    role: 'cell',
+    data: { label: 'Actual' },
+    text: '—'
+  });
+  var emptyB = el('div', {
+    cls:  'po1-cell po1-dash',
+    role: 'cell',
+    data: { label: 'Ajustado' },
+    text: '—'
+  });
+
+  // Col 4: Total CF
+  var totalCFText  = formatCurrency(totalCF, true);
+  var totalCFClass = totalCF > 0 ? 'po1-impact-positive'
+                   : totalCF < 0 ? 'po1-impact-negative'
+                   : 'po1-impact-neutral';
+  var cfCell = el('div', {
+    cls:  'po1-cell ' + totalCFClass,
+    role: 'cell',
+    data: { label: 'Impacto Flujo Caja' },
+    text: totalCFText
+  });
+
+  // Col 5: Total EBIT
+  var totalEBITText  = formatCurrency(totalEBIT, true);
+  var totalEBITClass = totalEBIT > 0 ? 'po1-impact-positive'
+                     : totalEBIT < 0 ? 'po1-impact-negative'
+                     : 'po1-impact-neutral';
+  var ebitCell = el('div', {
+    cls:  'po1-cell ' + totalEBITClass,
+    role: 'cell',
+    data: { label: 'Impacto EBIT' },
+    text: totalEBITText
+  });
+
+  // Col 6: Aggregate status
+  var dot   = el('span', {
+    cls:   'semaforo-dot semaforo-dot-lg ' + status,
+    title: statusLabel(status)
+  });
+  var badge = el('span', {
+    cls:  'semaforo-badge ' + status,
+    text: statusLabel(status)
+  });
+  var statusCell = el('div', {
+    cls:  'po1-status-cell',
+    role: 'cell',
+    data: { label: 'Estado' }
+  }, [dot, badge]);
+
+  var row = el('div', {
+    cls:  'po1-row po1-summary-row ' + rowBg,
+    role: 'row',
+    aria: 'Total impacto consolidado'
+  }, [labelCell, emptyA, emptyB, cfCell, ebitCell, statusCell]);
+
+  return row;
+}
+
+
+// ─── 9. BUILD TABLE ─────────────────────────────────────────────────────────
+
+/**
+ * Orchestrates the full table render: header, 7 variable rows, summary row.
+ * Appends all rows to #po1-rows container.
+ */
+function buildTable(data) {
+  var vars    = data.variables;
+  var revenue = vars.price.current * vars.volume.current;
+  var impacts = calcImpacts(vars);
+  var totals  = calcTotals(impacts);
+  var allZero = VARIABLE_KEYS.every(function(k) {
+    return vars[k].current === 0 && vars[k].adjusted === 0;
+  });
+
+  var container = document.getElementById('po1-rows');
+  if (!container) return;
+  container.textContent = ''; // clear safely
+
+  // Build 7 variable rows
+  impacts.forEach(function(impact) {
+    var varData = vars[impact.key];
+    var row     = buildVariableRow(impact.key, varData, impact, revenue);
+    container.appendChild(row);
+  });
+
+  // Build summary row
+  var summaryRow = buildSummaryRow(totals.totalCF, totals.totalEBIT, revenue);
+  container.appendChild(summaryRow);
+
+  // Show placeholder notice if all zeros
+  var notice = document.getElementById('placeholder-notice');
+  if (notice) {
+    if (allZero) {
+      notice.classList.add('visible');
+    } else {
+      notice.classList.remove('visible');
+    }
+  }
+
+}
+
+
+// ─── 10. RENDER DASHBOARD ───────────────────────────────────────────────────
+
+function renderDashboard(cashData) {
+  // Resolve data — fall back to defaults if absent
+  var data;
+  var isPlaceholder = false;
+
+  if (!cashData || !cashData.powerOfOne) {
+    data          = DEFAULT_POWER_OF_ONE;
+    isPlaceholder = true;
+    console.warn('[Power of One] window.CASH_DATA.powerOfOne not found — using fallback data.');
+  } else {
+    data = cashData.powerOfOne;
+  }
+
+  // ── Header meta ──
+  var metaEl = document.getElementById('board-meta');
+  if (metaEl) {
+    metaEl.textContent = data.company + '  ·  ' + data.period;
+  }
+
+  // ── Show placeholder notice immediately if no real data ──
+  if (isPlaceholder) {
+    var notice = document.getElementById('placeholder-notice');
+    if (notice) notice.classList.add('visible');
+  }
+
+  // ── Build table ──
+  buildTable(data);
+}
+
+
+// ─── 11. BOOT ────────────────────────────────────────────────────────────────
+
+document.addEventListener('DOMContentLoaded', function() {
+  try {
+    renderDashboard(window.CASH_DATA);
+  } catch (err) {
+    console.error('[Power of One] Render error:', err);
+    // Build error banner via DOM only — no innerHTML
+    var errDiv   = document.createElement('div');
+    errDiv.style.cssText = 'background:#fee2e2;color:#7f1d1d;padding:16px;font-family:monospace;font-size:13px;';
+    var errLabel = document.createElement('strong');
+    errLabel.textContent = 'Error al cargar el dashboard: ';
+    var errMsg   = document.createTextNode(err.message);
+    errDiv.appendChild(errLabel);
+    errDiv.appendChild(errMsg);
+    document.body.prepend(errDiv);
+  }
+});
+</script>
+</body>
+</html>
