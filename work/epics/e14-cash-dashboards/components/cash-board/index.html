@@ -761,13 +761,6 @@ function el(tag, opts, children) {
   return e;
 }
 
-/** Appends multiple children to an existing element. Returns the element. */
-function append(parent) {
-  for (var i = 1; i < arguments.length; i++) {
-    if (arguments[i]) parent.appendChild(arguments[i]);
-  }
-  return parent;
-}
 
 
 // ─── 4. BUILD CYCLE ROW (DOM-only, no innerHTML) ────────────────────────────
@@ -819,7 +812,7 @@ function buildCycleRow(cycle) {
 
   var track    = el('div', { cls: 'progress-bar-track' }, [barFill]);
   var blLeft   = el('span', { text: '0' });
-  var blRight  = el('span', { cls: 'cycle-bar-labels', text: 'Meta: ' + cycle.benchmark_days + 'd' });
+  var blRight  = el('span', { text: 'Meta: ' + cycle.benchmark_days + 'd' });
   var barLbls  = el('div', { cls: 'cycle-bar-labels' }, [blLeft, blRight]);
   var barWrap  = el('div', { cls: 'cycle-bar-wrapper' }, [track, barLbls]);
 
