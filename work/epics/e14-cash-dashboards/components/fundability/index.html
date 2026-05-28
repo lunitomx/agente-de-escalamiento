@@ -448,6 +448,8 @@ function buildRadar(data) {
         borderWidth: 2,
         pointBackgroundColor: colors.border,
         pointBorderColor: '#fff',
+        pointRadius: 4,
+        pointHoverRadius: 6,
         pointHoverBackgroundColor: '#fff',
         pointHoverBorderColor: colors.border
       }]
@@ -455,6 +457,9 @@ function buildRadar(data) {
     options: {
       responsive: true,
       maintainAspectRatio: true,
+      // aspectRatio:1 keeps a square chart on all viewports;
+      // combined with max-width:500px on .chart-wrapper this prevents
+      // the polygon becoming too small on 375px mobile screens (R2 mitigation).
       aspectRatio: 1,
       plugins: { legend: { display: false } },
       scales: {
