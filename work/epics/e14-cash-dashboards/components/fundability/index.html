@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'">
+  <title>Fundability — Radar de Criterios | ScaleUp</title>
+  <link rel="stylesheet" href="../shared/styles/dashboard-base.css">
+  <!--
+    Chart.js v4 — vendored locally at ../shared/vendor/chart.umd.min.js
+    Used for: radar chart of 8 fundability criteria (S14.4)
+    See: work/epics/e14-cash-dashboards/adr-visualization-framework.md
+  -->
+  <script src="../shared/vendor/chart.umd.min.js"></script>
+
+  <style>
+    /* =====================================================================
+       Fundability Dashboard — Component-specific layout styles
+       (Base tokens come from ../shared/styles/dashboard-base.css)
+       ===================================================================== */
+
+    /* ── Page layout ─────────────────────────────────────────────────── */
+    .page-wrapper {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .page-content {
+      flex: 1;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+      padding: var(--space-xl);
+    }
+
+    /* ── Dashboard header ─────────────────────────────────────────────── */
+    .board-header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e40af 100%);
+      color: white;
+      padding: var(--space-lg) var(--space-xl);
+    }
+
+    .board-header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-lg);
+      align-items: center;
+    }
+
+    .board-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #93c5fd;
+      margin-bottom: var(--space-xs);
+    }
+
+    .board-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: white;
+      line-height: 1.15;
+    }
+
+    .board-title-accent {
+      color: #93c5fd;
+    }
+
+    .board-meta-text {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-top: var(--space-xs);
+    }
+
+    /* ── Chart wrapper ────────────────────────────────────────────────── */
+    .chart-wrapper {
+      max-width: 500px;
+      margin: 0 auto var(--space-xl) auto;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      box-shadow: var(--shadow-md);
+    }
+
+    .chart-section-title {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-text-secondary);
+      text-align: center;
+      margin-bottom: var(--space-md);
+    }
+
+    /* ── Fundability table ────────────────────────────────────────────── */
+    .fundability-table {
+      max-width: 500px;
+      margin: 0 auto;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .fundability-table-title {
+      max-width: 500px;
+      margin: 0 auto var(--space-sm) auto;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-text-secondary);
+      padding-left: var(--space-xs);
+    }
+
+    .ft-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: 1px solid var(--color-border);
+      transition: background var(--transition);
+    }
+
+    .ft-row:last-child {
+      border-bottom: none;
+    }
+
+    .ft-row:hover {
+      background: var(--color-surface-2);
+    }
+
+    .ft-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      flex: 1;
+    }
+
+    /* ── Placeholder notice ─────────────────────────────────────────── */
+    .placeholder-notice {
+      display: none;
+      background: var(--color-gray-light);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-sm) var(--space-md);
+      font-size: 12px;
+      color: var(--color-gray-text);
+      margin-top: var(--space-md);
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .placeholder-notice.visible {
+      display: flex;
+    }
+
+    /* ── Zone legend ──────────────────────────────────────────────────── */
+    .zone-legend {
+      max-width: 500px;
+      margin: var(--space-lg) auto 0 auto;
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      flex-wrap: wrap;
+    }
+
+    .zone-legend-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+    }
+
+    .zone-legend-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      font-size: 12px;
+      color: var(--color-text-secondary);
+    }
+
+    .zone-legend-swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: var(--radius-full);
+      flex-shrink: 0;
+    }
+
+    .swatch-green  { background: rgba(22, 163, 74, 1); }
+    .swatch-yellow { background: rgba(217, 119, 6, 1); }
+    .swatch-red    { background: rgba(220, 38, 38, 1); }
+
+    /* ── Responsive ───────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .board-header {
+        padding: var(--space-md);
+      }
+
+      .board-header-inner {
+        grid-template-columns: 1fr;
+      }
+
+      .page-content {
+        padding: var(--space-md);
+      }
+
+      .chart-wrapper {
+        max-width: 100%;
+        padding: var(--space-md);
+      }
+
+      .fundability-table {
+        max-width: 100%;
+      }
+
+      .fundability-table-title {
+        max-width: 100%;
+      }
+
+      .placeholder-notice {
+        max-width: 100%;
+      }
+
+      .zone-legend {
+        max-width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-sm);
+      }
+
+      .ft-row {
+        padding: var(--space-sm);
+      }
+
+      .ft-label {
+        font-size: 12px;
+      }
+    }
+
+    /* ── Print ────────────────────────────────────────────────────────── */
+    @media print {
+      .board-header {
+        background: #0f172a !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .chart-wrapper,
+      .fundability-table {
+        box-shadow: none;
+        border: 1px solid #ccc;
+      }
+      .placeholder-notice {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <!-- ================================================================
+       DASHBOARD HEADER — populated by JS from data
+       ================================================================ -->
+  <header class="board-header" id="board-header-el">
+    <!-- populated by buildHeader() -->
+  </header>
+
+  <!-- ================================================================
+       MAIN CONTENT
+       ================================================================ -->
+  <main class="page-content">
+
+    <!-- Radar chart section -->
+    <div class="chart-wrapper">
+      <p class="chart-section-title">Perfil de Fundability</p>
+      <canvas id="fundability-radar" role="img" aria-label="Radar chart de criterios de fundability"></canvas>
+    </div>
+
+    <!-- Summary table — populated by buildSummaryTable() -->
+    <p class="fundability-table-title">Criterios</p>
+    <div id="fundability-table-container"></div>
+
+    <!-- Placeholder notice (visible when data is absent) -->
+    <div class="placeholder-notice" id="placeholder-notice" role="status">
+      <span aria-hidden="true">i</span>
+      <span>Datos de ejemplo — usa <strong>/scaleup-cash</strong> para ingresar tu perfil de fundability.</span>
+    </div>
+
+    <!-- Zone legend -->
+    <div class="zone-legend" aria-label="Leyenda de zonas de fundability">
+      <span class="zone-legend-title">Zonas</span>
+      <span class="zone-legend-item">
+        <span class="zone-legend-swatch swatch-green" aria-hidden="true"></span>
+        Verde = Promedio &ge; 2.5
+      </span>
+      <span class="zone-legend-item">
+        <span class="zone-legend-swatch swatch-yellow" aria-hidden="true"></span>
+        Amarillo = Promedio 1.5–2.49
+      </span>
+      <span class="zone-legend-item">
+        <span class="zone-legend-swatch swatch-red" aria-hidden="true"></span>
+        Rojo = Promedio &lt; 1.5
+      </span>
+    </div>
+
+  </main>
+</div>
+
+<script>
+/* =========================================================================
+   Fundability Dashboard — Data & Rendering Engine
+   ScaleUp · Story s14.4-fundability-visual · 2026-05-28
+
+   Architecture:
+   - window.CASH_DATA.fundability : inline data object (||  guard)
+   - RATING_MAP                   : Weak→1, Solid→2, Great→3
+   - getZoneColors()              : avg-based fill color selector
+   - buildRadar()                 : Chart.js radar instantiation
+   - ratingClass()                : rating → semaforo CSS class
+   - el()                         : DOM helper (no innerHTML)
+   - buildSummaryTable()          : 8-row criterion table
+   - buildHeader()                : .board-header DOM construction
+   - renderDashboard()            : boot render function
+   ========================================================================= */
+
+'use strict';
+
+// ─── 1. INLINE DATA ─────────────────────────────────────────────────────────
+// Acme Corp example data — rating spread chosen so avg = 2.0 (Yellow zone).
+// Replace with real data injected by /scaleup-cash coaching output.
+
+window.CASH_DATA = window.CASH_DATA || {};
+
+// The || guard ensures real data injected by /scaleup-cash is NEVER overwritten.
+// When the coaching tool injects real data before this script runs, this block
+// becomes a no-op. When no injection exists, placeholder data renders instead.
+window.CASH_DATA.fundability = window.CASH_DATA.fundability || {
+  company: "Acme Corp",
+  period: "Q2 2026",
+  criteria: [
+    { key: "leadership",     label: "Leadership",     rating: "Solid" },
+    { key: "business_model", label: "Business Model", rating: "Great" },
+    { key: "values",         label: "Values",         rating: "Solid" },
+    { key: "industry",       label: "Industry",       rating: "Weak"  },
+    { key: "exit",           label: "Exit",           rating: "Weak"  },
+    { key: "house",          label: "House",          rating: "Solid" },
+    { key: "consistency",    label: "Consistency",    rating: "Great" },
+    { key: "assets",         label: "Assets",         rating: "Solid" }
+  ]
+};
+
+
+// ─── 2. DEFAULT FALLBACK DATA ────────────────────────────────────────────────
+// All-Solid placeholder — used when window.CASH_DATA.fundability is absent
+// or has empty criteria. Renders a full octagon to indicate "no data yet"
+// rather than a blank chart.
+
+var DEFAULT_FUNDABILITY = {
+  company: "Tu Empresa",
+  period: "—",
+  criteria: [
+    { key: "leadership",     label: "Leadership",     rating: "Solid" },
+    { key: "business_model", label: "Business Model", rating: "Solid" },
+    { key: "values",         label: "Values",         rating: "Solid" },
+    { key: "industry",       label: "Industry",       rating: "Solid" },
+    { key: "exit",           label: "Exit",           rating: "Solid" },
+    { key: "house",          label: "House",          rating: "Solid" },
+    { key: "consistency",    label: "Consistency",    rating: "Solid" },
+    { key: "assets",         label: "Assets",         rating: "Solid" }
+  ]
+};
+
+
+// ─── 3. RATING MAP & COLOR ZONES ─────────────────────────────────────────────
+
+var RATING_MAP = { Weak: 1, Solid: 2, Great: 3 };
+
+/**
+ * Returns fill/border color pair based on average fundability score.
+ * Green: avg >= 2.5 | Yellow: avg >= 1.5 | Red: avg < 1.5
+ */
+function getZoneColors(avg) {
+  if (avg >= 2.5) return { bg: 'rgba(22, 163, 74, 0.25)',  border: 'rgba(22, 163, 74, 1)' };
+  if (avg >= 1.5) return { bg: 'rgba(217, 119, 6, 0.25)', border: 'rgba(217, 119, 6, 1)' };
+  return            { bg: 'rgba(220, 38, 38, 0.25)',  border: 'rgba(220, 38, 38, 1)' };
+}
+
+
+// ─── 4. DOM BUILDER HELPER ──────────────────────────────────────────────────
+/**
+ * Creates an element with optional class, textContent, style, attributes,
+ * and appended children. Never uses innerHTML — canonical pattern from S14.2.
+ */
+function el(tag, opts, children) {
+  var e = document.createElement(tag);
+  if (opts) {
+    if (opts.cls)            e.className = opts.cls;
+    if (opts.text !== undefined) e.textContent = opts.text;
+    if (opts.style)          e.style.cssText = opts.style;
+    if (opts.role)           e.setAttribute('role', opts.role);
+    if (opts.title)          e.setAttribute('title', opts.title);
+    if (opts.aria)           e.setAttribute('aria-label', opts.aria);
+    if (opts.id)             e.id = opts.id;
+    if (opts.data) {
+      var keys = Object.keys(opts.data);
+      for (var k = 0; k < keys.length; k++) {
+        e.setAttribute('data-' + keys[k], opts.data[keys[k]]);
+      }
+    }
+  }
+  if (children) {
+    for (var i = 0; i < children.length; i++) {
+      if (children[i]) e.appendChild(children[i]);
+    }
+  }
+  return e;
+}
+
+
+// ─── 5. CHART.JS RADAR ───────────────────────────────────────────────────────
+
+/**
+ * Instantiates the Chart.js radar for the 8 fundability criteria.
+ * Destroys any previous instance stored in window._fundabilityChart to avoid
+ * "canvas already in use" errors when re-rendering.
+ */
+function buildRadar(data) {
+  var canvas = document.getElementById('fundability-radar');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+
+  // Destroy previous instance if re-rendering
+  if (window._fundabilityChart) {
+    window._fundabilityChart.destroy();
+    window._fundabilityChart = null;
+  }
+
+  var values = data.criteria.map(function(c) { return RATING_MAP[c.rating] || 1; });
+  var avg    = values.reduce(function(s, v) { return s + v; }, 0) / values.length;
+  var colors = getZoneColors(avg);
+  var labels = data.criteria.map(function(c) { return c.label; });
+
+  window._fundabilityChart = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: values,
+        fill: true,
+        backgroundColor: colors.bg,
+        borderColor: colors.border,
+        borderWidth: 2,
+        pointBackgroundColor: colors.border,
+        pointBorderColor: '#fff',
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: colors.border
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      // aspectRatio:1 keeps a square chart on all viewports;
+      // combined with max-width:500px on .chart-wrapper this prevents
+      // the polygon becoming too small on 375px mobile screens (R2 mitigation).
+      aspectRatio: 1,
+      plugins: { legend: { display: false } },
+      scales: {
+        r: {
+          min: 0,
+          max: 3,
+          ticks: {
+            stepSize: 1,
+            callback: function(v) { return ['', 'Weak', 'Solid', 'Great'][v] || ''; },
+            font: { size: 10 },
+            backdropColor: 'transparent'
+          },
+          pointLabels: { font: { size: 12, weight: '600' } },
+          grid: { color: 'rgba(0,0,0,0.1)' },
+          angleLines: { color: 'rgba(0,0,0,0.15)' }
+        }
+      }
+    }
+  });
+}
+
+
+// ─── 6. SUMMARY TABLE ───────────────────────────────────────────────────────
+
+/**
+ * Maps a rating string to the appropriate semáforo CSS class.
+ * Great → green (investor-ready), Solid → yellow (acceptable),
+ * Weak → red (needs work).
+ */
+function ratingClass(rating) {
+  // Default to 'semaforo-red' (Weak) for unknown/malformed ratings —
+  // consistent with RATING_MAP fallback of 1 (Weak) used in buildRadar().
+  return { Great: 'semaforo-green', Solid: 'semaforo-yellow', Weak: 'semaforo-red' }[rating] || 'semaforo-red';
+}
+
+/**
+ * Builds the 8-row summary scorecard table via el() only — no innerHTML.
+ * Returns the fully constructed .fundability-table DOM element.
+ */
+function buildSummaryTable(data) {
+  var table = el('div', {
+    cls: 'fundability-table',
+    role: 'table',
+    aria: 'Criterios de Fundability'
+  });
+  table.setAttribute('aria-rowcount', String(data.criteria.length));
+
+  data.criteria.forEach(function(c) {
+    var label = el('div', {
+      cls: 'ft-label',
+      role: 'cell',
+      text: c.label
+    });
+
+    var badge = el('span', {
+      cls: 'semaforo-badge ' + ratingClass(c.rating),
+      text: c.rating
+    });
+
+    var row = el('div', {
+      cls: 'ft-row',
+      role: 'row'
+    }, [label, badge]);
+
+    table.appendChild(row);
+  });
+
+  return table;
+}
+
+
+// ─── 7. HEADER BUILDER ──────────────────────────────────────────────────────
+
+/**
+ * Builds the .board-header DOM via el() — same pattern as S14.1/S14.2.
+ * Populates the existing #board-header-el placeholder.
+ */
+function buildHeader(data) {
+  var headerEl = document.getElementById('board-header-el');
+  if (!headerEl) return;
+  headerEl.textContent = ''; // clear safely — no innerHTML
+
+  var eyebrow = el('p', { cls: 'board-eyebrow', text: 'ScaleUp · Cash Decision' });
+
+  var titleAccent = el('span', { cls: 'board-title-accent', text: 'Fundability' });
+  var titleSuffix = document.createTextNode(' — Radar de Criterios');
+  var titleH1 = el('h1', { cls: 'board-title' }, [titleAccent]);
+  titleH1.appendChild(titleSuffix);
+
+  var meta = el('p', {
+    cls: 'board-meta-text',
+    text: data.company + '  ·  ' + data.period
+  });
+
+  var inner = el('div', { cls: 'board-header-inner' }, [
+    el('div', {}, [eyebrow, titleH1, meta])
+  ]);
+
+  headerEl.appendChild(inner);
+}
+
+
+// ─── 8. RENDER DASHBOARD ────────────────────────────────────────────────────
+
+/**
+ * Main render function — resolves data, detects placeholder mode,
+ * orchestrates header + radar + summary table rendering.
+ */
+function renderDashboard(cashData) {
+  var data;
+  var isPlaceholder = false;
+
+  // Detect absent or empty data
+  if (
+    !cashData ||
+    !cashData.fundability ||
+    !cashData.fundability.criteria ||
+    cashData.fundability.criteria.length === 0
+  ) {
+    data = DEFAULT_FUNDABILITY;
+    isPlaceholder = true;
+    console.warn('[Fundability] window.CASH_DATA.fundability not found or empty — using all-Solid placeholder.');
+  } else {
+    data = cashData.fundability;
+  }
+
+  // ── Build header ──
+  buildHeader(data);
+
+  // ── Build radar chart ──
+  buildRadar(data);
+
+  // ── Build summary table ──
+  var container = document.getElementById('fundability-table-container');
+  if (container) {
+    container.textContent = ''; // clear safely
+    container.appendChild(buildSummaryTable(data));
+  }
+
+  // ── Show/hide placeholder notice ──
+  var notice = document.getElementById('placeholder-notice');
+  if (notice) {
+    if (isPlaceholder) {
+      notice.classList.add('visible');
+    } else {
+      notice.classList.remove('visible');
+    }
+  }
+}
+
+
+// ─── 9. BOOT ─────────────────────────────────────────────────────────────────
+
+document.addEventListener('DOMContentLoaded', function() {
+  try {
+    renderDashboard(window.CASH_DATA);
+  } catch (err) {
+    console.error('[Fundability] Render error:', err);
+    // Build error banner via DOM only — no innerHTML — same pattern as S14.2
+    var errDiv   = document.createElement('div');
+    errDiv.style.cssText = 'background:#fee2e2;color:#7f1d1d;padding:16px;font-family:monospace;font-size:13px;border-bottom:2px solid #dc2626;';
+    var errLabel = document.createElement('strong');
+    errLabel.textContent = 'Error al cargar el dashboard: ';
+    var errMsg   = document.createTextNode(err.message);
+    errDiv.appendChild(errLabel);
+    errDiv.appendChild(errMsg);
+    document.body.prepend(errDiv);
+  }
+});
+</script>
+</body>
+</html>
