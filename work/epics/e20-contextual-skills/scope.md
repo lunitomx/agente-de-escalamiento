@@ -1,6 +1,6 @@
 # Epic Scope: E20 — Contextual Skills (Grafo → Dashboards)
 
-**Status:** Draft
+**Status:** Complete
 **Dependencies:** E19 (grafo poblado)
 **Tamaño:** L
 
