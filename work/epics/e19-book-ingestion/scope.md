@@ -37,3 +37,34 @@
 - [ ] API de consulta funcional: GET /api/knowledge/search?q=concepto
 - [ ] Tests: cada capítulo del libro verificado contra entidades
 - [ ] Documentación del esquema del grafo
+
+## Implementation Plan
+
+> Added by rai-epic-plan — 2026-05-29
+
+### Story Sequence
+
+| Order | Story | Size | Dependencies | Milestone | Rationale |
+|:-----:|-------|:----:|--------------|-----------|-----------|
+| 1 | S19.1 — Book Parser | L | Ninguna | M1 | Primero hay que extraer los datos del libro antes de poder ingestarlos |
+| 2 | S19.2 — Entity Ingest | M | S19.1 | M1 | Las entidades se crean desde los datos parseados |
+| 3 | S19.3 — Relationship Builder | M | S19.2 | M1 | Las relaciones conectan entidades que ya existen |
+| 4 | S19.4 — Knowledge API | M | S19.2, S19.3 | M2 | API sobre entidades y relaciones ya pobladas |
+| 5 | S19.5 — Integrity Tests | S | S19.1-S19.4 | M2 | Validación final contra el libro fuente |
+
+### Milestones
+
+| Milestone | Stories | Success Criteria |
+|-----------|---------|------------------|
+| **M1: Data Pipeline** | S19.1, S19.2, S19.3 | Libro parseado, 30+ entidades, 50+ relaciones en el grafo |
+| **M2: Access & Verify** | S19.4, S19.5 | API funcional, tests de cobertura pasando |
+
+### Progress Tracking
+
+| Story | Size | Status | Actual | Velocity | Notes |
+|-------|:----:|:------:|:------:|:--------:|-------|
+| S19.1 — Book Parser | L | Pending | — | — | Extrae chapters, concepts, tools, metrics, habits, principles |
+| S19.2 — Entity Ingest | M | Pending | — | — | Crea entidades en GraphEngine con propiedades |
+| S19.3 — Relationship Builder | M | Pending | — | — | Conecta entidades con relaciones semánticas |
+| S19.4 — Knowledge API | M | Pending | — | — | Endpoints de consulta al grafo |
+| S19.5 — Integrity Tests | S | Pending | — | — | Cobertura contra el libro fuente |
