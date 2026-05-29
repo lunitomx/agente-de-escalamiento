@@ -218,11 +218,10 @@ class TestKnowledgeContext:
         result = handler.get_context(tool="Nonexistent Tool")
         assert result["status"] == "error"
 
-    def test_context_no_args_returns_empty(self, handler):
-        """get_context with no arguments should return empty."""
+    def test_context_no_args_returns_error(self, handler):
+        """get_context with no arguments should return error."""
         result = handler.get_context()
-        assert result["status"] == "ok"
-        assert result["entities"] == []
+        assert result["status"] == "error"
 
 
 class TestKnowledgeRoutes:

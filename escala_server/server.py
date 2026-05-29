@@ -293,6 +293,8 @@ def _build_router() -> Router:
 
     @router.get("/api/knowledge/context")
     def knowledge_context(tool: str | None = None, category: str | None = None):
+        if not tool and not category:
+            return {"status": "error", "message": "requires 'tool' or 'category' parameter"}
         return EscalaRequestHandler.knowledge.get_context(tool=tool, category=category)
 
     return router
