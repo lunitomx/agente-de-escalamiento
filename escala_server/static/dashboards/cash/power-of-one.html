@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Power of One — Interactivo | ScaleUp</title>
+  <link rel="stylesheet" href="../../shared/styles/dashboard-base.css">
+  <style>
+    /* Interactive additions */
+    .interactive-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .interactive-bar h2 { margin: 0; font-size: 1.1rem; }
+
+    .save-btn {
+      padding: 8px 20px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    .save-btn:hover { background: #1d4ed8; }
+    .save-btn:active { background: #1e40af; }
+
+    .save-indicator {
+      font-size: 0.85rem;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-weight: 500;
+    }
+    .save-indicator.saved { background: #dcfce7; color: #166534; }
+    .save-indicator.modified { background: #fef9c3; color: #854d0e; }
+
+    .sliders-section {
+      padding: 16px;
+      background: white;
+      border-radius: 8px;
+      margin: 12px 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .slider-row:last-child { border-bottom: none; }
+
+    .slider-label {
+      min-width: 150px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #334155;
+    }
+    .slider-value {
+      min-width: 100px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #1e293b;
+      text-align: right;
+    }
+    .slider-input {
+      flex: 1;
+      min-width: 120px;
+      height: 6px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: #e2e8f0;
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer;
+    }
+    .slider-input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      background: #2563eb;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    .slider-input::-webkit-slider-thumb:hover { transform: scale(1.2); }
+    .slider-input::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      background: #2563eb;
+      border-radius: 50%;
+      cursor: pointer;
+      border: none;
+    }
+    .slider-current {
+      min-width: 100px;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      text-align: right;
+    }
+
+    .impact-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      padding: 16px;
+      margin: 0 16px 16px;
+    }
+    .impact-card {
+      background: white;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .impact-card h3 {
+      margin: 0 0 8px;
+      font-size: 0.8rem;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .impact-card .value {
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+    .impact-card .value.positive { color: #16a34a; }
+    .impact-card .value.negative { color: #dc2626; }
+    .impact-card .value.neutral { color: #64748b; }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .slider-row { flex-wrap: wrap; }
+      .slider-label { min-width: 120px; }
+      .slider-value { min-width: 80px; }
+      .slider-current { min-width: 80px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container" role="main">
+    <!-- Interactive Bar -->
+    <div class="interactive-bar">
+      <h2>🔄 Power of One — Interactivo</h2>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span id="save-indicator" class="save-indicator saved">💾 Guardado</span>
+        <button id="save-btn" class="save-btn" onclick="DashboardInteractive.save()">💾 Guardar</button>
+      </div>
+    </div>
+
+    <!-- Impact Summary Cards -->
+    <div class="impact-summary" id="impact-summary">
+      <div class="impact-card">
+        <h3>Impacto CF</h3>
+        <div id="total-cf" class="value neutral">$0</div>
+      </div>
+      <div class="impact-card">
+        <h3>Impacto EBIT</h3>
+        <div id="total-ebit" class="value neutral">$0</div>
+      </div>
+      <div class="impact-card">
+        <h3>Estado</h3>
+        <div id="aggregate-status" class="value neutral">Sin datos</div>
+      </div>
+    </div>
+
+    <!-- Sliders -->
+    <div class="sliders-section">
+      <h3 style="margin:0 0 12px;font-size:0.95rem;color:#475569;">Ajusta las palancas</h3>
+      <div id="sliders-container"></div>
+    </div>
+
+    <!-- Original static table (hidden, preserved for reference) -->
+    <div id="original-container" style="display:none;"></div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../../shared/js/power-of-one-engine.js"></script>
+  <script src="../../shared/js/dashboard-interactive.js"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      // ── Default variables ────────────────────────────────────────────────
+      var defaultVariables = {
+        price:     { label: 'Precio por Unidad',    category: 'revenue',        unit: '$', current: 0, adjusted: 0 },
+        volume:    { label: 'Volumen (unidades)',    category: 'revenue',        unit: 'u', current: 0, adjusted: 0 },
+        cogs:      { label: 'COGS %',               category: 'cost',           unit: '%', current: 0, adjusted: 0 },
+        overheads: { label: 'Gastos Generales',      category: 'cost',           unit: '$', current: 0, adjusted: 0 },
+        ar_days:   { label: 'Días A/R',             category: 'working_capital', unit: 'd', current: 0, adjusted: 0 },
+        inv_days:  { label: 'Días Inventario',       category: 'working_capital', unit: 'd', current: 0, adjusted: 0 },
+        ap_days:   { label: 'Días A/P',             category: 'working_capital', unit: 'd', current: 0, adjusted: 0 }
+      };
+
+      var VARIABLE_KEYS = ['price', 'volume', 'cogs', 'overheads', 'ar_days', 'inv_days', 'ap_days'];
+
+      var variableMeta = {
+        price:     { label: 'Precio por Unidad',    unit: '$', min: 0, max: 500, step: 1 },
+        volume:    { label: 'Volumen (unidades)',    unit: 'u', min: 0, max: 100000, step: 100 },
+        cogs:      { label: 'COGS %',               unit: '%', min: 0, max: 100, step: 0.1 },
+        overheads: { label: 'Gastos Generales',      unit: '$', min: 0, max: 1000000, step: 1000 },
+        ar_days:   { label: 'Días A/R',             unit: 'd', min: 0, max: 120, step: 1 },
+        inv_days:  { label: 'Días Inventario',       unit: 'd', min: 0, max: 180, step: 1 },
+        ap_days:   { label: 'Días A/P',             unit: 'd', min: 0, max: 120, step: 1 }
+      };
+
+      // ── Recalc handler ──────────────────────────────────────────────────
+      function onRecalc(vars, impacts) {
+        var totalCF = 0;
+        var totalEBIT = 0;
+
+        // Calculate totals
+        for (var i = 0; i < impacts.length; i++) {
+          totalCF += impacts[i].cfImpact;
+          totalEBIT += impacts[i].ebitImpact;
+        }
+
+        // Update impact cards
+        var cfEl = document.getElementById('total-cf');
+        var ebitEl = document.getElementById('total-ebit');
+        var statusEl = document.getElementById('aggregate-status');
+
+        if (cfEl) {
+          cfEl.textContent = PowerOfOneEngine.formatCurrency(totalCF, true);
+          cfEl.className = 'value ' + (totalCF > 0 ? 'positive' : (totalCF < 0 ? 'negative' : 'neutral'));
+        }
+        if (ebitEl) {
+          ebitEl.textContent = PowerOfOneEngine.formatCurrency(totalEBIT, true);
+          ebitEl.className = 'value ' + (totalEBIT > 0 ? 'positive' : (totalEBIT < 0 ? 'negative' : 'neutral'));
+        }
+        if (statusEl) {
+          var aggStatus = PowerOfOneEngine.aggregateStatus(totalCF, totalEBIT);
+          statusEl.textContent = PowerOfOneEngine.statusLabel(aggStatus);
+          statusEl.className = 'value ' + (aggStatus === 'semaforo-green' ? 'positive' : (aggStatus === 'semaforo-red' ? 'negative' : 'neutral'));
+        }
+      }
+
+      // ── Init interactive dashboard ─────────────────────────────────────
+      DashboardInteractive.init({
+        apiPath: '/api/worksheets/cash/power-of-one',
+        variables: defaultVariables,
+        variableKeys: VARIABLE_KEYS,
+        variableMeta: variableMeta,
+        onRecalc: onRecalc,
+        containerId: 'sliders-container'
+      });
+    })();
+  </script>
+</body>
+</html>
