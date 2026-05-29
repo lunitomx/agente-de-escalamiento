@@ -75,7 +75,9 @@ class TestCORSHandler:
 
 class TestCompaniesHandler:
     def setup_method(self):
-        self.handler = CompaniesHandler()
+        import uuid
+        self.db_path = f"file:test_co_{uuid.uuid4().hex[:8]}?mode=memory&cache=shared"
+        self.handler = CompaniesHandler(db_path=self.db_path)
 
     def test_list_companies_empty(self):
         result = self.handler.list_companies()
@@ -103,7 +105,10 @@ class TestCompaniesHandler:
 
 class TestWorksheetsHandler:
     def setup_method(self):
-        self.handler = WorksheetsHandler()
+        # Unique :memory: db per test to avoid state leakage
+        import uuid
+        self.db_path = f"file:test_ws_{uuid.uuid4().hex[:8]}?mode=memory&cache=shared"
+        self.handler = WorksheetsHandler(db_path=self.db_path)
 
     def test_get_worksheets_empty(self):
         result = self.handler.get_worksheets("cash", "power-of-one")
