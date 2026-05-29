@@ -25,7 +25,7 @@ Crear dashboards visuales para las herramientas de la decisión People del siste
 - **DD2:** Reutilizan el framework visual de E14 (Chart.js + dashboard-base.css) con ruta relativa `../../e14-cash-dashboards/components/shared/`
 - **DD3:** Cada dashboard es single-file HTML, sin build step
 
-## Status: active
+## Status: complete
 
 ### Progress Tracking
 
@@ -35,5 +35,5 @@ Crear dashboards visuales para las herramientas de la decisión People del siste
 | S16.2 — FACe | L | Done | 2026-05-28 | 2026-05-28 | Matriz funciones × persona |
 | S16.3 — Team Growth | S | Done | 2026-05-28 | 2026-05-28 | Radar chart 3 áreas |
 | S16.4 — DISC | M | Done | 2026-05-28 | 2026-05-28 | Composición 4 cuadrantes |
-| S16.5 — Love/Loathe | S | Pending | — | — | Balance board tareas |
-| S16.6 — Hiring Pipeline | S | Pending | — | — | Pipeline 7 pasos |
+| S16.5 — Love/Loathe | S | Done | 2026-05-28 | 2026-05-28 | Balance board tareas |
+| S16.6 — Hiring Pipeline | S | Done | 2026-05-28 | 2026-05-28 | Pipeline 7 pasos |
