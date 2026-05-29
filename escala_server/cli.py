@@ -11,6 +11,7 @@ from pathlib import Path
 
 PID_FILE = Path.home() / ".escala" / "server.pid"
 LOG_FILE = Path.home() / ".escala" / "server.log"
+DEFAULT_DB_PATH = str(Path.home() / ".escala" / "escala.db")
 DEFAULT_PORT = 8080
 DEFAULT_HOST = "localhost"
 
@@ -33,13 +34,19 @@ def cmd_start(args):
     # Determine server module path — use -m for correct package resolution
     project_root = Path(__file__).resolve().parent.parent
 
+    # Build command arguments
+    cmd_args = [
+        sys.executable, "-m", "escala_server",
+        "--host", args.host,
+        "--port", str(args.port),
+        "--static-root", args.static_root,
+        "--db-path", args.db_path,
+    ]
+
     # Start server process using -m (preserves package context)
     with open(log_file, "w") as log:
         proc = subprocess.Popen(
-            [sys.executable, "-m", "escala_server",
-             "--host", args.host,
-             "--port", str(args.port),
-             "--static-root", args.static_root],
+            cmd_args,
             stdout=log,
             stderr=subprocess.STDOUT,
             start_new_session=True,
@@ -53,6 +60,7 @@ def cmd_start(args):
     time.sleep(0.5)
     if _is_pid_running(proc.pid):
         print(f"Server started (PID: {proc.pid}) on http://{args.host}:{args.port}")
+        print(f"Database: {args.db_path}")
     else:
         print("Error: Server failed to start. Check log:", log_file)
         sys.exit(1)
@@ -96,6 +104,7 @@ def cmd_status(args):
     if _is_pid_running(pid):
         print(f"Running (PID: {pid})")
         print(f"Server: http://localhost:{args.port}")
+        print(f"Database: {args.db_path}" if hasattr(args, "db_path") else "")
     else:
         print(f"Stopped (stale PID: {pid})")
         pid_file.unlink(missing_ok=True)
@@ -111,22 +120,56 @@ def _is_pid_running(pid: int) -> bool:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Escala Server — Local coaching dashboard server")
+    parser = argparse.ArgumentParser(
+        description="Escala Server — Local coaching dashboard server"
+    )
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
     # start
     start_parser = subparsers.add_parser("start", help="Start the server")
-    start_parser.add_argument("--host", default=DEFAULT_HOST, help=f"Host (default: {DEFAULT_HOST})")
-    start_parser.add_argument("--port", type=int, default=DEFAULT_PORT, help=f"Port (default: {DEFAULT_PORT})")
-    start_parser.add_argument("--static-root", default=".", help="Root directory for static files")
+    start_parser.add_argument(
+        "--host", default=DEFAULT_HOST, help=f"Host (default: {DEFAULT_HOST})"
+    )
+    start_parser.add_argument(
+        "--port", type=int, default=DEFAULT_PORT, help=f"Port (default: {DEFAULT_PORT})"
+    )
+    start_parser.add_argument(
+        "--static-root", default=".", help="Root directory for static files"
+    )
+    start_parser.add_argument(
+        "--db-path",
+        default=DEFAULT_DB_PATH,
+        help=f"SQLite database path (default: {DEFAULT_DB_PATH})",
+    )
 
     # stop
     stop_parser = subparsers.add_parser("stop", help="Stop the server")
-    stop_parser.add_argument("--port", type=int, default=DEFAULT_PORT, help="Port (for display)")
+    stop_parser.add_argument(
+        "--port", type=int, default=DEFAULT_PORT, help="Port (for display)"
+    )
 
     # status
     status_parser = subparsers.add_parser("status", help="Show server status")
-    status_parser.add_argument("--port", type=int, default=DEFAULT_PORT, help="Port (for display)")
+    status_parser.add_argument(
+        "--port", type=int, default=DEFAULT_PORT, help="Port (for display)"
+    )
+    status_parser.add_argument(
+        "--db-path",
+        default=DEFAULT_DB_PATH,
+        help=f"SQLite database path (for display)",
+    )
+
+    # migrate
+    migrate_parser = subparsers.add_parser("migrate", help="Import .scaleup/ data into SQLite")
+    migrate_parser.add_argument(
+        "yaml_root", nargs="?", default=".scaleup",
+        help="Path to .scaleup/ directory (default: .scaleup)"
+    )
+    migrate_parser.add_argument(
+        "--db-path",
+        default=DEFAULT_DB_PATH,
+        help=f"SQLite database path (default: {DEFAULT_DB_PATH})",
+    )
 
     args = parser.parse_args()
 
@@ -136,8 +179,20 @@ def main():
         cmd_stop(args)
     elif args.command == "status":
         cmd_status(args)
+    elif args.command == "migrate":
+        cmd_migrate(args)
     else:
         parser.print_help()
+
+
+def cmd_migrate(args):
+    """Run YAML migration into SQLite."""
+    from escala_server.migrate import migrate_from_yaml
+
+    print(f"Migrating from {args.yaml_root} → {args.db_path}")
+    result = migrate_from_yaml(args.db_path, args.yaml_root)
+    print(f"Migration {result['status']}: {result['counts']}")
+    print(f"Log: {result['log_path']}")
 
 
 if __name__ == "__main__":

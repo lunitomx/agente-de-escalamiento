@@ -17,9 +17,9 @@ class EscalaRequestHandler(BaseHTTPRequestHandler):
     # Class-level state (set by make_server)
     static_root: str = ""
     router: Router = Router()
-    companies: CompaniesHandler = CompaniesHandler()
-    worksheets: WorksheetsHandler = WorksheetsHandler()
-    sessions: SessionsHandler = SessionsHandler()
+    companies: CompaniesHandler = None  # type: ignore
+    worksheets: WorksheetsHandler = None  # type: ignore
+    sessions: SessionsHandler = None  # type: ignore
 
     def do_GET(self):
         path = self.path
@@ -133,6 +133,7 @@ class EscalaRequestHandler(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
         """Override to add timestamp prefix."""
         from datetime import datetime
+
         timestamp = datetime.now().strftime("%H:%M:%S")
         print(f"[{timestamp}] {args[0]} {args[1]} {args[2]}")
 
@@ -141,16 +142,27 @@ def make_server(
     host: str = "localhost",
     port: int = 8080,
     static_root: str = ".",
+    db_path: str | None = None,
 ) -> HTTPServer:
-    """Create and configure an Escala server instance."""
-    from .handlers import CompaniesHandler, WorksheetsHandler, SessionsHandler
+    """Create and configure an Escala server instance.
 
-    # Configure handler class
+    Args:
+        host: Host to bind to
+        port: Port to bind to
+        static_root: Root directory for static files
+        db_path: Path to SQLite database (default: ~/.escala/escala.db)
+    """
+    if db_path is None:
+        db_path = str(Path.home() / ".escala" / "escala.db")
+
+    from .daos import CompanyDAO
+    from .handlers import WorksheetsHandler, SessionsHandler
+
     EscalaRequestHandler.static_root = str(Path(static_root).resolve())
     EscalaRequestHandler.router = _build_router()
-    EscalaRequestHandler.companies = CompaniesHandler()
-    EscalaRequestHandler.worksheets = WorksheetsHandler()
-    EscalaRequestHandler.sessions = SessionsHandler()
+    EscalaRequestHandler.companies = CompaniesHandler(db_path)
+    EscalaRequestHandler.worksheets = WorksheetsHandler(db_path)
+    EscalaRequestHandler.sessions = SessionsHandler(db_path)
 
     server = HTTPServer((host, port), EscalaRequestHandler)
     return server
@@ -185,6 +197,11 @@ def _build_router() -> Router:
         return EscalaRequestHandler.worksheets.save_worksheet(
             category, tool, payload or {}
         )
+
+    @router.get("/api/worksheets/{category}/{tool}/changes")
+    def get_worksheet_changes(category=None, tool=None):
+        changes = EscalaRequestHandler.worksheets.get_changes(category, tool)
+        return {"data": changes, "status": "ok"}
 
     @router.get("/api/sessions")
     def list_sessions():
