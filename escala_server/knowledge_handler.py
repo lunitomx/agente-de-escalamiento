@@ -241,6 +241,8 @@ class KnowledgeHandler:
             dict with ``entities``, ``related``, ``principles``, ``habits``,
             and ``status``.
         """
+        if not tool and not category:
+            return {"status": "error", "message": "requires 'tool' or 'category' parameter"}
         conn = self.graph._conn()
 
         # Determine the set of relevant entity names via category signals
