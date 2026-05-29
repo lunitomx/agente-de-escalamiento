@@ -32,7 +32,7 @@ Crear dashboards visuales para las herramientas de la decisión Execution del si
 
 | Story | Size | Status | Started | Completed | Notes |
 |:------|:----:|:------:|:-------:|:---------:|:------|
-| S17.1 — Rockefeller Habits | M | Pending | — | — | Scoreboard 10 hábitos |
+| S17.1 — Rockefeller Habits | M | Done | 2026-05-28 | 2026-05-28 | Scoreboard 10 hábitos |
 | S17.2 — WWW | S | Pending | — | — | Task tracker |
 | S17.3 — SMART Priorities | M | Pending | — | — | Tablero anual + rocks |
 | S17.4 — Balanced KPIs | M | Pending | — | — | Leading/Lagging + semáforos |
