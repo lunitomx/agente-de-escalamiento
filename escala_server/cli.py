@@ -171,6 +171,17 @@ def main():
         help=f"SQLite database path (default: {DEFAULT_DB_PATH})",
     )
 
+    # ── inicia ──
+    inicia_parser = subparsers.add_parser("inicia", help="Start a coaching session")
+    inicia_parser.add_argument("--db-path", default=str(Path.home() / ".escala" / "escala.db"),
+                               help="SQLite database path")
+
+    # ── cierra ──
+    cierra_parser = subparsers.add_parser("cierra", help="Close the current coaching session")
+    cierra_parser.add_argument("--session-id", help="Session ID to close")
+    cierra_parser.add_argument("--db-path", default=str(Path.home() / ".escala" / "escala.db"),
+                               help="SQLite database path")
+
     args = parser.parse_args()
 
     if args.command == "start":
@@ -181,6 +192,10 @@ def main():
         cmd_status(args)
     elif args.command == "migrate":
         cmd_migrate(args)
+    elif args.command == "inicia":
+        cmd_inicia(args)
+    elif args.command == "cierra":
+        cmd_cierra(args)
     else:
         parser.print_help()
 
@@ -193,6 +208,27 @@ def cmd_migrate(args):
     result = migrate_from_yaml(args.db_path, args.yaml_root)
     print(f"Migration {result['status']}: {result['counts']}")
     print(f"Log: {result['log_path']}")
+
+
+def cmd_inicia(args):
+    """Start a coaching session."""
+    from escala_server.session.session_start import SessionStartOrchestrator
+    orchestrator = SessionStartOrchestrator(args.db_path)
+    context = orchestrator.start_session()
+    print(orchestrator.get_context_prompt())
+
+
+def cmd_cierra(args):
+    """Close a coaching session."""
+    from escala_server.session.session_close import SessionCloseOrchestrator
+    orchestrator = SessionCloseOrchestrator(args.db_path)
+    session_id = getattr(args, "session_id", None)
+    result = orchestrator.close_session(session_id)
+    print(f"Session {result.session_id} closed.")
+    print(f"  Duration: {result.duration}")
+    print(f"  Changes: {result.changes_count}")
+    print(f"  New facts: {result.new_facts_count}")
+    print(f"  Summary: {result.summary}")
 
 
 if __name__ == "__main__":
