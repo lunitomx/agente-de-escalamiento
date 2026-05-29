@@ -1,15 +1,14 @@
-# Story: Business Model Canvas — Visual Grid
+# Story Scope: S15.1 — BMC Visual Dashboard
 
 ## Epic: e15-strategy-dashboards
 
 ## Description
-Grid visual de 9 bloques del BMC con campos editables. Ejemplos de referencia (Google, Amazon, Zoom). Colores por bloque.
+Grid visual de 9 bloques del Business Model Canvas con campos editables, tags de ejemplos y referencias de empresas reales. Cada bloque con color distintivo.
 
 ## Acceptance Criteria
-- [ ] Dashboard visual renderizado con datos reales o placeholder
-- [ ] Todos los campos de la herramienta original representados visualmente
-- [ ] Semáforos/indicadores de estado funcionales
-- [ ] Responsivo (desktop y mobile)
-
-## Dependencies
-- Framework de visualización definido
+- [x] Dashboard visual renderizado con datos placeholder
+- [x] Grid de 9 bloques BMC con campos de texto editables
+- [x] Tags de ejemplos que se insertan al textarea al hacer clic
+- [x] Auto-guardado en localStorage
+- [x] Sección de referencias (Google, Amazon, Zoom, Netflix)
+- [x] Responsivo (desktop y mobile)
