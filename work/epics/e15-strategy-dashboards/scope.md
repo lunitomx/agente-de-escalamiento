@@ -27,7 +27,7 @@ Crear dashboards visuales para las herramientas de la decisión Strategy del sis
 - **DD2:** Reutilizan el framework visual de E14 (Chart.js + dashboard-base.css) con ruta relativa `../../e14-cash-dashboards/components/shared/`
 - **DD3:** Cada dashboard es single-file HTML, sin build step
 
-## Status: active
+## Status: complete
 
 ### Progress Tracking
 
