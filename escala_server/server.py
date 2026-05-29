@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from .cors import CORSHandler
-from .handlers import CompaniesHandler, WorksheetsHandler, SessionsHandler
+from .handlers import CompaniesHandler, WorksheetsHandler, SessionsHandler, MemoryHandler
 from .router import Router
 
 
@@ -20,6 +20,7 @@ class EscalaRequestHandler(BaseHTTPRequestHandler):
     companies: CompaniesHandler = None  # type: ignore
     worksheets: WorksheetsHandler = None  # type: ignore
     sessions: SessionsHandler = None  # type: ignore
+    memory: MemoryHandler = None  # type: ignore
 
     def do_GET(self):
         path = self.path
@@ -163,6 +164,7 @@ def make_server(
     EscalaRequestHandler.companies = CompaniesHandler(db_path)
     EscalaRequestHandler.worksheets = WorksheetsHandler(db_path)
     EscalaRequestHandler.sessions = SessionsHandler(db_path)
+    EscalaRequestHandler.memory = MemoryHandler(db_path)
 
     server = HTTPServer((host, port), EscalaRequestHandler)
     return server
@@ -171,6 +173,10 @@ def make_server(
 def _build_router() -> Router:
     """Build and return the API route table."""
     router = Router()
+
+    @router.get("/api/health")
+    def health_check():
+        return {"status": "ok", "service": "escala-server", "version": "0.1.0"}
 
     @router.get("/api/companies")
     def list_companies():
@@ -214,5 +220,38 @@ def _build_router() -> Router:
     @router.get("/api/sessions/{session_id}")
     def get_session(session_id=None):
         return EscalaRequestHandler.sessions.get_session(session_id)
+
+    # ── Memory & Knowledge Graph routes ──────────────────────────
+
+    @router.get("/api/memory/context")
+    def memory_context():
+        return EscalaRequestHandler.memory.context()
+
+    @router.get("/api/memory/facts")
+    def memory_list_facts(
+        query: str = "",
+        category: str | None = None,
+        tags: str | None = None,
+        min_trust: float = 0.0,
+    ):
+        return EscalaRequestHandler.memory.list_facts(
+            query=query, category=category, tags=tags, min_trust=min_trust
+        )
+
+    @router.post("/api/memory/facts")
+    def memory_create_fact(payload=None):
+        return EscalaRequestHandler.memory.create_fact(payload or {})
+
+    @router.get("/api/memory/graph/{entity_id}")
+    def memory_get_entity(entity_id=None):
+        return EscalaRequestHandler.memory.get_entity(int(entity_id))
+
+    @router.post("/api/memory/entities")
+    def memory_create_entity(payload=None):
+        return EscalaRequestHandler.memory.create_entity(payload or {})
+
+    @router.post("/api/memory/relationships")
+    def memory_create_relationship(payload=None):
+        return EscalaRequestHandler.memory.create_relationship(payload or {})
 
     return router
