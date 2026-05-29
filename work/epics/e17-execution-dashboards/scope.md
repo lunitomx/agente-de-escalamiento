@@ -21,4 +21,21 @@ Crear dashboards visuales para las herramientas de la decisión Execution del si
 - Sistema Escala base funcional (skills execution existentes)
 - Framework de visualización compartido con E14/E15/E16
 
-## Status: draft
+## Design Decisions
+- **DD1:** Todos los dashboards de E17 se ubicarán en `work/epics/e17-execution-dashboards/components/{dashboard-name}/index.html`
+- **DD2:** Reutilizan el framework visual de E14 (Chart.js + dashboard-base.css)
+- **DD3:** Cada dashboard es single-file HTML, sin build step
+
+## Status: active
+
+### Progress Tracking
+
+| Story | Size | Status | Started | Completed | Notes |
+|:------|:----:|:------:|:-------:|:---------:|:------|
+| S17.1 — Rockefeller Habits | M | Pending | — | — | Scoreboard 10 hábitos |
+| S17.2 — WWW | S | Pending | — | — | Task tracker |
+| S17.3 — SMART Priorities | M | Pending | — | — | Tablero anual + rocks |
+| S17.4 — Balanced KPIs | M | Pending | — | — | Leading/Lagging + semáforos |
+| S17.5 — Meeting Rhythms | S | Pending | — | — | Calendario + agendas |
+| S17.6 — Top 25 Influencers | S | Pending | — | — | Board relaciones |
+| S17.7 — Vision Summary | L | Pending | — | — | Panel unificado |
