@@ -12,6 +12,10 @@ AGENTS.md
 # Keep scaleup-* skills, exclude rai-* development skills
 .claude/skills/rai-*/
 
+# === Test artifacts ===
+:memory:
+file:test_*
+
 # === Source Materials ===
 *.pdf
 *.docx
