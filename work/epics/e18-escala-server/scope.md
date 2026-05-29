@@ -260,10 +260,10 @@ Stream 2 (Dashboards):  S18.3 ──► S18.2 ──► S18.5/S18.6/S18.7 ──
 | S18.1 — Server Core | XL | Done | — | — | http.server, routing, static, CLI |
 | S18.2 — Navigation & Home | M | Done | — | — | 4 tarjetas, breadcrumbs, responsive |
 | S18.3 — Power of One PILOT | L | Done | — | — | Sliders, recálculo, guardado |
-| S18.4 — Cash Suite | M | Pending | — | — | Hereda patrón S18.3 |
-| S18.5 — Strategy Suite | M | Pending | — | — | BMC, Core Customer, Brand Promises |
-| S18.6 — People Suite | M | Pending | — | — | Values, FACe, Team, DISC |
-| S18.7 — Execution Suite | M | Pending | — | — | RH Habits, WWW, Priorities, KPIs |
+| S18.4 — Cash Suite | M | Done | — | — | Hereda patrón S18.3 |
+| S18.5 — Strategy Suite | M | Done | — | — | BMC, Core Customer, Brand Promises |
+| S18.6 — People Suite | M | Done | — | — | Values, FACe, Team, DISC |
+| S18.7 — Execution Suite | M | Done | — | — | RH Habits, WWW, Priorities, KPIs |
 | S18.8 — SQLite Layer | XL | Done | — | — | Schema, DAO, migración YAML |
 | S18.9 — Memory & Graph | L | Pending | — | — | Facts, entities, semantic search |
 | S18.10 — escala-inicia | M | Pending | — | — | Session start orchestrator |
