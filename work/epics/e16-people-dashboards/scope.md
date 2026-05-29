@@ -31,7 +31,7 @@ Crear dashboards visuales para las herramientas de la decisión People del siste
 
 | Story | Size | Status | Started | Completed | Notes |
 |:------|:----:|:------:|:-------:|:---------:|:------|
-| S16.1 — Core Values | M | Pending | — | — | Mission to Mars + tarjetas |
+| S16.1 — Core Values | M | Done | 2026-05-28 | 2026-05-28 | Mission to Mars + tarjetas |
 | S16.2 — FACe | L | Pending | — | — | Matriz funciones × persona |
 | S16.3 — Team Growth | S | Pending | — | — | Radar chart 3 áreas |
 | S16.4 — DISC | M | Pending | — | — | Composición 4 cuadrantes |
