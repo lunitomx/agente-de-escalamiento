@@ -263,7 +263,7 @@ class TestKnowledgeRoutes:
         assert params["entity_name"] == "search"
 
 class TestKnowledgeContextHTTP:
-    """HTTP-level integration tests for /api/knowledge/context."""
+    """Route-level integration tests for /api/knowledge/context via handler."""
 
     @pytest.fixture
     def handler(self):
@@ -278,50 +278,34 @@ class TestKnowledgeContextHTTP:
         _graph_cache.pop(ingester.graph_engine._db_path, None)
         _mem_cache.pop(ingester.memory_engine._db_path, None)
 
-    @pytest.fixture
-    def router(self, handler):
-        """Build the server router with injected handler."""
-        from escala_server.server import _build_router
-        router = _build_router()
-        return router
-
-    def test_context_requires_params(self, router):
-        fn, params = router.dispatch("GET", "/api/knowledge/context")
-        assert fn is not None
-        result = fn(**params)
+    def test_context_requires_params(self, handler):
+        """get_context without params should return error."""
+        result = handler.get_context()
         assert result["status"] == "error"
 
-    def test_context_with_tool_returns_data(self, router):
-        fn, params = router.dispatch("GET", "/api/knowledge/context")
-        assert fn is not None
-        params["tool"] = "Power of One"
-        result = fn(**params)
+    def test_context_with_tool_returns_data(self, handler):
+        """get_context with tool should return data."""
+        result = handler.get_context(tool="Power of One")
         assert result["status"] == "ok"
         assert "tool" in result
         assert result["tool"]["name"] == "Power of One"
         assert len(result["entities"]) > 0
 
-    def test_context_with_category_returns_data(self, router):
-        fn, params = router.dispatch("GET", "/api/knowledge/context")
-        assert fn is not None
-        params["category"] = "cash"
-        result = fn(**params)
+    def test_context_with_category_returns_data(self, handler):
+        """get_context with category should return entities."""
+        result = handler.get_context(category="cash")
         assert result["status"] == "ok"
         names = [e["name"] for e in result["entities"]]
         assert "Cash Conversion Cycle (CCC)" in names
 
-    def test_context_with_nonexistent_tool(self, router):
-        fn, params = router.dispatch("GET", "/api/knowledge/context")
-        assert fn is not None
-        params["tool"] = "Nonexistent Tool"
-        result = fn(**params)
+    def test_context_with_nonexistent_tool(self, handler):
+        """get_context with invalid tool should return error."""
+        result = handler.get_context(tool="Nonexistent Tool")
         assert result["status"] == "error"
 
-    def test_context_includes_principles_and_habits(self, router):
-        fn, params = router.dispatch("GET", "/api/knowledge/context")
-        assert fn is not None
-        params["category"] = "execution"
-        result = fn(**params)
+    def test_context_includes_principles_and_habits(self, handler):
+        """Context response should include principles and habits."""
+        result = handler.get_context(category="execution")
         assert result["status"] == "ok"
         assert "principles" in result
         assert "habits" in result
