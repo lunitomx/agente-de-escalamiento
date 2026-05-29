@@ -33,7 +33,7 @@ Crear dashboards visuales para las herramientas de la decisión People del siste
 |:------|:----:|:------:|:-------:|:---------:|:------|
 | S16.1 — Core Values | M | Done | 2026-05-28 | 2026-05-28 | Mission to Mars + tarjetas |
 | S16.2 — FACe | L | Done | 2026-05-28 | 2026-05-28 | Matriz funciones × persona |
-| S16.3 — Team Growth | S | Pending | — | — | Radar chart 3 áreas |
+| S16.3 — Team Growth | S | Done | 2026-05-28 | 2026-05-28 | Radar chart 3 áreas |
 | S16.4 — DISC | M | Pending | — | — | Composición 4 cuadrantes |
 | S16.5 — Love/Loathe | S | Pending | — | — | Balance board tareas |
 | S16.6 — Hiring Pipeline | S | Pending | — | — | Pipeline 7 pasos |
