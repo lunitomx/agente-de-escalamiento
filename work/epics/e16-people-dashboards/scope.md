@@ -20,4 +20,20 @@ Crear dashboards visuales para las herramientas de la decisión People del siste
 - Sistema Escala base funcional (skills people existentes)
 - Framework de visualización compartido con E14/E15/E17
 
-## Status: draft
+## Design Decisions
+- **DD1:** Todos los dashboards de E16 se ubicarán en `work/epics/e16-people-dashboards/components/{dashboard-name}/index.html`
+- **DD2:** Reutilizan el framework visual de E14 (Chart.js + dashboard-base.css) con ruta relativa `../../e14-cash-dashboards/components/shared/`
+- **DD3:** Cada dashboard es single-file HTML, sin build step
+
+## Status: active
+
+### Progress Tracking
+
+| Story | Size | Status | Started | Completed | Notes |
+|:------|:----:|:------:|:-------:|:---------:|:------|
+| S16.1 — Core Values | M | Pending | — | — | Mission to Mars + tarjetas |
+| S16.2 — FACe | L | Pending | — | — | Matriz funciones × persona |
+| S16.3 — Team Growth | S | Pending | — | — | Radar chart 3 áreas |
+| S16.4 — DISC | M | Pending | — | — | Composición 4 cuadrantes |
+| S16.5 — Love/Loathe | S | Pending | — | — | Balance board tareas |
+| S16.6 — Hiring Pipeline | S | Pending | — | — | Pipeline 7 pasos |
