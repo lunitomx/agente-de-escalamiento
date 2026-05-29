@@ -281,12 +281,12 @@ Stream 2 (Dashboards):  S18.3 ──► S18.2 ──► S18.5/S18.6/S18.7 ──
 ## Status: In Progress
 
 ## Done Criteria
-- [ ] `escala.db` con todas las tablas
-- [ ] `escala-server start` sirve 22 dashboards con datos reales desde SQLite
-- [ ] Power of One con sliders que persisten a SQLite
-- [ ] Navegación Home → Decisión → Herramienta → Dashboard
-- [ ] `escala-inicia` carga contexto, memoria, grafo y detecta cambios
-- [ ] `escala-cierra` captura aprendizaje, detecta cambios, actualiza grafo
-- [ ] Cada modificación se registra con timestamp, sesión y diff
-- [ ] Migración YAML → SQLite funcional
-- [ ] Documentación completa
+- [x] `escala.db` con todas las tablas
+- [x] `escala-server start` sirve 22 dashboards con datos reales desde SQLite
+- [x] Power of One con sliders que persisten a SQLite
+- [x] Navegación Home → Decisión → Herramienta → Dashboard
+- [x] `escala-inicia` carga contexto, memoria, grafo y detecta cambios
+- [x] `escala-cierra` captura aprendizaje, detecta cambios, actualiza grafo
+- [x] Cada modificación se registra con timestamp, sesión y diff
+- [x] Migración YAML → SQLite funcional
+- [x] Documentación completa
