@@ -1,0 +1,6352 @@
+{
+  "meta": {
+    "source": "scaling_up_llamaparse.md",
+    "entities_count": 42,
+    "relationships_count": 59
+  },
+  "chapters": [
+    {
+      "id": 1,
+      "title": "Additional Praise for Scaling Up",
+      "level": 1,
+      "line_start": 1,
+      "line_end": 29,
+      "slug": "additional-praise-for-scaling-up"
+    },
+    {
+      "id": 2,
+      "title": "SCALING UP",
+      "level": 1,
+      "line_start": 30,
+      "line_end": 59,
+      "slug": "scaling-up"
+    },
+    {
+      "id": 3,
+      "title": "How a Few Companies Make It... and Why the Rest Don't",
+      "level": 2,
+      "line_start": 31,
+      "line_end": 59,
+      "slug": "how-a-few-companies-make-it-and-why-the-rest-dont",
+      "parent_id": 2
+    },
+    {
+      "id": 4,
+      "title": "THE DEDICATION",
+      "level": 1,
+      "line_start": 60,
+      "line_end": 70,
+      "slug": "the-dedication"
+    },
+    {
+      "id": 5,
+      "title": "THE ACKNOWLEDGEMENTS",
+      "level": 1,
+      "line_start": 71,
+      "line_end": 129,
+      "slug": "the-acknowledgements"
+    },
+    {
+      "id": 6,
+      "title": "Thank You!",
+      "level": 2,
+      "line_start": 72,
+      "line_end": 91,
+      "slug": "thank-you",
+      "parent_id": 5
+    },
+    {
+      "id": 7,
+      "title": "Business Leaders",
+      "level": 3,
+      "line_start": 76,
+      "line_end": 80,
+      "slug": "business-leaders",
+      "parent_id": 6
+    },
+    {
+      "id": 8,
+      "title": "Thought Leaders",
+      "level": 3,
+      "line_start": 81,
+      "line_end": 91,
+      "slug": "thought-leaders",
+      "parent_id": 6
+    },
+    {
+      "id": 9,
+      "title": "Marketing and Coaching Partners",
+      "level": 2,
+      "line_start": 92,
+      "line_end": 97,
+      "slug": "marketing-and-coaching-partners",
+      "parent_id": 5
+    },
+    {
+      "id": 10,
+      "title": "Key Collaborators",
+      "level": 2,
+      "line_start": 98,
+      "line_end": 101,
+      "slug": "key-collaborators",
+      "parent_id": 5
+    },
+    {
+      "id": 11,
+      "title": "The Council and Team",
+      "level": 2,
+      "line_start": 102,
+      "line_end": 129,
+      "slug": "the-council-and-team",
+      "parent_id": 5
+    },
+    {
+      "id": 12,
+      "title": "Family and Friends",
+      "level": 3,
+      "line_start": 118,
+      "line_end": 129,
+      "slug": "family-and-friends",
+      "parent_id": 11
+    },
+    {
+      "id": 13,
+      "title": "THE TABLE OF CONTENTS",
+      "level": 1,
+      "line_start": 130,
+      "line_end": 172,
+      "slug": "the-table-of-contents"
+    },
+    {
+      "id": 14,
+      "title": "SCALING UP PEOPLE",
+      "level": 3,
+      "line_start": 136,
+      "line_end": 141,
+      "slug": "scaling-up-people",
+      "parent_id": 13
+    },
+    {
+      "id": 15,
+      "title": "SCALING UP STRATEGY",
+      "level": 3,
+      "line_start": 142,
+      "line_end": 147,
+      "slug": "scaling-up-strategy",
+      "parent_id": 13
+    },
+    {
+      "id": 16,
+      "title": "SCALING UP EXECUTION",
+      "level": 3,
+      "line_start": 148,
+      "line_end": 153,
+      "slug": "scaling-up-execution",
+      "parent_id": 13
+    },
+    {
+      "id": 17,
+      "title": "SCALING UP CASH",
+      "level": 3,
+      "line_start": 154,
+      "line_end": 172,
+      "slug": "scaling-up-cash",
+      "parent_id": 13
+    },
+    {
+      "id": 18,
+      "title": "THE INTRODUCTION",
+      "level": 1,
+      "line_start": 173,
+      "line_end": 228,
+      "slug": "the-introduction"
+    },
+    {
+      "id": 19,
+      "title": "Tools for Scaling Up",
+      "level": 2,
+      "line_start": 174,
+      "line_end": 228,
+      "slug": "tools-for-scaling-up",
+      "parent_id": 18
+    },
+    {
+      "id": 20,
+      "title": "... So How Is This Book Different From *Mastering the Rockefeller Habits*?",
+      "level": 3,
+      "line_start": 197,
+      "line_end": 210,
+      "slug": "so-how-is-this-book-different-from-mastering-the-rockefeller-habits",
+      "parent_id": 19
+    },
+    {
+      "id": 21,
+      "title": "Most Important Routine/Habit",
+      "level": 3,
+      "line_start": 211,
+      "line_end": 228,
+      "slug": "most-important-routinehabit",
+      "parent_id": 19
+    },
+    {
+      "id": 22,
+      "title": "THE OVERVIEW",
+      "level": 1,
+      "line_start": 229,
+      "line_end": 282,
+      "slug": "the-overview"
+    },
+    {
+      "id": 23,
+      "title": "People, Strategy, Execution, Cash",
+      "level": 2,
+      "line_start": 230,
+      "line_end": 282,
+      "slug": "people-strategy-execution-cash",
+      "parent_id": 22
+    },
+    {
+      "id": 24,
+      "title": "Gazelles: High-Impact Firms",
+      "level": 3,
+      "line_start": 266,
+      "line_end": 282,
+      "slug": "gazelles-high-impact-firms",
+      "parent_id": 23
+    },
+    {
+      "id": 25,
+      "title": "Scaling Up",
+      "level": 1,
+      "line_start": 283,
+      "line_end": 377,
+      "slug": "scaling-up"
+    },
+    {
+      "id": 26,
+      "title": "Climbing Everest",
+      "level": 2,
+      "line_start": 329,
+      "line_end": 361,
+      "slug": "climbing-everest",
+      "parent_id": 25
+    },
+    {
+      "id": 27,
+      "title": "Wasted Debate",
+      "level": 3,
+      "line_start": 356,
+      "line_end": 361,
+      "slug": "wasted-debate",
+      "parent_id": 26
+    },
+    {
+      "id": 28,
+      "title": "4D Framework",
+      "level": 2,
+      "line_start": 362,
+      "line_end": 377,
+      "slug": "4d-framework",
+      "parent_id": 25
+    },
+    {
+      "id": 29,
+      "title": "Gazelles 4D Framework Getting to Results",
+      "level": 1,
+      "line_start": 378,
+      "line_end": 522,
+      "slug": "gazelles-4d-framework-getting-to-results"
+    },
+    {
+      "id": 30,
+      "title": "1 Driver (with Accelerators)",
+      "level": 3,
+      "line_start": 382,
+      "line_end": 387,
+      "slug": "1-driver-with-accelerators",
+      "parent_id": 29
+    },
+    {
+      "id": 31,
+      "title": "2 Demands (Balance)",
+      "level": 3,
+      "line_start": 388,
+      "line_end": 392,
+      "slug": "2-demands-balance",
+      "parent_id": 29
+    },
+    {
+      "id": 32,
+      "title": "3 Disciplines (Routines)",
+      "level": 3,
+      "line_start": 393,
+      "line_end": 398,
+      "slug": "3-disciplines-routines",
+      "parent_id": 29
+    },
+    {
+      "id": 33,
+      "title": "4 Decisions (Right Questions)",
+      "level": 3,
+      "line_start": 399,
+      "line_end": 405,
+      "slug": "4-decisions-right-questions",
+      "parent_id": 29
+    },
+    {
+      "id": 34,
+      "title": "! Results",
+      "level": 2,
+      "line_start": 406,
+      "line_end": 453,
+      "slug": "results",
+      "parent_id": 29
+    },
+    {
+      "id": 35,
+      "title": "Right Questions",
+      "level": 3,
+      "line_start": 428,
+      "line_end": 453,
+      "slug": "right-questions",
+      "parent_id": 34
+    },
+    {
+      "id": 36,
+      "title": "People",
+      "level": 2,
+      "line_start": 454,
+      "line_end": 522,
+      "slug": "people",
+      "parent_id": 29
+    },
+    {
+      "id": 37,
+      "title": "Strategy",
+      "level": 1,
+      "line_start": 523,
+      "line_end": 599,
+      "slug": "strategy"
+    },
+    {
+      "id": 38,
+      "title": "Execution",
+      "level": 1,
+      "line_start": 600,
+      "line_end": 677,
+      "slug": "execution"
+    },
+    {
+      "id": 39,
+      "title": "Cash",
+      "level": 1,
+      "line_start": 678,
+      "line_end": 769,
+      "slug": "cash"
+    },
+    {
+      "id": 40,
+      "title": "Final Recommendations",
+      "level": 2,
+      "line_start": 730,
+      "line_end": 769,
+      "slug": "final-recommendations",
+      "parent_id": 39
+    },
+    {
+      "id": 41,
+      "title": "Weekly Insights: Sign Up!",
+      "level": 3,
+      "line_start": 734,
+      "line_end": 739,
+      "slug": "weekly-insights-sign-up",
+      "parent_id": 40
+    },
+    {
+      "id": 42,
+      "title": "Technology and Coaching Support",
+      "level": 3,
+      "line_start": 740,
+      "line_end": 747,
+      "slug": "technology-and-coaching-support",
+      "parent_id": 40
+    },
+    {
+      "id": 43,
+      "title": "Relax With the Process",
+      "level": 3,
+      "line_start": 748,
+      "line_end": 769,
+      "slug": "relax-with-the-process",
+      "parent_id": 40
+    },
+    {
+      "id": 44,
+      "title": "THE BARRIERS",
+      "level": 1,
+      "line_start": 770,
+      "line_end": 1037,
+      "slug": "the-barriers"
+    },
+    {
+      "id": 45,
+      "title": "Leadership, Infrastructure, and Marketing",
+      "level": 2,
+      "line_start": 771,
+      "line_end": 821,
+      "slug": "leadership-infrastructure-and-marketing",
+      "parent_id": 44
+    },
+    {
+      "id": 46,
+      "title": "Perceptionist's \"Ping\"",
+      "level": 3,
+      "line_start": 804,
+      "line_end": 821,
+      "slug": "perceptionists-ping",
+      "parent_id": 45
+    },
+    {
+      "id": 47,
+      "title": "Grow Where You're Planted",
+      "level": 2,
+      "line_start": 822,
+      "line_end": 831,
+      "slug": "grow-where-youre-planted",
+      "parent_id": 44
+    },
+    {
+      "id": 48,
+      "title": "The Growth Paradox — an Anchor, or Wind at Your Back",
+      "level": 2,
+      "line_start": 832,
+      "line_end": 868,
+      "slug": "the-growth-paradox-an-anchor-or-wind-at-your-back",
+      "parent_id": 44
+    },
+    {
+      "id": 49,
+      "title": "Jack Harrington's Big Boat Experience",
+      "level": 3,
+      "line_start": 845,
+      "line_end": 868,
+      "slug": "jack-harringtons-big-boat-experience",
+      "parent_id": 48
+    },
+    {
+      "id": 50,
+      "title": "Complexity",
+      "level": 2,
+      "line_start": 869,
+      "line_end": 958,
+      "slug": "complexity",
+      "parent_id": 44
+    },
+    {
+      "id": 51,
+      "title": "Leadership: Prediction, Delegation, and Repetition",
+      "level": 2,
+      "line_start": 959,
+      "line_end": 1026,
+      "slug": "leadership-prediction-delegation-and-repetition",
+      "parent_id": 44
+    },
+    {
+      "id": 52,
+      "title": "Prediction",
+      "level": 3,
+      "line_start": 963,
+      "line_end": 970,
+      "slug": "prediction",
+      "parent_id": 51
+    },
+    {
+      "id": 53,
+      "title": "Delegation",
+      "level": 3,
+      "line_start": 971,
+      "line_end": 1011,
+      "slug": "delegation",
+      "parent_id": 51
+    },
+    {
+      "id": 54,
+      "title": "Repetition",
+      "level": 3,
+      "line_start": 1012,
+      "line_end": 1026,
+      "slug": "repetition",
+      "parent_id": 51
+    },
+    {
+      "id": 55,
+      "title": "Scalable Infrastructure",
+      "level": 2,
+      "line_start": 1027,
+      "line_end": 1037,
+      "slug": "scalable-infrastructure",
+      "parent_id": 44
+    },
+    {
+      "id": 56,
+      "title": "Scaling Up",
+      "level": 1,
+      "line_start": 1038,
+      "line_end": 1108,
+      "slug": "scaling-up"
+    },
+    {
+      "id": 57,
+      "title": "Marketing",
+      "level": 2,
+      "line_start": 1044,
+      "line_end": 1065,
+      "slug": "marketing",
+      "parent_id": 56
+    },
+    {
+      "id": 58,
+      "title": "Market Dynamics",
+      "level": 2,
+      "line_start": 1066,
+      "line_end": 1108,
+      "slug": "market-dynamics",
+      "parent_id": 56
+    },
+    {
+      "id": 59,
+      "title": "SCALING UP",
+      "level": 1,
+      "line_start": 1109,
+      "line_end": 1109,
+      "slug": "scaling-up"
+    },
+    {
+      "id": 60,
+      "title": "PEOPLE",
+      "level": 1,
+      "line_start": 1110,
+      "line_end": 1117,
+      "slug": "people"
+    },
+    {
+      "id": 61,
+      "title": "THE PEOPLE INTRODUCTION",
+      "level": 1,
+      "line_start": 1118,
+      "line_end": 1394,
+      "slug": "the-people-introduction"
+    },
+    {
+      "id": 62,
+      "title": "Section Overview",
+      "level": 2,
+      "line_start": 1133,
+      "line_end": 1394,
+      "slug": "section-overview",
+      "parent_id": 61
+    },
+    {
+      "id": 63,
+      "title": "Everybody, Somebody, Anybody, And Nobody",
+      "level": 3,
+      "line_start": 1159,
+      "line_end": 1394,
+      "slug": "everybody-somebody-anybody-and-nobody",
+      "parent_id": 62
+    },
+    {
+      "id": 64,
+      "title": "People: Process Accountability Chart (PACe)",
+      "level": 1,
+      "line_start": 1395,
+      "line_end": 1475,
+      "slug": "people-process-accountability-chart-pace"
+    },
+    {
+      "id": 65,
+      "title": "THE LEADERS",
+      "level": 1,
+      "line_start": 1476,
+      "line_end": 1618,
+      "slug": "the-leaders"
+    },
+    {
+      "id": 66,
+      "title": "The FACe and PACe of the Company",
+      "level": 2,
+      "line_start": 1477,
+      "line_end": 1500,
+      "slug": "the-face-and-pace-of-the-company",
+      "parent_id": 65
+    },
+    {
+      "id": 67,
+      "title": "The Organization: A Growing Organism",
+      "level": 2,
+      "line_start": 1501,
+      "line_end": 1510,
+      "slug": "the-organization-a-growing-organism",
+      "parent_id": 65
+    },
+    {
+      "id": 68,
+      "title": "Accountability, Responsibility, and Authority",
+      "level": 2,
+      "line_start": 1511,
+      "line_end": 1538,
+      "slug": "accountability-responsibility-and-authority",
+      "parent_id": 65
+    },
+    {
+      "id": 69,
+      "title": "One-Page Personal Plan (OPPP)",
+      "level": 2,
+      "line_start": 1539,
+      "line_end": 1618,
+      "slug": "one-page-personal-plan-oppp",
+      "parent_id": 65
+    },
+    {
+      "id": 70,
+      "title": "Column 1 — Relationships",
+      "level": 3,
+      "line_start": 1561,
+      "line_end": 1574,
+      "slug": "column-1-relationships",
+      "parent_id": 69
+    },
+    {
+      "id": 71,
+      "title": "Column 2 — Achievements",
+      "level": 3,
+      "line_start": 1575,
+      "line_end": 1592,
+      "slug": "column-2-achievements",
+      "parent_id": 69
+    },
+    {
+      "id": 72,
+      "title": "Column 3 — Rituals",
+      "level": 3,
+      "line_start": 1593,
+      "line_end": 1600,
+      "slug": "column-3-rituals",
+      "parent_id": 69
+    },
+    {
+      "id": 73,
+      "title": "Column 4 — Wealth",
+      "level": 3,
+      "line_start": 1601,
+      "line_end": 1618,
+      "slug": "column-4-wealth",
+      "parent_id": 69
+    },
+    {
+      "id": 74,
+      "title": "Function Accountability Chart (FACe)",
+      "level": 1,
+      "line_start": 1619,
+      "line_end": 1971,
+      "slug": "function-accountability-chart-face"
+    },
+    {
+      "id": 75,
+      "title": "Completing Your Function Accountability Chart (FACe)",
+      "level": 2,
+      "line_start": 1654,
+      "line_end": 1763,
+      "slug": "completing-your-function-accountability-chart-face",
+      "parent_id": 74
+    },
+    {
+      "id": 76,
+      "title": "STEP 1",
+      "level": 3,
+      "line_start": 1656,
+      "line_end": 1666,
+      "slug": "step-1",
+      "parent_id": 75
+    },
+    {
+      "id": 77,
+      "title": "STEP 2",
+      "level": 3,
+      "line_start": 1667,
+      "line_end": 1682,
+      "slug": "step-2",
+      "parent_id": 75
+    },
+    {
+      "id": 78,
+      "title": "The FACe of Perly Fullerton",
+      "level": 3,
+      "line_start": 1683,
+      "line_end": 1689,
+      "slug": "the-face-of-perly-fullerton",
+      "parent_id": 75
+    },
+    {
+      "id": 79,
+      "title": "Dell's Empty Boxes",
+      "level": 3,
+      "line_start": 1690,
+      "line_end": 1706,
+      "slug": "dells-empty-boxes",
+      "parent_id": 75
+    },
+    {
+      "id": 80,
+      "title": "STEP 3",
+      "level": 3,
+      "line_start": 1707,
+      "line_end": 1732,
+      "slug": "step-3",
+      "parent_id": 75
+    },
+    {
+      "id": 81,
+      "title": "STEP 4",
+      "level": 3,
+      "line_start": 1733,
+      "line_end": 1763,
+      "slug": "step-4",
+      "parent_id": 75
+    },
+    {
+      "id": 82,
+      "title": "Organizational Structure — Beyond Functions",
+      "level": 2,
+      "line_start": 1764,
+      "line_end": 1787,
+      "slug": "organizational-structure-beyond-functions",
+      "parent_id": 74
+    },
+    {
+      "id": 83,
+      "title": "Who Is Boss in a Matrix Organization?",
+      "level": 2,
+      "line_start": 1788,
+      "line_end": 1799,
+      "slug": "who-is-boss-in-a-matrix-organization",
+      "parent_id": 74
+    },
+    {
+      "id": 84,
+      "title": "Process Accountability Chart (PACe)",
+      "level": 2,
+      "line_start": 1800,
+      "line_end": 1877,
+      "slug": "process-accountability-chart-pace",
+      "parent_id": 74
+    },
+    {
+      "id": 85,
+      "title": "Power of Lean",
+      "level": 3,
+      "line_start": 1824,
+      "line_end": 1831,
+      "slug": "power-of-lean",
+      "parent_id": 84
+    },
+    {
+      "id": 86,
+      "title": "Operational Excellence",
+      "level": 3,
+      "line_start": 1832,
+      "line_end": 1847,
+      "slug": "operational-excellence",
+      "parent_id": 84
+    },
+    {
+      "id": 87,
+      "title": "Eliminating Waste",
+      "level": 3,
+      "line_start": 1848,
+      "line_end": 1855,
+      "slug": "eliminating-waste",
+      "parent_id": 84
+    },
+    {
+      "id": 88,
+      "title": "Bored Billing Accountant",
+      "level": 3,
+      "line_start": 1856,
+      "line_end": 1877,
+      "slug": "bored-billing-accountant",
+      "parent_id": 84
+    },
+    {
+      "id": 89,
+      "title": "Completing Your Process Accountability Chart (PACe)",
+      "level": 2,
+      "line_start": 1878,
+      "line_end": 1971,
+      "slug": "completing-your-process-accountability-chart-pace",
+      "parent_id": 74
+    },
+    {
+      "id": 90,
+      "title": "STEP 1",
+      "level": 3,
+      "line_start": 1880,
+      "line_end": 1893,
+      "slug": "step-1",
+      "parent_id": 89
+    },
+    {
+      "id": 91,
+      "title": "STEP 2",
+      "level": 3,
+      "line_start": 1894,
+      "line_end": 1909,
+      "slug": "step-2",
+      "parent_id": 89
+    },
+    {
+      "id": 92,
+      "title": "STEP 3",
+      "level": 3,
+      "line_start": 1910,
+      "line_end": 1919,
+      "slug": "step-3",
+      "parent_id": 89
+    },
+    {
+      "id": 93,
+      "title": "Mapping the Process",
+      "level": 3,
+      "line_start": 1920,
+      "line_end": 1941,
+      "slug": "mapping-the-process",
+      "parent_id": 89
+    },
+    {
+      "id": 94,
+      "title": "Checklists",
+      "level": 3,
+      "line_start": 1942,
+      "line_end": 1971,
+      "slug": "checklists",
+      "parent_id": 89
+    },
+    {
+      "id": 95,
+      "title": "THE TEAM",
+      "level": 1,
+      "line_start": 1972,
+      "line_end": 1972,
+      "slug": "the-team"
+    },
+    {
+      "id": 96,
+      "title": "Attracting and Hiring",
+      "level": 1,
+      "line_start": 1973,
+      "line_end": 2277,
+      "slug": "attracting-and-hiring"
+    },
+    {
+      "id": 97,
+      "title": "Get The Best Talent",
+      "level": 2,
+      "line_start": 1987,
+      "line_end": 2086,
+      "slug": "get-the-best-talent",
+      "parent_id": 96
+    },
+    {
+      "id": 98,
+      "title": "The Best Hires",
+      "level": 2,
+      "line_start": 2087,
+      "line_end": 2106,
+      "slug": "the-best-hires",
+      "parent_id": 96
+    },
+    {
+      "id": 99,
+      "title": "Recruiting Is a (Guerilla) Marketing Function",
+      "level": 2,
+      "line_start": 2107,
+      "line_end": 2194,
+      "slug": "recruiting-is-a-guerilla-marketing-function",
+      "parent_id": 96
+    },
+    {
+      "id": 100,
+      "title": "MOM's Goes Fishing",
+      "level": 3,
+      "line_start": 2131,
+      "line_end": 2194,
+      "slug": "moms-goes-fishing",
+      "parent_id": 99
+    },
+    {
+      "id": 101,
+      "title": "The Topgrading Interview",
+      "level": 2,
+      "line_start": 2195,
+      "line_end": 2230,
+      "slug": "the-topgrading-interview",
+      "parent_id": 96
+    },
+    {
+      "id": 102,
+      "title": "Check for Culture Fit",
+      "level": 2,
+      "line_start": 2231,
+      "line_end": 2277,
+      "slug": "check-for-culture-fit",
+      "parent_id": 96
+    },
+    {
+      "id": 103,
+      "title": "Test-Drive Potential Employees",
+      "level": 3,
+      "line_start": 2247,
+      "line_end": 2252,
+      "slug": "test-drive-potential-employees",
+      "parent_id": 102
+    },
+    {
+      "id": 104,
+      "title": "Will, Values, Results, Skill",
+      "level": 3,
+      "line_start": 2253,
+      "line_end": 2277,
+      "slug": "will-values-results-skill",
+      "parent_id": 102
+    },
+    {
+      "id": 105,
+      "title": "THE MANAGERS (COACHES)",
+      "level": 1,
+      "line_start": 2278,
+      "line_end": 2438,
+      "slug": "the-managers-coaches"
+    },
+    {
+      "id": 106,
+      "title": "Keeping and Growing (Educating) the Team",
+      "level": 2,
+      "line_start": 2279,
+      "line_end": 2438,
+      "slug": "keeping-and-growing-educating-the-team",
+      "parent_id": 105
+    },
+    {
+      "id": 107,
+      "title": "Keep Your Talent Engaged",
+      "level": 3,
+      "line_start": 2287,
+      "line_end": 2308,
+      "slug": "keep-your-talent-engaged",
+      "parent_id": 106
+    },
+    {
+      "id": 108,
+      "title": "5. Hire less; higher pay.",
+      "level": 3,
+      "line_start": 2309,
+      "line_end": 2338,
+      "slug": "5-hire-less-higher-pay",
+      "parent_id": 106
+    },
+    {
+      "id": 109,
+      "title": "4. Give recognition and show appreciation.",
+      "level": 3,
+      "line_start": 2339,
+      "line_end": 2356,
+      "slug": "4-give-recognition-and-show-appreciation",
+      "parent_id": 106
+    },
+    {
+      "id": 110,
+      "title": "3. Set clear expectations and provide a line of sight.",
+      "level": 3,
+      "line_start": 2357,
+      "line_end": 2370,
+      "slug": "3-set-clear-expectations-and-provide-a-line-of-sight",
+      "parent_id": 106
+    },
+    {
+      "id": 111,
+      "title": "2. Stop demotivating; start \"dehassling.\"",
+      "level": 3,
+      "line_start": 2371,
+      "line_end": 2392,
+      "slug": "2-stop-demotivating-start-dehassling",
+      "parent_id": 106
+    },
+    {
+      "id": 112,
+      "title": "1. Help people play to their strengths.",
+      "level": 3,
+      "line_start": 2393,
+      "line_end": 2422,
+      "slug": "1-help-people-play-to-their-strengths",
+      "parent_id": 106
+    },
+    {
+      "id": 113,
+      "title": "Are You a Manager or a Leader?",
+      "level": 3,
+      "line_start": 2423,
+      "line_end": 2438,
+      "slug": "are-you-a-manager-or-a-leader",
+      "parent_id": 106
+    },
+    {
+      "id": 114,
+      "title": "Grow Your Talent",
+      "level": 1,
+      "line_start": 2439,
+      "line_end": 2603,
+      "slug": "grow-your-talent"
+    },
+    {
+      "id": 115,
+      "title": "Onboarding — Getting the First Impression Right",
+      "level": 2,
+      "line_start": 2447,
+      "line_end": 2462,
+      "slug": "onboarding-getting-the-first-impression-right",
+      "parent_id": 114
+    },
+    {
+      "id": 116,
+      "title": "Formal Orientation",
+      "level": 2,
+      "line_start": 2463,
+      "line_end": 2474,
+      "slug": "formal-orientation",
+      "parent_id": 114
+    },
+    {
+      "id": 117,
+      "title": "All Growth Companies Are Training Companies",
+      "level": 2,
+      "line_start": 2475,
+      "line_end": 2496,
+      "slug": "all-growth-companies-are-training-companies",
+      "parent_id": 114
+    },
+    {
+      "id": 118,
+      "title": "Garbage University",
+      "level": 2,
+      "line_start": 2497,
+      "line_end": 2514,
+      "slug": "garbage-university",
+      "parent_id": 114
+    },
+    {
+      "id": 119,
+      "title": "Online Learning",
+      "level": 2,
+      "line_start": 2515,
+      "line_end": 2603,
+      "slug": "online-learning",
+      "parent_id": 114
+    },
+    {
+      "id": 120,
+      "title": "Growing People Through Coaching",
+      "level": 3,
+      "line_start": 2551,
+      "line_end": 2603,
+      "slug": "growing-people-through-coaching",
+      "parent_id": 119
+    },
+    {
+      "id": 121,
+      "title": "SCALING UP",
+      "level": 1,
+      "line_start": 2604,
+      "line_end": 2604,
+      "slug": "scaling-up"
+    },
+    {
+      "id": 122,
+      "title": "STRATEGY",
+      "level": 1,
+      "line_start": 2605,
+      "line_end": 2618,
+      "slug": "strategy"
+    },
+    {
+      "id": 123,
+      "title": "**THE STRATEGY** INTRODUCTION",
+      "level": 1,
+      "line_start": 2619,
+      "line_end": 2671,
+      "slug": "the-strategy-introduction"
+    },
+    {
+      "id": 124,
+      "title": "**Keys to Dominating Your Market**",
+      "level": 3,
+      "line_start": 2635,
+      "line_end": 2650,
+      "slug": "keys-to-dominating-your-market",
+      "parent_id": 123
+    },
+    {
+      "id": 125,
+      "title": "Section Overview",
+      "level": 2,
+      "line_start": 2651,
+      "line_end": 2671,
+      "slug": "section-overview",
+      "parent_id": 123
+    },
+    {
+      "id": 126,
+      "title": "Strategy: 7 Strata",
+      "level": 1,
+      "line_start": 2672,
+      "line_end": 2871,
+      "slug": "strategy-7-strata"
+    },
+    {
+      "id": 127,
+      "title": "Trends",
+      "level": 2,
+      "line_start": 2850,
+      "line_end": 2856,
+      "slug": "trends",
+      "parent_id": 126
+    },
+    {
+      "id": 128,
+      "title": "Strengths/Core Competencies",
+      "level": 2,
+      "line_start": 2857,
+      "line_end": 2861,
+      "slug": "strengthscore-competencies",
+      "parent_id": 126
+    },
+    {
+      "id": 129,
+      "title": "Weaknesses",
+      "level": 2,
+      "line_start": 2862,
+      "line_end": 2871,
+      "slug": "weaknesses",
+      "parent_id": 126
+    },
+    {
+      "id": 130,
+      "title": "Strategy: One-Page Strategic Plan (OPSP)",
+      "level": 1,
+      "line_start": 2872,
+      "line_end": 3111,
+      "slug": "strategy-one-page-strategic-plan-opsp"
+    },
+    {
+      "id": 131,
+      "title": "People (Reputation Drivers)",
+      "level": 2,
+      "line_start": 2876,
+      "line_end": 3001,
+      "slug": "people-reputation-drivers",
+      "parent_id": 130
+    },
+    {
+      "id": 132,
+      "title": "Employees",
+      "level": 3,
+      "line_start": 2878,
+      "line_end": 2882,
+      "slug": "employees",
+      "parent_id": 131
+    },
+    {
+      "id": 133,
+      "title": "Customers",
+      "level": 3,
+      "line_start": 2883,
+      "line_end": 2887,
+      "slug": "customers",
+      "parent_id": 131
+    },
+    {
+      "id": 134,
+      "title": "Shareholders",
+      "level": 3,
+      "line_start": 2888,
+      "line_end": 2981,
+      "slug": "shareholders",
+      "parent_id": 131
+    },
+    {
+      "id": 135,
+      "title": "Strengths/Core Competencies",
+      "level": 3,
+      "line_start": 2982,
+      "line_end": 2986,
+      "slug": "strengthscore-competencies",
+      "parent_id": 131
+    },
+    {
+      "id": 136,
+      "title": "Weaknesses:",
+      "level": 3,
+      "line_start": 2987,
+      "line_end": 3001,
+      "slug": "weaknesses",
+      "parent_id": 131
+    },
+    {
+      "id": 137,
+      "title": "Process (Productivity Drivers)",
+      "level": 2,
+      "line_start": 3002,
+      "line_end": 3111,
+      "slug": "process-productivity-drivers",
+      "parent_id": 130
+    },
+    {
+      "id": 138,
+      "title": "Make/Buy",
+      "level": 3,
+      "line_start": 3004,
+      "line_end": 3008,
+      "slug": "makebuy",
+      "parent_id": 137
+    },
+    {
+      "id": 139,
+      "title": "Sell",
+      "level": 3,
+      "line_start": 3009,
+      "line_end": 3013,
+      "slug": "sell",
+      "parent_id": 137
+    },
+    {
+      "id": 140,
+      "title": "Recordkeeping",
+      "level": 3,
+      "line_start": 3014,
+      "line_end": 3111,
+      "slug": "recordkeeping",
+      "parent_id": 137
+    },
+    {
+      "id": 141,
+      "title": "THE CORE",
+      "level": 1,
+      "line_start": 3112,
+      "line_end": 3140,
+      "slug": "the-core"
+    },
+    {
+      "id": 142,
+      "title": "Values, Purpose, and Competencies",
+      "level": 2,
+      "line_start": 3113,
+      "line_end": 3140,
+      "slug": "values-purpose-and-competencies",
+      "parent_id": 141
+    },
+    {
+      "id": 143,
+      "title": "The Core Values",
+      "level": 1,
+      "line_start": 3141,
+      "line_end": 3216,
+      "slug": "the-core-values"
+    },
+    {
+      "id": 144,
+      "title": "The Organization's Personality",
+      "level": 2,
+      "line_start": 3161,
+      "line_end": 3172,
+      "slug": "the-organizations-personality",
+      "parent_id": 143
+    },
+    {
+      "id": 145,
+      "title": "Discovering the Right Words",
+      "level": 2,
+      "line_start": 3173,
+      "line_end": 3216,
+      "slug": "discovering-the-right-words",
+      "parent_id": 143
+    },
+    {
+      "id": 146,
+      "title": "The Core Purpose",
+      "level": 1,
+      "line_start": 3217,
+      "line_end": 3511,
+      "slug": "the-core-purpose"
+    },
+    {
+      "id": 147,
+      "title": "Mission, Vision, Values",
+      "level": 3,
+      "line_start": 3252,
+      "line_end": 3259,
+      "slug": "mission-vision-values",
+      "parent_id": 146
+    },
+    {
+      "id": 148,
+      "title": "The Core Competencies",
+      "level": 2,
+      "line_start": 3260,
+      "line_end": 3285,
+      "slug": "the-core-competencies",
+      "parent_id": 146
+    },
+    {
+      "id": 149,
+      "title": "Bringing Your Core Alive",
+      "level": 2,
+      "line_start": 3286,
+      "line_end": 3396,
+      "slug": "bringing-your-core-alive",
+      "parent_id": 146
+    },
+    {
+      "id": 150,
+      "title": "The Dream On Initiative",
+      "level": 3,
+      "line_start": 3292,
+      "line_end": 3352,
+      "slug": "the-dream-on-initiative",
+      "parent_id": 149
+    },
+    {
+      "id": 151,
+      "title": "Dell's Shock Absorber",
+      "level": 3,
+      "line_start": 3353,
+      "line_end": 3372,
+      "slug": "dells-shock-absorber",
+      "parent_id": 149
+    },
+    {
+      "id": 152,
+      "title": "Storytelling",
+      "level": 3,
+      "line_start": 3373,
+      "line_end": 3396,
+      "slug": "storytelling",
+      "parent_id": 149
+    },
+    {
+      "id": 153,
+      "title": "Recruitment and Selection",
+      "level": 2,
+      "line_start": 3397,
+      "line_end": 3406,
+      "slug": "recruitment-and-selection",
+      "parent_id": 146
+    },
+    {
+      "id": 154,
+      "title": "Onboarding Process",
+      "level": 2,
+      "line_start": 3407,
+      "line_end": 3426,
+      "slug": "onboarding-process",
+      "parent_id": 146
+    },
+    {
+      "id": 155,
+      "title": "Performance Appraisals and Handbooks",
+      "level": 2,
+      "line_start": 3427,
+      "line_end": 3442,
+      "slug": "performance-appraisals-and-handbooks",
+      "parent_id": 146
+    },
+    {
+      "id": 156,
+      "title": "Recognition and Rewards",
+      "level": 2,
+      "line_start": 3443,
+      "line_end": 3456,
+      "slug": "recognition-and-rewards",
+      "parent_id": 146
+    },
+    {
+      "id": 157,
+      "title": "Newsletters",
+      "level": 2,
+      "line_start": 3457,
+      "line_end": 3462,
+      "slug": "newsletters",
+      "parent_id": 146
+    },
+    {
+      "id": 158,
+      "title": "Themes",
+      "level": 2,
+      "line_start": 3463,
+      "line_end": 3466,
+      "slug": "themes",
+      "parent_id": 146
+    },
+    {
+      "id": 159,
+      "title": "Everyday Reinforcement (The Most Important Step)",
+      "level": 2,
+      "line_start": 3467,
+      "line_end": 3511,
+      "slug": "everyday-reinforcement-the-most-important-step",
+      "parent_id": 146
+    },
+    {
+      "id": 160,
+      "title": "Carrots and Sticks — Tie to Values and Purpose",
+      "level": 3,
+      "line_start": 3489,
+      "line_end": 3497,
+      "slug": "carrots-and-sticks-tie-to-values-and-purpose",
+      "parent_id": 159
+    },
+    {
+      "id": 161,
+      "title": "Results?",
+      "level": 3,
+      "line_start": 3498,
+      "line_end": 3511,
+      "slug": "results",
+      "parent_id": 159
+    },
+    {
+      "id": 162,
+      "title": "THE 7 STRATA OF STRATEGY",
+      "level": 1,
+      "line_start": 3512,
+      "line_end": 3839,
+      "slug": "the-7-strata-of-strategy"
+    },
+    {
+      "id": 163,
+      "title": "The Framework for Dominating Your Industry",
+      "level": 2,
+      "line_start": 3513,
+      "line_end": 3550,
+      "slug": "the-framework-for-dominating-your-industry",
+      "parent_id": 162
+    },
+    {
+      "id": 164,
+      "title": "Strategic Thinking Team — The Council",
+      "level": 2,
+      "line_start": 3551,
+      "line_end": 3574,
+      "slug": "strategic-thinking-team-the-council",
+      "parent_id": 162
+    },
+    {
+      "id": 165,
+      "title": "Lords of Strategy",
+      "level": 2,
+      "line_start": 3575,
+      "line_end": 3602,
+      "slug": "lords-of-strategy",
+      "parent_id": 162
+    },
+    {
+      "id": 166,
+      "title": "Words You Own (Mindshare)",
+      "level": 2,
+      "line_start": 3603,
+      "line_end": 3662,
+      "slug": "words-you-own-mindshare",
+      "parent_id": 162
+    },
+    {
+      "id": 167,
+      "title": "Sandbox and Brand Promises",
+      "level": 2,
+      "line_start": 3663,
+      "line_end": 3735,
+      "slug": "sandbox-and-brand-promises",
+      "parent_id": 162
+    },
+    {
+      "id": 168,
+      "title": "Brand Promise Guarantee (Catalytic Mechanism)",
+      "level": 2,
+      "line_start": 3736,
+      "line_end": 3761,
+      "slug": "brand-promise-guarantee-catalytic-mechanism",
+      "parent_id": 162
+    },
+    {
+      "id": 169,
+      "title": "One-PHRASE Strategy (Key to Making Money)",
+      "level": 2,
+      "line_start": 3762,
+      "line_end": 3795,
+      "slug": "one-phrase-strategy-key-to-making-money",
+      "parent_id": 162
+    },
+    {
+      "id": 170,
+      "title": "Differentiating Activities (3 to 5 Hows)",
+      "level": 2,
+      "line_start": 3796,
+      "line_end": 3839,
+      "slug": "differentiating-activities-3-to-5-hows",
+      "parent_id": 162
+    },
+    {
+      "id": 171,
+      "title": "X-Factor (10x-100x Underlying Advantage)",
+      "level": 1,
+      "line_start": 3840,
+      "line_end": 3943,
+      "slug": "x-factor-10x-100x-underlying-advantage"
+    },
+    {
+      "id": 172,
+      "title": "Profit per X (Economic Engine) and BHAG® (10- to 25-Year Goal)",
+      "level": 2,
+      "line_start": 3876,
+      "line_end": 3921,
+      "slug": "profit-per-x-economic-engine-and-bhag-10--to-25-year-goal",
+      "parent_id": 171
+    },
+    {
+      "id": 173,
+      "title": "Big Hairy Audacious Goal (BHAG®)",
+      "level": 3,
+      "line_start": 3898,
+      "line_end": 3921,
+      "slug": "big-hairy-audacious-goal-bhag",
+      "parent_id": 172
+    },
+    {
+      "id": 174,
+      "title": "7 Strata Summary",
+      "level": 2,
+      "line_start": 3922,
+      "line_end": 3943,
+      "slug": "7-strata-summary",
+      "parent_id": 171
+    },
+    {
+      "id": 175,
+      "title": "THE ONE-PAGE STRATEGIC PLAN",
+      "level": 1,
+      "line_start": 3944,
+      "line_end": 4353,
+      "slug": "the-one-page-strategic-plan"
+    },
+    {
+      "id": 176,
+      "title": "The Tool for Strategic Planning",
+      "level": 2,
+      "line_start": 3945,
+      "line_end": 3974,
+      "slug": "the-tool-for-strategic-planning",
+      "parent_id": 175
+    },
+    {
+      "id": 177,
+      "title": "Everyone on the Same Page",
+      "level": 3,
+      "line_start": 3955,
+      "line_end": 3974,
+      "slug": "everyone-on-the-same-page",
+      "parent_id": 176
+    },
+    {
+      "id": 178,
+      "title": "Vision Summary",
+      "level": 2,
+      "line_start": 3975,
+      "line_end": 4007,
+      "slug": "vision-summary",
+      "parent_id": 175
+    },
+    {
+      "id": 179,
+      "title": "One-Page Strategic Plan (OPSP)",
+      "level": 2,
+      "line_start": 4008,
+      "line_end": 4086,
+      "slug": "one-page-strategic-plan-opsp",
+      "parent_id": 175
+    },
+    {
+      "id": 180,
+      "title": "OPSP Experiences: Holganix, Markitforce, and Towne Park",
+      "level": 3,
+      "line_start": 4044,
+      "line_end": 4086,
+      "slug": "opsp-experiences-holganix-markitforce-and-towne-park",
+      "parent_id": 179
+    },
+    {
+      "id": 181,
+      "title": "Filling In the OPSP",
+      "level": 2,
+      "line_start": 4087,
+      "line_end": 4099,
+      "slug": "filling-in-the-opsp",
+      "parent_id": 175
+    },
+    {
+      "id": 182,
+      "title": "Strengths, Weaknesses, and Trends",
+      "level": 2,
+      "line_start": 4100,
+      "line_end": 4113,
+      "slug": "strengths-weaknesses-and-trends",
+      "parent_id": 175
+    },
+    {
+      "id": 183,
+      "title": "OPSP Column 1: Core Values/Beliefs",
+      "level": 2,
+      "line_start": 4114,
+      "line_end": 4119,
+      "slug": "opsp-column-1-core-valuesbeliefs",
+      "parent_id": 175
+    },
+    {
+      "id": 184,
+      "title": "OPSP Column 2: Purpose, Profit per X, and BHAG®",
+      "level": 2,
+      "line_start": 4120,
+      "line_end": 4157,
+      "slug": "opsp-column-2-purpose-profit-per-x-and-bhag",
+      "parent_id": 175
+    },
+    {
+      "id": 185,
+      "title": "OPSP Column 3: Targets, Sandbox, and Brand Promises",
+      "level": 2,
+      "line_start": 4158,
+      "line_end": 4217,
+      "slug": "opsp-column-3-targets-sandbox-and-brand-promises",
+      "parent_id": 175
+    },
+    {
+      "id": 186,
+      "title": "OPSP Column 4: Goals",
+      "level": 3,
+      "line_start": 4192,
+      "line_end": 4217,
+      "slug": "opsp-column-4-goals",
+      "parent_id": 185
+    },
+    {
+      "id": 187,
+      "title": "OPSP Column 5: Actions",
+      "level": 2,
+      "line_start": 4218,
+      "line_end": 4353,
+      "slug": "opsp-column-5-actions",
+      "parent_id": 175
+    },
+    {
+      "id": 188,
+      "title": "OPSP Column 6: Theme, Scoreboard Design, and Celebration/Reward",
+      "level": 3,
+      "line_start": 4240,
+      "line_end": 4254,
+      "slug": "opsp-column-6-theme-scoreboard-design-and-celebrationreward",
+      "parent_id": 187
+    },
+    {
+      "id": 189,
+      "title": "OPSP Column 7: Your Accountability",
+      "level": 3,
+      "line_start": 4255,
+      "line_end": 4276,
+      "slug": "opsp-column-7-your-accountability",
+      "parent_id": 187
+    },
+    {
+      "id": 190,
+      "title": "People and Process (Reputation and Productivity)",
+      "level": 3,
+      "line_start": 4277,
+      "line_end": 4305,
+      "slug": "people-and-process-reputation-and-productivity",
+      "parent_id": 187
+    },
+    {
+      "id": 191,
+      "title": "A Better Balance",
+      "level": 3,
+      "line_start": 4306,
+      "line_end": 4353,
+      "slug": "a-better-balance",
+      "parent_id": 187
+    },
+    {
+      "id": 192,
+      "title": "Preparing for a Strategic Planning Session",
+      "level": 1,
+      "line_start": 4354,
+      "line_end": 4496,
+      "slug": "preparing-for-a-strategic-planning-session"
+    },
+    {
+      "id": 193,
+      "title": "Employee and Customer Feedback",
+      "level": 2,
+      "line_start": 4371,
+      "line_end": 4392,
+      "slug": "employee-and-customer-feedback",
+      "parent_id": 192
+    },
+    {
+      "id": 194,
+      "title": "SWT and SWOT",
+      "level": 2,
+      "line_start": 4393,
+      "line_end": 4398,
+      "slug": "swt-and-swot",
+      "parent_id": 192
+    },
+    {
+      "id": 195,
+      "title": "Inside/Industry Myopia",
+      "level": 2,
+      "line_start": 4399,
+      "line_end": 4404,
+      "slug": "insideindustry-myopia",
+      "parent_id": 192
+    },
+    {
+      "id": 196,
+      "title": "SWT Instead",
+      "level": 2,
+      "line_start": 4405,
+      "line_end": 4475,
+      "slug": "swt-instead",
+      "parent_id": 192
+    },
+    {
+      "id": 197,
+      "title": "Trends",
+      "level": 3,
+      "line_start": 4450,
+      "line_end": 4457,
+      "slug": "trends",
+      "parent_id": 196
+    },
+    {
+      "id": 198,
+      "title": "Inherent Strengths and Weaknesses",
+      "level": 3,
+      "line_start": 4458,
+      "line_end": 4475,
+      "slug": "inherent-strengths-and-weaknesses",
+      "parent_id": 196
+    },
+    {
+      "id": 199,
+      "title": "Mining All Levels",
+      "level": 2,
+      "line_start": 4476,
+      "line_end": 4496,
+      "slug": "mining-all-levels",
+      "parent_id": 192
+    },
+    {
+      "id": 200,
+      "title": "SCALING UP",
+      "level": 1,
+      "line_start": 4497,
+      "line_end": 4497,
+      "slug": "scaling-up"
+    },
+    {
+      "id": 201,
+      "title": "EXECUTION",
+      "level": 1,
+      "line_start": 4498,
+      "line_end": 4509,
+      "slug": "execution"
+    },
+    {
+      "id": 202,
+      "title": "**THE EXECUTION** INTRODUCTION",
+      "level": 1,
+      "line_start": 4510,
+      "line_end": 4535,
+      "slug": "the-execution-introduction"
+    },
+    {
+      "id": 203,
+      "title": "Section Overview",
+      "level": 1,
+      "line_start": 4536,
+      "line_end": 4745,
+      "slug": "section-overview"
+    },
+    {
+      "id": 204,
+      "title": "THE PRIORITY",
+      "level": 1,
+      "line_start": 4746,
+      "line_end": 4883,
+      "slug": "the-priority"
+    },
+    {
+      "id": 205,
+      "title": "Focus, Finish Lines, and Fun",
+      "level": 2,
+      "line_start": 4747,
+      "line_end": 4782,
+      "slug": "focus-finish-lines-and-fun",
+      "parent_id": 204
+    },
+    {
+      "id": 206,
+      "title": "Rockefeller Habits Checklist™",
+      "level": 2,
+      "line_start": 4783,
+      "line_end": 4806,
+      "slug": "rockefeller-habits-checklist",
+      "parent_id": 204
+    },
+    {
+      "id": 207,
+      "title": "Rockefeller Habit #1 — Healthy Team",
+      "level": 2,
+      "line_start": 4807,
+      "line_end": 4834,
+      "slug": "rockefeller-habit-1-healthy-team",
+      "parent_id": 204
+    },
+    {
+      "id": 208,
+      "title": "Rockefeller Habit #2 — The #1 Priority",
+      "level": 2,
+      "line_start": 4835,
+      "line_end": 4868,
+      "slug": "rockefeller-habit-2-the-1-priority",
+      "parent_id": 204
+    },
+    {
+      "id": 209,
+      "title": "Quarterly Themes",
+      "level": 2,
+      "line_start": 4869,
+      "line_end": 4883,
+      "slug": "quarterly-themes",
+      "parent_id": 204
+    },
+    {
+      "id": 210,
+      "title": "Scaling Up",
+      "level": 1,
+      "line_start": 4884,
+      "line_end": 5075,
+      "slug": "scaling-up"
+    },
+    {
+      "id": 211,
+      "title": "*Saving Mrs. Ryan*",
+      "level": 3,
+      "line_start": 4892,
+      "line_end": 4907,
+      "slug": "saving-mrs-ryan",
+      "parent_id": 210
+    },
+    {
+      "id": 212,
+      "title": "*Life Begins at 40*",
+      "level": 3,
+      "line_start": 4908,
+      "line_end": 4915,
+      "slug": "life-begins-at-40",
+      "parent_id": 210
+    },
+    {
+      "id": 213,
+      "title": "*180 to One*",
+      "level": 3,
+      "line_start": 4916,
+      "line_end": 4925,
+      "slug": "180-to-one",
+      "parent_id": 210
+    },
+    {
+      "id": 214,
+      "title": "*Bin it*",
+      "level": 3,
+      "line_start": 4926,
+      "line_end": 4947,
+      "slug": "bin-it",
+      "parent_id": 210
+    },
+    {
+      "id": 215,
+      "title": "*Bin's Health*",
+      "level": 3,
+      "line_start": 4948,
+      "line_end": 4965,
+      "slug": "bins-health",
+      "parent_id": 210
+    },
+    {
+      "id": 216,
+      "title": "To Reward or Not To Reward",
+      "level": 2,
+      "line_start": 4966,
+      "line_end": 4991,
+      "slug": "to-reward-or-not-to-reward",
+      "parent_id": 210
+    },
+    {
+      "id": 217,
+      "title": "Customer and Employee Feedback",
+      "level": 2,
+      "line_start": 4992,
+      "line_end": 5005,
+      "slug": "customer-and-employee-feedback",
+      "parent_id": 210
+    },
+    {
+      "id": 218,
+      "title": "Theme Creation and Celebration",
+      "level": 2,
+      "line_start": 5006,
+      "line_end": 5027,
+      "slug": "theme-creation-and-celebration",
+      "parent_id": 210
+    },
+    {
+      "id": 219,
+      "title": "Powerful Celebration Question",
+      "level": 3,
+      "line_start": 5022,
+      "line_end": 5027,
+      "slug": "powerful-celebration-question",
+      "parent_id": 218
+    },
+    {
+      "id": 220,
+      "title": "Rockefeller Habits #3, #4, #7, and #8",
+      "level": 2,
+      "line_start": 5028,
+      "line_end": 5075,
+      "slug": "rockefeller-habits-3-4-7-and-8",
+      "parent_id": 210
+    },
+    {
+      "id": 221,
+      "title": "THE DATA",
+      "level": 1,
+      "line_start": 5076,
+      "line_end": 5214,
+      "slug": "the-data"
+    },
+    {
+      "id": 222,
+      "title": "Powering Prediction",
+      "level": 2,
+      "line_start": 5077,
+      "line_end": 5135,
+      "slug": "powering-prediction",
+      "parent_id": 221
+    },
+    {
+      "id": 223,
+      "title": "Big Data",
+      "level": 3,
+      "line_start": 5085,
+      "line_end": 5109,
+      "slug": "big-data",
+      "parent_id": 222
+    },
+    {
+      "id": 224,
+      "title": "Intelligence-Gathering",
+      "level": 3,
+      "line_start": 5110,
+      "line_end": 5135,
+      "slug": "intelligence-gathering",
+      "parent_id": 222
+    },
+    {
+      "id": 225,
+      "title": "Metrics Everywhere",
+      "level": 2,
+      "line_start": 5136,
+      "line_end": 5155,
+      "slug": "metrics-everywhere",
+      "parent_id": 221
+    },
+    {
+      "id": 226,
+      "title": "Rockefeller Habit #5: Gather Employee Input",
+      "level": 2,
+      "line_start": 5156,
+      "line_end": 5214,
+      "slug": "rockefeller-habit-5-gather-employee-input",
+      "parent_id": 221
+    },
+    {
+      "id": 227,
+      "title": "Bring Every Brain Into the Game",
+      "level": 3,
+      "line_start": 5168,
+      "line_end": 5192,
+      "slug": "bring-every-brain-into-the-game",
+      "parent_id": 226
+    },
+    {
+      "id": 228,
+      "title": "Markitforce's Employee Lunches",
+      "level": 3,
+      "line_start": 5193,
+      "line_end": 5196,
+      "slug": "markitforces-employee-lunches",
+      "parent_id": 226
+    },
+    {
+      "id": 229,
+      "title": "Discuss at the Weekly Management Meeting",
+      "level": 3,
+      "line_start": 5197,
+      "line_end": 5202,
+      "slug": "discuss-at-the-weekly-management-meeting",
+      "parent_id": 226
+    },
+    {
+      "id": 230,
+      "title": "Ongoing Feedback",
+      "level": 3,
+      "line_start": 5203,
+      "line_end": 5214,
+      "slug": "ongoing-feedback",
+      "parent_id": 226
+    },
+    {
+      "id": 231,
+      "title": "Scaling Up",
+      "level": 1,
+      "line_start": 5215,
+      "line_end": 5242,
+      "slug": "scaling-up"
+    },
+    {
+      "id": 232,
+      "title": "Close the Loop",
+      "level": 2,
+      "line_start": 5223,
+      "line_end": 5242,
+      "slug": "close-the-loop",
+      "parent_id": 231
+    },
+    {
+      "id": 233,
+      "title": "Rockefeller Habit #6: Gather Customer Input",
+      "level": 1,
+      "line_start": 5243,
+      "line_end": 5268,
+      "slug": "rockefeller-habit-6-gather-customer-input"
+    },
+    {
+      "id": 234,
+      "title": "Conversations With Customers",
+      "level": 1,
+      "line_start": 5269,
+      "line_end": 5416,
+      "slug": "conversations-with-customers"
+    },
+    {
+      "id": 235,
+      "title": "Using Social Media",
+      "level": 3,
+      "line_start": 5301,
+      "line_end": 5306,
+      "slug": "using-social-media",
+      "parent_id": 234
+    },
+    {
+      "id": 236,
+      "title": "Discuss at the Weekly Meeting",
+      "level": 3,
+      "line_start": 5307,
+      "line_end": 5312,
+      "slug": "discuss-at-the-weekly-meeting",
+      "parent_id": 234
+    },
+    {
+      "id": 237,
+      "title": "Involve All Employees (Especially Salespeople)",
+      "level": 3,
+      "line_start": 5313,
+      "line_end": 5330,
+      "slug": "involve-all-employees-especially-salespeople",
+      "parent_id": 234
+    },
+    {
+      "id": 238,
+      "title": "Again, Close the Loop",
+      "level": 2,
+      "line_start": 5331,
+      "line_end": 5364,
+      "slug": "again-close-the-loop",
+      "parent_id": 234
+    },
+    {
+      "id": 239,
+      "title": "Getting the Most Out of Net Promoter Scores",
+      "level": 3,
+      "line_start": 5335,
+      "line_end": 5364,
+      "slug": "getting-the-most-out-of-net-promoter-scores",
+      "parent_id": 238
+    },
+    {
+      "id": 240,
+      "title": "Rockefeller Habit #9: KPIs for Everyone",
+      "level": 2,
+      "line_start": 5365,
+      "line_end": 5394,
+      "slug": "rockefeller-habit-9-kpis-for-everyone",
+      "parent_id": 234
+    },
+    {
+      "id": 241,
+      "title": "Did I Have a Great Day or Week?",
+      "level": 3,
+      "line_start": 5375,
+      "line_end": 5394,
+      "slug": "did-i-have-a-great-day-or-week",
+      "parent_id": 240
+    },
+    {
+      "id": 242,
+      "title": "One Critical Number and 3 to 5 Rocks",
+      "level": 2,
+      "line_start": 5395,
+      "line_end": 5402,
+      "slug": "one-critical-number-and-3-to-5-rocks",
+      "parent_id": 234
+    },
+    {
+      "id": 243,
+      "title": "Peer Coach",
+      "level": 2,
+      "line_start": 5403,
+      "line_end": 5416,
+      "slug": "peer-coach",
+      "parent_id": 234
+    },
+    {
+      "id": 244,
+      "title": "Rockefeller Habit #10: Scoreboards Everywhere",
+      "level": 1,
+      "line_start": 5417,
+      "line_end": 5447,
+      "slug": "rockefeller-habit-10-scoreboards-everywhere"
+    },
+    {
+      "id": 245,
+      "title": "Scaling Up",
+      "level": 1,
+      "line_start": 5448,
+      "line_end": 5477,
+      "slug": "scaling-up"
+    },
+    {
+      "id": 246,
+      "title": "Accountability Management Systems",
+      "level": 2,
+      "line_start": 5458,
+      "line_end": 5477,
+      "slug": "accountability-management-systems",
+      "parent_id": 245
+    },
+    {
+      "id": 247,
+      "title": "THE MEETING RHYTHM",
+      "level": 1,
+      "line_start": 5478,
+      "line_end": 5914,
+      "slug": "the-meeting-rhythm"
+    },
+    {
+      "id": 248,
+      "title": "The Heartbeat of the Organization",
+      "level": 2,
+      "line_start": 5479,
+      "line_end": 5529,
+      "slug": "the-heartbeat-of-the-organization",
+      "parent_id": 247
+    },
+    {
+      "id": 249,
+      "title": "Great Music vs. Noise",
+      "level": 3,
+      "line_start": 5491,
+      "line_end": 5529,
+      "slug": "great-music-vs-noise",
+      "parent_id": 248
+    },
+    {
+      "id": 250,
+      "title": "More Frequent Meetings",
+      "level": 2,
+      "line_start": 5530,
+      "line_end": 5539,
+      "slug": "more-frequent-meetings",
+      "parent_id": 247
+    },
+    {
+      "id": 251,
+      "title": "Competing on Internet Time",
+      "level": 3,
+      "line_start": 5536,
+      "line_end": 5539,
+      "slug": "competing-on-internet-time",
+      "parent_id": 250
+    },
+    {
+      "id": 252,
+      "title": "A Case for More Storytelling",
+      "level": 2,
+      "line_start": 5540,
+      "line_end": 5590,
+      "slug": "a-case-for-more-storytelling",
+      "parent_id": 247
+    },
+    {
+      "id": 253,
+      "title": "Walk-and-Talks",
+      "level": 3,
+      "line_start": 5558,
+      "line_end": 5562,
+      "slug": "walk-and-talks",
+      "parent_id": 252
+    },
+    {
+      "id": 254,
+      "title": "Three Powerful Advantages to Meeting Regularly",
+      "level": 3,
+      "line_start": 5563,
+      "line_end": 5590,
+      "slug": "three-powerful-advantages-to-meeting-regularly",
+      "parent_id": 252
+    },
+    {
+      "id": 255,
+      "title": "Rockefeller Habit #3: Meeting Rhythm",
+      "level": 2,
+      "line_start": 5591,
+      "line_end": 5623,
+      "slug": "rockefeller-habit-3-meeting-rhythm",
+      "parent_id": 247
+    },
+    {
+      "id": 256,
+      "title": "The Daily Huddle",
+      "level": 2,
+      "line_start": 5624,
+      "line_end": 5639,
+      "slug": "the-daily-huddle",
+      "parent_id": 247
+    },
+    {
+      "id": 257,
+      "title": "What Kills the Daily — and Most — Meetings?",
+      "level": 2,
+      "line_start": 5640,
+      "line_end": 5707,
+      "slug": "what-kills-the-daily-and-most-meetings",
+      "parent_id": 247
+    },
+    {
+      "id": 258,
+      "title": "The Weekly Meeting",
+      "level": 2,
+      "line_start": 5708,
+      "line_end": 5809,
+      "slug": "the-weekly-meeting",
+      "parent_id": 247
+    },
+    {
+      "id": 259,
+      "title": "The Agenda",
+      "level": 3,
+      "line_start": 5760,
+      "line_end": 5805,
+      "slug": "the-agenda",
+      "parent_id": 258
+    },
+    {
+      "id": 260,
+      "title": "Weekly CEO One-Pager",
+      "level": 3,
+      "line_start": 5806,
+      "line_end": 5809,
+      "slug": "weekly-ceo-one-pager",
+      "parent_id": 258
+    },
+    {
+      "id": 261,
+      "title": "The Monthly Management Meeting",
+      "level": 2,
+      "line_start": 5810,
+      "line_end": 5897,
+      "slug": "the-monthly-management-meeting",
+      "parent_id": 247
+    },
+    {
+      "id": 262,
+      "title": "Lessons From India",
+      "level": 3,
+      "line_start": 5820,
+      "line_end": 5823,
+      "slug": "lessons-from-india",
+      "parent_id": 261
+    },
+    {
+      "id": 263,
+      "title": "7% of Management Compensation",
+      "level": 3,
+      "line_start": 5824,
+      "line_end": 5865,
+      "slug": "7-of-management-compensation",
+      "parent_id": 261
+    },
+    {
+      "id": 264,
+      "title": "Ashiana Housing's Meeting Agenda",
+      "level": 3,
+      "line_start": 5866,
+      "line_end": 5881,
+      "slug": "ashiana-housings-meeting-agenda",
+      "parent_id": 261
+    },
+    {
+      "id": 265,
+      "title": "Monthly Town Hall",
+      "level": 3,
+      "line_start": 5882,
+      "line_end": 5897,
+      "slug": "monthly-town-hall",
+      "parent_id": 261
+    },
+    {
+      "id": 266,
+      "title": "Quarterly and Annual Planning Meetings",
+      "level": 2,
+      "line_start": 5898,
+      "line_end": 5914,
+      "slug": "quarterly-and-annual-planning-meetings",
+      "parent_id": 247
+    },
+    {
+      "id": 267,
+      "title": "SCALING UP",
+      "level": 1,
+      "line_start": 5915,
+      "line_end": 5915,
+      "slug": "scaling-up"
+    },
+    {
+      "id": 268,
+      "title": "CASH",
+      "level": 1,
+      "line_start": 5916,
+      "line_end": 5927,
+      "slug": "cash"
+    },
+    {
+      "id": 269,
+      "title": "THE CASH INTRODUCTION",
+      "level": 1,
+      "line_start": 5928,
+      "line_end": 5959,
+      "slug": "the-cash-introduction"
+    },
+    {
+      "id": 270,
+      "title": "Section Overview",
+      "level": 2,
+      "line_start": 5938,
+      "line_end": 5959,
+      "slug": "section-overview",
+      "parent_id": 269
+    },
+    {
+      "id": 271,
+      "title": "Cash Conversion Cycle (CCC)",
+      "level": 1,
+      "line_start": 5960,
+      "line_end": 6240,
+      "slug": "cash-conversion-cycle-ccc"
+    },
+    {
+      "id": 272,
+      "title": "A Ways to improve your Sales Cycle",
+      "level": 2,
+      "line_start": 5976,
+      "line_end": 6020,
+      "slug": "a-ways-to-improve-your-sales-cycle",
+      "parent_id": 271
+    },
+    {
+      "id": 273,
+      "title": "B Ways to improve your Make/Production & Inventory Cycle",
+      "level": 2,
+      "line_start": 6021,
+      "line_end": 6065,
+      "slug": "b-ways-to-improve-your-makeproduction-inventory-cycle",
+      "parent_id": 271
+    },
+    {
+      "id": 274,
+      "title": "C Ways to improve your Delivery Cycle",
+      "level": 2,
+      "line_start": 6066,
+      "line_end": 6110,
+      "slug": "c-ways-to-improve-your-delivery-cycle",
+      "parent_id": 271
+    },
+    {
+      "id": 275,
+      "title": "D Ways to improve your Billing & Payment Cycle",
+      "level": 2,
+      "line_start": 6111,
+      "line_end": 6240,
+      "slug": "d-ways-to-improve-your-billing-payment-cycle",
+      "parent_id": 271
+    },
+    {
+      "id": 276,
+      "title": "THE CASH",
+      "level": 1,
+      "line_start": 6241,
+      "line_end": 6455,
+      "slug": "the-cash"
+    },
+    {
+      "id": 277,
+      "title": "Accelerating Cash Flow",
+      "level": 2,
+      "line_start": 6242,
+      "line_end": 6267,
+      "slug": "accelerating-cash-flow",
+      "parent_id": 276
+    },
+    {
+      "id": 278,
+      "title": "Cash Conversion Cycle (CCC)",
+      "level": 3,
+      "line_start": 6252,
+      "line_end": 6267,
+      "slug": "cash-conversion-cycle-ccc",
+      "parent_id": 277
+    },
+    {
+      "id": 279,
+      "title": "Cash Acceleration Strategies (CASh)",
+      "level": 2,
+      "line_start": 6268,
+      "line_end": 6339,
+      "slug": "cash-acceleration-strategies-cash",
+      "parent_id": 276
+    },
+    {
+      "id": 280,
+      "title": "Shorten Cycle Times",
+      "level": 2,
+      "line_start": 6340,
+      "line_end": 6365,
+      "slug": "shorten-cycle-times",
+      "parent_id": 276
+    },
+    {
+      "id": 281,
+      "title": "Eliminate Mistakes",
+      "level": 2,
+      "line_start": 6366,
+      "line_end": 6389,
+      "slug": "eliminate-mistakes",
+      "parent_id": 276
+    },
+    {
+      "id": 282,
+      "title": "Change the Business Model",
+      "level": 2,
+      "line_start": 6390,
+      "line_end": 6397,
+      "slug": "change-the-business-model",
+      "parent_id": 276
+    },
+    {
+      "id": 283,
+      "title": "Improving Profitability",
+      "level": 2,
+      "line_start": 6398,
+      "line_end": 6418,
+      "slug": "improving-profitability",
+      "parent_id": 276
+    },
+    {
+      "id": 284,
+      "title": "Completing Your Cash Acceleration Strategies (CASh) Tool",
+      "level": 2,
+      "line_start": 6419,
+      "line_end": 6455,
+      "slug": "completing-your-cash-acceleration-strategies-cash-tool",
+      "parent_id": 276
+    },
+    {
+      "id": 285,
+      "title": "THE ACCOUNTING",
+      "level": 1,
+      "line_start": 6456,
+      "line_end": 6951,
+      "slug": "the-accounting"
+    },
+    {
+      "id": 286,
+      "title": "Driving Profitability",
+      "level": 2,
+      "line_start": 6457,
+      "line_end": 6491,
+      "slug": "driving-profitability",
+      "parent_id": 285
+    },
+    {
+      "id": 287,
+      "title": "Accounting: Underappreciated",
+      "level": 3,
+      "line_start": 6471,
+      "line_end": 6491,
+      "slug": "accounting-underappreciated",
+      "parent_id": 286
+    },
+    {
+      "id": 288,
+      "title": "Waterfall Graphs",
+      "level": 2,
+      "line_start": 6492,
+      "line_end": 6554,
+      "slug": "waterfall-graphs",
+      "parent_id": 285
+    },
+    {
+      "id": 289,
+      "title": "Trend Analysis",
+      "level": 2,
+      "line_start": 6555,
+      "line_end": 6579,
+      "slug": "trend-analysis",
+      "parent_id": 285
+    },
+    {
+      "id": 290,
+      "title": "Microsoft MapPoint",
+      "level": 3,
+      "line_start": 6562,
+      "line_end": 6579,
+      "slug": "microsoft-mappoint",
+      "parent_id": 289
+    },
+    {
+      "id": 291,
+      "title": "Two Sets of Books",
+      "level": 2,
+      "line_start": 6580,
+      "line_end": 6587,
+      "slug": "two-sets-of-books",
+      "parent_id": 285
+    },
+    {
+      "id": 292,
+      "title": "Simple Numbers",
+      "level": 2,
+      "line_start": 6588,
+      "line_end": 6606,
+      "slug": "simple-numbers",
+      "parent_id": 285
+    },
+    {
+      "id": 293,
+      "title": "Clear the Distortions",
+      "level": 2,
+      "line_start": 6607,
+      "line_end": 6612,
+      "slug": "clear-the-distortions",
+      "parent_id": 285
+    },
+    {
+      "id": 294,
+      "title": "Gross Margin Dollars",
+      "level": 2,
+      "line_start": 6613,
+      "line_end": 6630,
+      "slug": "gross-margin-dollars",
+      "parent_id": 285
+    },
+    {
+      "id": 295,
+      "title": "The Power of Gross Margin",
+      "level": 2,
+      "line_start": 6631,
+      "line_end": 6642,
+      "slug": "the-power-of-gross-margin",
+      "parent_id": 285
+    },
+    {
+      "id": 296,
+      "title": "Set Appropriate Profit Targets",
+      "level": 2,
+      "line_start": 6643,
+      "line_end": 6665,
+      "slug": "set-appropriate-profit-targets",
+      "parent_id": 285
+    },
+    {
+      "id": 297,
+      "title": "Use Labor Efficiency to Drive Profitability",
+      "level": 2,
+      "line_start": 6666,
+      "line_end": 6694,
+      "slug": "use-labor-efficiency-to-drive-profitability",
+      "parent_id": 285
+    },
+    {
+      "id": 298,
+      "title": "Labor Efficiency Ratio (LER) Example",
+      "level": 2,
+      "line_start": 6695,
+      "line_end": 6885,
+      "slug": "labor-efficiency-ratio-ler-example",
+      "parent_id": 285
+    },
+    {
+      "id": 299,
+      "title": "Understand the 4 Forces of Cash Flow",
+      "level": 2,
+      "line_start": 6886,
+      "line_end": 6951,
+      "slug": "understand-the-4-forces-of-cash-flow",
+      "parent_id": 285
+    },
+    {
+      "id": 300,
+      "title": "Force #1: Taxes",
+      "level": 3,
+      "line_start": 6892,
+      "line_end": 6897,
+      "slug": "force-1-taxes",
+      "parent_id": 299
+    },
+    {
+      "id": 301,
+      "title": "Force #2: Manage Debt",
+      "level": 3,
+      "line_start": 6898,
+      "line_end": 6915,
+      "slug": "force-2-manage-debt",
+      "parent_id": 299
+    },
+    {
+      "id": 302,
+      "title": "Force #3: Core Capital Target",
+      "level": 3,
+      "line_start": 6916,
+      "line_end": 6925,
+      "slug": "force-3-core-capital-target",
+      "parent_id": 299
+    },
+    {
+      "id": 303,
+      "title": "Force #4: Harvest Profits by Paying Dividends",
+      "level": 3,
+      "line_start": 6926,
+      "line_end": 6951,
+      "slug": "force-4-harvest-profits-by-paying-dividends",
+      "parent_id": 299
+    },
+    {
+      "id": 304,
+      "title": "THE POWER OF ONE",
+      "level": 1,
+      "line_start": 6952,
+      "line_end": 7231,
+      "slug": "the-power-of-one"
+    },
+    {
+      "id": 305,
+      "title": "7 Key Financial Levers",
+      "level": 2,
+      "line_start": 6953,
+      "line_end": 6984,
+      "slug": "7-key-financial-levers",
+      "parent_id": 304
+    },
+    {
+      "id": 306,
+      "title": "Profit vs. Cash",
+      "level": 3,
+      "line_start": 6967,
+      "line_end": 6984,
+      "slug": "profit-vs-cash",
+      "parent_id": 305
+    },
+    {
+      "id": 307,
+      "title": "The Dreaded \"Hospital Division\"",
+      "level": 2,
+      "line_start": 6985,
+      "line_end": 7010,
+      "slug": "the-dreaded-hospital-division",
+      "parent_id": 304
+    },
+    {
+      "id": 308,
+      "title": "The Numbers",
+      "level": 2,
+      "line_start": 7011,
+      "line_end": 7018,
+      "slug": "the-numbers",
+      "parent_id": 304
+    },
+    {
+      "id": 309,
+      "title": "What Is Cash Flow?",
+      "level": 2,
+      "line_start": 7019,
+      "line_end": 7165,
+      "slug": "what-is-cash-flow",
+      "parent_id": 304
+    },
+    {
+      "id": 310,
+      "title": "Two Uses of Cash",
+      "level": 2,
+      "line_start": 7166,
+      "line_end": 7231,
+      "slug": "two-uses-of-cash",
+      "parent_id": 304
+    },
+    {
+      "id": 311,
+      "title": "Measuring Financial Success",
+      "level": 1,
+      "line_start": 7232,
+      "line_end": 7565,
+      "slug": "measuring-financial-success"
+    },
+    {
+      "id": 312,
+      "title": "Operational Efficiency and Sales Effectiveness",
+      "level": 2,
+      "line_start": 7477,
+      "line_end": 7531,
+      "slug": "operational-efficiency-and-sales-effectiveness",
+      "parent_id": 311
+    },
+    {
+      "id": 313,
+      "title": "Return on Capital",
+      "level": 3,
+      "line_start": 7483,
+      "line_end": 7531,
+      "slug": "return-on-capital",
+      "parent_id": 312
+    },
+    {
+      "id": 314,
+      "title": "Minimum Return on Assets",
+      "level": 2,
+      "line_start": 7532,
+      "line_end": 7543,
+      "slug": "minimum-return-on-assets",
+      "parent_id": 311
+    },
+    {
+      "id": 315,
+      "title": "Return on Net Assets",
+      "level": 3,
+      "line_start": 7536,
+      "line_end": 7543,
+      "slug": "return-on-net-assets",
+      "parent_id": 314
+    },
+    {
+      "id": 316,
+      "title": "Your Return Is a Measure of Your Strategy",
+      "level": 2,
+      "line_start": 7544,
+      "line_end": 7565,
+      "slug": "your-return-is-a-measure-of-your-strategy",
+      "parent_id": 311
+    },
+    {
+      "id": 317,
+      "title": "The 4 Drivers",
+      "level": 1,
+      "line_start": 7566,
+      "line_end": 8032,
+      "slug": "the-4-drivers"
+    },
+    {
+      "id": 318,
+      "title": "Driver #1: Profitability",
+      "level": 2,
+      "line_start": 7574,
+      "line_end": 7677,
+      "slug": "driver-1-profitability",
+      "parent_id": 317
+    },
+    {
+      "id": 319,
+      "title": "Profitability Trends",
+      "level": 3,
+      "line_start": 7633,
+      "line_end": 7677,
+      "slug": "profitability-trends",
+      "parent_id": 318
+    },
+    {
+      "id": 320,
+      "title": "Driver #2: Working Capital Management",
+      "level": 2,
+      "line_start": 7678,
+      "line_end": 7775,
+      "slug": "driver-2-working-capital-management",
+      "parent_id": 317
+    },
+    {
+      "id": 321,
+      "title": "Working Capital Days",
+      "level": 3,
+      "line_start": 7739,
+      "line_end": 7775,
+      "slug": "working-capital-days",
+      "parent_id": 320
+    },
+    {
+      "id": 322,
+      "title": "Driver #3: Noncurrent Asset Management",
+      "level": 2,
+      "line_start": 7776,
+      "line_end": 7816,
+      "slug": "driver-3-noncurrent-asset-management",
+      "parent_id": 317
+    },
+    {
+      "id": 323,
+      "title": "Driver #4: Cash Flow/Funding",
+      "level": 2,
+      "line_start": 7817,
+      "line_end": 7871,
+      "slug": "driver-4-cash-flowfunding",
+      "parent_id": 317
+    },
+    {
+      "id": 324,
+      "title": "Marginal Cash Flow",
+      "level": 2,
+      "line_start": 7872,
+      "line_end": 7918,
+      "slug": "marginal-cash-flow",
+      "parent_id": 317
+    },
+    {
+      "id": 325,
+      "title": "Marginal Cash Flow for the Next $1 of Sales",
+      "level": 3,
+      "line_start": 7878,
+      "line_end": 7918,
+      "slug": "marginal-cash-flow-for-the-next-1-of-sales",
+      "parent_id": 324
+    },
+    {
+      "id": 326,
+      "title": "The Problem: Growing Broke!",
+      "level": 2,
+      "line_start": 7919,
+      "line_end": 8032,
+      "slug": "the-problem-growing-broke",
+      "parent_id": 317
+    },
+    {
+      "id": 327,
+      "title": "Profit vs. Cash Flow",
+      "level": 3,
+      "line_start": 7945,
+      "line_end": 8012,
+      "slug": "profit-vs-cash-flow",
+      "parent_id": 326
+    },
+    {
+      "id": 328,
+      "title": "The Bank",
+      "level": 3,
+      "line_start": 8013,
+      "line_end": 8032,
+      "slug": "the-bank",
+      "parent_id": 326
+    },
+    {
+      "id": 329,
+      "title": "The Power of One and the 7 Levers",
+      "level": 1,
+      "line_start": 8033,
+      "line_end": 8465,
+      "slug": "the-power-of-one-and-the-7-levers"
+    },
+    {
+      "id": 330,
+      "title": "The Impact of 1% and One-Day Changes Across the Board",
+      "level": 3,
+      "line_start": 8049,
+      "line_end": 8160,
+      "slug": "the-impact-of-1-and-one-day-changes-across-the-board",
+      "parent_id": 329
+    },
+    {
+      "id": 331,
+      "title": "The Impact of Customized Changes",
+      "level": 3,
+      "line_start": 8161,
+      "line_end": 8465,
+      "slug": "the-impact-of-customized-changes",
+      "parent_id": 329
+    },
+    {
+      "id": 332,
+      "title": "**NEXT STEPS**",
+      "level": 1,
+      "line_start": 8466,
+      "line_end": 8536,
+      "slug": "next-steps"
+    },
+    {
+      "id": 333,
+      "title": "5 Things to Do Now",
+      "level": 2,
+      "line_start": 8467,
+      "line_end": 8490,
+      "slug": "5-things-to-do-now",
+      "parent_id": 332
+    },
+    {
+      "id": 334,
+      "title": "One Step at a Time",
+      "level": 2,
+      "line_start": 8491,
+      "line_end": 8496,
+      "slug": "one-step-at-a-time",
+      "parent_id": 332
+    },
+    {
+      "id": 335,
+      "title": "You're Not Alone — Coaching, Learning, and Technology",
+      "level": 2,
+      "line_start": 8497,
+      "line_end": 8536,
+      "slug": "youre-not-alone-coaching-learning-and-technology",
+      "parent_id": 332
+    },
+    {
+      "id": 336,
+      "title": "Who Will Succeed",
+      "level": 3,
+      "line_start": 8519,
+      "line_end": 8536,
+      "slug": "who-will-succeed",
+      "parent_id": 335
+    },
+    {
+      "id": 337,
+      "title": "3 SUGGESTED PRIORITIES",
+      "level": 1,
+      "line_start": 8537,
+      "line_end": 8599,
+      "slug": "3-suggested-priorities"
+    },
+    {
+      "id": 338,
+      "title": "FOR GROWING YOUR BUSINESS",
+      "level": 2,
+      "line_start": 8538,
+      "line_end": 8599,
+      "slug": "for-growing-your-business",
+      "parent_id": 337
+    },
+    {
+      "id": 339,
+      "title": "Go to www.gazelles.com",
+      "level": 3,
+      "line_start": 8544,
+      "line_end": 8560,
+      "slug": "go-to-wwwgazellescom",
+      "parent_id": 338
+    },
+    {
+      "id": 340,
+      "title": "Want a Tool to Help Implement the Rockefeller Habits?",
+      "level": 3,
+      "line_start": 8561,
+      "line_end": 8583,
+      "slug": "want-a-tool-to-help-implement-the-rockefeller-habits",
+      "parent_id": 338
+    },
+    {
+      "id": 341,
+      "title": "DRIVE CULTURE.",
+      "level": 3,
+      "line_start": 8584,
+      "line_end": 8584,
+      "slug": "drive-culture",
+      "parent_id": 338
+    },
+    {
+      "id": 342,
+      "title": "DELIVER KNOWLEDGE.",
+      "level": 3,
+      "line_start": 8585,
+      "line_end": 8585,
+      "slug": "deliver-knowledge",
+      "parent_id": 338
+    },
+    {
+      "id": 343,
+      "title": "REWARD RESULTS.",
+      "level": 3,
+      "line_start": 8586,
+      "line_end": 8599,
+      "slug": "reward-results",
+      "parent_id": 338
+    },
+    {
+      "id": 344,
+      "title": "LEARN. GROW. SCALE.",
+      "level": 1,
+      "line_start": 8600,
+      "line_end": 8621,
+      "slug": "learn-grow-scale"
+    },
+    {
+      "id": 345,
+      "title": "For Emerging Growth Companies",
+      "level": 3,
+      "line_start": 8604,
+      "line_end": 8621,
+      "slug": "for-emerging-growth-companies",
+      "parent_id": 344
+    },
+    {
+      "id": 346,
+      "title": "WATCH. LEARN. IMPLEMENT.",
+      "level": 1,
+      "line_start": 8622,
+      "line_end": 8816,
+      "slug": "watch-learn-implement"
+    },
+    {
+      "id": 347,
+      "title": "CALL US NOW FOR A FREE TRIAL",
+      "level": 2,
+      "line_start": 8626,
+      "line_end": 8816,
+      "slug": "call-us-now-for-a-free-trial",
+      "parent_id": 346
+    },
+    {
+      "id": 348,
+      "title": "Scaling Up",
+      "level": 1,
+      "line_start": 8817,
+      "line_end": 8885,
+      "slug": "scaling-up"
+    },
+    {
+      "id": 349,
+      "title": "An Index of Selected Terms, People, Companies, and Authors in *Scaling Up*",
+      "level": 1,
+      "line_start": 8886,
+      "line_end": 9381,
+      "slug": "an-index-of-selected-terms-people-companies-and-authors-in-scaling-up"
+    },
+    {
+      "id": 350,
+      "title": "4 Decisions",
+      "level": 2,
+      "line_start": 8890,
+      "line_end": 8892,
+      "slug": "4-decisions",
+      "parent_id": 349
+    },
+    {
+      "id": 351,
+      "title": "4 Decisions Assessment",
+      "level": 2,
+      "line_start": 8893,
+      "line_end": 8895,
+      "slug": "4-decisions-assessment",
+      "parent_id": 349
+    },
+    {
+      "id": 352,
+      "title": "4D Framework",
+      "level": 2,
+      "line_start": 8896,
+      "line_end": 8899,
+      "slug": "4d-framework",
+      "parent_id": 349
+    },
+    {
+      "id": 353,
+      "title": "4Es of marketing",
+      "level": 2,
+      "line_start": 8900,
+      "line_end": 8902,
+      "slug": "4es-of-marketing",
+      "parent_id": 349
+    },
+    {
+      "id": 354,
+      "title": "4Q (4 Questions)",
+      "level": 2,
+      "line_start": 8903,
+      "line_end": 8905,
+      "slug": "4q-4-questions",
+      "parent_id": 349
+    },
+    {
+      "id": 355,
+      "title": "5Fs: Faith, Family, Friends, Fitness, Finance",
+      "level": 2,
+      "line_start": 8906,
+      "line_end": 8908,
+      "slug": "5fs-faith-family-friends-fitness-finance",
+      "parent_id": 349
+    },
+    {
+      "id": 356,
+      "title": "7 financial levers",
+      "level": 2,
+      "line_start": 8909,
+      "line_end": 8911,
+      "slug": "7-financial-levers",
+      "parent_id": 349
+    },
+    {
+      "id": 357,
+      "title": "7 Strata of Strategy",
+      "level": 2,
+      "line_start": 8912,
+      "line_end": 8916,
+      "slug": "7-strata-of-strategy",
+      "parent_id": 349
+    },
+    {
+      "id": 358,
+      "title": "Accountability, Responsibility, and Authority",
+      "level": 2,
+      "line_start": 8917,
+      "line_end": 8919,
+      "slug": "accountability-responsibility-and-authority",
+      "parent_id": 349
+    },
+    {
+      "id": 359,
+      "title": "Achor, Shawn",
+      "level": 2,
+      "line_start": 8920,
+      "line_end": 8922,
+      "slug": "achor-shawn",
+      "parent_id": 349
+    },
+    {
+      "id": 360,
+      "title": "Actions",
+      "level": 2,
+      "line_start": 8923,
+      "line_end": 8925,
+      "slug": "actions",
+      "parent_id": 349
+    },
+    {
+      "id": 361,
+      "title": "Ammex",
+      "level": 2,
+      "line_start": 8926,
+      "line_end": 8928,
+      "slug": "ammex",
+      "parent_id": 349
+    },
+    {
+      "id": 362,
+      "title": "AmRest Holdings",
+      "level": 2,
+      "line_start": 8929,
+      "line_end": 8931,
+      "slug": "amrest-holdings",
+      "parent_id": 349
+    },
+    {
+      "id": 363,
+      "title": "Appletree Answers",
+      "level": 2,
+      "line_start": 8932,
+      "line_end": 8934,
+      "slug": "appletree-answers",
+      "parent_id": 349
+    },
+    {
+      "id": 364,
+      "title": "Aquire",
+      "level": 2,
+      "line_start": 8935,
+      "line_end": 8937,
+      "slug": "aquire",
+      "parent_id": 349
+    },
+    {
+      "id": 365,
+      "title": "Ashiana Housing",
+      "level": 2,
+      "line_start": 8938,
+      "line_end": 8940,
+      "slug": "ashiana-housing",
+      "parent_id": 349
+    },
+    {
+      "id": 366,
+      "title": "Atlassian",
+      "level": 2,
+      "line_start": 8941,
+      "line_end": 8945,
+      "slug": "atlassian",
+      "parent_id": 349
+    },
+    {
+      "id": 367,
+      "title": "Badowski, Rosanne",
+      "level": 2,
+      "line_start": 8946,
+      "line_end": 8948,
+      "slug": "badowski-rosanne",
+      "parent_id": 349
+    },
+    {
+      "id": 368,
+      "title": "Banks, Rob",
+      "level": 2,
+      "line_start": 8949,
+      "line_end": 8951,
+      "slug": "banks-rob",
+      "parent_id": 349
+    },
+    {
+      "id": 369,
+      "title": "barriers",
+      "level": 2,
+      "line_start": 8952,
+      "line_end": 8957,
+      "slug": "barriers",
+      "parent_id": 349
+    },
+    {
+      "id": 370,
+      "title": "Bassi, Laurie",
+      "level": 2,
+      "line_start": 8958,
+      "line_end": 8960,
+      "slug": "bassi-laurie",
+      "parent_id": 349
+    },
+    {
+      "id": 371,
+      "title": "Beneton India Private Ltd.",
+      "level": 2,
+      "line_start": 8961,
+      "line_end": 8963,
+      "slug": "beneton-india-private-ltd",
+      "parent_id": 349
+    },
+    {
+      "id": 372,
+      "title": "Benjamin Franklin International School",
+      "level": 2,
+      "line_start": 8964,
+      "line_end": 8966,
+      "slug": "benjamin-franklin-international-school",
+      "parent_id": 349
+    },
+    {
+      "id": 373,
+      "title": "Big Ass Fans/Big Ass Solutions",
+      "level": 2,
+      "line_start": 8967,
+      "line_end": 8969,
+      "slug": "big-ass-fansbig-ass-solutions",
+      "parent_id": 349
+    },
+    {
+      "id": 374,
+      "title": "Big Hairy Audacious Goal (BHAG®)",
+      "level": 2,
+      "line_start": 8970,
+      "line_end": 8972,
+      "slug": "big-hairy-audacious-goal-bhag",
+      "parent_id": 349
+    },
+    {
+      "id": 375,
+      "title": "Bikoff, J. Darius",
+      "level": 2,
+      "line_start": 8973,
+      "line_end": 8975,
+      "slug": "bikoff-j-darius",
+      "parent_id": 349
+    },
+    {
+      "id": 376,
+      "title": "Blanchard, Ken",
+      "level": 2,
+      "line_start": 8976,
+      "line_end": 8978,
+      "slug": "blanchard-ken",
+      "parent_id": 349
+    },
+    {
+      "id": 377,
+      "title": "Blinds.com",
+      "level": 2,
+      "line_start": 8979,
+      "line_end": 8981,
+      "slug": "blindscom",
+      "parent_id": 349
+    },
+    {
+      "id": 378,
+      "title": "Bloom, Robert H.",
+      "level": 2,
+      "line_start": 8982,
+      "line_end": 8984,
+      "slug": "bloom-robert-h",
+      "parent_id": 349
+    },
+    {
+      "id": 379,
+      "title": "Booth, Jeff",
+      "level": 2,
+      "line_start": 8985,
+      "line_end": 8987,
+      "slug": "booth-jeff",
+      "parent_id": 349
+    },
+    {
+      "id": 380,
+      "title": "Brand Promise",
+      "level": 2,
+      "line_start": 8988,
+      "line_end": 8990,
+      "slug": "brand-promise",
+      "parent_id": 349
+    },
+    {
+      "id": 381,
+      "title": "Brand Promise Guarantee",
+      "level": 2,
+      "line_start": 8991,
+      "line_end": 8993,
+      "slug": "brand-promise-guarantee",
+      "parent_id": 349
+    },
+    {
+      "id": 382,
+      "title": "Brenneman, Greg",
+      "level": 2,
+      "line_start": 8994,
+      "line_end": 8996,
+      "slug": "brenneman-greg",
+      "parent_id": 349
+    },
+    {
+      "id": 383,
+      "title": "Browne, Gene",
+      "level": 2,
+      "line_start": 8997,
+      "line_end": 8999,
+      "slug": "browne-gene",
+      "parent_id": 349
+    },
+    {
+      "id": 384,
+      "title": "Buckingham, Marcus",
+      "level": 2,
+      "line_start": 9000,
+      "line_end": 9002,
+      "slug": "buckingham-marcus",
+      "parent_id": 349
+    },
+    {
+      "id": 385,
+      "title": "BuildDirect.com",
+      "level": 2,
+      "line_start": 9003,
+      "line_end": 9007,
+      "slug": "builddirectcom",
+      "parent_id": 349
+    },
+    {
+      "id": 386,
+      "title": "Cable, Daniel M.",
+      "level": 2,
+      "line_start": 9008,
+      "line_end": 9010,
+      "slug": "cable-daniel-m",
+      "parent_id": 349
+    },
+    {
+      "id": 387,
+      "title": "Calano, Jimmy",
+      "level": 2,
+      "line_start": 9011,
+      "line_end": 9013,
+      "slug": "calano-jimmy",
+      "parent_id": 349
+    },
+    {
+      "id": 388,
+      "title": "Calhoun, David",
+      "level": 2,
+      "line_start": 9014,
+      "line_end": 9016,
+      "slug": "calhoun-david",
+      "parent_id": 349
+    },
+    {
+      "id": 389,
+      "title": "Cash Acceleration Strategies (CASh) tool",
+      "level": 2,
+      "line_start": 9017,
+      "line_end": 9019,
+      "slug": "cash-acceleration-strategies-cash-tool",
+      "parent_id": 349
+    },
+    {
+      "id": 390,
+      "title": "cash conversion cycle (CCC)",
+      "level": 2,
+      "line_start": 9020,
+      "line_end": 9022,
+      "slug": "cash-conversion-cycle-ccc",
+      "parent_id": 349
+    },
+    {
+      "id": 391,
+      "title": "Cash Flow Story",
+      "level": 2,
+      "line_start": 9023,
+      "line_end": 9025,
+      "slug": "cash-flow-story",
+      "parent_id": 349
+    },
+    {
+      "id": 392,
+      "title": "Catapult Systems",
+      "level": 2,
+      "line_start": 9026,
+      "line_end": 9028,
+      "slug": "catapult-systems",
+      "parent_id": 349
+    },
+    {
+      "id": 393,
+      "title": "celebrations",
+      "level": 2,
+      "line_start": 9029,
+      "line_end": 9031,
+      "slug": "celebrations",
+      "parent_id": 349
+    },
+    {
+      "id": 394,
+      "title": "Chernow, Ron",
+      "level": 2,
+      "line_start": 9032,
+      "line_end": 9034,
+      "slug": "chernow-ron",
+      "parent_id": 349
+    },
+    {
+      "id": 395,
+      "title": "Christensen, Clayton M.",
+      "level": 2,
+      "line_start": 9035,
+      "line_end": 9037,
+      "slug": "christensen-clayton-m",
+      "parent_id": 349
+    },
+    {
+      "id": 396,
+      "title": "Churchill, Neil C.",
+      "level": 2,
+      "line_start": 9038,
+      "line_end": 9040,
+      "slug": "churchill-neil-c",
+      "parent_id": 349
+    },
+    {
+      "id": 397,
+      "title": "City Bin Co., The",
+      "level": 2,
+      "line_start": 9041,
+      "line_end": 9043,
+      "slug": "city-bin-co-the",
+      "parent_id": 349
+    },
+    {
+      "id": 398,
+      "title": "CJ Advertising",
+      "level": 2,
+      "line_start": 9044,
+      "line_end": 9046,
+      "slug": "cj-advertising",
+      "parent_id": 349
+    },
+    {
+      "id": 399,
+      "title": "Cleary, Andy",
+      "level": 2,
+      "line_start": 9047,
+      "line_end": 9049,
+      "slug": "cleary-andy",
+      "parent_id": 349
+    },
+    {
+      "id": 400,
+      "title": "Clifton, Donald O.",
+      "level": 2,
+      "line_start": 9050,
+      "line_end": 9052,
+      "slug": "clifton-donald-o",
+      "parent_id": 349
+    },
+    {
+      "id": 401,
+      "title": "Coastal.com",
+      "level": 2,
+      "line_start": 9053,
+      "line_end": 9055,
+      "slug": "coastalcom",
+      "parent_id": 349
+    },
+    {
+      "id": 402,
+      "title": "Coffman, Curt",
+      "level": 2,
+      "line_start": 9056,
+      "line_end": 9058,
+      "slug": "coffman-curt",
+      "parent_id": 349
+    },
+    {
+      "id": 403,
+      "title": "Collins, Jim",
+      "level": 2,
+      "line_start": 9059,
+      "line_end": 9061,
+      "slug": "collins-jim",
+      "parent_id": 349
+    },
+    {
+      "id": 404,
+      "title": "Conley, Chip",
+      "level": 2,
+      "line_start": 9062,
+      "line_end": 9064,
+      "slug": "conley-chip",
+      "parent_id": 349
+    },
+    {
+      "id": 405,
+      "title": "Conti, Dave",
+      "level": 2,
+      "line_start": 9065,
+      "line_end": 9067,
+      "slug": "conti-dave",
+      "parent_id": 349
+    },
+    {
+      "id": 406,
+      "title": "Cooper, Dwight",
+      "level": 2,
+      "line_start": 9068,
+      "line_end": 9381,
+      "slug": "cooper-dwight",
+      "parent_id": 349
+    }
+  ],
+  "entities": [
+    {
+      "id": "power-of-one",
+      "name": "Power of One",
+      "type": "concept",
+      "description": "The 7 main financial levers that affect cash flow. A 1% or one-day change to each lever compounds to dramatically improve operating cash flow.",
+      "keywords": [
+        "7 levers",
+        "cash flow",
+        "financial levers",
+        "one percent"
+      ],
+      "line_refs": [
+        15,
+        158,
+        702,
+        712,
+        5944,
+        5948,
+        6162,
+        6164,
+        6170,
+        6218,
+        6225,
+        6952,
+        6957,
+        6959,
+        7005,
+        7230,
+        7464,
+        7560,
+        7870,
+        8011
+      ],
+      "chapter_ids": [
+        1,
+        13,
+        17,
+        39,
+        269,
+        270,
+        271,
+        275,
+        304,
+        305,
+        307,
+        310,
+        311,
+        316,
+        317,
+        323,
+        326,
+        327
+      ]
+    },
+    {
+      "id": "cash-conversion-cycle",
+      "name": "Cash Conversion Cycle (CCC)",
+      "type": "concept",
+      "description": "The time it takes to convert investments in inventory and other resources into cash flows from sales. Measures AR Days + Inventory Days - AP Days.",
+      "keywords": [
+        "CCC",
+        "cash cycle",
+        "working capital",
+        "AR days",
+        "inventory days",
+        "AP days"
+      ],
+      "line_refs": [
+        690,
+        716,
+        720,
+        5960,
+        6244,
+        6246,
+        6248,
+        6250,
+        6252,
+        6254,
+        6264,
+        6270,
+        6274,
+        6287,
+        6342,
+        6346,
+        6370,
+        6394,
+        6423,
+        9020
+      ],
+      "chapter_ids": [
+        39,
+        271,
+        276,
+        277,
+        278,
+        279,
+        280,
+        281,
+        282,
+        284,
+        349,
+        390
+      ]
+    },
+    {
+      "id": "rockefeller-habits",
+      "name": "Rockefeller Habits",
+      "type": "concept",
+      "description": "A set of 10 foundational habits for scaling a business, including daily huddle, weekly meeting rhythms, priorities, data, and scoreboards.",
+      "keywords": [
+        "10 habits",
+        "routines",
+        "disciplines",
+        "mastering"
+      ],
+      "line_refs": [
+        183,
+        185,
+        187,
+        197,
+        199,
+        205,
+        209,
+        368,
+        424,
+        549,
+        630,
+        636,
+        742,
+        746,
+        826,
+        846,
+        998,
+        1000,
+        1485,
+        2164
+      ],
+      "chapter_ids": [
+        18,
+        19,
+        20,
+        25,
+        28,
+        29,
+        34,
+        37,
+        38,
+        39,
+        40,
+        42,
+        44,
+        47,
+        48,
+        49,
+        51,
+        53,
+        65,
+        66,
+        96,
+        99,
+        100
+      ]
+    },
+    {
+      "id": "4d-framework",
+      "name": "4D Framework",
+      "type": "concept",
+      "description": "The Gazelles framework organized around the 4 Decisions every leader must address: People, Strategy, Execution, and Cash.",
+      "keywords": [
+        "four decisions",
+        "people strategy execution cash",
+        "growth framework"
+      ],
+      "line_refs": [
+        362,
+        364,
+        378,
+        424,
+        430,
+        440,
+        8493,
+        8608,
+        8614,
+        8896
+      ],
+      "chapter_ids": [
+        25,
+        28,
+        29,
+        34,
+        35,
+        332,
+        334,
+        344,
+        345,
+        349,
+        352
+      ]
+    },
+    {
+      "id": "brand-promise",
+      "name": "Brand Promise",
+      "type": "concept",
+      "description": "The 3 key promises a company makes to its core customers that differentiate it from competitors (e.g., Southwest: Low Fares, Lots of Flights, Lots of Fun).",
+      "keywords": [
+        "brand promises",
+        "differentiation",
+        "kept promise indicators"
+      ],
+      "line_refs": [
+        551,
+        572,
+        573,
+        672,
+        2083,
+        2317,
+        2331,
+        2359,
+        2655,
+        2680,
+        2687,
+        2699,
+        2736,
+        2959,
+        2971,
+        3248,
+        3255,
+        3541,
+        3579,
+        3594
+      ],
+      "chapter_ids": [
+        37,
+        38,
+        96,
+        97,
+        105,
+        106,
+        108,
+        110,
+        123,
+        125,
+        126,
+        130,
+        131,
+        134,
+        146,
+        147,
+        162,
+        163,
+        165
+      ]
+    },
+    {
+      "id": "bhag",
+      "name": "Big Hairy Audacious Goal (BHAG)",
+      "type": "concept",
+      "description": "A 10-to-25-year aspirational goal that provides constant context for all decisions throughout the organization. Concept from Jim Collins.",
+      "keywords": [
+        "10-25 year goal",
+        "summit",
+        "collins",
+        "audacious"
+      ],
+      "line_refs": [
+        82,
+        331,
+        335,
+        337,
+        347,
+        472,
+        541,
+        577,
+        682,
+        1092,
+        1760,
+        1762,
+        2655,
+        2719,
+        2992,
+        3694,
+        4360,
+        4369,
+        4602,
+        5061
+      ],
+      "chapter_ids": [
+        5,
+        6,
+        8,
+        25,
+        26,
+        29,
+        36,
+        37,
+        39,
+        56,
+        58,
+        74,
+        75,
+        81,
+        123,
+        125,
+        126,
+        130,
+        131,
+        136,
+        162,
+        167,
+        192,
+        203,
+        210,
+        220
+      ]
+    },
+    {
+      "id": "one-page-strategic-plan",
+      "name": "One-Page Strategic Plan (OPSP)",
+      "type": "concept",
+      "description": "The best-known Gazelles tool driving alignment, accountability, and focus. 7 columns answering Who, What, When, Where, How, Why, Should/Shouldn't.",
+      "keywords": [
+        "OPSP",
+        "strategic plan",
+        "one page",
+        "7 columns"
+      ],
+      "line_refs": [
+        549,
+        579,
+        592,
+        598,
+        674,
+        2363,
+        2655,
+        2872,
+        3127,
+        3531,
+        3947,
+        3949,
+        4008,
+        4104,
+        4170,
+        4251,
+        4773,
+        5401,
+        5505,
+        9266
+      ],
+      "chapter_ids": [
+        37,
+        38,
+        105,
+        106,
+        110,
+        123,
+        125,
+        130,
+        141,
+        142,
+        162,
+        163,
+        175,
+        176,
+        179,
+        182,
+        185,
+        187,
+        188,
+        204,
+        205,
+        234,
+        242,
+        247,
+        248,
+        249,
+        349,
+        406
+      ]
+    },
+    {
+      "id": "profit-per-x",
+      "name": "Profit per X",
+      "type": "concept",
+      "description": "The key economic driver / fundamental metric that determines profitability per unit of the critical constraint (e.g., profit per customer, profit per employee).",
+      "keywords": [
+        "economic driver",
+        "fundamental metric",
+        "per unit"
+      ],
+      "line_refs": [
+        577,
+        2713,
+        2958,
+        3541,
+        3599,
+        3876,
+        3880,
+        3882,
+        3884,
+        3906,
+        3908,
+        4120,
+        4139,
+        4154,
+        4777,
+        9286
+      ],
+      "chapter_ids": [
+        37,
+        126,
+        130,
+        131,
+        134,
+        162,
+        163,
+        165,
+        171,
+        172,
+        173,
+        175,
+        184,
+        204,
+        205,
+        349,
+        406
+      ]
+    },
+    {
+      "id": "core-customers",
+      "name": "Core Customers",
+      "type": "concept",
+      "description": "The specific customer segment the company serves best, for whom the 3 Brand Promises are designed and kept.",
+      "keywords": [
+        "target market",
+        "customer segment",
+        "ideal customer"
+      ],
+      "line_refs": [
+        572,
+        672,
+        808,
+        1031,
+        1507,
+        2685,
+        3661,
+        3677,
+        4182
+      ],
+      "chapter_ids": [
+        37,
+        38,
+        44,
+        45,
+        46,
+        55,
+        65,
+        67,
+        126,
+        162,
+        166,
+        167,
+        175,
+        185
+      ]
+    },
+    {
+      "id": "core-values",
+      "name": "Core Values",
+      "type": "concept",
+      "description": "The handful of rules defining the company culture, reinforced through People (HR) systems on a daily basis.",
+      "keywords": [
+        "rules",
+        "culture",
+        "values",
+        "behavior"
+      ],
+      "line_refs": [
+        322,
+        333,
+        551,
+        592,
+        596,
+        662,
+        1020,
+        2073,
+        2097,
+        2193,
+        2245,
+        2258,
+        2331,
+        2471,
+        2571,
+        2664,
+        2734,
+        2895,
+        3117,
+        3141
+      ],
+      "chapter_ids": [
+        25,
+        26,
+        37,
+        38,
+        44,
+        51,
+        54,
+        96,
+        97,
+        98,
+        99,
+        100,
+        102,
+        104,
+        105,
+        106,
+        108,
+        114,
+        116,
+        119,
+        120,
+        123,
+        125,
+        126,
+        130,
+        131,
+        134,
+        141,
+        142,
+        143
+      ]
+    },
+    {
+      "id": "core-purpose",
+      "name": "Core Purpose",
+      "type": "concept",
+      "description": "The deeper 'why' behind the company's existence — what difference it makes in the world. A better word for 'mission.'",
+      "keywords": [
+        "why",
+        "mission",
+        "difference",
+        "purpose"
+      ],
+      "line_refs": [
+        31,
+        43,
+        205,
+        290,
+        472,
+        596,
+        662,
+        682,
+        857,
+        873,
+        969,
+        975,
+        1000,
+        1021,
+        1029,
+        3217,
+        3219,
+        4775,
+        9082,
+        9290
+      ],
+      "chapter_ids": [
+        2,
+        3,
+        18,
+        19,
+        20,
+        25,
+        29,
+        36,
+        37,
+        38,
+        39,
+        44,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        146,
+        204,
+        205,
+        349,
+        406
+      ]
+    },
+    {
+      "id": "swt",
+      "name": "SWT (Strengths, Weaknesses, Trends)",
+      "type": "concept",
+      "description": "An augmented SWOT that explores broader external trends beyond one's own industry. Prevents inside/industry myopia.",
+      "keywords": [
+        "SWOT",
+        "trends",
+        "external",
+        "myopia"
+      ],
+      "line_refs": [
+        5,
+        563,
+        565,
+        581,
+        592,
+        2657,
+        2663,
+        3947,
+        4102,
+        4358,
+        4365,
+        4393,
+        4397,
+        4401,
+        4403,
+        4407,
+        4411,
+        4452,
+        4478,
+        8479
+      ],
+      "chapter_ids": [
+        1,
+        37,
+        123,
+        125,
+        175,
+        176,
+        182,
+        192,
+        194,
+        195,
+        196,
+        197,
+        199,
+        332,
+        333
+      ]
+    },
+    {
+      "id": "7-strata-of-strategy",
+      "name": "7 Strata of Strategy",
+      "type": "concept",
+      "description": "Seven components of a robust strategy: words, sandbox, brand promises, KPIs, X-factor, profit-per-X, BHAG.",
+      "keywords": [
+        "seven strata",
+        "stratum",
+        "industry dominating",
+        "differentiation"
+      ],
+      "line_refs": [
+        145,
+        202,
+        567,
+        2083,
+        2337,
+        2655,
+        2661,
+        3271,
+        3512,
+        3517,
+        3529,
+        3565,
+        3577,
+        3581,
+        3621,
+        3673,
+        3724,
+        3784,
+        3818,
+        3838
+      ],
+      "chapter_ids": [
+        13,
+        15,
+        18,
+        19,
+        20,
+        37,
+        96,
+        97,
+        105,
+        106,
+        108,
+        123,
+        125,
+        146,
+        148,
+        162,
+        163,
+        164,
+        165,
+        166,
+        167,
+        169,
+        170
+      ]
+    },
+    {
+      "id": "topgrading",
+      "name": "Topgrading",
+      "type": "concept",
+      "description": "A hiring methodology for interviewing and selecting A-player talent, using structured scorecards and deep reference checks.",
+      "keywords": [
+        "hiring",
+        "a-player",
+        "brad smart",
+        "interviewing"
+      ],
+      "line_refs": [
+        139,
+        215,
+        505,
+        1137,
+        1758,
+        1977,
+        1979,
+        1989,
+        2069,
+        2195,
+        2203,
+        2205,
+        2227,
+        2229,
+        2315,
+        8628,
+        8712,
+        8728,
+        8733,
+        9357
+      ],
+      "chapter_ids": [
+        13,
+        14,
+        18,
+        19,
+        21,
+        29,
+        36,
+        61,
+        62,
+        74,
+        75,
+        81,
+        96,
+        97,
+        101,
+        105,
+        106,
+        108,
+        346,
+        347,
+        349,
+        406
+      ]
+    },
+    {
+      "id": "lean",
+      "name": "Lean",
+      "type": "concept",
+      "description": "Management practice invented by Toyota focused on streamlining and speeding up processes, eliminating waste.",
+      "keywords": [
+        "toyota",
+        "process improvement",
+        "waste elimination",
+        "streamline"
+      ],
+      "line_refs": [
+        204,
+        260,
+        503,
+        1816,
+        1818,
+        1820,
+        1822,
+        1824,
+        1826,
+        1828,
+        1830,
+        1846,
+        1850,
+        1854,
+        1858,
+        1860,
+        1862,
+        1864,
+        1866,
+        1876
+      ],
+      "chapter_ids": [
+        18,
+        19,
+        20,
+        22,
+        23,
+        29,
+        36,
+        74,
+        84,
+        85,
+        86,
+        87,
+        88
+      ]
+    },
+    {
+      "id": "face",
+      "name": "FACe (Function Accountability Chart)",
+      "type": "tool",
+      "description": "Lists the key functions (seats) all organizations must fill, with person accountable, leading KPIs, and outcomes. Gets the right butts in the right seats.",
+      "keywords": [
+        "function accountability",
+        "seats",
+        "butts in seats",
+        "org chart"
+      ],
+      "line_refs": [
+        472,
+        484,
+        1152,
+        1276,
+        1387,
+        1619,
+        1621,
+        1627,
+        1654,
+        1684,
+        1701,
+        4582,
+        5037,
+        9130
+      ],
+      "chapter_ids": [
+        29,
+        36,
+        61,
+        62,
+        63,
+        74,
+        75,
+        78,
+        79,
+        203,
+        210,
+        220,
+        349,
+        406
+      ]
+    },
+    {
+      "id": "pace",
+      "name": "PACe (Process Accountability Chart)",
+      "type": "tool",
+      "description": "Maps the 4-9 core processes that drive the company, with person accountable, process name, and 3 KPIs (better, faster, cheaper).",
+      "keywords": [
+        "process accountability",
+        "workflow",
+        "horizontal",
+        "cross-functional"
+      ],
+      "line_refs": [
+        495,
+        497,
+        656,
+        1153,
+        1395,
+        1768,
+        1800,
+        1802,
+        1814,
+        1878,
+        1896,
+        1912,
+        4018,
+        4584,
+        5039,
+        5227,
+        6539,
+        9285
+      ],
+      "chapter_ids": [
+        29,
+        36,
+        38,
+        61,
+        62,
+        64,
+        74,
+        82,
+        84,
+        89,
+        91,
+        92,
+        175,
+        179,
+        203,
+        210,
+        220,
+        231,
+        232,
+        285,
+        288,
+        349,
+        406
+      ]
+    },
+    {
+      "id": "oppp",
+      "name": "OPPP (One-Page Personal Plan)",
+      "type": "tool",
+      "description": "Mirrors the OPSP for personal life: Relationships, Achievements, Rituals, Wealth — aligning with People, Strategy, Execution, Cash.",
+      "keywords": [
+        "personal plan",
+        "life plan",
+        "faith family friends fitness finance"
+      ],
+      "line_refs": [
+        468,
+        470,
+        1151,
+        1186,
+        1539,
+        1545,
+        1547,
+        1603,
+        5407,
+        9265
+      ],
+      "chapter_ids": [
+        29,
+        36,
+        61,
+        62,
+        63,
+        65,
+        69,
+        73,
+        234,
+        243,
+        349,
+        406
+      ]
+    },
+    {
+      "id": "vision-summary",
+      "name": "Vision Summary",
+      "type": "tool",
+      "description": "A simplified one-page OPSP for companies just getting started or those with 50 or fewer employees. Communicates vision easily.",
+      "keywords": [
+        "simplified opsp",
+        "vision",
+        "one pager"
+      ],
+      "line_refs": [
+        187,
+        203,
+        351,
+        549,
+        551,
+        2657,
+        2662,
+        2727,
+        3255,
+        3947,
+        3973,
+        3975,
+        3977,
+        3979,
+        3986,
+        3988,
+        4006,
+        5058,
+        8479,
+        9365
+      ],
+      "chapter_ids": [
+        18,
+        19,
+        20,
+        25,
+        26,
+        37,
+        123,
+        125,
+        126,
+        146,
+        147,
+        175,
+        176,
+        177,
+        178,
+        210,
+        220,
+        332,
+        333,
+        349,
+        406
+      ]
+    },
+    {
+      "id": "topgrading-interview",
+      "name": "Topgrading Interview",
+      "type": "tool",
+      "description": "A structured chronological interview covering every role in the candidate's career, with scorecard and thorough reference checks.",
+      "keywords": [
+        "chronological interview",
+        "candidate assessment",
+        "scorecard"
+      ],
+      "line_refs": [
+        1758,
+        1989,
+        2001,
+        2003,
+        2069,
+        2071,
+        2085,
+        2097,
+        2195,
+        2197,
+        2229,
+        2413,
+        4308,
+        5259,
+        5401,
+        8712,
+        8837,
+        9197,
+        9322
+      ],
+      "chapter_ids": [
+        74,
+        75,
+        81,
+        96,
+        97,
+        98,
+        101,
+        105,
+        106,
+        112,
+        175,
+        187,
+        191,
+        233,
+        234,
+        242,
+        346,
+        347,
+        348,
+        349,
+        406
+      ]
+    },
+    {
+      "id": "www",
+      "name": "WWW (Who, What, When)",
+      "type": "tool",
+      "description": "At the end of weekly meetings, summarize Who said they'll do What, When. Drives clarity in communication and accountability.",
+      "keywords": [
+        "who what when",
+        "action items",
+        "accountability"
+      ],
+      "line_refs": [
+        386,
+        401,
+        472,
+        484,
+        493,
+        495,
+        497,
+        579,
+        592,
+        624,
+        656,
+        800,
+        1152,
+        1153,
+        1276,
+        1395,
+        1399,
+        1509,
+        1511,
+        1515
+      ],
+      "chapter_ids": [
+        29,
+        30,
+        33,
+        36,
+        37,
+        38,
+        44,
+        45,
+        61,
+        62,
+        63,
+        64,
+        65,
+        67,
+        68
+      ]
+    },
+    {
+      "id": "revenue-per-employee",
+      "name": "Revenue per Employee",
+      "type": "metric",
+      "description": "A key productivity metric measuring total revenue divided by number of employees, indicating operational efficiency.",
+      "keywords": [
+        "productivity",
+        "efficiency",
+        "per person"
+      ],
+      "line_refs": [
+        391,
+        418,
+        592,
+        598,
+        1772,
+        1818,
+        1828,
+        1830,
+        1858,
+        2317,
+        2329,
+        2387,
+        3002,
+        4277,
+        4293,
+        4295,
+        4297,
+        6342,
+        6668,
+        6678
+      ],
+      "chapter_ids": [
+        29,
+        31,
+        34,
+        37,
+        74,
+        82,
+        84,
+        85,
+        88,
+        105,
+        106,
+        108,
+        111,
+        130,
+        137,
+        175,
+        187,
+        190,
+        276,
+        280,
+        285,
+        297
+      ]
+    },
+    {
+      "id": "net-promoter-score",
+      "name": "Net Promoter Score (NPS)",
+      "type": "metric",
+      "description": "Customer loyalty metric based on how likely customers are to recommend the company. Scored from -100 to +100.",
+      "keywords": [
+        "NPS",
+        "customer loyalty",
+        "recommend",
+        "fred reichheld"
+      ],
+      "line_refs": [
+        359,
+        640,
+        658,
+        682,
+        690,
+        730,
+        756,
+        1060,
+        1597,
+        1709,
+        1816,
+        1940,
+        2164,
+        4518,
+        4849,
+        5305,
+        5337,
+        5353,
+        5363,
+        9258
+      ],
+      "chapter_ids": [
+        25,
+        26,
+        27,
+        38,
+        39,
+        40,
+        43,
+        56,
+        57,
+        65,
+        69,
+        72,
+        74,
+        75,
+        80,
+        84,
+        89,
+        93,
+        96,
+        99,
+        100,
+        202,
+        204,
+        208,
+        234,
+        235,
+        238,
+        239,
+        349,
+        406
+      ]
+    },
+    {
+      "id": "ccc-days",
+      "name": "Cash Conversion Cycle Days",
+      "type": "metric",
+      "description": "Number of days cash is tied up in the operating cycle: AR Days + Inventory Days - AP Days.",
+      "keywords": [
+        "CCC",
+        "operating cycle",
+        "days"
+      ],
+      "line_refs": [
+        690,
+        716,
+        720,
+        5960,
+        6244,
+        6246,
+        6248,
+        6250,
+        6252,
+        6254,
+        6264,
+        6270,
+        6274,
+        6287,
+        6342,
+        6346,
+        6370,
+        6394,
+        6423,
+        6425
+      ],
+      "chapter_ids": [
+        39,
+        271,
+        276,
+        277,
+        278,
+        279,
+        280,
+        281,
+        282,
+        284
+      ]
+    },
+    {
+      "id": "gross-margin",
+      "name": "Gross Margin",
+      "type": "metric",
+      "description": "Revenue minus cost of goods sold, expressed as a percentage. A fundamental profitability metric.",
+      "keywords": [
+        "margin",
+        "profitability",
+        "COGS"
+      ],
+      "line_refs": [
+        491,
+        525,
+        1086,
+        1088,
+        1634,
+        1746,
+        2621,
+        2627,
+        3894,
+        4210,
+        6465,
+        6494,
+        6539,
+        6549,
+        6613,
+        6615,
+        6619,
+        6621,
+        6631,
+        6633
+      ],
+      "chapter_ids": [
+        29,
+        36,
+        37,
+        56,
+        58,
+        74,
+        75,
+        81,
+        123,
+        171,
+        172,
+        175,
+        185,
+        186,
+        285,
+        286,
+        288,
+        294,
+        295
+      ]
+    },
+    {
+      "id": "kpi",
+      "name": "KPI (Key Performance Indicator)",
+      "type": "metric",
+      "description": "Quantifiable measures used to evaluate success. Leading indicators for daily/weekly activities driving results.",
+      "keywords": [
+        "key performance",
+        "indicator",
+        "measure",
+        "score"
+      ],
+      "line_refs": [
+        424,
+        491,
+        994,
+        1281,
+        1289,
+        1400,
+        1479,
+        1627,
+        1634,
+        1709,
+        2365,
+        4004,
+        4607,
+        5138,
+        5368,
+        5850,
+        5942,
+        6244,
+        8045,
+        8507
+      ],
+      "chapter_ids": [
+        29,
+        34,
+        36,
+        44,
+        51,
+        53,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        74,
+        75,
+        80,
+        105,
+        106,
+        110,
+        175,
+        178,
+        203,
+        221,
+        225,
+        234,
+        240,
+        247,
+        261,
+        263,
+        269,
+        270,
+        276,
+        277,
+        329,
+        332,
+        335
+      ]
+    },
+    {
+      "id": "daily-huddle",
+      "name": "Daily Huddle (15 min)",
+      "type": "habit",
+      "description": "A 15-minute daily stand-up meeting to align the team, share priorities, and surface issues. Rockefeller Habit cornerstone.",
+      "keywords": [
+        "morning huddle",
+        "stand-up",
+        "daily meeting",
+        "alignment"
+      ],
+      "line_refs": [
+        579,
+        846,
+        2369,
+        2469,
+        3367,
+        3399,
+        3971,
+        3973,
+        4089,
+        4098,
+        4540,
+        5058,
+        5379,
+        5452,
+        5456,
+        5464,
+        5481,
+        5569,
+        5654,
+        5706
+      ],
+      "chapter_ids": [
+        37,
+        44,
+        48,
+        49,
+        105,
+        106,
+        110,
+        114,
+        116,
+        146,
+        149,
+        151,
+        153,
+        175,
+        176,
+        177,
+        181,
+        203,
+        210,
+        220,
+        234,
+        240,
+        241,
+        245,
+        246,
+        247,
+        248,
+        252,
+        254,
+        257
+      ]
+    },
+    {
+      "id": "weekly-meeting",
+      "name": "Weekly Meeting (90 min)",
+      "type": "habit",
+      "description": "A 90-minute weekly executive meeting focused on reviewing KPIs, priorities, customer feedback, and one major topic.",
+      "keywords": [
+        "weekly executive",
+        "90 minutes",
+        "review",
+        "cadence"
+      ],
+      "line_refs": [
+        79,
+        100,
+        324,
+        505,
+        690,
+        754,
+        939,
+        1023,
+        2385,
+        2499,
+        2569,
+        2571,
+        2647,
+        3201,
+        4588,
+        4593,
+        5162,
+        5199,
+        5247,
+        5756
+      ],
+      "chapter_ids": [
+        5,
+        6,
+        7,
+        10,
+        25,
+        29,
+        36,
+        39,
+        40,
+        43,
+        44,
+        50,
+        51,
+        54,
+        105,
+        106,
+        111,
+        114,
+        118,
+        119,
+        120,
+        123,
+        124,
+        143,
+        145,
+        203,
+        221,
+        226,
+        229,
+        233,
+        247,
+        258
+      ]
+    },
+    {
+      "id": "quarterly-planning",
+      "name": "Quarterly Planning (off-site)",
+      "type": "habit",
+      "description": "A quarterly off-site planning session to review strategy, set next quarter priorities, and define the quarterly Theme.",
+      "keywords": [
+        "off-site",
+        "quarterly",
+        "planning",
+        "theme",
+        "90 days"
+      ],
+      "line_refs": [
+        185,
+        324,
+        347,
+        397,
+        543,
+        551,
+        652,
+        654,
+        846,
+        1023,
+        1928,
+        2121,
+        2569,
+        2664,
+        2776,
+        3046,
+        3057,
+        3191,
+        3205,
+        3288
+      ],
+      "chapter_ids": [
+        18,
+        19,
+        25,
+        26,
+        29,
+        32,
+        37,
+        38,
+        44,
+        48,
+        49,
+        51,
+        54,
+        74,
+        89,
+        93,
+        96,
+        99,
+        114,
+        119,
+        120,
+        123,
+        125,
+        126,
+        130,
+        137,
+        140,
+        143,
+        145,
+        146,
+        149
+      ]
+    },
+    {
+      "id": "annual-plan",
+      "name": "Annual Plan",
+      "type": "habit",
+      "description": "Annual strategic planning to set yearly goals, review progress toward BHAG, and align resources.",
+      "keywords": [
+        "yearly planning",
+        "annual strategy",
+        "goals"
+      ],
+      "line_refs": [
+        333,
+        351,
+        364,
+        464,
+        592,
+        656,
+        1135,
+        1479,
+        1537,
+        1543,
+        1573,
+        1587,
+        1595,
+        1597,
+        1603,
+        5405,
+        5613,
+        5619,
+        5898,
+        5900
+      ],
+      "chapter_ids": [
+        25,
+        26,
+        28,
+        29,
+        36,
+        37,
+        38,
+        61,
+        62,
+        65,
+        66,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        234,
+        243,
+        247,
+        255,
+        266
+      ]
+    },
+    {
+      "id": "monthly-meeting",
+      "name": "Monthly Meeting",
+      "type": "habit",
+      "description": "Monthly learning session to review trends, share best practices, and develop the team.",
+      "keywords": [
+        "monthly review",
+        "learning",
+        "development"
+      ],
+      "line_refs": [
+        36,
+        217,
+        219,
+        368,
+        385,
+        545,
+        824,
+        830,
+        855,
+        1349,
+        2093,
+        2417,
+        4825,
+        5481,
+        5534,
+        5602,
+        5754,
+        5838,
+        5840,
+        5862
+      ],
+      "chapter_ids": [
+        2,
+        3,
+        18,
+        19,
+        21,
+        25,
+        28,
+        29,
+        30,
+        37,
+        44,
+        47,
+        48,
+        49,
+        61,
+        62,
+        63,
+        96,
+        98,
+        105,
+        106,
+        112,
+        204,
+        207,
+        247,
+        248,
+        250,
+        255,
+        258,
+        261,
+        263
+      ]
+    },
+    {
+      "id": "no-surprises",
+      "name": "No Surprises",
+      "type": "principle",
+      "description": "Bad news early is good news. Create a culture where issues surface quickly so they can be addressed before becoming crises.",
+      "keywords": [
+        "bad news early",
+        "transparency",
+        "communication"
+      ],
+      "line_refs": [
+        309,
+        624,
+        654,
+        656,
+        846,
+        871,
+        875,
+        880,
+        943,
+        1000,
+        1042,
+        1535,
+        1739,
+        1746,
+        1770,
+        3121,
+        4548,
+        5464,
+        5886,
+        7572
+      ],
+      "chapter_ids": [
+        25,
+        38,
+        44,
+        48,
+        49,
+        50,
+        51,
+        53,
+        56,
+        65,
+        68,
+        74,
+        75,
+        81,
+        82,
+        141,
+        142,
+        203,
+        245,
+        246,
+        247,
+        261,
+        265,
+        317
+      ]
+    },
+    {
+      "id": "keep-things-simple",
+      "name": "Keep Things Simple",
+      "type": "principle",
+      "description": "Everything should be made as simple as possible, but not simpler (Einstein). Complexity is the enemy of execution.",
+      "keywords": [
+        "simple",
+        "einstein",
+        "complexity",
+        "simplicity"
+      ],
+      "line_refs": [
+        21,
+        331,
+        364,
+        424,
+        545,
+        596,
+        634,
+        1040,
+        1820,
+        1830,
+        1924,
+        1946,
+        1948,
+        1956,
+        2343,
+        2657,
+        3579,
+        3581,
+        3734,
+        3924
+      ],
+      "chapter_ids": [
+        1,
+        25,
+        26,
+        28,
+        29,
+        34,
+        37,
+        38,
+        56,
+        74,
+        84,
+        85,
+        89,
+        93,
+        94,
+        105,
+        106,
+        109,
+        123,
+        125,
+        162,
+        165,
+        167,
+        171,
+        174
+      ]
+    },
+    {
+      "id": "same-page",
+      "name": "Same Page",
+      "type": "principle",
+      "description": "Everyone in the organization is aligned around the same vision, priorities, and metrics. Driven by the OPSP.",
+      "keywords": [
+        "alignment",
+        "aligned",
+        "one page",
+        "unified"
+      ],
+      "line_refs": [
+        297,
+        579,
+        594,
+        846,
+        2369,
+        2469,
+        3367,
+        3399,
+        3947,
+        3955,
+        3971,
+        3973,
+        4089,
+        4098,
+        4540,
+        5058,
+        5379,
+        5464,
+        5481,
+        5514
+      ],
+      "chapter_ids": [
+        25,
+        37,
+        44,
+        48,
+        49,
+        105,
+        106,
+        110,
+        114,
+        116,
+        146,
+        149,
+        151,
+        153,
+        175,
+        176,
+        177,
+        181,
+        203,
+        210,
+        220,
+        234,
+        240,
+        241,
+        245,
+        246,
+        247,
+        248,
+        249
+      ]
+    },
+    {
+      "id": "priority-number-one",
+      "name": "Priority #1",
+      "type": "principle",
+      "description": "The single most important thing that must be accomplished this quarter. Finish lines every 90 days.",
+      "keywords": [
+        "number one",
+        "quarterly priority",
+        "finish line",
+        "focus"
+      ],
+      "line_refs": [
+        150,
+        264,
+        285,
+        293,
+        296,
+        331,
+        347,
+        438,
+        491,
+        541,
+        565,
+        579,
+        634,
+        652,
+        808,
+        826,
+        4073,
+        4253,
+        4747,
+        4749
+      ],
+      "chapter_ids": [
+        13,
+        16,
+        22,
+        23,
+        25,
+        26,
+        29,
+        34,
+        35,
+        36,
+        37,
+        38,
+        44,
+        45,
+        46,
+        47,
+        175,
+        179,
+        180,
+        187,
+        188,
+        204,
+        205
+      ]
+    },
+    {
+      "id": "healthy-conflict",
+      "name": "Healthy Conflict",
+      "type": "principle",
+      "description": "Organizations need constructive debate and disagreement to make better decisions. Silence is dangerous.",
+      "keywords": [
+        "debate",
+        "disagreement",
+        "constructive",
+        "Pat Lencioni"
+      ],
+      "line_refs": [
+        356,
+        357,
+        359,
+        640,
+        846,
+        1930,
+        2093,
+        2141,
+        2233,
+        3437,
+        3441,
+        4544,
+        4548,
+        4570,
+        4813,
+        4815,
+        5050,
+        5140,
+        5468,
+        5874
+      ],
+      "chapter_ids": [
+        25,
+        26,
+        27,
+        38,
+        44,
+        48,
+        49,
+        74,
+        89,
+        93,
+        96,
+        98,
+        99,
+        100,
+        102,
+        146,
+        155,
+        203,
+        204,
+        207,
+        210,
+        220,
+        221,
+        225,
+        245,
+        246,
+        247,
+        261,
+        264
+      ]
+    },
+    {
+      "id": "routine-sets-you-free",
+      "name": "Routine Sets You Free",
+      "type": "principle",
+      "description": "Goals without routines are wishes. The right habits and rhythms give freedom to focus on what matters most.",
+      "keywords": [
+        "routine",
+        "habit",
+        "discipline",
+        "freedom"
+      ],
+      "line_refs": [
+        211,
+        351,
+        353,
+        393,
+        420,
+        634,
+        638,
+        754,
+        969,
+        1595,
+        2281,
+        2631,
+        3469,
+        4037,
+        4362,
+        4391,
+        4538,
+        4544,
+        4548,
+        4552
+      ],
+      "chapter_ids": [
+        18,
+        19,
+        21,
+        25,
+        26,
+        29,
+        32,
+        34,
+        38,
+        39,
+        40,
+        43,
+        44,
+        51,
+        52,
+        65,
+        69,
+        72,
+        105,
+        106,
+        123,
+        146,
+        159,
+        175,
+        179,
+        192,
+        193,
+        203
+      ]
+    },
+    {
+      "id": "delegate-and-predict",
+      "name": "Delegate and Predict",
+      "type": "principle",
+      "description": "Leaders must develop the capability to delegate work and predict outcomes. The fundamental job of a leader is prediction (Deming).",
+      "keywords": [
+        "delegation",
+        "prediction",
+        "deming",
+        "leader role"
+      ],
+      "line_refs": [
+        82,
+        151,
+        308,
+        773,
+        802,
+        879,
+        959,
+        961,
+        963,
+        971,
+        989,
+        991,
+        1000,
+        1719,
+        5077,
+        5079,
+        5142,
+        5876,
+        6489,
+        6557
+      ],
+      "chapter_ids": [
+        5,
+        6,
+        8,
+        13,
+        16,
+        25,
+        44,
+        45,
+        50,
+        51,
+        52,
+        53,
+        74,
+        75,
+        80,
+        221,
+        222,
+        225,
+        247,
+        261,
+        264,
+        285,
+        286,
+        287,
+        289
+      ]
+    },
+    {
+      "id": "people-decision",
+      "name": "People",
+      "type": "decision",
+      "description": "The decision about attracting, keeping, and growing the right people.",
+      "keywords": [
+        "people",
+        "team",
+        "leaders",
+        "managers",
+        "talent"
+      ],
+      "line_refs": [
+        1110,
+        1118,
+        1395,
+        1476,
+        1619,
+        1972,
+        2278
+      ],
+      "chapter_ids": [
+        60,
+        61,
+        64,
+        65,
+        74,
+        95,
+        105
+      ]
+    },
+    {
+      "id": "strategy-decision",
+      "name": "Strategy",
+      "type": "decision",
+      "description": "The decision about crafting a truly differentiated strategy that matters to customers.",
+      "keywords": [
+        "strategy",
+        "core",
+        "BHAG",
+        "7 strata",
+        "OPSP"
+      ],
+      "line_refs": [
+        2605,
+        2619,
+        2672,
+        2872,
+        3112,
+        3512,
+        3944
+      ],
+      "chapter_ids": [
+        122,
+        123,
+        126,
+        130,
+        141,
+        162,
+        175
+      ]
+    },
+    {
+      "id": "execution-decision",
+      "name": "Execution",
+      "type": "decision",
+      "description": "The decision about driving flawless execution through priorities, data, and meeting rhythm.",
+      "keywords": [
+        "execution",
+        "priority",
+        "data",
+        "meeting rhythm",
+        "habits"
+      ],
+      "line_refs": [
+        4498,
+        4510,
+        4746,
+        5076,
+        5478
+      ],
+      "chapter_ids": [
+        201,
+        202,
+        204,
+        221,
+        247
+      ]
+    },
+    {
+      "id": "cash-decision",
+      "name": "Cash",
+      "type": "decision",
+      "description": "The decision about managing cash flow to weather storms and fuel growth.",
+      "keywords": [
+        "cash",
+        "accounting",
+        "power of one",
+        "CCC",
+        "cash flow"
+      ],
+      "line_refs": [
+        5916,
+        5928,
+        5960,
+        6241,
+        6456,
+        6952
+      ],
+      "chapter_ids": [
+        268,
+        269,
+        271,
+        276,
+        285,
+        304
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "source": "4d-framework",
+      "target": "people-decision",
+      "type": "contains",
+      "weight": 1.0,
+      "line_ref": 362,
+      "description": "4D Framework includes the People Decision"
+    },
+    {
+      "source": "4d-framework",
+      "target": "strategy-decision",
+      "type": "contains",
+      "weight": 1.0,
+      "line_ref": 362,
+      "description": "4D Framework includes the Strategy Decision"
+    },
+    {
+      "source": "4d-framework",
+      "target": "execution-decision",
+      "type": "contains",
+      "weight": 1.0,
+      "line_ref": 362,
+      "description": "4D Framework includes the Execution Decision"
+    },
+    {
+      "source": "4d-framework",
+      "target": "cash-decision",
+      "type": "contains",
+      "weight": 1.0,
+      "line_ref": 362,
+      "description": "4D Framework includes the Cash Decision"
+    },
+    {
+      "source": "face",
+      "target": "people-decision",
+      "type": "is_tool_for",
+      "weight": 1.0,
+      "line_ref": 138,
+      "description": "FACe is the primary tool for the People Decision"
+    },
+    {
+      "source": "pace",
+      "target": "people-decision",
+      "type": "is_tool_for",
+      "weight": 1.0,
+      "line_ref": 138,
+      "description": "PACe is a key tool for the People Decision"
+    },
+    {
+      "source": "topgrading",
+      "target": "people-decision",
+      "type": "is_tool_for",
+      "weight": 1.0,
+      "line_ref": 215,
+      "description": "Topgrading is the hiring methodology for People"
+    },
+    {
+      "source": "topgrading-interview",
+      "target": "topgrading",
+      "type": "implements",
+      "weight": 1.0,
+      "line_ref": 2195,
+      "description": "Topgrading Interview implements Topgrading methodology"
+    },
+    {
+      "source": "core-values",
+      "target": "people-decision",
+      "type": "belongs_to",
+      "weight": 0.9,
+      "line_ref": 322,
+      "description": "Core Values are reinforced through People systems"
+    },
+    {
+      "source": "oppp",
+      "target": "people-decision",
+      "type": "is_tool_for",
+      "weight": 0.8,
+      "line_ref": 468,
+      "description": "OPPP supports personal alignment with People Decision"
+    },
+    {
+      "source": "one-page-strategic-plan",
+      "target": "strategy-decision",
+      "type": "is_tool_for",
+      "weight": 1.0,
+      "line_ref": 3137,
+      "description": "OPSP is the primary tool for the Strategy Decision"
+    },
+    {
+      "source": "7-strata-of-strategy",
+      "target": "strategy-decision",
+      "type": "is_tool_for",
+      "weight": 1.0,
+      "line_ref": 145,
+      "description": "7 Strata is the strategic thinking framework"
+    },
+    {
+      "source": "swt",
+      "target": "strategy-decision",
+      "type": "is_tool_for",
+      "weight": 0.9,
+      "line_ref": 541,
+      "description": "SWT feeds into the Strategy Decision"
+    },
+    {
+      "source": "vision-summary",
+      "target": "one-page-strategic-plan",
+      "type": "implements",
+      "weight": 0.9,
+      "line_ref": 203,
+      "description": "Vision Summary is a simplified OPSP"
+    },
+    {
+      "source": "bhag",
+      "target": "strategy-decision",
+      "type": "belongs_to",
+      "weight": 1.0,
+      "line_ref": 333,
+      "description": "BHAG is a cornerstone of Strategy"
+    },
+    {
+      "source": "core-customers",
+      "target": "strategy-decision",
+      "type": "belongs_to",
+      "weight": 1.0,
+      "line_ref": 572,
+      "description": "Core Customers are defined in Strategy"
+    },
+    {
+      "source": "brand-promise",
+      "target": "strategy-decision",
+      "type": "belongs_to",
+      "weight": 1.0,
+      "line_ref": 551,
+      "description": "Brand Promises are defined in Strategy"
+    },
+    {
+      "source": "profit-per-x",
+      "target": "strategy-decision",
+      "type": "belongs_to",
+      "weight": 1.0,
+      "line_ref": 577,
+      "description": "Profit per X is the 7th Strata of Strategy"
+    },
+    {
+      "source": "core-purpose",
+      "target": "strategy-decision",
+      "type": "belongs_to",
+      "weight": 0.9,
+      "line_ref": 1021,
+      "description": "Core Purpose is a strategy component"
+    },
+    {
+      "source": "rockefeller-habits",
+      "target": "execution-decision",
+      "type": "belongs_to",
+      "weight": 1.0,
+      "line_ref": 183,
+      "description": "Rockefeller Habits drive the Execution Decision"
+    },
+    {
+      "source": "daily-huddle",
+      "target": "rockefeller-habits",
+      "type": "contained_in",
+      "weight": 1.0,
+      "line_ref": 205,
+      "description": "Daily Huddle is a Rockefeller Habit"
+    },
+    {
+      "source": "weekly-meeting",
+      "target": "rockefeller-habits",
+      "type": "contained_in",
+      "weight": 1.0,
+      "line_ref": 624,
+      "description": "Weekly Meeting is part of the Rockefeller Habits"
+    },
+    {
+      "source": "quarterly-planning",
+      "target": "rockefeller-habits",
+      "type": "contained_in",
+      "weight": 1.0,
+      "line_ref": 1928,
+      "description": "Quarterly Planning is a Rockefeller Habit"
+    },
+    {
+      "source": "annual-plan",
+      "target": "rockefeller-habits",
+      "type": "contained_in",
+      "weight": 1.0,
+      "line_ref": 5405,
+      "description": "Annual Plan is part of the Rockefeller Habits"
+    },
+    {
+      "source": "monthly-meeting",
+      "target": "rockefeller-habits",
+      "type": "contained_in",
+      "weight": 0.9,
+      "line_ref": 4825,
+      "description": "Monthly Meeting is part of the Rockefeller Habits"
+    },
+    {
+      "source": "www",
+      "target": "execution-decision",
+      "type": "is_tool_for",
+      "weight": 0.9,
+      "line_ref": 49,
+      "description": "WWW drives execution accountability"
+    },
+    {
+      "source": "kpi",
+      "target": "execution-decision",
+      "type": "belongs_to",
+      "weight": 1.0,
+      "line_ref": 424,
+      "description": "KPIs are key to execution data"
+    },
+    {
+      "source": "power-of-one",
+      "target": "cash-decision",
+      "type": "belongs_to",
+      "weight": 1.0,
+      "line_ref": 15,
+      "description": "Power of One is a Cash Decision tool"
+    },
+    {
+      "source": "cash-conversion-cycle",
+      "target": "cash-decision",
+      "type": "belongs_to",
+      "weight": 1.0,
+      "line_ref": 690,
+      "description": "CCC is a core Cash concept"
+    },
+    {
+      "source": "ccc-days",
+      "target": "cash-conversion-cycle",
+      "type": "measures",
+      "weight": 1.0,
+      "line_ref": null,
+      "description": "CCC Days measures the Cash Conversion Cycle"
+    },
+    {
+      "source": "revenue-per-employee",
+      "target": "cash-decision",
+      "type": "relates_to",
+      "weight": 0.7,
+      "line_ref": null,
+      "description": "Revenue per Employee impacts cash efficiency"
+    },
+    {
+      "source": "gross-margin",
+      "target": "cash-decision",
+      "type": "relates_to",
+      "weight": 0.8,
+      "line_ref": 491,
+      "description": "Gross Margin drives cash generation"
+    },
+    {
+      "source": "no-surprises",
+      "target": "execution-decision",
+      "type": "applies_to",
+      "weight": 1.0,
+      "line_ref": null,
+      "description": "No Surprises principle drives transparent execution"
+    },
+    {
+      "source": "keep-things-simple",
+      "target": "4d-framework",
+      "type": "applies_to",
+      "weight": 1.0,
+      "line_ref": null,
+      "description": "Keep Things Simple guides the 4D Framework design"
+    },
+    {
+      "source": "same-page",
+      "target": "strategy-decision",
+      "type": "applies_to",
+      "weight": 1.0,
+      "line_ref": 297,
+      "description": "Same Page principle underpins the OPSP"
+    },
+    {
+      "source": "priority-number-one",
+      "target": "execution-decision",
+      "type": "applies_to",
+      "weight": 1.0,
+      "line_ref": null,
+      "description": "Priority #1 drives execution focus"
+    },
+    {
+      "source": "healthy-conflict",
+      "target": "people-decision",
+      "type": "applies_to",
+      "weight": 0.9,
+      "line_ref": null,
+      "description": "Healthy Conflict enables better People decisions"
+    },
+    {
+      "source": "routine-sets-you-free",
+      "target": "execution-decision",
+      "type": "applies_to",
+      "weight": 1.0,
+      "line_ref": 351,
+      "description": "Routine Sets You Free is the foundation of Rockefeller Habits"
+    },
+    {
+      "source": "delegate-and-predict",
+      "target": "people-decision",
+      "type": "applies_to",
+      "weight": 1.0,
+      "line_ref": 308,
+      "description": "Delegate and Predict defines leadership capability"
+    },
+    {
+      "source": "face",
+      "target": "pace",
+      "type": "complements",
+      "weight": 1.0,
+      "line_ref": 138,
+      "description": "FACe (vertical functions) complements PACe (horizontal processes)"
+    },
+    {
+      "source": "one-page-strategic-plan",
+      "target": "7-strata-of-strategy",
+      "type": "incorporates",
+      "weight": 1.0,
+      "line_ref": 3137,
+      "description": "OPSP incorporates 7 Strata strategic thinking"
+    },
+    {
+      "source": "one-page-strategic-plan",
+      "target": "swt",
+      "type": "incorporates",
+      "weight": 0.9,
+      "line_ref": 3137,
+      "description": "OPSP incorporates SWT analysis"
+    },
+    {
+      "source": "oppp",
+      "target": "one-page-strategic-plan",
+      "type": "mirrors",
+      "weight": 1.0,
+      "line_ref": 468,
+      "description": "OPPP mirrors the OPSP structure for personal life"
+    },
+    {
+      "source": "power-of-one",
+      "target": "cash-conversion-cycle",
+      "type": "impacts",
+      "weight": 1.0,
+      "line_ref": 15,
+      "description": "Power of One levers directly impact the CCC"
+    },
+    {
+      "source": "revenue-per-employee",
+      "target": "kpi",
+      "type": "is_a",
+      "weight": 1.0,
+      "line_ref": null,
+      "description": "Revenue per Employee is a KPI"
+    },
+    {
+      "source": "net-promoter-score",
+      "target": "kpi",
+      "type": "is_a",
+      "weight": 1.0,
+      "line_ref": 4849,
+      "description": "Net Promoter Score is a KPI"
+    },
+    {
+      "source": "ccc-days",
+      "target": "kpi",
+      "type": "is_a",
+      "weight": 1.0,
+      "line_ref": null,
+      "description": "CCC Days is a KPI"
+    },
+    {
+      "source": "gross-margin",
+      "target": "kpi",
+      "type": "is_a",
+      "weight": 1.0,
+      "line_ref": 491,
+      "description": "Gross Margin is a KPI"
+    },
+    {
+      "source": "profit-per-x",
+      "target": "kpi",
+      "type": "is_a",
+      "weight": 0.9,
+      "line_ref": 577,
+      "description": "Profit per X is a critical KPI"
+    },
+    {
+      "source": "brand-promise",
+      "target": "core-customers",
+      "type": "serves",
+      "weight": 1.0,
+      "line_ref": 551,
+      "description": "Brand Promises serve Core Customers"
+    },
+    {
+      "source": "lean",
+      "target": "pace",
+      "type": "improves",
+      "weight": 0.8,
+      "line_ref": 204,
+      "description": "Lean principles improve process flows in PACe"
+    },
+    {
+      "source": "rockefeller-habits",
+      "target": "strategy-decision",
+      "type": "supports",
+      "weight": 0.8,
+      "line_ref": 183,
+      "description": "Rockefeller Habits enable strategy execution"
+    },
+    {
+      "source": "one-page-strategic-plan",
+      "target": "execution-decision",
+      "type": "enables",
+      "weight": 0.9,
+      "line_ref": 3137,
+      "description": "OPSP drives execution alignment"
+    },
+    {
+      "source": "cash-conversion-cycle",
+      "target": "strategy-decision",
+      "type": "informs",
+      "weight": 0.7,
+      "line_ref": 690,
+      "description": "CCC understanding informs strategic choices"
+    },
+    {
+      "source": "power-of-one",
+      "target": "execution-decision",
+      "type": "informs",
+      "weight": 0.7,
+      "line_ref": 15,
+      "description": "Power of One analysis informs execution priorities"
+    },
+    {
+      "source": "core-values",
+      "target": "topgrading",
+      "type": "guides",
+      "weight": 0.8,
+      "line_ref": 322,
+      "description": "Core Values guide Topgrading hiring decisions"
+    },
+    {
+      "source": "weekly-meeting",
+      "target": "same-page",
+      "type": "reinforces",
+      "weight": 0.9,
+      "line_ref": 624,
+      "description": "Weekly meeting rhythm reinforces Same Page alignment"
+    },
+    {
+      "source": "daily-huddle",
+      "target": "priority-number-one",
+      "type": "reinforces",
+      "weight": 0.9,
+      "line_ref": 205,
+      "description": "Daily Huddle reinforces Priority #1 focus"
+    },
+    {
+      "source": "kpi",
+      "target": "no-surprises",
+      "type": "enables",
+      "weight": 0.8,
+      "line_ref": 424,
+      "description": "KPIs enable No Surprises by surfacing issues early"
+    }
+  ]
+}
