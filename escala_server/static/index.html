@@ -220,7 +220,7 @@
         html += '<div class="tools-list">';
 
         for (var i = 0; i < tools.length; i++) {
-          var toolSlug = tools[i].toLowerCase().replace(/\s+/g, '-');
+          var toolSlug = tools[i].toLowerCase().replace(/[\/\s]+/g, '-');
           var toolUrl = '/dashboards/' + state.decision + '/' + toolSlug + '.html';
           html += '<div class="tool-item" onclick="window.location.href=\'' + toolUrl + '\'">' +
             '<h3>' + tools[i] + '</h3>' +
