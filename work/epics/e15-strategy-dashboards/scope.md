@@ -37,4 +37,4 @@ Crear dashboards visuales para las herramientas de la decisión Strategy del sis
 | S15.2 — Core Customer | S | Done | 2026-05-28 | 2026-05-28 | Tarjetas cliente + atributos |
 | S15.3 — Brand Promises | S | Done | 2026-05-28 | 2026-05-28 | 3 promesas + medidores |
 | S15.4 — Diff Activities | M | Done | 2026-05-28 | 2026-05-28 | Matriz competitiva |
-| S15.5 — Sandbox | S | Pending | — | — | Mapa 4 cuadrantes |
+| S15.5 — Sandbox | S | Done | 2026-05-28 | 2026-05-28 | Mapa 4 cuadrantes |
