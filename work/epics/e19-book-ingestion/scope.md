@@ -66,5 +66,5 @@
 | S19.1 — Book Parser | L | Done | — | — | Extrae chapters, concepts, tools, metrics, habits, principles |
 | S19.2 — Entity Ingest | M | Done | — | — | Crea entidades en GraphEngine con propiedades |
 | S19.3 — Relationship Builder | M | Done (via S19.2) | — | — | Superseded — relaciones ingeridas en S19.2 |
-| S19.4 — Knowledge API | M | Pending | — | — | Endpoints de consulta al grafo |
+| S19.4 — Knowledge API | M | Done | — | — | Endpoints de consulta al grafo |
 | S19.5 — Integrity Tests | S | Pending | — | — | Cobertura contra el libro fuente |
