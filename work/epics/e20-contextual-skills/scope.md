@@ -53,7 +53,7 @@
 |-------|:----:|:------:|:------:|:--------:|-------|
 | S20.1 — Knowledge Context API | M | Done | — | — | Test coverage + param validation added |
 | S20.2 — Dashboard Context Panel | L | Done | — | — | Panel + JS + 23 dashboards with includes |
-| S20.3 — Coaching Skill Helper | S | Pending | — | — | |
+| S20.3 — Coaching Skill Helper | S | Done | — | — | scaling_context.py module created |
 | S20.4 — Integration Tests | S | Pending | — | — | |
 
 ### Sequencing Risks
