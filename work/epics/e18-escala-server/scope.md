@@ -257,7 +257,7 @@ Stream 2 (Dashboards):  S18.3 ──► S18.2 ──► S18.5/S18.6/S18.7 ──
 
 | Story | Size | Status | Actual | Velocity | Notes |
 |-------|:----:|:------:|:------:|:--------:|-------|
-| S18.1 — Server Core | XL | Pending | — | — | http.server, routing, static, CLI |
+| S18.1 — Server Core | XL | Done | — | — | http.server, routing, static, CLI |
 | S18.2 — Navigation & Home | M | Pending | — | — | 4 tarjetas, breadcrumbs, responsive |
 | S18.3 — Power of One PILOT | L | Pending | — | — | Sliders, recálculo, guardado |
 | S18.4 — Cash Suite | M | Pending | — | — | Hereda patrón S18.3 |
