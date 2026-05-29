@@ -218,11 +218,10 @@ class TestKnowledgeContext:
         result = handler.get_context(tool="Nonexistent Tool")
         assert result["status"] == "error"
 
-    def test_context_no_args_returns_empty(self, handler):
-        """get_context with no arguments should return empty."""
+    def test_context_no_args_returns_error(self, handler):
+        """get_context with no arguments should return error."""
         result = handler.get_context()
-        assert result["status"] == "ok"
-        assert result["entities"] == []
+        assert result["status"] == "error"
 
 
 class TestKnowledgeRoutes:
@@ -262,3 +261,51 @@ class TestKnowledgeRoutes:
         handler_fn, params = router.dispatch("GET", "/api/knowledge/entity/search")
         assert handler_fn is not None
         assert params["entity_name"] == "search"
+
+class TestKnowledgeContextHTTP:
+    """Route-level integration tests for /api/knowledge/context via handler."""
+
+    @pytest.fixture
+    def handler(self):
+        """Create a fresh handler with ingested knowledge."""
+        uri = f"file:http_test_{uuid.uuid4().hex}?mode=memory&cache=shared"
+        ingester = KnowledgeIngester(db_path=uri)
+        ingester.ingest_all(json_path=str(JSON_PATH))
+        handler = KnowledgeHandler(ingester.graph_engine)
+        yield handler
+        from escala_server.graph_engine import _conn_cache as _graph_cache
+        from escala_server.memory_engine import _conn_cache as _mem_cache
+        _graph_cache.pop(ingester.graph_engine._db_path, None)
+        _mem_cache.pop(ingester.memory_engine._db_path, None)
+
+    def test_context_requires_params(self, handler):
+        """get_context without params should return error."""
+        result = handler.get_context()
+        assert result["status"] == "error"
+
+    def test_context_with_tool_returns_data(self, handler):
+        """get_context with tool should return data."""
+        result = handler.get_context(tool="Power of One")
+        assert result["status"] == "ok"
+        assert "tool" in result
+        assert result["tool"]["name"] == "Power of One"
+        assert len(result["entities"]) > 0
+
+    def test_context_with_category_returns_data(self, handler):
+        """get_context with category should return entities."""
+        result = handler.get_context(category="cash")
+        assert result["status"] == "ok"
+        names = [e["name"] for e in result["entities"]]
+        assert "Cash Conversion Cycle (CCC)" in names
+
+    def test_context_with_nonexistent_tool(self, handler):
+        """get_context with invalid tool should return error."""
+        result = handler.get_context(tool="Nonexistent Tool")
+        assert result["status"] == "error"
+
+    def test_context_includes_principles_and_habits(self, handler):
+        """Context response should include principles and habits."""
+        result = handler.get_context(category="execution")
+        assert result["status"] == "ok"
+        assert "principles" in result
+        assert "habits" in result
