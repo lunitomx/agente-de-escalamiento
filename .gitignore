@@ -45,7 +45,9 @@ Thumbs.db
 
 # === Agent directories (auto-synced, not project source) ===
 .agent/
+.agents/
 .hermes/
+.codex/
 
 # === Generated user data (exports, not source) ===
 .scaleup/my-company/exports/
