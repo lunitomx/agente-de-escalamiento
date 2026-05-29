@@ -63,8 +63,8 @@
 
 | Story | Size | Status | Actual | Velocity | Notes |
 |-------|:----:|:------:|:------:|:--------:|-------|
-| S19.1 — Book Parser | L | Pending | — | — | Extrae chapters, concepts, tools, metrics, habits, principles |
-| S19.2 — Entity Ingest | M | Pending | — | — | Crea entidades en GraphEngine con propiedades |
+| S19.1 — Book Parser | L | Done | — | — | Extrae chapters, concepts, tools, metrics, habits, principles |
+| S19.2 — Entity Ingest | M | Done | — | — | Crea entidades en GraphEngine con propiedades |
 | S19.3 — Relationship Builder | M | Pending | — | — | Conecta entidades con relaciones semánticas |
 | S19.4 — Knowledge API | M | Pending | — | — | Endpoints de consulta al grafo |
 | S19.5 — Integrity Tests | S | Pending | — | — | Cobertura contra el libro fuente |
