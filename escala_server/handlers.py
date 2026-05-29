@@ -124,6 +124,118 @@ class SessionsHandler:
         return {"data": session, "status": "ok"}
 
 
+class MemoryHandler:
+    """Handle memory & knowledge graph API (SQLite-backed)."""
+
+    def __init__(self, db_path: str = ":memory:"):
+        from .memory_engine import MemoryEngine
+        from .graph_engine import GraphEngine
+
+        self.memory = MemoryEngine(db_path)
+        self.graph = GraphEngine(db_path)
+
+    # ── fact endpoints ────────────────────────────────────────────
+
+    def list_facts(
+        self,
+        query: str = "",
+        category: str | None = None,
+        tags: str | None = None,
+        min_trust: float = 0.0,
+    ) -> dict:
+        """GET /api/memory/facts — search/list facts."""
+        tag_list = [t.strip() for t in tags.split(",")] if tags else None
+        results = self.memory.search_facts(
+            query=query or "",
+            category=category,
+            tags=tag_list,
+            min_trust=min_trust,
+        )
+        return {"data": results, "status": "ok"}
+
+    def create_fact(self, payload: dict) -> dict:
+        """POST /api/memory/facts — create a fact."""
+        content = payload.get("content", "")
+        if not content:
+            return {"status": "error", "message": "content is required"}
+        fid = self.memory.add_fact(
+            content=content,
+            category=payload.get("category", ""),
+            tags=payload.get("tags", []),
+            source=payload.get("source", ""),
+        )
+        return {"data": {"id": fid}, "status": "ok"}
+
+    def context(self, company_context: dict | None = None) -> dict:
+        """GET /api/memory/context — relevant facts for session context."""
+        facts = self.memory.get_relevant_facts(company_context)
+        return {"data": facts, "status": "ok"}
+
+    # ── entity endpoints ──────────────────────────────────────────
+
+    def get_entity(self, entity_id: int) -> dict:
+        """GET /api/memory/graph/{entity_id} — entity + relationships."""
+        conn = self.memory._conn()
+        row = conn.execute(
+            "SELECT id, type, name, properties, created_at, updated_at "
+            "FROM entities WHERE id = ?",
+            (entity_id,),
+        ).fetchone()
+        if row is None:
+            return {"status": "error", "message": f"Entity {entity_id} not found"}
+
+        entity = {
+            "id": row["id"],
+            "type": row["type"],
+            "name": row["name"],
+            "properties": json.loads(row["properties"]) if row["properties"] else {},
+            "created_at": row["created_at"],
+            "updated_at": row["updated_at"],
+        }
+
+        related = self.graph.get_related_entities(entity_id, depth=1)
+        facts = self.graph.get_entity_facts(entity_id)
+
+        return {
+            "data": {
+                "entity": entity,
+                "related": related,
+                "facts": facts,
+                "fact_count": len(facts),
+            },
+            "status": "ok",
+        }
+
+    def create_entity(self, payload: dict) -> dict:
+        """POST /api/memory/entities — create an entity."""
+        name = payload.get("name", "")
+        if not name:
+            return {"status": "error", "message": "name is required"}
+        eid = self.graph.add_entity(
+            name=name,
+            entity_type=payload.get("type", "generic"),
+            properties=payload.get("properties", {}),
+        )
+        return {"data": {"id": eid}, "status": "ok"}
+
+    def create_relationship(self, payload: dict) -> dict:
+        """POST /api/memory/relationships — create a relationship."""
+        source = payload.get("source_id")
+        target = payload.get("target_id")
+        if source is None or target is None:
+            return {
+                "status": "error",
+                "message": "source_id and target_id are required",
+            }
+        rid = self.graph.add_relationship(
+            source_id=int(source),
+            target_id=int(target),
+            relation_type=payload.get("type", "related_to"),
+            weight=float(payload.get("weight", 1.0)),
+        )
+        return {"data": {"id": rid}, "status": "ok"}
+
+
 # ── helpers ──────────────────────────────────────────────────────────
 
 def _serialise(value: Any) -> str | None:

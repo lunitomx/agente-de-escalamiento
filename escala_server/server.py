@@ -5,6 +5,7 @@ import os
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse, parse_qs
 
 from .cors import CORSHandler
 from .handlers import CompaniesHandler, WorksheetsHandler, SessionsHandler, MemoryHandler
@@ -12,7 +13,7 @@ from .router import Router
 
 
 class EscalaRequestHandler(BaseHTTPRequestHandler):
-    """HTTP request handler that routes to static files or API handlers."""
+    """HTTP request handler that routes to static files or API endpoints."""
 
     # Class-level state (set by make_server)
     static_root: str = ""
@@ -21,12 +22,25 @@ class EscalaRequestHandler(BaseHTTPRequestHandler):
     worksheets: WorksheetsHandler = None  # type: ignore
     sessions: SessionsHandler = None  # type: ignore
     memory: MemoryHandler = None  # type: ignore
+    knowledge_ingester: Any = None  # type: ignore
+    knowledge: Any = None  # type: ignore
 
     def do_GET(self):
         path = self.path
-        # Try API route first
-        handler, params = self.router.dispatch("GET", path)
+        # Parse query string before dispatch
+        parsed = urlparse(path)
+        clean_path = parsed.path
+        query_params: dict[str, str] = {}
+        for k, v in parse_qs(parsed.query).items():
+            query_params[k] = v[0]
+
+        # Try API route first (with clean path, no query string)
+        handler, params = self.router.dispatch("GET", clean_path)
         if handler:
+            # Merge query params into path params (path params take precedence)
+            for key, value in query_params.items():
+                if key not in params:
+                    params[key] = value
             self._send_json_response(handler(**params))
             return
         # Fall back to static file
@@ -157,7 +171,9 @@ def make_server(
         db_path = str(Path.home() / ".escala" / "escala.db")
 
     from .daos import CompanyDAO
+    from .graph_engine import GraphEngine
     from .handlers import WorksheetsHandler, SessionsHandler
+    from .knowledge_handler import KnowledgeHandler
 
     EscalaRequestHandler.static_root = str(Path(static_root).resolve())
     EscalaRequestHandler.router = _build_router()
@@ -165,6 +181,8 @@ def make_server(
     EscalaRequestHandler.worksheets = WorksheetsHandler(db_path)
     EscalaRequestHandler.sessions = SessionsHandler(db_path)
     EscalaRequestHandler.memory = MemoryHandler(db_path)
+    EscalaRequestHandler.knowledge_ingester = _build_knowledge_ingester(db_path)
+    EscalaRequestHandler.knowledge = KnowledgeHandler(GraphEngine(db_path))
 
     server = HTTPServer((host, port), EscalaRequestHandler)
     return server
@@ -254,4 +272,34 @@ def _build_router() -> Router:
     def memory_create_relationship(payload=None):
         return EscalaRequestHandler.memory.create_relationship(payload or {})
 
+    # ── Knowledge ingestion routes ──────────────────────────────
+
+    @router.post("/api/knowledge/ingest")
+    def knowledge_ingest(payload=None):
+        ingester = EscalaRequestHandler.knowledge_ingester
+        json_path = (payload or {}).get("json_path", "escala_server/data/book-knowledge.json")
+        result = ingester.ingest_all(json_path=json_path)
+        return {"data": result, "status": "ok"}
+
+    # ── Knowledge API routes (S19.4) ────────────────────────────
+
+    @router.get("/api/knowledge/search")
+    def knowledge_search(q: str = "", type: str | None = None):
+        return EscalaRequestHandler.knowledge.search(query=q, type_filter=type)
+
+    @router.get("/api/knowledge/entity/{entity_name}")
+    def knowledge_get_entity(entity_name=None):
+        return EscalaRequestHandler.knowledge.get_entity(entity_name)
+
+    @router.get("/api/knowledge/context")
+    def knowledge_context(tool: str | None = None, category: str | None = None):
+        return EscalaRequestHandler.knowledge.get_context(tool=tool, category=category)
+
     return router
+
+
+def _build_knowledge_ingester(db_path: str):
+    """Build a KnowledgeIngester instance for the given db_path."""
+    from .data.knowledge_ingester import KnowledgeIngester
+
+    return KnowledgeIngester(db_path=db_path)

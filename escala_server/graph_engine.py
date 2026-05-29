@@ -251,6 +251,24 @@ class GraphEngine:
         conn.commit()
         return id1
 
+    # ── get_entity_by_name ───────────────────────────────────────────
+
+    def get_entity_by_name(self, name: str) -> dict[str, Any] | None:
+        """Look up an entity by exact name match.
+
+        Returns:
+            Entity dict with id, type, name, properties, or None if not found.
+        """
+        conn = self._conn()
+        row = conn.execute(
+            "SELECT id, type, name, properties, created_at, updated_at "
+            "FROM entities WHERE name = ?",
+            (name,),
+        ).fetchone()
+        if row is None:
+            return None
+        return _entity_to_dict(row)
+
     # ── get_entity_facts ─────────────────────────────────────────────
 
     def get_entity_facts(self, entity_id: int) -> list[dict[str, Any]]:
