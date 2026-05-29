@@ -209,6 +209,75 @@ escala-cierra
 | S18.11 | escala-cierra (Session Close) | S18.8, S18.9 |
 | S18.12 | Installation & Lifecycle | S18.1-S18.11 |
 
+## Implementation Plan
+
+> Added by rai-epic-plan — 2026-05-29
+
+### Story Sequence
+
+| Order | Story | Size | Dependencies | Milestone | Rationale |
+|:-----:|-------|:----:|--------------|-----------|-----------|
+| 1 | S18.1 — Server Core | XL | Ninguna | M1 | Walking skeleton: primero el esqueleto — HTTP, routing, estáticos, CLI. Todo depende de esto. |
+| 2 | S18.3 — Power of One PILOT | L | S18.1 | M1 | Valida el patrón completo: UI ↔ server ↔ persistencia. Sin S18.8 aún — guardado simple en servidor. |
+| 3 | S18.8 — SQLite Layer | XL | S18.1 | M1 | Esquema completo, DAO layer, migración YAML→SQLite. Reemplaza persistencia temporal de S18.3. |
+| 4 | S18.2 — Navigation & Home | M | S18.1 | M1 | Home con 4 tarjetas, breadcrumbs. Necesario para navegar a dashboards. |
+| 5 | S18.5 — Strategy Suite | M | S18.1 | M2 | Core MVP — paralelizable con S18.6, S18.7 |
+| 6 | S18.6 — People Suite | M | S18.1 | M2 | Core MVP — paralelizable con S18.5, S18.7 |
+| 7 | S18.7 — Execution Suite | M | S18.1 | M2 | Core MVP — paralelizable con S18.5, S18.6 |
+| 8 | S18.4 — Cash Suite | M | S18.1, S18.3 | M2 | Hereda patrón del piloto S18.3. Va después de validar el patrón. |
+| 9 | S18.9 — Memory & Graph | L | S18.8 | M3 | Memoria neurosimbólica + grafo. Necesita SQLite primero. |
+| 10 | S18.10 — escala-inicia | M | S18.8, S18.9 | M3 | Paralelizable con S18.11 |
+| 11 | S18.11 — escala-cierra | M | S18.8, S18.9 | M3 | Paralelizable con S18.10 |
+| 12 | S18.12 — Installation & Lifecycle | M | S18.1-S18.11 | M4 | Capstone: migration, docs, health checks. Todo lo demás debe existir. |
+
+### Milestones
+
+| Milestone | Stories | Success Criteria |
+|-----------|---------|------------------|
+| **M1: Walking Skeleton** | S18.1, S18.3, S18.8, S18.2 | `escala-server start` sirve HTMLs. Power of One con sliders que guardan/cargan datos. SQLite con todas las tablas. Navegación Home funciona. |
+| **M2: Core MVP** | +S18.5, S18.6, S18.7, S18.4 | Los 22 dashboards son interactivos con datos desde SQLite. Todos los patrones de edición/persistencia funcionan. |
+| **M3: Memory & Sessions** | +S18.9, S18.10, S18.11 | `escala-inicia` carga contexto con memoria de sesiones previas. `escala-cierra` captura aprendizaje, detecta cambios, actualiza grafo. |
+| **M4: Epic Complete** | +S18.12 | Instalación completa con `install.sh`. Migración YAML→SQLite. Documentación. Health check endpoint. |
+
+### Parallel Work Streams
+
+```
+Time →
+Stream 1 (Foundation):  S18.1 ───► S18.8 ─────────────► S18.9 ──► S18.10/S18.11 ──► S18.12
+                                         ↓
+Stream 2 (Dashboards):  S18.3 ──► S18.2 ──► S18.5/S18.6/S18.7 ──► S18.4
+```
+
+**Merge points:**
+- S18.1 → split: Stream 1 (database) + Stream 2 (dashboards)
+- S18.8/S18.2 → Stream 2 adopta persistencia SQLite
+- S18.9 → Stream 1 continua a sesiones; Stream 2 converge en M2
+
+### Progress Tracking
+
+| Story | Size | Status | Actual | Velocity | Notes |
+|-------|:----:|:------:|:------:|:--------:|-------|
+| S18.1 — Server Core | XL | Pending | — | — | http.server, routing, static, CLI |
+| S18.2 — Navigation & Home | M | Pending | — | — | 4 tarjetas, breadcrumbs, responsive |
+| S18.3 — Power of One PILOT | L | Pending | — | — | Sliders, recálculo, guardado |
+| S18.4 — Cash Suite | M | Pending | — | — | Hereda patrón S18.3 |
+| S18.5 — Strategy Suite | M | Pending | — | — | BMC, Core Customer, Brand Promises |
+| S18.6 — People Suite | M | Pending | — | — | Values, FACe, Team, DISC |
+| S18.7 — Execution Suite | M | Pending | — | — | RH Habits, WWW, Priorities, KPIs |
+| S18.8 — SQLite Layer | XL | Pending | — | — | Schema, DAO, migración YAML |
+| S18.9 — Memory & Graph | L | Pending | — | — | Facts, entities, semantic search |
+| S18.10 — escala-inicia | M | Pending | — | — | Session start orchestrator |
+| S18.11 — escala-cierra | M | Pending | — | — | Session close with learning |
+| S18.12 — Install & Lifecycle | M | Pending | — | — | CLI, migration, docs |
+
+### Sequencing Risks
+
+| Risk | L/I | Mitigation |
+|------|:---:|------------|
+| S18.8 (SQLite) como XL + S18.9 (Memory) como L crean cuello de botella en Stream 1 | H/M | S18.8 y S18.9 se dividen en sub-stories si es necesario. Stream 2 (dashboards) avanza en paralelo mientras. |
+| S18.3 no tiene S18.8 como dependencia — guardado inicial sin SQLite puede requerir refactor | M/L | Diseñar interfaz de persistencia abstracta desde S18.1 para que S18.8 la implemente después. |
+| 22 dashboards existentes (E14-E17) pueden tener dependencias HTML/CSS no documentadas | M/M | Auditoría rápida de dashboards existentes antes de S18.3. |
+
 ## Status: In Progress
 
 ## Done Criteria
