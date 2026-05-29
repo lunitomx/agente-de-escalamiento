@@ -26,7 +26,7 @@ Crear dashboards visuales para las herramientas de la decisión Execution del si
 - **DD2:** Reutilizan el framework visual de E14 (Chart.js + dashboard-base.css)
 - **DD3:** Cada dashboard es single-file HTML, sin build step
 
-## Status: active
+## Status: complete
 
 ### Progress Tracking
 
@@ -38,4 +38,4 @@ Crear dashboards visuales para las herramientas de la decisión Execution del si
 | S17.4 — Balanced KPIs | M | Done | 2026-05-28 | 2026-05-28 | Leading/Lagging + semáforos |
 | S17.5 — Meeting Rhythms | S | Done | 2026-05-28 | 2026-05-28 | Calendario + agendas |
 | S17.6 — Top 25 Influencers | S | Done | 2026-05-28 | 2026-05-28 | Board relaciones |
-| S17.7 — Vision Summary | L | Pending | — | — | Panel unificado |
+| S17.7 — Vision Summary | L | Done | 2026-05-28 | 2026-05-28 | Panel unificado |
