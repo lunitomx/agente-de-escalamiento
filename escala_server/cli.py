@@ -134,7 +134,7 @@ def main():
         "--port", type=int, default=DEFAULT_PORT, help=f"Port (default: {DEFAULT_PORT})"
     )
     start_parser.add_argument(
-        "--static-root", default=".", help="Root directory for static files"
+        "--static-root", default="escala_server/static", help="Root directory for static files"
     )
     start_parser.add_argument(
         "--db-path",

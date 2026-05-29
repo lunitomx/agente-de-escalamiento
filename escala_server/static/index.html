@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Escala — Home | ScaleUp</title>
+  <link rel="stylesheet" href="shared/styles/dashboard-base.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f1f5f9; color: #1e293b; }
+
+    /* Breadcrumbs */
+    .breadcrumbs {
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px 24px; background: white;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 0.85rem;
+    }
+    .breadcrumbs a { color: #64748b; text-decoration: none; cursor: pointer; }
+    .breadcrumbs a:hover { color: #2563eb; }
+    .breadcrumbs .sep { color: #94a3b8; }
+    .breadcrumbs .current { color: #1e293b; font-weight: 600; }
+
+    /* Header */
+    .page-header {
+      padding: 24px 24px 0;
+    }
+    .page-header h1 { font-size: 1.5rem; color: #0f172a; }
+    .page-header p { color: #64748b; font-size: 0.9rem; margin-top: 4px; }
+
+    /* Decision Cards */
+    .decisions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      padding: 24px;
+    }
+    .decision-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      border-left: 4px solid #94a3b8;
+    }
+    .decision-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+    .decision-card .icon { font-size: 1.8rem; margin-bottom: 8px; }
+    .decision-card h2 { font-size: 1.1rem; margin-bottom: 4px; }
+    .decision-card .subtitle { font-size: 0.8rem; color: #64748b; margin-bottom: 12px; }
+    .decision-card .score {
+      font-size: 1.6rem; font-weight: 700;
+    }
+    .decision-card .score.good { color: #16a34a; }
+    .decision-card .score.warning { color: #ca8a04; }
+    .decision-card .score.critical { color: #dc2626; }
+    .decision-card .score.na { color: #94a3b8; }
+    .decision-card .meta {
+      font-size: 0.75rem; color: #94a3b8; margin-top: 8px;
+    }
+
+    .card-cash { border-left-color: #16a34a; }
+    .card-strategy { border-left-color: #2563eb; }
+    .card-people { border-left-color: #d946ef; }
+    .card-execution { border-left-color: #ea580c; }
+
+    /* Tool List */
+    .tools-list {
+      padding: 24px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px;
+    }
+    .tool-item {
+      background: white;
+      border-radius: 8px;
+      padding: 16px;
+      cursor: pointer;
+      transition: background 0.15s;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+      border: 1px solid #e2e8f0;
+    }
+    .tool-item:hover { background: #f8fafc; border-color: #2563eb; }
+    .tool-item h3 { font-size: 0.9rem; margin-bottom: 4px; }
+    .tool-item .status {
+      font-size: 0.8rem;
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+    .tool-item .status.ok { background: #dcfce7; color: #166534; }
+    .tool-item .status.pending { background: #fef9c3; color: #854d0e; }
+
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 16px; margin: 0 24px;
+      background: white; border: 1px solid #e2e8f0;
+      border-radius: 6px; cursor: pointer; font-size: 0.85rem;
+      transition: background 0.15s;
+    }
+    .back-btn:hover { background: #f1f5f9; }
+
+    @media (max-width: 640px) {
+      .decisions-grid { grid-template-columns: 1fr; padding: 16px; }
+      .tools-list { grid-template-columns: 1fr; padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="breadcrumbs" class="breadcrumbs"></div>
+  <div id="content"></div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var DECISIONS = [
+        { id: 'cash',     icon: '\u{1F4B0}', label: 'Cash',     subtitle: 'Flujo de caja y rentabilidad', color: 'card-cash' },
+        { id: 'strategy', icon: '\u{1F3AF}', label: 'Strategy', subtitle: 'Dirección y ventaja competitiva', color: 'card-strategy' },
+        { id: 'people',   icon: '\u{1F465}', label: 'People',   subtitle: 'Equipo y cultura', color: 'card-people' },
+        { id: 'execution',icon: '\u{2699}\u{FE0F}', label: 'Execution', subtitle: 'Ejecución y hábitos', color: 'card-execution' },
+      ];
+
+      var TOOLS = {
+        cash:     ['Power of One', 'Cash Board', 'Fundability', 'Recurring Revenue', 'CCC'],
+        strategy: ['BMC Board', 'Core Customer', 'Brand Promises', 'Diff Activities', 'Sandbox'],
+        people:   ['Core Values', 'FACe', 'Team Growth', 'DISC', 'Love/Loathe', 'Hiring Pipeline'],
+        execution:['Rockefeller Habits', 'WWW', 'Priorities', 'Balanced KPIs', 'Meeting Rhythms', 'Influencers', 'Vision Summary'],
+      };
+
+      var state = { view: 'home', decision: null };
+
+      function render() {
+        renderBreadcrumbs();
+        if (state.view === 'home') renderHome();
+        else if (state.view === 'tools') renderTools();
+      }
+
+      function renderBreadcrumbs() {
+        var el = document.getElementById('breadcrumbs');
+        if (state.view === 'home') {
+          el.innerHTML = '<span class="current">\u{1F3E0} Home</span>';
+        } else {
+          var decision = DECISIONS.find(function(d) { return d.id === state.decision; });
+          el.innerHTML = '<a onclick="navigateHome()">\u{1F3E0} Home</a>' +
+            '<span class="sep">\u203A</span>' +
+            '<span class="current">' + (decision ? decision.label : state.decision) + '</span>';
+        }
+      }
+
+      function renderHome() {
+        var el = document.getElementById('content');
+        var html = '<div class="page-header"><h1>Escala — Panel de Control</h1><p>Selecciona un área para ver sus herramientas</p></div>';
+        html += '<div class="decisions-grid">';
+
+        for (var i = 0; i < DECISIONS.length; i++) {
+          var d = DECISIONS[i];
+          html += '<div class="decision-card ' + d.color + '" onclick="navigateTools(\'' + d.id + '\')">' +
+            '<div class="icon">' + d.icon + '</div>' +
+            '<h2>' + d.label + '</h2>' +
+            '<div class="subtitle">' + d.subtitle + '</div>' +
+            '<div class="score na" id="score-' + d.id + '">--</div>' +
+            '<div class="meta" id="meta-' + d.id + '">Cargando...</div>' +
+            '</div>';
+        }
+        html += '</div>';
+        el.innerHTML = html;
+
+        // Load scores from API
+        for (var j = 0; j < DECISIONS.length; j++) {
+          loadScore(DECISIONS[j].id);
+        }
+      }
+
+      function loadScore(decisionId) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/api/worksheets/' + decisionId, true);
+        xhr.onload = function () {
+          var scoreEl = document.getElementById('score-' + decisionId);
+          var metaEl = document.getElementById('meta-' + decisionId);
+          if (!scoreEl || !metaEl) return;
+
+          if (xhr.status === 200) {
+            try {
+              var resp = JSON.parse(xhr.responseText);
+              if (resp.data && Object.keys(resp.data).length > 0) {
+                scoreEl.textContent = 'Datos OK';
+                scoreEl.className = 'score good';
+                metaEl.textContent = 'Con datos guardados';
+              } else {
+                scoreEl.textContent = 'Sin datos';
+                scoreEl.className = 'score na';
+                metaEl.textContent = 'Completa un worksheet para ver métricas';
+              }
+            } catch (e) {
+              scoreEl.textContent = '--';
+              metaEl.textContent = 'Error al cargar';
+            }
+          } else {
+            scoreEl.textContent = '--';
+            metaEl.textContent = 'Servidor no disponible';
+          }
+        };
+        xhr.onerror = function () {
+          var scoreEl = document.getElementById('score-' + decisionId);
+          var metaEl = document.getElementById('meta-' + decisionId);
+          if (scoreEl) scoreEl.textContent = '--';
+          if (metaEl) metaEl.textContent = 'Error de conexión';
+        };
+        xhr.send();
+      }
+
+      function renderTools() {
+        var el = document.getElementById('content');
+        var tools = TOOLS[state.decision] || [];
+        var decision = DECISIONS.find(function(d) { return d.id === state.decision; });
+        var label = decision ? decision.label : state.decision;
+
+        var html = '<div class="page-header"><h1>' + (decision ? decision.icon : '') + ' ' + label + '</h1><p>Selecciona una herramienta</p></div>';
+        html += '<div class="tools-list">';
+
+        for (var i = 0; i < tools.length; i++) {
+          var toolSlug = tools[i].toLowerCase().replace(/\s+/g, '-');
+          var toolUrl = '/dashboards/' + state.decision + '/' + toolSlug + '.html';
+          html += '<div class="tool-item" onclick="window.location.href=\'' + toolUrl + '\'">' +
+            '<h3>' + tools[i] + '</h3>' +
+            '<span class="status pending">Listo</span>' +
+            '</div>';
+        }
+        html += '</div>';
+        el.innerHTML = html;
+      }
+
+      // Global nav functions (called from onclick)
+      window.navigateHome = function () {
+        state.view = 'home';
+        state.decision = null;
+        render();
+      };
+
+      window.navigateTools = function (decisionId) {
+        state.view = 'tools';
+        state.decision = decisionId;
+        render();
+      };
+
+      // Init
+      render();
+    })();
+  </script>
+</body>
+</html>

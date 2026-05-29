@@ -13,20 +13,29 @@ def main():
 
     from escala_server.server import make_server
 
+    default_db = str(Path.home() / ".escala" / "escala.db")
+
     parser = argparse.ArgumentParser(description="Escala Server")
     parser.add_argument("--host", default="localhost", help="Host to bind to")
     parser.add_argument("--port", type=int, default=8080, help="Port to bind to")
-    parser.add_argument("--static-root", default=".", help="Static files root directory")
+    parser.add_argument("--static-root", default="escala_server/static", help="Static files root directory")
+    parser.add_argument(
+        "--db-path",
+        default=default_db,
+        help=f"SQLite database path (default: {default_db})",
+    )
     args = parser.parse_args()
 
     server = make_server(
         host=args.host,
         port=args.port,
         static_root=args.static_root,
+        db_path=args.db_path,
     )
 
     print(f"Escala Server running on http://{args.host}:{args.port}")
     print(f"Static root: {args.static_root}")
+    print(f"Database: {args.db_path}")
     sys.stdout.flush()
 
     try:
