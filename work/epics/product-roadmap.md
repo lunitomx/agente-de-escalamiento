@@ -36,7 +36,11 @@ E3 (Agent Framework) ──► E6 (Knowledge Ontology) ──► E7 (Agent Intel
 
 E11 (Agente de Escalamiento — repo público) ── DONE
 E12 (Codex Compat — absorbed into E11) ── CANCELLED
-E13 (Auditoría y Cierre) ── IN PROGRESS (2026-05-25)
+E13 (Auditoría y Cierre) ── DONE
+E14 (Cash Dashboards) ── DONE
+E15 (Strategy Dashboards) ── DONE
+E16 (People Dashboards) ── DONE
+E17 (Execution Dashboards) ── DONE
 ```
 
 ---
@@ -53,11 +57,15 @@ E13 (Auditoría y Cierre) ── IN PROGRESS (2026-05-25)
 | E10 — Cross-Platform Dist. | Skills para Claude, Hermes, Codex | ✅ DONE | 9/9 | — |
 | E11 — Agente de Escalamiento | Repo público + anonimización | ✅ DONE | 6/6 | — |
 | E12 — Codex & Auto-Update | Absorbido por E11 | ❌ CANCELLED | — | — |
-| E13 — Auditoría y Cierre | Sanear repo, cerrar epics, fix tests | 🔄 IN PROGRESS | 7/9 | 139 |
+| E13 — Auditoría y Cierre | Sanear repo, cerrar epics, fix tests | ✅ DONE | 9/9 | 139 |
+| E14 — Cash Dashboards | Dashboards visuales Cash (CASh, Power of One, Recurring Revenue, Fundability) | ✅ DONE | 4/4 | — |
+| E15 — Strategy Dashboards | Dashboards visuales Strategy (BMC, Core Customer, Brand Promises, Diff Activities, Sandbox) | ✅ DONE | 5/5 | — |
+| E16 — People Dashboards | Dashboards visuales People (Core Values, FACe, Team Growth, DISC, Love/Loathe, Hiring) | ✅ DONE | 6/6 | — |
+| E17 — Execution Dashboards | Dashboards visuales Execution (Rockefeller, WWW, Priorities, KPIs, Meetings, Influencers, Vision) | ✅ DONE | 7/7 | — |
 
 ## E13 — Auditoría y Cierre
 
-**Status:** 7/9 stories done (2026-05-25)
+**Status:** ✅ DONE (2026-05-25)
 
 | Story | Status | Description |
 |-------|--------|-------------|
@@ -69,9 +77,15 @@ E13 (Auditoría y Cierre) ── IN PROGRESS (2026-05-25)
 | S13.6 | ✅ | Add tests for diagnose, level, router (+34 tests) |
 | S13.7 | ✅ | Sync install.sh to root coaching/ |
 | S13.8 | ✅ | Remove orphaned .scaleup/coaching/ |
-| S13.9 | 🔄 | Update product-roadmap.md |
+| S13.9 | ✅ | Update product-roadmap.md |
 
-## Next After E13
+## E14–E17 — Visual Dashboards (22 stories)
+
+**Status:** ✅ ALL DONE (2026-05-28)
+
+4 épicas completadas en una sesión: Cash (4), Strategy (5), People (6), Execution (7). Framework visual con Chart.js vendored, dashboard-base.css, localStorage persistence. 22 dashboards single-file HTML, sin build step.
+
+## Next
 
 | Initiative | Priority | Rationale |
 |------------|----------|-----------|
@@ -93,5 +107,5 @@ E13 (Auditoría y Cierre) ── IN PROGRESS (2026-05-25)
 
 ---
 
-*Created: 2026-03-17 | Last updated: 2026-05-25*
+*Created: 2026-03-17 | Last updated: 2026-05-28*
 *Status: Active | Owner: Eduardo Muñoz Luna*
