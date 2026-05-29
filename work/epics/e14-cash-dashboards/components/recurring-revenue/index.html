@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'">
+  <title>Recurring Revenue — Health Dashboard | ScaleUp</title>
+  <link rel="stylesheet" href="../shared/styles/dashboard-base.css">
+
+  <style>
+    /* =====================================================================
+       Recurring Revenue Dashboard — Component-specific layout styles
+       (Base tokens come from ../shared/styles/dashboard-base.css)
+       ===================================================================== */
+
+    /* ── Page layout ─────────────────────────────────────────────────── */
+    .page-wrapper {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .page-content {
+      flex: 1;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+      padding: var(--space-xl);
+    }
+
+    /* ── Dashboard header ─────────────────────────────────────────────── */
+    .board-header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e40af 100%);
+      color: white;
+      padding: var(--space-lg) var(--space-xl);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--space-xl);
+    }
+
+    .board-header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-lg);
+      align-items: center;
+    }
+
+    .board-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #93c5fd;
+      margin-bottom: var(--space-xs);
+    }
+
+    .board-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: white;
+      line-height: 1.15;
+    }
+
+    .board-title-accent {
+      color: #93c5fd;
+    }
+
+    /* ── Summary banner ───────────────────────────────────────────────── */
+    .summary-banner {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
+    }
+
+    .summary-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      box-shadow: var(--shadow-sm);
+      text-align: center;
+    }
+
+    .summary-card-value {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--color-text-primary);
+      line-height: 1.1;
+    }
+
+    .summary-card-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--color-text-secondary);
+      margin-top: var(--space-xs);
+    }
+
+    .summary-card.tier-distribution {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tier-dots {
+      display: flex;
+      gap: var(--space-sm);
+      margin-top: var(--space-sm);
+    }
+
+    .tier-dot {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .tier-dot-swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    /* ── Tier grid ────────────────────────────────────────────────────── */
+    .tier-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-lg);
+    }
+
+    /* ── Tier card ────────────────────────────────────────────────────── */
+    .tier-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow var(--transition);
+    }
+
+    .tier-card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .tier-card-header {
+      padding: var(--space-md) var(--space-lg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-md);
+    }
+
+    .tier-card-header-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .tier-badge {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .tier-name {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .tier-count {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+    }
+
+    /* Tier color themes */
+    .tier-exceptional .tier-card-header { border-left: 4px solid var(--color-green); }
+    .tier-exceptional .tier-badge { background: var(--color-green); }
+    .tier-exceptional .tier-name { color: var(--color-green-text); }
+    .tier-exceptional .tier-count { background: var(--color-green-light); color: var(--color-green-text); }
+
+    .tier-solid .tier-card-header { border-left: 4px solid var(--color-brand); }
+    .tier-solid .tier-badge { background: var(--color-brand); }
+    .tier-solid .tier-name { color: #1e3a5f; }
+    .tier-solid .tier-count { background: var(--color-brand-light); color: #1e3a5f; }
+
+    .tier-weak .tier-card-header { border-left: 4px solid var(--color-yellow); }
+    .tier-weak .tier-badge { background: var(--color-yellow); }
+    .tier-weak .tier-name { color: var(--color-yellow-text); }
+    .tier-weak .tier-count { background: var(--color-yellow-light); color: var(--color-yellow-text); }
+
+    .tier-none .tier-card-header { border-left: 4px solid var(--color-red); }
+    .tier-none .tier-badge { background: var(--color-red); }
+    .tier-none .tier-name { color: var(--color-red-text); }
+    .tier-none .tier-count { background: var(--color-red-light); color: var(--color-red-text); }
+
+    /* ── Value Assessment ─────────────────────────────────────────────── */
+    .tier-assessment {
+      padding: var(--space-md) var(--space-lg);
+      border-top: 1px solid var(--color-border);
+      background: var(--color-surface-2);
+    }
+
+    .assessment-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-xs);
+    }
+
+    .assessment-meaning {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      line-height: 1.5;
+      margin-bottom: var(--space-sm);
+    }
+
+    .assessment-action {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-xs);
+    }
+
+    .assessment-action-arrow {
+      color: var(--color-brand);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* ── Customer list ────────────────────────────────────────────────── */
+    .tier-customers {
+      border-top: 1px solid var(--color-border);
+    }
+
+    .customer-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-sm) var(--space-lg);
+      border-bottom: 1px solid var(--color-border);
+      transition: background var(--transition);
+    }
+
+    .customer-row:last-child {
+      border-bottom: none;
+    }
+
+    .customer-row:hover {
+      background: var(--color-surface-2);
+    }
+
+    .customer-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+    }
+
+    .customer-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+    }
+
+    .customer-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      font-family: var(--font-mono);
+    }
+
+    .customer-tenure {
+      font-size: 12px;
+      color: var(--color-text-muted);
+    }
+
+    /* ── Empty state ──────────────────────────────────────────────────── */
+    .tier-empty {
+      padding: var(--space-xl) var(--space-lg);
+      text-align: center;
+      color: var(--color-text-muted);
+      font-size: 13px;
+      font-style: italic;
+    }
+
+    /* ── Footer ───────────────────────────────────────────────────────── */
+    .board-footer {
+      margin-top: var(--space-2xl);
+      padding: var(--space-lg) 0;
+      border-top: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--color-text-muted);
+    }
+
+    /* ── Responsive ───────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .page-content {
+        padding: var(--space-md);
+      }
+
+      .summary-banner {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .tier-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .board-title {
+        font-size: 22px;
+      }
+
+      .customer-meta {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 2px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .summary-banner {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="page-content">
+
+      <!-- ═══════════════════════════════════════════════════════════════ -->
+      <!-- Header                                                          -->
+      <!-- ═══════════════════════════════════════════════════════════════ -->
+      <header class="board-header">
+        <div class="board-header-inner">
+          <div>
+            <div class="board-eyebrow">Cash Decision</div>
+            <h1 class="board-title">Recurring Revenue <span class="board-title-accent">Health</span></h1>
+            <p class="board-meta-text">4-tier hierarchy — None · Weak · Solid · Exceptional</p>
+          </div>
+        </div>
+      </header>
+
+      <!-- ═══════════════════════════════════════════════════════════════ -->
+      <!-- Summary Banner                                                  -->
+      <!-- ═══════════════════════════════════════════════════════════════ -->
+      <div class="summary-banner" id="summary-banner"></div>
+
+      <!-- ═══════════════════════════════════════════════════════════════ -->
+      <!-- Tier Cards Grid                                                 -->
+      <!-- ═══════════════════════════════════════════════════════════════ -->
+      <div class="tier-grid" id="tier-grid"></div>
+
+      <!-- ═══════════════════════════════════════════════════════════════ -->
+      <!-- Footer                                                          -->
+      <!-- ═══════════════════════════════════════════════════════════════ -->
+      <footer class="board-footer">
+        <span>ScaleUp · Escala Cash Dashboards</span>
+        <span>E14 — Recurring Revenue</span>
+      </footer>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- Application Logic                                                  -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <script>
+  (function () {
+    /* ── Injection guard + demo data fallback ────────────────────────── */
+    window.CASH_DATA = window.CASH_DATA || {};
+    window.CASH_DATA.recurringRevenue = window.CASH_DATA.recurringRevenue || {
+      summary: {
+        totalMRR: 45200,
+        customerCount: 12,
+        tierDistribution: { exceptional: 1, solid: 3, weak: 5, none: 3 }
+      },
+      customers: [
+        { name: "Acme Corp",       monthlyValue: 12000, tenureMonths: 36, tier: "exceptional" },
+        { name: "Beta LLC",        monthlyValue: 5200,  tenureMonths: 8,  tier: "solid" },
+        { name: "Epsilon Co",      monthlyValue: 9500,  tenureMonths: 12, tier: "solid" },
+        { name: "Zeta Services",   monthlyValue: 4100,  tenureMonths: 6,  tier: "solid" },
+        { name: "Gamma SA",        monthlyValue: 3100,  tenureMonths: 3,  tier: "weak" },
+        { name: "Delta Inc",       monthlyValue: 1800,  tenureMonths: 1,  tier: "weak" },
+        { name: "Eta Solutions",   monthlyValue: 2200,  tenureMonths: 2,  tier: "weak" },
+        { name: "Theta Group",     monthlyValue: 1500,  tenureMonths: 1,  tier: "weak" },
+        { name: "Iota Digital",    monthlyValue: 2800,  tenureMonths: 4,  tier: "weak" }
+      ]
+    };
+
+    var data = window.CASH_DATA.recurringRevenue;
+
+    /* ── Tier definitions ────────────────────────────────────────────── */
+    var TIER_DEFS = [
+      {
+        id: "exceptional",
+        name: "Exceptional",
+        cssClass: "tier-exceptional",
+        meaning: "Revenue predecible con contratos anuales o multianuales. Baja rotación, alta confianza del cliente. Estos son tus clientes ancla.",
+        action: "Ya estás aquí. Enfócate en retención y expansión (upsell/cross-sell)."
+      },
+      {
+        id: "solid",
+        name: "Solid",
+        cssClass: "tier-solid",
+        meaning: "Revenue estable con contratos semestrales o trimestrales. Riesgo bajo pero aún expuesto a no-renovación. Base sana.",
+        action: "Para avanzar: ofrece descuento por annualización. Convierte contratos trimestrales a anuales."
+      },
+      {
+        id: "weak",
+        name: "Weak",
+        cssClass: "tier-weak",
+        meaning: "Revenue mes a mes sin contratos formales. Alta rotación. Cada mes empiezas desde cero con estos clientes.",
+        action: "Para avanzar: introduce contratos mínimos de 3 meses. Ofrece incentivo por compromiso."
+      },
+      {
+        id: "none",
+        name: "None",
+        cssClass: "tier-none",
+        meaning: "Sin revenue recurrente identificado. Trabajo por proyecto o ventas únicas. No hay previsibilidad de ingresos.",
+        action: "Para avanzar: identifica 1 servicio que puedas convertir a suscripción o retainer mensual."
+      }
+    ];
+
+    /* ── Formatting helpers ──────────────────────────────────────────── */
+    function formatCurrency(n) {
+      return "$" + n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    }
+
+    function formatTenure(months) {
+      if (months >= 12) {
+        var years = Math.floor(months / 12);
+        return years + (years === 1 ? " year" : " years");
+      }
+      return months + (months === 1 ? " month" : " months");
+    }
+
+    /* ── Render summary banner ───────────────────────────────────────── */
+    function renderSummary() {
+      var s = data.summary;
+      var d = s.tierDistribution;
+      var banner = document.getElementById("summary-banner");
+
+      // Clear
+      while (banner.firstChild) { banner.removeChild(banner.firstChild); }
+
+      // MRR card
+      var mrrCard = createSummaryCard(formatCurrency(s.totalMRR), "Total MRR");
+      banner.appendChild(mrrCard);
+
+      // Customers card
+      var custCard = createSummaryCard(String(s.customerCount), "Customers");
+      banner.appendChild(custCard);
+
+      // Tier distribution card
+      var tdCard = document.createElement("div");
+      tdCard.className = "summary-card tier-distribution";
+
+      var tdLabel = document.createElement("div");
+      tdLabel.className = "summary-card-label";
+      tdLabel.textContent = "Tier Distribution";
+      tdCard.appendChild(tdLabel);
+
+      var tdDots = document.createElement("div");
+      tdDots.className = "tier-dots";
+
+      var tierColors = { exceptional: "#16a34a", solid: "#2563eb", weak: "#d97706", none: "#dc2626" };
+      var tierOrder = ["exceptional", "solid", "weak", "none"];
+
+      for (var i = 0; i < tierOrder.length; i++) {
+        var tid = tierOrder[i];
+        var dot = document.createElement("span");
+        dot.className = "tier-dot";
+
+        var swatch = document.createElement("span");
+        swatch.className = "tier-dot-swatch";
+        swatch.setAttribute("style", "background:" + tierColors[tid]);
+        dot.appendChild(swatch);
+
+        var countText = document.createTextNode(String(d[tid] || 0));
+        dot.appendChild(countText);
+
+        tdDots.appendChild(dot);
+      }
+
+      tdCard.appendChild(tdDots);
+      banner.appendChild(tdCard);
+
+      // Tier transition rate card
+      var rateCard = createSummaryCard(
+        d.exceptional + d.solid + " / " + s.customerCount,
+        "Stable (Solid+)"
+      );
+      banner.appendChild(rateCard);
+    }
+
+    function createSummaryCard(value, label) {
+      var card = document.createElement("div");
+      card.className = "summary-card";
+
+      var valEl = document.createElement("div");
+      valEl.className = "summary-card-value";
+      valEl.textContent = value;
+      card.appendChild(valEl);
+
+      var lblEl = document.createElement("div");
+      lblEl.className = "summary-card-label";
+      lblEl.textContent = label;
+      card.appendChild(lblEl);
+
+      return card;
+    }
+
+    /* ── Render tier cards ───────────────────────────────────────────── */
+    function renderTierCards() {
+      var grid = document.getElementById("tier-grid");
+
+      // Clear
+      while (grid.firstChild) { grid.removeChild(grid.firstChild); }
+
+      // Group customers by tier
+      var byTier = { exceptional: [], solid: [], weak: [], none: [] };
+      for (var i = 0; i < data.customers.length; i++) {
+        var c = data.customers[i];
+        var t = c.tier || "none";
+        if (byTier[t]) {
+          byTier[t].push(c);
+        }
+      }
+
+      // Render each tier card
+      for (var t = 0; t < TIER_DEFS.length; t++) {
+        var def = TIER_DEFS[t];
+        var customers = byTier[def.id] || [];
+        grid.appendChild(buildTierCard(def, customers));
+      }
+    }
+
+    function buildTierCard(def, customers) {
+      var card = document.createElement("div");
+      card.className = "tier-card " + def.cssClass;
+
+      // ── Header ─────────────────────────────────────────────────────
+      var header = document.createElement("div");
+      header.className = "tier-card-header";
+
+      var left = document.createElement("div");
+      left.className = "tier-card-header-left";
+
+      var badge = document.createElement("span");
+      badge.className = "tier-badge";
+      left.appendChild(badge);
+
+      var nameEl = document.createElement("span");
+      nameEl.className = "tier-name";
+      nameEl.textContent = def.name;
+      left.appendChild(nameEl);
+
+      header.appendChild(left);
+
+      var countEl = document.createElement("span");
+      countEl.className = "tier-count";
+      countEl.textContent = customers.length;
+      header.appendChild(countEl);
+
+      card.appendChild(header);
+
+      // ── Value Assessment ───────────────────────────────────────────
+      var assessment = document.createElement("div");
+      assessment.className = "tier-assessment";
+
+      var asLabel = document.createElement("div");
+      asLabel.className = "assessment-label";
+      asLabel.textContent = "Value Assessment";
+      assessment.appendChild(asLabel);
+
+      var meaning = document.createElement("div");
+      meaning.className = "assessment-meaning";
+      meaning.textContent = def.meaning;
+      assessment.appendChild(meaning);
+
+      var action = document.createElement("div");
+      action.className = "assessment-action";
+
+      var arrow = document.createElement("span");
+      arrow.className = "assessment-action-arrow";
+      arrow.textContent = "→";
+      action.appendChild(arrow);
+
+      var actionText = document.createElement("span");
+      actionText.textContent = def.action;
+      action.appendChild(actionText);
+
+      assessment.appendChild(action);
+      card.appendChild(assessment);
+
+      // ── Customer list ──────────────────────────────────────────────
+      var custSection = document.createElement("div");
+      custSection.className = "tier-customers";
+
+      if (customers.length === 0) {
+        var empty = document.createElement("div");
+        empty.className = "tier-empty";
+        empty.textContent = "No customers in this tier";
+        custSection.appendChild(empty);
+      } else {
+        for (var i = 0; i < customers.length; i++) {
+          var c = customers[i];
+          var row = document.createElement("div");
+          row.className = "customer-row";
+
+          var cName = document.createElement("span");
+          cName.className = "customer-name";
+          cName.textContent = c.name;
+          row.appendChild(cName);
+
+          var meta = document.createElement("div");
+          meta.className = "customer-meta";
+
+          var val = document.createElement("span");
+          val.className = "customer-value";
+          val.textContent = formatCurrency(c.monthlyValue);
+          meta.appendChild(val);
+
+          var tenure = document.createElement("span");
+          tenure.className = "customer-tenure";
+          tenure.textContent = formatTenure(c.tenureMonths || 0);
+          meta.appendChild(tenure);
+
+          row.appendChild(meta);
+          custSection.appendChild(row);
+        }
+      }
+
+      card.appendChild(custSection);
+
+      return card;
+    }
+
+    /* ── Init ─────────────────────────────────────────────────────────── */
+    renderSummary();
+    renderTierCards();
+
+  })();
+  </script>
+</body>
+</html>
