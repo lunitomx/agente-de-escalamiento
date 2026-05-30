@@ -88,7 +88,7 @@ Stream 3 (Paralelo):         S21.6 ───────────────
 | S21.2 — Consulta directa | M | Done | ~20m | 1.0 | ✅ Handler + API + CLI, 12 tests |
 | S21.3 — Revisión de dailys | M | Done | ~10m | 1.0 | ✅ review_daily(), 5-element checklist, 15 tests |
 | S21.4 — Integración ciclo sesión | S | Done | ~8m | 1.0 | ✅ session_perspective() en cmd_cierra, 18 tests |
-| S21.5 — Modo board completo | M | Pending | — | — | Debate multi-turno con contexto acumulado |
+| S21.5 — Modo board completo | M | Done | ~12m | 1.0 | ✅ board_debate() multi-turno, 4D analysis, 21 tests |
 | S21.6 — Tests de coherencia | S | Pending | — | — | Tests contra libro: preguntas conocidas, respuestas esperadas |
 
 ### Sequencing Risks
