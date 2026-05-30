@@ -86,7 +86,7 @@ Stream 3 (Paralelo):         S21.6 ───────────────
 |-------|:----:|:------:|:------:|:--------:|-------|
 | S21.1 — Alma de Verne | S | Done | ~15m | 1.0 | ✅ `miembro-board/verne-harnish.md` — 266 líneas, 43 entidades del grafo |
 | S21.2 — Consulta directa | M | Done | ~20m | 1.0 | ✅ Handler + API + CLI, 12 tests |
-| S21.3 — Revisión de dailys | M | Pending | — | — | Endpoint `POST /api/verne/review-daily` + CLI |
+| S21.3 — Revisión de dailys | M | Done | ~10m | 1.0 | ✅ review_daily(), 5-element checklist, 15 tests |
 | S21.4 — Integración ciclo sesión | S | Pending | — | — | Hook en cierre de sesión para perspectiva de Verne |
 | S21.5 — Modo board completo | M | Pending | — | — | Debate multi-turno con contexto acumulado |
 | S21.6 — Tests de coherencia | S | Pending | — | — | Tests contra libro: preguntas conocidas, respuestas esperadas |
