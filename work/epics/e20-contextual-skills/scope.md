@@ -22,10 +22,10 @@
 - HTML/JS de dashboards existentes
 
 ## Done Criteria
-- [ ] GET /api/knowledge/context?tool=X devuelve entidades, relaciones y hechos relevantes
-- [ ] Panel de contexto visible en los 22 dashboards
-- [ ] Skills pueden consultar contexto por categoría (cash, strategy, people, execution)
-- [ ] Tests de integración: cada dashboard recibe contexto correcto
+- [x] GET /api/knowledge/context?tool=X devuelve entidades, relaciones y hechos relevantes
+- [x] Panel de contexto visible en los 22 dashboards
+- [x] Skills pueden consultar contexto por categoría (cash, strategy, people, execution)
+- [x] Tests de integración: cada dashboard recibe contexto correcto
 
 ## Implementation Plan
 
@@ -63,3 +63,6 @@
 | Grafo de E19 no poblado o schema distinto al esperado | H/M | Verificar estado real del grafo antes de empezar S20.1 |
 | 22 dashboards tienen HTML inconsistente | M/M | Crear componente reutilizable, adaptar por módulo |
 | Skills de coaching no existen aún como módulo importable | L/L | Helper como función standalone, no como skill plugin |
+
+> **Cerrada formalmente.** Auditada el 2026-05-29: 4/4 historias implementadas, 34/34 tests pasando.
+> Done criteria verificados contra código. Close commit y tag creados.
