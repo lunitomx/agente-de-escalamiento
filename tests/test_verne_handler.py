@@ -95,3 +95,32 @@ class TestVerneHandler:
         answer = result["answer"]
         # Should reference at least the entity found
         assert len(result.get("entities_used", [])) >= 0
+
+    # ── review_daily tests ─────────────────────────────────────────
+
+    def test_review_daily_complete(self, handler):
+        """A complete daily gets high score."""
+        result = handler.review_daily(
+            "Ayer logré cerrar 2 ventas. Hoy voy a llamar a 5 leads. "
+            "Mi obstáculo es que el CRM no actualiza. KPI: 10 llamadas/día. "
+            "Esto conecta con nuestra Prioridad #1 del trimestre."
+        )
+        assert result["status"] == "ok"
+        assert result["score_percent"] >= 80
+        assert "Logros de ayer" in result["elements_found"]
+        assert "Prioridades de hoy" in result["elements_found"]
+        assert "Obstáculos" in " ".join(result["elements_found"])
+
+    def test_review_daily_incomplete(self, handler):
+        """A sparse daily gets low score."""
+        result = handler.review_daily("Hoy tengo reuniones todo el día.")
+        assert result["status"] == "ok"
+        assert result["score_percent"] < 50
+        assert len(result["elements_missing"]) >= 3
+
+    def test_review_daily_empty(self, handler):
+        """Empty daily returns 0 score."""
+        result = handler.review_daily("")
+        assert result["status"] == "ok"
+        assert result["score"] == 0
+        assert result["score_percent"] == 0

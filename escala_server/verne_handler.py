@@ -113,6 +113,43 @@ _VERNE_TEMPLATES: dict[str, dict[str, Any]] = {
     },
 }
 
+# ── Daily review checklist (Rockefeller Habits) ──────────────────────
+
+_DAILY_CHECKLIST: dict[str, dict[str, Any]] = {
+    "logros_ayer": {
+        "keywords": ["ayer", "logré", "completé", "terminé", "hicimos", "achieved", "yesterday"],
+        "label": "Logros de ayer",
+        "weight": 3,
+        "message_missing": "No veo qué se logró ayer. El Daily Huddle empieza con los logros del día anterior — 60 segundos, sin excusas.",
+    },
+    "prioridades_hoy": {
+        "keywords": ["hoy", "voy a", "haré", "prioridad", "planeo", "today", "plan"],
+        "label": "Prioridades de hoy",
+        "weight": 3,
+        "message_missing": "¿Cuáles son tus 1-3 prioridades para hoy? Sin eso, el huddle es solo una reunión más.",
+    },
+    "obstaculos": {
+        "keywords": ["obstáculo", "bloqueo", "problema", "atasco", "necesito ayuda", "stuck", "blocker", "issue", "ayuda"],
+        "label": "Obstáculos / bloqueos",
+        "weight": 2,
+        "message_missing": "No mencionaste obstáculos. Recuerda: *bad news early is good news*. ¿Hay algo en lo que necesites ayuda?",
+    },
+    "metricas": {
+        "keywords": ["kpi", "métrica", "número", "indicador", "scoreboard", "dato", "data", "metric", "kpi"],
+        "label": "Métricas / KPIs",
+        "weight": 2,
+        "message_missing": "No veo métricas en tu daily. El scoreboard es lo que hace que un huddle sea productivo. ¿Cuál es tu KPI prioritario?",
+    },
+    "prioridad_1": {
+        "keywords": ["prioridad #1", "critical number", "tema del trimestre", "priority #1", "number one", "theme"],
+        "label": "Conexión con Prioridad #1 del trimestre",
+        "weight": 2,
+        "message_missing": "No vinculaste tu daily con la Prioridad #1 del trimestre. Rockefeller Habit: todo debe conectar con la línea de meta de 90 días.",
+    },
+}
+
+_MAX_SCORE = sum(item["weight"] for item in _DAILY_CHECKLIST.values())
+
 
 class VerneHandler:
     """Handle Verne-style answers to business questions."""
@@ -160,6 +197,73 @@ class VerneHandler:
             "entities_used": [e["name"] for e in entities],
             "entity_count": len(entities),
             "principles_applied": template.get("principles", []),
+            "status": "ok",
+        }
+
+    # ── daily review ───────────────────────────────────────────────────
+
+    def review_daily(self, daily_text: str) -> dict:
+        """Review a daily huddle summary against Rockefeller Habits.
+
+        Args:
+            daily_text: The daily huddle summary text (free form or JSON).
+
+        Returns:
+            dict with score, score_percent, elements_found, elements_missing,
+            observations, and status.
+        """
+        text_lower = daily_text.lower()
+        found: list[str] = []
+        missing: list[str] = []
+        score = 0
+
+        for item_id, item in _DAILY_CHECKLIST.items():
+            if any(kw in text_lower for kw in item["keywords"]):
+                found.append(item["label"])
+                score += item["weight"]
+            else:
+                missing.append(item["label"])
+
+        score_percent = round((score / _MAX_SCORE) * 100)
+
+        # Build observations
+        observations: list[str] = []
+        observations.append(f"**Puntuación Rockefeller:** {score}/{_MAX_SCORE} ({score_percent}%)")
+
+        if score_percent >= 80:
+            observations.append("✅ Buen daily. Tienes los elementos clave. Sigue así.")
+        elif score_percent >= 50:
+            observations.append("⚠️ Daily incompleto. Tienes lo básico pero faltan elementos clave.")
+        else:
+            observations.append("❌ Esto no es un Daily Huddle. Es una lista de tareas.")
+
+        if found:
+            observations.append(f"\n**Presente:** {', '.join(f'✅ {f}' for f in found)}")
+        if missing:
+            observations.append(f"\n**Ausente:**")
+            for item_id in [k for k in _DAILY_CHECKLIST if _DAILY_CHECKLIST[k]["label"] in missing]:
+                observations.append(f"  - ❌ {_DAILY_CHECKLIST[item_id]['message_missing']}")
+
+        # Verne's closing
+        if missing:
+            observations.append(
+                "\n*Un daily sin estructura no es un huddle — es ruido. "
+                "15 minutos. De pie. Logros de ayer, prioridades de hoy, obstáculos. "
+                "Eso es todo.*"
+            )
+        else:
+            observations.append(
+                "\n*Eso es un Daily Huddle de verdad. 15 minutos bien invertidos. "
+                "Ahora: ¿qué vas a hacer con esto?*"
+            )
+
+        return {
+            "score": score,
+            "score_max": _MAX_SCORE,
+            "score_percent": score_percent,
+            "elements_found": found,
+            "elements_missing": missing,
+            "observations": "\n".join(observations),
             "status": "ok",
         }
 

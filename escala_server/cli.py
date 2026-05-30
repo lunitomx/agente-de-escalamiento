@@ -190,6 +190,11 @@ def main():
     verne_ask_parser.add_argument("--db-path", default=str(Path.home() / ".escala" / "escala.db"),
                                   help="SQLite database path")
 
+    verne_review_parser = verne_sub.add_parser("review-daily", help="Revisar un daily huddle")
+    verne_review_parser.add_argument("daily_text", nargs="+", help="Texto del daily huddle")
+    verne_review_parser.add_argument("--db-path", default=str(Path.home() / ".escala" / "escala.db"),
+                                     help="SQLite database path")
+
     args = parser.parse_args()
 
     if args.command == "start":
@@ -259,9 +264,17 @@ def cmd_verne(args):
         if result.get("principles_applied"):
             print(f"⚖️  Principios: {', '.join(result['principles_applied'])}")
         print(f"🏷️  Categoría: {result.get('category', 'general')}".capitalize())
+    elif args.verne_command == "review-daily":
+        daily_text = " ".join(args.daily_text)
+        handler = VerneHandler(args.db_path)
+        result = handler.review_daily(daily_text)
+        print()
+        print(result.get("observations", ""))
+        print()
     else:
-        print("Comandos de Verne: ask")
+        print("Comandos de Verne: ask, review-daily")
         print("  escala verne ask \"tu pregunta\"")
+        print("  escala verne review-daily \"ayer logré X, hoy haré Y, obstáculo Z\"")
 
 
 if __name__ == "__main__":
