@@ -103,7 +103,7 @@ habla contigo, usa skills, guarda en markdown, genera HTML cuando lo necesitas.
 | Story | Size | Status | Notes |
 |-------|:----:|:------:|-------|
 | S23.1 — Package Structure | M | ✅ Done | AGENTS.md + setup.sh + estructura |
-| S23.2 — Setup Script | S | Pending | — |
+| S23.2 — Setup Script | S | ✅ Done | curl | bash + auto-detección + ~/.escala/ |
 | S23.3 — Memoria Core | M | Pending | — |
 | S23.4 — Búsqueda y síntesis | M | Pending | — |
 | S23.5 — Dashboard Generado | M | Pending | — |
