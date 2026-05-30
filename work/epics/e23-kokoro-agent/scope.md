@@ -110,7 +110,7 @@ habla contigo, usa skills, guarda en markdown, genera HTML cuando lo necesitas.
 | S23.6 — escala-cash refactor | M | ✅ Done | Agent-based en escala-agent/skills/escala-cash/ |
 | S23.7 — escala-strategy refactor | M | ✅ Done | Agent-based OPSP + 7 Estratos + SWOT |
 | S23.8 — escala-people refactor | M | ✅ Done | FACChart + Values + Topgrading |
-| S23.9 — escala-execution refactor | M | Pending | — |
+| S23.9 — escala-execution refactor | M | ✅ Done | Habits + Rhythms + Priorities |
 | S23.10 — Identidad Core | S | Pending | — |
 | S23.11 — MCP Server opcional | S | Pending | — |
 
