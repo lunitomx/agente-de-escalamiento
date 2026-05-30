@@ -352,6 +352,127 @@ class VerneHandler:
             "status": "ok",
         }
 
+    # ── board debate ───────────────────────────────────────────────────
+
+    def board_debate(
+        self,
+        decision: str,
+        context: str | None = None,
+        history: list[dict[str, str]] | None = None,
+    ) -> dict:
+        """Board-level debate on a strategic decision.
+
+        First turn (no history): analyze the decision across all 4 Decisions.
+        Subsequent turns (with history): challenge the user's position.
+
+        Args:
+            decision: Strategic decision to debate.
+            context:  Optional company context.
+            history:  Prior turns [{user: ..., verne: ...}, ...].
+
+        Returns:
+            dict with response, turn_number, next_questions, and status.
+        """
+        turn = len(history) if history else 0
+        lines: list[str] = []
+        decision_category = self._classify_question(decision)
+
+        if turn == 0:
+            # First turn: full board analysis
+            company_line = f" de **{context}**" if context else ""
+            lines.append(
+                f"**Verne** (modo board{company_line}):\n"
+                f"Analicemos esta decisión con las **4 Decisiones**:\n"
+            )
+
+            # People check
+            lines.append(
+                "**People:** ¿Quién liderará esto? ¿Tienes a la persona correcta "
+                "en el asiento? Sin un A-player responsable, el mejor plan fracasa."
+            )
+            # Strategy check
+            lines.append(
+                "**Strategy:** ¿Esta decisión está alineada con tu Core Customer "
+                "y Brand Promise? ¿O te estás desviando de tu diferenciación?"
+            )
+            # Execution check  
+            lines.append(
+                "**Execution:** ¿Tienes el ritmo para darle seguimiento? Una decisión "
+                "sin WWW (*Who does What by When*) es solo una intención."
+            )
+            # Cash check
+            lines.append(
+                "**Cash:** ¿Cómo impacta esto tu flujo de efectivo? ¿Cuánto oxígeno "
+                "tienes para esto? *No Surprises.*"
+            )
+
+            lines.append("")
+            lines.append("Ahora respóndeme esta: ¿cuál de estas 4 áreas te preocupa más?")
+            lines.append("")
+
+            next_questions = [
+                "¿Quién liderará esto y qué experiencia tiene?",
+                "¿Cómo se alinea con tu Core Customer?",
+                "¿Qué métricas usarás para medir éxito?",
+                "¿Cuánto efectivo requiere y de dónde sale?",
+            ]
+        else:
+            # Subsequent turn: respond to the user's last point
+            last_user = history[-1].get("user", "") if history else ""
+            lines.append(f"**Verne:**\n")
+
+            user_category = self._classify_question(last_user) if last_user else "general"
+
+            # Acknowledge
+            lines.append(
+                f"Entiendo tu punto. Analicémoslo desde **{decision_category.title()}**:\n"
+            )
+
+            # Challenge based on category
+            challenges = {
+                "people": (
+                    "Has hablado de personas. Pero recuerda: *Healthy Conflict* es necesario. "
+                    "¿Estás dispuesto a tener la conversación incómoda que esto requiere?"
+                ),
+                "strategy": (
+                    "Hablas de estrategia. Pero la estrategia sin Core Customer definido "
+                    "es dirección sin mapa. ¿Tu Core Customer sigue siendo el mismo?"
+                ),
+                "execution": (
+                    "Te enfocas en ejecución. *Routine Sets You Free* — ¿qué ritmo "
+                    "vas a poner en marcha para que esto no quede en el aire?"
+                ),
+                "cash": (
+                    "Cash es lo que siempre pongo primero. *Power of One* — ¿cuál "
+                    "de las 7 palancas te va a dar el mayor impacto aquí?"
+                ),
+                "general": (
+                    "Mire, todo se reduce a una cosa: ¿esto acerca o aleja a tu empresa "
+                    "de tu BHAG? Si no sabes cuál es tu BHAG, esa es la conversación "
+                    "que deberíamos tener."
+                ),
+            }
+
+            lines.append(challenges.get(user_category, challenges["general"]))
+            lines.append("")
+
+            next_questions = [
+                "¿Qué evidencia tienes de que esto funcionará?",
+                "¿Qué pasaría si no haces nada?",
+                "¿Quién más en tu equipo debería estar en esta conversación?",
+            ]
+
+        lines.append("")
+        lines.append("*¿Qué opinas de mi análisis? Sigue debatiendo.*")
+
+        return {
+            "response": "\n".join(lines),
+            "turn": turn + 1,
+            "category": decision_category,
+            "next_questions": next_questions,
+            "status": "ok",
+        }
+
     # ── internal methods ──────────────────────────────────────────────
 
     def _classify_question(self, question: str) -> str:

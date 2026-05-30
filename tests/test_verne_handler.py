@@ -145,3 +145,31 @@ class TestVerneHandler:
         result = handler.session_perspective(category="people", changes_count=3, company="Acme")
         assert "Acme" in result["perspective"]
         assert "People" in result["perspective"]
+
+    # ── board_debate tests ────────────────────────────────────────
+
+    def test_board_debate_first_turn(self, handler):
+        """First turn analyzes across 4 Decisions."""
+        result = handler.board_debate("Deberíamos abrir una nueva oficina")
+        assert result["status"] == "ok"
+        assert result["turn"] == 1
+        assert "People" in result["response"]
+        assert "Strategy" in result["response"]
+        assert "Cash" in result["response"]
+        assert len(result["next_questions"]) == 4
+
+    def test_board_debate_second_turn(self, handler):
+        """Second turn challenges the user's position."""
+        history = [{"user": "Creo que tenemos el equipo para esto", "verne": "... análisis ..."}]
+        result = handler.board_debate(
+            "Deberíamos abrir una nueva oficina",
+            history=history,
+        )
+        assert result["status"] == "ok"
+        assert result["turn"] == 2
+        assert len(result["next_questions"]) == 3
+
+    def test_board_debate_with_context(self, handler):
+        """Company context appears in first turn."""
+        result = handler.board_debate("Expandir producto", context="Acme Corp")
+        assert "Acme Corp" in result["response"]
