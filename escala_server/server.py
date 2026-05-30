@@ -22,8 +22,9 @@ class EscalaRequestHandler(BaseHTTPRequestHandler):
     worksheets: WorksheetsHandler = None  # type: ignore
     sessions: SessionsHandler = None  # type: ignore
     memory: MemoryHandler = None  # type: ignore
-    knowledge_ingester: Any = None  # type: ignore
-    knowledge: Any = None  # type: ignore
+    knowledge_ingester: Any = None  # type: ignore[annotation-unchecked]
+    knowledge: Any = None  # type: ignore[annotation-unchecked]
+    verne: Any = None  # type: ignore[annotation-unchecked]
 
     def do_GET(self):
         path = self.path
@@ -174,6 +175,7 @@ def make_server(
     from .graph_engine import GraphEngine
     from .handlers import WorksheetsHandler, SessionsHandler
     from .knowledge_handler import KnowledgeHandler
+    from .verne_handler import VerneHandler
 
     EscalaRequestHandler.static_root = str(Path(static_root).resolve())
     EscalaRequestHandler.router = _build_router()
@@ -183,6 +185,7 @@ def make_server(
     EscalaRequestHandler.memory = MemoryHandler(db_path)
     EscalaRequestHandler.knowledge_ingester = _build_knowledge_ingester(db_path)
     EscalaRequestHandler.knowledge = KnowledgeHandler(GraphEngine(db_path))
+    EscalaRequestHandler.verne = VerneHandler(db_path)
 
     server = HTTPServer((host, port), EscalaRequestHandler)
     return server
@@ -294,6 +297,18 @@ def _build_router() -> Router:
     @router.get("/api/knowledge/context")
     def knowledge_context(tool: str | None = None, category: str | None = None):
         return EscalaRequestHandler.knowledge.get_context(tool=tool, category=category)
+
+    # ── Verne routes (S21.2) ──────────────────────────────────────
+
+    @router.post("/api/verne/ask")
+    def verne_ask(payload=None):
+        question = (payload or {}).get("question", "")
+        context = (payload or {}).get("context")
+        return EscalaRequestHandler.verne.ask(question=question, context=context)
+
+    @router.get("/api/verne/ask")
+    def verne_ask_get(q: str = ""):
+        return EscalaRequestHandler.verne.ask(question=q)
 
     return router
 
