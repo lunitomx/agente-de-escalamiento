@@ -192,13 +192,13 @@
 
       // ── Default variables ────────────────────────────────────────────────
       var defaultVariables = {
-        price:     { label: 'Precio por Unidad',    category: 'revenue',        unit: '$', current: 0, adjusted: 0 },
-        volume:    { label: 'Volumen (unidades)',    category: 'revenue',        unit: 'u', current: 0, adjusted: 0 },
-        cogs:      { label: 'COGS %',               category: 'cost',           unit: '%', current: 0, adjusted: 0 },
-        overheads: { label: 'Gastos Generales',      category: 'cost',           unit: '$', current: 0, adjusted: 0 },
-        ar_days:   { label: 'Días A/R',             category: 'working_capital', unit: 'd', current: 0, adjusted: 0 },
-        inv_days:  { label: 'Días Inventario',       category: 'working_capital', unit: 'd', current: 0, adjusted: 0 },
-        ap_days:   { label: 'Días A/P',             category: 'working_capital', unit: 'd', current: 0, adjusted: 0 }
+        price:     { label: 'Precio por Unidad',    category: 'revenue',        unit: '$', current: 120, adjusted: 120 },
+        volume:    { label: 'Volumen mensual',       category: 'revenue',        unit: 'u', current: 10000, adjusted: 10000 },
+        cogs:      { label: 'COGS %',               category: 'cost',           unit: '%', current: 55, adjusted: 55 },
+        overheads: { label: 'Gastos Fijos Mensuales',category: 'cost',           unit: '$', current: 85000, adjusted: 85000 },
+        ar_days:   { label: 'Días Cuentas por Cobrar',category: 'working_capital', unit: 'd', current: 30, adjusted: 30 },
+        inv_days:  { label: 'Días Inventario',       category: 'working_capital', unit: 'd', current: 15, adjusted: 15 },
+        ap_days:   { label: 'Días Cuentas por Pagar',category: 'working_capital', unit: 'd', current: 20, adjusted: 20 }
       };
 
       var VARIABLE_KEYS = ['price', 'volume', 'cogs', 'overheads', 'ar_days', 'inv_days', 'ap_days'];
