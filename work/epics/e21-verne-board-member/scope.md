@@ -84,7 +84,7 @@ Stream 3 (Paralelo):         S21.6 ───────────────
 
 | Story | Size | Status | Actual | Velocity | Notes |
 |-------|:----:|:------:|:------:|:--------:|-------|
-| S21.1 — Alma de Verne | S | Pending | — | — | Crear `miembro-board/verne-harnish.md` con framework, preguntas, lente, sesgos, principios |
+| S21.1 — Alma de Verne | S | Done | ~15m | 1.0 | ✅ `miembro-board/verne-harnish.md` — 266 líneas, 43 entidades del grafo |
 | S21.2 — Consulta directa | M | Pending | — | — | Handler Verne + endpoint `/api/verne/ask` + CLI `escala verne ask` |
 | S21.3 — Revisión de dailys | M | Pending | — | — | Endpoint `POST /api/verne/review-daily` + CLI |
 | S21.4 — Integración ciclo sesión | S | Pending | — | — | Hook en cierre de sesión para perspectiva de Verne |
