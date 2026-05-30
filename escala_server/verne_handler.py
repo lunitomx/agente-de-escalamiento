@@ -417,6 +417,13 @@ class VerneHandler:
         Returns:
             dict with response, turn_number, next_questions, and status.
         """
+        if not decision or not decision.strip():
+            return {
+                "status": "error",
+                "message": ("No decision provided. Verne necesita una decisión para debatir.\n"
+                            "Ej: escala verne debate \"deberíamos abrir un nuevo local\""),
+            }
+
         turn = len(history) if history else 0
         lines: list[str] = []
         decision_category = self._classify_question(decision)
@@ -463,7 +470,11 @@ class VerneHandler:
         else:
             # Subsequent turn: respond to the user's last point
             last_user = history[-1].get("user", "") if history else ""
+
+            # Build a reference to what the user said (M3)
+            last_user_short = (last_user[:80] + "...") if len(last_user) > 80 else last_user
             lines.append(f"**Verne:**\n")
+            lines.append(f"Sobre lo que dices: *\"{last_user_short}\"* — déjame darte mi perspectiva.\n")
 
             user_category = self._classify_question(last_user) if last_user else "general"
 
