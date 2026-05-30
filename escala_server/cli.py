@@ -244,6 +244,17 @@ def cmd_cierra(args):
     print(f"  Changes: {result.changes_count}")
     print(f"  New facts: {result.new_facts_count}")
     print(f"  Summary: {result.summary}")
+    print()
+
+    # Verne's perspective (S21.4)
+    from escala_server.verne_handler import VerneHandler
+    verne = VerneHandler(args.db_path)
+    vp = verne.session_perspective(
+        category=getattr(result, "category", None),
+        changes_count=result.changes_count,
+        company=getattr(result, "company", None),
+    )
+    print(vp.get("perspective", ""))
 
 
 def cmd_verne(args):

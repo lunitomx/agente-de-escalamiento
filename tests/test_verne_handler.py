@@ -124,3 +124,24 @@ class TestVerneHandler:
         assert result["status"] == "ok"
         assert result["score"] == 0
         assert result["score_percent"] == 0
+
+    # ── session_perspective tests ──────────────────────────────────
+
+    def test_session_perspective_cash(self, handler):
+        """Cash session returns cash principle."""
+        result = handler.session_perspective(category="cash", changes_count=5)
+        assert result["status"] == "ok"
+        assert "Cash" in result["perspective"]
+        assert "Power of One" in result["perspective"]
+
+    def test_session_perspective_no_changes(self, handler):
+        """Session with no changes gets reflection comment."""
+        result = handler.session_perspective(category="strategy", changes_count=0)
+        assert result["status"] == "ok"
+        assert "reflexión" in result["perspective"]
+
+    def test_session_perspective_with_company(self, handler):
+        """Company name appears in perspective."""
+        result = handler.session_perspective(category="people", changes_count=3, company="Acme")
+        assert "Acme" in result["perspective"]
+        assert "People" in result["perspective"]

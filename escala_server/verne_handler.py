@@ -267,6 +267,91 @@ class VerneHandler:
             "status": "ok",
         }
 
+    # ── session perspective ────────────────────────────────────────────
+
+    _SESSION_PRINCIPLES = {
+        "people": (
+            "Trabajaste **People**. Recuerda: *Delegate and Predict*. "
+            "El trabajo de un líder es desarrollar a otros para que puedan predecir resultados. "
+            "Pregunta para la próxima: ¿tus A-players están en los asientos correctos?"
+        ),
+        "strategy": (
+            "Trabajaste **Strategy**. Recuerda: *Same Page*. "
+            "La estrategia más brillante no vale nada si no está en una página que todos entiendan. "
+            "Pregunta para la próxima: ¿tu OPSP refleja lo que acabas de decidir?"
+        ),
+        "execution": (
+            "Trabajaste **Execution**. Recuerda: *Routine Sets You Free*. "
+            "No se trata de trabajar más duro — se trata de tener el ritmo correcto. "
+            "Pregunta para la próxima: ¿tu Daily Huddle refleja estas prioridades?"
+        ),
+        "cash": (
+            "Trabajaste **Cash**. Recuerda: *No Surprises*. "
+            "El efectivo es el oxígeno del negocio. Lo que no se mide no se gestiona. "
+            "Pregunta para la próxima: ¿qué palanca del Power of One vas a mover esta semana?"
+        ),
+    }
+
+    _SESSION_CLOSINGS = [
+        "Buen trabajo. La ejecución no es un evento — es un hábito diario.",
+        "Sigue así. Recuerda: las empresas no crecen por casualidad, crecen por disciplina.",
+        "El camino es simple, no fácil. Pero tienes las herramientas. Úsalas.",
+        "Una sesión productiva. Ahora: ¿qué vas a hacer DIFERENTE mañana?",
+    ]
+
+    def session_perspective(
+        self,
+        category: str | None = None,
+        changes_count: int = 0,
+        company: str | None = None,
+    ) -> dict:
+        """Provide Verne's board member perspective at session close.
+
+        Args:
+            category:      The category worked on (cash/strategy/people/execution).
+            changes_count: How many changes were made in the session.
+            company:       Optional company name.
+
+        Returns:
+            dict with perspective (text), principle_applied, and status.
+        """
+        import random
+
+        parts: list[str] = []
+        company_line = f"de **{company}**" if company else ""
+        parts.append(
+            f"**Verne** (perspectiva de board {company_line}):\n"
+        )
+
+        # Opening
+        if changes_count > 0:
+            parts.append(
+                f"Veo que hiciste {changes_count} cambio(s) en esta sesión. "
+                "El movimiento es bueno — pero asegúrate de que sea movimiento hacia adelante.\n"
+            )
+        else:
+            parts.append(
+                "Esta sesión fue más de reflexión que de acción. "
+                "Nada de malo con eso — siempre y cuando la próxima sea de ejecución.\n"
+            )
+
+        # Category-specific principle
+        if category and category in self._SESSION_PRINCIPLES:
+            parts.append(self._SESSION_PRINCIPLES[category])
+
+        parts.append("")
+
+        # Closing
+        closing = random.choice(self._SESSION_CLOSINGS)
+        parts.append(f"*{closing}*")
+
+        return {
+            "perspective": "\n".join(parts),
+            "category": category or "general",
+            "principle_applied": self._SESSION_PRINCIPLES.get(category or "", ""),
+            "status": "ok",
+        }
+
     # ── internal methods ──────────────────────────────────────────────
 
     def _classify_question(self, question: str) -> str:
