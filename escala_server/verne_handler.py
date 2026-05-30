@@ -30,12 +30,19 @@ _CATEGORY_KEYWORDS: dict[str, list[str]] = {
         "fac", "organigrama", "rol", "responsabilidad", "accountability",
         "cultura", "valores", "topgrading", "liderazgo", "entrevista",
         "people", "hiring", "talent", "team", "who",
+        # Coloquial SME/Latam
+        "prima", "primo", "encargada", "encargado", "rendir", "rinde",
+        "maistro", "recomendación", "familia", "familiar", "jefe",
+        "contratación", "despedir", "renunció", "renuncia",
     ],
     "strategy": [
         "estrategia", "diferenciación", "core customer", "cliente",
         "brand promise", "bhag", "ops", "propósito", "visión", "misión",
         "marca", "posicionamiento", "swot", "7 estratos", "profit per x",
         "strategy", "differentiation", "purpose", "vision",
+        # Coloquial + negocio
+        "competencia", "expandir", "crecer", "nuevo mercado",
+        "sucursal", "franquicia", "local", "colonia", "zona",
     ],
     "execution": [
         "ejecución", "daily huddle", "weekly meeting", "prioridad",
@@ -43,13 +50,20 @@ _CATEGORY_KEYWORDS: dict[str, list[str]] = {
         "reunión", "tema del trimestre", "critical number",
         "execution", "habit", "rhythm", "priority", "meeting",
         "huddle", "routine",
+        # Coloquial + SaaS
+        "churn", "descompuso", "descompone", "máquina", "taller",
+        "producción", "proceso", "seguimiento", "atraso", "retraso",
     ],
     "cash": [
         "cash", "flujo", "efectivo", "power of one", "palanca",
-        "ccc", "capital", "trabajo", "gross margin", "margen",
+        "ccc", "capital", "gross margin", "margen",
         "ingreso", "gasto", "cuentas por cobrar", "inventario",
         "proveedores", "revenue", "profit", "rentabilidad",
-        "liquidez", "cash flow", "financial",
+        "liquidez", "cash flow", "financial", "return on cash", "roc",
+        # Coloquial SME
+        "maíz", "insumos", "materia prima", "quincena",
+        "cobrar", "pagar", "cobranza", "corte de caja",
+        "precio", "costos",
     ],
 }
 
