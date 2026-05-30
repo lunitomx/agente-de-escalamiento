@@ -182,6 +182,14 @@ def main():
     cierra_parser.add_argument("--db-path", default=str(Path.home() / ".escala" / "escala.db"),
                                help="SQLite database path")
 
+    # ── verne ──
+    verne_parser = subparsers.add_parser("verne", help="Consultar a Verne Harnish")
+    verne_sub = verne_parser.add_subparsers(dest="verne_command")
+    verne_ask_parser = verne_sub.add_parser("ask", help="Preguntar a Verne")
+    verne_ask_parser.add_argument("question", nargs="+", help="Pregunta para Verne")
+    verne_ask_parser.add_argument("--db-path", default=str(Path.home() / ".escala" / "escala.db"),
+                                  help="SQLite database path")
+
     args = parser.parse_args()
 
     if args.command == "start":
@@ -196,6 +204,8 @@ def main():
         cmd_inicia(args)
     elif args.command == "cierra":
         cmd_cierra(args)
+    elif args.command == "verne":
+        cmd_verne(args)
     else:
         parser.print_help()
 
@@ -229,6 +239,29 @@ def cmd_cierra(args):
     print(f"  Changes: {result.changes_count}")
     print(f"  New facts: {result.new_facts_count}")
     print(f"  Summary: {result.summary}")
+
+
+def cmd_verne(args):
+    """Dispatch Verne subcommands."""
+    from escala_server.verne_handler import VerneHandler
+
+    if args.verne_command == "ask":
+        question = " ".join(args.question)
+        handler = VerneHandler(args.db_path)
+        result = handler.ask(question)
+        print()
+        print(result.get("answer", ""))
+        print()
+        if result.get("entity_count", 0) > 0:
+            print(f"📚 Basado en {result['entity_count']} entidad(es) del grafo:")
+            for name in result.get("entities_used", []):
+                print(f"   • {name}")
+        if result.get("principles_applied"):
+            print(f"⚖️  Principios: {', '.join(result['principles_applied'])}")
+        print(f"🏷️  Categoría: {result.get('category', 'general')}".capitalize())
+    else:
+        print("Comandos de Verne: ask")
+        print("  escala verne ask \"tu pregunta\"")
 
 
 if __name__ == "__main__":
