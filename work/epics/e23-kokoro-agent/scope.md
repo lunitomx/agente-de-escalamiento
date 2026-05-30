@@ -104,7 +104,7 @@ habla contigo, usa skills, guarda en markdown, genera HTML cuando lo necesitas.
 |-------|:----:|:------:|-------|
 | S23.1 — Package Structure | M | ✅ Done | AGENTS.md + setup.sh + estructura |
 | S23.2 — Setup Script | S | ✅ Done | curl | bash + auto-detección + ~/.escala/ |
-| S23.3 — Memoria Core | M | Pending | — |
+| S23.3 — Memoria Core | M | ✅ Done | Skill: guardado .md + frontmatter + links |
 | S23.4 — Búsqueda y síntesis | M | Pending | — |
 | S23.5 — Dashboard Generado | M | Pending | — |
 | S23.6 — escala-cash refactor | M | Pending | — |
