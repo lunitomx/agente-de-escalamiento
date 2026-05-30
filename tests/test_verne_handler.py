@@ -173,3 +173,75 @@ class TestVerneHandler:
         """Company context appears in first turn."""
         result = handler.board_debate("Expandir producto", context="Acme Corp")
         assert "Acme Corp" in result["response"]
+
+    # ── coherence tests (S21.6) ────────────────────────────────────
+
+    def test_coherence_alma_has_4d_framework(self):
+        """The alma document references the 4 Decisions framework."""
+        alma = Path("miembro-board/verne-harnish.md").read_text()
+        assert "4 Decisiones" in alma
+        assert "People" in alma
+        assert "Strategy" in alma
+        assert "Execution" in alma
+        assert "Cash" in alma
+
+    def test_coherence_alma_has_rockefeller_habits(self):
+        """The alma document references Rockefeller Habits."""
+        alma = Path("miembro-board/verne-harnish.md").read_text()
+        assert "Rockefeller Habits" in alma
+        assert "Daily Huddle" in alma
+        assert "No Surprises" in alma
+
+    def test_coherence_alma_has_verne_questions(self):
+        """The alma document includes Verne's characteristic questions."""
+        alma = Path("miembro-board/verne-harnish.md").read_text()
+        assert "Core Customer" in alma
+        assert "Cash Conversion Cycle" in alma
+        assert "BHAG" in alma
+
+    def test_coherence_ask_uses_framework(self, handler):
+        """Answers reference the correct framework for the category."""
+        cash_result = handler.ask("¿Cómo mejoro mi flujo de efectivo?")
+        assert "Power of One" in cash_result["answer"]
+        assert "Cash Conversion Cycle" in cash_result.get("answer", "")
+
+        people_result = handler.ask("Necesito mejores personas en mi equipo")
+        assert "A-player" in people_result["answer"] or "asiento" in people_result["answer"]
+
+    def test_coherence_ask_principles_are_correct(self, handler):
+        """Each category returns the correct set of principles."""
+        # Cash
+        r = handler.ask("¿Cómo reduzco mi CCC?")
+        assert "No Surprises" in r["answer"]
+        # Execution
+        r = handler.ask("¿Cómo mejoro mi daily huddle?")
+        assert "Routine Sets You Free" in r["answer"] or "Priority" in r["answer"]
+        # People
+        r = handler.ask("Necesito contratar mejor")
+        assert "Healthy Conflict" in r["answer"] or "Delegate" in r["answer"]
+
+    def test_coherence_answer_structure(self, handler):
+        """Every answer has Verne's voice + questions + call to action."""
+        for question in [
+            "¿Cómo mejoro mi cash flow?",
+            "¿Necesito un daily huddle?",
+            "¿Cuál es mi estrategia?",
+            "¿Debo contratar más gente?",
+        ]:
+            result = handler.ask(question)
+            assert "**Verne:**" in result["answer"], f"Missing Verne voice for: {question}"
+            assert "?" in result["answer"], f"Missing questions for: {question}"
+            assert "¿Qué vas a hacer" in result["answer"], f"Missing CTA for: {question}"
+
+    def test_coherence_entities_are_real(self):
+        """All 42 entities from the book-knowledge.json are valid."""
+        import json
+        with open("escala_server/data/book-knowledge.json") as f:
+            data = json.load(f)
+        assert data["meta"]["entities_count"] == 42
+        assert data["meta"]["relationships_count"] == 59
+        names = [e["name"] for e in data["entities"]]
+        assert "Power of One" in names
+        assert "Rockefeller Habits" in names
+        assert "4D Framework" in names
+        assert len(names) == 42
