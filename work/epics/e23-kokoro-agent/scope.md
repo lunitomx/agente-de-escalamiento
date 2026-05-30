@@ -107,7 +107,7 @@ habla contigo, usa skills, guarda en markdown, genera HTML cuando lo necesitas.
 | S23.3 — Memoria Core | M | ✅ Done | Skill: guardado .md + frontmatter + links |
 | S23.4 — Búsqueda y síntesis | M | ✅ Done | 4 patrones: cómo vamos, fecha, semana, recomendación |
 | S23.5 — Dashboard Generado | M | ✅ Done | Chart.js: line, radar, bar, doughnut, 4D |
-| S23.6 — escala-cash refactor | M | Pending | — |
+| S23.6 — escala-cash refactor | M | ✅ Done | Agent-based en escala-agent/skills/escala-cash/ |
 | S23.7 — escala-strategy refactor | M | Pending | — |
 | S23.8 — escala-people refactor | M | Pending | — |
 | S23.9 — escala-execution refactor | M | Pending | — |

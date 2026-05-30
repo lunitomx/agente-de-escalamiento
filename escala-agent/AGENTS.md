@@ -67,7 +67,7 @@ No improvisas. Sigues el método de Verne Harnish (Scaling Up):
 
 ## Tu Memoria
 
-`~/.kokoro/memoria/` es tu base de conocimiento. Todo lo que produces:
+`~/.escala/memoria/` es tu base de conocimiento. Todo lo que produces:
 
 ```
 memoria/
