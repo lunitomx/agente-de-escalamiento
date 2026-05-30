@@ -3,121 +3,199 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Power of One — Motor | ScaleUp</title>
+  <title>Power of One — 7 Palancas | ScaleUp</title>
   <link rel="stylesheet" href="../../shared/styles/dashboard-base.css">
   <link rel="stylesheet" href="../../shared/styles/context-panel.css">
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f1f5f9; color: #1e293b; padding: 24px; }
     .tool-header { margin-bottom: 20px; }
     .tool-header h1 { font-size: 1.3rem; color: #0f172a; }
+    .tool-header .subtitle { font-size: 0.85rem; color: #64748b; margin-top: 4px; }
     .tool-header .breadcrumb { font-size: 0.8rem; color: #64748b; }
     .tool-header .breadcrumb a { color: #2563eb; text-decoration: none; }
 
-    .company-selector { margin-bottom: 20px; background: white; border-radius: 8px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-    .company-selector select { padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.9rem; flex: 1; min-width: 200px; background: #f8fafc; }
-    .company-selector label { font-weight: 600; color: #475569; }
+    .company-bar { margin-bottom: 16px; background: white; border-radius: 8px; padding: 14px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .company-bar select { padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.9rem; flex: 1; min-width: 200px; background: #f8fafc; }
+    .company-bar label { font-weight: 600; color: #475569; }
+    .btn { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.15s; }
+    .btn-primary { background: #2563eb; color: white; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-success { background: #16a34a; color: white; }
+    .btn-success:hover { background: #15803d; }
+    .btn-outline { background: transparent; border: 1px solid #e2e8f0; color: #475569; }
+    .btn-outline:hover { background: #f8fafc; }
+
+    .dashboard-grid { display: grid; grid-template-columns: 1fr 280px; gap: 16px; }
+    @media (max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; } }
+
+    .main-col { min-width: 0; }
+    .side-col { min-width: 0; }
 
     .metrics-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin-bottom: 16px; }
-    .metric-pill { background: white; border-radius: 8px; padding: 10px 14px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-    .metric-pill h4 { margin: 0 0 4px; font-size: 0.7rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
-    .metric-pill .val { font-size: 1.1rem; font-weight: 700; }
-    .metric-pill .val.green { color: #16a34a; }
-    .metric-pill .val.red { color: #dc2626; }
-    .metric-pill .val.gray { color: #64748b; }
+    .metric-card { background: white; border-radius: 8px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); position: relative; }
+    .metric-card .m-label { font-size: 0.7rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; display: flex; align-items: center; gap: 4px; }
+    .metric-card .m-label .info-icon { display: inline-block; width: 14px; height: 14px; background: #e2e8f0; color: #64748b; border-radius: 50%; text-align: center; line-height: 14px; font-size: 0.6rem; cursor: help; font-weight: 700; }
+    .metric-card .m-val { font-size: 1.2rem; font-weight: 700; }
+    .metric-card .m-val.green { color: #16a34a; }
+    .metric-card .m-val.red { color: #dc2626; }
+    .metric-card .m-val.gray { color: #64748b; }
+    .metric-card .m-before { font-size: 0.7rem; color: #94a3b8; }
+    .tooltip-box { display: none; position: absolute; top: 100%; left: 0; background: #1e293b; color: #f1f5f9; padding: 8px 12px; border-radius: 6px; font-size: 0.75rem; width: 220px; z-index: 10; line-height: 1.4; margin-top: 4px; }
+    .metric-card:hover .tooltip-box { display: block; }
 
-    .impact-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .impact-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
     .impact-card { background: white; border-radius: 8px; padding: 16px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-    .impact-card h3 { margin: 0 0 8px; font-size: 0.8rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
-    .impact-card .value { font-size: 1.5rem; font-weight: 700; }
+    .impact-card h3 { margin: 0 0 4px; font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+    .impact-card .sub { font-size: 0.7rem; color: #94a3b8; margin-top: 2px; }
+    .impact-card .value { font-size: 1.4rem; font-weight: 700; }
     .impact-card .value.positive { color: #16a34a; }
     .impact-card .value.negative { color: #dc2626; }
     .impact-card .value.neutral { color: #64748b; }
 
-    .levers-container { display: grid; gap: 6px; }
-    .lever-row { background: white; border-radius: 8px; padding: 10px 16px; display: flex; align-items: center; gap: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); flex-wrap: wrap; }
+    .toggle-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 0.85rem; color: #64748b; }
+    .toggle-bar .toggle { width: 40px; height: 22px; background: #e2e8f0; border-radius: 11px; cursor: pointer; position: relative; transition: background 0.2s; }
+    .toggle-bar .toggle.active { background: #2563eb; }
+    .toggle-bar .toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; background: white; border-radius: 50%; transition: transform 0.2s; }
+    .toggle-bar .toggle.active::after { transform: translateX(18px); }
+
+    .levers { display: grid; gap: 6px; }
+    .lever { background: white; border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); flex-wrap: wrap; }
     .lever-name { min-width: 200px; font-weight: 600; color: #334155; font-size: 0.85rem; }
-    .lever-base { color: #94a3b8; font-size: 0.8rem; min-width: 100px; }
-    .lever-buttons { display: flex; gap: 3px; }
-    .lever-btn { width: 32px; height: 32px; border-radius: 6px; border: 1px solid #e2e8f0; background: #f8fafc; cursor: pointer; font-size: 0.9rem; font-weight: 700; transition: all 0.15s; }
+    .lever-dir { font-size: 0.7rem; color: #94a3b8; font-weight: 400; }
+    .lever-base { color: #94a3b8; font-size: 0.8rem; min-width: 90px; }
+    .lever-btns { display: flex; gap: 3px; }
+    .lever-btn { width: 32px; height: 32px; border-radius: 6px; border: 1px solid #e2e8f0; background: #f8fafc; cursor: pointer; font-size: 0.9rem; font-weight: 700; transition: all 0.15s; display: flex; align-items: center; justify-content: center; }
     .lever-btn.up { color: #16a34a; border-color: #bbf7d0; }
     .lever-btn.up:hover { background: #dcfce7; }
     .lever-btn.down { color: #dc2626; border-color: #fecaca; }
     .lever-btn.down:hover { background: #fee2e2; }
     .lever-btn:active { transform: scale(0.95); }
-    .lever-adj { min-width: 65px; font-size: 0.8rem; font-weight: 600; text-align: center; }
+    .lever-adj { min-width: 55px; font-size: 0.85rem; font-weight: 700; text-align: center; }
     .lever-adj.pos { color: #16a34a; }
     .lever-adj.neg { color: #dc2626; }
     .lever-adj.zero { color: #94a3b8; }
-    .lever-impact { min-width: 110px; font-size: 0.85rem; text-align: right; font-weight: 600; margin-left: auto; }
+    .lever-impact { min-width: 100px; font-size: 0.85rem; text-align: right; font-weight: 600; margin-left: auto; display: flex; align-items: center; gap: 6px; justify-content: flex-end; }
+    .lever-impact .impact-before { font-size: 0.7rem; color: #94a3b8; font-weight: 400; }
 
-    .priorities { margin-top: 16px; background: white; border-radius: 8px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-    .priorities h3 { margin: 0 0 12px; font-size: 0.95rem; color: #0f172a; }
-    .priority-row { display: flex; align-items: center; gap: 12px; padding: 6px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; }
-    .priority-row:last-child { border-bottom: none; }
-    .priority-rank { font-weight: 700; color: #2563eb; min-width: 24px; }
-    .priority-label { flex: 1; }
-    .priority-impact { font-weight: 600; min-width: 100px; text-align: right; }
-    .priority-score { color: #94a3b8; font-size: 0.75rem; min-width: 60px; text-align: right; }
-    .priority-diff { min-width: 80px; }
+    .side-panel { display: flex; flex-direction: column; gap: 12px; }
+    .side-card { background: white; border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .side-card h3 { margin: 0 0 10px; font-size: 0.85rem; color: #0f172a; display: flex; align-items: center; gap: 6px; }
+    .verne-msg { font-size: 0.82rem; line-height: 1.5; color: #334155; }
+    .verne-msg strong { color: #0f172a; }
+    .verne-msg .principle { display: inline-block; background: #dbeafe; color: #1d4ed8; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; margin: 2px; }
 
-    .attribution { margin-top: 24px; font-size: 0.75rem; color: #94a3b8; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 12px; }
+    .priority-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.82rem; }
+    .priority-item:last-child { border-bottom: none; }
+    .priority-rank { font-weight: 700; color: #2563eb; min-width: 20px; font-size: 0.8rem; }
+    .priority-info { flex: 1; }
+    .priority-info .p-label { font-weight: 600; }
+    .priority-info .p-meta { font-size: 0.7rem; color: #94a3b8; }
+    .priority-impact { font-weight: 600; color: #16a34a; }
 
-    @media (max-width: 640px) {
-      .lever-row { flex-direction: column; align-items: stretch; }
-      .lever-name { min-width: auto; }
-      .lever-impact { margin-left: 0; text-align: left; }
-    }
+    .attribution { margin-top: 24px; font-size: 0.7rem; color: #94a3b8; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 12px; }
+
+    .saved-badge { font-size: 0.75rem; padding: 3px 10px; border-radius: 12px; }
+    .saved-badge.saved { background: #dcfce7; color: #166534; }
+    .saved-badge.modified { background: #fef9c3; color: #854d0e; }
   </style>
 </head>
 <body>
   <div class="dashboard-container" role="main">
     <div class="tool-header">
       <div class="breadcrumb"><a href="/">Home</a> › <a href="/" onclick="event.preventDefault();window.location.href='/'">Cash</a> › Power of One</div>
-      <h1>🔄 Power of One — Motor de 7 Palancas</h1>
+      <h1>🔄 Power of One — Las 7 Palancas</h1>
+      <div class="subtitle">Mejora 1% en cada palanca y mira el efecto en tu bolsillo. Basado en Alan Miltz / Scaling Up.</div>
     </div>
 
-    <!-- Company selector -->
-    <div class="company-selector">
+    <div class="company-bar">
       <label for="company-select">🏢 Empresa:</label>
-      <select id="company-select" onchange="loadCompany()">
-        <option value="">— Seleccionar empresa —</option>
+      <select id="company-select" onchange="onCompanyChange()">
+        <option value="">— Seleccionar —</option>
       </select>
-      <span id="industry-badge" style="font-size:0.8rem;color:#64748b;"></span>
+      <span id="industry-tag" style="font-size:0.8rem;color:#64748b;"></span>
+      <span id="save-indicator" class="saved-badge saved" style="margin-left:auto;">💾 Guardado</span>
+      <button class="btn btn-success" onclick="saveScenario()">💾 Guardar</button>
     </div>
 
-    <!-- Key Metrics -->
-    <div class="metrics-bar" id="metrics-bar">
-      <div class="metric-pill"><h4>Ventas Anuales</h4><div class="val gray" id="m-sales">—</div></div>
-      <div class="metric-pill"><h4>Margen Utilidad</h4><div class="val gray" id="m-margin">—</div></div>
-      <div class="metric-pill"><h4>CCC (días)</h4><div class="val gray" id="m-ccc">—</div></div>
-      <div class="metric-pill"><h4>DSO</h4><div class="val gray" id="m-dso">—</div></div>
-      <div class="metric-pill"><h4>DIO</h4><div class="val gray" id="m-dio">—</div></div>
-      <div class="metric-pill"><h4>DPO</h4><div class="val gray" id="m-dpo">—</div></div>
-    </div>
+    <div class="dashboard-grid">
+      <div class="main-col">
+        <!-- Métricas en humano -->
+        <div class="metrics-bar" id="metrics-bar">
+          <div class="metric-card">
+            <div class="m-label">VENTAS<i class="info-icon" title="Cuánto vendes al año">?</i></div>
+            <div class="m-val gray" id="m-sales">—</div>
+            <div class="tooltip-box">Tu ingreso total anual. De aquí sale todo.</div>
+          </div>
+          <div class="metric-card">
+            <div class="m-label">GANANCIA<i class="info-icon" title="Utilidad neta sobre ventas">?</i></div>
+            <div class="m-val gray" id="m-margin">—</div>
+            <div class="tooltip-box">De cada $100 que vendes, esto es lo que te queda después de todos los gastos.</div>
+          </div>
+          <div class="metric-card">
+            <div class="m-label">CICLO DE EFECTIVO<i class="info-icon" title="Cash Conversion Cycle">?</i></div>
+            <div class="m-val gray" id="m-ccc">—</div>
+            <div class="tooltip-box">Los días que pasan desde que pagas tu materia prima hasta que cobras. Menos días = más efectivo.</div>
+          </div>
+          <div class="metric-card">
+            <div class="m-label">DÍAS EN COBRAR<i class="info-icon" title="DSO - Days Sales Outstanding">?</i></div>
+            <div class="m-val gray" id="m-dso">—</div>
+            <div class="tooltip-box">Cuántos días tardas en cobrarle a tus clientes. Menos = mejor.</div>
+          </div>
+          <div class="metric-card">
+            <div class="m-label">DÍAS EN INVENTARIO<i class="info-icon" title="DIO - Days Inventory Outstanding">?</i></div>
+            <div class="m-val gray" id="m-dio">—</div>
+            <div class="tooltip-box">Cuántos días tienes tu producto guardado antes de venderlo. Menos = mejor.</div>
+          </div>
+          <div class="metric-card">
+            <div class="m-label">DÍAS EN PAGAR<i class="info-icon" title="DPO - Days Payable Outstanding">?</i></div>
+            <div class="m-val gray" id="m-dpo">—</div>
+            <div class="tooltip-box">Cuántos días tardas en pagar a tus proveedores. Más días = mejor (conservas el efectivo).</div>
+          </div>
+        </div>
 
-    <!-- Impact Summary -->
-    <div class="impact-summary">
-      <div class="impact-card">
-        <h3>Impacto en Cash Flow</h3>
-        <div id="total-cf" class="value neutral">$0</div>
-      </div>
-      <div class="impact-card">
-        <h3>Impacto en EBIT</h3>
-        <div id="total-ebit" class="value neutral">$0</div>
-      </div>
-      <div class="impact-card">
-        <h3>Mejora Compuesta</h3>
-        <div id="compounded" class="value neutral">—</div>
-      </div>
-    </div>
+        <!-- Impacto -->
+        <div class="impact-cards">
+          <div class="impact-card">
+            <h3>EFECTIVO EXTRA POR AÑO</h3>
+            <div id="total-cf" class="value neutral">$0</div>
+            <div class="sub">Lo que tu negocio genera de más</div>
+          </div>
+          <div class="impact-card">
+            <h3>UTILIDAD EXTRA POR AÑO</h3>
+            <div id="total-ebit" class="value neutral">$0</div>
+            <div class="sub">Ganancia adicional en tu operación</div>
+          </div>
+          <div class="impact-card">
+            <h3>MEJORA TOTAL</h3>
+            <div id="compounded" class="value neutral">—</div>
+            <div class="sub">Porcentaje de tus ventas totales</div>
+          </div>
+        </div>
 
-    <!-- Levers -->
-    <div class="levers-container" id="levers-container"></div>
+        <!-- Toggle antes/después -->
+        <div class="toggle-bar">
+          <span>Ver valores actuales</span>
+          <div id="toggle-compare" class="toggle" onclick="this.classList.toggle('active');renderImpacts()"></div>
+          <span>Ver con mejoras</span>
+        </div>
 
-    <!-- Priorities -->
-    <div class="priorities" id="priorities-section" style="display:none;">
-      <h3>🎯 Prioridades de implementación</h3>
-      <div id="priorities-list"></div>
+        <!-- Palancas -->
+        <div class="levers" id="levers-container"></div>
+      </div>
+
+      <!-- Side panel: Verne + Prioridades -->
+      <div class="side-col">
+        <div class="side-panel">
+          <div class="side-card">
+            <h3>🤵 Verne opina</h3>
+            <div id="verne-advice" class="verne-msg">Selecciona una empresa y ajusta las palancas para ver qué dice Verne.</div>
+          </div>
+          <div class="side-card" id="priorities-card" style="display:none;">
+            <h3>🎯 Prioridades</h3>
+            <div id="priorities-list"></div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <p class="attribution">
@@ -129,65 +207,65 @@
     (function () {
       'use strict';
 
-      // ── State ──────────────────────────────────────────────────
-      var API_BASE = '';
-      var currentFinancials = null;
-      var adjustments = {};
-      var LEVER_META = {
-        price:    { label: 'Precio', type: 'pct', dir: 'up', difficulty: 3, time: '2-4 semanas' },
-        volume:   { label: 'Volumen', type: 'pct', dir: 'up', difficulty: 4, time: '1-3 meses' },
-        cogs:     { label: 'COGS (Costo de Ventas)', type: 'pct', dir: 'down', difficulty: 3, time: '1-2 meses' },
-        opex:     { label: 'Gastos Operativos', type: 'pct', dir: 'down', difficulty: 2, time: '2-6 semanas' },
-        ar_days:  { label: 'Cuentas por Cobrar (DSO)', type: 'day', dir: 'down', difficulty: 2, time: '2-4 semanas' },
-        inv_days: { label: 'Inventario (DIO)', type: 'day', dir: 'down', difficulty: 3, time: '1-3 meses' },
-        ap_days:  { label: 'Cuentas por Pagar (DPO)', type: 'day', dir: 'up', difficulty: 2, time: '2-8 semanas' },
-      };
-      var LEVER_IDS = Object.keys(LEVER_META);
+      // ── Palancas en idioma humano ──────────────────────────────
+      var LEVERS = [
+        { id: 'price',    label: 'Precio', dir: 'up',   expl: '+1% = subes precios', type: 'pct', diff: 3, time: '2-4 semanas',
+          tooltip: 'Subir 1% tu precio va directo a tu bolsillo. Si vendes $1M al mes, son $10K extra.' },
+        { id: 'volume',   label: 'Volumen', dir: 'up',   expl: '+1% = vendes más', type: 'pct', diff: 4, time: '1-3 meses',
+          tooltip: 'Vender 1% más. El impacto es menor porque cada venta extra también cuesta producirla.' },
+        { id: 'cogs',     label: 'Costo de producto', dir: 'down', expl: '+1% = reduces costos', type: 'pct', diff: 3, time: '1-2 meses',
+          tooltip: 'Lo que te cuesta hacer tu producto. +1% significa reducir 1% ese costo (mejores proveedores, menos merma).' },
+        { id: 'opex',     label: 'Gastos fijos', dir: 'down', expl: '+1% = gastas menos', type: 'pct', diff: 2, time: '2-6 semanas',
+          tooltip: 'Renta, luz, sueldos administrativos. +1% = gastas 1% menos. El más fácil de implementar.' },
+        { id: 'ar_days',  label: 'Cobrar más rápido', dir: 'down', expl: '+1d = cobras 1 día antes', type: 'day', diff: 2, time: '2-4 semanas',
+          tooltip: 'Si hoy tardas 30 días en cobrar, mejorar 1 día = cobras en 29. Eso libera efectivo de inmediato.' },
+        { id: 'inv_days', label: 'Menos inventario', dir: 'down', expl: '+1d = 1 día menos en almacén', type: 'day', diff: 3, time: '1-3 meses',
+          tooltip: 'Tener mercancía guardada es dinero quieto. 1 día menos en almacén libera efectivo.' },
+        { id: 'ap_days',  label: 'Pagar más tarde', dir: 'up',   expl: '+1d = pagas 1 día después', type: 'day', diff: 2, time: '2-8 semanas',
+          tooltip: 'Si hoy pagas a 20 días, mejorar 1 día = pagas a 21. Ese día extra de efectivo en tu cuenta cuenta.' },
+      ];
 
-      // ── Default financials by industry ─────────────────────────
-      var DEFAULT_FINANCIALS = {
+      var LEVER_IDS = LEVERS.map(function(l) { return l.id; });
+
+      // ── Estado ─────────────────────────────────────────────────
+      var API_BASE = '';
+      var financials = null;
+      var adjustments = {};
+      var lastResult = null;
+      var currentCompanyId = '';
+      var currentCompanyName = '';
+
+      // ── Datos demo por empresa ──────────────────────────────────
+      var DEMO = {
         'Carnicería El Buen Corte': {
-          net_sales: 5400000, cogs: 3840000, opex: 1080000,
-          accounts_receivable: 150000, inventory: 300000, accounts_payable: 200000, net_profit: 480000,
-          industry: 'food'
+          f: { net_sales: 5400000, cogs: 3840000, opex: 1080000, accounts_receivable: 150000, inventory: 300000, accounts_payable: 200000, net_profit: 480000 },
+          ind: 'Alimentos'
         },
         'Estrategia 360 Consultores': {
-          net_sales: 14400000, cogs: 5760000, opex: 4200000,
-          accounts_receivable: 3600000, inventory: 0, accounts_payable: 1200000, net_profit: 1440000,
-          industry: 'services'
+          f: { net_sales: 14400000, cogs: 5760000, opex: 4200000, accounts_receivable: 3600000, inventory: 0, accounts_payable: 1200000, net_profit: 1440000 },
+          ind: 'Consultoría'
         },
         'CloudScale Technologies': {
-          net_sales: 42000000, cogs: 8400000, opex: 21600000,
-          accounts_receivable: 2000000, inventory: 0, accounts_payable: 3500000, net_profit: 8400000,
-          industry: 'saas'
+          f: { net_sales: 42000000, cogs: 8400000, opex: 21600000, accounts_receivable: 2000000, inventory: 0, accounts_payable: 3500000, net_profit: 8400000 },
+          ind: 'Tecnología'
         },
       };
-      var DEFAULT_FALLBACK = {
-        net_sales: 12000000, cogs: 7200000, opex: 3600000,
-        accounts_receivable: 1500000, inventory: 600000, accounts_payable: 800000, net_profit: 1200000,
-        industry: 'services'
-      };
+
+      var FALLBACK = { net_sales: 12000000, cogs: 7200000, opex: 3600000, accounts_receivable: 1500000, inventory: 600000, accounts_payable: 800000, net_profit: 1200000 };
 
       // ── Init ───────────────────────────────────────────────────
       function init() {
-        loadCompanies();
-      }
-
-      // ── Load companies ─────────────────────────────────────────
-      function loadCompanies() {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', API_BASE + '/api/companies', true);
         xhr.onload = function() {
           if (xhr.status === 200) {
             try {
               var resp = JSON.parse(xhr.responseText);
-              var companies = resp.data || [];
-              var sel = document.getElementById('company-select');
-              companies.forEach(function(c) {
+              (resp.data || []).forEach(function(c) {
                 var opt = document.createElement('option');
                 opt.value = c.id;
                 opt.textContent = c.name;
-                sel.appendChild(opt);
+                document.getElementById('company-select').appendChild(opt);
               });
             } catch(e) {}
           }
@@ -195,28 +273,21 @@
         xhr.send();
       }
 
-      // ── Load company data ──────────────────────────────────────
-      window.loadCompany = function() {
+      // ── Company change ─────────────────────────────────────────
+      window.onCompanyChange = function() {
         var sel = document.getElementById('company-select');
-        var name = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].textContent : '';
-        document.getElementById('industry-badge').textContent = '';
+        currentCompanyName = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].textContent : '';
+        currentCompanyId = sel.value;
+        var demo = DEMO[currentCompanyName];
+        document.getElementById('industry-tag').textContent = demo ? '🏭 ' + demo.ind : '';
 
-        // Try to load from defaults
-        var fin = DEFAULT_FINANCIALS[name] || DEFAULT_FALLBACK;
-        currentFinancials = {
-          net_sales: fin.net_sales,
-          cogs: fin.cogs,
-          opex: fin.opex,
-          accounts_receivable: fin.accounts_receivable,
-          inventory: fin.inventory,
-          accounts_payable: fin.accounts_payable,
-          net_profit: fin.net_profit,
-        };
-        document.getElementById('industry-badge').textContent = '🏭 ' + (fin.industry || 'services');
+        if (demo) {
+          financials = JSON.parse(JSON.stringify(demo.f));
+        } else {
+          financials = JSON.parse(JSON.stringify(FALLBACK));
+        }
 
-        // Reset adjustments
         LEVER_IDS.forEach(function(k) { adjustments[k] = 0; });
-
         renderLevers();
         calculate();
       };
@@ -224,108 +295,103 @@
       // ── Render levers ──────────────────────────────────────────
       function renderLevers() {
         var container = document.getElementById('levers-container');
-        if (!container || !currentFinancials) return;
+        if (!container || !financials) return;
         container.innerHTML = '';
 
-        LEVER_IDS.forEach(function(k) {
-          var meta = LEVER_META[k];
-          var adj = adjustments[k] || 0;
-          var row = document.createElement('div');
-          row.className = 'lever-row';
+        LEVERS.forEach(function(l) {
+          var adj = adjustments[l.id] || 0;
+          var baseVal = getBase(l.id);
 
-          // Name
+          var row = document.createElement('div');
+          row.className = 'lever';
+
           var name = document.createElement('span');
           name.className = 'lever-name';
-          name.textContent = meta.label;
+          name.innerHTML = l.label + ' <span class="lever-dir" title="' + l.tooltip + '">' + l.expl + ' ℹ️</span>';
           row.appendChild(name);
 
-          // Base value
-          var baseVal = getBaseValue(k);
           var base = document.createElement('span');
           base.className = 'lever-base';
-          base.textContent = 'Base: ' + formatBase(k, baseVal);
+          base.textContent = 'Base: ' + fmtBase(l.id, baseVal);
           row.appendChild(base);
 
-          // Buttons
           var btns = document.createElement('div');
-          btns.className = 'lever-buttons';
-          var downBtn = document.createElement('button');
-          downBtn.className = 'lever-btn down';
-          downBtn.textContent = '−1';
-          downBtn.addEventListener('click', function() { adjust(k, -1); });
-          btns.appendChild(downBtn);
-          var upBtn = document.createElement('button');
-          upBtn.className = 'lever-btn up';
-          upBtn.textContent = '+1';
-          upBtn.addEventListener('click', function() { adjust(k, 1); });
-          btns.appendChild(upBtn);
+          btns.className = 'lever-btns';
+          var d = document.createElement('button');
+          d.className = 'lever-btn down';
+          d.textContent = '−1';
+          d.addEventListener('click', function() { adjLever(l.id, -1); });
+          btns.appendChild(d);
+          var u = document.createElement('button');
+          u.className = 'lever-btn up';
+          u.textContent = '+1';
+          u.addEventListener('click', function() { adjLever(l.id, 1); });
+          btns.appendChild(u);
           row.appendChild(btns);
 
-          // Adjustment
           var adjEl = document.createElement('span');
           adjEl.className = 'lever-adj ' + (adj > 0 ? 'pos' : adj < 0 ? 'neg' : 'zero');
-          adjEl.id = 'adj-' + k;
-          adjEl.textContent = formatAdj(adj, meta.type);
+          adjEl.id = 'adj-' + l.id;
+          adjEl.textContent = fmtAdj(adj, l.type);
           row.appendChild(adjEl);
 
-          // Impact
           var imp = document.createElement('span');
           imp.className = 'lever-impact';
-          imp.id = 'impact-' + k;
-          imp.textContent = '—';
+          imp.id = 'impact-' + l.id;
+          imp.innerHTML = '<span style="color:#94a3b8;">—</span>';
           row.appendChild(imp);
 
           container.appendChild(row);
         });
       }
 
-      function getBaseValue(k) {
-        if (!currentFinancials) return 0;
-        if (k === 'price') return currentFinancials.net_sales / (currentFinancials.net_sales / 100);
-        if (k === 'volume') return currentFinancials.net_sales;
-        if (k === 'cogs') return currentFinancials.cogs;
-        if (k === 'opex') return currentFinancials.opex;
-        if (k === 'ar_days') return currentFinancials.accounts_receivable;
-        if (k === 'inv_days') return currentFinancials.inventory;
-        if (k === 'ap_days') return currentFinancials.accounts_payable;
+      function getBase(k) {
+        if (!financials) return 0;
+        var map = { net_sales: 'net_sales', cogs: 'cogs', opex: 'opex', accounts_receivable: 'accounts_receivable', inventory: 'inventory', accounts_payable: 'accounts_payable' };
+        var total = financials.net_sales || 1;
+        if (k === 'price') return 100;
+        if (k === 'volume') return total;
+        if (k === 'cogs') return financials.cogs;
+        if (k === 'opex') return financials.opex;
+        if (k === 'ar_days') return financials.accounts_receivable;
+        if (k === 'inv_days') return financials.inventory || 0;
+        if (k === 'ap_days') return financials.accounts_payable;
         return 0;
       }
 
-      function formatBase(k, val) {
-        var meta = LEVER_META[k];
-        if (meta.type === 'day') return val.toLocaleString('en-US') + ' (días)';
-        return '$' + val.toLocaleString('en-US');
+      function fmtBase(k, v) {
+        var l = LEVERS.find(function(x) { return x.id === k; });
+        if (l && l.type === 'day') return '$' + Number(v).toLocaleString('en-US');
+        return '$' + Number(v).toLocaleString('en-US');
       }
 
-      function formatAdj(adj, type) {
+      function fmtAdj(adj, type) {
         if (adj === 0) return '—';
-        var prefix = adj > 0 ? '+' : '';
-        if (type === 'day') return prefix + adj + 'd';
-        return prefix + adj + '%';
+        var p = adj > 0 ? '+' : '';
+        return type === 'day' ? p + adj + 'd' : p + adj + '%';
       }
 
       // ── Adjust ─────────────────────────────────────────────────
-      function adjust(k, delta) {
+      function adjLever(k, delta) {
         adjustments[k] = (adjustments[k] || 0) + delta;
-        var adjEl = document.getElementById('adj-' + k);
-        if (adjEl) {
+        var el = document.getElementById('adj-' + k);
+        if (el) {
           var a = adjustments[k];
-          var meta = LEVER_META[k];
-          adjEl.textContent = formatAdj(a, meta.type);
-          adjEl.className = 'lever-adj ' + (a > 0 ? 'pos' : a < 0 ? 'neg' : 'zero');
+          var l = LEVERS.find(function(x) { return x.id === k; });
+          el.textContent = fmtAdj(a, l ? l.type : 'pct');
+          el.className = 'lever-adj ' + (a > 0 ? 'pos' : a < 0 ? 'neg' : 'zero');
         }
         calculate();
+        document.getElementById('save-indicator').textContent = '⚠️ Sin guardar';
+        document.getElementById('save-indicator').className = 'saved-badge modified';
       }
 
       // ── Calculate via API ──────────────────────────────────────
       function calculate() {
-        if (!currentFinancials) return;
-
-        // Build adjustments payload: +1 = improve
-        var adjPayload = {};
+        if (!financials) return;
+        var adj = {};
         LEVER_IDS.forEach(function(k) {
-          var a = adjustments[k] || 0;
-          if (a !== 0) adjPayload[k] = a;
+          if (adjustments[k]) adj[k] = adjustments[k];
         });
 
         var xhr = new XMLHttpRequest();
@@ -336,95 +402,171 @@
             try {
               var resp = JSON.parse(xhr.responseText);
               if (resp.status === 'ok') {
-                updateResults(resp.data);
+                lastResult = resp.data;
+                renderResults(resp.data);
+                renderVerne(resp.data);
               }
             } catch(e) {}
           }
         };
-        xhr.send(JSON.stringify({
-          financials: currentFinancials,
-          adjustments: Object.keys(adjPayload).length > 0 ? adjPayload : null,
-        }));
+        xhr.send(JSON.stringify({ financials: financials, adjustments: Object.keys(adj).length ? adj : null }));
       }
 
-      // ── Update results ─────────────────────────────────────────
-      function updateResults(data) {
-        // Metrics
+      // ── Render results ─────────────────────────────────────────
+      function renderResults(data) {
         var m = data.metrics || {};
-        setText('m-sales', '$' + Number(currentFinancials.net_sales).toLocaleString('en-US'));
+        setText('m-sales', '$' + Number(financials.net_sales).toLocaleString('en-US'));
         setText('m-margin', m.profit_margin_pct + '%');
+        clsMetric('m-margin', m.profit_margin_pct > 15 ? 'green' : m.profit_margin_pct > 5 ? 'green' : 'red');
         setText('m-ccc', m.ccc_days + 'd');
+        clsMetric('m-ccc', m.ccc_days < 0 ? 'green' : m.ccc_days < 30 ? 'green' : m.ccc_days < 60 ? 'gray' : 'red');
         setText('m-dso', m.dso_days + 'd');
         setText('m-dio', m.dio_days + 'd');
         setText('m-dpo', m.dpo_days + 'd');
 
-        // Color metrics
-        colorMetric('m-ccc', m.ccc_days < 0 ? 'green' : m.ccc_days < 45 ? 'green' : 'red');
-        colorMetric('m-margin', m.profit_margin_pct > 15 ? 'green' : m.profit_margin_pct > 8 ? 'green' : 'red');
+        renderImpacts();
+        renderPriorities(data);
+      }
 
-        // Impact summary
-        var totalCF = data.combined_cash_impact || 0;
-        var totalEBIT = data.combined_ebit_impact || 0;
+      window.renderImpacts = function() {
+        if (!lastResult) return;
+        var showAfter = document.getElementById('toggle-compare').classList.contains('active');
+        var d = lastResult;
+        var totalCF = showAfter ? (d.combined_cash_impact || 0) : 0;
+        var totalEBIT = showAfter ? (d.combined_ebit_impact || 0) : 0;
+
         setImpact('total-cf', totalCF);
         setImpact('total-ebit', totalEBIT);
 
-        var baseRevenue = currentFinancials.net_sales || 1;
-        var pctOfBase = ((totalCF + totalEBIT) / baseRevenue) * 100;
-        var compEl = document.getElementById('compounded');
-        if (compEl) {
-          compEl.textContent = pctOfBase.toFixed(1) + '% del ingreso';
-          compEl.className = 'value ' + (pctOfBase > 0 ? 'positive' : pctOfBase < 0 ? 'negative' : 'neutral');
+        var baseRev = financials ? financials.net_sales : 1;
+        var pct = ((totalCF + totalEBIT) / baseRev) * 100;
+        var comp = document.getElementById('compounded');
+        if (comp) {
+          comp.textContent = showAfter ? pct.toFixed(1) + '%' : '0%';
+          comp.className = 'value ' + (pct > 0 ? 'positive' : 'neutral');
         }
 
-        // Per-lever impacts
-        (data.impacts || []).forEach(function(imp) {
+        // Per-lever
+        (d.impacts || []).forEach(function(imp) {
           var el = document.getElementById('impact-' + imp.lever);
           if (el) {
             var total = (imp.cash_impact || 0) + (imp.ebit_impact || 0);
-            el.textContent = (total >= 0 ? '+' : '') + '$' + Number(total).toLocaleString('en-US', { maximumFractionDigits: 0 });
-            el.style.color = total > 0 ? '#16a34a' : total < 0 ? '#dc2626' : '#94a3b8';
+            if (showAfter) {
+              el.innerHTML = '<span style="color:' + (total > 0 ? '#16a34a' : total < 0 ? '#dc2626' : '#94a3b8') + '">' +
+                (total >= 0 ? '+' : '') + '$' + Number(total).toLocaleString('en-US', {maximumFractionDigits: 0}) + '</span>';
+            } else {
+              el.innerHTML = '<span style="color:#94a3b8;">$0</span>';
+            }
           }
         });
+      };
 
-        // Priorities
-        var prioSection = document.getElementById('priorities-section');
-        var prioList = document.getElementById('priorities-list');
-        if (data.priorities && data.priorities.length > 0) {
-          prioSection.style.display = 'block';
-          prioList.innerHTML = '';
-          data.priorities.forEach(function(p) {
-            var row = document.createElement('div');
-            row.className = 'priority-row';
-            row.innerHTML =
-              '<span class="priority-rank">#' + p.rank + '</span>' +
-              '<span class="priority-label">' + p.label + '</span>' +
-              '<span class="priority-impact" style="color:' + (p.impact >= 0 ? '#16a34a' : '#dc2626') + '">' +
-                (p.impact >= 0 ? '+' : '') + '$' + Number(p.impact).toLocaleString('en-US', {maximumFractionDigits: 0}) +
-              '</span>' +
-              '<span class="priority-diff">D: ' + p.difficulty + '/5</span>' +
-              '<span class="priority-score">Score: ' + p.score + '</span>';
-            prioList.appendChild(row);
-          });
+      // ── Verne advice ──────────────────────────────────────────
+      function renderVerne(data) {
+        var el = document.getElementById('verne-advice');
+        if (!el) return;
+
+        var hasAdj = LEVER_IDS.some(function(k) { return adjustments[k] !== 0; });
+        if (!hasAdj) {
+          el.innerHTML = 'Ajusta las palancas con los botones +1 / -1 para ver qué opina Verne de tus prioridades.';
+          return;
+        }
+
+        var best = (data.priorities || [])[0];
+        if (!best) { el.innerHTML = 'Verne espera tus ajustes...'; return; }
+
+        var labelMap = {};
+        LEVERS.forEach(function(l) { labelMap[l.id] = l.label; });
+
+        var lines = [];
+        lines.push('<strong>Verne dice:</strong>');
+        lines.push('');
+
+        // Best priority
+        lines.push('🎯 <strong>Prioridad #1:</strong> ' + (labelMap[best.lever] || best.lever));
+        if (best.impact > 0) {
+          lines.push('   💰 Impacto: <strong>+' + Number(best.impact).toLocaleString('en-US', {maximumFractionDigits: 0}) + '</strong> al año');
+        }
+        lines.push('   ⏱ Tiempo: ' + best.time);
+        lines.push('   📊 Dificultad: ' + best.difficulty + '/5');
+        lines.push('');
+
+        // Rockefeller principle
+        var principles = {
+          price: 'Keep Things Simple · No Surprises',
+          volume: 'Routine Sets You Free',
+          cogs: 'Keep Things Simple · Delegate and Predict',
+          opex: 'Routine Sets You Free · No Surprises',
+          ar_days: 'No Surprises',
+          inv_days: 'Delegate and Predict',
+          ap_days: 'No Surprises · Keep Things Simple',
+        };
+        var princ = principles[best.lever] || 'Keep Things Simple';
+        lines.push('⚖️ <strong>Principio Rockefeller:</strong>');
+        princ.split('·').forEach(function(p) {
+          lines.push('   <span class="principle">' + p.trim() + '</span>');
+        });
+        lines.push('');
+        lines.push('💬 <em>Empieza por esta palanca. Es la que más impacto te dará por el esfuerzo requerido.</em>');
+
+        el.innerHTML = lines.join('\n');
+      }
+
+      // ── Priorities ─────────────────────────────────────────────
+      function renderPriorities(data) {
+        var card = document.getElementById('priorities-card');
+        var list = document.getElementById('priorities-list');
+        if (!data.priorities || data.priorities.length === 0) {
+          card.style.display = 'none';
+          return;
+        }
+        card.style.display = 'block';
+        list.innerHTML = '';
+
+        var labelMap = {};
+        LEVERS.forEach(function(l) { labelMap[l.id] = l.label; });
+
+        data.priorities.forEach(function(p) {
+          var row = document.createElement('div');
+          row.className = 'priority-item';
+          var name = labelMap[p.lever] || p.lever;
+          var diffStr = '';
+          for (var i = 0; i < 5; i++) diffStr += i < p.difficulty ? '●' : '○';
+          row.innerHTML =
+            '<span class="priority-rank">#' + p.rank + '</span>' +
+            '<span class="priority-info"><span class="p-label">' + name + '</span><br><span class="p-meta">' + diffStr + ' · ' + p.time + '</span></span>' +
+            '<span class="priority-impact">+$' + Number(p.impact).toLocaleString('en-US', {maximumFractionDigits: 0}) + '</span>';
+          list.appendChild(row);
+        });
+      }
+
+      // ── Save scenario ──────────────────────────────────────────
+      window.saveScenario = function() {
+        if (!currentCompanyId || !financials) { alert('Selecciona una empresa primero.'); return; }
+        var data = { data: { financials: financials, adjustments: adjustments } };
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', API_BASE + '/api/worksheets/cash/power-of-one', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onload = function() {
+          if (xhr.status === 200) {
+            document.getElementById('save-indicator').textContent = '💾 Guardado';
+            document.getElementById('save-indicator').className = 'saved-badge saved';
+          }
+        };
+        xhr.send(JSON.stringify(data));
+      };
+
+      // ── Helpers ────────────────────────────────────────────────
+      function setText(id, t) { var e = document.getElementById(id); if (e) e.textContent = t; }
+      function clsMetric(id, c) { var e = document.getElementById(id); if (e) e.className = 'm-val ' + c; }
+      function setImpact(id, v) {
+        var e = document.getElementById(id);
+        if (e) {
+          e.textContent = (v >= 0 ? '+' : '') + '$' + Number(v).toLocaleString('en-US', {maximumFractionDigits: 0});
+          e.className = 'value ' + (v > 0 ? 'positive' : v < 0 ? 'negative' : 'neutral');
         }
       }
 
-      function setText(id, text) {
-        var el = document.getElementById(id);
-        if (el) el.textContent = text;
-      }
-      function colorMetric(id, cls) {
-        var el = document.getElementById(id);
-        if (el) { el.className = 'val ' + cls; }
-      }
-      function setImpact(id, val) {
-        var el = document.getElementById(id);
-        if (el) {
-          el.textContent = (val >= 0 ? '+' : '') + '$' + Number(val).toLocaleString('en-US', { maximumFractionDigits: 0 });
-          el.className = 'value ' + (val > 0 ? 'positive' : val < 0 ? 'negative' : 'neutral');
-        }
-      }
-
-      // ── Start ──────────────────────────────────────────────────
       init();
     })();
   </script>
