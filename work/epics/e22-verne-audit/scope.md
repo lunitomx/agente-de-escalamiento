@@ -167,7 +167,7 @@ M3 (Polish):                   S22.9 ─► S22.10 ─► S22.11 ─► merge
 | S22.1 — Vocabulario coloquial | S | Done | ~5m | 1.0 | ✅ C3, C4, M2 — 9 escenarios coloquiales verificados |
 | S22.2 — Aleatorización + presentación | S | Done | ~5m | 1.0 | ✅ C5, C6, M7, m1 — 10 frases, shuffle, whoami |
 | S22.3 — board_debate con memoria | S | Done | ~3m | 1.0 | ✅ C5 validación, M3 referencia historial |
-| S22.4 — Power of One dashboard vivo | M | Pending | — | — | Conectar API worksheets al DashboardInteractive |
+| S22.4 — Power of One dashboard vivo | M | Done | ~10m | 1.0 | ✅ loadFromServer fix + defaults realistas |
 | S22.5 — Cash dashboards restantes | M | Pending | — | — | CCC, Fundability, Recurring Revenue, Cash Board |
 | S22.6 — Strategy dashboards | M | Pending | — | — | 5 dashboards |
 | S22.7 — People dashboards | M | Pending | — | — | 6 dashboards |
