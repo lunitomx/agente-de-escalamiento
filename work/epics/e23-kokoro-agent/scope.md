@@ -89,14 +89,14 @@ habla contigo, usa skills, guarda en markdown, genera HTML cuando lo necesitas.
 
 ## Done Criteria
 
-- [ ] `curl https://kokoro.sh | bash` instala todo
-- [ ] Claude/Codex/Hermes carga AGENTS.md y sabe que es Escala
+- [x] `curl https://kokoro.sh | bash` instala todo
+- [x] Claude/Codex/Hermes carga AGENTS.md y sabe que es Escala
 - [ ] Cada análisis guarda .md en `memoria/` con frontmatter + links
-- [ ] El agente puede buscar y sintetizar análisis anteriores
-- [ ] El agente puede generar HTML visual bajo demanda
-- [ ] Skills funcionan en Claude, Codex y Hermes
-- [ ] Servidor MCP opcional funcional
-- [ ] El servidor `escala_server/` legacy queda como compatible pero no necesario
+- [x] El agente puede buscar y sintetizar análisis anteriores
+- [x] El agente puede generar HTML visual bajo demanda
+- [x] Skills funcionan en Claude, Codex y Hermes
+- [x] Servidor MCP opcional funcional
+- [x] El servidor `escala_server/` legacy queda como compatible pero no necesario
 
 ## Progress Tracking
 
@@ -111,8 +111,8 @@ habla contigo, usa skills, guarda en markdown, genera HTML cuando lo necesitas.
 | S23.7 — escala-strategy refactor | M | ✅ Done | Agent-based OPSP + 7 Estratos + SWOT |
 | S23.8 — escala-people refactor | M | ✅ Done | FACChart + Values + Topgrading |
 | S23.9 — escala-execution refactor | M | ✅ Done | Habits + Rhythms + Priorities |
-| S23.10 — Identidad Core | S | Pending | — |
-| S23.11 — MCP Server opcional | S | Pending | — |
+| S23.10 — Identidad Core | S | ✅ Done | escala-core — identidad siempre cargada |
+| S23.11 — MCP Server opcional | S | ✅ Done | server.py — 5 herramientas MCP |
 
 ## Risks
 
