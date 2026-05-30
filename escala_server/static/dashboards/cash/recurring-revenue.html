@@ -201,13 +201,35 @@
         xhr.send(JSON.stringify({ data: DATA }));
       };
 
-      function updateVerne() {
+      function updateVerne() {{
         var el = document.getElementById('verne-advice');
         if (!el) return;
         var filled = Object.keys(DATA).length;
-        if (filled === 0) { el.innerHTML = 'Completa los campos para que Verne te dé su perspectiva.'; return; }
-        el.innerHTML = '<strong>Verne dice:</strong> Buen avance. Has completado ' + filled + ' de ' + METRICS.length + ' campos.<br><br>💡 <em>Recuerda: ' + getRandomTip() + '</em>';
-      }
+        if (filled === 0) {{ el.innerHTML = 'Completa los campos para que Verne te dé su perspectiva.'; return; }}
+
+        // Build a question from the filled data
+        var firstKey = Object.keys(DATA)[0];
+        var firstLabel = '';
+        METRICS.forEach(function(m) {{ if (m.key === firstKey) firstLabel = m.label; }});
+        var question = 'Trabajé en ' + firstLabel + ': ' + DATA[firstKey] + '. ¿Qué opinas?';
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', API_BASE + '/api/verne/ask', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onload = function() {{
+          if (xhr.status === 200) {{
+            try {{
+              var resp = JSON.parse(xhr.responseText);
+              if (resp.status === 'ok') {{
+                el.innerHTML = '<strong>Verne dice:</strong><br><br>' + resp.answer.replace(/\n/g, '<br>');
+                return;
+              }}
+            }} catch(e) {{}}
+          }}
+          el.innerHTML = '<strong>Verne dice:</strong> Buen avance. Has completado ' + filled + ' de ' + METRICS.length + ' campos. <br><br>💡 <em>Recuerda: ' + getRandomTip() + '</em>';
+        }};
+        xhr.send(JSON.stringify({{ question: question }}));
+      }}
 
       var TIPS = [
         'Lo que no se mide no se gestiona.',
