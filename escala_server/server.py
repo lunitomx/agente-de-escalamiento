@@ -324,6 +324,41 @@ def _build_router() -> Router:
             decision=decision, context=context, history=history
         )
 
+    # ── Cash / Power of One routes ────────────────────────────────
+
+    @router.post("/api/cash/power-of-one")
+    def cash_power_of_one(payload=None):
+        from .cash import PowerOfOneEngine, FinancialInputs
+
+        data = payload or {}
+        inputs = FinancialInputs.from_dict(data.get("financials", {}))
+        adjustments = data.get("adjustments")
+        engine = PowerOfOneEngine()
+        result = engine.calculate(inputs, adjustments=adjustments)
+
+        return {
+            "status": "ok",
+            "data": {
+                "combined_cash_impact": result.combined_cash_impact,
+                "combined_ebit_impact": result.combined_ebit_impact,
+                "metrics": result.metrics,
+                "impacts": [
+                    {
+                        "lever": i.lever,
+                        "label": i.label,
+                        "cash_impact": i.cash_impact,
+                        "ebit_impact": i.ebit_impact,
+                        "difficulty": i.difficulty,
+                        "time": i.time,
+                        "improvement_pct": i.improvement_pct,
+                        "improvement_days": i.improvement_days,
+                    }
+                    for i in result.impacts
+                ],
+                "priorities": result.priorities,
+            },
+        }
+
     return router
 
 
