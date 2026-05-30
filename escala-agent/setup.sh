@@ -1,58 +1,109 @@
 #!/bin/bash
 # ESCALA — Agente de Escalamiento
 # Instalación: curl -s https://escala.sh | bash
+# Repo: github.com/lunitomx/agente-de-escalamiento
 # Créditos: Eduardo Muñoz Luna · Verne Harnish · Humberto Martínez Barón
 
 set -e
 
-KOKORO_DIR="$HOME/.kokoro"
-ESCALA_SRC="$(cd "$(dirname "$0")" && pwd)"
+# ── Colors ──────────────────────────────────────────────────────────
+BOLD='\033[1m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
 
-echo "🚀 Instalando ESCALA — Agente de Escalamiento"
+echo ""
+echo -e "${BOLD}${BLUE}  ███████  ██████   █████  ██      █████      ███████ ████████ ██  ██████  ███    ██${NC}"
+echo -e "${BOLD}${BLUE}  ██      ██      ██   ██ ██      ██   ██     ██         ██    ██ ██       ████   ██${NC}"
+echo -e "${BOLD}${BLUE}  █████   ██      ███████ ██      ███████     █████      ██    ██ ██   ███ ██ ██  ██${NC}"
+echo -e "${BOLD}${BLUE}  ██      ██      ██   ██ ██      ██   ██     ██         ██    ██ ██    ██ ██  ██ ██${NC}"
+echo -e "${BOLD}${BLUE}  ███████  ██████ ██   ██ ███████ ██   ██     ███████    ██    ██  ██████  ██   ████${NC}"
+echo ""
+echo -e "${BOLD}Agente de Escalamiento — Metodología Scaling Up${NC}"
+echo -e "${YELLOW}Verne Harnish · Alan Miltz · Humberto Martínez Barón${NC}"
 echo ""
 
-# 1. Crear ~/.kokoro/
-mkdir -p "$KOKORO_DIR"/memoria/{dailys,analisis,dashboard}
-mkdir -p "$KOKORO_DIR"/mcp
-echo "  ✅ ~/.kokoro/ creado"
+# ── Config ──────────────────────────────────────────────────────────
+ESCALA_DIR="$HOME/.escala"
+GITHUB_RAW="https://raw.githubusercontent.com/lunitomx/agente-de-escalamiento/main"
+GITHUB_REPO="https://github.com/lunitomx/agente-de-escalamiento.git"
 
-# 2. Copiar AGENTS.md
-cp "$ESCALA_SRC/AGENTS.md" "$KOKORO_DIR/AGENTS.md"
-echo "  ✅ Identidad instalada"
-
-# 3. Copiar skills
-if [ -d "$ESCALA_SRC/skills" ]; then
-  mkdir -p "$KOKORO_DIR/skills"
-  cp -r "$ESCALA_SRC/skills/"* "$KOKORO_DIR/skills/" 2>/dev/null || true
-  echo "  ✅ Skills copiadas a ~/.kokoro/skills/"
+# ── Detect source ────────────────────────────────────────────────────
+SCRIPT_SRC="$(cd "$(dirname "$0")" 2>/dev/null && pwd)"
+if [ -f "$SCRIPT_SRC/AGENTS.md" ]; then
+  # Running from local repo
+  SRC="$SCRIPT_SRC"
+  echo -e "  ${GREEN}📦${NC} Instalando desde repositorio local"
+else
+  # Running from curl pipe — download package
+  SRC="/tmp/escala-install-$$"
+  mkdir -p "$SRC"
+  echo -e "  ${BLUE}🌐${NC} Descargando desde GitHub..."
+  git clone --depth 1 "$GITHUB_REPO" "$SRC" 2>/dev/null || {
+    # Fallback: download individual files
+    echo -e "  ${YELLOW}⚠️${NC} git no disponible, descargando archivos..."
+    for f in AGENTS.md setup.sh; do
+      curl -sL "$GITHUB_RAW/$f" -o "$SRC/$f" &
+    done
+    mkdir -p "$SRC/skills" "$SRC/mcp"
+    wait
+  }
+  echo -e "  ${GREEN}✅${NC} Descargado"
 fi
 
-# 4. Instalar en Claude Code
-CLAUDE_SKILLS="$HOME/.claude/skills"
-if [ -d "$CLAUDE_SKILLS" ]; then
-  for skill in "$KOKORO_DIR/skills/"*/; do
+# ── Install ──────────────────────────────────────────────────────────
+
+# 1. Create ~/.escala/
+mkdir -p "$ESCALA_DIR"/memoria/{dailys,analisis,dashboard}
+mkdir -p "$ESCALA_DIR"/mcp
+echo -e "  ${GREEN}✅${NC} ~/.escala/ creado"
+
+# 2. Copy AGENTS.md
+cp "$SRC/AGENTS.md" "$ESCALA_DIR/AGENTS.md"
+echo -e "  ${GREEN}✅${NC} Identidad instalada"
+
+# 3. Copy skills
+if [ -d "$SRC/skills" ] && [ "$(ls -A "$SRC/skills" 2>/dev/null)" ]; then
+  mkdir -p "$ESCALA_DIR/skills"
+  cp -r "$SRC/skills/"* "$ESCALA_DIR/skills/" 2>/dev/null || true
+  echo -e "  ${GREEN}✅${NC} Skills copiadas a ~/.escala/skills/"
+fi
+
+# 4. Copy MCP server
+if [ -f "$SRC/mcp/server.py" ]; then
+  cp "$SRC/mcp/server.py" "$ESCALA_DIR/mcp/server.py"
+  echo -e "  ${GREEN}✅${NC} MCP server copiado"
+fi
+
+# 5. Link to Claude Code
+CLAUDE_DIR="$HOME/.claude/skills"
+if [ -d "$CLAUDE_DIR" ] && [ -d "$ESCALA_DIR/skills" ]; then
+  for skill in "$ESCALA_DIR/skills/"*/; do
+    [ -d "$skill" ] || continue
     name=$(basename "$skill")
-    ln -sf "$skill" "$CLAUDE_SKILLS/$name" 2>/dev/null || cp -r "$skill" "$CLAUDE_SKILLS/$name"
+    ln -sf "$skill" "$CLAUDE_DIR/$name" 2>/dev/null || cp -r "$skill" "$CLAUDE_DIR/$name"
   done
-  echo "  ✅ Skills vinculadas en ~/.claude/skills/"
+  echo -e "  ${GREEN}✅${NC} Skills vinculadas en ~/.claude/skills/"
 fi
 
-# 5. Instalar en Hermes
-HERMES_SKILLS="$HOME/.hermes/skills"
-if [ -d "$HERMES_SKILLS" ]; then
-  for skill in "$KOKORO_DIR/skills/"*/; do
+# 6. Link to Hermes
+HERMES_DIR="$HOME/.hermes/skills"
+if [ -d "$HERMES_DIR" ] && [ -d "$ESCALA_DIR/skills" ]; then
+  for skill in "$ESCALA_DIR/skills/"*/; do
+    [ -d "$skill" ] || continue
     name=$(basename "$skill")
-    ln -sf "$skill" "$HERMES_SKILLS/$name" 2>/dev/null || cp -r "$skill" "$HERMES_SKILLS/$name"
+    ln -sf "$skill" "$HERMES_DIR/$name" 2>/dev/null || cp -r "$skill" "$HERMES_DIR/$name"
   done
-  echo "  ✅ Skills vinculadas en ~/.hermes/skills/"
+  echo -e "  ${GREEN}✅${NC} Skills vinculadas en ~/.hermes/skills/"
 fi
 
-# 6. Crear índice de memoria inicial
-if [ ! -f "$KOKORO_DIR/memoria/indice.md" ]; then
-  cat > "$KOKORO_DIR/memoria/indice.md" << 'EOF'
+# 7. Create memory index
+if [ ! -f "$ESCALA_DIR/memoria/indice.md" ]; then
+  cat > "$ESCALA_DIR/memoria/indice.md" << 'EOF'
 # Índice de Memoria — ESCALA
 
-_Actualizado automáticamente. Cada nuevo análisis se registra aquí._
+_Actualizado automáticamente._
 
 ## Dailys
 | Fecha | Empresa | Score | Archivo |
@@ -62,23 +113,33 @@ _Actualizado automáticamente. Cada nuevo análisis se registra aquí._
 | Fecha | Tipo | Empresa | Archivo |
 |-------|------|---------|---------|
 
-## Dashboards Generados
+## Dashboards
 | Fecha | Título | Archivo |
 |-------|--------|---------|
 EOF
-  echo "  ✅ Índice de memoria creado"
+  echo -e "  ${GREEN}✅${NC} Índice de memoria creado"
 fi
 
-# 7. MCP server
-if [ -f "$ESCALA_SRC/mcp/server.py" ]; then
-  cp "$ESCALA_SRC/mcp/server.py" "$KOKORO_DIR/mcp/server.py"
-  echo "  ✅ MCP server copiado"
+# ── Cleanup ─────────────────────────────────────────────────────────
+if [ "$SRC" != "$SCRIPT_SRC" ] && [ -d "$SRC" ]; then
+  rm -rf "$SRC" 2>/dev/null || true
 fi
 
+# ── Done ────────────────────────────────────────────────────────────
 echo ""
-echo "🎯 ESCALA instalado correctamente."
-echo "   Ya puedes hablar con cualquier LLM sobre escalar tu negocio."
-echo "   Los skills están disponibles en ~/.kokoro/skills/"
+echo -e "${BOLD}${GREEN}🎯 ESCALA instalado correctamente.${NC}"
 echo ""
-echo "📖 Próximo paso: abre Claude/Codex/Hermes y dile:"
-echo "   'Quiero escalar mi negocio'"
+echo -e "  ${BOLD}📂${NC} Instalado en:  ${BLUE}~/.escala/${NC}"
+echo -e "  ${BOLD}📝${NC} Identidad:     ${BLUE}~/.escala/AGENTS.md${NC}"
+echo -e "  ${BOLD}🧠${NC} Memoria:       ${BLUE}~/.escala/memoria/${NC}"
+echo -e "  ${BOLD}🔧${NC} Skills:        ${BLUE}~/.escala/skills/${NC}"
+echo ""
+echo -e "${BOLD}${YELLOW}📖 Próximo paso:${NC}"
+echo -e "  Abre Claude/Codex/Hermes y dile:"
+echo -e "  ${BLUE}\"Quiero escalar mi negocio\"${NC}"
+echo ""
+echo -e "${BOLD}${YELLOW}📖 O prueba los skills directamente:${NC}"
+echo -e "  ${BLUE}\"Analiza mi daily huddle\"${NC}"
+echo -e "  ${BLUE}\"Hagamos el Power of One\"${NC}"
+echo -e "  ${BLUE}\"Revisemos mi FACe\"${NC}"
+echo ""
