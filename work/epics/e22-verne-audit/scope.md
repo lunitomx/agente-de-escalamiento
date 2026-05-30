@@ -164,9 +164,9 @@ M3 (Polish):                   S22.9 ─► S22.10 ─► S22.11 ─► merge
 
 | Story | Size | Status | Actual | Velocity | Notes |
 |-------|:----:|:------:|:------:|:--------:|-------|
-| S22.1 — Vocabulario coloquial | S | Pending | — | — | Arreglar C3, C4, M2. `_CATEGORY_KEYWORDS` + tests |
-| S22.2 — Aleatorización + presentación | S | Pending | — | — | C5, C6, M7. `_VERNE_TEMPLATES` shuffle + "quién eres" handler |
-| S22.3 — board_debate con memoria | S | Pending | — | — | M3. Usar history para personalizar respuesta |
+| S22.1 — Vocabulario coloquial | S | Done | ~5m | 1.0 | ✅ C3, C4, M2 — 9 escenarios coloquiales verificados |
+| S22.2 — Aleatorización + presentación | S | Done | ~5m | 1.0 | ✅ C5, C6, M7, m1 — 10 frases, shuffle, whoami |
+| S22.3 — board_debate con memoria | S | Done | ~3m | 1.0 | ✅ C5 validación, M3 referencia historial |
 | S22.4 — Power of One dashboard vivo | M | Pending | — | — | Conectar API worksheets al DashboardInteractive |
 | S22.5 — Cash dashboards restantes | M | Pending | — | — | CCC, Fundability, Recurring Revenue, Cash Board |
 | S22.6 — Strategy dashboards | M | Pending | — | — | 5 dashboards |
