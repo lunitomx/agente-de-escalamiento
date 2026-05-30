@@ -132,3 +132,97 @@ Cuando el usuario pregunta "¿cómo vamos?":
 2. Ve 3 dailys: 6/12, 8/12, 10/12 → tendencia ↑
 3. Ve 1 análisis Power of One
 4. Sintetiza: "Tus dailys mejoraron de 6 a 10. El Power of One muestra $120K de oportunidad."
+
+## Síntesis avanzada (S23.4)
+
+### Consultas frecuentes del usuario y cómo responderlas
+
+#### "¿Cómo vamos?"
+1. Lee `memoria/indice.md` — extrae los últimos 5 registros de cada tipo
+2. Agrupa por tipo (dailys, análisis, dashboards)
+3. Calcula tendencias:
+   - Dailys: ¿el score sube o baja? Promedio semanal vs anterior
+   - Análisis: ¿cuántos se han completado? ¿cuáles faltan?
+4. Responde con estructura:
+   ```markdown
+   ## Última semana
+   - Dailys: 3 registros. Promedio: 8/12 (↑ vs semana anterior 6/12)
+   - Power of One: 1 análisis. Oportunidad: $120K
+   - FACe: pendiente (no lo hemos trabajado)
+   
+   ## Recomendación
+   Te sugiero trabajar el FACe — es la herramienta que falta.
+   ```
+
+#### "¿Qué pasó el [fecha]?"
+1. Busca archivos con esa fecha en el frontmatter:
+   ```bash
+   grep -l "fecha: 2026-05-30" ~/.escala/memoria/**/*.md
+   ```
+2. Lee los archivos encontrados
+3. Resume: "El 30 de mayo analizaste un daily (score 10/12) e hiciste el Power of One."
+
+#### "Muéstrame los dailys de esta semana"
+1. Calcula la fecha de inicio de la semana actual
+2. Busca archivos en `memoria/dailys/` con fecha >= inicio_semana
+3. Lee los scores de cada uno
+4. Genera tabla:
+   ```markdown
+   | Fecha | Score | 
+   |-------|:-----:|
+   | Lun   | 6/12  |
+   | Mar   | 8/12  |
+   | Mié   | 10/12 |
+   | **Promedio** | **8/12** |
+   ```
+
+#### "¿Qué me recomiendas basado en mis datos?"
+1. Lee índice para tener panorama completo
+2. Identifica:
+   - Herramientas NO trabajadas (FACe vacío, OPSP vacío)
+   - Áreas débiles (dailys sin métricas, CCC alto)
+   - Análisis antiguos que merecen actualización
+3. Responde priorizando:
+   ```markdown
+   Basado en tus 12 análisis guardados:
+   
+   1️⃣ **Prioridad: FACe** — Nunca lo hemos trabajado
+      Sin un organigrama claro, las contrataciones son al tanteo.
+   
+   2️⃣ **Mejorar dailys** — 3 de 5 dailys no tienen métricas
+      Sin scoreboard, el huddle pierde su poder.
+   
+   3️⃣ **Actualizar Power of One** — El último es de enero
+      Tus números cambiaron, el impacto también.
+   ```
+
+### Patrones de síntesis
+
+| Contexto | Patrón |
+|----------|--------|
+| Datos numéricos (scores, $) | Calcula promedios, tendencias, totales |
+| Herramientas completadas | Checklist: ✅/⚠️/❌ con prioridad |
+| Relaciones entre análisis | Enlaza: "cuando hicimos FACe, detectaste que te faltaba un gerente" |
+| Recomendaciones | Prioriza por impacto: "esto te puede liberar más efectivo" |
+
+### Comandos de búsqueda avanzada
+
+```bash
+# Buscar por rango de fechas
+grep -E "fecha: 2026-05-2[5-9]" ~/.escala/memoria/**/*.md
+
+# Buscar por score mínimo
+grep -l "score: [89]/12\|score: 1[0-2]/12" ~/.escala/memoria/dailys/*.md
+
+# Buscar por tag
+grep -l "tags:.*cash.*" ~/.escala/memoria/**/*.md
+
+# Buscar por empresa + tipo
+grep -l "empresa: Carnicería" ~/.escala/memoria/analisis/*.md
+
+# Contar registros por tipo
+for f in ~/.escala/memoria/*/; do echo "$(basename $f): $(ls "$f" 2>/dev/null | wc -l) archivos"; done
+
+# Extraer todos los scores de dailys
+grep -h "score:" ~/.escala/memoria/dailys/*.md | sed 's/.*: //'
+```
