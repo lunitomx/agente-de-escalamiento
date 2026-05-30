@@ -195,6 +195,12 @@ def main():
     verne_review_parser.add_argument("--db-path", default=str(Path.home() / ".escala" / "escala.db"),
                                      help="SQLite database path")
 
+    verne_debate_parser = verne_sub.add_parser("debate", help="Debatir una decisión estratégica con Verne")
+    verne_debate_parser.add_argument("decision", nargs="+", help="Decisión estratégica a debatir")
+    verne_debate_parser.add_argument("--context", help="Contexto de la empresa")
+    verne_debate_parser.add_argument("--db-path", default=str(Path.home() / ".escala" / "escala.db"),
+                                     help="SQLite database path")
+
     args = parser.parse_args()
 
     if args.command == "start":
@@ -282,10 +288,24 @@ def cmd_verne(args):
         print()
         print(result.get("observations", ""))
         print()
+    elif args.verne_command == "debate":
+        decision = " ".join(args.decision)
+        context = getattr(args, "context", None)
+        handler = VerneHandler(args.db_path)
+        result = handler.board_debate(decision=decision, context=context)
+        print()
+        print(result.get("response", ""))
+        print()
+        if result.get("next_questions"):
+            print("Próximas preguntas para reflexionar:")
+            for i, q in enumerate(result["next_questions"], 1):
+                print(f"  {i}. {q}")
+        print()
     else:
-        print("Comandos de Verne: ask, review-daily")
+        print("Comandos de Verne: ask, review-daily, debate")
         print("  escala verne ask \"tu pregunta\"")
         print("  escala verne review-daily \"ayer logré X, hoy haré Y, obstáculo Z\"")
+        print("  escala verne debate \"deberíamos expandirnos a nuevo mercado\"")
 
 
 if __name__ == "__main__":

@@ -315,6 +315,15 @@ def _build_router() -> Router:
         daily_text = (payload or {}).get("daily_text", "")
         return EscalaRequestHandler.verne.review_daily(daily_text=daily_text)
 
+    @router.post("/api/verne/debate")
+    def verne_debate(payload=None):
+        decision = (payload or {}).get("decision", "")
+        context = (payload or {}).get("context")
+        history = (payload or {}).get("history")
+        return EscalaRequestHandler.verne.board_debate(
+            decision=decision, context=context, history=history
+        )
+
     return router
 
 
