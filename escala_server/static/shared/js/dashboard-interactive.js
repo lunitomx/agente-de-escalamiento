@@ -41,6 +41,18 @@ var DashboardInteractive = (function () {
     loadFromServer();
   }
 
+  function applySavedData(savedVars) {
+    var keys = state.variableKeys;
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i];
+      if (savedVars[key] !== undefined) {
+        state.variables[key].current = savedVars[key].current || 0;
+        state.variables[key].adjusted = savedVars[key].adjusted || 0;
+      }
+    }
+    state.savedVersion = JSON.parse(JSON.stringify(state.variables));
+  }
+
   function loadFromServer() {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', state.apiPath, true);
@@ -48,8 +60,12 @@ var DashboardInteractive = (function () {
       if (xhr.status === 200) {
         try {
           var resp = JSON.parse(xhr.responseText);
-          if (resp.data && resp.data.variables) {
-            applySavedData(resp.data.variables);
+          // Handle both {data: {variables: ...}} and {data: {data: {variables: ...}}}
+          var payload = resp.data || {};
+          if (payload.data && payload.data.variables) {
+            applySavedData(payload.data.variables);
+          } else if (payload.variables) {
+            applySavedData(payload.variables);
           }
         } catch (e) { /* ignore parse errors */ }
       }
