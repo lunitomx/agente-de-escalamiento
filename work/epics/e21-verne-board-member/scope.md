@@ -1,7 +1,7 @@
 # Epic Scope: E21 — Verne Harnish Board Member
 
-**Status:** Draft
-**Dependencies:** E19 (grafo de conocimiento del libro)
+**Status:** Complete
+**Dependencies:** E19 (grafo de conocimiento del libro), E18 (infraestructura)
 **Tamaño:** XL
 
 ## In Scope
@@ -28,12 +28,12 @@
 - El alma debe basarse ESTRICTAMENTE en el libro — no inventar
 
 ## Done Criteria
-- [ ] `miembro-board/verne-harnish.md` completo con framework, preguntas, lente, sesgos, principios
-- [ ] Verne puede analizar un daily y dar observaciones
-- [ ] Verne puede responder a "¿qué opinas de X?" con coherencia
-- [ ] Integrado con escala-inicia: Verne recibe contexto de la sesión
-- [ ] Los skills pueden consultar "¿qué diría Verne sobre X?"
-- [ ] Tests: respuestas de Verne son coherentes con el libro
+- [x] `miembro-board/verne-harnish.md` completo con framework, preguntas, lente, sesgos, principios
+- [x] Verne puede analizar un daily y dar observaciones
+- [x] Verne puede responder a "¿qué opinas de X?" con coherencia
+- [x] Integrado con escala-cierra: Verne recibe contexto de la sesión
+- [x] Los skills pueden consultar "¿qué diría Verne sobre X?"
+- [x] Tests: respuestas de Verne son coherentes con el libro
 
 ## Implementation Plan
 
@@ -89,7 +89,7 @@ Stream 3 (Paralelo):         S21.6 ───────────────
 | S21.3 — Revisión de dailys | M | Done | ~10m | 1.0 | ✅ review_daily(), 5-element checklist, 15 tests |
 | S21.4 — Integración ciclo sesión | S | Done | ~8m | 1.0 | ✅ session_perspective() en cmd_cierra, 18 tests |
 | S21.5 — Modo board completo | M | Done | ~12m | 1.0 | ✅ board_debate() multi-turno, 4D analysis, 21 tests |
-| S21.6 — Tests de coherencia | S | Pending | — | — | Tests contra libro: preguntas conocidas, respuestas esperadas |
+| S21.6 — Tests de coherencia | S | Done | ~5m | 1.0 | ✅ 7 coherence tests, 28 total |
 
 ### Sequencing Risks
 
