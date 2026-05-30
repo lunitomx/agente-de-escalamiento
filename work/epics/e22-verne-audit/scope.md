@@ -1,6 +1,6 @@
 # Epic Scope: E22 — Full System Audit (3 Empresas × Todos los Skills)
 
-**Status:** Draft
+**Status:** In Progress
 **Dependencies:** E14 (Cash dashboards), E15 (Strategy dashboards), E16 (People dashboards), E17 (Execution dashboards), E21 (Verne)
 **Tamaño:** L
 
@@ -98,6 +98,90 @@ Para cada empresa, se usaron TDDOS los skills disponibles:
 
 ## Done Criteria
 
-- [ ] C1-C6 creados como stories y priorizados
-- [ ] M1-M7 creados como stories
+- [ ] C1-C6 resueltos
+- [ ] M1-M7 resueltos  
 - [ ] Auditoría commiteada en E22
+
+## Implementation Plan
+
+> Added by `/rai-epic-plan` — 2026-05-30
+
+### Story Sequence
+
+| Order | Story | Size | Dependencies | Milestone | Rationale |
+|:-----:|-------|:----:|--------------|-----------|-----------|
+| 1 | **S22.1 — Vocabulario coloquial** | S | — | M1 | Quick win alto impacto: arreglar C3, C4, M2 en 1 archivo |
+| 2 | **S22.2 — Aleatorización + presentación** | S | — | M1 | Quick win: C5, C6, M7. Verne deja de sonar a robot |
+| 3 | **S22.3 — board_debate con memoria** | S | — | M1 | Quick win: M3 + validación. El debate profundiza |
+| 4 | **S22.4 — Power of One dashboard vivo** | M | S14 | M2 | **Primer dashboard funcional.** Conectar API data al HTML existente |
+| 5 | **S22.5 — Cash dashboards restantes** | M | S22.4 | M2 | CCC, Fundability, Recurring Revenue, Cash Board |
+| 6 | **S22.6 — Strategy dashboards** | M | S22.4 | M2 | BMC, Brand Promises, Core Customer, Diff Activities, Sandbox |
+| 7 | **S22.7 — People dashboards** | M | S22.4 | M2 | Core Values, DISC, FACe, Hiring Pipeline, Love/Loathe, Team Growth |
+| 8 | **S22.8 — Execution dashboards** | M | S22.4 | M2 | Balanced KPIs, Influencers, Meeting Rhythms, Priorities, Rockefeller Habits, Vision Summary, WWW |
+| 9 | **S22.9 — Context panel + sugerencias** | S | S22.4 | M2 | M4 + M6. Contexto del grafo al lado + "basado en tus datos..." |
+| 10 | **S22.10 — Sesiones + adaptación** | S | — | M3 | M5 + M1. Session close fix + conciencia de tipo de empresa |
+| 11 | **S22.11 — Tests coloquiales** | S | S22.1 | M3 | m5. Tests con lenguaje de carnicería, consultoría, SaaS |
+| 12 | **S22.12 — Export, logging, pulido** | S | — | M3 | m1-m4: variación, export CSV, logging, integraciones |
+
+### Milestones
+
+| Milestone | Stories | Success Criteria |
+|-----------|---------|------------------|
+| **M1: Quick Wins** | S22.1, S22.2, S22.3 | Clasificación arreglada. Verne con personalidad. Debate con memoria. |
+| **M2: Dashboards Vivos** | S22.4 — S22.9 | 22 dashboards muestran datos reales de worksheets. Context panel activo. Sugerencias post-dashboard. |
+| **M3: Sesiones Pulidas** | S22.10 — S22.12 | Sesiones funcionan. Tests coloquiales pasan. Export disponible. |
+
+### Sequencing Strategy
+
+**Risk-first / Quick wins:** Los primeros 3 stories (S22.1-S22.3) son fixes pequeños
+en 1-2 archivos cada uno. Se resuelven rápido mientras calentamos para la
+carga pesada.
+
+**Walking skeleton dashboard (S22.4):** Power of One es el único dashboard que
+tiene el motor interactivo. Primero lo hacemos funcional (conectar API data),
+luego replicamos el patrón a los otros 22 dashboards (S22.5-S22.8). Esto
+comprueba la arquitectura antes de escalar.
+
+**Dependency-driven:** S22.5-S22.8 dependen de S22.4 (el patrón). S22.9
+depende de tener dashboards funcionales. S22.11 depende de S22.1.
+
+### Parallel Work Streams
+
+```
+Tiempo →
+M1 (Quick Wins):  S22.1 ─► S22.2 ─► S22.3
+                                               ↓
+M2 (Dashboards):  S22.4 ─┬─► S22.5 ─► S22.6 ─► merge
+                         │       └► S22.7 ────┘
+                         └► S22.8 ────────────► merge
+                                                    ↓
+M3 (Polish):                   S22.9 ─► S22.10 ─► S22.11 ─► merge
+                                                    ↓
+                                         S22.12 ────┘
+```
+
+### Progress Tracking
+
+| Story | Size | Status | Actual | Velocity | Notes |
+|-------|:----:|:------:|:------:|:--------:|-------|
+| S22.1 — Vocabulario coloquial | S | Pending | — | — | Arreglar C3, C4, M2. `_CATEGORY_KEYWORDS` + tests |
+| S22.2 — Aleatorización + presentación | S | Pending | — | — | C5, C6, M7. `_VERNE_TEMPLATES` shuffle + "quién eres" handler |
+| S22.3 — board_debate con memoria | S | Pending | — | — | M3. Usar history para personalizar respuesta |
+| S22.4 — Power of One dashboard vivo | M | Pending | — | — | Conectar API worksheets al DashboardInteractive |
+| S22.5 — Cash dashboards restantes | M | Pending | — | — | CCC, Fundability, Recurring Revenue, Cash Board |
+| S22.6 — Strategy dashboards | M | Pending | — | — | 5 dashboards |
+| S22.7 — People dashboards | M | Pending | — | — | 6 dashboards |
+| S22.8 — Execution dashboards | M | Pending | — | — | 7 dashboards |
+| S22.9 — Context panel + sugerencias | S | Pending | — | — | Activar context-panel.js + sugerencias post-data |
+| S22.10 — Sesiones + adaptación | S | Pending | — | — | Session close fix + tipo de empresa |
+| S22.11 — Tests coloquiales | S | Pending | — | — | Tests con lenguaje de los 3 buyer personas |
+| S22.12 — Export, logging, pulido | S | Pending | — | — | Variación frases, CSV, logging |
+
+### Sequencing Risks
+
+| Risk | L/I | Mitigation |
+|------|:---:|------------|
+| S22.4-S22.8: 22 dashboards to wire up | H/H | Power of One como template. Script de generación para los 22. No hacerlos a mano. |
+| DashboardInteractive.init() API puede no ser compatible con worksheet data model | M/M | Inspeccionar el JS existente primero. Adaptar si es necesario. |
+| m2-m4 (logging, export, integraciones) pueden crecer en scope | M/L | Marcar m2-m4 como "nice to have" — no bloquean M3 |
+
