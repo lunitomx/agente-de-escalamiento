@@ -90,13 +90,29 @@ habla contigo, usa skills, guarda en markdown, genera HTML cuando lo necesitas.
 ## Done Criteria
 
 - [ ] `curl https://kokoro.sh | bash` instala todo
-- [ ] Claude/Codex/Hermes carga AGENTS.md y sabe que es Kokoro
+- [ ] Claude/Codex/Hermes carga AGENTS.md y sabe que es Escala
 - [ ] Cada análisis guarda .md en `memoria/` con frontmatter + links
 - [ ] El agente puede buscar y sintetizar análisis anteriores
 - [ ] El agente puede generar HTML visual bajo demanda
 - [ ] Skills funcionan en Claude, Codex y Hermes
 - [ ] Servidor MCP opcional funcional
 - [ ] El servidor `escala_server/` legacy queda como compatible pero no necesario
+
+## Progress Tracking
+
+| Story | Size | Status | Notes |
+|-------|:----:|:------:|-------|
+| S23.1 — Package Structure | M | ✅ Done | AGENTS.md + setup.sh + estructura |
+| S23.2 — Setup Script | S | Pending | — |
+| S23.3 — Memoria Core | M | Pending | — |
+| S23.4 — Búsqueda y síntesis | M | Pending | — |
+| S23.5 — Dashboard Generado | M | Pending | — |
+| S23.6 — escala-cash refactor | M | Pending | — |
+| S23.7 — escala-strategy refactor | M | Pending | — |
+| S23.8 — escala-people refactor | M | Pending | — |
+| S23.9 — escala-execution refactor | M | Pending | — |
+| S23.10 — Identidad Core | S | Pending | — |
+| S23.11 — MCP Server opcional | S | Pending | — |
 
 ## Risks
 
