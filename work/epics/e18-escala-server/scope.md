@@ -278,7 +278,10 @@ Stream 2 (Dashboards):  S18.3 ──► S18.2 ──► S18.5/S18.6/S18.7 ──
 | S18.3 no tiene S18.8 como dependencia — guardado inicial sin SQLite puede requerir refactor | M/L | Diseñar interfaz de persistencia abstracta desde S18.1 para que S18.8 la implemente después. |
 | 22 dashboards existentes (E14-E17) pueden tener dependencias HTML/CSS no documentadas | M/M | Auditoría rápida de dashboards existentes antes de S18.3. |
 
-## Status: In Progress
+## Status: COMPLETE
+
+> Cerrada formalmente en commit `2a63e09` — epic(e18): close with retrospective
+> Tag: `epic/e18-complete`
 
 ## Done Criteria
 - [x] `escala.db` con todas las tablas
