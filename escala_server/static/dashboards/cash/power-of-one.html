@@ -3,256 +3,429 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Power of One — Interactivo | ScaleUp</title>
+  <title>Power of One — Motor | ScaleUp</title>
   <link rel="stylesheet" href="../../shared/styles/dashboard-base.css">
   <link rel="stylesheet" href="../../shared/styles/context-panel.css">
   <style>
-    /* Interactive additions */
-    .interactive-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 16px;
-      background: #f8fafc;
-      border-bottom: 1px solid #e2e8f0;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .interactive-bar h2 { margin: 0; font-size: 1.1rem; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f1f5f9; color: #1e293b; padding: 24px; }
+    .tool-header { margin-bottom: 20px; }
+    .tool-header h1 { font-size: 1.3rem; color: #0f172a; }
+    .tool-header .breadcrumb { font-size: 0.8rem; color: #64748b; }
+    .tool-header .breadcrumb a { color: #2563eb; text-decoration: none; }
 
-    .save-btn {
-      padding: 8px 20px;
-      background: #2563eb;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      font-weight: 600;
-      transition: background 0.2s;
-    }
-    .save-btn:hover { background: #1d4ed8; }
-    .save-btn:active { background: #1e40af; }
+    .company-selector { margin-bottom: 20px; background: white; border-radius: 8px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .company-selector select { padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.9rem; flex: 1; min-width: 200px; background: #f8fafc; }
+    .company-selector label { font-weight: 600; color: #475569; }
 
-    .save-indicator {
-      font-size: 0.85rem;
-      padding: 4px 12px;
-      border-radius: 12px;
-      font-weight: 500;
-    }
-    .save-indicator.saved { background: #dcfce7; color: #166534; }
-    .save-indicator.modified { background: #fef9c3; color: #854d0e; }
+    .metrics-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin-bottom: 16px; }
+    .metric-pill { background: white; border-radius: 8px; padding: 10px 14px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .metric-pill h4 { margin: 0 0 4px; font-size: 0.7rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+    .metric-pill .val { font-size: 1.1rem; font-weight: 700; }
+    .metric-pill .val.green { color: #16a34a; }
+    .metric-pill .val.red { color: #dc2626; }
+    .metric-pill .val.gray { color: #64748b; }
 
-    .sliders-section {
-      padding: 16px;
-      background: white;
-      border-radius: 8px;
-      margin: 12px 16px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    }
-    .slider-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 8px 0;
-      border-bottom: 1px solid #f1f5f9;
-    }
-    .slider-row:last-child { border-bottom: none; }
-
-    .slider-label {
-      min-width: 150px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: #334155;
-    }
-    .slider-value {
-      min-width: 100px;
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: #1e293b;
-      text-align: right;
-    }
-    .slider-input {
-      flex: 1;
-      min-width: 120px;
-      height: 6px;
-      -webkit-appearance: none;
-      appearance: none;
-      background: #e2e8f0;
-      border-radius: 3px;
-      outline: none;
-      cursor: pointer;
-    }
-    .slider-input::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 18px;
-      height: 18px;
-      background: #2563eb;
-      border-radius: 50%;
-      cursor: pointer;
-      transition: transform 0.15s;
-    }
-    .slider-input::-webkit-slider-thumb:hover { transform: scale(1.2); }
-    .slider-input::-moz-range-thumb {
-      width: 18px;
-      height: 18px;
-      background: #2563eb;
-      border-radius: 50%;
-      cursor: pointer;
-      border: none;
-    }
-    .slider-current {
-      min-width: 100px;
-      font-size: 0.8rem;
-      color: #94a3b8;
-      text-align: right;
-    }
-
-    .impact-summary {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 12px;
-      padding: 16px;
-      margin: 0 16px 16px;
-    }
-    .impact-card {
-      background: white;
-      border-radius: 8px;
-      padding: 16px;
-      text-align: center;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    }
-    .impact-card h3 {
-      margin: 0 0 8px;
-      font-size: 0.8rem;
-      color: #64748b;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .impact-card .value {
-      font-size: 1.4rem;
-      font-weight: 700;
-    }
+    .impact-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .impact-card { background: white; border-radius: 8px; padding: 16px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .impact-card h3 { margin: 0 0 8px; font-size: 0.8rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+    .impact-card .value { font-size: 1.5rem; font-weight: 700; }
     .impact-card .value.positive { color: #16a34a; }
     .impact-card .value.negative { color: #dc2626; }
     .impact-card .value.neutral { color: #64748b; }
 
-    /* Responsive */
+    .levers-container { display: grid; gap: 6px; }
+    .lever-row { background: white; border-radius: 8px; padding: 10px 16px; display: flex; align-items: center; gap: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); flex-wrap: wrap; }
+    .lever-name { min-width: 200px; font-weight: 600; color: #334155; font-size: 0.85rem; }
+    .lever-base { color: #94a3b8; font-size: 0.8rem; min-width: 100px; }
+    .lever-buttons { display: flex; gap: 3px; }
+    .lever-btn { width: 32px; height: 32px; border-radius: 6px; border: 1px solid #e2e8f0; background: #f8fafc; cursor: pointer; font-size: 0.9rem; font-weight: 700; transition: all 0.15s; }
+    .lever-btn.up { color: #16a34a; border-color: #bbf7d0; }
+    .lever-btn.up:hover { background: #dcfce7; }
+    .lever-btn.down { color: #dc2626; border-color: #fecaca; }
+    .lever-btn.down:hover { background: #fee2e2; }
+    .lever-btn:active { transform: scale(0.95); }
+    .lever-adj { min-width: 65px; font-size: 0.8rem; font-weight: 600; text-align: center; }
+    .lever-adj.pos { color: #16a34a; }
+    .lever-adj.neg { color: #dc2626; }
+    .lever-adj.zero { color: #94a3b8; }
+    .lever-impact { min-width: 110px; font-size: 0.85rem; text-align: right; font-weight: 600; margin-left: auto; }
+
+    .priorities { margin-top: 16px; background: white; border-radius: 8px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .priorities h3 { margin: 0 0 12px; font-size: 0.95rem; color: #0f172a; }
+    .priority-row { display: flex; align-items: center; gap: 12px; padding: 6px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; }
+    .priority-row:last-child { border-bottom: none; }
+    .priority-rank { font-weight: 700; color: #2563eb; min-width: 24px; }
+    .priority-label { flex: 1; }
+    .priority-impact { font-weight: 600; min-width: 100px; text-align: right; }
+    .priority-score { color: #94a3b8; font-size: 0.75rem; min-width: 60px; text-align: right; }
+    .priority-diff { min-width: 80px; }
+
+    .attribution { margin-top: 24px; font-size: 0.75rem; color: #94a3b8; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 12px; }
+
     @media (max-width: 640px) {
-      .slider-row { flex-wrap: wrap; }
-      .slider-label { min-width: 120px; }
-      .slider-value { min-width: 80px; }
-      .slider-current { min-width: 80px; }
+      .lever-row { flex-direction: column; align-items: stretch; }
+      .lever-name { min-width: auto; }
+      .lever-impact { margin-left: 0; text-align: left; }
     }
   </style>
 </head>
 <body>
   <div class="dashboard-container" role="main">
-    <!-- Interactive Bar -->
-    <div class="interactive-bar">
-      <h2>🔄 Power of One — Interactivo</h2>
-      <div style="display:flex;align-items:center;gap:12px;">
-        <span id="save-indicator" class="save-indicator saved">💾 Guardado</span>
-        <button id="save-btn" class="save-btn" onclick="DashboardInteractive.save()">💾 Guardar</button>
-      </div>
+    <div class="tool-header">
+      <div class="breadcrumb"><a href="/">Home</a> › <a href="/" onclick="event.preventDefault();window.location.href='/'">Cash</a> › Power of One</div>
+      <h1>🔄 Power of One — Motor de 7 Palancas</h1>
     </div>
 
-    <!-- Impact Summary Cards -->
-    <div class="impact-summary" id="impact-summary">
+    <!-- Company selector -->
+    <div class="company-selector">
+      <label for="company-select">🏢 Empresa:</label>
+      <select id="company-select" onchange="loadCompany()">
+        <option value="">— Seleccionar empresa —</option>
+      </select>
+      <span id="industry-badge" style="font-size:0.8rem;color:#64748b;"></span>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="metrics-bar" id="metrics-bar">
+      <div class="metric-pill"><h4>Ventas Anuales</h4><div class="val gray" id="m-sales">—</div></div>
+      <div class="metric-pill"><h4>Margen Utilidad</h4><div class="val gray" id="m-margin">—</div></div>
+      <div class="metric-pill"><h4>CCC (días)</h4><div class="val gray" id="m-ccc">—</div></div>
+      <div class="metric-pill"><h4>DSO</h4><div class="val gray" id="m-dso">—</div></div>
+      <div class="metric-pill"><h4>DIO</h4><div class="val gray" id="m-dio">—</div></div>
+      <div class="metric-pill"><h4>DPO</h4><div class="val gray" id="m-dpo">—</div></div>
+    </div>
+
+    <!-- Impact Summary -->
+    <div class="impact-summary">
       <div class="impact-card">
-        <h3>Impacto CF</h3>
+        <h3>Impacto en Cash Flow</h3>
         <div id="total-cf" class="value neutral">$0</div>
       </div>
       <div class="impact-card">
-        <h3>Impacto EBIT</h3>
+        <h3>Impacto en EBIT</h3>
         <div id="total-ebit" class="value neutral">$0</div>
       </div>
       <div class="impact-card">
-        <h3>Estado</h3>
-        <div id="aggregate-status" class="value neutral">Sin datos</div>
+        <h3>Mejora Compuesta</h3>
+        <div id="compounded" class="value neutral">—</div>
       </div>
     </div>
 
-    <!-- Sliders -->
-    <div class="sliders-section">
-      <h3 style="margin:0 0 12px;font-size:0.95rem;color:#475569;">Ajusta las palancas</h3>
-      <div id="sliders-container"></div>
+    <!-- Levers -->
+    <div class="levers-container" id="levers-container"></div>
+
+    <!-- Priorities -->
+    <div class="priorities" id="priorities-section" style="display:none;">
+      <h3>🎯 Prioridades de implementación</h3>
+      <div id="priorities-list"></div>
     </div>
 
-    <!-- Original static table (hidden, preserved for reference) -->
-    <div id="original-container" style="display:none;"></div>
+    <p class="attribution">
+      Metodología: <strong>Alan Miltz</strong> · Implementación original: <strong>Humberto Martínez Barón</strong> · Adaptación: Kokoro (Eduardo Muñoz Luna)
+    </p>
   </div>
 
-  <!-- Scripts -->
-  <script src="../../shared/js/power-of-one-engine.js"></script>
-  <script src="../../shared/js/dashboard-interactive.js"></script>
   <script>
     (function () {
       'use strict';
 
-      // ── Default variables ────────────────────────────────────────────────
-      var defaultVariables = {
-        price:     { label: 'Precio por Unidad',    category: 'revenue',        unit: '$', current: 120, adjusted: 120 },
-        volume:    { label: 'Volumen mensual',       category: 'revenue',        unit: 'u', current: 10000, adjusted: 10000 },
-        cogs:      { label: 'COGS %',               category: 'cost',           unit: '%', current: 55, adjusted: 55 },
-        overheads: { label: 'Gastos Fijos Mensuales',category: 'cost',           unit: '$', current: 85000, adjusted: 85000 },
-        ar_days:   { label: 'Días Cuentas por Cobrar',category: 'working_capital', unit: 'd', current: 30, adjusted: 30 },
-        inv_days:  { label: 'Días Inventario',       category: 'working_capital', unit: 'd', current: 15, adjusted: 15 },
-        ap_days:   { label: 'Días Cuentas por Pagar',category: 'working_capital', unit: 'd', current: 20, adjusted: 20 }
+      // ── State ──────────────────────────────────────────────────
+      var API_BASE = '';
+      var currentFinancials = null;
+      var adjustments = {};
+      var LEVER_META = {
+        price:    { label: 'Precio', type: 'pct', dir: 'up', difficulty: 3, time: '2-4 semanas' },
+        volume:   { label: 'Volumen', type: 'pct', dir: 'up', difficulty: 4, time: '1-3 meses' },
+        cogs:     { label: 'COGS (Costo de Ventas)', type: 'pct', dir: 'down', difficulty: 3, time: '1-2 meses' },
+        opex:     { label: 'Gastos Operativos', type: 'pct', dir: 'down', difficulty: 2, time: '2-6 semanas' },
+        ar_days:  { label: 'Cuentas por Cobrar (DSO)', type: 'day', dir: 'down', difficulty: 2, time: '2-4 semanas' },
+        inv_days: { label: 'Inventario (DIO)', type: 'day', dir: 'down', difficulty: 3, time: '1-3 meses' },
+        ap_days:  { label: 'Cuentas por Pagar (DPO)', type: 'day', dir: 'up', difficulty: 2, time: '2-8 semanas' },
+      };
+      var LEVER_IDS = Object.keys(LEVER_META);
+
+      // ── Default financials by industry ─────────────────────────
+      var DEFAULT_FINANCIALS = {
+        'Carnicería El Buen Corte': {
+          net_sales: 5400000, cogs: 3840000, opex: 1080000,
+          accounts_receivable: 150000, inventory: 300000, accounts_payable: 200000, net_profit: 480000,
+          industry: 'food'
+        },
+        'Estrategia 360 Consultores': {
+          net_sales: 14400000, cogs: 5760000, opex: 4200000,
+          accounts_receivable: 3600000, inventory: 0, accounts_payable: 1200000, net_profit: 1440000,
+          industry: 'services'
+        },
+        'CloudScale Technologies': {
+          net_sales: 42000000, cogs: 8400000, opex: 21600000,
+          accounts_receivable: 2000000, inventory: 0, accounts_payable: 3500000, net_profit: 8400000,
+          industry: 'saas'
+        },
+      };
+      var DEFAULT_FALLBACK = {
+        net_sales: 12000000, cogs: 7200000, opex: 3600000,
+        accounts_receivable: 1500000, inventory: 600000, accounts_payable: 800000, net_profit: 1200000,
+        industry: 'services'
       };
 
-      var VARIABLE_KEYS = ['price', 'volume', 'cogs', 'overheads', 'ar_days', 'inv_days', 'ap_days'];
+      // ── Init ───────────────────────────────────────────────────
+      function init() {
+        loadCompanies();
+      }
 
-      var variableMeta = {
-        price:     { label: 'Precio por Unidad',    unit: '$', min: 0, max: 500, step: 1 },
-        volume:    { label: 'Volumen (unidades)',    unit: 'u', min: 0, max: 100000, step: 100 },
-        cogs:      { label: 'COGS %',               unit: '%', min: 0, max: 100, step: 0.1 },
-        overheads: { label: 'Gastos Generales',      unit: '$', min: 0, max: 1000000, step: 1000 },
-        ar_days:   { label: 'Días A/R',             unit: 'd', min: 0, max: 120, step: 1 },
-        inv_days:  { label: 'Días Inventario',       unit: 'd', min: 0, max: 180, step: 1 },
-        ap_days:   { label: 'Días A/P',             unit: 'd', min: 0, max: 120, step: 1 }
+      // ── Load companies ─────────────────────────────────────────
+      function loadCompanies() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', API_BASE + '/api/companies', true);
+        xhr.onload = function() {
+          if (xhr.status === 200) {
+            try {
+              var resp = JSON.parse(xhr.responseText);
+              var companies = resp.data || [];
+              var sel = document.getElementById('company-select');
+              companies.forEach(function(c) {
+                var opt = document.createElement('option');
+                opt.value = c.id;
+                opt.textContent = c.name;
+                sel.appendChild(opt);
+              });
+            } catch(e) {}
+          }
+        };
+        xhr.send();
+      }
+
+      // ── Load company data ──────────────────────────────────────
+      window.loadCompany = function() {
+        var sel = document.getElementById('company-select');
+        var name = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].textContent : '';
+        document.getElementById('industry-badge').textContent = '';
+
+        // Try to load from defaults
+        var fin = DEFAULT_FINANCIALS[name] || DEFAULT_FALLBACK;
+        currentFinancials = {
+          net_sales: fin.net_sales,
+          cogs: fin.cogs,
+          opex: fin.opex,
+          accounts_receivable: fin.accounts_receivable,
+          inventory: fin.inventory,
+          accounts_payable: fin.accounts_payable,
+          net_profit: fin.net_profit,
+        };
+        document.getElementById('industry-badge').textContent = '🏭 ' + (fin.industry || 'services');
+
+        // Reset adjustments
+        LEVER_IDS.forEach(function(k) { adjustments[k] = 0; });
+
+        renderLevers();
+        calculate();
       };
 
-      // ── Recalc handler ──────────────────────────────────────────────────
-      function onRecalc(vars, impacts) {
-        var totalCF = 0;
-        var totalEBIT = 0;
+      // ── Render levers ──────────────────────────────────────────
+      function renderLevers() {
+        var container = document.getElementById('levers-container');
+        if (!container || !currentFinancials) return;
+        container.innerHTML = '';
 
-        // Calculate totals
-        for (var i = 0; i < impacts.length; i++) {
-          totalCF += impacts[i].cfImpact;
-          totalEBIT += impacts[i].ebitImpact;
+        LEVER_IDS.forEach(function(k) {
+          var meta = LEVER_META[k];
+          var adj = adjustments[k] || 0;
+          var row = document.createElement('div');
+          row.className = 'lever-row';
+
+          // Name
+          var name = document.createElement('span');
+          name.className = 'lever-name';
+          name.textContent = meta.label;
+          row.appendChild(name);
+
+          // Base value
+          var baseVal = getBaseValue(k);
+          var base = document.createElement('span');
+          base.className = 'lever-base';
+          base.textContent = 'Base: ' + formatBase(k, baseVal);
+          row.appendChild(base);
+
+          // Buttons
+          var btns = document.createElement('div');
+          btns.className = 'lever-buttons';
+          var downBtn = document.createElement('button');
+          downBtn.className = 'lever-btn down';
+          downBtn.textContent = '−1';
+          downBtn.addEventListener('click', function() { adjust(k, -1); });
+          btns.appendChild(downBtn);
+          var upBtn = document.createElement('button');
+          upBtn.className = 'lever-btn up';
+          upBtn.textContent = '+1';
+          upBtn.addEventListener('click', function() { adjust(k, 1); });
+          btns.appendChild(upBtn);
+          row.appendChild(btns);
+
+          // Adjustment
+          var adjEl = document.createElement('span');
+          adjEl.className = 'lever-adj ' + (adj > 0 ? 'pos' : adj < 0 ? 'neg' : 'zero');
+          adjEl.id = 'adj-' + k;
+          adjEl.textContent = formatAdj(adj, meta.type);
+          row.appendChild(adjEl);
+
+          // Impact
+          var imp = document.createElement('span');
+          imp.className = 'lever-impact';
+          imp.id = 'impact-' + k;
+          imp.textContent = '—';
+          row.appendChild(imp);
+
+          container.appendChild(row);
+        });
+      }
+
+      function getBaseValue(k) {
+        if (!currentFinancials) return 0;
+        if (k === 'price') return currentFinancials.net_sales / (currentFinancials.net_sales / 100);
+        if (k === 'volume') return currentFinancials.net_sales;
+        if (k === 'cogs') return currentFinancials.cogs;
+        if (k === 'opex') return currentFinancials.opex;
+        if (k === 'ar_days') return currentFinancials.accounts_receivable;
+        if (k === 'inv_days') return currentFinancials.inventory;
+        if (k === 'ap_days') return currentFinancials.accounts_payable;
+        return 0;
+      }
+
+      function formatBase(k, val) {
+        var meta = LEVER_META[k];
+        if (meta.type === 'day') return val.toLocaleString('en-US') + ' (días)';
+        return '$' + val.toLocaleString('en-US');
+      }
+
+      function formatAdj(adj, type) {
+        if (adj === 0) return '—';
+        var prefix = adj > 0 ? '+' : '';
+        if (type === 'day') return prefix + adj + 'd';
+        return prefix + adj + '%';
+      }
+
+      // ── Adjust ─────────────────────────────────────────────────
+      function adjust(k, delta) {
+        adjustments[k] = (adjustments[k] || 0) + delta;
+        var adjEl = document.getElementById('adj-' + k);
+        if (adjEl) {
+          var a = adjustments[k];
+          var meta = LEVER_META[k];
+          adjEl.textContent = formatAdj(a, meta.type);
+          adjEl.className = 'lever-adj ' + (a > 0 ? 'pos' : a < 0 ? 'neg' : 'zero');
+        }
+        calculate();
+      }
+
+      // ── Calculate via API ──────────────────────────────────────
+      function calculate() {
+        if (!currentFinancials) return;
+
+        // Build adjustments payload: +1 = improve
+        var adjPayload = {};
+        LEVER_IDS.forEach(function(k) {
+          var a = adjustments[k] || 0;
+          if (a !== 0) adjPayload[k] = a;
+        });
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', API_BASE + '/api/cash/power-of-one', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onload = function() {
+          if (xhr.status === 200) {
+            try {
+              var resp = JSON.parse(xhr.responseText);
+              if (resp.status === 'ok') {
+                updateResults(resp.data);
+              }
+            } catch(e) {}
+          }
+        };
+        xhr.send(JSON.stringify({
+          financials: currentFinancials,
+          adjustments: Object.keys(adjPayload).length > 0 ? adjPayload : null,
+        }));
+      }
+
+      // ── Update results ─────────────────────────────────────────
+      function updateResults(data) {
+        // Metrics
+        var m = data.metrics || {};
+        setText('m-sales', '$' + Number(currentFinancials.net_sales).toLocaleString('en-US'));
+        setText('m-margin', m.profit_margin_pct + '%');
+        setText('m-ccc', m.ccc_days + 'd');
+        setText('m-dso', m.dso_days + 'd');
+        setText('m-dio', m.dio_days + 'd');
+        setText('m-dpo', m.dpo_days + 'd');
+
+        // Color metrics
+        colorMetric('m-ccc', m.ccc_days < 0 ? 'green' : m.ccc_days < 45 ? 'green' : 'red');
+        colorMetric('m-margin', m.profit_margin_pct > 15 ? 'green' : m.profit_margin_pct > 8 ? 'green' : 'red');
+
+        // Impact summary
+        var totalCF = data.combined_cash_impact || 0;
+        var totalEBIT = data.combined_ebit_impact || 0;
+        setImpact('total-cf', totalCF);
+        setImpact('total-ebit', totalEBIT);
+
+        var baseRevenue = currentFinancials.net_sales || 1;
+        var pctOfBase = ((totalCF + totalEBIT) / baseRevenue) * 100;
+        var compEl = document.getElementById('compounded');
+        if (compEl) {
+          compEl.textContent = pctOfBase.toFixed(1) + '% del ingreso';
+          compEl.className = 'value ' + (pctOfBase > 0 ? 'positive' : pctOfBase < 0 ? 'negative' : 'neutral');
         }
 
-        // Update impact cards
-        var cfEl = document.getElementById('total-cf');
-        var ebitEl = document.getElementById('total-ebit');
-        var statusEl = document.getElementById('aggregate-status');
+        // Per-lever impacts
+        (data.impacts || []).forEach(function(imp) {
+          var el = document.getElementById('impact-' + imp.lever);
+          if (el) {
+            var total = (imp.cash_impact || 0) + (imp.ebit_impact || 0);
+            el.textContent = (total >= 0 ? '+' : '') + '$' + Number(total).toLocaleString('en-US', { maximumFractionDigits: 0 });
+            el.style.color = total > 0 ? '#16a34a' : total < 0 ? '#dc2626' : '#94a3b8';
+          }
+        });
 
-        if (cfEl) {
-          cfEl.textContent = PowerOfOneEngine.formatCurrency(totalCF, true);
-          cfEl.className = 'value ' + (totalCF > 0 ? 'positive' : (totalCF < 0 ? 'negative' : 'neutral'));
-        }
-        if (ebitEl) {
-          ebitEl.textContent = PowerOfOneEngine.formatCurrency(totalEBIT, true);
-          ebitEl.className = 'value ' + (totalEBIT > 0 ? 'positive' : (totalEBIT < 0 ? 'negative' : 'neutral'));
-        }
-        if (statusEl) {
-          var aggStatus = PowerOfOneEngine.aggregateStatus(totalCF, totalEBIT);
-          statusEl.textContent = PowerOfOneEngine.statusLabel(aggStatus);
-          statusEl.className = 'value ' + (aggStatus === 'semaforo-green' ? 'positive' : (aggStatus === 'semaforo-red' ? 'negative' : 'neutral'));
+        // Priorities
+        var prioSection = document.getElementById('priorities-section');
+        var prioList = document.getElementById('priorities-list');
+        if (data.priorities && data.priorities.length > 0) {
+          prioSection.style.display = 'block';
+          prioList.innerHTML = '';
+          data.priorities.forEach(function(p) {
+            var row = document.createElement('div');
+            row.className = 'priority-row';
+            row.innerHTML =
+              '<span class="priority-rank">#' + p.rank + '</span>' +
+              '<span class="priority-label">' + p.label + '</span>' +
+              '<span class="priority-impact" style="color:' + (p.impact >= 0 ? '#16a34a' : '#dc2626') + '">' +
+                (p.impact >= 0 ? '+' : '') + '$' + Number(p.impact).toLocaleString('en-US', {maximumFractionDigits: 0}) +
+              '</span>' +
+              '<span class="priority-diff">D: ' + p.difficulty + '/5</span>' +
+              '<span class="priority-score">Score: ' + p.score + '</span>';
+            prioList.appendChild(row);
+          });
         }
       }
 
-      // ── Init interactive dashboard ─────────────────────────────────────
-      DashboardInteractive.init({
-        apiPath: '/api/worksheets/cash/power-of-one',
-        variables: defaultVariables,
-        variableKeys: VARIABLE_KEYS,
-        variableMeta: variableMeta,
-        onRecalc: onRecalc,
-        containerId: 'sliders-container'
-      });
+      function setText(id, text) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = text;
+      }
+      function colorMetric(id, cls) {
+        var el = document.getElementById(id);
+        if (el) { el.className = 'val ' + cls; }
+      }
+      function setImpact(id, val) {
+        var el = document.getElementById(id);
+        if (el) {
+          el.textContent = (val >= 0 ? '+' : '') + '$' + Number(val).toLocaleString('en-US', { maximumFractionDigits: 0 });
+          el.className = 'value ' + (val > 0 ? 'positive' : val < 0 ? 'negative' : 'neutral');
+        }
+      }
+
+      // ── Start ──────────────────────────────────────────────────
+      init();
     })();
   </script>
   <script src="../../shared/js/context-panel.js"></script>
