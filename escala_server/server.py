@@ -310,6 +310,11 @@ def _build_router() -> Router:
     def verne_ask_get(q: str = ""):
         return EscalaRequestHandler.verne.ask(question=q)
 
+    @router.post("/api/verne/review-daily")
+    def verne_review_daily(payload=None):
+        daily_text = (payload or {}).get("daily_text", "")
+        return EscalaRequestHandler.verne.review_daily(daily_text=daily_text)
+
     return router
 
 
