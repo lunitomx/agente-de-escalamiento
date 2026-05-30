@@ -193,6 +193,30 @@ class VerneHandler:
                 "message": "No question provided. Verne espera una pregunta.",
             }
 
+        # 0. Check for identity questions (C6)
+        q_lower = question.lower().strip("¿?¡!")
+        if q_lower in ("quién eres", "quien eres", "who are you", "quién eres verne", "quien es verne"):
+            return {
+                "answer": (
+                    "**Verne:** Soy Verne Harnish, fundador de Gazelles y autor de *Scaling Up*.\n\n"
+                    "Llevo 30 años ayudando a empresas a escalar. Mi framework son las **4 Decisiones**:\n"
+                    "  - **People:** La gente correcta en los asientos correctos\n"
+                    "  - **Strategy:** Diferenciación real que importa al cliente\n"
+                    "  - **Execution:** Ritmo imparable con Rockefeller Habits\n"
+                    "  - **Cash:** Flujo de efectivo para crecer sin morir\n\n"
+                    "Puedes preguntarme:\n"
+                    "  • `ask` — \"¿cómo mejoro mi flujo de caja?\"\n"
+                    "  • `review-daily` — pásame tu daily y lo califico\n"
+                    "  • `debate` — \"¿deberíamos expandirnos?\"\n\n"
+                    "¿Por dónde quieres empezar?"
+                ),
+                "category": "general",
+                "entities_used": [],
+                "entity_count": 0,
+                "principles_applied": [],
+                "status": "ok",
+            }
+
         # 1. Classify the question
         category = self._classify_question(question)
 
@@ -311,6 +335,12 @@ class VerneHandler:
         "Sigue así. Recuerda: las empresas no crecen por casualidad, crecen por disciplina.",
         "El camino es simple, no fácil. Pero tienes las herramientas. Úsalas.",
         "Una sesión productiva. Ahora: ¿qué vas a hacer DIFERENTE mañana?",
+        "La estrategia sin ejecución es un sueño. Tú ya tienes el sueño — ahora ejecuta.",
+        "No se trata de trabajar más duro, sino de tener el ritmo correcto. ¿Tienes tu daily huddle?",
+        "Lo que no se mide no se gestiona. Esta sesión te dio claridad — no la desperdicies.",
+        "El crecimiento sostenible se construye con hábitos, no con genialidad. Sigue construyendo.",
+        "El Power of One no miente. Mejora 1% en cada palanca y verás.",
+        "No surprises. Las malas noticias temprano son buenas noticias. Vuelve cuando tengas dudas.",
     ]
 
     def session_perspective(
@@ -555,9 +585,11 @@ class VerneHandler:
 
             lines.append("")
 
-        # Verne's characteristic questions
-        questions = template.get("questions", [])
+        # Verne's characteristic questions (C5: shuffled for variety)
+        questions = list(template.get("questions", []))
         if questions:
+            import random
+            random.shuffle(questions)
             lines.append("**Mis preguntas para ti:**")
             for q in questions:
                 if isinstance(q, tuple):

@@ -303,9 +303,20 @@ def cmd_verne(args):
         print()
     else:
         print("Comandos de Verne: ask, review-daily, debate")
+        print()
         print("  escala verne ask \"tu pregunta\"")
-        print("  escala verne review-daily \"ayer logré X, hoy haré Y, obstáculo Z\"")
-        print("  escala verne debate \"deberíamos expandirnos a nuevo mercado\"")
+        print("    → Verne responde desde su framework de 4 Decisiones")
+        print("    Ej: escala verne ask \"cómo mejoro mi flujo de efectivo\"")
+        print()
+        print("  escala verne review-daily \"logros de ayer, planes de hoy, obstáculos\"")
+        print("    → Verne califica tu daily (0-12) contra Rockefeller Habits")
+        print("    Ej: escala verne review-daily \"ayer vendí 5, hoy voy a cobrar, no tengo maíz\"")
+        print()
+        print("  escala verne debate \"decisión estratégica\"")
+        print("    → Verne analiza tu decisión con las 4 Decisiones")
+        print("    Ej: escala verne debate \"deberíamos abrir un nuevo local\"")
+        print()
+        print("  También puedes preguntarle 'quién eres' para conocerlo.")
 
 
 if __name__ == "__main__":
