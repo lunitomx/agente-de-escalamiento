@@ -171,13 +171,11 @@ M3 (Polish):                   S22.9 ─► S22.10 ─► S22.11 ─► merge
 | S22.5 — Cash Engine Humberto | M | Done | ~15m | 1.0 | ✅ Motor 7 palancas, CCC, benchmarks, 9 tests |
 | S22.6 — Power of One conectado al backend | M | Done | ~10m | 1.0 | ✅ API + selector empresas demo |
 | S22.7 — Power of One idioma humano + Verne | S | Done | ~10m | 1.0 | ✅ Tooltips, Verne, guardado, toggle |
-| S22.8 — Strategy dashboards | M | Pending | — | — | 5 dashboards |
-| S22.9 — People dashboards | M | Pending | — | — | 6 dashboards |
-| S22.10 — Execution dashboards | M | Pending | — | — | 7 dashboards |
-| S22.11 — Context panel + sugerencias | S | Pending | — | — | Activar context-panel.js + sugerencias post-data |
-| S22.12 — Sesiones + adaptación | S | Pending | — | — | Session close fix + tipo de empresa |
-| S22.13 — Tests coloquiales | S | Pending | — | — | Tests con lenguaje de los 3 buyer personas |
-| S22.14 — Export, logging, pulido | S | Pending | — | — | Variación frases, CSV, logging |
+| S22.8 — 22 dashboards (template) | XL | Done | ~15m | 1.0 | ✅ Generador produce todos con tooltips, Verne, guardado |
+| S22.9 — Context panel + sugerencias | S | Pending | — | — | Activar context-panel.js + sugerencias post-data |
+| S22.10 — Sesiones + adaptación | S | Pending | — | — | Session close fix + tipo de empresa |
+| S22.11 — Tests coloquiales | S | Pending | — | — | Tests con lenguaje de los 3 buyer personas |
+| S22.12 — Export, logging, pulido | S | Pending | — | — | Variación frases, CSV, logging |
 
 ### Sequencing Risks
 
