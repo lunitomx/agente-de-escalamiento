@@ -12,41 +12,29 @@
     .tool-header h1 { font-size: 1.3rem; color: #0f172a; }
     .tool-header .subtitle { font-size: 0.85rem; color: #64748b; margin-top: 4px; }
     .tool-header .breadcrumb { font-size: 0.8rem; color: #64748b; }
-    .tool-header .breadcrumb a { color: #2563eb; text-decoration: none; }
 
     .company-bar { margin-bottom: 16px; background: white; border-radius: 8px; padding: 14px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .company-bar select { padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.9rem; flex: 1; min-width: 200px; background: #f8fafc; }
     .company-bar label { font-weight: 600; color: #475569; }
-    .btn { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
-    .btn-primary { background: #2563eb; color: white; }
-    .btn-primary:hover { background: #1d4ed8; }
-    .btn-success { background: #16a34a; color: white; }
-    .btn-success:hover { background: #15803d; }
 
     .grid { display: grid; grid-template-columns: 1fr 280px; gap: 16px; }
     @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
 
     .desc-card { background: white; border-radius: 8px; padding: 14px 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); font-size: 0.85rem; color: #475569; }
 
-    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 16px; }
-    .metric-box { background: white; border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); position: relative; }
-    .metric-box .m-label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: flex; align-items: center; gap: 4px; }
-    .metric-box .m-label .info { display: inline-block; width: 14px; height: 14px; background: #e2e8f0; color: #64748b; border-radius: 50%; text-align: center; line-height: 14px; font-size: 0.6rem; cursor: help; font-weight: 700; }
-    .metric-box .m-val { font-size: 1.1rem; font-weight: 600; color: #334155; }
-    .metric-box .m-val.empty { color: #94a3b8; font-style: italic; font-weight: 400; }
-    .metric-box .m-input { width: 100%; padding: 6px 8px; border: 1px solid #e2e8f0; border-radius: 4px; font-size: 0.85rem; margin-top: 4px; }
-    .metric-box .m-input:focus { outline: none; border-color: #2563eb; }
-    .tooltip { display: none; position: absolute; top: 100%; left: 0; background: #1e293b; color: #f1f5f9; padding: 8px 12px; border-radius: 6px; font-size: 0.75rem; width: 220px; z-index: 10; line-height: 1.4; margin-top: 4px; }
-    .metric-box:hover .tooltip { display: block; }
+    .fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+    .field { background: white; border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .field .f-label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: flex; align-items: center; gap: 4px; }
+    .field .f-val { font-size: 1rem; font-weight: 600; color: #334155; }
+    .field .f-val.empty { color: #94a3b8; font-style: italic; font-weight: 400; }
 
     .side-card { background: white; border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 12px; }
     .side-card h3 { margin: 0 0 10px; font-size: 0.85rem; color: #0f172a; }
     .verne-msg { font-size: 0.82rem; line-height: 1.5; color: #334155; }
-    .verne-msg strong { color: #0f172a; }
 
-    .saved-badge { font-size: 0.75rem; padding: 3px 10px; border-radius: 12px; }
-    .saved-badge.saved { background: #dcfce7; color: #166534; }
-    .saved-badge.modified { background: #fef9c3; color: #854d0e; }
+    .no-data { text-align: center; padding: 60px 20px; color: #94a3b8; }
+    .no-data .big-icon { font-size: 3rem; margin-bottom: 12px; }
+    .no-data p { font-size: 0.85rem; line-height: 1.5; }
 
     .attribution { margin-top: 24px; font-size: 0.7rem; color: #94a3b8; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 12px; }
   </style>
@@ -64,34 +52,40 @@
       <select id="company-select" onchange="onCompanyChange()">
         <option value="">— Seleccionar —</option>
       </select>
-      <span id="save-indicator" class="saved-badge saved" style="margin-left:auto;">💾 Guardado</span>
-      <button class="btn btn-success" onclick="saveData()">💾 Guardar</button>
+      <span style="font-size:0.8rem;color:#94a3b8;">Los datos se cargan de lo que trabajaste con Kokoro.</span>
     </div>
 
     <div class="desc-card">Define claramente tu mercado: a quién sirves, dónde, y qué NO haces.</div>
 
-    <div class="grid">
-      <div>
-        <div class="metrics-grid" id="metrics-container"></div>
-      </div>
-      <div>
-        <div class="side-card">
-          <h3>🤵 Verne opina</h3>
-          <div id="verne-advice" class="verne-msg">Completa los campos y guarda para ver qué dice Verne sobre este tema.</div>
+    <div id="no-data" class="no-data" style="display:block;">
+      <div class="big-icon">🎯</div>
+      <h3>Sin datos aún</h3>
+      <p>Dile a Kokoro en la conversación que quiere trabajar este tema.<br>
+      Kokoro te guiará, guardará los resultados, y aquí aparecerán.</p>
+    </div>
+
+    <div id="content-area" style="display:none;">
+      <div class="grid">
+        <div>
+          <div class="fields" id="fields-container"></div>
+        </div>
+        <div>
+          <div class="side-card">
+            <h3>🤵 Verne opina</h3>
+            <div id="verne-advice" class="verne-msg">Carga datos para que Verne opine.</div>
+          </div>
         </div>
       </div>
     </div>
 
-    <p class="attribution">Metodología: <strong>Alan Miltz / Verne Harnish</strong> · Powered by Kokoro (Eduardo Muñoz Luna)</p>
+    <p class="attribution">Metodología: <strong>Alan Miltz / Verne Harnish</strong> · Powered by Kokoro</p>
   </div>
 
   <script>
     (function () {
       'use strict';
       var API_BASE = '';
-      var DATA = {};
       var currentCompanyId = '';
-
       var METRICS = [{'key': 'scope', 'label': 'Mi territorio', 'tip': 'Dónde y a quién le vendes.'}, {'key': 'exclude', 'label': 'Fuera de mi territorio', 'tip': 'Lo que NO haces, para no distraerte.'}, {'key': 'bhag_link', 'label': 'Conexión con BHAG', 'tip': 'Cómo este territorio te acerca a tu meta grande.'}];
 
       function init() {
@@ -111,36 +105,16 @@
           }
         };
         xhr.send();
-        renderMetrics();
-      }
-
-      function renderMetrics() {
-        var container = document.getElementById('metrics-container');
-        if (!container) return;
-        container.innerHTML = '';
-        METRICS.forEach(function(m) {
-          var box = document.createElement('div');
-          box.className = 'metric-box';
-          box.innerHTML =
-            '<div class="m-label">' + m.label + '<span class="info" title="' + m.tip + '">?</span>' +
-            '<div class="tooltip">' + m.tip + '</div></div>' +
-            '<div class="m-val empty" id="val-' + m.key + '">—</div>' +
-            '<input class="m-input" id="inp-' + m.key + '" placeholder="Escribe aquí..." oninput="onFieldChange()">';
-          container.appendChild(box);
-        });
       }
 
       window.onCompanyChange = function() {
         var sel = document.getElementById('company-select');
         currentCompanyId = sel.value;
-        DATA = {};
-        renderMetrics();
-        document.getElementById('verne-advice').textContent = 'Completa los campos y guarda para ver qué dice Verne.';
-        loadFromServer();
+        if (!currentCompanyId) { showNone(); return; }
+        loadData();
       };
 
-      function loadFromServer() {
-        if (!currentCompanyId) return;
+      function loadData() {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', API_BASE + '/api/worksheets/strategy/sandbox', true);
         xhr.onload = function() {
@@ -149,98 +123,63 @@
               var resp = JSON.parse(xhr.responseText);
               var payload = resp.data || {};
               var saved = payload.data || payload.variables || payload;
-              if (saved && typeof saved === 'object') {
-                METRICS.forEach(function(m) {
-                  if (saved[m.key] !== undefined) {
-                    var valEl = document.getElementById('val-' + m.key);
-                    var inpEl = document.getElementById('inp-' + m.key);
-                    if (valEl) { valEl.textContent = saved[m.key]; valEl.className = 'm-val'; }
-                    if (inpEl) { inpEl.value = saved[m.key]; }
-                    DATA[m.key] = saved[m.key];
-                  }
-                });
+              if (saved && Object.keys(saved).length > 0) {
+                showData(saved);
+                return;
               }
             } catch(e) {}
           }
+          showNone();
         };
         xhr.send();
       }
 
-      window.onFieldChange = function() {
-        var changed = false;
+      function showNone() {
+        document.getElementById('no-data').style.display = 'block';
+        document.getElementById('content-area').style.display = 'none';
+      }
+
+      function showData(data) {
+        document.getElementById('no-data').style.display = 'none';
+        document.getElementById('content-area').style.display = 'block';
+
+        var container = document.getElementById('fields-container');
+        container.innerHTML = '';
+        var filled = 0;
+
         METRICS.forEach(function(m) {
-          var inp = document.getElementById('inp-' + m.key);
-          var val = document.getElementById('val-' + m.key);
-          if (inp && inp.value.trim()) {
-            DATA[m.key] = inp.value.trim();
-            if (val) { val.textContent = inp.value.trim(); val.className = 'm-val'; }
-            changed = true;
-          } else if (inp && !inp.value.trim() && DATA[m.key]) {
-            delete DATA[m.key];
-            if (val) { val.textContent = '—'; val.className = 'm-val empty'; }
-          }
+          var val = data[m.key];
+          if (val !== undefined && val !== null && val !== '') filled++;
+
+          var box = document.createElement('div');
+          box.className = 'field';
+          var displayVal = (val !== undefined && val !== null && val !== '') ? val : '—';
+          var cls = (val !== undefined && val !== null && val !== '') ? '' : 'empty';
+          box.innerHTML =
+            '<div class="f-label">' + m.label + ' <span style="font-size:0.6rem;color:#94a3b8;cursor:help;" title="' + m.tip + '">?</span></div>' +
+            '<div class="f-val ' + cls + '">' + escapeHtml(String(displayVal)) + '</div>';
+          container.appendChild(box);
         });
-        if (changed) {
-          document.getElementById('save-indicator').textContent = '⚠️ Sin guardar';
-          document.getElementById('save-indicator').className = 'saved-badge modified';
-          updateVerne();
-        }
-      };
 
-      window.saveData = function() {
-        if (!currentCompanyId) { alert('Selecciona una empresa primero.'); return; }
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', API_BASE + '/api/worksheets/strategy/sandbox', true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.onload = function() {
-          if (xhr.status === 200) {
-            document.getElementById('save-indicator').textContent = '💾 Guardado';
-            document.getElementById('save-indicator').className = 'saved-badge saved';
-          }
-        };
-        xhr.send(JSON.stringify({ data: DATA }));
-      };
+        // Verne
+        var pct = METRICS.length > 0 ? (filled / METRICS.length) * 100 : 0;
+        var verneEl = document.getElementById('verne-advice');
+        var lines = [];
+        lines.push('<strong>Verne dice:</strong>');
+        if (filled === 0) lines.push('Aún no hay datos registrados. Trabaja este tema con Kokoro.');
+        else if (pct >= 80) lines.push('✅ Tienes ' + filled + ' de ' + METRICS.length + ' campos. Buen avance. Sigue así.');
+        else if (pct >= 50) lines.push('⚠️ Tienes ' + filled + ' de ' + METRICS.length + '. Te falta completar algunos.');
+        else lines.push('apenas ' + filled + ' de ' + METRICS.length + '. Trabaja este tema con Kokoro.');
+        lines.push('');
+        lines.push('💡 <em>Lo que no se mide no se gestiona.</em>');
+        verneEl.innerHTML = lines.join('<br>');
+      }
 
-      function updateVerne() {{
-        var el = document.getElementById('verne-advice');
-        if (!el) return;
-        var filled = Object.keys(DATA).length;
-        if (filled === 0) {{ el.innerHTML = 'Completa los campos para que Verne te dé su perspectiva.'; return; }}
-
-        // Build a question from the filled data
-        var firstKey = Object.keys(DATA)[0];
-        var firstLabel = '';
-        METRICS.forEach(function(m) {{ if (m.key === firstKey) firstLabel = m.label; }});
-        var question = 'Trabajé en ' + firstLabel + ': ' + DATA[firstKey] + '. ¿Qué opinas?';
-
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', API_BASE + '/api/verne/ask', true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.onload = function() {{
-          if (xhr.status === 200) {{
-            try {{
-              var resp = JSON.parse(xhr.responseText);
-              if (resp.status === 'ok') {{
-                el.innerHTML = '<strong>Verne dice:</strong><br><br>' + resp.answer.replace(/\n/g, '<br>');
-                return;
-              }}
-            }} catch(e) {{}}
-          }}
-          el.innerHTML = '<strong>Verne dice:</strong> Buen avance. Has completado ' + filled + ' de ' + METRICS.length + ' campos. <br><br>💡 <em>Recuerda: ' + getRandomTip() + '</em>';
-        }};
-        xhr.send(JSON.stringify({{ question: question }}));
-      }}
-
-      var TIPS = [
-        'Lo que no se mide no se gestiona.',
-        'La estrategia sin ejecución es un sueño.',
-        'Keep Things Simple.',
-        'No Surprises — malas noticias temprano son buenas noticias.',
-        'Routine Sets You Free.',
-        'El Power of One no miente: mejora 1% en cada palanca.',
-        'Las nalgas correctas en los asientos correctos.',
-      ];
-      function getRandomTip() { return TIPS[Math.floor(Math.random() * TIPS.length)]; }
+      function escapeHtml(s) {
+        var d = document.createElement('div');
+        d.textContent = s;
+        return d.innerHTML;
+      }
 
       init();
     })();

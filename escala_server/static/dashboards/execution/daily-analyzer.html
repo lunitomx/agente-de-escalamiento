@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Analyzer | ScaleUp</title>
+  <link rel="stylesheet" href="../../shared/styles/dashboard-base.css">
+  <link rel="stylesheet" href="../../shared/styles/context-panel.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f1f5f9; color: #1e293b; padding: 24px; }
+    .tool-header { margin-bottom: 20px; }
+    .tool-header h1 { font-size: 1.3rem; color: #0f172a; }
+    .tool-header .subtitle { font-size: 0.85rem; color: #64748b; margin-top: 4px; }
+    .tool-header .breadcrumb { font-size: 0.8rem; color: #64748b; }
+    .tool-header .breadcrumb a { color: #2563eb; text-decoration: none; }
+
+    .company-bar { margin-bottom: 16px; background: white; border-radius: 8px; padding: 14px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .company-bar select { padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.9rem; flex: 1; min-width: 200px; background: #f8fafc; }
+    .company-bar label { font-weight: 600; color: #475569; }
+
+    .grid { display: grid; grid-template-columns: 1fr 300px; gap: 16px; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+
+    .score-card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); text-align: center; margin-bottom: 16px; }
+    .score-card .big-score { font-size: 3rem; font-weight: 800; }
+    .score-card .big-score.green { color: #16a34a; }
+    .score-card .big-score.yellow { color: #ca8a04; }
+    .score-card .big-score.red { color: #dc2626; }
+    .score-card .big-score.gray { color: #94a3b8; }
+    .score-card .score-label { font-size: 0.9rem; color: #64748b; margin-top: 4px; }
+    .score-card .sub { font-size: 0.8rem; color: #94a3b8; margin-top: 8px; }
+
+    .chart-container { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 16px; }
+    .chart-container h3 { margin: 0 0 12px; font-size: 0.85rem; color: #0f172a; }
+
+    .elements { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+    .element { border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; gap: 10px; font-size: 0.85rem; }
+    .element.present { background: #f0fdf4; border: 1px solid #bbf7d0; }
+    .element.missing { background: #fef2f2; border: 1px solid #fecaca; }
+    .element .icon { font-size: 1.2rem; }
+    .element .label { font-weight: 600; flex: 1; }
+    .element .detail { font-size: 0.75rem; color: #64748b; }
+
+    .side-panel { display: flex; flex-direction: column; gap: 12px; }
+    .side-card { background: white; border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .side-card h3 { margin: 0 0 10px; font-size: 0.85rem; color: #0f172a; }
+    .verne-msg { font-size: 0.82rem; line-height: 1.5; color: #334155; }
+    .verne-msg strong { color: #0f172a; }
+
+    .history-list { max-height: 300px; overflow-y: auto; }
+    .history-item { padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.8rem; }
+    .history-item:last-child { border-bottom: none; }
+    .history-item .h-date { color: #94a3b8; font-size: 0.7rem; }
+    .history-item .h-score { font-weight: 700; float: right; }
+
+    .no-data { text-align: center; padding: 40px 20px; color: #94a3b8; }
+    .no-data .big-icon { font-size: 3rem; margin-bottom: 12px; }
+
+    .attribution { margin-top: 24px; font-size: 0.7rem; color: #94a3b8; text-align: center; }
+
+    @media (max-width: 640px) { .elements { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <div class="tool-header">
+      <div class="breadcrumb"><a href="/">Home</a> › Ejecución › Daily Analyzer</div>
+      <h1>📊 Daily Analyzer</h1>
+      <div class="subtitle">Tus dailys analizados contra los Rockefeller Habits. <strong>Kokoro</strong> interpreta, Verne opina, tú actúas.</div>
+    </div>
+
+    <div class="company-bar">
+      <label for="company-select">🏢 Empresa:</label>
+      <select id="company-select" onchange="onCompanyChange()">
+        <option value="">— Seleccionar —</option>
+      </select>
+      <span style="font-size:0.8rem;color:#94a3b8;">Los datos se cargan automáticamente. Sin formularios.</span>
+    </div>
+
+    <div class="grid">
+      <div>
+        <div id="no-data" class="no-data" style="display:none;">
+          <div class="big-icon">📋</div>
+          <h3>No hay dailys analizados aún</h3>
+          <p>Dile a Kokoro en la conversación: <em>"analiza mi daily"</em> y pega tu transcript.<br>
+          Kokoro lo procesa, Verne lo califica, y aquí aparecen los resultados.</p>
+        </div>
+
+        <div id="content-area" style="display:none;">
+          <div class="score-card">
+            <div id="big-score" class="big-score gray">—</div>
+            <div class="score-label">Score Rockefeller</div>
+            <div class="sub">Sobre 12 puntos posibles</div>
+          </div>
+
+          <div class="chart-container">
+            <h3>🕸️ Cobertura de hábitos</h3>
+            <canvas id="radar-chart"></canvas>
+          </div>
+
+          <div class="elements" id="elements-container"></div>
+
+          <div class="chart-container" id="history-container" style="display:none;">
+            <h3>📈 Tendencia de dailys</h3>
+            <canvas id="trend-chart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-panel">
+        <div class="side-card">
+          <h3>🤵 Verne opina</h3>
+          <div id="verne-advice" class="verne-msg">Carga un daily para que Verne te dé su perspectiva.</div>
+        </div>
+        <div class="side-card" id="history-card" style="display:none;">
+          <h3>📜 Últimos análsis</h3>
+          <div class="history-list" id="history-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="attribution">Rockefeller Habits · Metodología Verne Harnish · Powered by Kokoro</p>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+      var API_BASE = '';
+      var radarChart = null;
+      var trendChart = null;
+      var currentCompanyId = '';
+
+      function init() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', API_BASE + '/api/companies', true);
+        xhr.onload = function() {
+          if (xhr.status === 200) {
+            try {
+              var resp = JSON.parse(xhr.responseText);
+              (resp.data || []).forEach(function(c) {
+                var opt = document.createElement('option');
+                opt.value = c.id;
+                opt.textContent = c.name;
+                document.getElementById('company-select').appendChild(opt);
+              });
+            } catch(e) {}
+          }
+        };
+        xhr.send();
+      }
+
+      window.onCompanyChange = function() {
+        var sel = document.getElementById('company-select');
+        currentCompanyId = sel.value;
+        if (!currentCompanyId) { showNoData(); return; }
+        loadData();
+      };
+
+      function loadData() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', API_BASE + '/api/worksheets/execution/daily-review', true);
+        xhr.onload = function() {
+          if (xhr.status === 200) {
+            try {
+              var resp = JSON.parse(xhr.responseText);
+              var data = resp.data || {};
+              var saved = data.data || data.variables || data;
+              if (saved && saved.score !== undefined) {
+                showResult(saved);
+                return;
+              }
+            } catch(e) {}
+          }
+          showNoData();
+        };
+        xhr.send();
+      }
+
+      function showNoData() {
+        document.getElementById('no-data').style.display = 'block';
+        document.getElementById('content-area').style.display = 'none';
+        document.getElementById('history-card').style.display = 'none';
+      }
+
+      function showResult(data) {
+        document.getElementById('no-data').style.display = 'none';
+        document.getElementById('content-area').style.display = 'block';
+
+        var score = data.score || 0;
+        var maxScore = data.score_max || 12;
+        var pct = maxScore > 0 ? (score / maxScore) * 100 : 0;
+
+        // Big score
+        var scoreEl = document.getElementById('big-score');
+        scoreEl.textContent = score + '/' + maxScore;
+        scoreEl.className = 'big-score ' + (pct >= 80 ? 'green' : pct >= 50 ? 'yellow' : 'red');
+
+        // Elements
+        var container = document.getElementById('elements-container');
+        container.innerHTML = '';
+        var checklist = {
+          'logros_ayer': { label: 'Logros de ayer', icon: '✅' },
+          'prioridades_hoy': { label: 'Prioridades de hoy', icon: '🎯' },
+          'obstaculos': { label: 'Obstáculos', icon: '🚧' },
+          'metricas': { label: 'Métricas / KPIs', icon: '📊' },
+          'prioridad_1': { label: 'Conexión Prioridad #1', icon: '🏆' },
+        };
+        var found = data.elements_found || [];
+        var allLabels = Object.keys(checklist);
+        var radarLabels = [];
+        var radarValues = [];
+        allLabels.forEach(function(k) {
+          var c = checklist[k];
+          var isPresent = found.indexOf(c.label) >= 0;
+          var el = document.createElement('div');
+          el.className = 'element ' + (isPresent ? 'present' : 'missing');
+          el.innerHTML =
+            '<span class="icon">' + (isPresent ? '✅' : '❌') + '</span>' +
+            '<span class="label">' + c.label + '</span>';
+          container.appendChild(el);
+          radarLabels.push(c.label);
+          radarValues.push(isPresent ? 100 : 0);
+        });
+
+        // Radar chart
+        var ctx = document.getElementById('radar-chart').getContext('2d');
+        if (radarChart) radarChart.destroy();
+        radarChart = new Chart(ctx, {
+          type: 'radar',
+          data: {
+            labels: radarLabels,
+            datasets: [{
+              label: 'Cobertura',
+              data: radarValues,
+              backgroundColor: 'rgba(22, 163, 74, 0.2)',
+              borderColor: '#16a34a',
+              borderWidth: 2,
+              pointBackgroundColor: '#16a34a',
+              pointRadius: 4,
+            }]
+          },
+          options: {
+            responsive: true,
+            scales: { r: { min: 0, max: 100, ticks: { display: false } } },
+            plugins: { legend: { display: false } }
+          }
+        });
+
+        // Verne
+        var verneEl = document.getElementById('verne-advice');
+        var verneLines = [];
+        verneLines.push('<strong>Verne dice:</strong>');
+        if (pct >= 80) verneLines.push('✅ Buen daily. Tienes los elementos clave. Sigue así.');
+        else if (pct >= 50) verneLines.push('⚠️ Daily incompleto. Te falta estructura.');
+        else verneLines.push('❌ Esto no es un Daily Huddle. Es una lista de tareas.');
+        verneLines.push('');
+        var missing = data.elements_missing || [];
+        if (missing.length > 0) {
+          verneLines.push('📋 <strong>Te falta:</strong>');
+          missing.forEach(function(m) { verneLines.push('  • ' + m); });
+        }
+        verneLines.push('');
+        verneLines.push('💡 <em>15 minutos. De pie. Logros, prioridades, obstáculos. Nada más.</em>');
+        verneEl.innerHTML = verneLines.join('<br>');
+
+        document.getElementById('history-card').style.display = 'block';
+      }
+
+      init();
+    })();
+  </script>
+  <script src="../../shared/js/context-panel.js"></script>
+</body>
+</html>
