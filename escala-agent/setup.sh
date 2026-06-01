@@ -26,31 +26,17 @@ echo ""
 
 # ── Config ──────────────────────────────────────────────────────────
 ESCALA_DIR="$HOME/.escala"
-GITHUB_RAW="https://raw.githubusercontent.com/lunitomx/agente-de-escalamiento/main"
-GITHUB_REPO="https://github.com/lunitomx/agente-de-escalamiento.git"
 
-# ── Detect source ────────────────────────────────────────────────────
+# ── Detect source ──────────────────────────────────────────────────
 SCRIPT_SRC="$(cd "$(dirname "$0")" 2>/dev/null && pwd)"
-if [ -f "$SCRIPT_SRC/AGENTS.md" ]; then
-  # Running from local repo
-  SRC="$SCRIPT_SRC"
-  echo -e "  ${GREEN}📦${NC} Instalando desde repositorio local"
-else
-  # Running from curl pipe — download package
-  SRC="/tmp/escala-install-$$"
-  mkdir -p "$SRC"
-  echo -e "  ${BLUE}🌐${NC} Descargando desde GitHub..."
-  git clone --depth 1 "$GITHUB_REPO" "$SRC" 2>/dev/null || {
-    # Fallback: download individual files
-    echo -e "  ${YELLOW}⚠️${NC} git no disponible, descargando archivos..."
-    for f in AGENTS.md setup.sh; do
-      curl -sL "$GITHUB_RAW/$f" -o "$SRC/$f" &
-    done
-    mkdir -p "$SRC/skills" "$SRC/mcp"
-    wait
-  }
-  echo -e "  ${GREEN}✅${NC} Descargado"
+if [ ! -f "$SCRIPT_SRC/AGENTS.md" ]; then
+  echo -e "  ${YELLOW}⚠️${NC} No se encuentra AGENTS.md en este directorio."
+  echo -e "  Asegúrate de estar en el repositorio clonado:"
+  echo -e "  git clone https://github.com/lunitomx/agente-de-escalamiento.git"
+  exit 1
 fi
+SRC="$SCRIPT_SRC"
+echo -e "  ${GREEN}📦${NC} Instalando desde repositorio local"
 
 # ── Install ──────────────────────────────────────────────────────────
 
@@ -120,10 +106,6 @@ EOF
   echo -e "  ${GREEN}✅${NC} Índice de memoria creado"
 fi
 
-# ── Cleanup ─────────────────────────────────────────────────────────
-if [ "$SRC" != "$SCRIPT_SRC" ] && [ -d "$SRC" ]; then
-  rm -rf "$SRC" 2>/dev/null || true
-fi
 
 # ── Done ────────────────────────────────────────────────────────────
 echo ""
