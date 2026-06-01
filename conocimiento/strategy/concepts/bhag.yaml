@@ -1,0 +1,34 @@
+id: concept-bhag
+type: concept
+name: "BHAG — Big Hairy Audacious Goal"
+name_es: "BHAG — Meta Grande, Peluda y Audaz"
+decision: strategy
+summary: >
+  A 10- to 25-year goal that provides a constant, inspirational summit for the entire
+  organization. Coined by Jim Collins and Jerry Porras. The BHAG must be bold enough to
+  feel nearly unreachable yet clear enough to energize daily decisions. It answers: "What
+  are we ultimately trying to achieve?" In Scaling Up, the BHAG sits at the top of the
+  OPSP and all strategy flows toward it. A good BHAG requires no explanation — it is
+  viscerally understood by every employee.
+source:
+  book_chapter: "THE CORE"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 513
+  workbook_file: "metodologias_parsed/strategy_workbook.txt"
+  workbook_line: 354
+relationships:
+  - type: belongs-to
+    target: decision-strategy
+  - type: feeds-into
+    target: tool-opsp
+  - type: measured-by
+    target: metric-revenue-growth-rate
+  - type: feeds-into
+    target: concept-priorities-rocks
+tags: [strategy, BHAG, vision, long-term, Collins, purpose]
+metadata:
+  difficulty: advanced
+  application: >
+    Review BHAG annually in the strategic planning session. Test it: does every employee
+    understand it without explanation? Does it still energize or has it become wallpaper?
+    The BHAG should drive 25 years of decisions, not just the current quarter.

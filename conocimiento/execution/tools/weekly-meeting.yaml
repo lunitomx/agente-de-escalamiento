@@ -1,0 +1,33 @@
+id: tool-weekly-meeting
+type: tool
+name: Weekly Team Meeting
+name_es: Reunion Semanal del Equipo
+decision: execution
+summary: >
+  A 60-90 minute weekly meeting focused on accountability, learning, and strategic
+  discussion. Agenda: good news (2 min), numbers review — Critical Number + KPIs
+  (5 min), Rock status — each rock owner reports on/off track (15 min), customer and
+  employee insights (10 min), one educational topic (15 min), priority discussion (30 min).
+  The "situation room" — a dedicated physical or virtual space with KPIs and Rock status
+  visible — supports the weekly meeting. Teams that skip weekly meetings lose alignment
+  within two weeks.
+source:
+  book_chapter: "THE MEETING RHYTHM"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 910
+  workbook_file: "metodologias_parsed/execution_workbook.txt"
+  workbook_line: 502
+relationships:
+  - type: belongs-to
+    target: decision-execution
+  - type: requires
+    target: concept-meeting-rhythm
+  - type: requires
+    target: concept-priorities-rocks
+  - type: implements
+    target: worksheet-meeting-agenda
+tags: [execution, weekly-meeting, accountability, rhythm, KPIs, rocks]
+metadata:
+  difficulty: beginner
+  time_estimate: "60-90 minutes"
+  frequency: weekly

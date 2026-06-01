@@ -1,0 +1,49 @@
+id: decision-cash
+type: decision
+name: Cash
+name_es: Efectivo
+summary: >
+  Accelerating cash flow to fuel growth without external financing.
+  Covers the Cash Conversion Cycle, Power of One, and cash acceleration strategies.
+source:
+  book_chapter: "SCALING UP CASH"
+  book_line: 5916
+relationships:
+  - type: contains
+    target: concept-ccc
+  - type: contains
+    target: concept-working-capital
+  - type: contains
+    target: concept-gross-margin
+  - type: contains
+    target: concept-cash-acceleration
+  - type: contains
+    target: concept-revenue-per-employee
+  - type: contains
+    target: tool-power-of-one
+  - type: contains
+    target: tool-ccc-analysis
+  - type: contains
+    target: tool-simple-numbers
+  - type: contains
+    target: tool-ar-optimization
+  - type: contains
+    target: tool-pricing-lever
+  - type: contains
+    target: worksheet-ccc
+  - type: contains
+    target: worksheet-power-of-one
+  - type: contains
+    target: worksheet-cash-flow-forecast
+  - type: contains
+    target: metric-ccc-days
+  - type: contains
+    target: metric-days-sales-outstanding
+  - type: contains
+    target: metric-gross-margin-percentage
+  - type: contains
+    target: metric-revenue-per-employee
+tags: [cash, cashflow, ccc, profitability, financing, growth]
+metadata:
+  key_question: "Do you have consistent sources of cash, generated internally, to fuel growth?"
+  chapter_range: "Chapters: The Cash Introduction, Cash Conversion Cycle, The Cash"

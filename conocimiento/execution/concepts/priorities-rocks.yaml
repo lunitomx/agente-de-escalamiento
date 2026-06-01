@@ -1,0 +1,34 @@
+id: concept-priorities-rocks
+type: concept
+name: Priorities and Rocks
+name_es: Prioridades y Rocas Trimestrales
+decision: execution
+summary: >
+  The 3-5 most important company-level goals for the quarter, called "Rocks" (from
+  Stephen Covey's big rocks metaphor). Each Rock must be SMART: Specific, Measurable,
+  Attainable, Relevant, and Time-bound. Rocks cascade: company Rocks inform team Rocks,
+  which inform individual Rocks. Every employee should be able to articulate their top
+  1-2 Rocks and how they connect to the company's Critical Number. Rocks are set in the
+  Quarterly Planning session and reviewed weekly in team meetings.
+source:
+  book_chapter: "THE PRIORITY"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 1455
+  workbook_file: "metodologias_parsed/execution_workbook.txt"
+  workbook_line: 497
+relationships:
+  - type: belongs-to
+    target: decision-execution
+  - type: requires
+    target: concept-critical-number
+  - type: feeds-into
+    target: tool-quarterly-planning
+  - type: measured-by
+    target: metric-rock-completion-rate
+tags: [execution, priorities, rocks, quarterly, SMART, alignment]
+metadata:
+  difficulty: beginner
+  application: >
+    Set 3-5 company Rocks per quarter. Each Rock: one owner, one deadline (end of quarter),
+    one measurable outcome. Mid-quarter: review at weekly meeting (on track / at risk / done).
+    End of quarter: 80%+ completion rate is the target.

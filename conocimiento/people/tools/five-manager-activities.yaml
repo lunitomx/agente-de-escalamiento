@@ -1,0 +1,29 @@
+id: tool-five-manager-activities
+type: tool
+name: Five Manager Activities
+name_es: Cinco Actividades del Manager
+decision: people
+summary: >
+  Five critical activities that distinguish great managers (coaches), listed in reverse
+  order of importance: (5) Hire fewer people, pay them more; (4) Give recognition and
+  show appreciation; (3) Set clear expectations with line-of-sight to company goals;
+  (2) Dehassle — remove obstacles and bureaucracy that demotivate; (1) Help people play
+  to their strengths. Periodic one-on-one coaching sessions structured around these five
+  topics keep teams engaged and growing. Gallup: managers account for 70% of variance in
+  employee engagement.
+source:
+  book_chapter: "THE MANAGERS (COACHES)"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 3054
+relationships:
+  - type: belongs-to
+    target: decision-people
+  - type: measured-by
+    target: metric-employee-satisfaction
+  - type: feeds-into
+    target: tool-team-assessment
+tags: [people, management, coaching, engagement, one-on-one, retention]
+metadata:
+  difficulty: intermediate
+  time_estimate: "30 min per one-on-one session"
+  frequency: weekly

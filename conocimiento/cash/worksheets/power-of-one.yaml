@@ -1,0 +1,37 @@
+id: worksheet-power-of-one
+type: worksheet
+name: Power of One Worksheet
+name_es: Hoja de Trabajo del Poder del Uno
+decision: cash
+summary: >
+  An impact calculator showing the effect on Net Cash Flow and EBIT of improving
+  each of the seven financial levers by 1%. Inputs: current values for Price, Volume,
+  COGS%, Operating Expenses, AR days, AP days, Inventory days. Output: ranked list of
+  which 1% change produces the largest cash and profit impact in this specific business.
+  The worksheet makes abstract financial theory concrete — leaders see exactly how much
+  a 1-day reduction in AR days is worth vs. a 1% price increase.
+source:
+  file: "metodologias_parsed/cash_workbook.txt"
+  file_line: 1042
+relationships:
+  - type: belongs-to
+    target: decision-cash
+  - type: implements
+    target: tool-power-of-one
+tags: [cash, worksheet, power-of-one, levers, impact, EBIT, cash-flow]
+metadata:
+  fields:
+    - "Current financials: Revenue, Gross Margin %, Operating Expenses, EBIT"
+    - "Lever 1: Price — current avg price, 1% increase impact on EBIT and cash"
+    - "Lever 2: Volume — current units, 1% increase impact on cash (note: consumes cash)"
+    - "Lever 3: COGS% — current direct cost %, 1% reduction impact"
+    - "Lever 4: Operating Expenses — current OpEx, 1% reduction impact"
+    - "Lever 5: AR days — current DSO, 1-day reduction impact on cash"
+    - "Lever 6: AP days — current DPO, 1-day extension impact on cash"
+    - "Lever 7: Inventory days — current inventory days, 1-day reduction impact"
+    - "Ranked output: which lever has highest cash impact per 1% improvement"
+    - "Chosen lever: the one you will focus on this quarter"
+  output: "Ranked lever impact table + selected focus lever for the quarter"
+  difficulty: intermediate
+  time_estimate: "2-3 hours"
+  frequency: quarterly

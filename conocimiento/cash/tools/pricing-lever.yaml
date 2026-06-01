@@ -1,0 +1,31 @@
+id: tool-pricing-lever
+type: tool
+name: Pricing as a Cash Lever
+name_es: El Precio como Palanca de Efectivo
+decision: cash
+summary: >
+  The first and most powerful of the Power of One's seven levers. A 1% price increase
+  on existing revenue flows almost entirely to gross margin and EBIT — with zero working
+  capital consumption. Unlike volume growth (which requires more staff, inventory, and
+  receivables), price improvement is pure margin. Key analysis: calculate the revenue
+  lost if a 1% price increase causes customers to defect vs. the margin gained if they
+  don't. Most businesses under-price because they fear customer loss, not because their
+  pricing is actually competitive.
+source:
+  book_chapter: "THE POWER OF ONE"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 1044
+  workbook_file: "metodologias_parsed/cash_workbook.txt"
+  workbook_line: 963
+relationships:
+  - type: belongs-to
+    target: decision-cash
+  - type: feeds-into
+    target: tool-power-of-one
+  - type: feeds-into
+    target: concept-gross-margin
+tags: [cash, pricing, power-of-one, margin, lever, competitive-strategy]
+metadata:
+  difficulty: intermediate
+  time_estimate: "2-4 hours for pricing analysis"
+  frequency: annually

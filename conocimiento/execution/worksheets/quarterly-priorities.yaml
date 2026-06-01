@@ -1,0 +1,31 @@
+id: worksheet-quarterly-priorities
+type: worksheet
+name: Quarterly Priorities and Rocks Worksheet
+name_es: Hoja de Trabajo de Prioridades y Rocas Trimestrales
+decision: execution
+summary: >
+  The quarterly planning template for setting the Critical Number, 3-5 company Rocks,
+  and Quarterly Theme. Also captures the prior quarter's Rock completion review. Output
+  feeds the OPSP quarterly columns and cascades to team and individual Rock worksheets.
+source:
+  file: "metodologias_parsed/execution_workbook.txt"
+  file_line: 869
+relationships:
+  - type: belongs-to
+    target: decision-execution
+  - type: implements
+    target: tool-quarterly-planning
+tags: [execution, worksheet, quarterly, rocks, critical-number, planning]
+metadata:
+  fields:
+    - "Prior quarter review: each Rock — done / not done / why"
+    - "Prior quarter Critical Number: actual vs target"
+    - "New Critical Number: metric, current value, target, owner"
+    - "Company Rocks (3-5): each with owner, SMART description, deadline"
+    - "Quarterly Theme: name, visual concept, celebration criteria"
+    - "Annual Chapters: which 2 annual priorities do these Rocks advance?"
+    - "Cascade: each team's 3-5 Rocks aligned to company Rocks"
+  output: "Signed-off quarterly execution plan with Critical Number + Rocks + Theme"
+  difficulty: intermediate
+  time_estimate: "1-2 day planning session"
+  frequency: quarterly

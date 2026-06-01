@@ -1,0 +1,34 @@
+id: concept-gross-margin
+type: concept
+name: Gross Margin
+name_es: Margen Bruto
+decision: cash
+summary: >
+  Revenue minus direct costs (cost of goods sold), expressed as a percentage of revenue.
+  Scaling Up, co-written with Greg Crabtree (Simple Numbers), treats gross margin dollars
+  — not revenue — as the "real top line." Revenue can grow while gross margin shrinks,
+  masking a deteriorating business model. Sustainable growth requires growing gross margin
+  dollars AND maintaining or improving gross margin percentage. Target gross margins
+  vary by industry: SaaS 70%+, professional services 50%+, manufacturing 30%+.
+source:
+  book_chapter: "SCALING UP CASH"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 1627
+  workbook_file: "metodologias_parsed/cash_workbook.txt"
+  workbook_line: 83
+relationships:
+  - type: belongs-to
+    target: decision-cash
+  - type: measured-by
+    target: metric-gross-margin-percentage
+  - type: feeds-into
+    target: tool-simple-numbers
+  - type: feeds-into
+    target: tool-power-of-one
+tags: [cash, gross-margin, profitability, Simple-Numbers, Crabtree, top-line]
+metadata:
+  difficulty: intermediate
+  application: >
+    Track gross margin % monthly alongside gross margin dollars. Alert: revenue
+    growing but GM% declining means you are buying revenue — not building a business.
+    Identify which product lines, customers, or pricing decisions are compressing margins.

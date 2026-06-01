@@ -1,0 +1,28 @@
+id: concept-right-people-right-seats
+type: concept
+name: Right People, Right Seats
+name_es: Personas Correctas en los Asientos Correctos
+decision: people
+summary: >
+  The foundational People concept: every role must be filled by someone who
+  fits the company's core values (right person) AND has the skills and passion
+  for their specific role (right seat). Misalignment in either dimension
+  creates organizational drag.
+source:
+  book_chapter: "THE TEAM"
+  book_line: 1972
+  file: "scaling_up_llamaparse.txt"
+  file_line: 667
+relationships:
+  - type: belongs-to
+    target: decision-people
+  - type: measured-by
+    target: metric-employee-satisfaction
+  - type: feeds-into
+    target: tool-face
+  - type: feeds-into
+    target: concept-priorities-rocks
+tags: [people, hiring, culture, alignment, topgrading]
+metadata:
+  difficulty: beginner
+  application: "Evaluate every team member quarterly against core values fit + role fit"

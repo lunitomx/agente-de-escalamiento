@@ -1,0 +1,51 @@
+id: decision-strategy
+type: decision
+name: Strategy
+name_es: Estrategia
+summary: >
+  Creating a differentiated strategy that drives sustainable revenue growth.
+  Covers core values, purpose, BHAG, brand promises, and the 7 Strata of Strategy.
+source:
+  book_chapter: "SCALING UP STRATEGY"
+  book_line: 2604
+relationships:
+  - type: contains
+    target: concept-bhag
+  - type: contains
+    target: concept-core-purpose
+  - type: contains
+    target: concept-brand-promise
+  - type: contains
+    target: concept-core-customer
+  - type: contains
+    target: concept-differentiating-activities
+  - type: contains
+    target: tool-7-strata
+  - type: contains
+    target: tool-swt
+  - type: contains
+    target: tool-opsp
+  - type: contains
+    target: tool-sandbox
+  - type: contains
+    target: tool-x-factor
+  - type: contains
+    target: tool-profit-per-x
+  - type: contains
+    target: worksheet-opsp
+  - type: contains
+    target: worksheet-swt
+  - type: contains
+    target: worksheet-7-strata
+  - type: contains
+    target: worksheet-core-customer
+  - type: contains
+    target: metric-revenue-growth-rate
+  - type: contains
+    target: metric-brand-promise-kept-rate
+  - type: contains
+    target: metric-profit-per-x-value
+tags: [strategy, differentiation, vision, purpose, competitive-advantage]
+metadata:
+  key_question: "Can you state your firm's strategy simply — and is it driving sustainable revenue growth?"
+  chapter_range: "Chapters: The Core, The 7 Strata, The One-Page Strategic Plan"

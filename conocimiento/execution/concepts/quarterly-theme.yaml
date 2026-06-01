@@ -1,0 +1,32 @@
+id: concept-quarterly-theme
+type: concept
+name: Quarterly Theme and Celebration
+name_es: Tema Trimestral y Celebracion
+decision: execution
+summary: >
+  A creative name, visual metaphor, and celebration mechanism that brings the quarterly
+  Critical Number to life for every employee. The Quarterly Theme makes abstract metrics
+  tangible and fun. It includes: a theme name (e.g., "Operation Everest"), a scoreboard
+  visible throughout the company, a mid-quarter check-in, and a defined celebration if
+  the Critical Number is hit. The celebration is announced upfront — it is not a surprise.
+  Themes create energy, focus, and shared identity around execution.
+source:
+  book_chapter: "THE PRIORITY"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 957
+  workbook_file: "metodologias_parsed/execution_workbook.txt"
+  workbook_line: 498
+relationships:
+  - type: belongs-to
+    target: decision-execution
+  - type: requires
+    target: concept-critical-number
+  - type: feeds-into
+    target: tool-scoreboard
+tags: [execution, theme, celebration, motivation, quarterly, culture]
+metadata:
+  difficulty: beginner
+  application: >
+    Design the Quarterly Theme in the planning session: name it, define the scoreboard,
+    announce the celebration criteria. Post everywhere. Update the scoreboard weekly.
+    Celebrate visibly when the Critical Number is hit — even for a near-miss.

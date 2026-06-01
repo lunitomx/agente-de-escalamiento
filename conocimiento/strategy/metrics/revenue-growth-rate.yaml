@@ -1,0 +1,26 @@
+id: metric-revenue-growth-rate
+type: metric
+name: Revenue Growth Rate
+name_es: Tasa de Crecimiento de Ingresos
+decision: strategy
+summary: >
+  Year-over-year revenue growth expressed as a percentage. The primary indicator that
+  the strategy is working — Scaling Up's definition of success is "sustainable revenue
+  growth." Growth below inflation indicates the strategy is failing to differentiate.
+  Scaling Up targets: companies with clear strategy and execution grow 2-3x faster than
+  their industry average. Tracked annually as the BHAG-level indicator and quarterly as
+  a progress signal.
+source:
+  book_chapter: "SCALING UP STRATEGY"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 2604
+relationships:
+  - type: belongs-to
+    target: decision-strategy
+  - type: measured-by
+    target: concept-bhag
+tags: [strategy, metric, revenue, growth, BHAG, performance]
+metadata:
+  unit: percentage (YoY)
+  direction: higher_better
+  benchmark: "2-3x industry average is the Scaling Up target for well-executed strategy"

@@ -1,0 +1,33 @@
+id: tool-ccc-analysis
+type: tool
+name: CCC Analysis and Improvement
+name_es: Analisis y Mejora del Ciclo de Conversion de Efectivo
+decision: cash
+summary: >
+  A structured process for mapping, measuring, and improving the Cash Conversion Cycle.
+  Step 1: measure each sub-cycle in days (Sales, Delivery, Billing & Payment). Step 2:
+  brainstorm 3 operational improvements per sub-cycle (improve, eliminate, or redesign).
+  Step 3: pick the highest-impact improvement per sub-cycle and assign an owner.
+  Step 4: track progress quarterly. The goal is not just incremental improvement but
+  structural redesign — moving toward a negative CCC where customers pay before costs
+  are incurred.
+source:
+  book_chapter: "SCALING UP CASH"
+  file: "scaling_up_llamaparse.txt"
+  file_line: 1063
+  workbook_file: "metodologias_parsed/cash_workbook.txt"
+  workbook_line: 696
+relationships:
+  - type: belongs-to
+    target: decision-cash
+  - type: requires
+    target: concept-ccc
+  - type: requires
+    target: concept-cash-acceleration
+  - type: implements
+    target: worksheet-ccc
+tags: [cash, CCC, analysis, improvement, sub-cycles, acceleration]
+metadata:
+  difficulty: intermediate
+  time_estimate: "2-4 hours first mapping; 1 hour quarterly review"
+  frequency: quarterly

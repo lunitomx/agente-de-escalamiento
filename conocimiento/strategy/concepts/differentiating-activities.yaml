@@ -1,0 +1,33 @@
+id: concept-differentiating-activities
+type: concept
+name: Differentiating Activities
+name_es: Actividades Diferenciadoras
+decision: strategy
+summary: >
+  The 3-5 unique operational activities that make delivering the Brand Promise possible
+  and that competitors cannot easily replicate. Analogous to Michael Porter's "activities
+  that fit and reinforce each other." These are not just things you do well — they are
+  the specific ways you deliver on your brand promise that are structurally hard to copy.
+  In the 7 Strata, differentiating activities are the third component and the operational
+  foundation of sustainable competitive advantage.
+source:
+  book_chapter: "THE 7 STRATA OF STRATEGY"
+  file: "metodologias_parsed/strategy_workbook.txt"
+  file_line: 1892
+relationships:
+  - type: belongs-to
+    target: decision-strategy
+  - type: requires
+    target: concept-brand-promise
+  - type: feeds-into
+    target: tool-7-strata
+  - type: feeds-into
+    target: tool-opsp
+tags: [strategy, differentiation, competitive-advantage, activities, Porter, 7-strata]
+metadata:
+  difficulty: advanced
+  application: >
+    List 10 things you do to deliver your brand promise. Cross out those your competitors
+    also do. What remains (if anything) are your differentiating activities. If nothing
+    remains, you don't have a strategy — you have a list of features. Build toward 3-5
+    activities that are structurally hard for competitors to replicate.

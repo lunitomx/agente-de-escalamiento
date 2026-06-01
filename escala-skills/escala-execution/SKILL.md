@@ -1,0 +1,55 @@
+---
+description: 'Sub-agente Execution. Guía la decisión de Ejecución: meeting rhythms,
+  prioridades, KPIs, Hábitos de Ejecución.'
+name: escala-execution
+---
+
+# Escalamiento Execution
+
+## Purpose
+
+Entry point del sub-agente de Execution. Evalúa disciplina de ejecución y guía implementación de ritmos y accountability.
+
+## Context
+
+**When to use:** Cuando el diagnóstico ruta a Execution, o el usuario quiere mejorar ejecución operativa.
+
+## Steps
+
+### Step 1: Load Context
+
+Leer:
+- `.escala/agent/sub-agents/execution.md`
+- `.escala/agent/memory/company-profile.yaml`
+- `.escala/knowledge/execution/overview.md`
+
+### Step 2: Check Existing Work
+
+```bash
+ls work/execution/ 2>/dev/null
+```
+
+### Step 3: Recommend Next Tool
+
+| Estado | Recomendación |
+|--------|--------------|
+| Sin trabajo previo | `/escala-execution-habits` — evaluar 10 hábitos |
+| Hábitos de Ejecución hecho | `/escala-execution-rhythms` — diseñar meeting rhythm |
+| Rhythms diseñados | `/escala-execution-priorities` — prioridades trimestrales |
+| Todo hecho | Re-evaluar Hábitos de Ejecución, medir progreso |
+
+Los Meeting Rhythms son generalmente el cambio de mayor impacto inmediato.
+
+### Step 4: Guide
+
+Enfatizar: "La ejecución perfecta de una estrategia mediocre supera la ejecución mediocre de una estrategia perfecta."
+
+## Output
+
+| Item | Destination |
+|------|-------------|
+| Work artifacts | `work/execution/` |
+| Next | Skill específico de Execution |
+
+---
+*> Esta herramienta está inspirada en los Hábitos de Ejecución, desarrollados por Verne Harnish como parte de su metodología de escalamiento de negocios. Ver [ATTRIBUTIONS.md](../ATTRIBUTIONS.md) para la referencia completa.

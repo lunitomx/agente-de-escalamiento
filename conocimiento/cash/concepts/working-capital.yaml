@@ -1,0 +1,30 @@
+id: concept-working-capital
+type: concept
+name: Working Capital
+name_es: Capital de Trabajo
+decision: cash
+summary: >
+  The cash tied up in day-to-day operations — the difference between current assets
+  (cash, receivables, inventory) and current liabilities (payables, short-term debt).
+  Growing companies often run out of working capital before they run out of profit:
+  revenue growth requires more inventory, more receivables, and more staff before
+  the cash from that growth arrives. Understanding working capital consumption per
+  unit of growth is essential to avoid the "growth trap" — profitable but cash-starved.
+source:
+  book_chapter: "SCALING UP CASH"
+  file: "metodologias_parsed/cash_workbook.txt"
+  file_line: 434
+relationships:
+  - type: belongs-to
+    target: decision-cash
+  - type: requires
+    target: concept-ccc
+  - type: feeds-into
+    target: tool-power-of-one
+tags: [cash, working-capital, growth-trap, financing, assets, liabilities]
+metadata:
+  difficulty: intermediate
+  application: >
+    Calculate working capital monthly: current assets minus current liabilities.
+    Track the trend — if working capital is shrinking despite profit growth,
+    you are in the growth trap. Reduce CCC to free working capital.

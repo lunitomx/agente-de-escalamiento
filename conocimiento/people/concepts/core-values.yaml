@@ -1,0 +1,29 @@
+id: concept-core-values
+type: concept
+name: Core Values
+name_es: Valores Fundamentales
+decision: people
+summary: >
+  The 4-5 non-negotiable rules that govern all decisions and relationships in the company.
+  Discovered through the "Mission to Mars" exercise: identify 5-7 existing employees who
+  best represent the culture you want, then extract the gut-level qualities they share.
+  Core Values guide hiring, firing, recognition, and strategy — they are lived, not posted.
+source:
+  book_chapter: "THE CORE"
+  file: "metodologias_parsed/people_workbook.txt"
+  file_line: 334
+relationships:
+  - type: belongs-to
+    target: decision-people
+  - type: feeds-into
+    target: tool-topgrading
+  - type: feeds-into
+    target: tool-face
+  - type: measured-by
+    target: metric-values-alignment-score
+tags: [people, values, culture, hiring, identity]
+metadata:
+  difficulty: intermediate
+  application: >
+    Use in every hiring decision (do they fit?), every performance review
+    (are they living the values?), and as the filter for strategic choices.

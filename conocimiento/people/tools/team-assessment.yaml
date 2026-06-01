@@ -1,0 +1,25 @@
+id: tool-team-assessment
+type: tool
+name: Team Growth Assessment
+name_es: Evaluacion de Crecimiento del Equipo
+decision: people
+summary: >
+  A self-assessment framework where leaders rate both company effectiveness and their own
+  personal leadership in three areas critical for team growth: onboarding new members,
+  regular one-on-one coaching, and ongoing learning and development. Scored 1 (weak) to
+  5 (strong). Results surface the development area most needing a quarterly priority.
+  Cultures that invest in all three areas achieve double the growth of those that don't.
+source:
+  book_chapter: "THE MANAGERS (COACHES)"
+  file: "metodologias_parsed/people_workbook.txt"
+  file_line: 1802
+relationships:
+  - type: belongs-to
+    target: decision-people
+  - type: implements
+    target: worksheet-team-growth
+tags: [people, team-development, onboarding, coaching, learning, assessment]
+metadata:
+  difficulty: beginner
+  time_estimate: "15 minutes"
+  frequency: quarterly

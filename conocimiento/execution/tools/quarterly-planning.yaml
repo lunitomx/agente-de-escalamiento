@@ -1,0 +1,32 @@
+id: tool-quarterly-planning
+type: tool
+name: Quarterly Planning Session
+name_es: Sesion de Planeacion Trimestral
+decision: execution
+summary: >
+  A 1-2 day offsite session held at the end of each quarter to review results, set the
+  next quarter's Critical Number, define 3-5 Rocks, design the Quarterly Theme, and
+  cascade priorities to all teams. Agenda: review prior quarter's Rocks (what got done,
+  what didn't, why), review KPIs and Critical Number, SWT update, set new Critical Number,
+  set company Rocks, announce Quarterly Theme and celebration. Each department then holds
+  its own session to cascade team-level Rocks aligned with the company Rocks.
+source:
+  book_chapter: "THE PRIORITY"
+  file: "metodologias_parsed/execution_workbook.txt"
+  file_line: 606
+relationships:
+  - type: belongs-to
+    target: decision-execution
+  - type: requires
+    target: concept-priorities-rocks
+  - type: requires
+    target: concept-critical-number
+  - type: requires
+    target: concept-quarterly-theme
+  - type: implements
+    target: worksheet-quarterly-priorities
+tags: [execution, quarterly-planning, rocks, critical-number, offsite, rhythm]
+metadata:
+  difficulty: intermediate
+  time_estimate: "1-2 days"
+  frequency: quarterly
