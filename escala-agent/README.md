@@ -1,0 +1,88 @@
+# ESCALA — Agente de Escalamiento
+
+> Para gente que aplica **Scaling Up** (Verne Harnish) y quiere un agente AI que
+> guíe las 4 Decisiones: **Cash, Strategy, People, Execution**.
+
+## ¿Qué es?
+
+Escala es un **conjunto de instrucciones** para Claude Code, Codex CLI, o Hermes Agent.
+Cuando los cargas, el LLM se convierte en un estratega que:
+
+- Te guía a través del **Power of One** (7 palancas financieras)
+- Construye contigo tu **Plan Estratégico de Una Página (OPSP)**
+- Mapea tu **FACChart** (quién es responsable de qué)
+- Evalúa tus **10 Hábitos de Ejecución** con scoring
+- Guarda cada análisis en markdown para que puedas revisitarlo
+- Se **auto-mejora** detectando patrones de uso
+
+**Cero servidores.** Todo corre dentro del LLM. Tus datos se quedan en tu compu.
+
+## Instalación
+
+```bash
+# 1. Clona el repo
+git clone https://github.com/lunitomx/agente-de-escalamiento.git ~/.escala-repo
+
+# 2. Corre el instalador
+cd ~/.escala-repo && bash setup.sh
+
+# 3. Abre Claude Code / Codex / Hermes y dile:
+#    "Quiero escalar mi negocio"
+```
+
+El instalador:
+1. Crea `~/.escala/` con skills, memoria y configuración
+2. Vincula los skills en `~/.claude/skills/` y `~/.hermes/skills/`
+3. Deja `~/.escala/AGENTS.md` listo para Claude/Codex
+
+## Cómo usarlo
+
+| Dile al agente... | Carga | Resultado |
+|-------------------|-------|-----------|
+| "Quiero escalar mi negocio" | Identidad | El agente sabe quién es |
+| "Revisemos mis números" | Cash | Power of One + CCC |
+| "Definamos la estrategia" | Strategy | OPSP + BHAG |
+| "Hablemos del equipo" | People | FACChart + Valores |
+| "Mejoremos la ejecución" | Execution | 10 Hábitos + Rhythms |
+| "Revísate" | Evolve | Escanea y propone mejoras |
+| "Muéstrame" | — | Genera HTML visual |
+
+## Estructura
+
+```
+~/.escala/
+├── AGENTS.md                 ← Identidad: dile esto al LLM
+├── skills/                   ← Skills que el agente carga
+│   ├── escala-core/          ← Siempre cargado
+│   ├── escala-cash/          ← Power of One, CCC
+│   ├── escala-strategy/      ← OPSP, BHAG, 7 Estratos
+│   ├── escala-people/        ← FACChart, Topgrading
+│   ├── escala-execution/     ← Hábitos, Rhythms
+│   └── escala-evolve/        ← Auto-mejora
+├── memoria/                  ← Tus análisis (markdown)
+│   ├── indice.md
+│   ├── analisis/             ← Cash, Strategy, People, Execution
+│   ├── dashboard/            ← HTMLs visuales generados
+│   └── evolucion/            ← Propuestas de mejora
+└── mcp/server.py             ← Opcional (persistencia)
+```
+
+## Para Claude Code
+
+Solo dile: `Quiero escalar mi negocio` y automáticamente leerá `~/.escala/AGENTS.md`.
+
+## Para Codex CLI
+
+```bash
+codex --instructions ~/.escala/AGENTS.md
+```
+
+## Para Hermes Agent
+
+Los skills se vinculan automáticamente durante `setup.sh` a `~/.hermes/skills/`.
+
+## Créditos
+
+- **Metodología:** Verne Harnish (Scaling Up), Alan Miltz (Power of One)
+- **Implementación Power of One:** Humberto Martínez Barón
+- **Creación:** Eduardo Muñoz Luna — Kokoro
