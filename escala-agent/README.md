@@ -21,10 +21,10 @@ Cuando los cargas, el LLM se convierte en un estratega que:
 
 ```bash
 # 1. Clona el repo
-git clone https://github.com/lunitomx/scaleupagent.git
+git clone https://github.com/lunitomx/agente-de-escalamiento.git
 
 # 2. Ábrelo con Claude Code (automático — lee su CLAUDE.md)
-cd scaleupagent && code .
+cd agente-de-escalamiento && code .
 
 # 3. Dile: "Quiero escalar mi negocio"
 ```
