@@ -21,19 +21,18 @@ Cuando los cargas, el LLM se convierte en un estratega que:
 
 ```bash
 # 1. Clona el repo
-git clone https://github.com/lunitomx/scaleupagent.git ~/.escala-repo
+git clone https://github.com/lunitomx/scaleupagent.git
 
-# 2. Corre el instalador
-cd ~/.escala-repo && bash setup.sh
+# 2. Ábrelo con Claude Code (automático — lee su CLAUDE.md)
+cd scaleupagent && code .
 
-# 3. Abre Claude Code / Codex / Hermes y dile:
-#    "Quiero escalar mi negocio"
+# 3. Dile: "Quiero escalar mi negocio"
 ```
 
-El instalador:
-1. Crea `~/.escala/` con skills, memoria y configuración
-2. Vincula los skills en `~/.claude/skills/` y `~/.hermes/skills/`
-3. Deja `~/.escala/AGENTS.md` listo para Claude/Codex
+> **🚀 No requiere setup.** El `CLAUDE.md` le dice a Claude Code quién eres al instante.
+> Si usas **Codex CLI**: `codex --instructions CODEX.md`
+> Si usas **Hermes**: corre `bash setup.sh` para instalar los skills localmente.
+
 
 ## Cómo usarlo
 
