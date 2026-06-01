@@ -32,7 +32,7 @@ SCRIPT_SRC="$(cd "$(dirname "$0")" 2>/dev/null && pwd)"
 if [ ! -f "$SCRIPT_SRC/AGENTS.md" ]; then
   echo -e "  ${YELLOW}⚠️${NC} No se encuentra AGENTS.md en este directorio."
   echo -e "  Asegúrate de estar en el repositorio clonado:"
-  echo -e "  git clone https://github.com/lunitomx/agente-de-escalamiento.git"
+  echo -e "  git clone https://github.com/lunitomx/scaleupagent.git"
   exit 1
 fi
 SRC="$SCRIPT_SRC"

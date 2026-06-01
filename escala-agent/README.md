@@ -21,7 +21,7 @@ Cuando los cargas, el LLM se convierte en un estratega que:
 
 ```bash
 # 1. Clona el repo
-git clone https://github.com/lunitomx/agente-de-escalamiento.git ~/.escala-repo
+git clone https://github.com/lunitomx/scaleupagent.git ~/.escala-repo
 
 # 2. Corre el instalador
 cd ~/.escala-repo && bash setup.sh
