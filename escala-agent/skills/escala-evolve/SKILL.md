@@ -192,6 +192,69 @@ Cuando se ejecuta como cron:
 
 ---
 
+## Auto-Patch Flow (Modificación de Skills)
+
+Cuando una propuesta de mejora es **aprobada**, ejecutas este flujo para modificar el skill:
+
+### Paso 1: Backup del skill original
+
+Antes de tocar nada:
+
+```bash
+cp ~/.escala/skills/{skill-name}/SKILL.md ~/.escala/memoria/evolucion/backups/{skill-name}-{YYYY-MM-DD}.md
+```
+
+### Paso 2: Generar diff
+
+Muestra al usuario el cambio propuesto como diff:
+
+```diff
++ ## Paso 0: Calcular margen de contribución
++ Pregunta al usuario: "De cada venta, ¿cuánto te queda después de costos directos?"
+```
+
+### Paso 3: Pedir aprobación explícita
+
+"Este es el cambio propuesto para `escala-cash`. ¿Lo aplico?"
+
+⚠️ **NUNCA apliques sin confirmación explícita.** "Sí", "dale", "ok" = aprobado. Silencio o duda = no aplicar.
+
+### Paso 4: Aplicar el cambio
+
+Si el usuario aprueba, genera el nuevo SKILL.md completo y lo escribe en `~/.escala/skills/{skill-name}/SKILL.md`.
+
+También actualiza el archivo en el repo si existe:
+- `escala-agent/skills/{skill-name}/SKILL.md`
+
+### Paso 5: Registrar en changelog
+
+Agrega una entrada en `~/.escala/memoria/evolucion/changelog.md`:
+
+```markdown
+### {YYYY-MM-DD} — [{skill-name}] {título del cambio}
+
+**Propuesta:** PC-{N}
+**Estado:** ✅ Aplicada
+**Skill:** {skill-name}
+**Cambio:** {descripción}
+**Evidencia:** {referencia al hallazgo}
+**Rollback:** `cp ~/.escala/memoria/evolucion/backups/{skill-name}-{YYYY-MM-DD}.md ~/.escala/skills/{skill-name}/SKILL.md`
+```
+
+### Paso 6: Confirmar al usuario
+
+"✅ Aplicado. Si algo no funciona, puedo revertirlo con el backup."
+
+### Rollback (si el usuario pide deshacer)
+
+```bash
+cp ~/.escala/memoria/evolucion/backups/{skill-name}-{YYYY-MM-DD}.md ~/.escala/skills/{skill-name}/SKILL.md
+```
+
+"✅ Revertido. El skill volvió a su estado anterior."
+
+---
+
 ## Skills relacionados
 
 - `escala-core` — Identidad fundamental
