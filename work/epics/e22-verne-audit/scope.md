@@ -1,6 +1,6 @@
 # Epic Scope: E22 — Full System Audit (3 Empresas × Todos los Skills)
 
-**Status:** In Progress
+**Status:** ✅ COMPLETE (absorbida por E23/E24)
 **Dependencies:** E14 (Cash dashboards), E15 (Strategy dashboards), E16 (People dashboards), E17 (Execution dashboards), E21 (Verne)
 **Tamaño:** L
 
@@ -173,9 +173,9 @@ M3 (Polish):                   S22.9 ─► S22.10 ─► S22.11 ─► merge
 | S22.7 — Power of One idioma humano + Verne | S | Done | ~10m | 1.0 | ✅ Tooltips, Verne, guardado, toggle |
 | S22.8 — 22 dashboards (template) | XL | Done | ~15m | 1.0 | ✅ Generador produce todos con tooltips, Verne, guardado |
 | S22.9 — Dashboards visual-only + Daily Analyzer | M | Done | ~10m | 1.0 | ✅ Sin inputs. Radar chart. Score Rockefeller. |
-| S22.10 — Sesiones + adaptación | S | Pending | — | — | Session close fix + tipo de empresa |
-| S22.11 — Tests coloquiales | S | Pending | — | — | Tests con lenguaje de los 3 buyer personas |
-| S22.12 — Export, logging, pulido | S | Pending | — | — | Variación frases, CSV, logging |
+| S22.10 — Sesiones + adaptación | S | 🌀 Absorbida | Por E23/E24 agente-first — | — | Session close fix + tipo de empresa |
+| S22.11 — Tests coloquiales | S | 🌀 Absorbida | Por S23.6 skill agent-based — | — | Tests con lenguaje de los 3 buyer personas |
+| S22.12 — Export, logging, pulido | S | ❌ Descopada | Server-specific — | — | Variación frases, CSV, logging |
 
 ### Sequencing Risks
 
