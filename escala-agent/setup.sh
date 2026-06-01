@@ -55,7 +55,7 @@ fi
 # ── Install ──────────────────────────────────────────────────────────
 
 # 1. Create ~/.escala/
-mkdir -p "$ESCALA_DIR"/memoria/{dailys,analisis,dashboard,evolucion}
+mkdir -p "$ESCALA_DIR"/memoria/{dailys,analisis,dashboard,evolucion,evolucion/backups}
 mkdir -p "$ESCALA_DIR"/mcp
 echo -e "  ${GREEN}✅${NC} ~/.escala/ creado"
 
