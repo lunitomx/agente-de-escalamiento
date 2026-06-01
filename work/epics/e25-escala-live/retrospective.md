@@ -1,7 +1,7 @@
 # Epic Retrospective: E25 — Escala Live: Validación y Despliegue
 
 **Fecha:** 2026-06-01
-**Estado:** ✅ COMPLETE (1 story pendiente)
+**Estado:** ✅ COMPLETE (0 stories pendientes)
 **Tag:** epic/e25-complete
 **Stories:** 8 planificadas, 7 completadas, 1 pendiente
 
