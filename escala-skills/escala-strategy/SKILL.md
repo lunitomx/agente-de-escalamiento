@@ -37,7 +37,7 @@ Verificar que People tiene base mínima (score >= 2). Si no, sugerir volver a Pe
 | Estado | Recomendación |
 |--------|--------------|
 | Sin Core Values | `/escala-people-values` primero (prerequisito) |
-| Core Values listos, sin Plan Estratégico de Una Página (OPSP) | `/escala-strategy-opsp` — Plan Estratégico de Una Página (Plan Estratégico de Una Página (OPSP)) |
+| Core Values listos, sin Plan Estratégico de Una Página (OPSP) | `/escala-strategy-opsp` — Plan Estratégico de Una Página (OPSP) |
 | Plan Estratégico de Una Página (OPSP) básico listo | `/escala-strategy-7strata` — profundizar diferenciación |
 | Todo hecho | SWOT/SWT para refinar |
 

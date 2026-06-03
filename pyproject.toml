@@ -13,3 +13,12 @@ include = ["coaching*", "validators*"]
 
 [tool.setuptools.package-data]
 "conocimiento" = ["**/*.yaml", "**/*.yml"]
+
+[tool.pytest.ini_options]
+# Bare `pytest` only collects the project's own suites — keeps it from
+# recursing into untracked scratch dirs (e.g. referencias-humberto/).
+testpaths = ["coaching", "escala_server", "tests"]
+norecursedirs = [
+    ".git", ".venv", "build", "dist", "node_modules",
+    "referencias-humberto", ".scaleup", "work", ".raise",
+]
