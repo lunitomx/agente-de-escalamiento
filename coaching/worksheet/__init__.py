@@ -292,8 +292,26 @@ def run(context: dict) -> dict:
             "status": "completed",
         }
         ensure_dir(state_path.parent)
+
+        # Anti-overwrite silencioso: si vamos a pisar un worksheet YA finalizado,
+        # respaldamos la versión previa con timestamp en vez de borrarla sin rastro.
+        # El flujo normal step→save (status in_progress) no genera respaldos.
+        backup_path = None
+        if state_path.exists() and state.get("status") == "completed":
+            import datetime
+            import shutil
+            ts = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+            backup_path = state_path.with_name(f"{worksheet['id']}.{ts}.bak.yaml")
+            shutil.copy2(state_path, backup_path)
+
         write_yaml(state_path, completed_data)
 
-        return {"output": f"✅ **{worksheet['name']}** guardado como completado.", "artifacts": {"worksheet": worksheet, "completed_data": completed_data, "state_path": str(state_path)}, "errors": []}
+        output = f"✅ **{worksheet['name']}** guardado como completado."
+        if backup_path is not None:
+            output += f"\n\n♻️ Se respaldó la versión previa en `{backup_path.name}` antes de sobrescribir."
+        artifacts = {"worksheet": worksheet, "completed_data": completed_data, "state_path": str(state_path)}
+        if backup_path is not None:
+            artifacts["backup_path"] = str(backup_path)
+        return {"output": output, "artifacts": artifacts, "errors": []}
 
     return {"output": "", "artifacts": {}, "errors": [f"Unknown action: {action}"]}
