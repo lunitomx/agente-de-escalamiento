@@ -14,7 +14,7 @@ Read the task board and extract counts and in-progress items. Sub-skill of `/esc
 ### Step 1: Read Task Board
 
 ```bash
-cat .escala/my-company/tasks.md
+cat .scaleup/my-company/tasks.md
 ```
 
 ### Step 2: Parse Sections

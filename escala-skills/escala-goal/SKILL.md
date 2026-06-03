@@ -13,7 +13,7 @@ Set or view the company's annual Meta SMART. This goal acts as a strategic filte
 
 ### Step 1: Check Current Goal
 
-Read `.escala/my-company/annual-goal.md`. If the goal fields are filled, display current goal. If empty, proceed to goal creation.
+Read `.scaleup/my-company/annual-goal.md`. If the goal fields are filled, display current goal. If empty, proceed to goal creation.
 
 ### Step 2: Goal Creation (if needed)
 
@@ -44,7 +44,7 @@ For each decision, ask how the goal connects:
 
 ### Step 5: Save Goal
 
-Write the responses to `.escala/my-company/annual-goal.md` filling in the template fields.
+Write the responses to `.scaleup/my-company/annual-goal.md` filling in the template fields.
 
 ### Step 6: Confirm
 
@@ -60,7 +60,7 @@ Filtro activo: toda recomendación se evalúa contra esta meta.
 
 | Item | Destination |
 |------|-------------|
-| Annual goal | `.escala/my-company/annual-goal.md` |
+| Annual goal | `.scaleup/my-company/annual-goal.md` |
 | Filter | Active in all coaching skills |
 
 ---

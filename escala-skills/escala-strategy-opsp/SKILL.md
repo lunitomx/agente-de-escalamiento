@@ -21,8 +21,8 @@ Guiar al usuario paso a paso para completar su Plan Estratégico de Una Página 
 ### Step 1: Load Context & Template
 
 Leer:
-- `.escala/agent/memory/company-profile.yaml`
-- `.escala/knowledge/strategy/tools/one-page-strategic-plan.md`
+- `.scaleup/agent/memory/company-profile.yaml`
+- `.scaleup/knowledge/strategy/tools/opsp.yaml`
 - `templates/opsp.md`
 - `work/strategy/opsp.md` (si existe, para actualizar)
 

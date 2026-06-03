@@ -19,9 +19,9 @@ Entry point del sub-agente de People. Evalúa la madurez de People, revisa traba
 ### Step 1: Load Context
 
 Leer:
-- `.escala/agent/sub-agents/people.md` (persona del sub-agente)
-- `.escala/agent/memory/company-profile.yaml` (contexto empresa)
-- `.escala/knowledge/people/overview.md` (conocimiento del dominio)
+- `.scaleup/agent/sub-agents/people.md` (persona del sub-agente)
+- `.scaleup/agent/memory/company-profile.yaml` (contexto empresa)
+- `.scaleup/knowledge/people/overview.md` (conocimiento del dominio)
 
 ### Step 2: Check Existing Work
 

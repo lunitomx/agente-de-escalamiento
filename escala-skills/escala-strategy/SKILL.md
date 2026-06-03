@@ -19,9 +19,9 @@ Entry point del sub-agente de Strategy. Evalúa madurez estratégica, verifica p
 ### Step 1: Load Context
 
 Leer:
-- `.escala/agent/sub-agents/strategy.md`
-- `.escala/agent/memory/company-profile.yaml`
-- `.escala/knowledge/strategy/overview.md`
+- `.scaleup/agent/sub-agents/strategy.md`
+- `.scaleup/agent/memory/company-profile.yaml`
+- `.scaleup/knowledge/strategy/overview.md`
 
 ### Step 2: Check Existing Work & Prerequisites
 

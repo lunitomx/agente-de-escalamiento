@@ -14,7 +14,7 @@ Read the most recent session logs and produce a summary. Sub-skill of `/escala-s
 ### Step 1: List Session Files
 
 ```bash
-ls -1 .escala/my-company/sessions/*.md 2>/dev/null | sort | tail -3
+ls -1 .scaleup/my-company/sessions/*.md 2>/dev/null | sort | tail -3
 ```
 
 Filenames are `YYYY-MM-DD.md` — lexicographic sort equals chronological order.

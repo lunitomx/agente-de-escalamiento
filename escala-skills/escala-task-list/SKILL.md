@@ -13,7 +13,7 @@ Show the current state of the task board with counts per section and metadata.
 
 ### Step 1: Read Board
 
-Read `.escala/my-company/tasks.md`.
+Read `.scaleup/my-company/tasks.md`.
 
 ### Step 2: Parse and Count
 

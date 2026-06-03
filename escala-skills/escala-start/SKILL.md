@@ -17,7 +17,7 @@ This skill orchestrates 4 phases inline (file reads are simple enough to not req
 
 ### Step 1: Load Company Profile
 
-Read `.escala/agent/memory/company-profile.yaml`.
+Read `.scaleup/agent/memory/company-profile.yaml`.
 
 Extract:
 - `company.name`, `company.growth_stage`, `company.employees`, `company.industry`
@@ -46,7 +46,7 @@ Do NOT proceed past this point without a valid profile.
 ### Step 3: Load Recent Sessions
 
 ```bash
-ls -1 .escala/my-company/sessions/*.md 2>/dev/null | sort | tail -3
+ls -1 .scaleup/my-company/sessions/*.md 2>/dev/null | sort | tail -3
 ```
 
 For each file found, read the YAML frontmatter and extract: `date`, `decision_focus`, `duration_minutes`.
@@ -55,7 +55,7 @@ If no sessions exist, note "Sin sesiones previas" and continue.
 
 ### Step 4: Load Open Tasks
 
-Read `.escala/my-company/tasks.md`.
+Read `.scaleup/my-company/tasks.md`.
 
 Parse the three sections:
 - **En Progreso** — count items, list each with description
@@ -71,9 +71,9 @@ Run the overdue detection gate:
 ```bash
 python3 -c "
 import sys, pathlib
-sys.path.insert(0, str(pathlib.Path('.escala/agent')))
+sys.path.insert(0, str(pathlib.Path('.scaleup/agent')))
 from validators.tasks import find_overdue
-overdue = find_overdue(pathlib.Path('.escala/my-company/tasks.md'))
+overdue = find_overdue(pathlib.Path('.scaleup/my-company/tasks.md'))
 for t in overdue:
     print(f'OVERDUE: {t[\"description\"]} (due: {t[\"due\"]})')
 if not overdue:

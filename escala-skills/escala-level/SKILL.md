@@ -11,7 +11,7 @@ Detectar automáticamente el nivel de coaching del usuario (Shu/Ha/Ri) basado en
 
 ## Architecture
 
-Adapter delgado. Core logic en `.escala/coaching/level/`.
+Adapter delgado. Core logic en `.scaleup/coaching/level/`.
 
 ## Steps
 
@@ -59,5 +59,5 @@ El SKILL.md de cada skill debe incluir:
 
 | Item | Destination |
 |------|-------------|
-| Level | `.escala/agent/memory/company-profile.yaml` → coaching.level |
+| Level | `.scaleup/agent/memory/company-profile.yaml` → coaching.level |
 | Auto-detect | Basado en promedio de scores |

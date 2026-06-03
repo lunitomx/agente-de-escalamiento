@@ -46,5 +46,5 @@ class TestRouterConstants:
 
     def test_command_format(self):
         for decision, cmd in SUB_AGENT_COMMANDS.items():
-            assert cmd.startswith("/scaleup-")
+            assert cmd.startswith("/escala-")
             assert decision in cmd

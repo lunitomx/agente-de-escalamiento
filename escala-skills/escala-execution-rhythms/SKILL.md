@@ -14,7 +14,7 @@ Diseñar la cadencia completa de reuniones de la empresa siguiendo el modelo Esc
 
 ### Step 1: Load Context
 
-Leer `.escala/knowledge/execution/tools/meeting-rhythms.md`.
+Leer `.scaleup/knowledge/execution/concepts/meeting-rhythm.yaml`.
 Cargar template `templates/meeting-rhythm-planner.md`.
 
 ### Step 2: Current State

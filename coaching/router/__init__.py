@@ -7,10 +7,10 @@ from pathlib import Path
 PRIORITY_ORDER = ["people", "strategy", "execution", "cash"]
 
 SUB_AGENT_COMMANDS = {
-    "people": "/scaleup-people",
-    "strategy": "/scaleup-strategy",
-    "execution": "/scaleup-execution",
-    "cash": "/scaleup-cash",
+    "people": "/escala-people",
+    "strategy": "/escala-strategy",
+    "execution": "/escala-execution",
+    "cash": "/escala-cash",
 }
 
 SUB_AGENT_LABELS = {
@@ -56,12 +56,12 @@ def run(context: dict) -> dict:
         for dec_key in PRIORITY_ORDER:
             score = scores.get(dec_key, "—")
             lines.append(f"| {SUB_AGENT_LABELS[dec_key]} | `{SUB_AGENT_COMMANDS[dec_key]}` | {score} |")
-        lines.extend(["", "Para ir a un sub-agente específico, usa su comando directamente.", "O corre `/scaleup-diagnose` para que el router decida por ti."])
+        lines.extend(["", "Para ir a un sub-agente específico, usa su comando directamente.", "O corre `/escala-diagnose` para que el router decida por ti."])
         return {"output": "\n".join(lines), "artifacts": {"sub_agents": list(SUB_AGENT_COMMANDS.keys())}, "errors": []}
 
     elif action == "route":
         if not scores:
-            return {"output": "", "artifacts": {}, "errors": ["No hay scores de diagnóstico. Corre `/scaleup-diagnose` primero."]}
+            return {"output": "", "artifacts": {}, "errors": ["No hay scores de diagnóstico. Corre `/escala-diagnose` primero."]}
 
         explicit = context.get("explicit_request", "").lower()
         if explicit and explicit in SUB_AGENT_COMMANDS:

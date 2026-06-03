@@ -157,7 +157,7 @@ def test_pulse_history_table_structure(tmp_path):
             "date": "2026-05-06",
             "answers": {"people": 1, "strategy": 0, "execution": -1, "cash": 0, "overall": 0},
             "trends": {"people": "improving", "strategy": "stalling", "execution": "regressing", "cash": "stalling", "overall": "stalling"},
-            "course_corrections": ["Execution regressing → run /scaleup-execution"],
+            "course_corrections": ["Execution regressing → run /escala-execution"],
         }]
     }
     (pulse_dir / "pulse-history.yaml").write_text(yaml.dump(history))

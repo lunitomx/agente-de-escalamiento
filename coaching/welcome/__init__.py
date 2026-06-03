@@ -77,11 +77,11 @@ def run(context: dict) -> dict:
     elif methodology == "bmc":
         output_lines.append(
             "Tienes un modelo de negocio establecido. Pasemos directo al diagnóstico "
-            "de las 4 decisiones con `/scaleup-diagnose`."
+            "de las 4 decisiones con `/escala-diagnose`."
         )
     else:
         output_lines.append(
-            "Tu perfil está listo. Siguiente paso: `/scaleup-diagnose` para evaluar "
+            "Tu perfil está listo. Siguiente paso: `/escala-diagnose` para evaluar "
             "tu situación actual en las 4 decisiones."
         )
 

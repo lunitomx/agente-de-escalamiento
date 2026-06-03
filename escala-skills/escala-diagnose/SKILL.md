@@ -7,7 +7,7 @@ name: escala-diagnose
 
 ## Purpose
 
-Evaluar el estado de la empresa en las 4 decisiones mediante preguntas guiadas. Generar reporte con scores y priorización. Usa el core module en `.escala/coaching/diagnose/`.
+Evaluar el estado de la empresa en las 4 decisiones mediante preguntas guiadas. Generar reporte con scores y priorización. Usa el core module en `.scaleup/coaching/diagnose/`.
 
 ## Architecture
 
@@ -18,7 +18,7 @@ Este skill es un **adapter delgado**. La lógica de scoring, priorización y per
 ### Step 1: Load Context
 
 ```bash
-test -f .escala/agent/memory/company-profile.yaml && echo "EXISTS" || echo "NO_PROFILE"
+test -f .scaleup/agent/memory/company-profile.yaml && echo "EXISTS" || echo "NO_PROFILE"
 ```
 
 | Result | Action |
@@ -60,7 +60,7 @@ print(json.dumps(result, indent=2, ensure_ascii=False))
 ### Step 4: Quality Gate
 
 ```bash
-python3 .escala/agent/validators/diagnose.py .escala/agent/memory/company-profile.yaml
+python3 .scaleup/agent/validators/diagnose.py .scaleup/agent/memory/company-profile.yaml
 ```
 
 ### Step 5: Present Results
@@ -83,5 +83,5 @@ print(json.dumps(run(json.loads(sys.stdin.read())), indent=2, ensure_ascii=False
 
 | Item | Destination |
 |------|-------------|
-| Scores actualizados | `.escala/agent/memory/company-profile.yaml` |
+| Scores actualizados | `.scaleup/agent/memory/company-profile.yaml` |
 | Próximo paso | Sub-agente recomendado |

@@ -99,7 +99,7 @@ def run(context: dict) -> dict:
             )
         lines.extend([
             "",
-            "Para empezar: `/scaleup-worksheet [nombre]`",
+            "Para empezar: `/escala-worksheet [nombre]`",
             "Para reanudar: mismo comando si ya empezaste",
         ])
 
@@ -119,7 +119,7 @@ def run(context: dict) -> dict:
         completed = get_completed_ids(base)
         if worksheet["id"] in completed:
             return {
-                "output": f"Worksheet **{worksheet['name']}** ya está completado. Usa `/scaleup-worksheet list` para ver otros.",
+                "output": f"Worksheet **{worksheet['name']}** ya está completado. Usa `/escala-worksheet list` para ver otros.",
                 "artifacts": {"worksheet": worksheet, "status": "completed"},
                 "errors": [],
             }
@@ -207,7 +207,7 @@ def run(context: dict) -> dict:
         state_path = base / ".scaleup" / "my-company" / "worksheets" / f"{worksheet['id']}.yaml"
         state = read_yaml(state_path)
         if not state:
-            return {"output": "", "artifacts": {}, "errors": [f"Worksheet '{ws_name}' no iniciado. Usa /scaleup-worksheet {ws_name} primero"]}
+            return {"output": "", "artifacts": {}, "errors": [f"Worksheet '{ws_name}' no iniciado. Usa /escala-worksheet {ws_name} primero"]}
 
         current_step = state.get("current_step", 0)
         total_steps = state.get("total_steps", 0)
@@ -245,8 +245,8 @@ def run(context: dict) -> dict:
             lines.extend([
                 "",
                 "Próximos pasos sugeridos:",
-                f"- `/scaleup-progress` para ver tu avance general",
-                f"- `/scaleup-worksheet list` para ver otros worksheets",
+                f"- `/escala-progress` para ver tu avance general",
+                f"- `/escala-worksheet list` para ver otros worksheets",
             ])
 
             return {

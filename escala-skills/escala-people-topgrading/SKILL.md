@@ -14,7 +14,7 @@ Guiar al usuario para implementar el proceso de Topgrading: contratar A-players 
 
 ### Step 1: Load Context
 
-Leer `.escala/knowledge/people/tools/topgrading.md` y company profile.
+Leer `.scaleup/knowledge/people/tools/topgrading.yaml` y company profile.
 
 ### Step 2: Assess Current Hiring
 

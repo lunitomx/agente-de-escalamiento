@@ -29,7 +29,7 @@ If no node or date, omit those fields from the comment.
 
 ### Step 3: Append to Task Board
 
-Read `.escala/my-company/tasks.md`. Append the new task under `## En Progreso` section.
+Read `.scaleup/my-company/tasks.md`. Append the new task under `## En Progreso` section.
 
 ### Step 4: Confirm
 
@@ -37,4 +37,4 @@ Report: "Tarea agregada: {description} (decision: {decision})"
 
 ## Output
 
-Updated `.escala/my-company/tasks.md` with new task.
+Updated `.scaleup/my-company/tasks.md` with new task.
