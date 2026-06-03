@@ -11,6 +11,7 @@ Standalone:
 """
 from __future__ import annotations
 
+import datetime
 import json
 import pathlib
 import sys
@@ -53,7 +54,27 @@ def _load_worksheet_content(knowledge_dir: str | None, node_path: str) -> dict:
     return data if isinstance(data, dict) else {}
 
 
-def _get_completed_ids(worksheets_dir: str | None) -> set[str]:
+def _resolve_worksheets_dir(context: dict) -> pathlib.Path:
+    """Resolve the directory holding worksheet state.
+
+    Companies are isolated by directory: callers pass ``base_path`` (the
+    company's project root). An explicit ``worksheets_dir`` overrides everything.
+    We must NOT fall back to a bare relative ``.scaleup/my-company`` that ignores
+    ``base_path`` — doing so makes every company write to the same CWD folder and
+    silently clobber each other's worksheets.
+    """
+    explicit = context.get("worksheets_dir")
+    if explicit:
+        return pathlib.Path(explicit)
+    base = pathlib.Path(context.get("base_path", "."))
+    return base / ".scaleup" / "my-company" / "worksheets"
+
+
+def _timestamp() -> str:
+    return datetime.datetime.now().strftime("%Y%m%dT%H%M%S%f")
+
+
+def _get_completed_ids(worksheets_dir: str | pathlib.Path | None) -> set[str]:
     if not worksheets_dir:
         return set()
     path = pathlib.Path(worksheets_dir)
@@ -93,7 +114,7 @@ def run(context: dict) -> dict:
         if not meta:
             return {"output": "", "artifacts": {}, "errors": [f"Worksheet not found: {worksheet_id}"]}
 
-        completed = _get_completed_ids(context.get("worksheets_dir"))
+        completed = _get_completed_ids(_resolve_worksheets_dir(context))
         missing = check_prerequisites(registry, worksheet_id, completed)
 
         content = _load_worksheet_content(context.get("knowledge_dir"), meta.get("node_path", ""))
@@ -117,20 +138,32 @@ def run(context: dict) -> dict:
 
     elif action == "save":
         worksheet_data = context.get("data", {})
-        worksheets_dir = context.get("worksheets_dir", ".scaleup/my-company/worksheets")
-        path = pathlib.Path(worksheets_dir)
+        path = _resolve_worksheets_dir(context)
         path.mkdir(parents=True, exist_ok=True)
 
         wid = worksheet_data.get("worksheet_id", "unknown")
         file_path = path / f"{wid}.yaml"
-        file_path.write_text(
-            yaml.dump(worksheet_data, default_flow_style=False, allow_unicode=True, sort_keys=False),
-            encoding="utf-8",
+        new_content = yaml.dump(
+            worksheet_data, default_flow_style=False, allow_unicode=True, sort_keys=False
         )
+
+        backup_path = None
+        if file_path.exists():
+            existing = file_path.read_text(encoding="utf-8")
+            if existing != new_content and not context.get("overwrite"):
+                # Never lose data silently: snapshot the prior version before
+                # overwriting, so a re-save or a different company can't clobber it.
+                backup_path = file_path.with_name(f"{wid}.{_timestamp()}.bak.yaml")
+                backup_path.write_text(existing, encoding="utf-8")
+
+        file_path.write_text(new_content, encoding="utf-8")
         output = format_completed(worksheet_data)
+        artifacts = {"saved_path": str(file_path), "worksheet_id": wid}
+        if backup_path is not None:
+            artifacts["backup_path"] = str(backup_path)
         return {
             "output": output,
-            "artifacts": {"saved_path": str(file_path), "worksheet_id": wid},
+            "artifacts": artifacts,
             "errors": [],
         }
 

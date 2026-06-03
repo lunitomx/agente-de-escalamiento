@@ -60,7 +60,7 @@ print(json.dumps(run(json.loads(sys.stdin.read())), indent=2, ensure_ascii=False
 ### Step 5: Quality Gate
 
 ```bash
-python3 .escala/agent/validators/worksheet.py .escala/my-company/worksheets/face.yaml
+python3 validators/worksheet.py .scaleup/my-company/worksheets/face.yaml
 ```
 
 ## Resume Flow
@@ -79,5 +79,11 @@ print(json.dumps(run(json.loads(sys.stdin.read())), indent=2, ensure_ascii=False
 
 | Item | Destination |
 |------|-------------|
-| Worksheet state | `.escala/my-company/worksheets/{id}.yaml` |
+| Worksheet state | `{base_path}/.scaleup/my-company/worksheets/{id}.yaml` |
 | Completed worksheets | Mismo archivo con status: completed |
+
+> **Aislamiento por negocio:** el estado se guarda relativo al `base_path` que se
+> pasa en cada acción (la raíz del proyecto de ese negocio). Trabaja cada negocio
+> desde su propia carpeta para no mezclar worksheets. Antes de sobrescribir un
+> worksheet existente con contenido distinto, el engine guarda un respaldo
+> `{id}.{timestamp}.bak.yaml` (sáltalo con `overwrite: true`).
