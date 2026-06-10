@@ -7,6 +7,9 @@ name = "escala-coaching"
 version = "1.0.0"
 description = "Motor de coaching del Agente de Escalamiento"
 requires-python = ">=3.10"
+dependencies = [
+    "pyyaml>=6.0",
+]
 
 [tool.setuptools.packages.find]
 include = ["coaching*", "validators*"]
