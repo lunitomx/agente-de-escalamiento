@@ -19,6 +19,8 @@ import re
 from pathlib import Path
 from typing import Any
 
+import yaml
+
 from .graph_engine import GraphEngine
 from .knowledge_handler import KnowledgeHandler
 
@@ -67,102 +69,9 @@ _CATEGORY_KEYWORDS: dict[str, list[str]] = {
     ],
 }
 
-# ── Verne response templates per category ────────────────────────────
-
-_VERNE_TEMPLATES: dict[str, dict[str, Any]] = {
-    "people": {
-        "diagnosis": "Eso suena a un tema de **People**. Déjame preguntarte algo directo:",
-        "questions": [
-            "¿Tienes a la persona correcta en cada asiento de tu FACe?",
-            "¿Cuándo fue la última vez que hiciste una entrevista Topgrading real?",
-            "¿Tu equipo tiene Healthy Conflict o silencio político?",
-            "¿Qué estás haciendo para desarrollar a tus A-players?",
-        ],
-        "principles": ["Delegate and Predict", "Healthy Conflict"],
-        "reframe": "Recuerda: las nalgas correctas en los asientos correctos. Sin eso, nada más funciona.",
-    },
-    "strategy": {
-        "diagnosis": "Eso es un tema de **Estrategia**. Antes de profundizar:",
-        "questions": [
-            "¿Quién es tu Core Customer? Descríbelo en una frase.",
-            "¿Cuáles son tus 3 Brand Promises y cómo sabes que las cumples?",
-            "¿Cuál es tu BHAG a 10-25 años?",
-            "¿Tu OPSP está actualizado y todo el equipo lo conoce?",
-        ],
-        "principles": ["Same Page", "Keep Things Simple"],
-        "reframe": "La estrategia sin ejecución es un sueño. Pero empecemos por tener claro el sueño en una página.",
-    },
-    "execution": {
-        "diagnosis": "Hablas de **Ejecución**. El talón de Aquiles de la mayoría de las empresas. Pregunto:",
-        "questions": [
-            "¿Tienes un Daily Huddle de 15 minutos todos los días?",
-            "¿Cuál es tu Prioridad #1 este trimestre?",
-            "¿Tu weekly meeting termina con un WWW claro?",
-            "¿Tus KPIs son leading o lagging?",
-        ],
-        "principles": ["No Surprises", "Priority #1", "Routine Sets You Free"],
-        "reframe": "Las metas sin rutinas son deseos. El ritmo constante vence a la intensidad esporádica.",
-    },
-    "cash": {
-        "diagnosis": "**Cash** — mi tema favorito. Sin efectivo no hay empresa. Por eso pregunto:",
-        "questions": [
-            "¿Cuál es tu Cash Conversion Cycle en días?",
-            "¿Qué está pasando con cada palanca del Power of One?",
-            "¿Sabes tu Gross Margin sin mirarlo?",
-            "¿Tienes suficiente efectivo para 12 meses sin crecimiento?",
-        ],
-        "principles": ["No Surprises", "Keep Things Simple"],
-        "reframe": "El efectivo es el oxígeno. El Power of One no miente — mejora 1% en cada palanca y verás lo que pasa.",
-    },
-    "general": {
-        "diagnosis": "Déjame ponerme mis lentes de Verne y ver esto desde las **4 Decisiones**:",
-        "questions": [
-            ("People", "¿Quién es responsable de esto?"),
-            ("Strategy", "¿Esto está alineado con tu Core Customer y Brand Promise?"),
-            ("Execution", "¿Tienes un ritmo para darle seguimiento?"),
-            ("Cash", "¿Cómo impacta esto tu flujo de efectivo?"),
-        ],
-        "principles": ["Keep Things Simple", "No Surprises", "Routine Sets You Free"],
-        "reframe": "Mira, todo negocio se reduce a 4 decisiones. Siempre empiezo por ahí.",
-    },
-}
-
-# ── Daily review checklist (Rockefeller Habits) ──────────────────────
-
-_DAILY_CHECKLIST: dict[str, dict[str, Any]] = {
-    "logros_ayer": {
-        "keywords": ["ayer", "logré", "completé", "terminé", "hicimos", "achieved", "yesterday"],
-        "label": "Logros de ayer",
-        "weight": 3,
-        "message_missing": "No veo qué se logró ayer. El Daily Huddle empieza con los logros del día anterior — 60 segundos, sin excusas.",
-    },
-    "prioridades_hoy": {
-        "keywords": ["hoy", "voy a", "haré", "prioridad", "planeo", "today", "plan"],
-        "label": "Prioridades de hoy",
-        "weight": 3,
-        "message_missing": "¿Cuáles son tus 1-3 prioridades para hoy? Sin eso, el huddle es solo una reunión más.",
-    },
-    "obstaculos": {
-        "keywords": ["obstáculo", "bloqueo", "problema", "atasco", "necesito ayuda", "stuck", "blocker", "issue", "ayuda"],
-        "label": "Obstáculos / bloqueos",
-        "weight": 2,
-        "message_missing": "No mencionaste obstáculos. Recuerda: *bad news early is good news*. ¿Hay algo en lo que necesites ayuda?",
-    },
-    "metricas": {
-        "keywords": ["kpi", "métrica", "número", "indicador", "scoreboard", "dato", "data", "metric", "kpi"],
-        "label": "Métricas / KPIs",
-        "weight": 2,
-        "message_missing": "No veo métricas en tu daily. El scoreboard es lo que hace que un huddle sea productivo. ¿Cuál es tu KPI prioritario?",
-    },
-    "prioridad_1": {
-        "keywords": ["prioridad #1", "critical number", "tema del trimestre", "priority #1", "number one", "theme"],
-        "label": "Conexión con Prioridad #1 del trimestre",
-        "weight": 2,
-        "message_missing": "No vinculaste tu daily con la Prioridad #1 del trimestre. Rockefeller Habit: todo debe conectar con la línea de meta de 90 días.",
-    },
-}
-
-_MAX_SCORE = sum(item["weight"] for item in _DAILY_CHECKLIST.values())
+# ── Verne response templates — loaded from YAML at init ──────────
+# See conocimiento/coaching/verne-templates.yaml
+# See conocimiento/coaching/daily-checklist.yaml
 
 
 class VerneHandler:
@@ -174,6 +83,16 @@ class VerneHandler:
         self.graph = GraphEngine(db_path)
         self.knowledge = KnowledgeHandler(self.graph)
         self._alma: str | None = None
+
+        # Load Verne templates from YAML
+        _coaching_dir = Path(__file__).resolve().parent.parent / "conocimiento" / "coaching"
+        self._templates = yaml.safe_load(
+            (_coaching_dir / "verne-templates.yaml").read_text(encoding="utf-8")
+        )
+        self._checklist = yaml.safe_load(
+            (_coaching_dir / "daily-checklist.yaml").read_text(encoding="utf-8")
+        )
+        self._max_score = sum(item["weight"] for item in self._checklist.values())
 
     # ── public API ────────────────────────────────────────────────────
 
@@ -224,7 +143,7 @@ class VerneHandler:
         entities = self._get_relevant_entities(question, category)
 
         # 3. Get template for this category
-        template = _VERNE_TEMPLATES.get(category, _VERNE_TEMPLATES["general"])
+        template = self._templates.get(category, self._templates["general"])
 
         # 4. Build the answer
         answer = self._build_answer(question, category, template, entities)
@@ -255,18 +174,18 @@ class VerneHandler:
         missing: list[str] = []
         score = 0
 
-        for item_id, item in _DAILY_CHECKLIST.items():
+        for item_id, item in self._checklist.items():
             if any(kw in text_lower for kw in item["keywords"]):
                 found.append(item["label"])
                 score += item["weight"]
             else:
                 missing.append(item["label"])
 
-        score_percent = round((score / _MAX_SCORE) * 100)
+        score_percent = round((score / self._max_score) * 100)
 
         # Build observations
         observations: list[str] = []
-        observations.append(f"**Puntuación Rockefeller:** {score}/{_MAX_SCORE} ({score_percent}%)")
+        observations.append(f"**Puntuación Rockefeller:** {score}/{self._max_score} ({score_percent}%)")
 
         if score_percent >= 80:
             observations.append("✅ Buen daily. Tienes los elementos clave. Sigue así.")
@@ -279,8 +198,8 @@ class VerneHandler:
             observations.append(f"\n**Presente:** {', '.join(f'✅ {f}' for f in found)}")
         if missing:
             observations.append(f"\n**Ausente:**")
-            for item_id in [k for k in _DAILY_CHECKLIST if _DAILY_CHECKLIST[k]["label"] in missing]:
-                observations.append(f"  - ❌ {_DAILY_CHECKLIST[item_id]['message_missing']}")
+            for item_id in [k for k in self._checklist if self._checklist[k]["label"] in missing]:
+                observations.append(f"  - ❌ {self._checklist[item_id]['message_missing']}")
 
         # Verne's closing
         if missing:
@@ -297,7 +216,7 @@ class VerneHandler:
 
         return {
             "score": score,
-            "score_max": _MAX_SCORE,
+            "score_max": self._max_score,
             "score_percent": score_percent,
             "elements_found": found,
             "elements_missing": missing,
