@@ -1,139 +1,106 @@
 ---
+description: 'Flujo guiado de inicio a fin: de "hola" a dashboard con recomendación. El agente elige la decisión correcta, aplica el skill, y entrega valor en <10 min.'
 name: escala-start
-description: 'Session start orchestrator. Loads company context, recent sessions, and open tasks. Presents summary and proposes focus.'
 ---
 
-# Escalamiento Start — Session Orchestrator
+# Escalamiento — Primer Diagnóstico en 10 Minutos
 
 ## Purpose
 
-Load company context at the start of a coaching session. Presents a summary of the company's current state, recent sessions, and open tasks. Proposes a focus for the session.
+El objetivo es simple: en menos de 10 minutos desde que el usuario dijo "hola", debe tener un diagnóstico claro con una recomendación accionable. No un tour. No un menú. Valor.
 
-## Pipeline
+Este skill es el motor que ejecuta la promesa del onboarding: detectar el dolor, elegir el skill correcto, ejecutarlo, y entregar.
 
-This skill orchestrates 4 phases inline (file reads are simple enough to not require subagents). Quality gate validates profile completeness before proceeding.
+## Principios
 
-## Steps
+- **Una decisión a la vez.** No diagnosticar People y Strategy y Cash en la primera sesión. La que más duele.
+- **Datos mínimos.** Si el usuario no tiene datos, usar lo que diga. "Dime los 3 números que sí sabes."
+- **Dashboard siempre.** Cada diagnóstico termina con algo visible: un dashboard HTML, un PDF, o al menos un resumen estructurado en markdown.
+- **Siguiente paso concreto.** "Esto es lo que tienes. Esto es lo que te recomiendo hacer esta semana."
 
-### Step 1: Load Company Profile
+## Flow
 
-Read `.escala/agent/memory/company-profile.yaml`.
+### Paso 1: Elegir la decisión correcta (1 min)
 
-Extract:
-- `company.name`, `company.growth_stage`, `company.employees`, `company.industry`
-- `scores.people`, `scores.strategy`, `scores.execution`, `scores.cash`
-- `scores.last_diagnosis`
-- `focus.current_decision`, `focus.last_session`
+Basado en lo que el usuario dijo en el welcome, clasificar su dolor principal:
 
-### Step 2: Quality Gate — Profile Completeness
+| El usuario dice... | Decisión | Skill |
+|---|---|---|
+| "Mi equipo no funciona", "No tengo a quién delegar" | People | escala-people-organigrama / escala-people-fac |
+| "No sé para dónde voy", "Mi competencia me está comiendo" | Strategy | escala-strategy-opsp / escala-strategy-swt |
+| "No llegamos a las metas", "Puro apagar incendios" | Execution | escala-execution-prioridad / escala-execution-habits |
+| "No tengo dinero", "No sé a dónde se va el cash" | Cash | escala-cash-finanzas / escala-cash-power1 |
+| "Todo está mal" | General | escala-diagnose |
 
-Check if `company.name` has a value.
+Si no está claro: "De estas 4 áreas, ¿cuál te quita más el sueño: tu equipo, tu rumbo, tu operación o tu dinero?"
 
-| Condition | Action |
-|-----------|--------|
-| `company.name` is filled | Continue to Step 3 |
-| `company.name` is empty or missing | **HALT** — display message and redirect |
+### Paso 2: Recolectar datos mínimos (2-3 min)
 
-If halted, present:
+Activar escala-discover para detectar dónde están los datos.
 
-```
-No tengo información de tu empresa todavía.
-Ejecuta /escala-welcome para crear tu perfil.
-```
+Si no hay datos: "No te preocupes. Dime lo que sepas. Aunque sean 3 números."
 
-Do NOT proceed past this point without a valid profile.
+**Mínimo viable por decisión:**
 
-### Step 3: Load Recent Sessions
+- **People:** "Dime 3 personas clave de tu equipo y qué hacen."
+- **Strategy:** "¿Quién es tu cliente ideal? Descríbelo en una frase."
+- **Execution:** "¿Cuál es tu meta más importante este trimestre?"
+- **Cash:** "¿Cuánto vendiste el mes pasado y cuánto gastaste?"
 
-```bash
-ls -1 .escala/my-company/sessions/*.md 2>/dev/null | sort | tail -3
-```
+Con eso es suficiente para un primer diagnóstico.
 
-For each file found, read the YAML frontmatter and extract: `date`, `decision_focus`, `duration_minutes`.
+### Paso 3: Ejecutar diagnóstico (3-4 min)
 
-If no sessions exist, note "Sin sesiones previas" and continue.
+Aplicar el skill correspondiente con los datos disponibles (aunque sean mínimos).
 
-### Step 4: Load Open Tasks
+"Perfecto. Déjame analizar esto..."
 
-Read `.escala/my-company/tasks.md`.
+El skill debe:
+- Procesar los datos (de archivo o de conversación)
+- Generar el diagnóstico
+- Guardar resultados
+- Generar dashboard o resumen
 
-Parse the three sections:
-- **En Progreso** — count items, list each with description
-- **Próximo** — count items
-- **Completado** — count items
+### Paso 4: Entregar resultado (2 min)
 
-If all sections are empty, note "Sin tareas registradas".
-
-### Step 4b: Accountability Check
-
-Run the overdue detection gate:
-
-```bash
-python3 -c "
-import sys, pathlib
-sys.path.insert(0, str(pathlib.Path('.escala/agent')))
-from validators.tasks import find_overdue
-overdue = find_overdue(pathlib.Path('.escala/my-company/tasks.md'))
-for t in overdue:
-    print(f'OVERDUE: {t[\"description\"]} (due: {t[\"due\"]})')
-if not overdue:
-    print('NO_OVERDUE')
-"
-```
-
-If overdue tasks exist, flag them prominently in the presentation:
+Mostrar al usuario:
 
 ```
-⚠️ Tareas vencidas:
-- {task} (vencida desde {due_date})
+📊 Diagnóstico inicial — [Decisión]
+
+Esto es lo que veo:
+[3-5 hallazgos clave con datos]
+
+Mi recomendación:
+[1 acción concreta para esta semana]
+
+Próximo paso:
+[Qué hacer, con qué skill, y cuándo volver]
+
+¿Quieres profundizar en algo de esto o prefieres pasar a otra área?
 ```
 
-For each overdue task, ask:
-- "¿La completaste? → mover a Completado"
-- "¿Sigue en progreso? → actualizar fecha"
-- "¿Ya no aplica? → eliminar"
+### Paso 5: Guardar y preparar siguiente sesión
 
-This is the accountability loop — the agent follows up on commitments from previous sessions.
+Guardar todo en `work/` y en memoria/.
 
-### Step 5: Present Context & Propose Focus
+"Ya guardé todo. La próxima vez que entres, seguimos donde nos quedamos. ¿Hay algo más en lo que pueda ayudarte hoy?"
 
-Display:
+## Time Budget
 
-```
-══════════════════════════════════════════════════════
-  {company_name} — Sesión {today's date}
-══════════════════════════════════════════════════════
+| Fase | Tiempo |
+|---|---|
+| Elegir decisión | 1 min |
+| Recolectar datos | 2-3 min |
+| Ejecutar diagnóstico | 3-4 min |
+| Entregar resultado | 2 min |
+| **Total** | **8-10 min** |
 
-  Scores:  People {N} │ Strategy {N} │ Execution {N} │ Cash {N}
-  Último diagnóstico: {date or "pendiente"}
+Si en 10 minutos no hay diagnóstico, el skill no está funcionando. Optimizar.
 
-  Últimas sesiones:
-  - {date}: {focus} ({duration} min)
-  - {date}: {focus} ({duration} min)
-  - {date}: {focus} ({duration} min)
+## Notas
 
-  Tareas en progreso: {count}
-  {- task description}
-  {- task description}
-
-──────────────────────────────────────────────────────
-  Recomendación: {proposed focus}
-══════════════════════════════════════════════════════
-```
-
-**Focus recommendation logic:**
-1. If there are in-progress tasks → "Revisar tareas en progreso"
-2. If any score is 1 → recommend that decision (lowest first)
-3. If last session had a decision focus → "Continuar con {decision}"
-4. If all scores >= 3 → "Revisión general — considera /escala-diagnose"
-
-## Output
-
-| Item | Destination |
-|------|-------------|
-| Context summary | Displayed to user |
-| Focus recommendation | Displayed to user |
-
-## Design Notes
-
-Sub-skills exist at `escala-start-load-*` for documentation and future use when complexity grows. Currently inlined because each phase is a simple file read (< 20 lines of logic). Per ADR-0: "If a step is < 20 lines of logic, inline it in orchestrator."
+- Si el usuario se va por las ramas: "Volvamos a [tema]. Dijiste que [su dolor]. ¿Quieres que empecemos por ahí?"
+- Si el usuario quiere cambiar de tema a mitad: "OK, cambiemos. ¿Qué es más urgente ahora?"
+- Si el diagnóstico revela algo más grave que el dolor inicial: "Mira, entramos por [tema A], pero lo que veo es que [tema B] es más urgente. ¿Re-enfocamos?"
+- Siempre terminar con optimismo: "Esto tiene solución. Vamos paso a paso."
