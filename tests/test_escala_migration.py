@@ -11,9 +11,10 @@ import tempfile
 from pathlib import Path
 
 import pytest
+import yaml
 
 from escala_server.daos import init_db
-from escala_server.migrate import migrate_from_yaml, read_yaml_file, _parse_simple_yaml
+from escala_server.migrate import migrate_from_yaml, read_yaml_file
 
 
 # ─── Simple YAML Parser Tests ──────────────────────────────────
@@ -24,52 +25,52 @@ class TestSimpleYamlParser:
 
     def test_key_value_pairs(self):
         text = "name: Test Corp\nindustry: Tech\n"
-        result = _parse_simple_yaml(text)
+        result = yaml.safe_load(text)
         assert result == {"name": "Test Corp", "industry": "Tech"}
 
     def test_integers_and_floats(self):
         text = "count: 42\nprice: 9.99\n"
-        result = _parse_simple_yaml(text)
+        result = yaml.safe_load(text)
         assert result == {"count": 42, "price": 9.99}
 
     def test_booleans(self):
         text = "active: true\ndisabled: false\n"
-        result = _parse_simple_yaml(text)
+        result = yaml.safe_load(text)
         assert result == {"active": True, "disabled": False}
 
     def test_null_values(self):
         text = "empty: null\nnone: ~\n"
-        result = _parse_simple_yaml(text)
+        result = yaml.safe_load(text)
         assert result == {"empty": None, "none": None}
 
     def test_list_with_items(self):
         text = "items:\n- apple\n- banana\n- cherry\n"
-        result = _parse_simple_yaml(text)
+        result = yaml.safe_load(text)
         assert result == {"items": ["apple", "banana", "cherry"]}
 
     def test_comments(self):
         text = "# This is a comment\nname: value\n# another comment\nkey: 42\n"
-        result = _parse_simple_yaml(text)
+        result = yaml.safe_load(text)
         assert result == {"name": "value", "key": 42}
 
     def test_empty_list(self):
         text = "items: []\nname: test\n"
-        result = _parse_simple_yaml(text)
+        result = yaml.safe_load(text)
         assert result == {"items": [], "name": "test"}
 
     def test_quoted_strings(self):
         text = 'name: "Test Corp"\ndesc: \'A great company\'\n'
-        result = _parse_simple_yaml(text)
+        result = yaml.safe_load(text)
         assert result == {"name": "Test Corp", "desc": "A great company"}
 
     def test_nested_mapping(self):
         text = "person:\n  name: John\n  age: 30\n"
-        result = _parse_simple_yaml(text)
+        result = yaml.safe_load(text)
         assert result == {"person": {"name": "John", "age": 30}}
 
     def test_block_scalar(self):
         text = "summary: >\n  This is a long\n  description that\n  spans multiple lines\n"
-        result = _parse_simple_yaml(text)
+        result = yaml.safe_load(text)
         assert "summary" in result
         assert "description" in result["summary"]
 
