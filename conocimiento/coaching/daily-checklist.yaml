@@ -1,0 +1,32 @@
+# Daily Review Checklist — Rockefeller Habits
+# Cargado por VerneHandler para evaluar daily huddles
+
+logros_ayer:
+  keywords: ["ayer", "logré", "completé", "terminé", "hicimos", "achieved", "yesterday"]
+  label: "Logros de ayer"
+  weight: 3
+  message_missing: "No veo qué se logró ayer. El Daily Huddle empieza con los logros del día anterior — 60 segundos, sin excusas."
+
+prioridades_hoy:
+  keywords: ["hoy", "voy a", "haré", "prioridad", "planeo", "today", "plan"]
+  label: "Prioridades de hoy"
+  weight: 3
+  message_missing: "¿Cuáles son tus 1-3 prioridades para hoy? Sin eso, el huddle es solo una reunión más."
+
+obstaculos:
+  keywords: ["obstáculo", "bloqueo", "problema", "atasco", "necesito ayuda", "stuck", "blocker", "issue", "ayuda"]
+  label: "Obstáculos / bloqueos"
+  weight: 2
+  message_missing: "No mencionaste obstáculos. Recuerda: *bad news early is good news*. ¿Hay algo en lo que necesites ayuda?"
+
+metricas:
+  keywords: ["kpi", "métrica", "número", "indicador", "scoreboard", "dato", "data", "metric"]
+  label: "Métricas / KPIs"
+  weight: 2
+  message_missing: "No veo métricas en tu daily. El scoreboard es lo que hace que un huddle sea productivo. ¿Cuál es tu KPI prioritario?"
+
+prioridad_1:
+  keywords: ["prioridad #1", "critical number", "tema del trimestre", "priority #1", "number one", "theme"]
+  label: "Conexión con Prioridad #1 del trimestre"
+  weight: 2
+  message_missing: "No vinculaste tu daily con la Prioridad #1 del trimestre. Rockefeller Habit: todo debe conectar con la línea de meta de 90 días."
