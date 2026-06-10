@@ -47,25 +47,35 @@ class EscalaRequestHandler(BaseHTTPRequestHandler):
         # Fall back to static file
         self._serve_static(path)
 
-    def do_POST(self):
-        handler, params = self.router.dispatch("POST", self.path)
+    def _handle_api_request(self, method: str):
+        """Handle API POST/PATCH requests with error handling.
+
+        Wraps JSON parsing and handler execution in try/except so that
+        malformed payloads or unexpected handler exceptions don't crash
+        the worker thread.
+        """
+        handler, params = self.router.dispatch(method, self.path)
         if not handler:
-            self._send_json_error(404, "Not found")
-            return
+            return self._send_json_error(404, "Not found")
+
         content_length = int(self.headers.get("Content-Length", 0))
         body = self.rfile.read(content_length) if content_length > 0 else b"{}"
-        payload = json.loads(body) if body else {}
-        self._send_json_response(handler(payload=payload, **params))
+
+        try:
+            payload = json.loads(body) if body else {}
+        except json.JSONDecodeError:
+            return self._send_json_error(400, "Invalid JSON")
+
+        try:
+            self._send_json_response(handler(payload=payload, **params))
+        except Exception:
+            self._send_json_error(500, "Internal server error")
+
+    def do_POST(self):
+        self._handle_api_request("POST")
 
     def do_PATCH(self):
-        handler, params = self.router.dispatch("PATCH", self.path)
-        if not handler:
-            self._send_json_error(404, "Not found")
-            return
-        content_length = int(self.headers.get("Content-Length", 0))
-        body = self.rfile.read(content_length) if content_length > 0 else b"{}"
-        payload = json.loads(body) if body else {}
-        self._send_json_response(handler(payload=payload, **params))
+        self._handle_api_request("PATCH")
 
     def do_OPTIONS(self):
         """Handle CORS preflight."""
