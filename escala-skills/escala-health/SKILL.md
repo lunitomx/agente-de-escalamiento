@@ -1,3 +1,8 @@
+---
+description: 'Health check del Agente de Escalamiento. Verifica skills instalados, paquete Python, imports y versión del repo. Diagnostica problemas de instalación.'
+name: escala-health
+---
+
 # escala-health
 
 ## Propósito

@@ -1,3 +1,8 @@
+---
+description: 'Actualiza los skills del Agente de Escalamiento desde GitHub. Git pull + reinstall. Mantén tu agente al día con los últimos fixes y skills nuevos.'
+name: escala-update
+---
+
 # escala-update
 
 ## Propósito
