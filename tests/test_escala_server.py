@@ -168,3 +168,79 @@ class TestServerIntegration:
             assert resp.status == 200
         except Exception as e:
             pytest.fail(f"Static file test failed: {e}")
+
+
+# ─── Resilience Tests ──────────────────────────────────────────
+
+class TestServerResilience:
+    """Verify server survives errors gracefully (S27.1)."""
+
+    def test_invalid_json_returns_400(self):
+        """POST with malformed body must return 400, not crash."""
+        import urllib.request
+        import urllib.error
+
+        port = 18081
+        proc = subprocess.Popen(
+            [sys.executable, "-m", "escala_server", "--port", str(port)],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            cwd=PROJECT_ROOT,
+        )
+        time.sleep(1)
+        try:
+            url = f"http://localhost:{port}/api/companies"
+            req = urllib.request.Request(
+                url,
+                data=b"{invalid",
+                headers={"Content-Type": "application/json"},
+                method="POST",
+            )
+            try:
+                urllib.request.urlopen(req)
+                pytest.fail("Expected HTTPError for 400")
+            except urllib.error.HTTPError as e:
+                assert e.code == 400
+                body = json.loads(e.read())
+                assert body["status"] == "error"
+                assert "JSON" in body["message"]
+        finally:
+            os.kill(proc.pid, signal.SIGTERM)
+            proc.wait(timeout=5)
+
+    def test_server_survives_error(self):
+        """After an error, health check must still return 200."""
+        import urllib.request
+        import urllib.error
+
+        port = 18082
+        proc = subprocess.Popen(
+            [sys.executable, "-m", "escala_server", "--port", str(port)],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            cwd=PROJECT_ROOT,
+        )
+        time.sleep(1)
+        try:
+            # Trigger an error first
+            url = f"http://localhost:{port}/api/companies"
+            req = urllib.request.Request(
+                url,
+                data=b"{invalid",
+                headers={"Content-Type": "application/json"},
+                method="POST",
+            )
+            try:
+                urllib.request.urlopen(req)
+            except urllib.error.HTTPError:
+                pass  # Expected
+
+            # Server must still be alive
+            health_url = f"http://localhost:{port}/api/health"
+            resp = urllib.request.urlopen(health_url)
+            assert resp.status == 200
+            data = json.loads(resp.read())
+            assert data["status"] == "ok"
+        finally:
+            os.kill(proc.pid, signal.SIGTERM)
+            proc.wait(timeout=5)
