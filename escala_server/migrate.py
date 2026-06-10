@@ -93,8 +93,8 @@ def migrate_from_yaml(db_path: str, yaml_root: str) -> dict[str, Any]:
                     }
                     data_json = json.dumps(profile_data, ensure_ascii=False)
                     conn.execute(
-                        "INSERT OR IGNORE INTO companies (id, data_json) VALUES (?, ?)",
-                        (company_id, data_json),
+                        "INSERT OR IGNORE INTO companies (id, name, metadata) VALUES (?, ?, ?)",
+                        (company_id, "My Company", data_json),
                     )
                     if conn.total_changes > 0:
                         counts["companies"] += 1
@@ -113,7 +113,7 @@ def migrate_from_yaml(db_path: str, yaml_root: str) -> dict[str, Any]:
                     data = read_yaml_file(pulse_path)
                     data_json = json.dumps(data, ensure_ascii=False)
                     conn.execute(
-                        """INSERT OR REPLACE INTO worksheets (category, tool, data_json)
+                        """INSERT OR REPLACE INTO worksheets (category, tool, data)
                            VALUES (?, ?, ?)""",
                         ("company", "pulse-history", data_json),
                     )
@@ -132,7 +132,7 @@ def migrate_from_yaml(db_path: str, yaml_root: str) -> dict[str, Any]:
                         tool_name = ctx_file.stem
                         data_json = json.dumps(data, ensure_ascii=False)
                         conn.execute(
-                            """INSERT OR REPLACE INTO worksheets (category, tool, data_json)
+                            """INSERT OR REPLACE INTO worksheets (category, tool, data)
                                VALUES (?, ?, ?)""",
                             ("context", tool_name, data_json),
                         )
@@ -151,7 +151,7 @@ def migrate_from_yaml(db_path: str, yaml_root: str) -> dict[str, Any]:
                         data = {"content": text}
                         data_json = json.dumps(data, ensure_ascii=False)
                         conn.execute(
-                            """INSERT OR REPLACE INTO worksheets (category, tool, data_json)
+                            """INSERT OR REPLACE INTO worksheets (category, tool, data)
                                VALUES (?, ?, ?)""",
                             ("company", tool, data_json),
                         )
@@ -169,7 +169,7 @@ def migrate_from_yaml(db_path: str, yaml_root: str) -> dict[str, Any]:
                     data = {"content": text}
                     data_json = json.dumps(data, ensure_ascii=False)
                     conn.execute(
-                        """INSERT OR REPLACE INTO worksheets (category, tool, data_json)
+                        """INSERT OR REPLACE INTO worksheets (category, tool, data)
                            VALUES (?, ?, ?)""",
                         ("company", "tasks", data_json),
                     )
@@ -195,7 +195,7 @@ def migrate_from_yaml(db_path: str, yaml_root: str) -> dict[str, Any]:
                         data_json = json.dumps(session_data, ensure_ascii=False)
                         session_id = hashlib.md5(str(session_file).encode()).hexdigest()[:8]
                         conn.execute(
-                            "INSERT OR IGNORE INTO sessions (id, data_json) VALUES (?, ?)",
+                            "INSERT OR IGNORE INTO sessions (id, metadata) VALUES (?, ?)",
                             (session_id, data_json),
                         )
                         if conn.total_changes > 0:
@@ -220,7 +220,7 @@ def migrate_from_yaml(db_path: str, yaml_root: str) -> dict[str, Any]:
                             tool_name = ws_file.stem
                             data_json = json.dumps(data, ensure_ascii=False)
                             conn.execute(
-                                """INSERT OR REPLACE INTO worksheets (category, tool, data_json)
+                                """INSERT OR REPLACE INTO worksheets (category, tool, data)
                                    VALUES (?, ?, ?)""",
                                 (decision, tool_name, data_json),
                             )
