@@ -18,7 +18,7 @@ Este skill es un **adapter delgado**. La lógica de trend mapping, persistencia 
 ### Step 1: Load Context
 
 ```bash
-test -f .escala/agent/memory/company-profile.yaml && echo "EXISTS" || echo "NO_PROFILE"
+test -f .scaleup/agent/memory/company-profile.yaml && echo "EXISTS" || echo "NO_PROFILE"
 ```
 
 | Result | Action |
@@ -73,7 +73,7 @@ If `result["errors"]` is non-empty:
 ### Step 5: Run Quality Gate
 
 ```bash
-python3 .escala/agent/validators/pulse.py .escala/my-company/pulse-history.yaml
+python3 .scaleup/agent/validators/pulse.py .scaleup/my-company/pulse-history.yaml
 ```
 
 If the gate exits 1, report the error and do not present results as successful.
@@ -91,7 +91,7 @@ If the gate exits 1, report the error and do not present results as successful.
 
 | Item | Destination |
 |------|-------------|
-| Pulse history | `.escala/my-company/pulse-history.yaml` |
+| Pulse history | `.scaleup/my-company/pulse-history.yaml` |
 | History schema | `{pulses: [{date, answers, trends, course_corrections}]}` |
 | Valid answer values | -1 (regressing), 0 (stalling), +1 (improving) |
 | Valid trend values | regressing, stalling, improving |

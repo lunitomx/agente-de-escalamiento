@@ -1,5 +1,5 @@
 ---
-description: 'Guía paso a paso para llenar el Plan Estratégico de Una Página (Plan Estratégico de Una Página (OPSP)) (Plan Estratégico de Una Página (OPSP)), la herramienta
+description: 'Guía paso a paso para llenar el Plan Estratégico de Una Página (OPSP), la herramienta
   central de Escalamiento de Negocios para Strategy.'
 name: escala-strategy-opsp
 ---
@@ -8,7 +8,7 @@ name: escala-strategy-opsp
 
 ## Purpose
 
-Guiar al usuario paso a paso para completar su Plan Estratégico de Una Página (Plan Estratégico de Una Página (OPSP)). El Plan Estratégico de Una Página (OPSP) es LA herramienta central de Escalamiento de Negocios — toda la estrategia de la empresa en una sola página.
+Guiar al usuario paso a paso para completar su Plan Estratégico de Una Página (OPSP). El Plan Estratégico de Una Página (OPSP) es LA herramienta central de Escalamiento de Negocios — toda la estrategia de la empresa en una sola página.
 
 ## Context
 
@@ -21,8 +21,8 @@ Guiar al usuario paso a paso para completar su Plan Estratégico de Una Página 
 ### Step 1: Load Context & Template
 
 Leer:
-- `.escala/agent/memory/company-profile.yaml`
-- `.escala/knowledge/strategy/tools/one-page-strategic-plan.md`
+- `.scaleup/agent/memory/company-profile.yaml`
+- `.scaleup/knowledge/strategy/tools/opsp.yaml`
 - `templates/opsp.md`
 - `work/strategy/opsp.md` (si existe, para actualizar)
 

@@ -22,7 +22,7 @@ Este skill es un **adapter delgado**. Toda la lógica vive en Python. No contien
 ### Step 1: Prerequisite Check
 
 ```bash
-test -f .escala/agent/memory/company-profile.yaml && echo "EXISTS" || echo "NO_PROFILE"
+test -f .scaleup/agent/memory/company-profile.yaml && echo "EXISTS" || echo "NO_PROFILE"
 ```
 
 | Result | Action |
@@ -49,7 +49,7 @@ result = json.loads(sys.stdin.read())
 with open('/tmp/dashboard-output.md', 'w') as f:
     f.write(result['output'])
 print(json.dumps(result, indent=2, ensure_ascii=False))
-" > /tmp/dashboard-result.json && python3 .escala/agent/validators/dashboard.py /tmp/dashboard-output.md
+" > /tmp/dashboard-result.json && python3 .scaleup/agent/validators/dashboard.py /tmp/dashboard-output.md
 ```
 
 Exit 0 = validation passed. Exit 1 = missing sections (show errors).

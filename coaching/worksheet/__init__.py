@@ -99,7 +99,7 @@ def run(context: dict) -> dict:
             )
         lines.extend([
             "",
-            "Para empezar: `/scaleup-worksheet [nombre]`",
+            "Para empezar: `/escala-worksheet [nombre]`",
             "Para reanudar: mismo comando si ya empezaste",
         ])
 
@@ -119,7 +119,7 @@ def run(context: dict) -> dict:
         completed = get_completed_ids(base)
         if worksheet["id"] in completed:
             return {
-                "output": f"Worksheet **{worksheet['name']}** ya está completado. Usa `/scaleup-worksheet list` para ver otros.",
+                "output": f"Worksheet **{worksheet['name']}** ya está completado. Usa `/escala-worksheet list` para ver otros.",
                 "artifacts": {"worksheet": worksheet, "status": "completed"},
                 "errors": [],
             }
@@ -207,7 +207,7 @@ def run(context: dict) -> dict:
         state_path = base / ".scaleup" / "my-company" / "worksheets" / f"{worksheet['id']}.yaml"
         state = read_yaml(state_path)
         if not state:
-            return {"output": "", "artifacts": {}, "errors": [f"Worksheet '{ws_name}' no iniciado. Usa /scaleup-worksheet {ws_name} primero"]}
+            return {"output": "", "artifacts": {}, "errors": [f"Worksheet '{ws_name}' no iniciado. Usa /escala-worksheet {ws_name} primero"]}
 
         current_step = state.get("current_step", 0)
         total_steps = state.get("total_steps", 0)
@@ -245,8 +245,8 @@ def run(context: dict) -> dict:
             lines.extend([
                 "",
                 "Próximos pasos sugeridos:",
-                f"- `/scaleup-progress` para ver tu avance general",
-                f"- `/scaleup-worksheet list` para ver otros worksheets",
+                f"- `/escala-progress` para ver tu avance general",
+                f"- `/escala-worksheet list` para ver otros worksheets",
             ])
 
             return {
@@ -292,8 +292,26 @@ def run(context: dict) -> dict:
             "status": "completed",
         }
         ensure_dir(state_path.parent)
+
+        # Anti-overwrite silencioso: si vamos a pisar un worksheet YA finalizado,
+        # respaldamos la versión previa con timestamp en vez de borrarla sin rastro.
+        # El flujo normal step→save (status in_progress) no genera respaldos.
+        backup_path = None
+        if state_path.exists() and state.get("status") == "completed":
+            import datetime
+            import shutil
+            ts = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+            backup_path = state_path.with_name(f"{worksheet['id']}.{ts}.bak.yaml")
+            shutil.copy2(state_path, backup_path)
+
         write_yaml(state_path, completed_data)
 
-        return {"output": f"✅ **{worksheet['name']}** guardado como completado.", "artifacts": {"worksheet": worksheet, "completed_data": completed_data, "state_path": str(state_path)}, "errors": []}
+        output = f"✅ **{worksheet['name']}** guardado como completado."
+        if backup_path is not None:
+            output += f"\n\n♻️ Se respaldó la versión previa en `{backup_path.name}` antes de sobrescribir."
+        artifacts = {"worksheet": worksheet, "completed_data": completed_data, "state_path": str(state_path)}
+        if backup_path is not None:
+            artifacts["backup_path"] = str(backup_path)
+        return {"output": output, "artifacts": artifacts, "errors": []}
 
     return {"output": "", "artifacts": {}, "errors": [f"Unknown action: {action}"]}

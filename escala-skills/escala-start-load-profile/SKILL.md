@@ -14,7 +14,7 @@ Read the company profile YAML and extract context for the session. Sub-skill of 
 ### Step 1: Read Profile
 
 ```bash
-cat .escala/agent/memory/company-profile.yaml
+cat .scaleup/agent/memory/company-profile.yaml
 ```
 
 ### Step 2: Extract Context

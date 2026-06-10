@@ -18,7 +18,7 @@ Base filename: `YYYY-MM-DD.md` using today's date.
 Check if file already exists:
 
 ```bash
-ls .escala/my-company/sessions/YYYY-MM-DD*.md 2>/dev/null
+ls .scaleup/my-company/sessions/YYYY-MM-DD*.md 2>/dev/null
 ```
 
 | Condition | Filename |
@@ -30,12 +30,12 @@ ls .escala/my-company/sessions/YYYY-MM-DD*.md 2>/dev/null
 ### Step 2: Ensure Directory Exists
 
 ```bash
-mkdir -p .escala/my-company/sessions
+mkdir -p .scaleup/my-company/sessions
 ```
 
 ### Step 3: Write Session Log
 
-Write to `.escala/my-company/sessions/{filename}`:
+Write to `.scaleup/my-company/sessions/{filename}`:
 
 ```markdown
 ---
@@ -61,4 +61,4 @@ Report the file path and contents written.
 
 ## Output
 
-Session log file at `.escala/my-company/sessions/{filename}`.
+Session log file at `.scaleup/my-company/sessions/{filename}`.

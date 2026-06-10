@@ -11,7 +11,7 @@ Guiar al usuario a través de cualquier worksheet de Escalamiento de Negocios, c
 
 ## Architecture
 
-Adapter delgado. Core logic en `.escala/coaching/worksheet/`.
+Adapter delgado. Core logic en `.scaleup/coaching/worksheet/`.
 
 ## Steps
 
@@ -60,7 +60,7 @@ print(json.dumps(run(json.loads(sys.stdin.read())), indent=2, ensure_ascii=False
 ### Step 5: Quality Gate
 
 ```bash
-python3 .escala/agent/validators/worksheet.py .escala/my-company/worksheets/face.yaml
+python3 .scaleup/agent/validators/worksheet.py .scaleup/my-company/worksheets/face.yaml
 ```
 
 ## Resume Flow
@@ -79,5 +79,5 @@ print(json.dumps(run(json.loads(sys.stdin.read())), indent=2, ensure_ascii=False
 
 | Item | Destination |
 |------|-------------|
-| Worksheet state | `.escala/my-company/worksheets/{id}.yaml` |
+| Worksheet state | `.scaleup/my-company/worksheets/{id}.yaml` |
 | Completed worksheets | Mismo archivo con status: completed |

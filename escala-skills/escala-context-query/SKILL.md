@@ -17,7 +17,7 @@ Accept a category filter: org, metrics, competitive, custom, or "all".
 
 ### Step 2: Read Files
 
-Read the appropriate YAML file(s) from `.escala/my-company/context/`.
+Read the appropriate YAML file(s) from `.scaleup/my-company/context/`.
 
 ### Step 3: Present
 

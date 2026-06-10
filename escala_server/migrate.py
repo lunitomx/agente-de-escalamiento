@@ -154,7 +154,8 @@ def _parse_yaml_list(
                 result.append(_parse_scalar(item_text.strip()))
             idx += 1
         else:
-            idx += 1
+            # Non-list line at this level → end of the block sequence
+            break
 
     return result, idx
 
@@ -211,17 +212,16 @@ def _parse_yaml_mapping(
                         if next_stripped
                         else 0
                     )
+                    if next_stripped.startswith("- ") and next_indent >= current_indent:
+                        # Block sequence — YAML allows it at the same indent as the key
+                        sub_val, idx = _parse_yaml_value(lines, idx + 1, current_indent)
+                        result[key] = sub_val
+                        continue
                     if next_stripped and next_indent > current_indent:
-                        if next_stripped.startswith("- "):
-                            # List follows this key
-                            sub_val, idx = _parse_yaml_value(lines, idx + 1, current_indent)
-                            result[key] = sub_val
-                            continue
-                        else:
-                            # Sub-mapping follows
-                            sub_val, idx = _parse_yaml_value(lines, idx + 1, current_indent)
-                            result[key] = sub_val
-                            continue
+                        # Sub-mapping follows
+                        sub_val, idx = _parse_yaml_value(lines, idx + 1, current_indent)
+                        result[key] = sub_val
+                        continue
                 result[key] = None
                 idx += 1
                 continue

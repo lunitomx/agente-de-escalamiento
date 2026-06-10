@@ -60,7 +60,7 @@ def run(context: dict) -> dict:
             avg = round(sum(v for v in scores.values() if isinstance(v, int)) / len([v for v in scores.values() if isinstance(v, int)]), 1)
             lines.append(f"Basado en score promedio: {avg}/5")
         lines.append("")
-        lines.append("Para cambiar manualmente: `/scaleup-level --set shu|ha|ri`")
+        lines.append("Para cambiar manualmente: `/escala-level --set shu|ha|ri`")
         return {"output": "\n".join(lines), "artifacts": {"level": level, "level_info": level_info, "instructions": instructions}, "errors": []}
 
     elif action == "set":

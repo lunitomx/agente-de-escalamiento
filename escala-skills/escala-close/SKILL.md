@@ -37,7 +37,7 @@ Collect into structured data:
 Determine filename:
 
 ```bash
-ls .escala/my-company/sessions/$(date +%Y-%m-%d)*.md 2>/dev/null
+ls .scaleup/my-company/sessions/$(date +%Y-%m-%d)*.md 2>/dev/null
 ```
 
 | Existing files | New filename |
@@ -49,7 +49,7 @@ ls .escala/my-company/sessions/$(date +%Y-%m-%d)*.md 2>/dev/null
 Ensure directory exists:
 
 ```bash
-mkdir -p .escala/my-company/sessions
+mkdir -p .scaleup/my-company/sessions
 ```
 
 Write session log with YAML frontmatter:
@@ -75,7 +75,7 @@ Run the Python validator on the written file:
 ```bash
 python3 -c "
 import sys, pathlib
-sys.path.insert(0, str(pathlib.Path('.escala/agent')))
+sys.path.insert(0, str(pathlib.Path('.scaleup/agent')))
 from validators.session import validate_session_log
 errors = validate_session_log(pathlib.Path('{log_file_path}'))
 if errors:
@@ -113,7 +113,7 @@ echo '{
 - Capture the returned JSON. If `errors` is non-empty, surface errors to user and abort.
 - Then run the summary quality gate:
   ```bash
-  python3 .escala/agent/validators/summary_validator.py {log_file_path}
+  python3 .scaleup/agent/validators/summary_validator.py {log_file_path}
   ```
   Must exit 0. If it exits 1, surface the error and abort.
 - Continue to Step 4 only when both checks pass.
@@ -141,6 +141,6 @@ Duración: {duration_minutes} min
 
 | Item | Destination |
 |------|-------------|
-| Session log | `.escala/my-company/sessions/YYYY-MM-DD.md` |
+| Session log | `.scaleup/my-company/sessions/YYYY-MM-DD.md` |
 | Validation | Python quality gate (pass/fail) |
 | Confirmation | Displayed to user |

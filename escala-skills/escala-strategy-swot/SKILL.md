@@ -13,7 +13,7 @@ Facilitar un análisis SWOT (Strengths, Weaknesses, Opportunities, Threats) adap
 
 ### Step 1: Load Context
 
-Leer company profile y `.escala/knowledge/strategy/tools/swot-analysis.md`.
+Leer company profile y `.scaleup/knowledge/strategy/tools/swt.yaml`.
 
 ### Step 2: Strengths
 

@@ -26,7 +26,7 @@ Ask or infer: "What fact should I remember about your company?"
 
 ### Step 3: Append to File
 
-Read the appropriate YAML file in `.escala/my-company/context/`. Append to the `facts` list:
+Read the appropriate YAML file in `.scaleup/my-company/context/`. Append to the `facts` list:
 
 ```yaml
 - description: "{the fact}"
@@ -40,4 +40,4 @@ Report: "Registrado: {fact} (categoría: {category})"
 
 ## Output
 
-Updated context file in `.escala/my-company/context/`.
+Updated context file in `.scaleup/my-company/context/`.

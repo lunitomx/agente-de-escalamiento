@@ -11,7 +11,7 @@ Mostrar el progreso del usuario en las 4 decisiones: scores actuales, worksheets
 
 ## Architecture
 
-Adapter delgado. Core logic en `.escala/coaching/progress/`.
+Adapter delgado. Core logic en `.scaleup/coaching/progress/`.
 
 ## Steps
 
@@ -28,7 +28,7 @@ print(json.dumps(run(json.loads(sys.stdin.read())), indent=2, ensure_ascii=False
 ### Step 2: Quality Gate
 
 ```bash
-python3 .escala/agent/validators/progress.py
+python3 .scaleup/agent/validators/progress.py
 ```
 
 ### Step 3: Present Dashboard

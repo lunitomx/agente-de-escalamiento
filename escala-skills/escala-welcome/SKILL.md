@@ -11,7 +11,7 @@ Dar la bienvenida, recoger info de la empresa y guardar el perfil usando el core
 
 ## Architecture
 
-Este skill es un **adapter delgado** que invoca el core module en `.escala/coaching/welcome/`.
+Este skill es un **adapter delgado** que invoca el core module en `.scaleup/coaching/welcome/`.
 La lógica de negocio (validación, stage detection, persistencia) vive en Python, no en SKILL.md.
 
 ## Steps
@@ -19,7 +19,7 @@ La lógica de negocio (validación, stage detection, persistencia) vive en Pytho
 ### Step 1: Check Existing Profile
 
 ```bash
-test -f .escala/agent/memory/company-profile.yaml && echo "EXISTS" || echo "NEW"
+test -f .scaleup/agent/memory/company-profile.yaml && echo "EXISTS" || echo "NEW"
 ```
 
 | Result | Action |
@@ -52,7 +52,7 @@ print(json.dumps(result, indent=2, ensure_ascii=False))
 ### Step 4: Quality Gate
 
 ```bash
-python3 .escala/agent/validators/welcome.py .escala/agent/memory/company-profile.yaml
+python3 .scaleup/agent/validators/welcome.py .scaleup/agent/memory/company-profile.yaml
 ```
 
 | Result | Action |
@@ -68,5 +68,5 @@ Mostrar el `output` del core module al usuario.
 
 | Item | Destination |
 |------|-------------|
-| Company profile | `.escala/agent/memory/company-profile.yaml` |
+| Company profile | `.scaleup/agent/memory/company-profile.yaml` |
 | Next | `/escala-diagnose` |

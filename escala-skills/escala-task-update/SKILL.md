@@ -25,7 +25,7 @@ Ask which task to update, or identify by description match.
 
 ### Step 3: Update Task Board
 
-Read `.escala/my-company/tasks.md`. Remove the task from its current section. Add it to the target section.
+Read `.scaleup/my-company/tasks.md`. Remove the task from its current section. Add it to the target section.
 
 If moving to Completado, change `- [ ]` to `- [x]` and append completion date: `<!-- completed:YYYY-MM-DD -->`.
 
@@ -35,4 +35,4 @@ Report the move: "{task} moved from {old} to {new}"
 
 ## Output
 
-Updated `.escala/my-company/tasks.md` with task in new state.
+Updated `.scaleup/my-company/tasks.md` with task in new state.

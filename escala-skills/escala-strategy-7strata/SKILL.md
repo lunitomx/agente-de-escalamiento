@@ -14,7 +14,7 @@ Caminar por los 7 Estratos de Estrategia de Escalamiento de Negocios para constr
 
 ### Step 1: Load Context
 
-Leer `.escala/knowledge/strategy/tools/seven-strata-of-strategy.md`.
+Leer `.scaleup/knowledge/strategy/tools/7-strata.yaml`.
 
 ### Step 2: Walk Through Each Stratum
 

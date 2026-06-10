@@ -69,10 +69,10 @@ SCORE_LABELS = {
 PRIORITY_ORDER = ["people", "strategy", "execution", "cash"]
 
 ROUTING_RULES = {
-    "people": "/scaleup-people",
-    "strategy": "/scaleup-strategy",
-    "execution": "/scaleup-execution",
-    "cash": "/scaleup-cash",
+    "people": "/escala-people",
+    "strategy": "/escala-strategy",
+    "execution": "/escala-execution",
+    "cash": "/escala-cash",
 }
 
 
@@ -184,7 +184,7 @@ def run(context: dict) -> dict:
         report_lines.append(f"- `{ROUTING_RULES[dec_key]}` — {DIAGNOSE_QUESTIONS[dec_key]['label']} (score: {score})")
 
     report_lines.append("")
-    report_lines.append("> Para re-evaluar: `/scaleup-diagnose`")
+    report_lines.append("> Para re-evaluar: `/escala-diagnose`")
 
     output = "\n".join(report_lines)
 

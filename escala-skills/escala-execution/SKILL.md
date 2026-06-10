@@ -19,9 +19,9 @@ Entry point del sub-agente de Execution. Evalúa disciplina de ejecución y guí
 ### Step 1: Load Context
 
 Leer:
-- `.escala/agent/sub-agents/execution.md`
-- `.escala/agent/memory/company-profile.yaml`
-- `.escala/knowledge/execution/overview.md`
+- `.scaleup/agent/sub-agents/execution.md`
+- `.scaleup/agent/memory/company-profile.yaml`
+- `.scaleup/knowledge/execution/overview.md`
 
 ### Step 2: Check Existing Work
 

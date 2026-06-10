@@ -31,13 +31,13 @@ DECISION_LABELS = {
 }
 
 ROUTING_RULES = {
-    "people": "/scaleup-people",
-    "strategy": "/scaleup-strategy",
-    "execution": "/scaleup-execution",
-    "cash": "/scaleup-cash",
+    "people": "/escala-people",
+    "strategy": "/escala-strategy",
+    "execution": "/escala-execution",
+    "cash": "/escala-cash",
 }
 
-PLACEHOLDER = "> Not configured yet. Run /scaleup-welcome."
+PLACEHOLDER = "> Not configured yet. Run /escala-welcome."
 
 
 # ---------------------------------------------------------------------------
@@ -91,7 +91,7 @@ def _build_next_steps(scores: dict) -> str:
     lines = []
     if priority:
         label = DECISION_LABELS.get(priority, priority.title())
-        cmd = ROUTING_RULES.get(priority, f"/scaleup-{priority}")
+        cmd = ROUTING_RULES.get(priority, f"/escala-{priority}")
         lines.append(f"**Priority Focus:** {label} — `{cmd}`")
         lines.append("")
         lines.append(
@@ -105,13 +105,13 @@ def _build_next_steps(scores: dict) -> str:
         others_sorted = sorted(others, key=lambda k: scores.get(k, 99))
         for key in others_sorted:
             score = scores.get(key, "—")
-            cmd_other = ROUTING_RULES.get(key, f"/scaleup-{key}")
+            cmd_other = ROUTING_RULES.get(key, f"/escala-{key}")
             lbl = DECISION_LABELS.get(key, key.title())
             lines.append(f"- `{cmd_other}` — {lbl} (score: {score})")
     else:
-        lines.append("Run `/scaleup-diagnose` to complete your assessment and get personalized next steps.")
+        lines.append("Run `/escala-diagnose` to complete your assessment and get personalized next steps.")
     lines.append("")
-    lines.append("> To re-evaluate: `/scaleup-diagnose`")
+    lines.append("> To re-evaluate: `/escala-diagnose`")
     return "\n".join(lines)
 
 
@@ -170,10 +170,10 @@ def run(context: dict) -> dict:
         priority = _detect_priority(scores)
         if priority:
             priority_label = DECISION_LABELS.get(priority, priority.title())
-            priority_cmd = ROUTING_RULES.get(priority, f"/scaleup-{priority}")
+            priority_cmd = ROUTING_RULES.get(priority, f"/escala-{priority}")
             scores_body += f"\n\n**Priority focus:** {priority_label} — `{priority_cmd}`"
     else:
-        scores_body = "> No diagnosis scores found. Run `/scaleup-diagnose` first."
+        scores_body = "> No diagnosis scores found. Run `/escala-diagnose` first."
 
     # --- Build next steps ---
     next_steps_body = _build_next_steps(scores)

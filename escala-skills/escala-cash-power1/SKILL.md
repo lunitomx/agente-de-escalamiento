@@ -13,7 +13,7 @@ Calcular el impacto en cash flow de mejorar 1% (o 1 día) cada una de las 7 pala
 
 ### Step 1: Load Context
 
-Leer `.escala/knowledge/cash/tools/power-of-one.md`.
+Leer `.scaleup/knowledge/cash/tools/power-of-one.yaml`.
 Cargar template `templates/power-of-one.md`.
 
 ### Step 2: Gather Current Numbers

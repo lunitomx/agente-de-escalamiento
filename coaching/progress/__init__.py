@@ -56,7 +56,7 @@ def run(context: dict) -> dict:
         return {"output": "No hay worksheets registrados en la ontología. Verifica E6.", "artifacts": {}, "errors": ["Empty worksheet registry"]}
 
     if not scores:
-        return {"output": "Aún no tienes diagnóstico. Corre `/scaleup-diagnose` primero para establecer tus scores base.", "artifacts": {}, "errors": ["No diagnosis scores found"]}
+        return {"output": "Aún no tienes diagnóstico. Corre `/escala-diagnose` primero para establecer tus scores base.", "artifacts": {}, "errors": ["No diagnosis scores found"]}
 
     lines = ["## 📊 Dashboard de Progreso", "", "### Scores por Decisión", "", "| Decisión | Score | Nivel |", "|----------|-------|-------|"]
     level_labels = {1: "🔴 No iniciado", 2: "🟠 Ad hoc", 3: "🟡 Emergente", 4: "🟢 Establecido", 5: "⭐ Optimizado"}
@@ -84,9 +84,9 @@ def run(context: dict) -> dict:
         dec_ws = [w for w in all_ws if w.get("decision") == lowest_decision and w["id"] not in completed]
         if dec_ws:
             next_ws = dec_ws[0]
-            lines.extend(["### Siguiente Sugerido", f"- {next_ws['name']} (`{next_ws['id']}`) en {DECISION_LABELS.get(lowest_decision, lowest_decision)}", f"- Dificultad: {next_ws.get('difficulty', '—')} | Tiempo: {next_ws.get('time_estimate', '—')}", f"- Usa `/scaleup-worksheet {next_ws['id']}` para empezar", ""])
+            lines.extend(["### Siguiente Sugerido", f"- {next_ws['name']} (`{next_ws['id']}`) en {DECISION_LABELS.get(lowest_decision, lowest_decision)}", f"- Dificultad: {next_ws.get('difficulty', '—')} | Tiempo: {next_ws.get('time_estimate', '—')}", f"- Usa `/escala-worksheet {next_ws['id']}` para empezar", ""])
 
-    lines.append("> Actualiza tu diagnóstico con `/scaleup-diagnose` para mantener scores al día.")
+    lines.append("> Actualiza tu diagnóstico con `/escala-diagnose` para mantener scores al día.")
 
     total_all = sum(len([w for w in all_ws if w.get("decision") == d]) for d in DECISION_ORDER)
     done_all = sum(1 for w in all_ws if w["id"] in completed)

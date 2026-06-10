@@ -19,9 +19,9 @@ Entry point del sub-agente de Cash. Evalúa salud financiera operativa y guía o
 ### Step 1: Load Context
 
 Leer:
-- `.escala/agent/sub-agents/cash.md`
-- `.escala/agent/memory/company-profile.yaml`
-- `.escala/knowledge/cash/overview.md`
+- `.scaleup/agent/sub-agents/cash.md`
+- `.scaleup/agent/memory/company-profile.yaml`
+- `.scaleup/knowledge/cash/overview.md`
 
 ### Step 2: Check Existing Work
 

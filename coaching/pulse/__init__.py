@@ -61,7 +61,7 @@ def _build_course_corrections(trends: dict) -> list[str]:
     for decision in DECISIONS:
         if trends.get(decision) == "regressing":
             label = DECISION_LABELS.get(decision, decision.title())
-            cmd = ROUTING_RULES.get(decision, f"/scaleup-{decision}")
+            cmd = ROUTING_RULES.get(decision, f"/escala-{decision}")
             corrections.append(f"{label} regressing → run {cmd}")
     return corrections
 

@@ -47,10 +47,13 @@ def init_db(db_path: str) -> sqlite3.Connection:
     Creates the database file and all required tables if they don't exist.
     Idempotent — safe to call multiple times.
     """
-    path = Path(db_path).expanduser().resolve()
-    path.parent.mkdir(parents=True, exist_ok=True)
-
-    conn = sqlite3.connect(str(path))
+    if db_path == ":memory:" or db_path.startswith("file:"):
+        # In-memory / URI databases must not be treated as filesystem paths
+        conn = sqlite3.connect(db_path, uri=db_path.startswith("file:"))
+    else:
+        path = Path(db_path).expanduser().resolve()
+        path.parent.mkdir(parents=True, exist_ok=True)
+        conn = sqlite3.connect(str(path))
     conn.execute("PRAGMA journal_mode=WAL")
     conn.execute("PRAGMA foreign_keys=ON")
     conn.executescript(SCHEMA_SQL)

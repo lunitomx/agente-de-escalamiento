@@ -14,7 +14,7 @@ Mapear el CCC completo de la empresa: cuántos días tarda un peso invertido en 
 
 ### Step 1: Load Context
 
-Leer `.escala/knowledge/cash/tools/cash-conversion-cycle.md`.
+Leer `.scaleup/knowledge/cash/tools/ccc-analysis.yaml`.
 Cargar template `templates/cash-conversion-cycle.md`.
 
 ### Step 2: Map Sales Cycle
