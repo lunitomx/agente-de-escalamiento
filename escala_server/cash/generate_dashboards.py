@@ -12,6 +12,7 @@ Humberto Martínez Barón y Alan Miltz.
 
 from __future__ import annotations
 
+import json
 import os
 from pathlib import Path
 
@@ -495,7 +496,6 @@ def generate() -> None:
 
         for db in dashboards:
             tool_id = db["id"]
-            metrics_json = str(db["metrics"]).replace("'", '"').replace('"key"', "'key'").replace('"label"', "'label'").replace('"tip"', "'tip'")
 
             # Build the HTML
             html = (
@@ -507,7 +507,7 @@ def generate() -> None:
                 .replace("{SUBTITLE}", db["subtitle"])
                 .replace("{DESC}", db["desc"])
                 .replace("{ICON}", cat_info["icon"])
-                .replace("{METRICS_JSON}", str(db["metrics"]))
+                .replace("{METRICS_JSON}", json.dumps(db["metrics"]))
             )
 
             output_path = cat_dir / f"{tool_id}.html"
