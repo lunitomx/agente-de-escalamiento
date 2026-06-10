@@ -1,0 +1,57 @@
+session_id: "S-E-260609-1738"
+summary: "Auditoría Fable 5 + 7 épicas completadas (E27-E34) — 21 historias, 15 skills nuevos, 0 bugs"
+type: feature
+outcomes:
+  - "Auditoría Fable 5 completa con 4 fases y documento entregable"
+  - "E27: Error handling HTTP — _handle_api_request con try/except, 12/12 tests"
+  - "E28: Deuda técnica — pyyaml reemplaza parser casero (-341 LOC), SQL columnas corregidas, json.dumps() en dashboards"
+  - "E30: 4 skills de lectura inteligente (organigrama, finanzas, pipeline, pizarrón)"
+  - "E31: Templates Verne a YAML + 4 skills board proactivo (board, SWT, prioridad, acta)"
+  - "E32: 3 skills onboarding conversacional (welcome, discover, start)"
+  - "E33: 3 skills ritmos vivos (setup, weekly, quarterly)"
+  - "E34: 2 skills memoria longitudinal (timeline, alerts)"
+  - "Fix: frontmatter en escala-health y escala-update (2 skills pre-existentes)"
+  - "55/55 skills con frontmatter válido. 366/368 tests pass."
+patterns:
+  - description: "Skills markdown como artefactos primarios — guían conversación sin código nuevo"
+    context: "skills,coaching,scaling-up"
+    type: process
+  - description: "QA Antagonista después de cada historia — detecta regresiones inmediatamente"
+    context: "qa,testing,antagonista"
+    type: process
+corrections:
+  - what: "E26 (CI/CD) y E29 (refactors internos) eliminados — no aplican al modelo agente Claude Code"
+    lesson: "No construir infraestructura que el usuario final nunca va a ver ni usar"
+current_work:
+  release: ""
+  epic: ""
+  story: ""
+  phase: ""
+  branch: main
+pending:
+  decisions: []
+  blockers: []
+  next_actions:
+    - "E30-E34 skills listos para usar con Claude Code/Codex"
+    - "Retomar visión de coach cuando se requieran más capacidades"
+narrative: |
+  ## Decisiones
+  - Eliminar E26 (CI/CD no aplica a agente Claude Code) y E29 (refactors invisibles)
+  - Skills markdown como estrategia: guían la conversación, no requieren código nuevo
+  - QA Antagonista después de cada historia como gate de calidad
+  
+  ## Artefactos creados
+  - auditoria-fable5-2026-06-09.md (documento completo 5 secciones)
+  - 15 skills nuevos en escala-skills/
+  - conocimiento/coaching/verne-templates.yaml + daily-checklist.yaml
+  - pyproject.toml: pyyaml agregado
+  
+  ## Branch State
+  - main: 386 commits ahead of gitlab/main
+  - Último commit: fix frontmatter escala-health + escala-update
+  
+next_session_prompt: |
+  E30-E34 completos. 15 skills nuevos listos para probar con Claude Code/Codex.
+  Prioridad: probar el flujo conversacional completo (welcome → discover → diagnóstico → board → ritmos).
+  Si hay bugs, reparar. Si no, el agente está listo para usuarios reales.
+  Pendiente pre-existente: 2 tests de migración fallan por falta de datos en .scaleup/ (no es regresión).
