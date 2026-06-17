@@ -1,0 +1,64 @@
+session_id: "S-L-260616-1745"
+summary: "SES-S-L-260616-1745: E29 governance repair + E30 ScaleUp pipelines"
+type: feature
+outcomes:
+  - "E29 Governance Repair completada: auditoría de últimas épicas, reparación de cierres ambiguos, re-clasificación de drafts y tags canónicos."
+  - "E30 ScaleUp Skill Pipeline Orchestration completada: registry declarativo de pipelines sobre skills existentes, validador, tests y entrypoints alineados."
+  - "Commits E29/E30 creados y etiquetados localmente."
+  - "Push a GitHub origin/main completado con tags epic/e29-governance-repair-complete y epic/e30-scaleup-skill-pipelines-complete."
+patterns:
+  - description: "Pipeline registry before runtime executor: first validate the orchestration contract over existing skills, then decide whether a runner is justified."
+    context: "scaleup,pipelines,skills,governance"
+    type: architecture
+  - description: "Slug-based epic tags prevent number-only tag collisions when multiple local epic folders reuse E numbers."
+    context: "epics,tags,governance"
+    type: process
+corrections:
+  - what: "Draft epic folders were being interpreted as completed work through number-only tag inference."
+    lesson: "Backlog truth must come from tracked files, close evidence, retrospectives and canonical tags; ignored drafts are backlog candidates, not completed epics."
+current_work:
+  release: ScaleUp Agent
+  epic: E31
+  phase: ready-to-start
+  branch: main
+pending:
+  decisions:
+    - "Decide whether to push main to gitlab; gitlab/main is 391 commits behind, so it was not pushed automatically."
+    - "Choose whether E31 is a lightweight runner, guided execution skill, or full runtime executor."
+  blockers: []
+  next_actions:
+    - "Start E31: ScaleUp Pipeline Runtime / Runner."
+    - "Keep local tracked pyc drift in mind: escala_server/cash/__pycache__/__init__.cpython-314.pyc remains modified and was intentionally not touched."
+narrative: |
+  ## Decisions
+  - Treated Emilio's guidance as a ScaleUp-specific pipeline orchestration epic, not as a generic new-skill effort.
+  - E30 composes existing `scaleup-*` skills and preserves current commands.
+  - Runtime execution was deferred until the registry contract is stable.
+  - Pushed to GitHub `origin`; did not push to GitLab because that remote is hundreds of commits behind.
+
+  ## Artifacts
+  - `work/epics/e29-governance-repair/` contains the E29 repair audit and tag index.
+  - `work/epics/e30-scaleup-skill-pipelines/` contains E30 brief, scope, design and final audit.
+  - `.raise/pipelines/scaleup.yaml` defines seven canonical ScaleUp pipelines.
+  - `validators/pipelines.py` validates the registry.
+  - `tests/test_pipeline_registry.py` verifies valid registry, drift cases and entrypoint references.
+  - `.claude/skills/scaleup-{start,close,cash,strategy,people,execution}/SKILL.md` reference canonical pipeline IDs.
+
+  ## Verification
+  - E29 final audit passed with zero failures.
+  - E30 registry validation passed with zero errors.
+  - E30 targeted tests passed: 5/5.
+  - Main repo suite passed when excluding external ignored references and the known local migration fixture limitation: 453 passed, 2 skipped.
+
+  ## Branch State
+  - Branch: `main`.
+  - Last commit: `c0ebddd epic(e30): orchestrate scaleup skills as pipelines`.
+  - Tags: `epic/e29-governance-repair-complete`, `epic/e30-scaleup-skill-pipelines-complete`.
+  - GitHub origin/main is current at E30 after push.
+  - GitLab main was not pushed because it is 391 commits behind local main.
+next_session_prompt: |
+  Start E31: ScaleUp Pipeline Runtime / Runner.
+
+  Recommended objective: make `.raise/pipelines/scaleup.yaml` operational without overbuilding. First version should list pipelines, show phases/gates/stop conditions, guide a user through a selected pipeline, and record execution evidence. Avoid a full generic engine until the guided runner proves value.
+
+  Before coding, verify current git state. Expected known local drift: `escala_server/cash/__pycache__/__init__.cpython-314.pyc` may still be modified and should not be touched unless the user explicitly asks.
