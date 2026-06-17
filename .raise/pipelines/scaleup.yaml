@@ -1,0 +1,425 @@
+version: 1
+description: Canonical ScaleUp skill pipelines over the existing scaleup-* skill catalog.
+principles:
+  - Pipelines compose existing skills; they do not replace the skill catalog.
+  - Orchestrators sequence, validate, and route; sub-skills do substantive work.
+  - Each phase declares context, output, evidence, and inference budget.
+  - Code gates are preferred when validation can be deterministic.
+pipelines:
+  - id: scaleup-session-start
+    entrypoint: scaleup-start
+    intent: Load company context and propose the best session focus.
+    inputs:
+      - .scaleup/agent/memory/company-profile.yaml
+      - .scaleup/my-company/sessions/
+      - .scaleup/my-company/tasks.md
+    phases:
+      - id: load-profile
+        skill: scaleup-start-load-profile
+        mode: inline
+        context: Company profile YAML.
+        output: Company profile summary and scores.
+        evidence: Profile path and extracted company name.
+        inference_budget: low
+        model_hint: deterministic-read
+      - id: load-sessions
+        skill: scaleup-start-load-sessions
+        mode: inline
+        context: Last session logs.
+        output: Recent session summary.
+        evidence: Session filenames used.
+        inference_budget: low
+        model_hint: summarizer
+      - id: load-tasks
+        skill: scaleup-start-load-tasks
+        mode: inline
+        context: Task board markdown.
+        output: Open task counts and in-progress tasks.
+        evidence: Task board path and section counts.
+        inference_budget: low
+        model_hint: deterministic-read
+      - id: present-context
+        skill: scaleup-start-present
+        mode: inline
+        context: Profile, sessions, and tasks.
+        output: Session opening summary and recommended focus.
+        evidence: Focus recommendation rationale.
+        inference_budget: medium
+        model_hint: coaching-presenter
+    gates:
+      - name: validate_context_bundle
+        type: code
+        after_phase: load-profile
+        validator: validators.session.validate_context_bundle
+        on_fail: Halt and redirect to scaleup-welcome.
+    stop_conditions:
+      - Missing or empty company profile.
+    outputs:
+      - Session context bundle.
+      - Recommended focus.
+    evidence:
+      - Source files read.
+      - Focus rationale.
+
+  - id: scaleup-session-close
+    entrypoint: scaleup-close
+    intent: Capture session outcomes, write a durable log, generate summary, and sync views.
+    inputs:
+      - User session close answers.
+      - .scaleup/my-company/sessions/
+    phases:
+      - id: capture
+        skill: scaleup-close-capture
+        mode: inline
+        context: User answers about work completed, decisions, and tasks.
+        output: Structured session capture.
+        evidence: Captured fields.
+        inference_budget: medium
+        model_hint: structured-interviewer
+      - id: log
+        skill: scaleup-close-log
+        mode: inline
+        context: Structured capture.
+        output: Session log markdown with YAML frontmatter.
+        evidence: Log file path.
+        inference_budget: low
+        model_hint: deterministic-writer
+      - id: summary
+        skill: scaleup-close
+        mode: code_gate
+        context: Validated session log and captured data.
+        output: Session summary appended to log.
+        evidence: Summary section in log.
+        inference_budget: low
+        model_hint: code-module
+      - id: sync
+        skill: scaleup-close-sync
+        mode: inline
+        context: Session log path.
+        output: Human-readable synced session views.
+        evidence: Sync confirmation.
+        inference_budget: low
+        model_hint: deterministic-writer
+    gates:
+      - name: validate_session_log
+        type: code
+        after_phase: log
+        validator: validators.session.validate_session_log
+        on_fail: Report errors and retry log phase.
+      - name: validate_summary_presence
+        type: code
+        after_phase: summary
+        validator: validators.summary_validator.validate_summary
+        on_fail: Continue with warning; do not lose the session log.
+    stop_conditions:
+      - User cannot provide minimum close data.
+      - Session log cannot be written.
+    outputs:
+      - Session log.
+      - Session summary.
+      - Synced markdown views.
+    evidence:
+      - Log file path.
+      - Validator result.
+
+  - id: scaleup-people-development
+    entrypoint: scaleup-people
+    intent: Build the People operating system from accountability to values to hiring discipline.
+    inputs:
+      - Company profile.
+      - Existing people worksheets.
+    phases:
+      - id: facchart
+        skill: scaleup-people-fac
+        mode: subskill
+        context: Business functions, accountables, and KPIs.
+        output: Function Accountability Chart.
+        evidence: Worksheet completion marker.
+        inference_budget: medium
+        model_hint: facilitator
+      - id: core-values
+        skill: scaleup-people-values
+        mode: subskill
+        context: Observed behaviors and accountability patterns.
+        output: Core values candidates and definitions.
+        evidence: Values worksheet or decision note.
+        inference_budget: high
+        model_hint: synthesis
+      - id: topgrading
+        skill: scaleup-people-topgrading
+        mode: subskill
+        context: Roles, values, and hiring gaps.
+        output: Hiring process plan.
+        evidence: Topgrading worksheet or task list.
+        inference_budget: medium
+        model_hint: process-designer
+    gates:
+      - name: facchart_has_single_accountable
+        type: manual
+        after_phase: facchart
+        on_fail: Keep refining FACChart before values or hiring.
+      - name: values_are_observed_not_invented
+        type: manual
+        after_phase: core-values
+        on_fail: Return to behavior evidence.
+    stop_conditions:
+      - Missing business function map.
+      - User cannot provide observed behavior evidence for values.
+    outputs:
+      - FACChart.
+      - Core values.
+      - Hiring process plan.
+    evidence:
+      - Completed worksheets.
+      - Context facts added or tasks created.
+
+  - id: scaleup-strategy-development
+    entrypoint: scaleup-strategy
+    intent: Produce a coherent strategic direction from market facts to OPSP and 7 Strata.
+    inputs:
+      - Company profile.
+      - Core values or explicit strategy prerequisites.
+      - Market and customer context.
+    phases:
+      - id: swot
+        skill: scaleup-strategy-swot
+        mode: subskill
+        context: Strengths, weaknesses, trends, opportunities, and threats.
+        output: SWT/SWOT synthesis.
+        evidence: SWOT worksheet.
+        inference_budget: medium
+        model_hint: strategic-analyst
+      - id: opsp
+        skill: scaleup-strategy-opsp
+        mode: subskill
+        context: Company purpose, BHAG, targets, and priorities.
+        output: One-Page Strategic Plan.
+        evidence: OPSP worksheet.
+        inference_budget: high
+        model_hint: strategic-facilitator
+      - id: seven-strata
+        skill: scaleup-strategy-7strata
+        mode: subskill
+        context: OPSP and differentiation evidence.
+        output: 7 Strata strategy map.
+        evidence: 7 Strata worksheet.
+        inference_budget: high
+        model_hint: differentiation-strategist
+      - id: persist-decisions
+        skill: scaleup-context-add
+        mode: subskill
+        context: Approved strategic decisions.
+        output: Stored strategy facts.
+        evidence: Context record path.
+        inference_budget: low
+        model_hint: deterministic-writer
+    gates:
+      - name: strategy_prerequisites_present
+        type: manual
+        after_phase: swot
+        on_fail: Redirect to scaleup-people-values or context collection.
+      - name: opsp_internal_consistency
+        type: manual
+        after_phase: opsp
+        on_fail: Reconcile purpose, BHAG, targets, and priorities.
+    stop_conditions:
+      - Missing core values when they are required for strategy decisions.
+      - OPSP cannot be made internally consistent.
+    outputs:
+      - SWOT/SWT.
+      - OPSP.
+      - 7 Strata.
+      - Stored strategy facts.
+    evidence:
+      - Worksheet completion.
+      - Stored context facts.
+
+  - id: scaleup-execution-system
+    entrypoint: scaleup-execution
+    intent: Convert strategy into execution cadence, quarterly priorities, and accountability.
+    inputs:
+      - Current OPSP or strategic priorities.
+      - Meeting cadence context.
+      - Team accountability context.
+    phases:
+      - id: rockefeller
+        skill: scaleup-execution-rockefeller
+        mode: subskill
+        context: Current execution habits.
+        output: Rockefeller Habits assessment.
+        evidence: Habits score table.
+        inference_budget: medium
+        model_hint: diagnostic-coach
+      - id: rhythms
+        skill: scaleup-execution-rhythms
+        mode: subskill
+        context: Habits assessment and team calendar.
+        output: Meeting rhythm design.
+        evidence: Rhythm plan.
+        inference_budget: medium
+        model_hint: operating-system-designer
+      - id: priorities
+        skill: scaleup-execution-priorities
+        mode: subskill
+        context: Strategy, critical number, and rhythm plan.
+        output: Quarterly priorities and theme.
+        evidence: Priorities worksheet.
+        inference_budget: high
+        model_hint: execution-facilitator
+      - id: create-tasks
+        skill: scaleup-task-add
+        mode: subskill
+        context: Approved priorities.
+        output: Task board entries.
+        evidence: Task IDs or task board diff.
+        inference_budget: low
+        model_hint: deterministic-writer
+    gates:
+      - name: priorities_have_single_critical_number
+        type: manual
+        after_phase: priorities
+        on_fail: Reduce priorities until Critical Number is clear.
+    stop_conditions:
+      - No current strategic priority exists.
+      - User cannot assign accountability.
+    outputs:
+      - Rockefeller Habits assessment.
+      - Meeting rhythm.
+      - Quarterly priorities.
+      - Task board updates.
+    evidence:
+      - Worksheet completion.
+      - Task board updates.
+
+  - id: scaleup-cash-acceleration-system
+    entrypoint: scaleup-cash
+    intent: Diagnose cash flow levers and convert them into an acceleration plan.
+    inputs:
+      - Revenue, margin, AR, AP, inventory, WIP, and growth assumptions.
+      - Existing cash worksheets.
+    phases:
+      - id: ccc
+        skill: scaleup-cash-ccc
+        mode: subskill
+        context: Cash conversion data.
+        output: Cash Conversion Cycle map.
+        evidence: CCC worksheet.
+        inference_budget: medium
+        model_hint: financial-facilitator
+      - id: power-of-one
+        skill: scaleup-cash-power1
+        mode: subskill
+        context: CCC and baseline financial levers.
+        output: Power of One impact table.
+        evidence: Power of One worksheet or dashboard data.
+        inference_budget: medium
+        model_hint: quantitative-analyst
+      - id: acceleration
+        skill: scaleup-cash-acceleration
+        mode: subskill
+        context: Highest impact levers.
+        output: Cash acceleration plan.
+        evidence: Prioritized cash moves.
+        inference_budget: high
+        model_hint: financial-strategist
+      - id: create-tasks
+        skill: scaleup-task-add
+        mode: subskill
+        context: Approved cash moves.
+        output: Task board entries.
+        evidence: Task IDs or task board diff.
+        inference_budget: low
+        model_hint: deterministic-writer
+    gates:
+      - name: ccc_inputs_complete
+        type: manual
+        after_phase: ccc
+        on_fail: Collect missing cash data before Power of One.
+      - name: acceleration_moves_are_prioritized
+        type: manual
+        after_phase: acceleration
+        on_fail: Limit plan to the few highest-impact levers.
+    stop_conditions:
+      - Missing baseline cash data.
+      - User cannot choose priority cash moves.
+    outputs:
+      - CCC map.
+      - Power of One analysis.
+      - Cash acceleration plan.
+      - Task board updates.
+    evidence:
+      - Completed worksheets.
+      - Task board updates.
+
+  - id: scaleup-quarterly-review
+    entrypoint: scaleup-pulse
+    intent: Review current business health and produce a shareable state report.
+    inputs:
+      - Company profile.
+      - Current scores.
+      - Pulse history.
+      - Task board.
+    phases:
+      - id: diagnose
+        skill: scaleup-diagnose
+        mode: subskill
+        context: Guided diagnostic answers.
+        output: Scores across People, Strategy, Execution, and Cash.
+        evidence: Diagnosis artifact.
+        inference_budget: medium
+        model_hint: diagnostic-coach
+      - id: pulse
+        skill: scaleup-pulse
+        mode: subskill
+        context: Current quarter trend assessment.
+        output: Pulse entry and trend.
+        evidence: Pulse history update.
+        inference_budget: medium
+        model_hint: trend-facilitator
+      - id: progress
+        skill: scaleup-progress
+        mode: subskill
+        context: Scores, worksheets, and task state.
+        output: Progress summary and next step.
+        evidence: Progress report.
+        inference_budget: low
+        model_hint: summarizer
+      - id: dashboard
+        skill: scaleup-dashboard
+        mode: subskill
+        context: Scores and pulse history.
+        output: Dashboard view.
+        evidence: Dashboard render or artifact path.
+        inference_budget: low
+        model_hint: deterministic-render
+      - id: export
+        skill: scaleup-export
+        mode: subskill
+        context: Current company state.
+        output: Shareable markdown export.
+        evidence: Export file path.
+        inference_budget: low
+        model_hint: deterministic-writer
+    gates:
+      - name: scores_are_current
+        type: manual
+        after_phase: diagnose
+        on_fail: Run or update diagnosis before review.
+      - name: export_has_required_sections
+        type: code
+        after_phase: export
+        validator: validators.export.validate_export
+        on_fail: Regenerate export or report missing sections.
+    stop_conditions:
+      - Missing company profile.
+      - User declines quarterly trend assessment.
+    outputs:
+      - Updated scores.
+      - Pulse trend.
+      - Progress summary.
+      - Dashboard.
+      - Export.
+    evidence:
+      - Pulse history.
+      - Export path.
+

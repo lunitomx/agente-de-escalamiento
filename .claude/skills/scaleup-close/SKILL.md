@@ -13,6 +13,8 @@ Close the coaching session by capturing what was accomplished, writing a structu
 
 This skill orchestrates 3 phases + 1 quality gate + 1 summary generation step.
 
+Canonical pipeline ID: `scaleup-session-close`. Registry: `.raise/pipelines/scaleup.yaml`.
+
 ## Steps
 
 ### Step 1: Capture Session Activity

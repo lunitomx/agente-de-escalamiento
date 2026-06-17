@@ -13,6 +13,8 @@ Load company context at the start of a coaching session. Presents a summary of t
 
 This skill orchestrates 4 phases inline (file reads are simple enough to not require subagents). Quality gate validates profile completeness before proceeding.
 
+Canonical pipeline ID: `scaleup-session-start`. Registry: `.raise/pipelines/scaleup.yaml`.
+
 ## Steps
 
 ### Step 1: Load Company Profile

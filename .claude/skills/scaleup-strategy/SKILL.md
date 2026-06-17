@@ -14,6 +14,21 @@ Entry point del sub-agente de Strategy. Evalúa madurez estratégica, verifica p
 
 **When to use:** Cuando el diagnóstico ruta a Strategy, o el usuario quiere trabajar en estrategia.
 
+## Canonical Pipeline
+
+Pipeline ID: `scaleup-strategy-development`
+
+Este entrypoint no reemplaza los skills de Strategy. Orquesta el flujo recomendado:
+
+1. `/scaleup-strategy-swot` — sintetizar SWT/SWOT
+2. `/scaleup-strategy-opsp` — construir One-Page Strategic Plan
+3. `/scaleup-strategy-7strata` — profundizar diferenciación
+4. `/scaleup-context-add` — guardar decisiones aprobadas
+
+Stop conditions: faltan prerequisitos de estrategia, o el OPSP no puede quedar internamente consistente.
+Quality gates: `strategy_prerequisites_present`, `opsp_internal_consistency`.
+Registry: `.raise/pipelines/scaleup.yaml`.
+
 ## Steps
 
 ### Step 1: Load Context
