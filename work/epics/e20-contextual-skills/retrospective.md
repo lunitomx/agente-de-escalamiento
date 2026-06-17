@@ -26,3 +26,12 @@ Pipeline completo: endpoint de contexto → panel en dashboards → helper para 
 ## What's Next
 
 - **E21 — Verne Board Member**: El siguiente paso lógico tras E20.
+
+## Pipeline / Skills / Gates
+
+- Pipeline pattern: knowledge context endpoint → dashboard context panel → coaching helper → integration tests.
+- Skills/components involved: contextual dashboard panels and coaching helper.
+- Core modules: `KnowledgeHandler.get_context()`, `/api/knowledge/context`, dashboard includes, `scaling_context.py`.
+- Quality gates: parameter validation, handler-level tests, dashboard include tests, S20.4 integration checks.
+- Verification evidence: close commit `67c3d0c`, 4 story retrospectives, scope status complete, and `epic/e20-complete`.
+- Canonical tag: `epic/e20-contextual-skills-complete`.

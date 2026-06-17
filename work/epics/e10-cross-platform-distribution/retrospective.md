@@ -65,3 +65,12 @@ Built 6 coaching engine modules and a cross-platform installer that distributes 
 1. Test ScaleUp skills from a clean project (outside this repo)
 2. Test in Hermes with real tool call mapping
 3. Evaluate E11 scope: onboarding/GTM or Hermes adapter refinement
+
+## Pipeline / Skills / Gates
+
+- Pipeline pattern: discovery first, then engine replication, then installer/distribution.
+- Skills involved: 39 ScaleUp skills classified in S10.1.
+- Core modules: 6 engine-backed modules (`welcome`, `diagnose`, `worksheet`, `progress`, `level`, `router`).
+- Quality gates: existing validators copied/reused; module engines independently testable through `python3 -m coaching.{module}`.
+- Verification evidence: compatibility matrix, 89 tests added, 122 total suite reported, and known Hermes adapter limitation documented instead of hidden.
+- Canonical tag: `epic/e10-cross-platform-distribution-complete`.

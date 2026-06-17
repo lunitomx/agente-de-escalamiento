@@ -1,9 +1,10 @@
 # Epic Retrospective: E25 — Escala Live: Validación y Despliegue
 
 **Fecha:** 2026-06-01
-**Estado:** ✅ COMPLETE (0 stories pendientes)
+**Estado:** ✅ COMPLETE (0 stories abiertas)
 **Tag:** epic/e25-complete
-**Stories:** 8 planificadas, 7 completadas, 1 pendiente
+**Canonical closure commit:** `3794689 docs(e25): S25.5 done — epic complete`
+**Stories:** 8 planificadas, 8 completadas, 0 abiertas
 
 ---
 
@@ -19,7 +20,7 @@ E25 validó que todo el ecosistema Escala funciona. Los 3 smoke tests pasaron, l
 | S25.2 — Smoke strategy | ✅ | OPSP completo con los 8 componentes |
 | S25.3 — Smoke evolve | ✅ | 4 dimensiones analizadas, patrón detectado |
 | S25.4 — Skills en Hermes | ✅ | 8 skills linkeados y verificados |
-| S25.5 — Despliegue setup.sh | ⏳ Pendiente | Necesita decisión del usuario |
+| S25.5 — README + setup.sh limpio | ✅ | Instalación documentada como `git clone` + `bash setup.sh`; se retiró el camino curl-pipe |
 | S25.6 — Cerrar E22 | ✅ | E22 cerrada, 3 historias absorbidas/descopadas |
 | S25.7 — Docs rápida | ✅ | 5-MIN-GUIDE.md creado |
 | S25.8 — Evolve demo | ✅ | Ciclo completo: escanear→detectar→proponer→backup→diff |
@@ -34,6 +35,15 @@ E25 validó que todo el ecosistema Escala funciona. Los 3 smoke tests pasaron, l
 - **Tests:** 319 pass (sin regresiones)
 - **Archivos en memoria:** 3 (1 cash, 1 strategy, 1 evolve)
 
-## Pendiente
+## Cierre Adicional
 
-**S25.5 — Despliegue setup.sh**: ¿Quieres que hostee `setup.sh` en algún lado para que `curl https://escala.sh | bash` funcione? Podemos usar GitHub Pages desde este mismo repo, o un VPS si prefieres.
+No queda trabajo abierto para el cierre. El despliegue `curl https://escala.sh | bash` quedó descartado para esta épica; S25.5 cerró con instalación desde repositorio local clonado.
+
+## Pipeline / Skills / Gates
+
+- Pipeline pattern: smoke-test cash → smoke-test strategy → smoke-test evolve → install in Hermes → repair setup/docs → close E22 → quick guide → evolve demo.
+- Skills/components involved: `escala-cash`, `escala-strategy`, `escala-evolve`, Hermes skill links, setup/README, 5-minute guide.
+- Core modules: agent skills and local installation scripts; no server deploy was required after S25.5 changed the install path.
+- Quality gates: smoke tests for cash/strategy/evolve, Hermes link verification, E22 close verification, evolve demo with backup/diff flow.
+- Verification evidence: legacy tag `epic/e25-complete`, final closure commit `3794689`, tracked retrospectives for S25.1-S25.5/S25.7/S25.8, and scope done criteria checked.
+- Canonical tag: `epic/e25-escala-live-complete`.

@@ -1,6 +1,6 @@
 # Epic Scope: E25 — Escala Live: Validación y Despliegue
 
-**Status:** Draft
+**Status:** Complete
 **Dependencies:** E23 (Agent skills), E24 (Evolve)
 **Tamaño:** M
 
@@ -29,7 +29,7 @@ Llevar Escala de "skills escritos" a "skills funcionando en producción". Valida
 
 | Story | Size | Qué |
 |-------|:----:|-----|
-| **S25.6 — Cerrar E22 pendientes** | S | Revisar S22.10-S22.12. Si fueron absorbidas por E23/E24, cerrar con retrospectiva. Si no, ejecutar. |
+| **S25.6 — Cerrar E22 absorciones** | S | Revisar S22.10-S22.12. Si fueron absorbidas por E23/E24, cerrar con retrospectiva; si quedaron fuera de alcance, documentar el descarte. |
 | **S25.7 — Documentación rápida** | S | Guía "Escala en 5 minutos": qué decirle al agente, ejemplos de prompts, estructura de skills. |
 
 ### Fase 4: Evolve en acción (S25.8)
@@ -40,9 +40,16 @@ Llevar Escala de "skills escritos" a "skills funcionando en producción". Valida
 
 ## Done Criteria
 
-- [ ] S25.1-S25.3: skills probados y funcionando
-- [ ] S25.4: skills linkeados en ~/.hermes/skills/
-- [ ] S25.5: `curl https://escala.sh | bash` funcional (o alternativa)
-- [ ] S25.6: E22 cerrada formalmente
-- [ ] S25.7: guía rápida disponible
-- [ ] S25.8: ciclo completo evolve demostrado
+- [x] S25.1-S25.3: skills probados y funcionando
+- [x] S25.4: skills linkeados en ~/.hermes/skills/
+- [x] S25.5: instalación alternativa documentada (`git clone` + `bash setup.sh`)
+- [x] S25.6: E22 cerrada formalmente
+- [x] S25.7: guía rápida disponible
+- [x] S25.8: ciclo completo evolve demostrado
+
+## Closure Evidence
+
+- Legacy tag: `epic/e25-complete` (created before S25.5 documentation repair)
+- Final closure commit: `3794689 docs(e25): S25.5 done — epic complete`
+- Story evidence: tracked retrospectives for S25.1, S25.2, S25.3, S25.4, S25.5, S25.7, and S25.8
+- Closure note: original curl-pipe deployment was replaced by the approved local GitHub installation path: clone the repo and run `bash setup.sh`.

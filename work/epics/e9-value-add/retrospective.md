@@ -69,3 +69,12 @@ No RAISE server available across all 4 stories. No `.raise/rai/learnings/` recor
 - **Quality:** 0 bugs escaped to main; QR caught real issues every story
 - **Test count:** 17 → 21 → 23 → 38 per story; full suite 20 → 41 → 62 → (S9.4 clean)
 - **Pattern debt:** 0 — all retrospective patterns applied forward within the epic
+
+## Pipeline / Skills / Gates
+
+- Pipeline pattern: core Python modules with SKILL.md adapters.
+- Skills involved: `scaleup-export`, `scaleup-pulse`, `scaleup-dashboard`, `scaleup-close`.
+- Core modules: `coaching/export`, `coaching/pulse`, `coaching/dashboard`, `coaching/summary`.
+- Quality gates: export, pulse, dashboard, and summary validators in `.scaleup/agent/validators/`.
+- Verification evidence: story-level tests grew to 62+; QR caught schema, null-coalescing, regex anchoring, and tautological-test issues before merge.
+- Canonical tag: `epic/e9-value-add-complete`.

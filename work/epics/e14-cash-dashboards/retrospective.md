@@ -80,3 +80,12 @@ No hay trabajo huérfano. Los 4 dashboards son autocontenidos y funcionales con 
 ## Next
 
 E14 estableció el framework de visualización para las herramientas Cash. La siguiente épica (E15 en adelante) puede reutilizar `dashboard-base.css`, el patrón de header, y el vendor de Chart.js sin repetir el walking skeleton.
+
+## Pipeline / Skills / Gates
+
+- Pipeline pattern: visual walking skeleton in S14.1, then pattern reuse across S14.2-S14.4.
+- Skills/components involved: Cash Board, Power of One, Fundability Radar, Recurring Revenue dashboards.
+- Core modules: static HTML/CSS/JS dashboards using shared `dashboard-base.css` and vendored Chart.js.
+- Quality gates: manual visual verification, AR/QR fixes, injection guard consistency, no `innerHTML` violations reported across components.
+- Verification evidence: scope verification table, story retrospectives, AR/QR fix commits, and `epic/e14-complete`.
+- Canonical tag: `epic/e14-cash-dashboards-complete`.

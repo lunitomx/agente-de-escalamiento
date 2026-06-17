@@ -20,6 +20,7 @@ file:test_*
 *.pdf
 *.docx
 *.pptx
+referencias-humberto/
 
 # === Client Data (never commit) ===
 data/

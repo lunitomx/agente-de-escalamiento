@@ -33,3 +33,12 @@ E24 creó el **sistema inmune de Escala** — un skill que se mejora a sí mismo
 ## Créditos
 
 **Creación:** Eduardo Muñoz Luna — Kokoro
+
+## Pipeline / Skills / Gates
+
+- Pipeline pattern: scan memory → detect patterns/gaps/trends → register proposal → post-session/weekly automation → approved auto-patch.
+- Skills/components involved: `escala-evolve`, evolution registry/changelog, post-session automation, weekly cron, auto-patch flow.
+- Core modules: evolve skill instructions, memory/evolution files, backup/diff/rollback flow.
+- Quality gates: proposal states (`propuesta`, `aprobada`, `aplicada`, `rechazada`), human approval before patch, backup before mutation, diff presentation, rollback path.
+- Verification evidence: close commit `b16e16b`, 5 story retrospectives, scope status complete, and `epic/e24-complete`.
+- Canonical tag: `epic/e24-escala-evolve-complete`.

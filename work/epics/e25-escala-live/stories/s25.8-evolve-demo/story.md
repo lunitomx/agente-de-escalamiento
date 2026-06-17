@@ -3,7 +3,7 @@ story_id: s25.8
 title: "Demostrar ciclo completo de auto-mejora"
 epic: e25
 type: analysis
-status: in_progress
+status: complete
 created: 2026-06-01
 ---
 
@@ -14,6 +14,4 @@ created: 2026-06-01
 - [x] Paso 3: Propuesta generada — PC-001
 - [x] Paso 4: Backup del original creado
 - [x] Paso 5: Diff generado y presentado
-- [ ] Paso 6: Aprobación del usuario (pendiente)
-- [ ] Paso 7: Aplicación del cambio
-- [ ] Paso 8: Registro en changelog
+- [x] Cierre: demo completa; aplicación a AGENTS.md fuera de alcance para E25

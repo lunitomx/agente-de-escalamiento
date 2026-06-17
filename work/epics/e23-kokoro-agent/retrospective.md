@@ -75,3 +75,12 @@ E23 transformó la arquitectura de Escala de **server-dependent** a **agent-firs
 - **Metodología:** Verne Harnish (Scaling Up), Alan Miltz (Power of One), Brad Smart (Topgrading)
 - **Implementación original del motor Cash:** Humberto Martínez Barón
 - **Creación y dirección:** Eduardo Muñoz Luna — Kokoro
+
+## Pipeline / Skills / Gates
+
+- Pipeline pattern: package/setup → markdown memory → generated dashboard → agent-based skill suite → core identity → optional MCP server.
+- Skills/components involved: `escala-cash`, `escala-strategy`, `escala-people`, `escala-execution`, `escala-core`, memory/dashboard skills, MCP tools.
+- Core modules: agent-first `escala-agent` package, markdown memory store, optional MCP server.
+- Quality gates: scope tracking commits for S23.1-S23.11, story retrospectives for S23.6-S23.11, 319-test legacy suite reported with 2 unrelated pre-existing failures.
+- Verification evidence: close commit `d2f0729`, final scope status commit `e619e9c`, scope tracking table, and `epic/e23-complete`.
+- Canonical tag: `epic/e23-kokoro-agent-complete`.

@@ -52,3 +52,13 @@ Aunque el servidor `escala_server/` ya no es necesario, el conocimiento capturad
 - **Buyer Personas:** Eduardo Muñoz Luna
 - **Power of One Engine:** Humberto Martínez Barón (implementación original)
 - **Metodología:** Verne Harnish (Scaling Up), Alan Miltz (Power of One)
+
+## Pipeline / Skills / Gates
+
+- Pipeline pattern: 3-company audit → prioritized fixes → dashboard/template improvements → absorption/descoping under agent-first architecture.
+- Skills/components involved: colloquial vocabulary, board debate, Power of One, dashboard template generation, daily analyzer.
+- Core modules: `escala_server/cash/__init__.py`, dashboard templates, Verne/board review paths, agent-first successor skills in E23/E24.
+- Quality gates: completed story tracking for S22.1-S22.9, documented absorption of S22.10-S22.11 and descoping of S22.12.
+- Absorption evidence: S22.10 absorbed by E23/E24 session identity and evolve post-session; S22.11 absorbed by E23/S23.6 agent-based cash skill; S22.12 descoped because server export/logging no longer fit the agent-first architecture.
+- Verification evidence: close commit `d0beb58`, retrospective, scope status complete, and `epic/e22-complete`.
+- Canonical tag: `epic/e22-verne-audit-complete`.

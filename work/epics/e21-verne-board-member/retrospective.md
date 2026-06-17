@@ -46,3 +46,12 @@ revisar dailys, dar perspectiva al cerrar sesión, y debatir decisiones estraté
 - E18 (infraestructura servidor) — ✅ usada
 - E19 (grafo de conocimiento) — ✅ usado (42 entidades referenciadas)
 - E20 (contextual skills) — no dependiente
+
+## Pipeline / Skills / Gates
+
+- Pipeline pattern: Verne identity artifact → direct question handler → daily review → session integration → board debate → coherence tests.
+- Skills/components involved: Verne board member, daily review, session perspective, board debate.
+- Core modules: `miembro-board/verne-harnish.md`, `VerneHandler.ask()`, `review_daily()`, `session_perspective()`, `board_debate()`.
+- Quality gates: 28 tests total, including 7 coherence tests in S21.6.
+- Verification evidence: close commit `6b1db28`, 6 story rows in retrospective, scope status complete, and `epic/e21-complete`.
+- Canonical tag: `epic/e21-verne-board-member-complete`.

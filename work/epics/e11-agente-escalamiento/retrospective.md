@@ -54,3 +54,12 @@ completed: "2026-05-24"
 
 - **PAT-E11-001**: Repos públicos con contenido inspirado → aviso educativo, sin copyright personal
 - **PAT-E11-002**: Migraciones masivas → script de transformación + verificación con grep post-migración
+
+## Pipeline / Skills / Gates
+
+- Pipeline pattern: repo scaffold → skill migration → attribution → installability → docs → fresh verification.
+- Skills involved: 39 `scaleup-*` skills migrated to `escala-*`.
+- Core process: migration script plus systematic grep verification, not manual line-by-line editing alone.
+- Quality gates: no forbidden internal references, paths made relative, attribution present where methodology appears, install path tested for student use.
+- Verification evidence: S11.2 retrospective reports 39 migrated skills and reference rewrites; S11.6 reports fresh-clone verification.
+- Canonical tag: `epic/e11-agente-escalamiento-complete`.

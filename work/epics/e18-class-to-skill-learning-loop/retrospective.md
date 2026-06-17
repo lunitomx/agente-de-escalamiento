@@ -74,4 +74,14 @@ Sí. La pipeline end-to-end funciona:
 
 ## Tag
 
-`epic/e18-complete`
+Legacy collision: `epic/e18-complete` points to E18 Escala Server, not this epic.
+
+Canonical tag required: `epic/e18-class-to-skill-learning-loop-complete` at close commit `d857799`.
+
+## Pipeline / Skills / Gates
+
+- Pipeline pattern: class bundle → pattern extraction → skill delta suggestions → reviewable report.
+- Skills/components involved: class intake, pattern extraction, skill delta mapping, class report generation.
+- Core modules: `coaching/class_intake.py`, `coaching/pattern_extraction.py`, `coaching/skill_deltas.py`, `coaching/class_report.py`.
+- Quality gates: 45 tests passing, single-responsibility modules, traceability from report back to source class bundle.
+- Verification evidence: close commit `d857799`, four story retrospectives, and canonical tag `epic/e18-class-to-skill-learning-loop-complete`.

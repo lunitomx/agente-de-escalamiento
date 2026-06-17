@@ -59,3 +59,12 @@
 - 22 dashboards servidos
 - 193 tests pasando
 - 0 dependencias externas (solo stdlib Python)
+
+## Pipeline / Skills / Gates
+
+- Pipeline pattern: server walking skeleton → dashboard pilot → suites → SQLite → memory/graph → session lifecycle → install/lifecycle.
+- Skills/components involved: `escala-inicia`, `escala-cierra`, 22 dashboards, server CLI, memory/graph engine.
+- Core modules: `escala_server/server.py`, DAOs, memory engine, graph engine, session start/close modules.
+- Quality gates: story-level tests, 193 tests passing at close, health endpoint, migration checks, and session lifecycle verification.
+- Verification evidence: close commit `2a63e09`, post-close status patch `90425ba`, 12 story retrospectives, `epic/e18-complete`.
+- Canonical tag: `epic/e18-escala-server-complete`.
