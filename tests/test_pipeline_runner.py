@@ -309,3 +309,34 @@ def test_cli_inspects_and_resumes_evidence(
     assert "next_phase: load-tasks" in inspect_out
     assert resume_result == 0
     assert "scaleup-session-start: resumed at load-tasks" in resume_out
+
+
+def test_runner_integrates_with_every_canonical_scaleup_pipeline(
+    tmp_path: Path,
+) -> None:
+    registry = load_registry(REGISTRY)
+
+    for pipeline in registry.pipelines:
+        evidence_path = tmp_path / f"{pipeline.id}.yaml"
+        evidence = run_guided_pipeline(
+            registry,
+            pipeline.id,
+            evidence_path=evidence_path,
+        )
+        written = load_run_evidence(evidence_path)
+        detail = render_pipeline_detail(pipeline)
+
+        assert evidence.state == "completed"
+        assert written.pipeline_id == pipeline.id
+        assert written.entrypoint == pipeline.entrypoint
+        assert written.phases_reviewed == [phase.id for phase in pipeline.phases]
+        assert [gate.name for gate in written.gate_decisions] == [
+            gate.name for gate in pipeline.gates
+        ]
+        assert written.stop_conditions == pipeline.stop_conditions
+        assert written.outputs_expected == pipeline.outputs
+        assert written.evidence_expected == pipeline.evidence
+        assert f"pipeline: {pipeline.id}" in detail
+        assert "stop_conditions:" in detail
+        assert "outputs:" in detail
+        assert "evidence:" in detail
