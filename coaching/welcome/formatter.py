@@ -2,6 +2,7 @@
 
 No I/O. Accepts structured profile dict, returns YAML string.
 """
+
 from __future__ import annotations
 
 try:
@@ -11,7 +12,9 @@ except ImportError as e:
 
 
 def format_profile(profile: dict) -> str:
-    return yaml.dump(profile, default_flow_style=False, allow_unicode=True, sort_keys=False)
+    return yaml.dump(
+        profile, default_flow_style=False, allow_unicode=True, sort_keys=False
+    )
 
 
 def format_summary(profile: dict) -> str:

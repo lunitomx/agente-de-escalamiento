@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import json
 import re
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, asdict
 from pathlib import Path
 from typing import Optional
 
@@ -26,7 +26,9 @@ class SkillDelta:
     """A suggested improvement for an Escala skill, grounded in class evidence."""
 
     target_skill: str
-    suggestion_type: str  # "new_prompt", "strengthen_prompt", "fix_contradiction", "new_heuristic"
+    suggestion_type: (
+        str  # "new_prompt", "strengthen_prompt", "fix_contradiction", "new_heuristic"
+    )
     description: str
     evidence: str
     priority: str = "P2"  # P0 (critical), P1 (high), P2 (medium), P3 (low)
@@ -47,38 +49,68 @@ class SkillDelta:
 # Pattern keyword → target skill areas + suggestion type
 _MAP_RULES: list[tuple[re.Pattern, str, str, str, str]] = [
     # (pattern_regex, target_skill, suggestion_type, description_template, priority)
-
     # Canvas / business model
-    (re.compile(r"canvas", re.I), "kokoro-canvas", "strengthen_prompt",
-     "Reforzar prompt del canvas con el tema detectado", "P1"),
-
+    (
+        re.compile(r"canvas", re.I),
+        "kokoro-canvas",
+        "strengthen_prompt",
+        "Reforzar prompt del canvas con el tema detectado",
+        "P1",
+    ),
     # Strategy
-    (re.compile(r"estrategi|strategi", re.I), "escala-strategy", "new_prompt",
-     "Añadir prompt basado en el tema de estrategia observado en clase", "P1"),
-
+    (
+        re.compile(r"estrategi|strategi", re.I),
+        "escala-strategy",
+        "new_prompt",
+        "Añadir prompt basado en el tema de estrategia observado en clase",
+        "P1",
+    ),
     # Core customer / buyer persona
-    (re.compile(r"cliente|core.?customer|buyer.?person|a quién", re.I), "escala-people", "strengthen_prompt",
-     "Reforzar prompt de definición de cliente ideal con hallazgo de clase", "P2"),
-
+    (
+        re.compile(r"cliente|core.?customer|buyer.?person|a quién", re.I),
+        "escala-people",
+        "strengthen_prompt",
+        "Reforzar prompt de definición de cliente ideal con hallazgo de clase",
+        "P2",
+    ),
     # Brand promise
-    (re.compile(r"promesa|brand.?promise|marca", re.I), "kokoro-luxury-communication", "new_prompt",
-     "Añadir prompt para brand promise basado en la clase", "P1"),
-
+    (
+        re.compile(r"promesa|brand.?promise|marca", re.I),
+        "kokoro-luxury-communication",
+        "new_prompt",
+        "Añadir prompt para brand promise basado en la clase",
+        "P1",
+    ),
     # Commitment / homework
-    (re.compile(r"compromiso|antes de la próxima clase|tarea", re.I), "escala-execution", "new_heuristic",
-     "Añadir heurística de seguimiento de compromisos post-clase", "P2"),
-
+    (
+        re.compile(r"compromiso|antes de la próxima clase|tarea", re.I),
+        "escala-execution",
+        "new_heuristic",
+        "Añadir heurística de seguimiento de compromisos post-clase",
+        "P2",
+    ),
     # Execution / habits
-    (re.compile(r"ejecución|hábito|ritmo|reunión", re.I), "escala-execution-habits", "new_heuristic",
-     "Añadir heurística basada en tema de ejecución", "P3"),
-
+    (
+        re.compile(r"ejecución|hábito|ritmo|reunión", re.I),
+        "escala-execution-habits",
+        "new_heuristic",
+        "Añadir heurística basada en tema de ejecución",
+        "P3",
+    ),
     # Cash / finances
-    (re.compile(r"cash|efectivo|ingreso|rentabil", re.I), "escala-cash", "new_prompt",
-     "Añadir prompt financiero basado en el tema de clase", "P2"),
+    (
+        re.compile(r"cash|efectivo|ingreso|rentabil", re.I),
+        "escala-cash",
+        "new_prompt",
+        "Añadir prompt financiero basado en el tema de clase",
+        "P2",
+    ),
 ]
 
 
-def _match_pattern_to_skill(pattern_label: str, pattern_evidence: str) -> Optional[SkillDelta]:
+def _match_pattern_to_skill(
+    pattern_label: str, pattern_evidence: str
+) -> Optional[SkillDelta]:
     """Match a single pattern label against mapping rules."""
     for regex, skill, sug_type, desc_template, priority in _MAP_RULES:
         if regex.search(pattern_label):
@@ -207,13 +239,17 @@ def load_deltas(bundle: ClassBundle) -> list[SkillDelta]:
 def main() -> None:
     import argparse
 
-    parser = argparse.ArgumentParser(prog="skill-deltas", description="Suggest skill deltas from class patterns")
+    parser = argparse.ArgumentParser(
+        prog="skill-deltas", description="Suggest skill deltas from class patterns"
+    )
     sub = parser.add_subparsers(dest="command", required=True)
 
-    suggest_parser = sub.add_parser("suggest", help="Generate deltas from class bundle patterns")
+    suggest_parser = sub.add_parser(
+        "suggest", help="Generate deltas from class bundle patterns"
+    )
     suggest_parser.add_argument("class_id", help="Class ID")
 
-    skills_parser = sub.add_parser("skills", help="List available skills in inventory")
+    sub.add_parser("skills", help="List available skills in inventory")
 
     args = parser.parse_args()
 

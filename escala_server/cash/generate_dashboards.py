@@ -13,7 +13,6 @@ Humberto Martínez Barón y Alan Miltz.
 from __future__ import annotations
 
 import json
-import os
 from pathlib import Path
 
 DASHBOARD_DIR = Path(__file__).resolve().parent.parent / "static" / "dashboards"
@@ -30,9 +29,21 @@ DASHBOARDS = {
             "subtitle": "Panorama general de tu liquidez",
             "desc": "Cuánto efectivo tienes, cuánto necesitas y dónde está tu dinero.",
             "metrics": [
-                {"key": "efectivo", "label": "Efectivo disponible", "tip": "El dinero que tienes hoy en caja y bancos."},
-                {"key": "ccc", "label": "Ciclo de efectivo", "tip": "Días desde que pagas materia prima hasta que cobras."},
-                {"key": "quincena", "label": "Problema de liquidez", "tip": "¿Cortas de efectivo en ciertos momentos?"},
+                {
+                    "key": "efectivo",
+                    "label": "Efectivo disponible",
+                    "tip": "El dinero que tienes hoy en caja y bancos.",
+                },
+                {
+                    "key": "ccc",
+                    "label": "Ciclo de efectivo",
+                    "tip": "Días desde que pagas materia prima hasta que cobras.",
+                },
+                {
+                    "key": "quincena",
+                    "label": "Problema de liquidez",
+                    "tip": "¿Cortas de efectivo en ciertos momentos?",
+                },
             ],
         },
         {
@@ -41,10 +52,26 @@ DASHBOARDS = {
             "subtitle": "CCC: Días para convertir tu inversión en dinero",
             "desc": "Mide cuántos días pasan desde que pagas tu inventario hasta que cobras a tus clientes.",
             "metrics": [
-                {"key": "ccc_dias", "label": "CCC en días", "tip": "Menos días = más rápido recuperas tu inversión."},
-                {"key": "ar_dias", "label": "Días en cobrar", "tip": "Lo que tardan tus clientes en pagarte."},
-                {"key": "inv_dias", "label": "Días en inventario", "tip": "Lo que dura tu producto en el almacén."},
-                {"key": "ap_dias", "label": "Días en pagar", "tip": "Lo que tardas en pagar a proveedores."},
+                {
+                    "key": "ccc_dias",
+                    "label": "CCC en días",
+                    "tip": "Menos días = más rápido recuperas tu inversión.",
+                },
+                {
+                    "key": "ar_dias",
+                    "label": "Días en cobrar",
+                    "tip": "Lo que tardan tus clientes en pagarte.",
+                },
+                {
+                    "key": "inv_dias",
+                    "label": "Días en inventario",
+                    "tip": "Lo que dura tu producto en el almacén.",
+                },
+                {
+                    "key": "ap_dias",
+                    "label": "Días en pagar",
+                    "tip": "Lo que tardas en pagar a proveedores.",
+                },
             ],
         },
         {
@@ -53,9 +80,21 @@ DASHBOARDS = {
             "subtitle": "¿Qué tan atractivo eres para financiamiento?",
             "desc": "Evalúa tu capacidad de conseguir financiamiento basado en tus métricas financieras.",
             "metrics": [
-                {"key": "gross_margin", "label": "Margen bruto", "tip": "Lo que ganas después del costo de tu producto."},
-                {"key": "profit_margin", "label": "Margen neto", "tip": "Lo que realmente te queda después de todo."},
-                {"key": "revenue_growth", "label": "Crecimiento", "tip": "Qué tan rápido estás creciendo."},
+                {
+                    "key": "gross_margin",
+                    "label": "Margen bruto",
+                    "tip": "Lo que ganas después del costo de tu producto.",
+                },
+                {
+                    "key": "profit_margin",
+                    "label": "Margen neto",
+                    "tip": "Lo que realmente te queda después de todo.",
+                },
+                {
+                    "key": "revenue_growth",
+                    "label": "Crecimiento",
+                    "tip": "Qué tan rápido estás creciendo.",
+                },
             ],
         },
         {
@@ -64,9 +103,21 @@ DASHBOARDS = {
             "subtitle": "Lo que puedes contar mes a mes",
             "desc": "Mide tus ingresos predecibles: membresías, suscripciones, contratos.",
             "metrics": [
-                {"key": "mrr", "label": "Ingreso mensual recurrente", "tip": "Lo que facturas cada mes sin fallar."},
-                {"key": "churn", "label": "Deserción mensual", "tip": "Clientes que se van cada mes. Menos = mejor."},
-                {"key": "arr", "label": "Ingreso anual recurrente", "tip": "MRR × 12. Tu ingreso predecible al año."},
+                {
+                    "key": "mrr",
+                    "label": "Ingreso mensual recurrente",
+                    "tip": "Lo que facturas cada mes sin fallar.",
+                },
+                {
+                    "key": "churn",
+                    "label": "Deserción mensual",
+                    "tip": "Clientes que se van cada mes. Menos = mejor.",
+                },
+                {
+                    "key": "arr",
+                    "label": "Ingreso anual recurrente",
+                    "tip": "MRR × 12. Tu ingreso predecible al año.",
+                },
             ],
         },
     ],
@@ -78,9 +129,21 @@ DASHBOARDS = {
             "subtitle": "¿Cómo generas valor y dinero?",
             "desc": "Tu modelo de negocio en una hoja: qué vendes, a quién, cómo y cuánto cobras.",
             "metrics": [
-                {"key": "core_customer", "label": "Cliente ideal", "tip": "La persona que más te compra y a quien mejor le sirves."},
-                {"key": "brand_promise", "label": "Promesa de marca", "tip": "Lo que prometes cumplir siempre a tus clientes."},
-                {"key": "sandbox", "label": "Territorio", "tip": "Dónde compites y hasta dónde puedes llegar."},
+                {
+                    "key": "core_customer",
+                    "label": "Cliente ideal",
+                    "tip": "La persona que más te compra y a quien mejor le sirves.",
+                },
+                {
+                    "key": "brand_promise",
+                    "label": "Promesa de marca",
+                    "tip": "Lo que prometes cumplir siempre a tus clientes.",
+                },
+                {
+                    "key": "sandbox",
+                    "label": "Territorio",
+                    "tip": "Dónde compites y hasta dónde puedes llegar.",
+                },
             ],
         },
         {
@@ -89,9 +152,21 @@ DASHBOARDS = {
             "subtitle": "Las 3 promesas que diferencian tu negocio",
             "desc": "Las 3 promesas clave que haces a tus clientes y que te diferencian de la competencia.",
             "metrics": [
-                {"key": "promise_1", "label": "Promesa #1", "tip": "La razón principal por la que te compran."},
-                {"key": "promise_2", "label": "Promesa #2", "tip": "La segunda razón por la que te eligen."},
-                {"key": "promise_3", "label": "Promesa #3", "tip": "El extra que nadie más da."},
+                {
+                    "key": "promise_1",
+                    "label": "Promesa #1",
+                    "tip": "La razón principal por la que te compran.",
+                },
+                {
+                    "key": "promise_2",
+                    "label": "Promesa #2",
+                    "tip": "La segunda razón por la que te eligen.",
+                },
+                {
+                    "key": "promise_3",
+                    "label": "Promesa #3",
+                    "tip": "El extra que nadie más da.",
+                },
             ],
         },
         {
@@ -100,9 +175,21 @@ DASHBOARDS = {
             "subtitle": "¿A quién le vendes?",
             "desc": "Define con precisión quién es tu cliente ideal: el que más te compra, paga bien y es feliz.",
             "metrics": [
-                {"key": "description", "label": "Descripción", "tip": "Tu cliente ideal en una frase."},
-                {"key": "needs", "label": "Necesidades", "tip": "Qué problemas les resuelves."},
-                {"key": "segment", "label": "Segmento", "tip": "Qué tipo de negocio o persona es."},
+                {
+                    "key": "description",
+                    "label": "Descripción",
+                    "tip": "Tu cliente ideal en una frase.",
+                },
+                {
+                    "key": "needs",
+                    "label": "Necesidades",
+                    "tip": "Qué problemas les resuelves.",
+                },
+                {
+                    "key": "segment",
+                    "label": "Segmento",
+                    "tip": "Qué tipo de negocio o persona es.",
+                },
             ],
         },
         {
@@ -111,9 +198,21 @@ DASHBOARDS = {
             "subtitle": "¿Qué haces diferente a los demás?",
             "desc": "Las actividades clave que te hacen único y que tu competencia no hace (o no hace bien).",
             "metrics": [
-                {"key": "activity_1", "label": "Diferenciador #1", "tip": "Lo que mejor haces y nadie más hace."},
-                {"key": "activity_2", "label": "Diferenciador #2", "tip": "Otra cosa que te hace único."},
-                {"key": "x_factor", "label": "Factor X", "tip": "Tu ventaja secreta, la que nadie puede copiar fácil."},
+                {
+                    "key": "activity_1",
+                    "label": "Diferenciador #1",
+                    "tip": "Lo que mejor haces y nadie más hace.",
+                },
+                {
+                    "key": "activity_2",
+                    "label": "Diferenciador #2",
+                    "tip": "Otra cosa que te hace único.",
+                },
+                {
+                    "key": "x_factor",
+                    "label": "Factor X",
+                    "tip": "Tu ventaja secreta, la que nadie puede copiar fácil.",
+                },
             ],
         },
         {
@@ -122,9 +221,21 @@ DASHBOARDS = {
             "subtitle": "¿Dónde compites y dónde no?",
             "desc": "Define claramente tu mercado: a quién sirves, dónde, y qué NO haces.",
             "metrics": [
-                {"key": "scope", "label": "Mi territorio", "tip": "Dónde y a quién le vendes."},
-                {"key": "exclude", "label": "Fuera de mi territorio", "tip": "Lo que NO haces, para no distraerte."},
-                {"key": "bhag_link", "label": "Conexión con BHAG", "tip": "Cómo este territorio te acerca a tu meta grande."},
+                {
+                    "key": "scope",
+                    "label": "Mi territorio",
+                    "tip": "Dónde y a quién le vendes.",
+                },
+                {
+                    "key": "exclude",
+                    "label": "Fuera de mi territorio",
+                    "tip": "Lo que NO haces, para no distraerte.",
+                },
+                {
+                    "key": "bhag_link",
+                    "label": "Conexión con BHAG",
+                    "tip": "Cómo este territorio te acerca a tu meta grande.",
+                },
             ],
         },
     ],
@@ -136,9 +247,21 @@ DASHBOARDS = {
             "subtitle": "Las reglas que definen tu cultura",
             "desc": "Los 3-5 valores que guían cómo contratas, despides y operas el negocio.",
             "metrics": [
-                {"key": "value_1", "label": "Valor #1", "tip": "El valor más importante de tu empresa."},
-                {"key": "value_2", "label": "Valor #2", "tip": "El segundo pilar de tu cultura."},
-                {"key": "value_3", "label": "Valor #3", "tip": "Lo que no negocias aunque cueste dinero."},
+                {
+                    "key": "value_1",
+                    "label": "Valor #1",
+                    "tip": "El valor más importante de tu empresa.",
+                },
+                {
+                    "key": "value_2",
+                    "label": "Valor #2",
+                    "tip": "El segundo pilar de tu cultura.",
+                },
+                {
+                    "key": "value_3",
+                    "label": "Valor #3",
+                    "tip": "Lo que no negocias aunque cueste dinero.",
+                },
             ],
         },
         {
@@ -147,9 +270,21 @@ DASHBOARDS = {
             "subtitle": "¿Quién es responsable de qué?",
             "desc": "Los asientos clave de tu organización y quién está en cada uno. Sin lagunas, sin duplicidades.",
             "metrics": [
-                {"key": "seats", "label": "Asientos clave", "tip": "Los roles que TODO negocio necesita tener."},
-                {"key": "filled", "label": "Asientos ocupados", "tip": "Cuántos de esos roles están cubiertos."},
-                {"key": "gaps", "label": "Huecos", "tip": "Los asientos vacíos que urgen llenar."},
+                {
+                    "key": "seats",
+                    "label": "Asientos clave",
+                    "tip": "Los roles que TODO negocio necesita tener.",
+                },
+                {
+                    "key": "filled",
+                    "label": "Asientos ocupados",
+                    "tip": "Cuántos de esos roles están cubiertos.",
+                },
+                {
+                    "key": "gaps",
+                    "label": "Huecos",
+                    "tip": "Los asientos vacíos que urgen llenar.",
+                },
             ],
         },
         {
@@ -158,9 +293,21 @@ DASHBOARDS = {
             "subtitle": "¿Cómo encuentras y contratas talento?",
             "desc": "Tu proceso para atraer, evaluar y contratar A-players.",
             "metrics": [
-                {"key": "source", "label": "Fuente principal", "tip": "De dónde vienen tus mejores contrataciones."},
-                {"key": "time_to_hire", "label": "Tiempo de contratación", "tip": "Cuánto tardas desde que buscas hasta que contratas."},
-                {"key": "interview_process", "label": "Proceso de entrevista", "tip": "Cómo evalúas si alguien es A-player."},
+                {
+                    "key": "source",
+                    "label": "Fuente principal",
+                    "tip": "De dónde vienen tus mejores contrataciones.",
+                },
+                {
+                    "key": "time_to_hire",
+                    "label": "Tiempo de contratación",
+                    "tip": "Cuánto tardas desde que buscas hasta que contratas.",
+                },
+                {
+                    "key": "interview_process",
+                    "label": "Proceso de entrevista",
+                    "tip": "Cómo evalúas si alguien es A-player.",
+                },
             ],
         },
         {
@@ -169,9 +316,21 @@ DASHBOARDS = {
             "subtitle": "¿Tu equipo está creciendo contigo?",
             "desc": "Evalúa si tu equipo actual puede llevar la empresa al siguiente nivel.",
             "metrics": [
-                {"key": "a_players", "label": "A-Players", "tip": "Los que están en el top 10% de su rol."},
-                {"key": "development", "label": "Plan de desarrollo", "tip": "Cómo estás invirtiendo en tu gente."},
-                {"key": "succession", "label": "Sucesión", "tip": "Quién podría tomar tu lugar si te vas."},
+                {
+                    "key": "a_players",
+                    "label": "A-Players",
+                    "tip": "Los que están en el top 10% de su rol.",
+                },
+                {
+                    "key": "development",
+                    "label": "Plan de desarrollo",
+                    "tip": "Cómo estás invirtiendo en tu gente.",
+                },
+                {
+                    "key": "succession",
+                    "label": "Sucesión",
+                    "tip": "Quién podría tomar tu lugar si te vas.",
+                },
             ],
         },
         {
@@ -180,9 +339,21 @@ DASHBOARDS = {
             "subtitle": "¿Qué amas y qué odias de tu negocio?",
             "desc": "Ejercicio de claridad: las partes que te encantan y las que te frustran de tu negocio.",
             "metrics": [
-                {"key": "love", "label": "Lo que amo", "tip": "Las partes de mi negocio que me apasionan."},
-                {"key": "loathe", "label": "Lo que odio", "tip": "Las partes que debería delegar o eliminar."},
-                {"key": "action", "label": "Siguiente paso", "tip": "Qué voy a hacer con lo que odio."},
+                {
+                    "key": "love",
+                    "label": "Lo que amo",
+                    "tip": "Las partes de mi negocio que me apasionan.",
+                },
+                {
+                    "key": "loathe",
+                    "label": "Lo que odio",
+                    "tip": "Las partes que debería delegar o eliminar.",
+                },
+                {
+                    "key": "action",
+                    "label": "Siguiente paso",
+                    "tip": "Qué voy a hacer con lo que odio.",
+                },
             ],
         },
         {
@@ -191,10 +362,26 @@ DASHBOARDS = {
             "subtitle": "¿Cómo se comporta tu equipo?",
             "desc": "Perfil de comportamiento del equipo: Dominancia, Influencia, Estabilidad, Cumplimiento.",
             "metrics": [
-                {"key": "dominance", "label": "D - Dominancia", "tip": "Quién empuja, quién toma el control."},
-                {"key": "influence", "label": "I - Influencia", "tip": "Quién conecta, quién comunica."},
-                {"key": "steadiness", "label": "S - Estabilidad", "tip": "Quién da continuidad, quién mantiene la calma."},
-                {"key": "compliance", "label": "C - Cumplimiento", "tip": "Quién revisa, quién asegura la calidad."},
+                {
+                    "key": "dominance",
+                    "label": "D - Dominancia",
+                    "tip": "Quién empuja, quién toma el control.",
+                },
+                {
+                    "key": "influence",
+                    "label": "I - Influencia",
+                    "tip": "Quién conecta, quién comunica.",
+                },
+                {
+                    "key": "steadiness",
+                    "label": "S - Estabilidad",
+                    "tip": "Quién da continuidad, quién mantiene la calma.",
+                },
+                {
+                    "key": "compliance",
+                    "label": "C - Cumplimiento",
+                    "tip": "Quién revisa, quién asegura la calidad.",
+                },
             ],
         },
     ],
@@ -206,10 +393,26 @@ DASHBOARDS = {
             "subtitle": "Los 10 hábitos para escalar tu negocio",
             "desc": "Los hábitos diarios, semanales, mensuales y trimestrales que mantienen tu negocio en ritmo de crecimiento.",
             "metrics": [
-                {"key": "daily_huddle", "label": "Daily Huddle", "tip": "Reunión de 15 min diaria. De pie. Sin sillas."},
-                {"key": "weekly_meeting", "label": "Weekly Meeting", "tip": "90 min semanales para revisar KPIs y prioridades."},
-                {"key": "quarterly", "label": "Quarterly Planning", "tip": "Off-site trimestral para definir la prioridad del trimestre."},
-                {"key": "theme", "label": "Tema del trimestre", "tip": "La prioridad #1 para los próximos 90 días."},
+                {
+                    "key": "daily_huddle",
+                    "label": "Daily Huddle",
+                    "tip": "Reunión de 15 min diaria. De pie. Sin sillas.",
+                },
+                {
+                    "key": "weekly_meeting",
+                    "label": "Weekly Meeting",
+                    "tip": "90 min semanales para revisar KPIs y prioridades.",
+                },
+                {
+                    "key": "quarterly",
+                    "label": "Quarterly Planning",
+                    "tip": "Off-site trimestral para definir la prioridad del trimestre.",
+                },
+                {
+                    "key": "theme",
+                    "label": "Tema del trimestre",
+                    "tip": "La prioridad #1 para los próximos 90 días.",
+                },
             ],
         },
         {
@@ -218,9 +421,21 @@ DASHBOARDS = {
             "subtitle": "La prioridad #1 que mueve tu negocio",
             "desc": "Define tu Critical Number: la métrica única que, si mejora, todo lo demás mejora.",
             "metrics": [
-                {"key": "priority_1", "label": "Prioridad #1", "tip": "La única cosa que más importa este trimestre."},
-                {"key": "critical_number", "label": "Número crítico", "tip": "La métrica que mide tu prioridad #1."},
-                {"key": "target", "label": "Meta", "tip": "A dónde quieres llegar con esta prioridad."},
+                {
+                    "key": "priority_1",
+                    "label": "Prioridad #1",
+                    "tip": "La única cosa que más importa este trimestre.",
+                },
+                {
+                    "key": "critical_number",
+                    "label": "Número crítico",
+                    "tip": "La métrica que mide tu prioridad #1.",
+                },
+                {
+                    "key": "target",
+                    "label": "Meta",
+                    "tip": "A dónde quieres llegar con esta prioridad.",
+                },
             ],
         },
         {
@@ -229,10 +444,26 @@ DASHBOARDS = {
             "subtitle": "El latido de tu empresa",
             "desc": "Define la cadencia de reuniones que mantiene a todos alineados y avanzando.",
             "metrics": [
-                {"key": "daily", "label": "Daily (15 min)", "tip": "¿Todos los días? ¿A qué hora?"},
-                {"key": "weekly", "label": "Weekly (90 min)", "tip": "¿Mismo día, misma hora?"},
-                {"key": "monthly", "label": "Mensual", "tip": "¿Revisión de tendencias y aprendizaje?"},
-                {"key": "quarterly", "label": "Trimestral", "tip": "¿Off-site con todo el equipo clave?"},
+                {
+                    "key": "daily",
+                    "label": "Daily (15 min)",
+                    "tip": "¿Todos los días? ¿A qué hora?",
+                },
+                {
+                    "key": "weekly",
+                    "label": "Weekly (90 min)",
+                    "tip": "¿Mismo día, misma hora?",
+                },
+                {
+                    "key": "monthly",
+                    "label": "Mensual",
+                    "tip": "¿Revisión de tendencias y aprendizaje?",
+                },
+                {
+                    "key": "quarterly",
+                    "label": "Trimestral",
+                    "tip": "¿Off-site con todo el equipo clave?",
+                },
             ],
         },
         {
@@ -241,9 +472,21 @@ DASHBOARDS = {
             "subtitle": "¿Quién hace qué para cuándo?",
             "desc": "El cierre de cada reunión: quién se compromete a hacer qué y para cuándo.",
             "metrics": [
-                {"key": "last_www", "label": "Último WWW", "tip": "Los compromisos de tu última reunión."},
-                {"key": "completion", "label": "Cumplimiento", "tip": "¿Qué porcentaje de WWWs se completan?"},
-                {"key": "accountability", "label": "Responsable", "tip": "Una persona por cada compromiso. Sin equipos."},
+                {
+                    "key": "last_www",
+                    "label": "Último WWW",
+                    "tip": "Los compromisos de tu última reunión.",
+                },
+                {
+                    "key": "completion",
+                    "label": "Cumplimiento",
+                    "tip": "¿Qué porcentaje de WWWs se completan?",
+                },
+                {
+                    "key": "accountability",
+                    "label": "Responsable",
+                    "tip": "Una persona por cada compromiso. Sin equipos.",
+                },
             ],
         },
         {
@@ -252,9 +495,17 @@ DASHBOARDS = {
             "subtitle": "Tu visión en una página",
             "desc": "El OPSP simplificado: qué haces, para quién, por qué y a dónde vas.",
             "metrics": [
-                {"key": "purpose", "label": "Propósito", "tip": "Por qué existe tu empresa."},
+                {
+                    "key": "purpose",
+                    "label": "Propósito",
+                    "tip": "Por qué existe tu empresa.",
+                },
                 {"key": "bhag", "label": "BHAG", "tip": "Tu meta grande a 10-25 años."},
-                {"key": "core_customer", "label": "Cliente ideal", "tip": "A quién le sirves mejor."},
+                {
+                    "key": "core_customer",
+                    "label": "Cliente ideal",
+                    "tip": "A quién le sirves mejor.",
+                },
             ],
         },
         {
@@ -263,10 +514,26 @@ DASHBOARDS = {
             "subtitle": "Las métricas que realmente importan",
             "desc": "Indicadores clave en 4 áreas: financieros, clientes, procesos, aprendizaje.",
             "metrics": [
-                {"key": "financial", "label": "Financiero", "tip": "Margen, ingresos, efectivo."},
-                {"key": "customer", "label": "Cliente", "tip": "Satisfacción, retención, NPS."},
-                {"key": "process", "label": "Procesos", "tip": "Eficiencia, calidad, velocidad."},
-                {"key": "learning", "label": "Aprendizaje", "tip": "Capacitación, innovación, cultura."},
+                {
+                    "key": "financial",
+                    "label": "Financiero",
+                    "tip": "Margen, ingresos, efectivo.",
+                },
+                {
+                    "key": "customer",
+                    "label": "Cliente",
+                    "tip": "Satisfacción, retención, NPS.",
+                },
+                {
+                    "key": "process",
+                    "label": "Procesos",
+                    "tip": "Eficiencia, calidad, velocidad.",
+                },
+                {
+                    "key": "learning",
+                    "label": "Aprendizaje",
+                    "tip": "Capacitación, innovación, cultura.",
+                },
             ],
         },
         {
@@ -276,8 +543,16 @@ DASHBOARDS = {
             "desc": "Las personas y factores que más impactan tus decisiones estratégicas.",
             "metrics": [
                 {"key": "mentor", "label": "Mentores", "tip": "¿Quién te da consejo?"},
-                {"key": "peers", "label": "Pares", "tip": "¿Colegas en situaciones similares?"},
-                {"key": "market", "label": "Mercado", "tip": "Clientes, competencia, tendencias."},
+                {
+                    "key": "peers",
+                    "label": "Pares",
+                    "tip": "¿Colegas en situaciones similares?",
+                },
+                {
+                    "key": "market",
+                    "label": "Mercado",
+                    "tip": "Clientes, competencia, tendencias.",
+                },
             ],
         },
     ],
@@ -499,8 +774,7 @@ def generate() -> None:
 
             # Build the HTML
             html = (
-                HTML_TEMPLATE
-                .replace("{CATEGORY}", category)
+                HTML_TEMPLATE.replace("{CATEGORY}", category)
                 .replace("{CATEGORY_LABEL}", cat_info["label"])
                 .replace("{TOOL_ID}", tool_id)
                 .replace("{TITLE}", db["title"])

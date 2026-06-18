@@ -10,7 +10,7 @@ Public exports:
 """
 
 from .base import BaseDAO
-from .schema import init_db
+from ..schema import init_db
 from .company_dao import CompanyDAO
 from .worksheet_dao import WorksheetDAO
 from .session_dao import SessionDAO

@@ -1,13 +1,17 @@
 """
 Quality gate: validate progress data consistency.
 """
+
 from pathlib import Path
+from typing import Optional
 import yaml
 
 DECISIONS = ["people", "strategy", "execution", "cash"]
 
 
-def validate_progress(profile_path: Path, registry_path: Path, worksheets_dir: Path = None) -> list[str]:
+def validate_progress(
+    profile_path: Path, registry_path: Path, worksheets_dir: Optional[Path] = None
+) -> list[str]:
     """Validate progress data consistency."""
     errors = []
 
@@ -59,6 +63,7 @@ def validate_progress(profile_path: Path, registry_path: Path, worksheets_dir: P
 
 if __name__ == "__main__":
     import sys
+
     profile_path = Path(".scaleup/agent/memory/company-profile.yaml")
     registry_path = Path(".scaleup/knowledge/registry/worksheets.yaml")
     ws_dir = Path(".scaleup/my-company/worksheets")

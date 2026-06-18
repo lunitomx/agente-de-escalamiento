@@ -9,6 +9,7 @@ Standalone (stdin JSON or --context arg):
     python3 -m coaching.summary                         # reads JSON from stdin
     python3 -m coaching.summary --context '{"...": ...}'  # reads JSON from arg
 """
+
 from __future__ import annotations
 
 import json
@@ -89,19 +90,39 @@ def _main() -> None:
         if idx + 1 < len(args):
             context_json = args[idx + 1]
         else:
-            print(json.dumps({"output": "", "artifacts": {}, "errors": ["--context requires a JSON argument"]}))
+            print(
+                json.dumps(
+                    {
+                        "output": "",
+                        "artifacts": {},
+                        "errors": ["--context requires a JSON argument"],
+                    }
+                )
+            )
             sys.exit(1)
     else:
         context_json = sys.stdin.read().strip()
 
     if not context_json:
-        print(json.dumps({"output": "", "artifacts": {}, "errors": ["No context provided (use stdin or --context)"]}))
+        print(
+            json.dumps(
+                {
+                    "output": "",
+                    "artifacts": {},
+                    "errors": ["No context provided (use stdin or --context)"],
+                }
+            )
+        )
         sys.exit(1)
 
     try:
         context = json.loads(context_json)
     except json.JSONDecodeError as exc:
-        print(json.dumps({"output": "", "artifacts": {}, "errors": [f"Invalid JSON: {exc}"]}))
+        print(
+            json.dumps(
+                {"output": "", "artifacts": {}, "errors": [f"Invalid JSON: {exc}"]}
+            )
+        )
         sys.exit(1)
 
     result = run(context)

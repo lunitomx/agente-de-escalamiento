@@ -41,11 +41,13 @@ def _render_header(bundle: ClassBundle) -> str:
     if bundle.artifact_paths:
         lines.append(f"| Artifacts | {len(bundle.artifact_paths)} file(s) |")
 
-    lines.extend([
-        "",
-        "---",
-        "",
-    ])
+    lines.extend(
+        [
+            "",
+            "---",
+            "",
+        ]
+    )
     return "\n".join(lines)
 
 
@@ -85,7 +87,9 @@ def _render_patterns(bundle: ClassBundle) -> str:
         lines.append("")
 
         for p in group:
-            lines.append(f"- **{p.label}** (x{p.occurrences}, confidence: {p.confidence:.0%})")
+            lines.append(
+                f"- **{p.label}** (x{p.occurrences}, confidence: {p.confidence:.0%})"
+            )
             lines.append(f"  - Evidence: _{p.evidence}_")
             lines.append("")
 
@@ -110,7 +114,12 @@ def _render_deltas(bundle: ClassBundle) -> str:
         return "\n".join(lines)
 
     for d in deltas:
-        priority_label = {"P0": "🔴 Critical", "P1": "🟠 High", "P2": "🟡 Medium", "P3": "🟢 Low"}
+        priority_label = {
+            "P0": "🔴 Critical",
+            "P1": "🟠 High",
+            "P2": "🟡 Medium",
+            "P3": "🟢 Low",
+        }
         prio = priority_label.get(d.priority, d.priority)
 
         lines.append(f"### [{prio}] {d.target_skill}")
@@ -153,7 +162,9 @@ def generate_report(bundle: ClassBundle) -> Path:
 def main() -> None:
     import argparse
 
-    parser = argparse.ArgumentParser(prog="class-report", description="Generate learning report for a class bundle")
+    parser = argparse.ArgumentParser(
+        prog="class-report", description="Generate learning report for a class bundle"
+    )
     parser.add_argument("class_id", help="Class ID")
     args = parser.parse_args()
 

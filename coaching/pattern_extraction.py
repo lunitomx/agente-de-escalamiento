@@ -10,9 +10,8 @@ from __future__ import annotations
 import json
 import re
 from collections import Counter
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, asdict
 from pathlib import Path
-from typing import Optional
 
 from coaching.class_intake import ClassBundle, _CLASSES_ROOT
 
@@ -45,14 +44,73 @@ class Pattern:
 # ---------------------------------------------------------------------------
 
 _STOPWORDS = {
-    "de", "la", "que", "el", "en", "y", "a", "los", "del", "se",
-    "las", "por", "un", "una", "con", "no", "es", "lo", "al", "su",
-    "le", "para", "más", "como", "pero", "sus", "este", "entre",
-    "está", "todo", "esta", "muy", "qué", "porque", "eso", "hay",
-    "tiene", "era", "son", "han", "fue", "ser", "sido", "cada",
-    "también", "solo", "donde", "quien", "cómo", "tan", "años",
-    "dos", "vez", "después", "así", "sí", "ni", "contra", "hasta",
-    "puede", "hace", "tener", "tanto", "hoy", "voy", "va", "he",
+    "de",
+    "la",
+    "que",
+    "el",
+    "en",
+    "y",
+    "a",
+    "los",
+    "del",
+    "se",
+    "las",
+    "por",
+    "un",
+    "una",
+    "con",
+    "no",
+    "es",
+    "lo",
+    "al",
+    "su",
+    "le",
+    "para",
+    "más",
+    "como",
+    "pero",
+    "sus",
+    "este",
+    "entre",
+    "está",
+    "todo",
+    "esta",
+    "muy",
+    "qué",
+    "porque",
+    "eso",
+    "hay",
+    "tiene",
+    "era",
+    "son",
+    "han",
+    "fue",
+    "ser",
+    "sido",
+    "cada",
+    "también",
+    "solo",
+    "donde",
+    "quien",
+    "cómo",
+    "tan",
+    "años",
+    "dos",
+    "vez",
+    "después",
+    "así",
+    "sí",
+    "ni",
+    "contra",
+    "hasta",
+    "puede",
+    "hace",
+    "tener",
+    "tanto",
+    "hoy",
+    "voy",
+    "va",
+    "he",
 }
 
 _DECISION_KEYWORDS = [
@@ -266,10 +324,14 @@ def load_patterns(bundle: ClassBundle) -> list[Pattern]:
 def main() -> None:
     import argparse
 
-    parser = argparse.ArgumentParser(prog="pattern-extract", description="Extract patterns from class bundles")
+    parser = argparse.ArgumentParser(
+        prog="pattern-extract", description="Extract patterns from class bundles"
+    )
     sub = parser.add_subparsers(dest="command", required=True)
 
-    extract_parser = sub.add_parser("extract", help="Extract patterns from a class bundle")
+    extract_parser = sub.add_parser(
+        "extract", help="Extract patterns from a class bundle"
+    )
     extract_parser.add_argument("class_id", help="Class ID")
 
     args = parser.parse_args()
@@ -282,7 +344,9 @@ def main() -> None:
         save_patterns(bundle, patterns)
         print(f"✓ {len(patterns)} patterns extracted and saved")
         for p in patterns[:10]:
-            print(f"  [{p.type:12s}] {p.label} (x{p.occurrences}, conf={p.confidence:.2f})")
+            print(
+                f"  [{p.type:12s}] {p.label} (x{p.occurrences}, conf={p.confidence:.2f})"
+            )
 
 
 if __name__ == "__main__":

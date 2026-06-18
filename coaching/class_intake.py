@@ -8,9 +8,7 @@ into a structured, traceable bundle persisted as YAML.
 from __future__ import annotations
 
 import argparse
-import os
 import re
-import sys
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -28,14 +26,18 @@ class ClassBundle:
     date: str
     source_type: str  # "bbb", "file", "upload", etc.
     transcript_path: str
-    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    created_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
 
     # optional
     audio_path: Optional[str] = None
     source_url: Optional[str] = None
     artifact_paths: list[str] = field(default_factory=list)
 
-    provenance: dict = field(default_factory=lambda: {"source": "unknown", "original_location": None})
+    provenance: dict = field(
+        default_factory=lambda: {"source": "unknown", "original_location": None}
+    )
 
     def to_dict(self) -> dict:
         """Convert to YAML-serializable dict."""
@@ -163,7 +165,13 @@ def _persist_bundle(bundle: ClassBundle) -> Path:
 
     yaml_path = bundle_dir / "bundle.yaml"
     with open(yaml_path, "w", encoding="utf-8") as f:
-        yaml.dump(bundle.to_dict(), f, allow_unicode=True, sort_keys=False, default_flow_style=False)
+        yaml.dump(
+            bundle.to_dict(),
+            f,
+            allow_unicode=True,
+            sort_keys=False,
+            default_flow_style=False,
+        )
 
     return yaml_path
 
@@ -213,18 +221,35 @@ def summary(bundle: ClassBundle) -> str:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(prog="class-intake", description="Class intake and bundling")
+    parser = argparse.ArgumentParser(
+        prog="class-intake", description="Class intake and bundling"
+    )
     sub = parser.add_subparsers(dest="command", required=True)
 
     # ingest
-    ingest_parser = sub.add_parser("ingest", help="Create a class bundle from transcript + metadata")
-    ingest_parser.add_argument("--transcript", required=True, help="Path to transcript file")
+    ingest_parser = sub.add_parser(
+        "ingest", help="Create a class bundle from transcript + metadata"
+    )
+    ingest_parser.add_argument(
+        "--transcript", required=True, help="Path to transcript file"
+    )
     ingest_parser.add_argument("--title", required=True, help="Class title")
-    ingest_parser.add_argument("--date", default="", help="Class date (YYYY-MM-DD, defaults to today)")
-    ingest_parser.add_argument("--source-type", default="file", choices=["bbb", "file", "upload"], help="Source type")
-    ingest_parser.add_argument("--source-url", default=None, help="Original recording URL")
+    ingest_parser.add_argument(
+        "--date", default="", help="Class date (YYYY-MM-DD, defaults to today)"
+    )
+    ingest_parser.add_argument(
+        "--source-type",
+        default="file",
+        choices=["bbb", "file", "upload"],
+        help="Source type",
+    )
+    ingest_parser.add_argument(
+        "--source-url", default=None, help="Original recording URL"
+    )
     ingest_parser.add_argument("--audio", default=None, help="Path to audio file")
-    ingest_parser.add_argument("--artifact", action="append", default=[], help="Path to lesson artifact")
+    ingest_parser.add_argument(
+        "--artifact", action="append", default=[], help="Path to lesson artifact"
+    )
 
     # load
     load_parser = sub.add_parser("load", help="Load and show a class bundle")

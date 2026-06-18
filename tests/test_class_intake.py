@@ -65,7 +65,13 @@ class TestIngestBasic:
 
 
 class TestPersistence:
-    def test_bundle_persisted_as_yaml(self, transcript_path: Path) -> None:
+    def test_bundle_persisted_as_yaml(
+        self,
+        transcript_path: Path,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.chdir(tmp_path)
         bundle = ingest_class(
             transcript_path=str(transcript_path),
             title="Persist Test",
@@ -83,7 +89,9 @@ class TestPersistence:
         assert cid.startswith("260526-eln")
         assert "-" in cid
 
-    def test_artifact_paths_absolute(self, transcript_path: Path, tmp_path: Path) -> None:
+    def test_artifact_paths_absolute(
+        self, transcript_path: Path, tmp_path: Path
+    ) -> None:
         rel_artifact = tmp_path / "prompt.txt"
         rel_artifact.write_text("prompt content", encoding="utf-8")
 
@@ -109,9 +117,12 @@ class TestCli:
         test_args = [
             "class-intake",
             "ingest",
-            "--transcript", str(transcript_path),
-            "--title", "CLI Test Class",
-            "--date", "2026-06-02",
+            "--transcript",
+            str(transcript_path),
+            "--title",
+            "CLI Test Class",
+            "--date",
+            "2026-06-02",
         ]
         sys_argv_saved = sys.argv
         try:

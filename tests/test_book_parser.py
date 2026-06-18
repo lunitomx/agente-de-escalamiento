@@ -10,7 +10,6 @@ Validates that the parser:
 """
 
 import json
-import os
 import pytest
 import sys
 from pathlib import Path
@@ -81,15 +80,24 @@ class TestBookParser:
             assert "id" in entity, f"Entity missing 'id': {entity}"
             assert "name" in entity, f"Entity {entity.get('id')} missing 'name'"
             assert "type" in entity, f"Entity {entity.get('id')} missing 'type'"
-            assert entity["type"] in ("concept", "tool", "metric", "habit", "principle", "decision"), (
-                f"Entity {entity.get('id')} has invalid type: {entity['type']}"
+            assert entity["type"] in (
+                "concept",
+                "tool",
+                "metric",
+                "habit",
+                "principle",
+                "decision",
+            ), f"Entity {entity.get('id')} has invalid type: {entity['type']}"
+            assert "description" in entity, (
+                f"Entity {entity['id']} missing 'description'"
             )
-            assert "description" in entity, f"Entity {entity['id']} missing 'description'"
             assert "keywords" in entity, f"Entity {entity['id']} missing 'keywords'"
             assert isinstance(entity["keywords"], list)
             assert "line_refs" in entity, f"Entity {entity['id']} missing 'line_refs'"
             assert isinstance(entity["line_refs"], list)
-            assert "chapter_ids" in entity, f"Entity {entity['id']} missing 'chapter_ids'"
+            assert "chapter_ids" in entity, (
+                f"Entity {entity['id']} missing 'chapter_ids'"
+            )
             assert isinstance(entity["chapter_ids"], list)
 
     # ── Specific entity tests ────────────────────────────────────────────
@@ -176,15 +184,17 @@ class TestBookParser:
     def test_relationships_have_required_fields(self, result):
         """Each relationship must have source, target, type, weight."""
         for rel in result["relationships"]:
-            assert "source" in rel, f"Relationship missing 'source'"
-            assert "target" in rel, f"Relationship missing 'target'"
-            assert "type" in rel, f"Relationship missing 'type'"
-            assert "weight" in rel, f"Relationship missing 'weight'"
+            assert "source" in rel, "Relationship missing 'source'"
+            assert "target" in rel, "Relationship missing 'target'"
+            assert "type" in rel, "Relationship missing 'type'"
+            assert "weight" in rel, "Relationship missing 'weight'"
             assert 0 < rel["weight"] <= 1.0, f"Invalid weight: {rel['weight']}"
 
     def test_specific_relationships_exist(self, result):
         """Verify key expected relationships."""
-        rel_pairs = {(r["source"], r["target"], r["type"]) for r in result["relationships"]}
+        rel_pairs = {
+            (r["source"], r["target"], r["type"]) for r in result["relationships"]
+        }
 
         expected = [
             ("daily-huddle", "rockefeller-habits", "contained_in"),
@@ -207,11 +217,13 @@ class TestBookParser:
     def test_chapters_have_correct_structure(self, result):
         """Each chapter must have id, title, level, line_start, line_end, slug."""
         for chapter in result["chapters"]:
-            assert "id" in chapter, f"Chapter missing 'id'"
+            assert "id" in chapter, "Chapter missing 'id'"
             assert "title" in chapter, f"Chapter {chapter.get('id')} missing 'title'"
             assert "level" in chapter, f"Chapter {chapter.get('id')} missing 'level'"
             assert chapter["level"] in (1, 2, 3), f"Invalid level: {chapter['level']}"
-            assert "line_start" in chapter, f"Chapter {chapter['id']} missing 'line_start'"
+            assert "line_start" in chapter, (
+                f"Chapter {chapter['id']} missing 'line_start'"
+            )
             assert "line_end" in chapter, f"Chapter {chapter['id']} missing 'line_end'"
             assert chapter["line_end"] >= chapter["line_start"]
             assert "slug" in chapter, f"Chapter {chapter['id']} missing 'slug'"
@@ -221,7 +233,9 @@ class TestBookParser:
         ids = [c["id"] for c in result["chapters"]]
         assert ids[0] == 1
         for i in range(1, len(ids)):
-            assert ids[i] == ids[i - 1] + 1, f"Non-sequential chapter IDs: {ids[i-1]} → {ids[i]}"
+            assert ids[i] == ids[i - 1] + 1, (
+                f"Non-sequential chapter IDs: {ids[i - 1]} → {ids[i]}"
+            )
 
     # ── Cross-reference integrity tests ──────────────────────────────────
 
@@ -253,8 +267,17 @@ class TestBookParser:
     def test_entity_types_present(self, result):
         """All entity types should be present."""
         types_found = {e["type"] for e in result["entities"]}
-        for expected_type in ("concept", "tool", "metric", "habit", "principle", "decision"):
-            assert expected_type in types_found, f"Entity type '{expected_type}' not found"
+        for expected_type in (
+            "concept",
+            "tool",
+            "metric",
+            "habit",
+            "principle",
+            "decision",
+        ):
+            assert expected_type in types_found, (
+                f"Entity type '{expected_type}' not found"
+            )
 
     # ── Output file tests ────────────────────────────────────────────────
 
@@ -272,6 +295,7 @@ class TestBookParser:
 
 
 # ── Helpers ─────────────────────────────────────────────────────────────────
+
 
 def _find_entity(result: dict, entity_id: str) -> dict | None:
     """Find an entity by ID."""

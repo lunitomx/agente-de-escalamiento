@@ -1,10 +1,10 @@
 """Quality gate validators for task board."""
+
 from __future__ import annotations
 
 import pathlib
 import re
 from datetime import date, datetime
-from typing import Any
 
 
 _TASK_RE = re.compile(r"^- \[[ x]\] (.+?)(?:\s*<!--\s*(.+?)\s*-->)?$")
@@ -36,14 +36,16 @@ def parse_tasks(board_path: pathlib.Path) -> dict[str, list[dict]]:
             meta_str = match.group(2) or ""
             meta = dict(_META_RE.findall(meta_str))
             done = line.strip().startswith("- [x]")
-            result[current_section].append({
-                "description": desc,
-                "done": done,
-                "decision": meta.get("decision", ""),
-                "node": meta.get("node", ""),
-                "due": meta.get("due", ""),
-                "completed": meta.get("completed", ""),
-            })
+            result[current_section].append(
+                {
+                    "description": desc,
+                    "done": done,
+                    "decision": meta.get("decision", ""),
+                    "node": meta.get("node", ""),
+                    "due": meta.get("due", ""),
+                    "completed": meta.get("completed", ""),
+                }
+            )
 
     return result
 

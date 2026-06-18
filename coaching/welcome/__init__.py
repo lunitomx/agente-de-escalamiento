@@ -1,6 +1,7 @@
 """
 Welcome module — company intake, stage detection, profile creation.
 """
+
 from pathlib import Path
 from ..core import detect_stage, write_yaml
 
@@ -59,14 +60,14 @@ def run(context: dict) -> dict:
     output_lines = [
         f"## Bienvenido, {name}!",
         "",
-        f"He creado tu perfil de empresa:",
-        f"",
-        f"| Campo | Valor |",
-        f"|-------|-------|",
+        "He creado tu perfil de empresa:",
+        "",
+        "| Campo | Valor |",
+        "|-------|-------|",
         f"| Industria | {industry} |",
         f"| Empleados | {employees} |",
         f"| Etapa | {stage} |",
-        f"",
+        "",
     ]
 
     if methodology == "lean-canvas":
@@ -90,3 +91,12 @@ def run(context: dict) -> dict:
         "artifacts": {"profile": profile, "profile_path": str(profile_path)},
         "errors": [],
     }
+
+
+def _main() -> None:
+    """Minimal module entry point for ``python -m coaching.welcome``."""
+    result = run({})
+    if result.get("output"):
+        print(result["output"])
+    for error in result.get("errors", []):
+        print(error)

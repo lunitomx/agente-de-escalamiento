@@ -1,7 +1,8 @@
 """
 Tests for welcome module.
 """
-import json, os, sys
+
+import sys
 from pathlib import Path
 
 
@@ -29,7 +30,14 @@ def test_welcome_rejects_missing_name(tmp_path):
     sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
     from coaching.welcome import run
 
-    result = run({"company_name": "", "industry": "Tech", "employees": 5, "base_path": str(tmp_path)})
+    result = run(
+        {
+            "company_name": "",
+            "industry": "Tech",
+            "employees": 5,
+            "base_path": str(tmp_path),
+        }
+    )
     assert any("company_name" in e for e in result["errors"])
 
 

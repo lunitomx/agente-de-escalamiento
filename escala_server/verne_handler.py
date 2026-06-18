@@ -14,8 +14,6 @@ Usage::
 
 from __future__ import annotations
 
-import os
-import re
 from pathlib import Path
 from typing import Any
 
@@ -28,44 +26,141 @@ from .knowledge_handler import KnowledgeHandler
 
 _CATEGORY_KEYWORDS: dict[str, list[str]] = {
     "people": [
-        "persona", "gente", "equipo", "talento", "contratar", "a-player",
-        "fac", "organigrama", "rol", "responsabilidad", "accountability",
-        "cultura", "valores", "topgrading", "liderazgo", "entrevista",
-        "people", "hiring", "talent", "team", "who",
+        "persona",
+        "gente",
+        "equipo",
+        "talento",
+        "contratar",
+        "a-player",
+        "fac",
+        "organigrama",
+        "rol",
+        "responsabilidad",
+        "accountability",
+        "cultura",
+        "valores",
+        "topgrading",
+        "liderazgo",
+        "entrevista",
+        "people",
+        "hiring",
+        "talent",
+        "team",
+        "who",
         # Coloquial SME/Latam
-        "prima", "primo", "encargada", "encargado", "rendir", "rinde",
-        "maistro", "recomendación", "familia", "familiar", "jefe",
-        "contratación", "despedir", "renunció", "renuncia",
+        "prima",
+        "primo",
+        "encargada",
+        "encargado",
+        "rendir",
+        "rinde",
+        "maistro",
+        "recomendación",
+        "familia",
+        "familiar",
+        "jefe",
+        "contratación",
+        "despedir",
+        "renunció",
+        "renuncia",
     ],
     "strategy": [
-        "estrategia", "diferenciación", "core customer", "cliente",
-        "brand promise", "bhag", "ops", "propósito", "visión", "misión",
-        "marca", "posicionamiento", "swot", "7 estratos", "profit per x",
-        "strategy", "differentiation", "purpose", "vision",
+        "estrategia",
+        "diferenciación",
+        "core customer",
+        "cliente",
+        "brand promise",
+        "bhag",
+        "ops",
+        "propósito",
+        "visión",
+        "misión",
+        "marca",
+        "posicionamiento",
+        "swot",
+        "7 estratos",
+        "profit per x",
+        "strategy",
+        "differentiation",
+        "purpose",
+        "vision",
         # Coloquial + negocio
-        "competencia", "expandir", "crecer", "nuevo mercado",
-        "sucursal", "franquicia", "local", "colonia", "zona",
+        "competencia",
+        "expandir",
+        "crecer",
+        "nuevo mercado",
+        "sucursal",
+        "franquicia",
+        "local",
+        "colonia",
+        "zona",
     ],
     "execution": [
-        "ejecución", "daily huddle", "weekly meeting", "prioridad",
-        "kpi", "métricas", "ritmo", "hábito", "disciplina",
-        "reunión", "tema del trimestre", "critical number",
-        "execution", "habit", "rhythm", "priority", "meeting",
-        "huddle", "routine",
+        "ejecución",
+        "daily huddle",
+        "weekly meeting",
+        "prioridad",
+        "kpi",
+        "métricas",
+        "ritmo",
+        "hábito",
+        "disciplina",
+        "reunión",
+        "tema del trimestre",
+        "critical number",
+        "execution",
+        "habit",
+        "rhythm",
+        "priority",
+        "meeting",
+        "huddle",
+        "routine",
         # Coloquial + SaaS
-        "churn", "descompuso", "descompone", "máquina", "taller",
-        "producción", "proceso", "seguimiento", "atraso", "retraso",
+        "churn",
+        "descompuso",
+        "descompone",
+        "máquina",
+        "taller",
+        "producción",
+        "proceso",
+        "seguimiento",
+        "atraso",
+        "retraso",
     ],
     "cash": [
-        "cash", "flujo", "efectivo", "power of one", "palanca",
-        "ccc", "capital", "gross margin", "margen",
-        "ingreso", "gasto", "cuentas por cobrar", "inventario",
-        "proveedores", "revenue", "profit", "rentabilidad",
-        "liquidez", "cash flow", "financial", "return on cash", "roc",
+        "cash",
+        "flujo",
+        "efectivo",
+        "power of one",
+        "palanca",
+        "ccc",
+        "capital",
+        "gross margin",
+        "margen",
+        "ingreso",
+        "gasto",
+        "cuentas por cobrar",
+        "inventario",
+        "proveedores",
+        "revenue",
+        "profit",
+        "rentabilidad",
+        "liquidez",
+        "cash flow",
+        "financial",
+        "return on cash",
+        "roc",
         # Coloquial SME
-        "maíz", "insumos", "materia prima", "quincena",
-        "cobrar", "pagar", "cobranza", "corte de caja",
-        "precio", "costos",
+        "maíz",
+        "insumos",
+        "materia prima",
+        "quincena",
+        "cobrar",
+        "pagar",
+        "cobranza",
+        "corte de caja",
+        "precio",
+        "costos",
     ],
 }
 
@@ -85,7 +180,9 @@ class VerneHandler:
         self._alma: str | None = None
 
         # Load Verne templates from YAML
-        _coaching_dir = Path(__file__).resolve().parent.parent / "conocimiento" / "coaching"
+        _coaching_dir = (
+            Path(__file__).resolve().parent.parent / "conocimiento" / "coaching"
+        )
         self._templates = yaml.safe_load(
             (_coaching_dir / "verne-templates.yaml").read_text(encoding="utf-8")
         )
@@ -114,7 +211,13 @@ class VerneHandler:
 
         # 0. Check for identity questions (C6)
         q_lower = question.lower().strip("¿?¡!")
-        if q_lower in ("quién eres", "quien eres", "who are you", "quién eres verne", "quien es verne"):
+        if q_lower in (
+            "quién eres",
+            "quien eres",
+            "who are you",
+            "quién eres verne",
+            "quien es verne",
+        ):
             return {
                 "answer": (
                     "**Verne:** Soy Verne Harnish, fundador de Gazelles y autor de *Scaling Up*.\n\n"
@@ -124,9 +227,9 @@ class VerneHandler:
                     "  - **Execution:** Ritmo imparable con Rockefeller Habits\n"
                     "  - **Cash:** Flujo de efectivo para crecer sin morir\n\n"
                     "Puedes preguntarme:\n"
-                    "  • `ask` — \"¿cómo mejoro mi flujo de caja?\"\n"
+                    '  • `ask` — "¿cómo mejoro mi flujo de caja?"\n'
                     "  • `review-daily` — pásame tu daily y lo califico\n"
-                    "  • `debate` — \"¿deberíamos expandirnos?\"\n\n"
+                    '  • `debate` — "¿deberíamos expandirnos?"\n\n'
                     "¿Por dónde quieres empezar?"
                 ),
                 "category": "general",
@@ -185,21 +288,33 @@ class VerneHandler:
 
         # Build observations
         observations: list[str] = []
-        observations.append(f"**Puntuación Rockefeller:** {score}/{self._max_score} ({score_percent}%)")
+        observations.append(
+            f"**Puntuación Rockefeller:** {score}/{self._max_score} ({score_percent}%)"
+        )
 
         if score_percent >= 80:
             observations.append("✅ Buen daily. Tienes los elementos clave. Sigue así.")
         elif score_percent >= 50:
-            observations.append("⚠️ Daily incompleto. Tienes lo básico pero faltan elementos clave.")
+            observations.append(
+                "⚠️ Daily incompleto. Tienes lo básico pero faltan elementos clave."
+            )
         else:
-            observations.append("❌ Esto no es un Daily Huddle. Es una lista de tareas.")
+            observations.append(
+                "❌ Esto no es un Daily Huddle. Es una lista de tareas."
+            )
 
         if found:
-            observations.append(f"\n**Presente:** {', '.join(f'✅ {f}' for f in found)}")
+            observations.append(
+                f"\n**Presente:** {', '.join(f'✅ {f}' for f in found)}"
+            )
         if missing:
-            observations.append(f"\n**Ausente:**")
-            for item_id in [k for k in self._checklist if self._checklist[k]["label"] in missing]:
-                observations.append(f"  - ❌ {self._checklist[item_id]['message_missing']}")
+            observations.append("\n**Ausente:**")
+            for item_id in [
+                k for k in self._checklist if self._checklist[k]["label"] in missing
+            ]:
+                observations.append(
+                    f"  - ❌ {self._checklist[item_id]['message_missing']}"
+                )
 
         # Verne's closing
         if missing:
@@ -282,9 +397,7 @@ class VerneHandler:
 
         parts: list[str] = []
         company_line = f"de **{company}**" if company else ""
-        parts.append(
-            f"**Verne** (perspectiva de board {company_line}):\n"
-        )
+        parts.append(f"**Verne** (perspectiva de board {company_line}):\n")
 
         # Opening
         if changes_count > 0:
@@ -339,8 +452,10 @@ class VerneHandler:
         if not decision or not decision.strip():
             return {
                 "status": "error",
-                "message": ("No decision provided. Verne necesita una decisión para debatir.\n"
-                            "Ej: escala verne debate \"deberíamos abrir un nuevo local\""),
+                "message": (
+                    "No decision provided. Verne necesita una decisión para debatir.\n"
+                    'Ej: escala verne debate "deberíamos abrir un nuevo local"'
+                ),
             }
 
         turn = len(history) if history else 0
@@ -365,7 +480,7 @@ class VerneHandler:
                 "**Strategy:** ¿Esta decisión está alineada con tu Core Customer "
                 "y Brand Promise? ¿O te estás desviando de tu diferenciación?"
             )
-            # Execution check  
+            # Execution check
             lines.append(
                 "**Execution:** ¿Tienes el ritmo para darle seguimiento? Una decisión "
                 "sin WWW (*Who does What by When*) es solo una intención."
@@ -377,7 +492,9 @@ class VerneHandler:
             )
 
             lines.append("")
-            lines.append("Ahora respóndeme esta: ¿cuál de estas 4 áreas te preocupa más?")
+            lines.append(
+                "Ahora respóndeme esta: ¿cuál de estas 4 áreas te preocupa más?"
+            )
             lines.append("")
 
             next_questions = [
@@ -391,11 +508,17 @@ class VerneHandler:
             last_user = history[-1].get("user", "") if history else ""
 
             # Build a reference to what the user said (M3)
-            last_user_short = (last_user[:80] + "...") if len(last_user) > 80 else last_user
-            lines.append(f"**Verne:**\n")
-            lines.append(f"Sobre lo que dices: *\"{last_user_short}\"* — déjame darte mi perspectiva.\n")
+            last_user_short = (
+                (last_user[:80] + "...") if len(last_user) > 80 else last_user
+            )
+            lines.append("**Verne:**\n")
+            lines.append(
+                f'Sobre lo que dices: *"{last_user_short}"* — déjame darte mi perspectiva.\n'
+            )
 
-            user_category = self._classify_question(last_user) if last_user else "general"
+            user_category = (
+                self._classify_question(last_user) if last_user else "general"
+            )
 
             # Acknowledge
             lines.append(
@@ -506,7 +629,9 @@ class VerneHandler:
         # Entity context (if found)
         if entities:
             entity_names = [e["name"] for e in entities[:3]]
-            lines.append(f"Veo que mencionas conceptos como *{', '.join(entity_names)}* — déjame ponerte contexto:\n")
+            lines.append(
+                f"Veo que mencionas conceptos como *{', '.join(entity_names)}* — déjame ponerte contexto:\n"
+            )
 
             for ent in entities[:2]:
                 desc = ent.get("description", "")
@@ -519,6 +644,7 @@ class VerneHandler:
         questions = list(template.get("questions", []))
         if questions:
             import random
+
             random.shuffle(questions)
             lines.append("**Mis preguntas para ti:**")
             for q in questions:

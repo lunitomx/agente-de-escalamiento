@@ -2,6 +2,7 @@
 
 No I/O. Accepts structured summary dict, returns markdown string.
 """
+
 from __future__ import annotations
 
 

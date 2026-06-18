@@ -10,6 +10,7 @@ Exit codes:
     0 — file is valid (## Session Summary present)
     1 — section missing, file not found, or read error
 """
+
 import re
 import sys
 from pathlib import Path
@@ -46,7 +47,9 @@ def validate_summary(log_path: str) -> list[str]:
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python summary_validator.py <path-to-session-log>", file=sys.stderr)
+        print(
+            "Usage: python summary_validator.py <path-to-session-log>", file=sys.stderr
+        )
         sys.exit(1)
 
     path_arg = sys.argv[1]

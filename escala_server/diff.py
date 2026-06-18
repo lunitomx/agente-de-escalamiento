@@ -8,7 +8,9 @@ Detects added and removed keys.
 from typing import Any
 
 
-def dict_diff(old_dict: dict[str, Any], new_dict: dict[str, Any]) -> list[dict[str, Any]]:
+def dict_diff(
+    old_dict: dict[str, Any], new_dict: dict[str, Any]
+) -> list[dict[str, Any]]:
     """Compute the diff between two dictionaries.
 
     Returns a list of change entries, each with:
@@ -39,25 +41,31 @@ def _dict_diff_recursive(
 
         if not in_old:
             # Key was added
-            changes.append({
-                "field": field,
-                "old_value": None,
-                "new_value": new[key],
-            })
+            changes.append(
+                {
+                    "field": field,
+                    "old_value": None,
+                    "new_value": new[key],
+                }
+            )
         elif not in_new:
             # Key was removed
-            changes.append({
-                "field": field,
-                "old_value": old[key],
-                "new_value": None,
-            })
+            changes.append(
+                {
+                    "field": field,
+                    "old_value": old[key],
+                    "new_value": None,
+                }
+            )
         elif isinstance(old[key], dict) and isinstance(new[key], dict):
             # Both are dicts — recurse
             _dict_diff_recursive(old[key], new[key], field, changes)
         elif old[key] != new[key]:
             # Values differ
-            changes.append({
-                "field": field,
-                "old_value": old[key],
-                "new_value": new[key],
-            })
+            changes.append(
+                {
+                    "field": field,
+                    "old_value": old[key],
+                    "new_value": new[key],
+                }
+            )

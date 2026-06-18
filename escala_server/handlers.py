@@ -238,6 +238,7 @@ class MemoryHandler:
 
 # ── helpers ──────────────────────────────────────────────────────────
 
+
 def _serialise(value: Any) -> str | None:
     """Stringify a value for storage in changes_log."""
     if value is None:

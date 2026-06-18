@@ -2,7 +2,10 @@
 
 No I/O. Accepts scores dict, returns routing decision.
 """
+
 from __future__ import annotations
+
+from typing import Any
 
 DECISIONS = ["people", "strategy", "execution", "cash"]
 
@@ -14,7 +17,7 @@ SUB_AGENTS = {
 }
 
 
-def route(scores: dict, explicit: str | None = None) -> dict:
+def route(scores: dict[str, Any], explicit: str | None = None) -> dict[str, Any]:
     if explicit and explicit in DECISIONS:
         agent = SUB_AGENTS[explicit]
         return {
@@ -36,7 +39,7 @@ def route(scores: dict, explicit: str | None = None) -> dict:
             "score": None,
         }
 
-    lowest = min(valid, key=valid.get)
+    lowest = min(valid, key=lambda decision: valid[decision])
     agent = SUB_AGENTS[lowest]
     return {
         "decision": lowest,

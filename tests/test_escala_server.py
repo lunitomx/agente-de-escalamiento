@@ -3,12 +3,12 @@
 import json
 import os
 import signal
+import socket
 import subprocess
 import sys
-import tempfile
-import threading
 import time
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -17,13 +17,42 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "escala_server"))
 
 # Import after path setup
-from escala_server.server import EscalaRequestHandler, make_server
 from escala_server.router import Router
-from escala_server.handlers import CompaniesHandler, WorksheetsHandler, SessionsHandler
+from escala_server.handlers import CompaniesHandler, WorksheetsHandler
 from escala_server.cors import CORSHandler
 
 
+def free_port() -> int:
+    with socket.socket() as sock:
+        sock.bind(("localhost", 0))
+        return int(sock.getsockname()[1])
+
+
+def wait_for_server(proc: subprocess.Popen[Any], port: int) -> None:
+    import urllib.request
+
+    deadline = time.monotonic() + 5
+    last_error: Exception | None = None
+    while time.monotonic() < deadline:
+        if proc.poll() is not None:
+            assert proc.stderr is not None
+            stderr = proc.stderr.read().decode("utf-8", errors="replace")
+            raise AssertionError(f"server exited early: {stderr}")
+        try:
+            with urllib.request.urlopen(
+                f"http://localhost:{port}/api/health",
+                timeout=0.2,
+            ) as response:
+                if response.status == 200:
+                    return
+        except Exception as exc:
+            last_error = exc
+            time.sleep(0.1)
+    raise AssertionError(f"server did not start: {last_error}")
+
+
 # ─── Router Tests ─────────────────────────────────────────────
+
 
 class TestRouter:
     def test_register_and_dispatch_get(self):
@@ -62,6 +91,7 @@ class TestRouter:
 
 # ─── CORS Tests ───────────────────────────────────────────────
 
+
 class TestCORSHandler:
     def test_cors_headers_present(self):
         headers = CORSHandler.get_headers()
@@ -73,9 +103,11 @@ class TestCORSHandler:
 
 # ─── Handler Tests ────────────────────────────────────────────
 
+
 class TestCompaniesHandler:
     def setup_method(self):
         import uuid
+
         self.db_path = f"file:test_co_{uuid.uuid4().hex[:8]}?mode=memory&cache=shared"
         self.handler = CompaniesHandler(db_path=self.db_path)
 
@@ -107,6 +139,7 @@ class TestWorksheetsHandler:
     def setup_method(self):
         # Unique :memory: db per test to avoid state leakage
         import uuid
+
         self.db_path = f"file:test_ws_{uuid.uuid4().hex[:8]}?mode=memory&cache=shared"
         self.handler = WorksheetsHandler(db_path=self.db_path)
 
@@ -125,18 +158,18 @@ class TestWorksheetsHandler:
 
 # ─── Server Integration Tests ─────────────────────────────────
 
+
 @pytest.fixture
 def server_process():
     """Start server in background for integration testing."""
-    port = 18080  # Use non-standard port to avoid conflicts
+    port = free_port()
     proc = subprocess.Popen(
         [sys.executable, "-m", "escala_server", "--port", str(port)],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         cwd=PROJECT_ROOT,
     )
-    # Wait for server to start
-    time.sleep(1)
+    wait_for_server(proc, port)
     yield port, proc
     # Cleanup
     os.kill(proc.pid, signal.SIGTERM)
@@ -172,6 +205,7 @@ class TestServerIntegration:
 
 # ─── Resilience Tests ──────────────────────────────────────────
 
+
 class TestServerResilience:
     """Verify server survives errors gracefully (S27.1)."""
 
@@ -180,14 +214,14 @@ class TestServerResilience:
         import urllib.request
         import urllib.error
 
-        port = 18081
+        port = free_port()
         proc = subprocess.Popen(
             [sys.executable, "-m", "escala_server", "--port", str(port)],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             cwd=PROJECT_ROOT,
         )
-        time.sleep(1)
+        wait_for_server(proc, port)
         try:
             url = f"http://localhost:{port}/api/companies"
             req = urllib.request.Request(
@@ -213,14 +247,14 @@ class TestServerResilience:
         import urllib.request
         import urllib.error
 
-        port = 18082
+        port = free_port()
         proc = subprocess.Popen(
             [sys.executable, "-m", "escala_server", "--port", str(port)],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             cwd=PROJECT_ROOT,
         )
-        time.sleep(1)
+        wait_for_server(proc, port)
         try:
             # Trigger an error first
             url = f"http://localhost:{port}/api/companies"

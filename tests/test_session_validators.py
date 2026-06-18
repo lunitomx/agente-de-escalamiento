@@ -1,12 +1,14 @@
 """Tests for session lifecycle quality gate validators."""
+
 from __future__ import annotations
 
 import pathlib
 import sys
 
-import pytest
 
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / ".scaleup" / "agent"))
+sys.path.insert(
+    0, str(pathlib.Path(__file__).resolve().parent.parent / ".scaleup" / "agent")
+)
 from validators.session import validate_context_bundle, validate_session_log
 
 
@@ -61,13 +63,17 @@ class TestValidateSessionLog:
 
     def test_invalid_duration_zero(self, tmp_path: pathlib.Path) -> None:
         log = tmp_path / "zero-dur.md"
-        log.write_text("---\ndate: 2026-04-25\nduration_minutes: 0\ndecision_focus: people\n---\n")
+        log.write_text(
+            "---\ndate: 2026-04-25\nduration_minutes: 0\ndecision_focus: people\n---\n"
+        )
         errors = validate_session_log(log)
         assert any("positive integer" in e for e in errors)
 
     def test_invalid_duration_negative(self, tmp_path: pathlib.Path) -> None:
         log = tmp_path / "neg-dur.md"
-        log.write_text("---\ndate: 2026-04-25\nduration_minutes: -5\ndecision_focus: people\n---\n")
+        log.write_text(
+            "---\ndate: 2026-04-25\nduration_minutes: -5\ndecision_focus: people\n---\n"
+        )
         errors = validate_session_log(log)
         assert any("positive integer" in e for e in errors)
 
@@ -81,7 +87,9 @@ class TestValidateSessionLog:
 
     def test_invalid_decision_focus(self, tmp_path: pathlib.Path) -> None:
         log = tmp_path / "bad-focus.md"
-        log.write_text("---\ndate: 2026-04-25\nduration_minutes: 30\ndecision_focus: marketing\n---\n")
+        log.write_text(
+            "---\ndate: 2026-04-25\nduration_minutes: 30\ndecision_focus: marketing\n---\n"
+        )
         errors = validate_session_log(log)
         assert any("must be one of" in e for e in errors)
 
@@ -129,7 +137,9 @@ class TestValidateContextBundle:
 
     def test_scores_with_zero(self, tmp_path: pathlib.Path) -> None:
         profile = tmp_path / "zero.yaml"
-        profile.write_text("company:\n  name: Test\nscores:\n  people: 0\n  strategy: 0\n")
+        profile.write_text(
+            "company:\n  name: Test\nscores:\n  people: 0\n  strategy: 0\n"
+        )
         assert validate_context_bundle(profile) == []
 
     def test_scores_with_none(self, tmp_path: pathlib.Path) -> None:

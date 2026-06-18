@@ -3,7 +3,6 @@
 from pathlib import Path
 from typing import Any
 import json
-import os
 from datetime import datetime
 
 
@@ -12,7 +11,14 @@ MEMORIA_DIR = Path.home() / ".escala" / "memoria"
 
 def ensure_dir():
     MEMORIA_DIR.mkdir(parents=True, exist_ok=True)
-    for sub in ["dailys", "analisis/cash", "analisis/strategy", "analisis/people", "analisis/execution", "dashboard"]:
+    for sub in [
+        "dailys",
+        "analisis/cash",
+        "analisis/strategy",
+        "analisis/people",
+        "analisis/execution",
+        "dashboard",
+    ]:
         (MEMORIA_DIR / sub).mkdir(parents=True, exist_ok=True)
 
 
@@ -29,8 +35,14 @@ def handle_request(request: dict[str, Any]) -> dict[str, Any]:
                     "inputSchema": {
                         "type": "object",
                         "properties": {
-                            "path": {"type": "string", "description": "Relative path under memoria/ (e.g. 'analisis/cash/power-of-one-2026-05-30.md')"},
-                            "content": {"type": "string", "description": "Markdown content with YAML frontmatter"},
+                            "path": {
+                                "type": "string",
+                                "description": "Relative path under memoria/ (e.g. 'analisis/cash/power-of-one-2026-05-30.md')",
+                            },
+                            "content": {
+                                "type": "string",
+                                "description": "Markdown content with YAML frontmatter",
+                            },
                         },
                         "required": ["path", "content"],
                     },
@@ -41,7 +53,10 @@ def handle_request(request: dict[str, Any]) -> dict[str, Any]:
                     "inputSchema": {
                         "type": "object",
                         "properties": {
-                            "path": {"type": "string", "description": "Relative path under memoria/"},
+                            "path": {
+                                "type": "string",
+                                "description": "Relative path under memoria/",
+                            },
                         },
                         "required": ["path"],
                     },
@@ -52,8 +67,16 @@ def handle_request(request: dict[str, Any]) -> dict[str, Any]:
                     "inputSchema": {
                         "type": "object",
                         "properties": {
-                            "dir": {"type": "string", "description": "Subdirectory (e.g. 'analisis/cash')", "default": ""},
-                            "limit": {"type": "integer", "description": "Max results", "default": 20},
+                            "dir": {
+                                "type": "string",
+                                "description": "Subdirectory (e.g. 'analisis/cash')",
+                                "default": "",
+                            },
+                            "limit": {
+                                "type": "integer",
+                                "description": "Max results",
+                                "default": 20,
+                            },
                         },
                         "required": [],
                     },
@@ -64,8 +87,15 @@ def handle_request(request: dict[str, Any]) -> dict[str, Any]:
                     "inputSchema": {
                         "type": "object",
                         "properties": {
-                            "query": {"type": "string", "description": "Search keyword"},
-                            "dir": {"type": "string", "description": "Subdirectory to search in", "default": ""},
+                            "query": {
+                                "type": "string",
+                                "description": "Search keyword",
+                            },
+                            "dir": {
+                                "type": "string",
+                                "description": "Subdirectory to search in",
+                                "default": "",
+                            },
                         },
                         "required": ["query"],
                     },
@@ -89,13 +119,20 @@ def handle_request(request: dict[str, Any]) -> dict[str, Any]:
             full_path = MEMORIA_DIR / path
             full_path.parent.mkdir(parents=True, exist_ok=True)
             full_path.write_text(content)
-            return {"content": [{"type": "text", "text": f"Written: {path} ({len(content)} chars)"}]}
+            return {
+                "content": [
+                    {"type": "text", "text": f"Written: {path} ({len(content)} chars)"}
+                ]
+            }
 
         elif tool == "escala_read_memo":
             path = args["path"]
             full_path = MEMORIA_DIR / path
             if not full_path.exists():
-                return {"content": [{"type": "text", "text": f"File not found: {path}"}], "isError": True}
+                return {
+                    "content": [{"type": "text", "text": f"File not found: {path}"}],
+                    "isError": True,
+                }
             return {"content": [{"type": "text", "text": full_path.read_text()}]}
 
         elif tool == "escala_list_memos":
@@ -104,8 +141,16 @@ def handle_request(request: dict[str, Any]) -> dict[str, Any]:
             target = MEMORIA_DIR / subdir if subdir else MEMORIA_DIR
             if not target.exists():
                 return {"content": [{"type": "text", "text": "[]"}]}
-            files = sorted(target.rglob("*.md"), key=lambda f: f.stat().st_mtime, reverse=True)[:limit]
-            result = [{"path": str(f.relative_to(MEMORIA_DIR)), "modified": datetime.fromtimestamp(f.stat().st_mtime).isoformat()} for f in files]
+            files = sorted(
+                target.rglob("*.md"), key=lambda f: f.stat().st_mtime, reverse=True
+            )[:limit]
+            result = [
+                {
+                    "path": str(f.relative_to(MEMORIA_DIR)),
+                    "modified": datetime.fromtimestamp(f.stat().st_mtime).isoformat(),
+                }
+                for f in files
+            ]
             return {"content": [{"type": "text", "text": json.dumps(result, indent=2)}]}
 
         elif tool == "escala_search_memos":
@@ -117,15 +162,40 @@ def handle_request(request: dict[str, Any]) -> dict[str, Any]:
             results = []
             for f in target.rglob("*.md"):
                 if query in f.read_text().lower():
-                    results.append({"path": str(f.relative_to(MEMORIA_DIR)), "modified": datetime.fromtimestamp(f.stat().st_mtime).isoformat()})
-            return {"content": [{"type": "text", "text": json.dumps(results[:20], indent=2)}]}
+                    results.append(
+                        {
+                            "path": str(f.relative_to(MEMORIA_DIR)),
+                            "modified": datetime.fromtimestamp(
+                                f.stat().st_mtime
+                            ).isoformat(),
+                        }
+                    )
+            return {
+                "content": [
+                    {"type": "text", "text": json.dumps(results[:20], indent=2)}
+                ]
+            }
 
         elif tool == "escala_generate_index":
-            index_lines = ["# Índice de Memoria — Escala\n", f"*Actualizado: {datetime.now().strftime('%Y-%m-%d %H:%M')}*\n\n"]
-            for subdir in ["dailys", "analisis/cash", "analisis/strategy", "analisis/people", "analisis/execution", "dashboard"]:
+            index_lines = [
+                "# Índice de Memoria — Escala\n",
+                f"*Actualizado: {datetime.now().strftime('%Y-%m-%d %H:%M')}*\n\n",
+            ]
+            for subdir in [
+                "dailys",
+                "analisis/cash",
+                "analisis/strategy",
+                "analisis/people",
+                "analisis/execution",
+                "dashboard",
+            ]:
                 target = MEMORIA_DIR / subdir
                 if target.exists():
-                    files = sorted(target.glob("*.md"), key=lambda f: f.stat().st_mtime, reverse=True)
+                    files = sorted(
+                        target.glob("*.md"),
+                        key=lambda f: f.stat().st_mtime,
+                        reverse=True,
+                    )
                     if files:
                         index_lines.append(f"## {subdir}\n")
                         for f in files:
@@ -135,13 +205,24 @@ def handle_request(request: dict[str, Any]) -> dict[str, Any]:
                         index_lines.append("\n")
             content = "".join(index_lines)
             (MEMORIA_DIR / "indice.md").write_text(content)
-            return {"content": [{"type": "text", "text": f"Index regenerated: {len(index_lines)} lines"}]}
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": f"Index regenerated: {len(index_lines)} lines",
+                    }
+                ]
+            }
 
-    return {"content": [{"type": "text", "text": f"Unknown method: {method}"}], "isError": True}
+    return {
+        "content": [{"type": "text", "text": f"Unknown method: {method}"}],
+        "isError": True,
+    }
 
 
 if __name__ == "__main__":
     import sys
+
     if len(sys.argv) > 1 and sys.argv[1] == "stdio":
         # STDIO transport for MCP
         for line in sys.stdin:

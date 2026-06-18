@@ -18,7 +18,6 @@ DDL_STATEMENTS = [
         value  TEXT NOT NULL
     )
     """,
-
     # ── companies ────────────────────────────────────────────────────
     """
     CREATE TABLE IF NOT EXISTS companies (
@@ -30,7 +29,6 @@ DDL_STATEMENTS = [
         updated_at TEXT NOT NULL DEFAULT (datetime('now'))
     )
     """,
-
     # ── worksheets (versioned — each save creates a new row) ─────────
     """
     CREATE TABLE IF NOT EXISTS worksheets (
@@ -44,7 +42,6 @@ DDL_STATEMENTS = [
         updated_at  TEXT NOT NULL DEFAULT (datetime('now'))
     )
     """,
-
     # ── sessions ─────────────────────────────────────────────────────
     """
     CREATE TABLE IF NOT EXISTS sessions (
@@ -56,7 +53,6 @@ DDL_STATEMENTS = [
         updated_at  TEXT NOT NULL DEFAULT (datetime('now'))
     )
     """,
-
     # ── changes_log ──────────────────────────────────────────────────
     """
     CREATE TABLE IF NOT EXISTS changes_log (
@@ -72,7 +68,6 @@ DDL_STATEMENTS = [
         created_at  TEXT NOT NULL DEFAULT (datetime('now'))
     )
     """,
-
     # ── memory_facts ─────────────────────────────────────────────────
     """
     CREATE TABLE IF NOT EXISTS memory_facts (
@@ -83,7 +78,6 @@ DDL_STATEMENTS = [
         updated_at  TEXT NOT NULL DEFAULT (datetime('now'))
     )
     """,
-
     # ── entities ─────────────────────────────────────────────────────
     """
     CREATE TABLE IF NOT EXISTS entities (
@@ -95,7 +89,6 @@ DDL_STATEMENTS = [
         updated_at  TEXT NOT NULL DEFAULT (datetime('now'))
     )
     """,
-
     # ── relationships ────────────────────────────────────────────────
     """
     CREATE TABLE IF NOT EXISTS relationships (
