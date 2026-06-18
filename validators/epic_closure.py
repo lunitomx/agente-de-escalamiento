@@ -75,21 +75,58 @@ AUDITED_EPIC_RULES: tuple[EpicClosureRule, ...] = (
     EpicClosureRule(
         epic_id="E31",
         path="work/epics/e31-scaleup-pipeline-runtime-runner/scope.md",
-        expected_status="active",
+        expected_status="complete",
+        required_phrases=("Final Status", "S31.3 is now complete"),
+    ),
+)
+
+
+BACKLOG_DRAFT_RULES: tuple[EpicClosureRule, ...] = (
+    EpicClosureRule(
+        epic_id="E19 Strategy Core Draft",
+        path="work/epics/e19-strategy-core-skills/scope.md",
+        expected_status="backlog/not completed",
         allow_open_done_criteria=True,
-        forbidden_phrases=(
-            "epic/e31-complete",
-            "epic/e31-scaleup-pipeline-runtime-runner-complete",
-        ),
+        required_phrases=("Backlog Closure Review", "no `complete` tag"),
+    ),
+    EpicClosureRule(
+        epic_id="E20 Voice of Customer Draft",
+        path="work/epics/e20-voice-of-customer-evidence-capture/scope.md",
+        expected_status="backlog/not completed",
+        allow_open_done_criteria=True,
+        required_phrases=("Backlog Closure Review", "no `complete` tag"),
+    ),
+    EpicClosureRule(
+        epic_id="E21 Transcript Intelligence Draft",
+        path="work/epics/e21-transcript-intelligence-for-escala/scope.md",
+        expected_status="backlog/not completed",
+        allow_open_done_criteria=True,
+        required_phrases=("Backlog Closure Review", "no `complete` tag"),
+    ),
+    EpicClosureRule(
+        epic_id="E22 Validation Drift Draft",
+        path="work/epics/e22-validation-drift-governance/scope.md",
+        expected_status="backlog/not completed",
+        allow_open_done_criteria=True,
+        required_phrases=("Backlog Closure Review", "no `complete` tag"),
     ),
 )
 
 
 def validate_audited_epic_closures(root: Path) -> list[str]:
     """Return closure governance errors for the E32 audited epic set."""
+    return _validate_epic_rules(root, AUDITED_EPIC_RULES)
+
+
+def validate_backlog_draft_closures(root: Path) -> list[str]:
+    """Return governance errors for draft epics closed as backlog."""
+    return _validate_epic_rules(root, BACKLOG_DRAFT_RULES)
+
+
+def _validate_epic_rules(root: Path, rules: tuple[EpicClosureRule, ...]) -> list[str]:
     errors: list[str] = []
 
-    for rule in AUDITED_EPIC_RULES:
+    for rule in rules:
         path = root / rule.path
         if not path.exists():
             errors.append(f"{rule.epic_id}: missing scope file: {rule.path}")
@@ -144,6 +181,8 @@ def _normalize_status(value: str) -> str:
     clean = re.sub(r"\s+", " ", clean)
     if "partial/backlog" in clean:
         return "partial/backlog"
+    if "backlog/not completed" in clean:
+        return "backlog/not completed"
     if "absorbed/descoped" in clean:
         return "absorbed/descoped"
     if "partial" in clean:
