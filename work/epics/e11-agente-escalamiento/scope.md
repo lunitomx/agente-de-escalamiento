@@ -1,5 +1,7 @@
 # Epic Scope: E11 — Agente de Escalamiento (repo público)
 
+**Status:** Complete
+
 ## Objective
 
 Crear un repositorio público `agente-de-escalamiento` en GitHub que contenga los skills de escalamiento de negocios (categoría scaleup-*) completamente anonimizados, con atribución explícita a los autores originales de las metodologías en las que se inspira, y listo para ser instalado por estudiantes de licenciatura en Hermes Agent, Codex CLI y Claude Code.
@@ -33,12 +35,18 @@ Crear un repositorio público `agente-de-escalamiento` en GitHub que contenga lo
 
 ## Done Criteria
 
-- [ ] Repo `agente-de-escalamiento` creado y público en GitHub
-- [ ] Todos los skills scaleup-* migrados y anonimizados
-- [ ] Cada mención a metodología incluye atribución al autor original
-- [ ] README documenta instalación en Hermes, Codex CLI y Claude Code
-- [ ] Un estudiante puede instalar y usar el agente en < 10 minutos
-- [ ] Repositorio no contiene referencias al proyecto interno ScaliingUPAI
+- [x] Repo `agente-de-escalamiento` creado y público en GitHub
+- [x] Todos los skills scaleup-* migrados y anonimizados
+- [x] Cada mención a metodología incluye atribución al autor original
+- [x] README documenta instalación en Hermes, Codex CLI y Claude Code
+- [x] Un estudiante puede instalar y usar el agente en < 10 minutos
+- [x] Repositorio no contiene referencias al proyecto interno ScaliingUPAI
+
+Retrospective evidence: `work/epics/e11-agente-escalamiento/retrospective.md`
+reports the same six criteria checked, cites the public repo
+`https://github.com/lunitomx/agente-de-escalamiento`, and names the S11.6 fresh
+clone verification as final evidence. The previous unchecked boxes in this scope
+were a governance drift, not a new product gap.
 
 ## Risks
 

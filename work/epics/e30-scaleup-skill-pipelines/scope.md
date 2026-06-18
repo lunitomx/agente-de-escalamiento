@@ -1,5 +1,7 @@
 # Epic Scope: E30 - ScaleUp Skill Pipeline Orchestration
 
+**Status:** Complete
+
 ## Objective
 
 Turn the existing ScaleUp skill catalog into explicit pipelines of skills, so each major business workflow has a documented sequence, quality gates, stop conditions, and evidence trail. This applies Emilio's guidance to the existing `scaleup-*` skills: do not make one giant skill; orchestrate small skills as a pipeline.
@@ -94,3 +96,6 @@ Risk-first walking skeleton.
 ## Final Status
 
 E30 is complete for the registry-and-alignment scope. Runtime execution remains intentionally deferred: the current deliverable is a validated pipeline contract over the existing ScaleUp skills, plus entrypoint documentation that makes those pipelines visible to users and future agents.
+
+E32 reference: this is a trusted closure for the registry-and-alignment scope
+only. Runtime runner work belongs to E31 and is not claimed by E30.

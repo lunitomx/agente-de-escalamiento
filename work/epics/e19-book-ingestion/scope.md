@@ -1,6 +1,6 @@
 # Epic Scope: E19 — Book Ingestion & Knowledge Graph
 
-**Status:** Complete
+**Status:** Partial
 **Dependencies:** E18 (infraestructura base)
 **Tamaño:** XL
 
@@ -45,6 +45,17 @@
 - Retrospective evidence: `work/epics/e19-book-ingestion/retrospective.md`
 - Integrity evidence: S19.5 reported 12 integrity tests covering the full book structure.
 - [ ] Documentación del esquema del grafo
+
+## Governance correction
+
+Corrected status: **Partial**. The retrospective reports parser, entity ingest,
+relationships, API, and integrity tests as completed, but this scope still has
+open Done Criteria and no independent schema documentation check. E19 must not
+be counted as an unqualified complete closure from this scope alone.
+
+required follow-up: either produce independent evidence for the parser/API/schema
+criteria and check them with citations, or create a new product/governance story
+for the remaining schema documentation and proof gaps.
 
 ## Implementation Plan
 

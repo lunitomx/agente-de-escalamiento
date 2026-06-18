@@ -1,6 +1,6 @@
 # Epic Scope: E23 — Kokoro Agent Package
 
-**Status:** ✅ COMPLETE
+**Status:** Partial
 **Dependencies:** E21 (Verne), E22 (Auditoría y correcciones)
 **Tamaño:** XL
 
@@ -97,6 +97,19 @@ habla contigo, usa skills, guarda en markdown, genera HTML cuando lo necesitas.
 - [x] Skills funcionan en Claude, Codex y Hermes
 - [x] Servidor MCP opcional funcional
 - [x] El servidor `escala_server/` legacy queda como compatible pero no necesario
+
+## Governance correction
+
+Corrected status: **Partial**. The package, skills, search/synthesis,
+dashboard generation, cross-platform compatibility, optional MCP server, and
+legacy-server compatibility remain evidenced by the retrospective. The open
+criterion "Cada análisis guarda .md en `memoria/` con frontmatter + links" is
+not independently proven in this scope, so E23 must not be treated as an
+unqualified complete closure.
+
+required follow-up: add a focused story that proves end-to-end markdown memory
+creation with frontmatter and links, or explicitly descopes that guarantee from
+the package contract.
 
 ## Progress Tracking
 
