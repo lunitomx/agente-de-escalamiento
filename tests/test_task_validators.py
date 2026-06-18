@@ -1,12 +1,14 @@
 """Tests for task board validators."""
+
 from __future__ import annotations
 
 import pathlib
 import sys
 
-import pytest
 
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / ".scaleup" / "agent"))
+sys.path.insert(
+    0, str(pathlib.Path(__file__).resolve().parent.parent / ".scaleup" / "agent")
+)
 from validators.tasks import find_overdue, parse_tasks, validate_task_board
 
 
@@ -52,7 +54,9 @@ class TestParseTasks:
 
     def test_task_without_metadata(self, tmp_path: pathlib.Path) -> None:
         p = tmp_path / "tasks.md"
-        p.write_text("## En Progreso\n\n- [ ] Simple task\n\n## Próximo\n\n## Completado\n")
+        p.write_text(
+            "## En Progreso\n\n- [ ] Simple task\n\n## Próximo\n\n## Completado\n"
+        )
         tasks = parse_tasks(p)
         assert tasks["En Progreso"][0]["decision"] == ""
 
@@ -71,13 +75,17 @@ class TestValidateTaskBoard:
 
     def test_invalid_decision(self, tmp_path: pathlib.Path) -> None:
         p = tmp_path / "tasks.md"
-        p.write_text("## En Progreso\n\n- [ ] Bad <!-- decision:marketing -->\n\n## Próximo\n\n## Completado\n")
+        p.write_text(
+            "## En Progreso\n\n- [ ] Bad <!-- decision:marketing -->\n\n## Próximo\n\n## Completado\n"
+        )
         errors = validate_task_board(p)
         assert any("invalid decision" in e for e in errors)
 
     def test_invalid_due_date(self, tmp_path: pathlib.Path) -> None:
         p = tmp_path / "tasks.md"
-        p.write_text("## En Progreso\n\n- [ ] Bad <!-- due:tomorrow -->\n\n## Próximo\n\n## Completado\n")
+        p.write_text(
+            "## En Progreso\n\n- [ ] Bad <!-- due:tomorrow -->\n\n## Próximo\n\n## Completado\n"
+        )
         errors = validate_task_board(p)
         assert any("invalid due date" in e for e in errors)
 
@@ -92,5 +100,7 @@ class TestFindOverdue:
 
     def test_no_overdue(self, tmp_path: pathlib.Path) -> None:
         p = tmp_path / "tasks.md"
-        p.write_text("## En Progreso\n\n- [ ] Future <!-- due:2099-01-01 -->\n\n## Próximo\n\n## Completado\n")
+        p.write_text(
+            "## En Progreso\n\n- [ ] Future <!-- due:2099-01-01 -->\n\n## Próximo\n\n## Completado\n"
+        )
         assert find_overdue(p) == []

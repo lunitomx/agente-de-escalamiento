@@ -10,6 +10,7 @@ Exit codes:
     0 — file is valid
     1 — one or more required sections are missing
 """
+
 import sys
 from pathlib import Path
 

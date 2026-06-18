@@ -2,6 +2,7 @@
 Deterministic retrieval engine for the Scaling Up knowledge ontology.
 Zero external dependencies — pure file-based, pure Python.
 """
+
 from __future__ import annotations
 
 import pathlib
@@ -23,7 +24,9 @@ class KnowledgeGraph:
     """
 
     def __init__(self, knowledge_dir: str | pathlib.Path | None = None) -> None:
-        self._dir = pathlib.Path(knowledge_dir) if knowledge_dir else _DEFAULT_KNOWLEDGE_DIR
+        self._dir = (
+            pathlib.Path(knowledge_dir) if knowledge_dir else _DEFAULT_KNOWLEDGE_DIR
+        )
         self._nodes: dict[str, dict] = {}
         self._by_decision: dict[str, list[str]] = {}
         self._by_type: dict[str, list[str]] = {}
@@ -144,7 +147,8 @@ class KnowledgeGraph:
             if (
                 nid in self._nodes
                 and e["target"] in self._nodes
-                and self._nodes[nid].get("decision") != self._nodes[e["target"]].get("decision")
+                and self._nodes[nid].get("decision")
+                != self._nodes[e["target"]].get("decision")
                 and self._nodes[nid].get("decision") is not None
                 and self._nodes[e["target"]].get("decision") is not None
             )

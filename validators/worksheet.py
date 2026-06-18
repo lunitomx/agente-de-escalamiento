@@ -1,6 +1,7 @@
 """
 Quality gate: validate worksheet completion.
 """
+
 from pathlib import Path
 import yaml
 
@@ -37,7 +38,9 @@ def validate_worksheet(path: Path) -> list[str]:
     return errors
 
 
-def validate_registry_consistency(registry_path: Path, worksheets_dir: Path) -> list[str]:
+def validate_registry_consistency(
+    registry_path: Path, worksheets_dir: Path
+) -> list[str]:
     """Check that all completed worksheets correspond to registry entries."""
     errors = []
 
@@ -63,7 +66,12 @@ def validate_registry_consistency(registry_path: Path, worksheets_dir: Path) -> 
 
 if __name__ == "__main__":
     import sys
-    path = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(".scaleup/my-company/worksheets")
+
+    path = (
+        Path(sys.argv[1])
+        if len(sys.argv) > 1
+        else Path(".scaleup/my-company/worksheets")
+    )
     if path.is_dir():
         all_ok = True
         for f in sorted(path.glob("*.yaml")):

@@ -25,7 +25,9 @@ def cmd_start(args):
     if pid_file.exists():
         pid = int(pid_file.read_text().strip())
         if _is_pid_running(pid):
-            print(f"Server already running (PID: {pid}) on http://localhost:{args.port}")
+            print(
+                f"Server already running (PID: {pid}) on http://localhost:{args.port}"
+            )
             return
 
     # Ensure .escala dir exists
@@ -36,11 +38,17 @@ def cmd_start(args):
 
     # Build command arguments
     cmd_args = [
-        sys.executable, "-m", "escala_server",
-        "--host", args.host,
-        "--port", str(args.port),
-        "--static-root", args.static_root,
-        "--db-path", args.db_path,
+        sys.executable,
+        "-m",
+        "escala_server",
+        "--host",
+        args.host,
+        "--port",
+        str(args.port),
+        "--static-root",
+        args.static_root,
+        "--db-path",
+        args.db_path,
     ]
 
     # Start server process using -m (preserves package context)
@@ -134,7 +142,9 @@ def main():
         "--port", type=int, default=DEFAULT_PORT, help=f"Port (default: {DEFAULT_PORT})"
     )
     start_parser.add_argument(
-        "--static-root", default="escala_server/static", help="Root directory for static files"
+        "--static-root",
+        default="escala_server/static",
+        help="Root directory for static files",
     )
     start_parser.add_argument(
         "--db-path",
@@ -156,14 +166,18 @@ def main():
     status_parser.add_argument(
         "--db-path",
         default=DEFAULT_DB_PATH,
-        help=f"SQLite database path (for display)",
+        help="SQLite database path (for display)",
     )
 
     # migrate
-    migrate_parser = subparsers.add_parser("migrate", help="Import .scaleup/ data into SQLite")
+    migrate_parser = subparsers.add_parser(
+        "migrate", help="Import .scaleup/ data into SQLite"
+    )
     migrate_parser.add_argument(
-        "yaml_root", nargs="?", default=".scaleup",
-        help="Path to .scaleup/ directory (default: .scaleup)"
+        "yaml_root",
+        nargs="?",
+        default=".scaleup",
+        help="Path to .scaleup/ directory (default: .scaleup)",
     )
     migrate_parser.add_argument(
         "--db-path",
@@ -173,33 +187,58 @@ def main():
 
     # ── inicia ──
     inicia_parser = subparsers.add_parser("inicia", help="Start a coaching session")
-    inicia_parser.add_argument("--db-path", default=str(Path.home() / ".escala" / "escala.db"),
-                               help="SQLite database path")
+    inicia_parser.add_argument(
+        "--db-path",
+        default=str(Path.home() / ".escala" / "escala.db"),
+        help="SQLite database path",
+    )
 
     # ── cierra ──
-    cierra_parser = subparsers.add_parser("cierra", help="Close the current coaching session")
+    cierra_parser = subparsers.add_parser(
+        "cierra", help="Close the current coaching session"
+    )
     cierra_parser.add_argument("--session-id", help="Session ID to close")
-    cierra_parser.add_argument("--db-path", default=str(Path.home() / ".escala" / "escala.db"),
-                               help="SQLite database path")
+    cierra_parser.add_argument(
+        "--db-path",
+        default=str(Path.home() / ".escala" / "escala.db"),
+        help="SQLite database path",
+    )
 
     # ── verne ──
     verne_parser = subparsers.add_parser("verne", help="Consultar a Verne Harnish")
     verne_sub = verne_parser.add_subparsers(dest="verne_command")
     verne_ask_parser = verne_sub.add_parser("ask", help="Preguntar a Verne")
     verne_ask_parser.add_argument("question", nargs="+", help="Pregunta para Verne")
-    verne_ask_parser.add_argument("--db-path", default=str(Path.home() / ".escala" / "escala.db"),
-                                  help="SQLite database path")
+    verne_ask_parser.add_argument(
+        "--db-path",
+        default=str(Path.home() / ".escala" / "escala.db"),
+        help="SQLite database path",
+    )
 
-    verne_review_parser = verne_sub.add_parser("review-daily", help="Revisar un daily huddle")
-    verne_review_parser.add_argument("daily_text", nargs="+", help="Texto del daily huddle")
-    verne_review_parser.add_argument("--db-path", default=str(Path.home() / ".escala" / "escala.db"),
-                                     help="SQLite database path")
+    verne_review_parser = verne_sub.add_parser(
+        "review-daily", help="Revisar un daily huddle"
+    )
+    verne_review_parser.add_argument(
+        "daily_text", nargs="+", help="Texto del daily huddle"
+    )
+    verne_review_parser.add_argument(
+        "--db-path",
+        default=str(Path.home() / ".escala" / "escala.db"),
+        help="SQLite database path",
+    )
 
-    verne_debate_parser = verne_sub.add_parser("debate", help="Debatir una decisión estratégica con Verne")
-    verne_debate_parser.add_argument("decision", nargs="+", help="Decisión estratégica a debatir")
+    verne_debate_parser = verne_sub.add_parser(
+        "debate", help="Debatir una decisión estratégica con Verne"
+    )
+    verne_debate_parser.add_argument(
+        "decision", nargs="+", help="Decisión estratégica a debatir"
+    )
     verne_debate_parser.add_argument("--context", help="Contexto de la empresa")
-    verne_debate_parser.add_argument("--db-path", default=str(Path.home() / ".escala" / "escala.db"),
-                                     help="SQLite database path")
+    verne_debate_parser.add_argument(
+        "--db-path",
+        default=str(Path.home() / ".escala" / "escala.db"),
+        help="SQLite database path",
+    )
 
     args = parser.parse_args()
 
@@ -234,16 +273,20 @@ def cmd_migrate(args):
 def cmd_inicia(args):
     """Start a coaching session."""
     from escala_server.session.session_start import SessionStartOrchestrator
+
     orchestrator = SessionStartOrchestrator(args.db_path)
-    context = orchestrator.start_session()
+    orchestrator.start_session()
     print(orchestrator.get_context_prompt())
 
 
 def cmd_cierra(args):
     """Close a coaching session."""
     from escala_server.session.session_close import SessionCloseOrchestrator
+
     orchestrator = SessionCloseOrchestrator(args.db_path)
     session_id = getattr(args, "session_id", None)
+    if session_id is None:
+        raise SystemExit("--session-id is required for cierra")
     result = orchestrator.close_session(session_id)
     print(f"Session {result.session_id} closed.")
     print(f"  Duration: {result.duration}")
@@ -254,6 +297,7 @@ def cmd_cierra(args):
 
     # Verne's perspective (S21.4)
     from escala_server.verne_handler import VerneHandler
+
     verne = VerneHandler(args.db_path)
     vp = verne.session_perspective(
         category=getattr(result, "category", None),
@@ -304,17 +348,19 @@ def cmd_verne(args):
     else:
         print("Comandos de Verne: ask, review-daily, debate")
         print()
-        print("  escala verne ask \"tu pregunta\"")
+        print('  escala verne ask "tu pregunta"')
         print("    → Verne responde desde su framework de 4 Decisiones")
-        print("    Ej: escala verne ask \"cómo mejoro mi flujo de efectivo\"")
+        print('    Ej: escala verne ask "cómo mejoro mi flujo de efectivo"')
         print()
-        print("  escala verne review-daily \"logros de ayer, planes de hoy, obstáculos\"")
+        print('  escala verne review-daily "logros de ayer, planes de hoy, obstáculos"')
         print("    → Verne califica tu daily (0-12) contra Rockefeller Habits")
-        print("    Ej: escala verne review-daily \"ayer vendí 5, hoy voy a cobrar, no tengo maíz\"")
+        print(
+            '    Ej: escala verne review-daily "ayer vendí 5, hoy voy a cobrar, no tengo maíz"'
+        )
         print()
-        print("  escala verne debate \"decisión estratégica\"")
+        print('  escala verne debate "decisión estratégica"')
         print("    → Verne analiza tu decisión con las 4 Decisiones")
-        print("    Ej: escala verne debate \"deberíamos abrir un nuevo local\"")
+        print('    Ej: escala verne debate "deberíamos abrir un nuevo local"')
         print()
         print("  También puedes preguntarle 'quién eres' para conocerlo.")
 

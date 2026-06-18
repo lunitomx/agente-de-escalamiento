@@ -10,7 +10,6 @@ from _pytest.fixtures import SubRequest
 from coaching.class_intake import (
     ClassBundle,
     ingest_class,
-    load_bundle,
 )
 from coaching.pattern_extraction import (
     Pattern,
@@ -75,7 +74,13 @@ class TestPatternDataclass:
         assert p.occurrences == 3
 
     def test_pattern_roundtrip(self) -> None:
-        p1 = Pattern(type="theme", label="estrategia", evidence="texto", occurrences=5, confidence=0.8)
+        p1 = Pattern(
+            type="theme",
+            label="estrategia",
+            evidence="texto",
+            occurrences=5,
+            confidence=0.8,
+        )
         d = p1.to_dict()
         p2 = Pattern.from_dict(d)
         assert p1.type == p2.type
@@ -108,7 +113,9 @@ class TestThemeExtraction:
         patterns = extract_patterns(b)
         themes = [p for p in patterns if p.type == "theme"]
         for t in themes:
-            assert t.occurrences >= 2, f"Theme '{t.label}' only {t.occurrences} occurrences"
+            assert t.occurrences >= 2, (
+                f"Theme '{t.label}' only {t.occurrences} occurrences"
+            )
 
 
 # ── Task 3: Decision + commitment extraction ─────────────────────────────

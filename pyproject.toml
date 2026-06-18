@@ -16,6 +16,38 @@ dependencies = [
 dev = [
     "pyright>=1.1.0",
     "pytest>=9.0",
+    "pytest-cov>=7.0",
+]
+
+[tool.ruff]
+extend-exclude = [
+    ".scaleup",
+    "referencias-humberto",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*.py" = ["E402"]
+
+[tool.pyright]
+include = [
+    "coaching",
+    "escala_server",
+    "tests",
+    "validators",
+]
+exclude = [
+    ".scaleup",
+    "referencias-humberto",
+]
+
+[tool.pytest.ini_options]
+norecursedirs = [
+    ".scaleup",
+    "referencias-humberto",
+]
+testpaths = [
+    "tests",
+    "coaching",
 ]
 
 [tool.setuptools.packages.find]

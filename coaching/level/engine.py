@@ -2,12 +2,28 @@
 
 No I/O. Accepts scores + activity data, returns level assessment.
 """
+
 from __future__ import annotations
 
 LEVELS = {
-    "shu": {"label": "Shu (Follow)", "label_es": "Shu (Seguir)", "min_avg": 0, "max_avg": 2.0},
-    "ha": {"label": "Ha (Break)", "label_es": "Ha (Adaptar)", "min_avg": 2.1, "max_avg": 3.5},
-    "ri": {"label": "Ri (Transcend)", "label_es": "Ri (Trascender)", "min_avg": 3.6, "max_avg": 5.0},
+    "shu": {
+        "label": "Shu (Follow)",
+        "label_es": "Shu (Seguir)",
+        "min_avg": 0,
+        "max_avg": 2.0,
+    },
+    "ha": {
+        "label": "Ha (Break)",
+        "label_es": "Ha (Adaptar)",
+        "min_avg": 2.1,
+        "max_avg": 3.5,
+    },
+    "ri": {
+        "label": "Ri (Transcend)",
+        "label_es": "Ri (Trascender)",
+        "min_avg": 3.6,
+        "max_avg": 5.0,
+    },
 }
 
 LEVEL_GUIDANCE = {
@@ -17,7 +33,9 @@ LEVEL_GUIDANCE = {
 }
 
 
-def detect_level(avg_score: float, worksheets_completed: int, sessions_count: int) -> str:
+def detect_level(
+    avg_score: float, worksheets_completed: int, sessions_count: int
+) -> str:
     if avg_score >= 3.6 and worksheets_completed >= 8 and sessions_count >= 10:
         return "ri"
     if avg_score >= 2.1 and worksheets_completed >= 3 and sessions_count >= 3:

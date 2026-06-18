@@ -2,13 +2,34 @@
 
 No I/O. Accepts company data dict, returns structured profile dict.
 """
+
 from __future__ import annotations
 
 GROWTH_STAGES = {
-    "startup": {"min_employees": 1, "max_employees": 9, "label": "Startup", "label_es": "Startup"},
-    "growth": {"min_employees": 10, "max_employees": 50, "label": "Growth", "label_es": "Crecimiento"},
-    "scaleup": {"min_employees": 51, "max_employees": 250, "label": "Scale-Up", "label_es": "Escalamiento"},
-    "enterprise": {"min_employees": 251, "max_employees": 99999, "label": "Enterprise", "label_es": "Empresa"},
+    "startup": {
+        "min_employees": 1,
+        "max_employees": 9,
+        "label": "Startup",
+        "label_es": "Startup",
+    },
+    "growth": {
+        "min_employees": 10,
+        "max_employees": 50,
+        "label": "Growth",
+        "label_es": "Crecimiento",
+    },
+    "scaleup": {
+        "min_employees": 51,
+        "max_employees": 250,
+        "label": "Scale-Up",
+        "label_es": "Escalamiento",
+    },
+    "enterprise": {
+        "min_employees": 251,
+        "max_employees": 99999,
+        "label": "Enterprise",
+        "label_es": "Empresa",
+    },
 }
 
 REQUIRED_FIELDS = ["name", "industry", "employees"]
@@ -48,7 +69,8 @@ def build_profile(data: dict) -> dict:
             "location": data.get("location", ""),
             "description": data.get("description", ""),
         },
-        "scores": data.get("scores") or {
+        "scores": data.get("scores")
+        or {
             "people": None,
             "strategy": None,
             "execution": None,

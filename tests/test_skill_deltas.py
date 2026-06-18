@@ -82,7 +82,11 @@ class TestSkillsInventory:
 class TestSuggestDeltas:
     def test_canvas_pattern_maps_to_skill(self) -> None:
         patterns = [
-            Pattern(type="theme", label="business model canvas", evidence="canvas mencionado 3 veces"),
+            Pattern(
+                type="theme",
+                label="business model canvas",
+                evidence="canvas mencionado 3 veces",
+            ),
         ]
         skills = ["kokoro-canvas", "escala-strategy"]
         deltas = suggest_deltas(patterns, skills)
@@ -92,7 +96,11 @@ class TestSuggestDeltas:
 
     def test_strategy_pattern_maps(self) -> None:
         patterns = [
-            Pattern(type="theme", label="estrategia de la empresa", evidence="estrategia mencionada"),
+            Pattern(
+                type="theme",
+                label="estrategia de la empresa",
+                evidence="estrategia mencionada",
+            ),
         ]
         skills = ["escala-strategy"]
         deltas = suggest_deltas(patterns, skills)
@@ -101,7 +109,11 @@ class TestSuggestDeltas:
 
     def test_commitment_pattern_maps(self) -> None:
         patterns = [
-            Pattern(type="commitment", label="compromiso", evidence="compromiso de hablar con cliente"),
+            Pattern(
+                type="commitment",
+                label="compromiso",
+                evidence="compromiso de hablar con cliente",
+            ),
         ]
         skills = ["escala-execution"]
         deltas = suggest_deltas(patterns, skills)
@@ -115,7 +127,9 @@ class TestSuggestDeltas:
 
     def test_unknown_pattern_no_false_match(self) -> None:
         patterns = [
-            Pattern(type="theme", label="temperatura del clima", evidence="clima mencionado"),
+            Pattern(
+                type="theme", label="temperatura del clima", evidence="clima mencionado"
+            ),
         ]
         skills = ["escala-strategy", "kokoro-canvas"]
         deltas = suggest_deltas(patterns, skills)
@@ -125,8 +139,12 @@ class TestSuggestDeltas:
     def test_priority_sorting(self) -> None:
         patterns = [
             Pattern(type="theme", label="business model canvas", evidence="canvas"),
-            Pattern(type="theme", label="estrategia corporativa", evidence="estrategia"),
-            Pattern(type="commitment", label="compromiso semanal", evidence="compromiso"),
+            Pattern(
+                type="theme", label="estrategia corporativa", evidence="estrategia"
+            ),
+            Pattern(
+                type="commitment", label="compromiso semanal", evidence="compromiso"
+            ),
         ]
         skills = ["kokoro-canvas", "escala-strategy", "escala-execution"]
         deltas = suggest_deltas(patterns, skills)
@@ -190,7 +208,6 @@ class TestEdgeCases:
         class FakeBundle:
             class_id = "999999-fake-test"
 
-        fake = FakeBundle()
         # Should handle being passed as a bundle even though not ClassBundle
         # We patch _CLASSES_ROOT manually by saving to tmp_path equivalent
         path = Path("work/classes/999999-fake-test/deltas.json")

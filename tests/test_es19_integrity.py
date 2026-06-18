@@ -33,7 +33,12 @@ class TestBookCoverage:
     def test_execution_entities_exist(self):
         data = _get_data()
         names = [e["name"].lower() for e in data["entities"]]
-        for name in ["daily huddle", "weekly meeting", "quarterly planning", "rockefeller habits"]:
+        for name in [
+            "daily huddle",
+            "weekly meeting",
+            "quarterly planning",
+            "rockefeller habits",
+        ]:
             assert any(name in n for n in names), f"Missing EXECUTION entity: {name}"
 
     def test_cash_entities_exist(self):
@@ -78,9 +83,9 @@ class TestBookCoverage:
         data = _get_data()
         assert len(data["chapters"]) >= 100, f"Only {len(data['chapters'])} chapters"
         for ch in data["chapters"][:5]:
-            assert ch.get("id"), f"Chapter missing id"
-            assert ch.get("title"), f"Chapter missing title"
-            assert ch.get("level") in [1, 2, 3], f"Chapter has invalid level"
+            assert ch.get("id"), "Chapter missing id"
+            assert ch.get("title"), "Chapter missing title"
+            assert ch.get("level") in [1, 2, 3], "Chapter has invalid level"
 
     def test_json_file_exists_and_valid(self):
         assert JSON_PATH.exists(), "book-knowledge.json not found"

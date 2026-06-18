@@ -1,17 +1,33 @@
 """
 Worksheet module — load from ontology, guide step by step, validate, save.
 """
+
 from pathlib import Path
+from typing import Any
+
 from ..core import read_yaml, write_yaml, ensure_dir
 
 
-REGISTRY_PATH = Path(__file__).parent.parent.parent / ".scaleup" / "knowledge" / "registry" / "worksheets.yaml"
+REGISTRY_PATH = (
+    Path(__file__).parent.parent.parent
+    / ".scaleup"
+    / "knowledge"
+    / "registry"
+    / "worksheets.yaml"
+)
 COMPLETED_DIR = Path(".scaleup/my-company/worksheets")
 
 
-def list_worksheets(decision: str = None, base_path: Path = None) -> list[dict]:
+def list_worksheets(
+    decision: str | None = None,
+    base_path: Path | None = None,
+) -> list[dict[str, Any]]:
     """List all worksheets, optionally filtered by decision."""
-    registry_path = (base_path / ".scaleup" / "knowledge" / "registry" / "worksheets.yaml") if base_path else REGISTRY_PATH
+    registry_path = (
+        (base_path / ".scaleup" / "knowledge" / "registry" / "worksheets.yaml")
+        if base_path
+        else REGISTRY_PATH
+    )
     registry = read_yaml(registry_path)
     worksheets = registry.get("worksheets", [])
     if decision:
@@ -19,9 +35,16 @@ def list_worksheets(decision: str = None, base_path: Path = None) -> list[dict]:
     return worksheets
 
 
-def find_worksheet(name_or_id: str, base_path: Path = None) -> dict | None:
+def find_worksheet(
+    name_or_id: str,
+    base_path: Path | None = None,
+) -> dict[str, Any] | None:
     """Find a worksheet by name or ID (case-insensitive)."""
-    registry_path = (base_path / ".scaleup" / "knowledge" / "registry" / "worksheets.yaml") if base_path else REGISTRY_PATH
+    registry_path = (
+        (base_path / ".scaleup" / "knowledge" / "registry" / "worksheets.yaml")
+        if base_path
+        else REGISTRY_PATH
+    )
     registry = read_yaml(registry_path)
     name_lower = name_or_id.lower()
     for w in registry.get("worksheets", []):
@@ -32,9 +55,13 @@ def find_worksheet(name_or_id: str, base_path: Path = None) -> dict | None:
     return None
 
 
-def get_completed_ids(base_path: Path = None) -> list[str]:
+def get_completed_ids(base_path: Path | None = None) -> list[str]:
     """Get list of completed worksheet IDs from saved files."""
-    wdir = (base_path / ".scaleup" / "my-company" / "worksheets") if base_path else COMPLETED_DIR
+    wdir = (
+        (base_path / ".scaleup" / "my-company" / "worksheets")
+        if base_path
+        else COMPLETED_DIR
+    )
     if not wdir.exists():
         return []
     completed = []
@@ -48,7 +75,10 @@ def get_completed_ids(base_path: Path = None) -> list[str]:
     return completed
 
 
-def load_worksheet_content(worksheet: dict, base_path: Path = None) -> dict:
+def load_worksheet_content(
+    worksheet: dict[str, Any],
+    base_path: Path | None = None,
+) -> dict[str, Any]:
     """Load full worksheet content from its ontology node_path."""
     node_path = worksheet.get("node_path", "")
     if not node_path:
@@ -59,7 +89,7 @@ def load_worksheet_content(worksheet: dict, base_path: Path = None) -> dict:
     return {**worksheet, **content}
 
 
-def run(context: dict) -> dict:
+def run(context: dict[str, Any]) -> dict[str, Any]:
     """
     Execute worksheet guidance.
 
@@ -76,10 +106,11 @@ def run(context: dict) -> dict:
     """
     base = Path(context.get("base_path", "."))
     action = context.get("action", "list")
-    errors = []
 
     if action == "list":
         decision = context.get("decision")
+        if decision is not None and not isinstance(decision, str):
+            decision = str(decision)
         all_ws = list_worksheets(decision, base)
         completed = get_completed_ids(base)
 
@@ -97,23 +128,33 @@ def run(context: dict) -> dict:
                 f"{w.get('difficulty', '—')} | "
                 f"{w.get('time_estimate', '—')} | {status} |"
             )
-        lines.extend([
-            "",
-            "Para empezar: `/scaleup-worksheet [nombre]`",
-            "Para reanudar: mismo comando si ya empezaste",
-        ])
+        lines.extend(
+            [
+                "",
+                "Para empezar: `/scaleup-worksheet [nombre]`",
+                "Para reanudar: mismo comando si ya empezaste",
+            ]
+        )
 
-        return {"output": "\n".join(lines), "artifacts": {"worksheets": all_ws, "completed": completed}, "errors": []}
+        return {
+            "output": "\n".join(lines),
+            "artifacts": {"worksheets": all_ws, "completed": completed},
+            "errors": [],
+        }
 
     elif action in ("start", "resume"):
-        ws_name = context.get("worksheet_name", "")
+        ws_name = str(context.get("worksheet_name", ""))
         worksheet = find_worksheet(ws_name, base)
         if not worksheet:
-            available = [w["name"] for w in list_worksheets(decision=None, base_path=base)]
+            available = [
+                w["name"] for w in list_worksheets(decision=None, base_path=base)
+            ]
             return {
                 "output": "",
                 "artifacts": {},
-                "errors": [f"Worksheet '{ws_name}' no encontrado. Disponibles: {', '.join(available[:5])}..."],
+                "errors": [
+                    f"Worksheet '{ws_name}' no encontrado. Disponibles: {', '.join(available[:5])}..."
+                ],
             }
 
         completed = get_completed_ids(base)
@@ -124,7 +165,9 @@ def run(context: dict) -> dict:
                 "errors": [],
             }
 
-        state_path = base / ".scaleup" / "my-company" / "worksheets" / f"{worksheet['id']}.yaml"
+        state_path = (
+            base / ".scaleup" / "my-company" / "worksheets" / f"{worksheet['id']}.yaml"
+        )
         state = read_yaml(state_path)
         if state and action == "resume":
             current_step = state.get("current_step", 0)
@@ -149,43 +192,57 @@ def run(context: dict) -> dict:
         ]
 
         if current_step == 0:
-            lines.extend([
-                "### Paso 1: Información General",
-                "",
-                "Antes de empezar, confirma que tienes:",
-            ])
+            lines.extend(
+                [
+                    "### Paso 1: Información General",
+                    "",
+                    "Antes de empezar, confirma que tienes:",
+                ]
+            )
             if worksheet.get("prerequisites"):
-                lines.append("- [ ] Prerrequisitos completados: " + ", ".join(worksheet["prerequisites"]))
-            lines.extend([
-                "- [ ] Datos actualizados de tu empresa",
-                "- [ ] 1-2 horas sin interrupciones",
-                "",
-                "Responde con 'listo' para empezar.",
-            ])
+                lines.append(
+                    "- [ ] Prerrequisitos completados: "
+                    + ", ".join(worksheet["prerequisites"])
+                )
+            lines.extend(
+                [
+                    "- [ ] Datos actualizados de tu empresa",
+                    "- [ ] 1-2 horas sin interrupciones",
+                    "",
+                    "Responde con 'listo' para empezar.",
+                ]
+            )
         else:
             step_idx = current_step - 1
             if step_idx < len(fields):
-                lines.extend([
-                    f"### Paso {current_step + 1}: {fields[step_idx]}",
-                    "",
-                    "Completa este campo. Responde con tu información.",
-                ])
+                lines.extend(
+                    [
+                        f"### Paso {current_step + 1}: {fields[step_idx]}",
+                        "",
+                        "Completa este campo. Responde con tu información.",
+                    ]
+                )
             else:
-                lines.extend([
-                    "### Revisión Final",
-                    "",
-                    "Has completado todos los pasos. Revisa tus respuestas y confirma para guardar.",
-                ])
+                lines.extend(
+                    [
+                        "### Revisión Final",
+                        "",
+                        "Has completado todos los pasos. Revisa tus respuestas y confirma para guardar.",
+                    ]
+                )
 
-        write_yaml(state_path, {
-            "worksheet_id": worksheet["id"],
-            "worksheet_name": worksheet["name"],
-            "decision": worksheet.get("decision"),
-            "current_step": current_step,
-            "total_steps": total_steps,
-            "fields": saved_fields,
-            "status": "in_progress",
-        })
+        write_yaml(
+            state_path,
+            {
+                "worksheet_id": worksheet["id"],
+                "worksheet_name": worksheet["name"],
+                "decision": worksheet.get("decision"),
+                "current_step": current_step,
+                "total_steps": total_steps,
+                "fields": saved_fields,
+                "status": "in_progress",
+            },
+        )
 
         return {
             "output": "\n".join(lines),
@@ -199,15 +256,27 @@ def run(context: dict) -> dict:
         }
 
     elif action == "step":
-        ws_name = context.get("worksheet_name", "")
+        ws_name = str(context.get("worksheet_name", ""))
         worksheet = find_worksheet(ws_name, base)
         if not worksheet:
-            return {"output": "", "artifacts": {}, "errors": [f"Worksheet '{ws_name}' no encontrado"]}
+            return {
+                "output": "",
+                "artifacts": {},
+                "errors": [f"Worksheet '{ws_name}' no encontrado"],
+            }
 
-        state_path = base / ".scaleup" / "my-company" / "worksheets" / f"{worksheet['id']}.yaml"
+        state_path = (
+            base / ".scaleup" / "my-company" / "worksheets" / f"{worksheet['id']}.yaml"
+        )
         state = read_yaml(state_path)
         if not state:
-            return {"output": "", "artifacts": {}, "errors": [f"Worksheet '{ws_name}' no iniciado. Usa /scaleup-worksheet {ws_name} primero"]}
+            return {
+                "output": "",
+                "artifacts": {},
+                "errors": [
+                    f"Worksheet '{ws_name}' no iniciado. Usa /scaleup-worksheet {ws_name} primero"
+                ],
+            }
 
         current_step = state.get("current_step", 0)
         total_steps = state.get("total_steps", 0)
@@ -242,34 +311,64 @@ def run(context: dict) -> dict:
             ]
             for field_name, value in saved_fields.items():
                 lines.append(f"- **{field_name}:** {value}")
-            lines.extend([
-                "",
-                "Próximos pasos sugeridos:",
-                f"- `/scaleup-progress` para ver tu avance general",
-                f"- `/scaleup-worksheet list` para ver otros worksheets",
-            ])
+            lines.extend(
+                [
+                    "",
+                    "Próximos pasos sugeridos:",
+                    "- `/scaleup-progress` para ver tu avance general",
+                    "- `/scaleup-worksheet list` para ver otros worksheets",
+                ]
+            )
 
             return {
                 "output": "\n".join(lines),
-                "artifacts": {"worksheet": worksheet, "completed_data": completed_data, "state_path": str(state_path)},
+                "artifacts": {
+                    "worksheet": worksheet,
+                    "completed_data": completed_data,
+                    "state_path": str(state_path),
+                },
                 "errors": [],
             }
         else:
-            write_yaml(state_path, {**state, "current_step": current_step, "fields": saved_fields, "status": "in_progress"})
+            write_yaml(
+                state_path,
+                {
+                    **state,
+                    "current_step": current_step,
+                    "fields": saved_fields,
+                    "status": "in_progress",
+                },
+            )
 
             if current_step < len(fields):
                 next_field = fields[current_step]
-                lines = [f"### Paso {current_step + 1}: {next_field}", "", "Completa este campo con tu información."]
+                lines = [
+                    f"### Paso {current_step + 1}: {next_field}",
+                    "",
+                    "Completa este campo con tu información.",
+                ]
             else:
-                lines = ["### Revisión Final", "", "Has completado todos los campos. Revisa y confirma:", ""]
+                lines = [
+                    "### Revisión Final",
+                    "",
+                    "Has completado todos los campos. Revisa y confirma:",
+                    "",
+                ]
                 for field_name, value in saved_fields.items():
                     lines.append(f"- **{field_name}:** {value}")
                 lines.append("")
-                lines.append("Responde 'confirmar' para guardar el worksheet como completado.")
+                lines.append(
+                    "Responde 'confirmar' para guardar el worksheet como completado."
+                )
 
             return {
                 "output": "\n".join(lines),
-                "artifacts": {"worksheet": worksheet, "current_step": current_step, "total_steps": total_steps, "state_path": str(state_path)},
+                "artifacts": {
+                    "worksheet": worksheet,
+                    "current_step": current_step,
+                    "total_steps": total_steps,
+                    "state_path": str(state_path),
+                },
                 "errors": [],
             }
 
@@ -277,9 +376,15 @@ def run(context: dict) -> dict:
         ws_name = context.get("worksheet_name", "")
         worksheet = find_worksheet(ws_name, base)
         if not worksheet:
-            return {"output": "", "artifacts": {}, "errors": [f"Worksheet '{ws_name}' no encontrado"]}
+            return {
+                "output": "",
+                "artifacts": {},
+                "errors": [f"Worksheet '{ws_name}' no encontrado"],
+            }
 
-        state_path = base / ".scaleup" / "my-company" / "worksheets" / f"{worksheet['id']}.yaml"
+        state_path = (
+            base / ".scaleup" / "my-company" / "worksheets" / f"{worksheet['id']}.yaml"
+        )
         state = read_yaml(state_path)
         fields = state.get("fields", {})
 
@@ -294,6 +399,23 @@ def run(context: dict) -> dict:
         ensure_dir(state_path.parent)
         write_yaml(state_path, completed_data)
 
-        return {"output": f"✅ **{worksheet['name']}** guardado como completado.", "artifacts": {"worksheet": worksheet, "completed_data": completed_data, "state_path": str(state_path)}, "errors": []}
+        return {
+            "output": f"✅ **{worksheet['name']}** guardado como completado.",
+            "artifacts": {
+                "worksheet": worksheet,
+                "completed_data": completed_data,
+                "state_path": str(state_path),
+            },
+            "errors": [],
+        }
 
     return {"output": "", "artifacts": {}, "errors": [f"Unknown action: {action}"]}
+
+
+def _main() -> None:
+    """Minimal module entry point for ``python -m coaching.worksheet``."""
+    result = run({})
+    if result.get("output"):
+        print(result["output"])
+    for error in result.get("errors", []):
+        print(error)

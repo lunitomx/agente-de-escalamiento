@@ -1,6 +1,7 @@
 """
 Quality gate: validate welcome/onboarding profile completeness.
 """
+
 from pathlib import Path
 import yaml
 
@@ -41,7 +42,12 @@ def validate_company_profile(profile_path: Path) -> list[str]:
 
 if __name__ == "__main__":
     import sys
-    path = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(".scaleup/agent/memory/company-profile.yaml")
+
+    path = (
+        Path(sys.argv[1])
+        if len(sys.argv) > 1
+        else Path(".scaleup/agent/memory/company-profile.yaml")
+    )
     errors = validate_company_profile(path)
     if errors:
         print("VALIDATION FAILED:")

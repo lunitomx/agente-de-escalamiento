@@ -2,7 +2,10 @@
 
 No I/O. Accepts answers dict, returns structured diagnosis dict.
 """
+
 from __future__ import annotations
+
+from typing import Any
 
 DECISIONS = ["people", "strategy", "execution", "cash"]
 
@@ -17,7 +20,7 @@ SCORE_LABELS = {
 }
 
 
-def validate_scores(scores: dict) -> list[str]:
+def validate_scores(scores: dict[str, Any]) -> list[str]:
     errors = []
     for dec in DECISIONS:
         val = scores.get(dec)
@@ -26,19 +29,21 @@ def validate_scores(scores: dict) -> list[str]:
         elif not isinstance(val, int):
             errors.append(f"{dec} score must be integer, got: {type(val).__name__}")
         elif val < SCORE_RANGE[0] or val > SCORE_RANGE[1]:
-            errors.append(f"{dec} score out of range ({SCORE_RANGE[0]}-{SCORE_RANGE[1]}): {val}")
+            errors.append(
+                f"{dec} score out of range ({SCORE_RANGE[0]}-{SCORE_RANGE[1]}): {val}"
+            )
     return errors
 
 
-def calculate_focus(scores: dict) -> str:
+def calculate_focus(scores: dict[str, Any]) -> str:
     valid = {k: v for k, v in scores.items() if k in DECISIONS and isinstance(v, int)}
     if not valid:
         return "people"
-    return min(valid, key=valid.get)
+    return min(valid, key=lambda decision: valid[decision])
 
 
-def build_diagnosis(data: dict) -> dict:
-    scores = {}
+def build_diagnosis(data: dict[str, Any]) -> dict[str, Any]:
+    scores: dict[str, int] = {}
     for dec in DECISIONS:
         val = data.get(dec)
         if isinstance(val, int):
@@ -59,7 +64,9 @@ def build_diagnosis(data: dict) -> dict:
             "total": total,
             "average": round(avg, 1),
             "lowest": focus,
-            "highest": max(scores, key=scores.get) if scores else "",
+            "highest": max(scores, key=lambda decision: scores[decision])
+            if scores
+            else "",
         },
         "labels": {dec: SCORE_LABELS.get(s, "") for dec, s in scores.items()},
     }

@@ -1,6 +1,7 @@
 """
 Router module — deterministic routing to decision sub-agents.
 """
+
 from ..core import read_yaml
 from pathlib import Path
 
@@ -52,16 +53,39 @@ def run(context: dict) -> dict:
     scores = context.get("scores", profile.get("scores", {}))
 
     if action == "list":
-        lines = ["## Sub-agentes Disponibles", "", "| Sub-agente | Comando | Score |", "|------------|---------|-------|"]
+        lines = [
+            "## Sub-agentes Disponibles",
+            "",
+            "| Sub-agente | Comando | Score |",
+            "|------------|---------|-------|",
+        ]
         for dec_key in PRIORITY_ORDER:
             score = scores.get(dec_key, "—")
-            lines.append(f"| {SUB_AGENT_LABELS[dec_key]} | `{SUB_AGENT_COMMANDS[dec_key]}` | {score} |")
-        lines.extend(["", "Para ir a un sub-agente específico, usa su comando directamente.", "O corre `/scaleup-diagnose` para que el router decida por ti."])
-        return {"output": "\n".join(lines), "artifacts": {"sub_agents": list(SUB_AGENT_COMMANDS.keys())}, "errors": []}
+            lines.append(
+                f"| {SUB_AGENT_LABELS[dec_key]} | `{SUB_AGENT_COMMANDS[dec_key]}` | {score} |"
+            )
+        lines.extend(
+            [
+                "",
+                "Para ir a un sub-agente específico, usa su comando directamente.",
+                "O corre `/scaleup-diagnose` para que el router decida por ti.",
+            ]
+        )
+        return {
+            "output": "\n".join(lines),
+            "artifacts": {"sub_agents": list(SUB_AGENT_COMMANDS.keys())},
+            "errors": [],
+        }
 
     elif action == "route":
         if not scores:
-            return {"output": "", "artifacts": {}, "errors": ["No hay scores de diagnóstico. Corre `/scaleup-diagnose` primero."]}
+            return {
+                "output": "",
+                "artifacts": {},
+                "errors": [
+                    "No hay scores de diagnóstico. Corre `/scaleup-diagnose` primero."
+                ],
+            }
 
         explicit = context.get("explicit_request", "").lower()
         if explicit and explicit in SUB_AGENT_COMMANDS:
@@ -71,16 +95,55 @@ def run(context: dict) -> dict:
             target = detect_priority(scores)
             reason = f"Score más bajo ({scores.get(target, '?')}/5)"
 
-        lines = [f"## Routing: {SUB_AGENT_LABELS[target]}", "", f"**Razón:** {reason}", "", f"Usa `{SUB_AGENT_COMMANDS[target]}` para empezar.", "", "### Resumen de Scores", "| Decisión | Score |", "|----------|-------|"]
+        lines = [
+            f"## Routing: {SUB_AGENT_LABELS[target]}",
+            "",
+            f"**Razón:** {reason}",
+            "",
+            f"Usa `{SUB_AGENT_COMMANDS[target]}` para empezar.",
+            "",
+            "### Resumen de Scores",
+            "| Decisión | Score |",
+            "|----------|-------|",
+        ]
         for dec_key in PRIORITY_ORDER:
             score = scores.get(dec_key, "—")
-            lines.append(f"| {SUB_AGENT_LABELS[dec_key]} | {score}{' ⬅' if dec_key == target else ''} |")
+            lines.append(
+                f"| {SUB_AGENT_LABELS[dec_key]} | {score}{' ⬅' if dec_key == target else ''} |"
+            )
 
-        return {"output": "\n".join(lines), "artifacts": {"target_decision": target, "target_command": SUB_AGENT_COMMANDS[target], "reason": reason, "scores": scores}, "errors": []}
+        return {
+            "output": "\n".join(lines),
+            "artifacts": {
+                "target_decision": target,
+                "target_command": SUB_AGENT_COMMANDS[target],
+                "reason": reason,
+                "scores": scores,
+            },
+            "errors": [],
+        }
 
     elif action == "status":
         current = profile.get("focus", {}).get("current_decision")
-        lines = ["## Estado de Sub-agentes", "", "Última decisión trabajada: " + (current or "Ninguna"), ""]
-        return {"output": "\n".join(lines), "artifacts": {"current_decision": current}, "errors": []}
+        lines = [
+            "## Estado de Sub-agentes",
+            "",
+            "Última decisión trabajada: " + (current or "Ninguna"),
+            "",
+        ]
+        return {
+            "output": "\n".join(lines),
+            "artifacts": {"current_decision": current},
+            "errors": [],
+        }
 
     return {"output": "", "artifacts": {}, "errors": [f"Unknown action: {action}"]}
+
+
+def _main() -> None:
+    """Minimal module entry point for ``python -m coaching.router``."""
+    result = run({})
+    if result.get("output"):
+        print(result["output"])
+    for error in result.get("errors", []):
+        print(error)

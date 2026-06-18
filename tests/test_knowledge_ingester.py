@@ -8,7 +8,6 @@ Validates that the KnowledgeIngester:
   - Stores entity properties correctly (description, keywords, line_refs in properties dict)
 """
 
-import json
 import sys
 import uuid
 from pathlib import Path
@@ -149,9 +148,7 @@ class TestKnowledgeIngester:
         """ingest_all should create memory facts for each entity."""
         ingester.ingest_all(json_path=str(JSON_PATH))
 
-        facts = ingester.memory_engine.search_facts(
-            "", category="book_knowledge"
-        )
+        facts = ingester.memory_engine.search_facts("", category="book_knowledge")
         assert len(facts) >= 42  # At least one fact per entity
 
         # Each fact should reference an entity name

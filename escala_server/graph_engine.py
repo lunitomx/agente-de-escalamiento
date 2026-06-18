@@ -174,7 +174,9 @@ class GraphEngine:
                         "id": row["eid"],
                         "type": row["etype"],
                         "name": row["ename"],
-                        "properties": json.loads(row["eproperties"]) if row["eproperties"] else {},
+                        "properties": json.loads(row["eproperties"])
+                        if row["eproperties"]
+                        else {},
                     }
 
                     result.append(

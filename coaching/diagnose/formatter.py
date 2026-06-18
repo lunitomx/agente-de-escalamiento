@@ -2,6 +2,7 @@
 
 No I/O. Accepts structured diagnosis dict, returns markdown string.
 """
+
 from __future__ import annotations
 
 
@@ -17,22 +18,26 @@ def format_diagnosis(diagnosis: dict) -> str:
         lines.append(f"- **{dec.capitalize()}:** {score}/5 {bar} ({label})")
 
     summary = diagnosis.get("summary", {})
-    lines.extend([
-        "",
-        f"**Average:** {summary.get('average', 0)}/5",
-        f"**Strongest:** {summary.get('highest', '').capitalize()}",
-        f"**Weakest:** {summary.get('lowest', '').capitalize()}",
-    ])
+    lines.extend(
+        [
+            "",
+            f"**Average:** {summary.get('average', 0)}/5",
+            f"**Strongest:** {summary.get('highest', '').capitalize()}",
+            f"**Weakest:** {summary.get('lowest', '').capitalize()}",
+        ]
+    )
 
     focus = diagnosis.get("focus", {})
     if focus.get("decision"):
-        lines.extend([
-            "",
-            f"### Recommended Focus: **{focus['decision'].capitalize()}**",
-            "",
-            f"Your lowest score is in **{focus['decision'].capitalize()}** ({focus.get('label', '')}). "
-            "Focus coaching sessions on this decision to build your foundation.",
-        ])
+        lines.extend(
+            [
+                "",
+                f"### Recommended Focus: **{focus['decision'].capitalize()}**",
+                "",
+                f"Your lowest score is in **{focus['decision'].capitalize()}** ({focus.get('label', '')}). "
+                "Focus coaching sessions on this decision to build your foundation.",
+            ]
+        )
 
     lines.append("")
     return "\n".join(lines)

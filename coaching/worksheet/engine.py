@@ -2,6 +2,7 @@
 
 No I/O. Accepts worksheet data and registry, returns structured worksheet dict.
 """
+
 from __future__ import annotations
 
 
@@ -18,7 +19,9 @@ def list_worksheets(registry: list[dict], decision: str | None = None) -> list[d
     return list(registry)
 
 
-def check_prerequisites(registry: list[dict], worksheet_id: str, completed: set[str]) -> list[str]:
+def check_prerequisites(
+    registry: list[dict], worksheet_id: str, completed: set[str]
+) -> list[str]:
     ws = find_worksheet(registry, worksheet_id)
     if not ws:
         return [f"Worksheet not found: {worksheet_id}"]

@@ -20,8 +20,8 @@ Las 7 palancas:
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from decimal import Decimal, ROUND_HALF_UP
+from dataclasses import dataclass
+from decimal import Decimal
 from enum import Enum
 from typing import Any
 
@@ -42,49 +42,49 @@ LEVER_META: dict[str, dict[str, Any]] = {
     "price": {
         "label": "Precio",
         "type": "pct",
-        "improvement_dir": "up",      # +1% = mejora (subir precio)
+        "improvement_dir": "up",  # +1% = mejora (subir precio)
         "difficulty": 3,
         "time": "2-4 semanas",
     },
     "volume": {
         "label": "Volumen",
         "type": "pct",
-        "improvement_dir": "up",      # +1% = mejora (vender más)
+        "improvement_dir": "up",  # +1% = mejora (vender más)
         "difficulty": 4,
         "time": "1-3 meses",
     },
     "cogs": {
         "label": "COGS (Costo de Ventas)",
         "type": "pct",
-        "improvement_dir": "down",    # -1% = mejora (reducir costo)
+        "improvement_dir": "down",  # -1% = mejora (reducir costo)
         "difficulty": 3,
         "time": "1-2 meses",
     },
     "opex": {
         "label": "Gastos Operativos",
         "type": "pct",
-        "improvement_dir": "down",    # -1% = mejora (gastar menos)
+        "improvement_dir": "down",  # -1% = mejora (gastar menos)
         "difficulty": 2,
         "time": "2-6 semanas",
     },
     "ar_days": {
         "label": "Cuentas por Cobrar (DSO)",
         "type": "day",
-        "improvement_dir": "down",    # -1 día = mejora (cobrar más rápido)
+        "improvement_dir": "down",  # -1 día = mejora (cobrar más rápido)
         "difficulty": 2,
         "time": "2-4 semanas",
     },
     "inv_days": {
         "label": "Inventario (DIO)",
         "type": "day",
-        "improvement_dir": "down",    # -1 día = mejora (menos inventario)
+        "improvement_dir": "down",  # -1 día = mejora (menos inventario)
         "difficulty": 3,
         "time": "1-3 meses",
     },
     "ap_days": {
         "label": "Cuentas por Pagar (DPO)",
         "type": "day",
-        "improvement_dir": "up",      # +1 día = mejora (pagar más tarde)
+        "improvement_dir": "up",  # +1 día = mejora (pagar más tarde)
         "difficulty": 2,
         "time": "2-8 semanas",
     },
@@ -94,13 +94,14 @@ LEVER_META: dict[str, dict[str, Any]] = {
 @dataclass
 class FinancialInputs:
     """Datos financieros de entrada para el cálculo de las 7 palancas."""
-    net_sales: Decimal          # Ventas netas (anuales)
-    cost_of_goods_sold: Decimal # COGS (anual)
-    total_opex: Decimal         # Gastos operativos (anual)
-    accounts_receivable: Decimal # Cuentas por cobrar
-    inventory: Decimal          # Inventario
-    accounts_payable: Decimal   # Cuentas por pagar
-    net_profit: Decimal         # Utilidad neta (anual)
+
+    net_sales: Decimal  # Ventas netas (anuales)
+    cost_of_goods_sold: Decimal  # COGS (anual)
+    total_opex: Decimal  # Gastos operativos (anual)
+    accounts_receivable: Decimal  # Cuentas por cobrar
+    inventory: Decimal  # Inventario
+    accounts_payable: Decimal  # Cuentas por pagar
+    net_profit: Decimal  # Utilidad neta (anual)
 
     @classmethod
     def from_dict(cls, data: dict) -> FinancialInputs:
@@ -130,14 +131,14 @@ class FinancialInputs:
 class LeverImpact:
     lever: str
     label: str
-    improvement_pct: float       # ej: 1.0 = 1%
-    improvement_days: int        # ej: 1 = 1 día (solo para type=day)
+    improvement_pct: float  # ej: 1.0 = 1%
+    improvement_days: int  # ej: 1 = 1 día (solo para type=day)
     current_value: float
     improved_value: float
-    cash_impact: float           # Impacto en cash flow ($)
-    ebit_impact: float           # Impacto en EBIT ($)
-    direction: str               # "up" o "down"
-    difficulty: int               # 1-5
+    cash_impact: float  # Impacto en cash flow ($)
+    ebit_impact: float  # Impacto en EBIT ($)
+    direction: str  # "up" o "down"
+    difficulty: int  # 1-5
     time: str
 
 
@@ -147,8 +148,8 @@ class PowerOfOneResult:
     impacts: list[LeverImpact]
     combined_cash_impact: float
     combined_ebit_impact: float
-    metrics: dict[str, float]    # DSO, DIO, DPO, CCC, margen, etc.
-    priorities: list[dict]       # Palancas ordenadas por impacto/dificultad
+    metrics: dict[str, float]  # DSO, DIO, DPO, CCC, margen, etc.
+    priorities: list[dict]  # Palancas ordenadas por impacto/dificultad
 
 
 class PowerOfOneEngine:
@@ -184,21 +185,26 @@ class PowerOfOneEngine:
         daily_cogs = inputs.cost_of_goods_sold / self.days_per_year
 
         # Métricas base
-        dso = (inputs.accounts_receivable / daily_sales) if daily_sales > 0 else Decimal("0")
+        dso = (
+            (inputs.accounts_receivable / daily_sales)
+            if daily_sales > 0
+            else Decimal("0")
+        )
         dio = (inputs.inventory / daily_cogs) if daily_cogs > 0 else Decimal("0")
         dpo = (inputs.accounts_payable / daily_cogs) if daily_cogs > 0 else Decimal("0")
         ccc = dso + dio - dpo
         contribution_margin = (
             (inputs.net_sales - inputs.cost_of_goods_sold) / inputs.net_sales
-            if inputs.net_sales > 0 else Decimal("0")
+            if inputs.net_sales > 0
+            else Decimal("0")
         )
         profit_margin = (
             inputs.net_profit / inputs.net_sales * 100
-            if inputs.net_sales > 0 else Decimal("0")
+            if inputs.net_sales > 0
+            else Decimal("0")
         )
 
         impacts: list[LeverImpact] = []
-        base_revenue = float(inputs.net_sales)
 
         for lever_id, meta in LEVER_META.items():
             adj = adjustments.get(lever_id, 0)
@@ -210,7 +216,6 @@ class PowerOfOneEngine:
             pct_change = Decimal(str(abs_adj)) / Decimal("100")
 
             if meta["type"] == "pct":
-
                 if lever_id == "price":
                     # +1% precio → impacto = ventas × 1% (volumen constante)
                     delta = inputs.net_sales * pct_change
@@ -227,7 +232,7 @@ class PowerOfOneEngine:
                     # -1% COGS → ahorro directo
                     delta = inputs.cost_of_goods_sold * pct_change
                     if is_improvement:
-                        cf = float(delta)   # reducción COGS = cash positivo
+                        cf = float(delta)  # reducción COGS = cash positivo
                         ebit = float(delta)
                     else:
                         cf = -float(delta)
@@ -276,19 +281,21 @@ class PowerOfOneEngine:
                     else:
                         cf, ebit = 0.0, 0.0
 
-            impacts.append(LeverImpact(
-                lever=lever_id,
-                label=meta["label"],
-                improvement_pct=float(pct_change) if meta["type"] == "pct" else 0.0,
-                improvement_days=abs_adj if meta["type"] == "day" else 0,
-                current_value=0.0,
-                improved_value=0.0,
-                cash_impact=round(cf, 2),
-                ebit_impact=round(ebit, 2),
-                direction=meta["improvement_dir"],
-                difficulty=meta["difficulty"],
-                time=meta["time"],
-            ))
+            impacts.append(
+                LeverImpact(
+                    lever=lever_id,
+                    label=meta["label"],
+                    improvement_pct=float(pct_change) if meta["type"] == "pct" else 0.0,
+                    improvement_days=abs_adj if meta["type"] == "day" else 0,
+                    current_value=0.0,
+                    improved_value=0.0,
+                    cash_impact=round(cf, 2),
+                    ebit_impact=round(ebit, 2),
+                    direction=meta["improvement_dir"],
+                    difficulty=meta["difficulty"],
+                    time=meta["time"],
+                )
+            )
 
         # Combinado
         total_cf = round(sum(i.cash_impact for i in impacts), 2)
@@ -308,7 +315,9 @@ class PowerOfOneEngine:
                 "impact": round(i.cash_impact + i.ebit_impact, 2),
                 "difficulty": i.difficulty,
                 "time": i.time,
-                "score": round((i.cash_impact + i.ebit_impact) / max(i.difficulty, 1), 2),
+                "score": round(
+                    (i.cash_impact + i.ebit_impact) / max(i.difficulty, 1), 2
+                ),
             }
             for rank, i in enumerate(scored, 1)
         ]

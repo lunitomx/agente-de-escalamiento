@@ -31,7 +31,6 @@ Usage::
 from __future__ import annotations
 
 import json
-import re
 import time
 import uuid
 from datetime import datetime, timezone
@@ -40,9 +39,9 @@ from typing import Any
 
 import sqlite3
 
-_TRUST_DECAY_RATE = 0.01       # per week since last update
+_TRUST_DECAY_RATE = 0.01  # per week since last update
 _TRUST_MIN_VISIBLE = 0.1
-_DECAY_SECONDS = 7 * 86400     # one week in seconds
+_DECAY_SECONDS = 7 * 86400  # one week in seconds
 
 
 class MemoryEngine:
@@ -302,9 +301,9 @@ class MemoryEngine:
             try:
                 # SQLite datetime → epoch seconds
                 updated_dt = datetime.strptime(updated_str, "%Y-%m-%d %H:%M:%S")
-                age_seconds = now_ts - updated_dt.replace(
-                    tzinfo=timezone.utc
-                ).timestamp()
+                age_seconds = (
+                    now_ts - updated_dt.replace(tzinfo=timezone.utc).timestamp()
+                )
             except (ValueError, OSError):
                 continue
 
@@ -339,9 +338,7 @@ def _resolve_path(db_path: str) -> str:
     return str(Path(db_path).resolve())
 
 
-def _fact_row_to_dict(
-    row: sqlite3.Row, data: dict[str, Any]
-) -> dict[str, Any]:
+def _fact_row_to_dict(row: sqlite3.Row, data: dict[str, Any]) -> dict[str, Any]:
     return {
         "id": row["id"],
         "key": row["key"],

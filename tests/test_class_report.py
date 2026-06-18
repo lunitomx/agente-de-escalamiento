@@ -23,8 +23,16 @@ class TestGenerateReport:
 
         # Save some patterns and deltas
         patterns = [
-            Pattern(type="theme", label="estrategia corporativa", evidence="estrategia mencionada 5 veces"),
-            Pattern(type="decision", label="compromiso", evidence="compromiso de hablar con cliente"),
+            Pattern(
+                type="theme",
+                label="estrategia corporativa",
+                evidence="estrategia mencionada 5 veces",
+            ),
+            Pattern(
+                type="decision",
+                label="compromiso",
+                evidence="compromiso de hablar con cliente",
+            ),
         ]
         save_patterns(bundle, patterns)
 
@@ -53,7 +61,9 @@ class TestGenerateReport:
     def test_header_has_class_info(self) -> None:
         t = Path("/tmp/test_header_info.txt")
         t.write_text("transcript", encoding="utf-8")
-        bundle = ingest_class(transcript_path=str(t), title="Header Test", date="2026-06-02")
+        bundle = ingest_class(
+            transcript_path=str(t), title="Header Test", date="2026-06-02"
+        )
         header = _render_header(bundle)
         assert "Header Test" in header
         assert "Class ID" in header
@@ -62,15 +72,22 @@ class TestGenerateReport:
     def test_empty_patterns_shows_no_patterns(self) -> None:
         t = Path("/tmp/test_empty_patterns.txt")
         t.write_text("transcript", encoding="utf-8")
-        bundle = ingest_class(transcript_path=str(t), title="Empty Patterns", date="2026-06-02")
+        bundle = ingest_class(
+            transcript_path=str(t), title="Empty Patterns", date="2026-06-02"
+        )
         patterns_section = _render_patterns(bundle)
         assert "Total patterns:" in patterns_section
-        assert "No patterns extracted" in patterns_section or "0" in patterns_section.split("Total patterns:")[1][:5]
+        assert (
+            "No patterns extracted" in patterns_section
+            or "0" in patterns_section.split("Total patterns:")[1][:5]
+        )
 
     def test_report_three_sections(self) -> None:
         t = Path("/tmp/test_three_sections.txt")
         t.write_text("transcript", encoding="utf-8")
-        bundle = ingest_class(transcript_path=str(t), title="Three Sections", date="2026-06-02")
+        bundle = ingest_class(
+            transcript_path=str(t), title="Three Sections", date="2026-06-02"
+        )
 
         patterns = [Pattern(type="theme", label="tema de prueba", evidence="prueba")]
         save_patterns(bundle, patterns)
@@ -93,7 +110,9 @@ class TestGenerateReport:
     def test_delta_shows_priority_and_skill(self) -> None:
         t = Path("/tmp/test_delta_shows.txt")
         t.write_text("transcript", encoding="utf-8")
-        bundle = ingest_class(transcript_path=str(t), title="Delta Show", date="2026-06-02")
+        bundle = ingest_class(
+            transcript_path=str(t), title="Delta Show", date="2026-06-02"
+        )
 
         deltas = [
             SkillDelta(

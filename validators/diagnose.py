@@ -1,13 +1,17 @@
 """
 Quality gate: validate diagnosis scores.
 """
+
 from pathlib import Path
+from typing import Optional
 import yaml
 
 VALID_DECISIONS = ["people", "strategy", "execution", "cash"]
 
 
-def validate_diagnosis_scores(profile_path: Path, required_decisions: list[str] = None) -> list[str]:
+def validate_diagnosis_scores(
+    profile_path: Path, required_decisions: Optional[list[str]] = None
+) -> list[str]:
     """
     Validate diagnosis scores in company profile.
     Returns list of errors (empty = valid).
@@ -47,7 +51,12 @@ def validate_diagnosis_scores(profile_path: Path, required_decisions: list[str] 
 
 if __name__ == "__main__":
     import sys
-    path = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(".scaleup/agent/memory/company-profile.yaml")
+
+    path = (
+        Path(sys.argv[1])
+        if len(sys.argv) > 1
+        else Path(".scaleup/agent/memory/company-profile.yaml")
+    )
     errors = validate_diagnosis_scores(path)
     if errors:
         print("VALIDATION FAILED:")

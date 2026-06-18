@@ -18,7 +18,11 @@ def main():
     parser = argparse.ArgumentParser(description="Escala Server")
     parser.add_argument("--host", default="localhost", help="Host to bind to")
     parser.add_argument("--port", type=int, default=8080, help="Port to bind to")
-    parser.add_argument("--static-root", default="escala_server/static", help="Static files root directory")
+    parser.add_argument(
+        "--static-root",
+        default="escala_server/static",
+        help="Static files root directory",
+    )
     parser.add_argument(
         "--db-path",
         default=default_db,

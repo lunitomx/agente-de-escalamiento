@@ -2,6 +2,7 @@
 
 No I/O. Accepts progress dict, returns markdown string.
 """
+
 from __future__ import annotations
 
 DECISIONS = ["people", "strategy", "execution", "cash"]
@@ -19,11 +20,13 @@ def format_progress(progress: dict, suggestion: dict | None = None) -> str:
         else:
             lines.append(f"- **{dec.capitalize()}:** —")
 
-    lines.extend([
-        "",
-        f"**Average Score:** {progress.get('average_score', 0)}/5",
-        f"**Worksheets:** {progress.get('worksheets_completed', 0)}/{progress.get('worksheets_total', 0)} ({progress.get('completion_pct', 0)}%)",
-    ])
+    lines.extend(
+        [
+            "",
+            f"**Average Score:** {progress.get('average_score', 0)}/5",
+            f"**Worksheets:** {progress.get('worksheets_completed', 0)}/{progress.get('worksheets_total', 0)} ({progress.get('completion_pct', 0)}%)",
+        ]
+    )
 
     focus = progress.get("focus")
     if focus:
@@ -35,10 +38,14 @@ def format_progress(progress: dict, suggestion: dict | None = None) -> str:
         if action == "diagnose":
             lines.append("Run `/scaleup-diagnose` to get your baseline scores.")
         elif action == "worksheet":
-            lines.append(f"Run `/scaleup-worksheet {suggestion['worksheet_id']}` — {suggestion.get('worksheet_name', '')}")
+            lines.append(
+                f"Run `/scaleup-worksheet {suggestion['worksheet_id']}` — {suggestion.get('worksheet_name', '')}"
+            )
             lines.append(f"*Reason: {suggestion.get('reason', '')}*")
         elif action == "coaching":
-            lines.append(f"Run `/scaleup-{suggestion['decision']}` for deep coaching on {suggestion['decision'].capitalize()}.")
+            lines.append(
+                f"Run `/scaleup-{suggestion['decision']}` for deep coaching on {suggestion['decision'].capitalize()}."
+            )
             lines.append(f"*Reason: {suggestion.get('reason', '')}*")
 
     lines.append("")

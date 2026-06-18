@@ -1,14 +1,18 @@
 """Escala HTTP Server — serves static files and API endpoints."""
 
 import json
-import os
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse, parse_qs
 
 from .cors import CORSHandler
-from .handlers import CompaniesHandler, WorksheetsHandler, SessionsHandler, MemoryHandler
+from .handlers import (
+    CompaniesHandler,
+    WorksheetsHandler,
+    SessionsHandler,
+    MemoryHandler,
+)
 from .router import Router
 
 
@@ -181,7 +185,6 @@ def make_server(
     if db_path is None:
         db_path = str(Path.home() / ".escala" / "escala.db")
 
-    from .daos import CompanyDAO
     from .graph_engine import GraphEngine
     from .handlers import WorksheetsHandler, SessionsHandler
     from .knowledge_handler import KnowledgeHandler
@@ -219,24 +222,32 @@ def _build_router() -> Router:
 
     @router.get("/api/companies/{company_id}")
     def get_company(company_id=None):
+        assert company_id is not None
         return EscalaRequestHandler.companies.get_company(company_id)
 
     @router.patch("/api/companies/{company_id}")
     def update_company(company_id=None, payload=None):
+        assert company_id is not None
         return EscalaRequestHandler.companies.update_company(company_id, payload or {})
 
     @router.get("/api/worksheets/{category}/{tool}")
     def get_worksheet(category=None, tool=None):
+        assert category is not None
+        assert tool is not None
         return EscalaRequestHandler.worksheets.get_worksheets(category, tool)
 
     @router.post("/api/worksheets/{category}/{tool}")
     def save_worksheet(category=None, tool=None, payload=None):
+        assert category is not None
+        assert tool is not None
         return EscalaRequestHandler.worksheets.save_worksheet(
             category, tool, payload or {}
         )
 
     @router.get("/api/worksheets/{category}/{tool}/changes")
     def get_worksheet_changes(category=None, tool=None):
+        assert category is not None
+        assert tool is not None
         changes = EscalaRequestHandler.worksheets.get_changes(category, tool)
         return {"data": changes, "status": "ok"}
 
@@ -250,6 +261,7 @@ def _build_router() -> Router:
 
     @router.get("/api/sessions/{session_id}")
     def get_session(session_id=None):
+        assert session_id is not None
         return EscalaRequestHandler.sessions.get_session(session_id)
 
     # ── Memory & Knowledge Graph routes ──────────────────────────
@@ -275,6 +287,7 @@ def _build_router() -> Router:
 
     @router.get("/api/memory/graph/{entity_id}")
     def memory_get_entity(entity_id=None):
+        assert entity_id is not None
         return EscalaRequestHandler.memory.get_entity(int(entity_id))
 
     @router.post("/api/memory/entities")
@@ -290,7 +303,9 @@ def _build_router() -> Router:
     @router.post("/api/knowledge/ingest")
     def knowledge_ingest(payload=None):
         ingester = EscalaRequestHandler.knowledge_ingester
-        json_path = (payload or {}).get("json_path", "escala_server/data/book-knowledge.json")
+        json_path = (payload or {}).get(
+            "json_path", "escala_server/data/book-knowledge.json"
+        )
         result = ingester.ingest_all(json_path=json_path)
         return {"data": result, "status": "ok"}
 

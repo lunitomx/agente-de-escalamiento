@@ -1,4 +1,5 @@
 """Validation for declarative ScaleUp pipeline registries."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -86,7 +87,9 @@ def validate_pipeline_registry(
 
         phase_ids = _validate_phases(pipeline_id, pipeline.get("phases"), skills_root)
         errors.extend(phase_ids["errors"])
-        errors.extend(_validate_gates(pipeline_id, pipeline.get("gates"), phase_ids["ids"]))
+        errors.extend(
+            _validate_gates(pipeline_id, pipeline.get("gates"), phase_ids["ids"])
+        )
 
         for list_key in ("inputs", "stop_conditions", "outputs", "evidence"):
             value = pipeline.get(list_key)
@@ -105,7 +108,10 @@ def _validate_phases(
     phase_ids: set[str] = set()
 
     if not isinstance(phases, list) or not phases:
-        return {"ids": phase_ids, "errors": [f"{pipeline_id}: phases must be non-empty"]}
+        return {
+            "ids": phase_ids,
+            "errors": [f"{pipeline_id}: phases must be non-empty"],
+        }
 
     for index, phase in enumerate(phases):
         if not isinstance(phase, dict):
@@ -117,7 +123,9 @@ def _validate_phases(
 
         missing = _PHASE_REQUIRED - phase.keys()
         if missing:
-            errors.append(f"{prefix}: missing required keys: {', '.join(sorted(missing))}")
+            errors.append(
+                f"{prefix}: missing required keys: {', '.join(sorted(missing))}"
+            )
 
         if phase_id in phase_ids:
             errors.append(f"{pipeline_id}: duplicate phase id: {phase_id}")
@@ -138,7 +146,8 @@ def _validate_phases(
             errors.append(f"{prefix}: invalid inference_budget: {budget!r}")
 
         for text_key in ("context", "output", "evidence", "model_hint"):
-            if not isinstance(phase.get(text_key), str) or not phase.get(text_key).strip():
+            text_value = phase.get(text_key)
+            if not isinstance(text_value, str) or not text_value.strip():
                 errors.append(f"{prefix}: {text_key} must be a non-empty string")
 
     return {"ids": phase_ids, "errors": errors}
@@ -182,7 +191,8 @@ def _validate_gates(
         if gate_type == "code" and not isinstance(gate.get("validator"), str):
             errors.append(f"{pipeline_id}.{name}: code gate requires validator")
 
-        if not isinstance(gate.get("on_fail"), str) or not gate.get("on_fail").strip():
+        on_fail = gate.get("on_fail")
+        if not isinstance(on_fail, str) or not on_fail.strip():
             errors.append(f"{pipeline_id}.{name}: on_fail must be a non-empty string")
 
     return errors
@@ -201,4 +211,3 @@ def _validate_skill_exists(
     skill_path = skills_root / skill_name / "SKILL.md"
     if not skill_path.exists():
         errors.append(f"{owner}: skill not found: {skill_path}")
-

@@ -2,6 +2,7 @@
 
 Code-based validation (ADR-5) — the LLM never evaluates its own output.
 """
+
 from __future__ import annotations
 
 import pathlib
@@ -53,7 +54,9 @@ def validate_session_log(log_path: pathlib.Path) -> list[str]:
     if "duration_minutes" in frontmatter:
         dur = frontmatter["duration_minutes"]
         if not isinstance(dur, int) or dur <= 0:
-            errors.append(f"'duration_minutes' must be a positive integer, got: {dur!r}")
+            errors.append(
+                f"'duration_minutes' must be a positive integer, got: {dur!r}"
+            )
 
     if "decision_focus" in frontmatter:
         focus = frontmatter["decision_focus"]
@@ -76,9 +79,7 @@ def validate_context_bundle(profile_path: pathlib.Path) -> list[str]:
         return [f"Profile not found: {profile_path}"]
 
     try:
-        data: dict[str, Any] = yaml.safe_load(
-            profile_path.read_text(encoding="utf-8")
-        )
+        data: dict[str, Any] = yaml.safe_load(profile_path.read_text(encoding="utf-8"))
     except yaml.YAMLError as exc:
         return [f"Invalid YAML: {exc}"]
 

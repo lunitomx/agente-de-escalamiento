@@ -2,6 +2,7 @@
 
 No I/O. Accepts session data dict, returns structured summary dict.
 """
+
 from __future__ import annotations
 
 

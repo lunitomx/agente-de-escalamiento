@@ -11,6 +11,7 @@ Exit codes:
     0 — file is valid (or pulses list is empty)
     1 — one or more validation errors found
 """
+
 import sys
 from pathlib import Path
 
@@ -32,6 +33,7 @@ def validate_pulse_history(file_path: Path) -> list[str]:
 
     try:
         import yaml
+
         content = file_path.read_text(encoding="utf-8")
         data = yaml.safe_load(content) or {}
     except Exception as e:

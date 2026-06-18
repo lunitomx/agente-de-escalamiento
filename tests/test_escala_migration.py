@@ -4,7 +4,6 @@ Tests the migration from sample YAML data to SQLite.
 Uses the actual .scaleup/ directory in the project as source data.
 """
 
-import json
 import os
 import sqlite3
 import tempfile
@@ -13,8 +12,34 @@ from pathlib import Path
 import pytest
 import yaml
 
-from escala_server.daos import init_db
 from escala_server.migrate import migrate_from_yaml, read_yaml_file
+
+
+def sample_scaleup_root(tmp_path: Path) -> Path:
+    """Create deterministic .scaleup fixture data for migration assertions."""
+    root = tmp_path / ".scaleup"
+    company_dir = root / "my-company"
+    sessions_dir = company_dir / "sessions"
+    worksheet_dir = root / "knowledge" / "strategy" / "worksheets"
+
+    sessions_dir.mkdir(parents=True)
+    worksheet_dir.mkdir(parents=True)
+
+    (company_dir / "profile.md").write_text("# My Company\n", encoding="utf-8")
+    (company_dir / "pulse-history.yaml").write_text(
+        "pulses:\n  - date: 2026-01-01\n    answers:\n      cash: 3\n",
+        encoding="utf-8",
+    )
+    (sessions_dir / "session.md").write_text(
+        "---\ndate: 2026-01-01\n---\nSession notes\n",
+        encoding="utf-8",
+    )
+    (worksheet_dir / "opsp.yaml").write_text(
+        "id: opsp\ntype: worksheet\nname: One Page Strategic Plan\n",
+        encoding="utf-8",
+    )
+
+    return root
 
 
 # ─── Simple YAML Parser Tests ──────────────────────────────────
@@ -59,7 +84,7 @@ class TestSimpleYamlParser:
         assert result == {"items": [], "name": "test"}
 
     def test_quoted_strings(self):
-        text = 'name: "Test Corp"\ndesc: \'A great company\'\n'
+        text = "name: \"Test Corp\"\ndesc: 'A great company'\n"
         result = yaml.safe_load(text)
         assert result == {"name": "Test Corp", "desc": "A great company"}
 
@@ -69,7 +94,9 @@ class TestSimpleYamlParser:
         assert result == {"person": {"name": "John", "age": 30}}
 
     def test_block_scalar(self):
-        text = "summary: >\n  This is a long\n  description that\n  spans multiple lines\n"
+        text = (
+            "summary: >\n  This is a long\n  description that\n  spans multiple lines\n"
+        )
         result = yaml.safe_load(text)
         assert "summary" in result
         assert "description" in result["summary"]
@@ -102,7 +129,12 @@ class TestReadYamlFile:
         """Read a knowledge base YAML file."""
         project_root = Path(__file__).resolve().parent.parent
         yaml_path = (
-            project_root / ".scaleup" / "knowledge" / "strategy" / "concepts" / "brand-promise.yaml"
+            project_root
+            / ".scaleup"
+            / "knowledge"
+            / "strategy"
+            / "concepts"
+            / "brand-promise.yaml"
         )
         if not yaml_path.exists():
             pytest.skip("brand-promise.yaml not found")
@@ -120,13 +152,9 @@ class TestReadYamlFile:
 class TestMigration:
     """Test migration from YAML to SQLite."""
 
-    def test_migration_creates_tables(self):
+    def test_migration_creates_tables(self, tmp_path):
         """Migration initializes the database with required tables."""
-        project_root = Path(__file__).resolve().parent.parent
-        yaml_root = str(project_root / ".scaleup")
-
-        if not Path(yaml_root).is_dir():
-            pytest.skip(".scaleup/ directory not found")
+        yaml_root = str(sample_scaleup_root(tmp_path))
 
         with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as f:
             db_path = f.name
@@ -143,19 +171,15 @@ class TestMigration:
             table_names = {t[0] for t in tables}
             assert "companies" in table_names
             assert "worksheets" in table_names
-            assert "changes" in table_names
+            assert "changes_log" in table_names
             assert "sessions" in table_names
             conn.close()
         finally:
             os.unlink(db_path)
 
-    def test_migration_is_idempotent(self):
+    def test_migration_is_idempotent(self, tmp_path):
         """Running migration twice produces same results."""
-        project_root = Path(__file__).resolve().parent.parent
-        yaml_root = str(project_root / ".scaleup")
-
-        if not Path(yaml_root).is_dir():
-            pytest.skip(".scaleup/ directory not found")
+        yaml_root = str(sample_scaleup_root(tmp_path))
 
         with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as f:
             db_path = f.name
@@ -175,13 +199,9 @@ class TestMigration:
         finally:
             os.unlink(db_path)
 
-    def test_migration_imports_sessions(self):
+    def test_migration_imports_sessions(self, tmp_path):
         """Migration imports session markdown files."""
-        project_root = Path(__file__).resolve().parent.parent
-        yaml_root = str(project_root / ".scaleup")
-
-        if not Path(yaml_root).is_dir():
-            pytest.skip(".scaleup/ directory not found")
+        yaml_root = str(sample_scaleup_root(tmp_path))
 
         with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as f:
             db_path = f.name
@@ -195,13 +215,9 @@ class TestMigration:
         finally:
             os.unlink(db_path)
 
-    def test_migration_imports_worksheets(self):
+    def test_migration_imports_worksheets(self, tmp_path):
         """Migration imports worksheet/knowledge YAML files."""
-        project_root = Path(__file__).resolve().parent.parent
-        yaml_root = str(project_root / ".scaleup")
-
-        if not Path(yaml_root).is_dir():
-            pytest.skip(".scaleup/ directory not found")
+        yaml_root = str(sample_scaleup_root(tmp_path))
 
         with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as f:
             db_path = f.name
@@ -215,13 +231,9 @@ class TestMigration:
         finally:
             os.unlink(db_path)
 
-    def test_migration_writes_log(self):
+    def test_migration_writes_log(self, tmp_path):
         """Migration writes a log file."""
-        project_root = Path(__file__).resolve().parent.parent
-        yaml_root = str(project_root / ".scaleup")
-
-        if not Path(yaml_root).is_dir():
-            pytest.skip(".scaleup/ directory not found")
+        yaml_root = str(sample_scaleup_root(tmp_path))
 
         with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as f:
             db_path = f.name

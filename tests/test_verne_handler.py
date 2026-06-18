@@ -40,7 +40,9 @@ class TestVerneHandler:
 
     def test_ask_execution_question(self, handler):
         """An execution question returns execution category."""
-        result = handler.ask("Necesitamos mejorar nuestra ejecución y tener daily huddle")
+        result = handler.ask(
+            "Necesitamos mejorar nuestra ejecución y tener daily huddle"
+        )
         assert result["status"] == "ok"
         assert result["category"] == "execution"
 
@@ -92,7 +94,6 @@ class TestVerneHandler:
     def test_answer_includes_entity_context(self, handler):
         """Answer references entities from the knowledge graph."""
         result = handler.ask("Explícame el Power of One")
-        answer = result["answer"]
         # Should reference at least the entity found
         assert len(result.get("entities_used", [])) >= 0
 
@@ -142,7 +143,9 @@ class TestVerneHandler:
 
     def test_session_perspective_with_company(self, handler):
         """Company name appears in perspective."""
-        result = handler.session_perspective(category="people", changes_count=3, company="Acme")
+        result = handler.session_perspective(
+            category="people", changes_count=3, company="Acme"
+        )
         assert "Acme" in result["perspective"]
         assert "People" in result["perspective"]
 
@@ -160,7 +163,12 @@ class TestVerneHandler:
 
     def test_board_debate_second_turn(self, handler):
         """Second turn challenges the user's position."""
-        history = [{"user": "Creo que tenemos el equipo para esto", "verne": "... análisis ..."}]
+        history = [
+            {
+                "user": "Creo que tenemos el equipo para esto",
+                "verne": "... análisis ...",
+            }
+        ]
         result = handler.board_debate(
             "Deberíamos abrir una nueva oficina",
             history=history,
@@ -206,7 +214,10 @@ class TestVerneHandler:
         assert "Cash Conversion Cycle" in cash_result.get("answer", "")
 
         people_result = handler.ask("Necesito mejores personas en mi equipo")
-        assert "A-player" in people_result["answer"] or "asiento" in people_result["answer"]
+        assert (
+            "A-player" in people_result["answer"]
+            or "asiento" in people_result["answer"]
+        )
 
     def test_coherence_ask_principles_are_correct(self, handler):
         """Each category returns the correct set of principles."""
@@ -229,13 +240,16 @@ class TestVerneHandler:
             "¿Debo contratar más gente?",
         ]:
             result = handler.ask(question)
-            assert "**Verne:**" in result["answer"], f"Missing Verne voice for: {question}"
+            assert "**Verne:**" in result["answer"], (
+                f"Missing Verne voice for: {question}"
+            )
             assert "?" in result["answer"], f"Missing questions for: {question}"
-            assert "¿Qué vas a hacer" in result["answer"], f"Missing CTA for: {question}"
+            assert "¿Qué vas a hacer" in result["answer"], (
+                f"Missing CTA for: {question}"
+            )
 
     def test_coherence_entities_are_real(self):
         """All 42 entities from the book-knowledge.json are valid."""
-        import json
         with open("escala_server/data/book-knowledge.json") as f:
             data = json.load(f)
         assert data["meta"]["entities_count"] == 42

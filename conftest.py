@@ -1,4 +1,5 @@
 """Ensure .scaleup/ is on sys.path so coaching.* imports resolve from repo root."""
+
 import sys
 from pathlib import Path
 

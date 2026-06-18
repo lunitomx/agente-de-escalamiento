@@ -6,7 +6,6 @@ from decimal import Decimal
 from escala_server.cash import (
     PowerOfOneEngine,
     FinancialInputs,
-    LeverType,
 )
 
 
@@ -17,13 +16,13 @@ class TestPowerOfOneEngine:
         self.engine = PowerOfOneEngine()
         # Datos típicos de una PyME mexicana (~$1M/mes ventas)
         self.inputs = FinancialInputs(
-            net_sales=Decimal("12000000"),       # 12M anual
-            cost_of_goods_sold=Decimal("7200000"), # 60% COGS
-            total_opex=Decimal("3600000"),        # 30% OPEX
-            accounts_receivable=Decimal("1500000"),# $1.5M en cuentas x cobrar
-            inventory=Decimal("600000"),           # $600K inventario
-            accounts_payable=Decimal("800000"),    # $800K cuentas x pagar
-            net_profit=Decimal("1200000"),         # 10% margen
+            net_sales=Decimal("12000000"),  # 12M anual
+            cost_of_goods_sold=Decimal("7200000"),  # 60% COGS
+            total_opex=Decimal("3600000"),  # 30% OPEX
+            accounts_receivable=Decimal("1500000"),  # $1.5M en cuentas x cobrar
+            inventory=Decimal("600000"),  # $600K inventario
+            accounts_payable=Decimal("800000"),  # $800K cuentas x pagar
+            net_profit=Decimal("1200000"),  # 10% margen
         )
 
     def test_calculate_default_1pct(self):
@@ -58,7 +57,13 @@ class TestPowerOfOneEngine:
         assert abs(result.metrics["dpo_days"] - expected_dpo) < 1
 
         # CCC = DSO + DIO - DPO
-        assert abs(result.metrics["ccc_days"] - (expected_dso + expected_dio - expected_dpo)) < 1
+        assert (
+            abs(
+                result.metrics["ccc_days"]
+                - (expected_dso + expected_dio - expected_dpo)
+            )
+            < 1
+        )
 
     def test_negative_adjustment(self):
         """Ajustes negativos (empeorar) deben dar impacto negativo."""
@@ -82,7 +87,9 @@ class TestPowerOfOneEngine:
         result = self.engine.calculate(self.inputs)
 
         scores = [p["score"] for p in result.priorities]
-        assert scores == sorted(scores, reverse=True), "Prioridades deben ir de mayor a menor score"
+        assert scores == sorted(scores, reverse=True), (
+            "Prioridades deben ir de mayor a menor score"
+        )
 
     def test_format_currency(self):
         """Formato de moneda funciona."""

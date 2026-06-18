@@ -2,10 +2,10 @@
 
 Validates company profile schema and renders YAML to markdown views.
 """
+
 from __future__ import annotations
 
 import pathlib
-from datetime import date
 from typing import Any
 
 try:
@@ -42,7 +42,9 @@ def validate_company_profile(profile_path: pathlib.Path) -> list[str]:
             errors.append("company.name is required")
         stage = company.get("growth_stage", "")
         if stage and stage not in _VALID_STAGES:
-            errors.append(f"company.growth_stage must be one of {_VALID_STAGES}, got: {stage!r}")
+            errors.append(
+                f"company.growth_stage must be one of {_VALID_STAGES}, got: {stage!r}"
+            )
         emp = company.get("employees", 0)
         if emp is not None and not isinstance(emp, (int, float)):
             errors.append(f"company.employees must be numeric, got: {emp!r}")
@@ -99,28 +101,32 @@ def render_profile_markdown(profile_path: pathlib.Path) -> str:
     else:
         lines.append("*Sin retos registrados*")
 
-    lines.extend([
-        "",
-        "## Scores de Diagnóstico",
-        "",
-        f"| Decisión | Score |",
-        f"|----------|-------|",
-        f"| People | {scores.get('people', 0)} |",
-        f"| Strategy | {scores.get('strategy', 0)} |",
-        f"| Execution | {scores.get('execution', 0)} |",
-        f"| Cash | {scores.get('cash', 0)} |",
-        "",
-        f"*Último diagnóstico: {scores.get('last_diagnosis', 'pendiente')}*",
-        "",
-    ])
+    lines.extend(
+        [
+            "",
+            "## Scores de Diagnóstico",
+            "",
+            "| Decisión | Score |",
+            "|----------|-------|",
+            f"| People | {scores.get('people', 0)} |",
+            f"| Strategy | {scores.get('strategy', 0)} |",
+            f"| Execution | {scores.get('execution', 0)} |",
+            f"| Cash | {scores.get('cash', 0)} |",
+            "",
+            f"*Último diagnóstico: {scores.get('last_diagnosis', 'pendiente')}*",
+            "",
+        ]
+    )
 
     if history:
-        lines.extend([
-            "## Historial de Diagnósticos",
-            "",
-            "| Fecha | People | Strategy | Execution | Cash |",
-            "|-------|--------|----------|-----------|------|",
-        ])
+        lines.extend(
+            [
+                "## Historial de Diagnósticos",
+                "",
+                "| Fecha | People | Strategy | Execution | Cash |",
+                "|-------|--------|----------|-----------|------|",
+            ]
+        )
         for entry in history:
             lines.append(
                 f"| {entry.get('date', '?')} | {entry.get('people', '?')} | "
@@ -130,14 +136,16 @@ def render_profile_markdown(profile_path: pathlib.Path) -> str:
         lines.append("")
 
     if focus.get("current_decision"):
-        lines.extend([
-            "## Foco Actual",
-            "",
-            f"- **Decisión:** {focus['current_decision']}",
-            f"- **Herramienta:** {focus.get('current_tool', '—')}",
-            f"- **Última sesión:** {focus.get('last_session', '—')}",
-            "",
-        ])
+        lines.extend(
+            [
+                "## Foco Actual",
+                "",
+                f"- **Decisión:** {focus['current_decision']}",
+                f"- **Herramienta:** {focus.get('current_tool', '—')}",
+                f"- **Última sesión:** {focus.get('last_session', '—')}",
+                "",
+            ]
+        )
 
-    lines.append(f"*Generado automáticamente desde company-profile.yaml*")
+    lines.append("*Generado automáticamente desde company-profile.yaml*")
     return "\n".join(lines) + "\n"

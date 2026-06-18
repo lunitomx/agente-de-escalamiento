@@ -71,9 +71,7 @@ class SessionStartOrchestrator:
 
     # ── main entry point ─────────────────────────────────────────
 
-    def start_session(
-        self, company_id: str | None = None
-    ) -> SessionContext:
+    def start_session(self, company_id: str | None = None) -> SessionContext:
         """Load full context and return a SessionContext snapshot.
 
         Steps performed:
@@ -104,9 +102,7 @@ class SessionStartOrchestrator:
         # 2. Last 3 sessions
         all_sessions = self._session_dao.list()
         last_sessions = all_sessions[:3]
-        last_session_date = (
-            last_sessions[0]["created_at"] if last_sessions else None
-        )
+        last_session_date = last_sessions[0]["created_at"] if last_sessions else None
 
         # 3. Relevant memory facts (top 5)
         company_context: dict[str, Any] | None = None
@@ -115,9 +111,7 @@ class SessionStartOrchestrator:
                 "industry": company.get("industry", ""),
                 "name": company.get("name", ""),
             }
-        relevant_facts = self._memory.get_relevant_facts(
-            company_context, limit=5
-        )
+        relevant_facts = self._memory.get_relevant_facts(company_context, limit=5)
 
         # 4. Detect changes since last session
         changes_count = self._count_changes_since(last_session_date)

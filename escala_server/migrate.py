@@ -26,6 +26,8 @@ def read_yaml_file(path: Path) -> Any:
     if path.suffix.lower() == ".json":
         return json.loads(text)
     return yaml.safe_load(text)
+
+
 def migrate_from_yaml(db_path: str, yaml_root: str) -> dict[str, Any]:
     """Import .scaleup/ YAML data into SQLite database.
 
@@ -77,7 +79,9 @@ def migrate_from_yaml(db_path: str, yaml_root: str) -> dict[str, Any]:
     try:
         company_dir = yaml_path / "my-company"
         if not company_dir.is_dir():
-            log_entries.append(f"WARNING: {company_dir} not found, no company data imported")
+            log_entries.append(
+                f"WARNING: {company_dir} not found, no company data imported"
+            )
         else:
             # Import profile
             profile_path = company_dir / "profile.md"
@@ -91,17 +95,21 @@ def migrate_from_yaml(db_path: str, yaml_root: str) -> dict[str, Any]:
                         "profile": profile_text,
                         "source": "profile.md",
                     }
-                    data_json = json.dumps(profile_data, ensure_ascii=False)
+                    data_json = json.dumps(
+                        profile_data, ensure_ascii=False, default=str
+                    )
                     conn.execute(
                         "INSERT OR IGNORE INTO companies (id, name, metadata) VALUES (?, ?, ?)",
                         (company_id, "My Company", data_json),
                     )
                     if conn.total_changes > 0:
                         counts["companies"] += 1
-                        log_entries.append(f"OK: Imported profile.md → company {company_id}")
+                        log_entries.append(
+                            f"OK: Imported profile.md → company {company_id}"
+                        )
                     else:
                         counts["skipped"] += 1
-                        log_entries.append(f"SKIP: profile.md already exists")
+                        log_entries.append("SKIP: profile.md already exists")
                 except Exception as e:
                     counts["errors"] += 1
                     log_entries.append(f"ERROR: profile.md: {e}")
@@ -111,7 +119,7 @@ def migrate_from_yaml(db_path: str, yaml_root: str) -> dict[str, Any]:
             if pulse_path.exists():
                 try:
                     data = read_yaml_file(pulse_path)
-                    data_json = json.dumps(data, ensure_ascii=False)
+                    data_json = json.dumps(data, ensure_ascii=False, default=str)
                     conn.execute(
                         """INSERT OR REPLACE INTO worksheets (category, tool, data)
                            VALUES (?, ?, ?)""",
@@ -130,7 +138,7 @@ def migrate_from_yaml(db_path: str, yaml_root: str) -> dict[str, Any]:
                     try:
                         data = read_yaml_file(ctx_file)
                         tool_name = ctx_file.stem
-                        data_json = json.dumps(data, ensure_ascii=False)
+                        data_json = json.dumps(data, ensure_ascii=False, default=str)
                         conn.execute(
                             """INSERT OR REPLACE INTO worksheets (category, tool, data)
                                VALUES (?, ?, ?)""",
@@ -143,13 +151,16 @@ def migrate_from_yaml(db_path: str, yaml_root: str) -> dict[str, Any]:
                         log_entries.append(f"ERROR: context/{ctx_file.name}: {e}")
 
             # Import quarterly focus and annual goal
-            for fname, tool in [("quarterly-focus.md", "quarterly-focus"), ("annual-goal.md", "annual-goal")]:
+            for fname, tool in [
+                ("quarterly-focus.md", "quarterly-focus"),
+                ("annual-goal.md", "annual-goal"),
+            ]:
                 fpath = company_dir / fname
                 if fpath.exists():
                     try:
                         text = fpath.read_text(encoding="utf-8")
                         data = {"content": text}
-                        data_json = json.dumps(data, ensure_ascii=False)
+                        data_json = json.dumps(data, ensure_ascii=False, default=str)
                         conn.execute(
                             """INSERT OR REPLACE INTO worksheets (category, tool, data)
                                VALUES (?, ?, ?)""",
@@ -167,7 +178,7 @@ def migrate_from_yaml(db_path: str, yaml_root: str) -> dict[str, Any]:
                 try:
                     text = tasks_path.read_text(encoding="utf-8")
                     data = {"content": text}
-                    data_json = json.dumps(data, ensure_ascii=False)
+                    data_json = json.dumps(data, ensure_ascii=False, default=str)
                     conn.execute(
                         """INSERT OR REPLACE INTO worksheets (category, tool, data)
                            VALUES (?, ?, ?)""",
@@ -192,18 +203,26 @@ def migrate_from_yaml(db_path: str, yaml_root: str) -> dict[str, Any]:
                             if len(parts) >= 3:
                                 session_data["frontmatter"] = parts[1].strip()
                                 session_data["body"] = parts[2].strip()
-                        data_json = json.dumps(session_data, ensure_ascii=False)
-                        session_id = hashlib.md5(str(session_file).encode()).hexdigest()[:8]
+                        data_json = json.dumps(
+                            session_data, ensure_ascii=False, default=str
+                        )
+                        session_id = hashlib.md5(
+                            str(session_file).encode()
+                        ).hexdigest()[:8]
                         conn.execute(
                             "INSERT OR IGNORE INTO sessions (id, metadata) VALUES (?, ?)",
                             (session_id, data_json),
                         )
                         if conn.total_changes > 0:
                             counts["sessions"] += 1
-                            log_entries.append(f"OK: Imported sessions/{session_file.name}")
+                            log_entries.append(
+                                f"OK: Imported sessions/{session_file.name}"
+                            )
                         else:
                             counts["skipped"] += 1
-                            log_entries.append(f"SKIP: sessions/{session_file.name} already exists")
+                            log_entries.append(
+                                f"SKIP: sessions/{session_file.name} already exists"
+                            )
                     except Exception as e:
                         counts["errors"] += 1
                         log_entries.append(f"ERROR: sessions/{session_file.name}: {e}")
@@ -218,7 +237,9 @@ def migrate_from_yaml(db_path: str, yaml_root: str) -> dict[str, Any]:
                         try:
                             data = read_yaml_file(ws_file)
                             tool_name = ws_file.stem
-                            data_json = json.dumps(data, ensure_ascii=False)
+                            data_json = json.dumps(
+                                data, ensure_ascii=False, default=str
+                            )
                             conn.execute(
                                 """INSERT OR REPLACE INTO worksheets (category, tool, data)
                                    VALUES (?, ?, ?)""",
