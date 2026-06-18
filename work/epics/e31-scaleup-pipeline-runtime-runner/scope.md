@@ -1,8 +1,9 @@
 ---
 epic_id: "E31"
 title: "ScaleUp Pipeline Runtime / Runner"
-status: "active"
+status: "complete"
 created: "2026-06-16"
+completed: "2026-06-18"
 ---
 
 # E31: ScaleUp Pipeline Runtime / Runner
@@ -35,10 +36,10 @@ Make `.raise/pipelines/scaleup.yaml` operational through a lightweight guided ru
 | S31.3 | Complete | Integration test covers every canonical pipeline and review documents pattern candidates. |
 
 ## Done Criteria
-- Users can run the first guided pipeline workflow from the CLI.
-- Tests cover happy path, unknown pipeline, malformed registry data, stop conditions, and evidence output.
-- Evidence artifacts are deterministic enough to support session close and later audits.
-- The implementation remains smaller than a generic orchestration framework and uses the existing registry contract.
+- [x] Users can run the first guided pipeline workflow from the CLI.
+- [x] Tests cover happy path, unknown pipeline, malformed registry data, stop conditions, and evidence output.
+- [x] Evidence artifacts are deterministic enough to support session close and later audits.
+- [x] The implementation remains smaller than a generic orchestration framework and uses the existing registry contract.
 
 ## Closure Guardrail
 
@@ -48,3 +49,10 @@ reviewed, and the epic Done Criteria are checked with evidence.
 
 Update after S31.3: S31.3 is now complete. E31 may proceed to epic close once
 the Done Criteria are verified against tests and story retrospectives.
+
+## Final Status
+
+Complete. E31 delivers a lightweight guided runner for the canonical ScaleUp
+pipeline registry: list, inspect, guided evidence recording, evidence inspect,
+resume, and integration coverage across every canonical pipeline. It does not
+execute skills automatically or become a generic workflow engine.
