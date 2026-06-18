@@ -1,6 +1,6 @@
 # Epic Scope: E22 — Full System Audit (3 Empresas × Todos los Skills)
 
-**Status:** ✅ COMPLETE (absorbida por E23/E24)
+**Status:** Absorbed/Descoped
 **Dependencies:** E14 (Cash dashboards), E15 (Strategy dashboards), E16 (People dashboards), E17 (Execution dashboards), E21 (Verne)
 **Tamaño:** L
 
@@ -102,6 +102,21 @@ Para cada empresa, se usaron TDDOS los skills disponibles:
 - [ ] M1-M7 resueltos  
 - [ ] Auditoría commiteada en E22
 
+## Absorption map
+
+Corrected status: **Absorbed/Descoped**. E22 produced a valuable audit and
+completed S22.1-S22.9, but the original C/M finding checklist above was not
+closed as written. The retrospective later reclassified the remaining work:
+
+- S22.10 was absorbed by E23/E24 agent-first session identity and post-session
+  evolution work.
+- S22.11 was absorbed by S23.6 agent-based cash skill work.
+- S22.12 was Descoped because server export/logging no longer fit the
+  agent-first architecture.
+
+Legacy tags may point to the historical close, but they do not prove the
+original C1-C6 and M1-M7 checklist was completed literally.
+
 ## Implementation Plan
 
 > Added by `/rai-epic-plan` — 2026-05-30
@@ -184,4 +199,3 @@ M3 (Polish):                   S22.9 ─► S22.10 ─► S22.11 ─► merge
 | S22.4-S22.8: 22 dashboards to wire up | H/H | Power of One como template. Script de generación para los 22. No hacerlos a mano. |
 | DashboardInteractive.init() API puede no ser compatible con worksheet data model | M/M | Inspeccionar el JS existente primero. Adaptar si es necesario. |
 | m2-m4 (logging, export, integraciones) pueden crecer en scope | M/L | Marcar m2-m4 como "nice to have" — no bloquean M3 |
-

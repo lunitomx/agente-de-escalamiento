@@ -1,5 +1,7 @@
 # E10: ScaleUp Cross-Platform Distribution
 
+**Status:** Complete
+
 ## Objective
 
 Construir los core Python coaching engines faltantes y distribuir el sistema ScaleUp completo (skills + knowledge + coaching engine + validators) como un bundle portable que funcione en Claude Code global, Hermes Agent y Codex — sin depender del repo de desarrollo.
@@ -207,6 +209,14 @@ S10.1 → S10.2 → S10.3 → S10.5 → S10.6 → S10.7 → S10.8 → S10.9
 ```
 
 S10.4 (Worksheet) está fuera del critical path — puede retrasarse sin bloquear la distribución.
+
+## Historical Milestones (Legacy backlog)
+
+The milestone checklist below is retained as historical planning context. It is
+not the source of truth for E10 closure because the final closure record is the
+Done Criteria section plus retrospective evidence above. Any unchecked item in
+this legacy section is backlog/documentation context, not a current claim that
+the epic remains open.
 
 ## Milestones
 

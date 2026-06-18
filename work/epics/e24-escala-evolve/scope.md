@@ -1,6 +1,6 @@
 # Epic Scope: E24 — Escala Evolve (Auto-Mejora)
 
-**Status:** ✅ COMPLETE
+**Status:** Partial/Backlog
 **Dependencies:** E23 (Agent-based skills), `~/.escala/memoria/` operativa
 **Tamaño:** M
 
@@ -54,6 +54,17 @@ Un **agente que se mejora a sí mismo**. Cada interacción en Escala deja una hu
 - [ ] Post-sesión automático funciona sin intervención del usuario
 - [ ] Cron semanal envía resumen de hallazgos
 - [ ] Auto-patch con aprobación: genera diff, espera confirmación, aplica, permite rollback
+
+## Governance correction
+
+Corrected status: **Partial/Backlog**. The retrospective claims all five stories
+were completed, but this scope's Done Criteria are all still open and no
+independent evidence is cited here for the weekly cron, post-session automation,
+or approved auto-patch rollback path.
+
+required follow-up: keep E24 as a backlog/partial epic until each criterion is
+proved with file paths, automation evidence, and tests, or split the unfinished
+automation and auto-patch work into new stories.
 
 ## Riesgos
 

@@ -1,5 +1,7 @@
 # Epic Scope: E29 — Governance Repair for Epic Closure Truth
 
+**Status:** Complete
+
 ## Objective
 
 Repair closure truth for the recently audited epic set so completed epics have unambiguous evidence, draft scopes are not misclassified as complete, and pipeline/skill/gate governance is visible without relying on memory or tag-number inference.
@@ -83,3 +85,6 @@ Risk-first.
 ## Final Status
 
 Complete as governance repair. Product work from ignored draft scopes was not implemented or closed; those drafts were explicitly reclassified as backlog candidates.
+
+Closure retrospective evidence: `work/epics/e29-governance-repair/retrospective.md`
+documents the repair boundaries and residual risks added by E32.

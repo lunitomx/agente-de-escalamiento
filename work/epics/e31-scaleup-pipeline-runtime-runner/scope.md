@@ -38,3 +38,9 @@ Make `.raise/pipelines/scaleup.yaml` operational through a lightweight guided ru
 - Tests cover happy path, unknown pipeline, malformed registry data, stop conditions, and evidence output.
 - Evidence artifacts are deterministic enough to support session close and later audits.
 - The implementation remains smaller than a generic orchestration framework and uses the existing registry contract.
+
+## Closure Guardrail
+
+E31 is active. S31.1 and S31.2 are complete as stories, but S31.3 remains
+pending. Do not create or rely on an E31 complete tag until S31.3 is implemented,
+reviewed, and the epic Done Criteria are checked with evidence.
