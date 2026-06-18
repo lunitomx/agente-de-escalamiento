@@ -24,13 +24,14 @@ Make `.raise/pipelines/scaleup.yaml` operational through a lightweight guided ru
 
 ## Planned Stories
 - [x] **S31.1 Guided ScaleUp pipeline runner:** list pipelines, inspect phases/gates/stop conditions, guide a selected run, and write evidence. ✓
-- **S31.2 Evidence and resume hardening:** make run evidence easy to inspect and resilient enough for interrupted sessions.
+- [x] **S31.2 Evidence and resume hardening:** make run evidence easy to inspect and resilient enough for interrupted sessions. ✓
 - **S31.3 Integration review:** validate the runner against the canonical ScaleUp pipelines and document any pattern candidates.
 
 ## Progress
 | Story | Status | Notes |
 | --- | --- | --- |
 | S31.1 | Complete | Guided runner implemented, reviewed, and gates repaired/passed. |
+| S31.2 | Complete | Evidence inspect/resume hardening implemented with append-only events and focused gates passed. |
 
 ## Done Criteria
 - Users can run the first guided pipeline workflow from the CLI.
