@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Mapping, Sequence
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
@@ -28,7 +28,17 @@ class SkillGoldenCase(BaseModel):
     notes: str = Field(min_length=1)
 
 
+class GoldenCaseOutput(BaseModel):
+    """Mapping from a golden case to a deterministic output artifact."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    case_id: str = Field(min_length=1)
+    output_path: Path
+
+
 SkillGoldenCase.model_rebuild()
+GoldenCaseOutput.model_rebuild()
 
 
 def load_golden_cases(fixture_path: Path) -> list[SkillGoldenCase]:
@@ -85,6 +95,67 @@ def validate_golden_case_directory(
         for error in validate_golden_case_file(fixture_path, skills_root):
             errors.append(f"{fixture_path.name}: {error}")
     return errors
+
+
+def validate_golden_case_output(
+    case: SkillGoldenCase,
+    output_text: str,
+) -> list[str]:
+    """Return drift errors for one golden case and output text."""
+    normalized_output = output_text.casefold()
+    errors: list[str] = []
+
+    for section in case.expected_sections:
+        if section.casefold() not in normalized_output:
+            errors.append(f"{case.case_id}: missing expected section: {section}")
+
+    for term in case.required_methodology_terms:
+        if term.casefold() not in normalized_output:
+            errors.append(f"{case.case_id}: missing methodology term: {term}")
+
+    for pattern in case.forbidden_claim_patterns:
+        if pattern.casefold() in normalized_output:
+            errors.append(f"{case.case_id}: forbidden claim pattern found: {pattern}")
+
+    if case.evidence_required and not _has_evidence_behavior(normalized_output):
+        errors.append(f"{case.case_id}: missing evidence behavior")
+
+    return errors
+
+
+def validate_golden_case_output_file(
+    case: SkillGoldenCase,
+    output_path: Path,
+) -> list[str]:
+    """Return drift errors for one golden case output file."""
+    try:
+        output_text = output_path.read_text(encoding="utf-8")
+    except OSError as exc:
+        return [f"{case.case_id}: output file not found: {output_path} ({exc})"]
+    return validate_golden_case_output(case, output_text)
+
+
+def validate_golden_case_output_directory(
+    cases: Sequence[SkillGoldenCase],
+    outputs_dir: Path,
+) -> list[str]:
+    """Return drift errors for outputs named after their case ids."""
+    errors: list[str] = []
+    for case in cases:
+        output_path = outputs_dir / f"{case.case_id}.md"
+        errors.extend(validate_golden_case_output_file(case, output_path))
+    return errors
+
+
+def _has_evidence_behavior(normalized_output: str) -> bool:
+    evidence_markers = (
+        "evidence id",
+        "evidence ids",
+        "citation",
+        "cited",
+        "missing evidence",
+    )
+    return any(marker in normalized_output for marker in evidence_markers)
 
 
 def _format_validation_error(error: Mapping[str, Any]) -> str:
