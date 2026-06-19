@@ -1,0 +1,23 @@
+- quote: "The weekly cash review helped us decide faster."
+  source_type: interview
+  source_label: Founder interview with Maria
+  captured_at: "2026-06-02"
+  context: Cash acceleration follow-up.
+  customer_segment: founder-led services company
+  evidence_tags:
+    - cash
+    - speed
+- quote: "They liked the process."
+  source_type: note
+  customer_segment: founder-led services company
+  evidence_tags:
+    - unclear
+- quote: "The weekly cash review helped us decide faster."
+  source_type: interview
+  source_label: Founder interview with Maria
+  captured_at: "2026-06-02"
+  context: Duplicate raw quote.
+  customer_segment: founder-led services company
+  evidence_tags:
+    - cash
+
