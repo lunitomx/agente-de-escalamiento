@@ -1,0 +1,23 @@
+- case_id: core-people-observed-values-accountability
+  skill: scaleup-people
+  input_context:
+    user_goal: Clarify team accountability and values.
+    observed_behaviors: []
+    existing_people_artifacts: []
+  expected_sections:
+    - Canonical Pipeline
+    - Check Existing Work
+    - Recommend Next Tool
+    - Guide
+  required_methodology_terms:
+    - Function Accountability Chart
+    - Core Values
+    - values_are_observed_not_invented
+    - facchart_has_single_accountable
+  forbidden_claim_patterns:
+    - "your values are"
+    - "everyone owns it"
+    - "A-player guaranteed"
+    - "culture fit"
+  evidence_required: true
+  notes: People must require observed behavior for values and single accountability for functions.

@@ -1,0 +1,23 @@
+- case_id: core-execution-critical-number-rhythm
+  skill: scaleup-execution
+  input_context:
+    user_goal: Improve quarterly execution.
+    current_priorities: []
+    existing_execution_artifacts: []
+  expected_sections:
+    - Canonical Pipeline
+    - Check Existing Work
+    - Recommend Next Tool
+    - Guide
+  required_methodology_terms:
+    - Rockefeller Habits
+    - meeting rhythm
+    - Critical Number
+    - priorities_have_single_critical_number
+  forbidden_claim_patterns:
+    - "all priorities are equally important"
+    - "no owner needed"
+    - "set and forget"
+    - "guaranteed execution"
+  evidence_required: true
+  notes: Execution must force a single Critical Number, rhythm, and accountable ownership before tasking.
