@@ -1,0 +1,26 @@
+- case_id: core-cash-ccc-power-one-operational-analysis
+  skill: scaleup-cash
+  input_context:
+    user_goal: Improve cash flow this quarter.
+    available_cash_inputs:
+      receivables_days: unknown
+      inventory_days: unknown
+      payables_days: unknown
+    existing_cash_artifacts: []
+  expected_sections:
+    - Canonical Pipeline
+    - Check Existing Work
+    - Recommend Next Tool
+    - Guide
+  required_methodology_terms:
+    - Cash Conversion Cycle
+    - Power of One
+    - acceleration moves
+    - ccc_inputs_complete
+  forbidden_claim_patterns:
+    - "financial advice"
+    - "guaranteed cash improvement"
+    - "invest in"
+    - "loan recommendation"
+  evidence_required: true
+  notes: Cash must guide operational CCC analysis and avoid regulated financial advice.

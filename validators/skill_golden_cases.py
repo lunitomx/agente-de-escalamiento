@@ -39,9 +39,21 @@ def load_golden_cases(fixture_path: Path) -> list[SkillGoldenCase]:
     return [SkillGoldenCase.model_validate(item) for item in data]
 
 
+def load_golden_case_directory(fixtures_dir: Path) -> list[SkillGoldenCase]:
+    """Load golden cases from all YAML files in a directory."""
+    fixture_paths = sorted(fixtures_dir.glob("*.yaml"))
+    if not fixture_paths:
+        raise ValueError(f"No golden case YAML files found in {fixtures_dir}")
+
+    cases: list[SkillGoldenCase] = []
+    for fixture_path in fixture_paths:
+        cases.extend(load_golden_cases(fixture_path))
+    return cases
+
+
 def validate_golden_case_file(
     fixture_path: Path,
-    skills_root: Path = Path(".agents/skills"),
+    skills_root: Path = Path(".claude/skills"),
 ) -> list[str]:
     """Return readable validation errors for one golden-case fixture file."""
     try:
@@ -56,6 +68,22 @@ def validate_golden_case_file(
         skill_path = skills_root / case.skill / "SKILL.md"
         if not skill_path.exists():
             errors.append(f"{case.case_id}: skill not found: {case.skill}")
+    return errors
+
+
+def validate_golden_case_directory(
+    fixtures_dir: Path,
+    skills_root: Path = Path(".claude/skills"),
+) -> list[str]:
+    """Return readable validation errors for all YAML fixtures in a directory."""
+    fixture_paths = sorted(fixtures_dir.glob("*.yaml"))
+    if not fixture_paths:
+        return [f"No golden case YAML files found in {fixtures_dir}"]
+
+    errors: list[str] = []
+    for fixture_path in fixture_paths:
+        for error in validate_golden_case_file(fixture_path, skills_root):
+            errors.append(f"{fixture_path.name}: {error}")
     return errors
 
 

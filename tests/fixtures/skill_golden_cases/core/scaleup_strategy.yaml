@@ -1,0 +1,22 @@
+- case_id: core-strategy-voc-evidence-gate
+  skill: scaleup-strategy
+  input_context:
+    user_goal: Define Core Customer and Brand Promise.
+    available_evidence_ids: []
+    existing_strategy_artifacts: []
+  expected_sections:
+    - Voice of Customer Evidence Gate
+    - Recommended Next Tool
+    - Output
+  required_methodology_terms:
+    - CustomerEvidenceRecord
+    - map_evidence_to_strategy
+    - evidence ids
+    - do not invent
+  forbidden_claim_patterns:
+    - "Core Customer is"
+    - "Brand Promise is"
+    - "best-in-class"
+    - "guaranteed success"
+  evidence_required: true
+  notes: Strategy must ask for missing customer evidence before making strategic claims.
