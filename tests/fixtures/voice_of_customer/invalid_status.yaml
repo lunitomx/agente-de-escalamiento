@@ -1,0 +1,12 @@
+- id: voc-003
+  source_type: interview
+  source_label: Customer interview with Luis Perez
+  captured_at: "2026-06-03"
+  context: Follow-up call.
+  quote: "The operating rhythm gave us focus."
+  customer_segment: services company
+  evidence_tags:
+    - execution
+  review_status: complete
+  is_fixture: false
+

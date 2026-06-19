@@ -1,0 +1,9 @@
+- id: voc-002
+  source_type: note
+  quote: "They liked the process."
+  customer_segment: founder-led services company
+  evidence_tags:
+    - unclear
+  review_status: draft
+  is_fixture: false
+

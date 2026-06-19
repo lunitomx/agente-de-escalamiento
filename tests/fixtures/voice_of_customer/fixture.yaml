@@ -1,0 +1,14 @@
+- id: voc-fixture-001
+  source_type: interview
+  source_label: Synthetic strategy workshop fixture
+  captured_at: "2026-06-01"
+  context: Synthetic fixture for validator tests.
+  quote: "The weekly cash review helped us decide faster."
+  customer_segment: fixture company
+  evidence_tags:
+    - cash
+    - speed
+  review_status: approved
+  is_fixture: true
+  notes: Synthetic fixture, not real customer evidence.
+
