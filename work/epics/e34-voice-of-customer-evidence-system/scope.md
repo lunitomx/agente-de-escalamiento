@@ -1,6 +1,6 @@
 # Epic Scope: E34 — Voice of Customer Evidence System
 
-**Status:** Planned
+**Status:** Complete
 **Created:** 2026-06-18
 **Renumbers:** E20 Voice of Customer & Evidence Capture
 **Absorbs:** E19 Strategy Core Skills as S34.4 strategy hardening
@@ -63,14 +63,14 @@ normalize it, and cite it when producing strategy outputs.
 
 ## Done Criteria
 
-- [ ] Evidence records are validated with source, context, date, and review
+- [x] Evidence records are validated with source, context, date, and review
       status.
-- [ ] Strategy outputs cite evidence records or explicitly state missing
+- [x] Strategy outputs cite evidence records or explicitly state missing
       evidence.
-- [ ] Prompt 0-4 hardening is implemented as story work, not claimed from the
+- [x] Prompt 0-4 hardening is implemented as story work, not claimed from the
       old E19 draft.
-- [ ] Tests or validators prove evidence-free claims are blocked or flagged.
-- [ ] Epic retrospective records what evidence was real, synthetic fixture, or
+- [x] Tests or validators prove evidence-free claims are blocked or flagged.
+- [x] Epic retrospective records what evidence was real, synthetic fixture, or
       still missing.
 
 ## Implementation Plan
@@ -104,9 +104,9 @@ Detailed story scopes, acceptance criteria, expected files, and gates live in
 
 ## Tag Action
 
-No complete tag exists or should exist for E34 until implementation stories,
-tests, and retrospective are complete. Old E20/E19 draft folders remain source
-context only.
+E34 is complete for the local evidence-contract scope after S34.5. A complete
+tag is allowed only at the merge/close commit that includes `final-audit.md`,
+`retrospective.md`, and `.raise/evidence/voice-of-customer.md`.
 
 ## Progress
 
@@ -116,4 +116,4 @@ context only.
 | S34.2 Testimonial normalization | Complete | `normalize_raw_quotes`, `RawCustomerQuote`, `NormalizationResult`, `tests/fixtures/voice_of_customer/raw_quotes.yaml`, `stories/s34.2-retrospective.md`; gates passed for scoped tests, lint, format, and types. |
 | S34.3 Voice-to-strategy mapping | Complete | `map_evidence_to_strategy`, `StrategyInput`, `StrategyGap`, `StrategyMappingResult`, `tests/test_voice_of_customer_mapping.py`, `stories/s34.3-retrospective.md`; gates passed for mapping tests, base VoC tests, lint, format, and types. |
 | S34.4 Strategy prompt hardening | Complete | Strategy, OPSP, and 7 Strata skills in `.agents` and `.claude` require `map_evidence_to_strategy`, cited evidence ids, one missing-evidence question at a time, and no invented claims; `tests/test_strategy_voice_of_customer_prompting.py`; `stories/s34.4-retrospective.md`. |
-| S34.5 Evidence library handoff | Pending | Not started. |
+| S34.5 Evidence library handoff | Complete | `.raise/evidence/voice-of-customer.md`, `tests/test_voice_of_customer_handoff.py`, `final-audit.md`, `retrospective.md`; final audit states fixture data is not real customer evidence. |
