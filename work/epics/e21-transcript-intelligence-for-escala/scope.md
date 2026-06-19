@@ -51,9 +51,11 @@ Verdict: **do not close as complete**. This folder contains only `brief.md` and
 `scope.md`; `git ls-files` and `git log -- <path>` show no tracked
 implementation, story artifacts, retrospective, or close commit for this draft.
 
-Corrected disposition: **Backlog/Not Completed**. The idea overlaps with the
-completed E18 class-to-skill learning loop but is broader. Any future work
-should start as a new numbered epic and explicitly reuse or extend E18 rather
-than pretending this draft was implemented.
+Corrected disposition: **Backlog/Not Completed; deprecated as an epic**. The
+idea overlaps with the completed E18 class-to-skill learning loop, which already
+covers class intake, pattern extraction, skill deltas, and reviewable reports.
+Do not renumber this as a full epic now. If the remaining operational detail is
+still valuable, promote only a small future E18 follow-up story for
+commitment/blocker extraction.
 
 Tag action: no `complete` tag should be created for this draft.

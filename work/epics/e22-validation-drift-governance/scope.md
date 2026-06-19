@@ -51,10 +51,10 @@ Verdict: **do not close as complete**. This folder contains only `brief.md` and
 `scope.md`; `git ls-files` and `git log -- <path>` show no tracked
 implementation, story artifacts, retrospective, or close commit for this draft.
 
-Corrected disposition: **Backlog/Not Completed**. Parts of this direction were
-later addressed by E30/E31 pipeline validation and E32 closure governance, but
-this draft's broader golden-case/drift-release-gate scope was not implemented.
-Future work should be renumbered and scoped around the remaining validation
-gaps.
+Corrected disposition: **Backlog/Not Completed; superseded by E35**. Parts of
+this direction were later addressed by E30/E31 pipeline validation and E32
+closure governance. The remaining valuable gap is now renumbered and narrowed
+as E35 Skill Golden Cases & Drift Gates: golden cases for core skills plus a
+methodological release gate.
 
 Tag action: no `complete` tag should be created for this draft.

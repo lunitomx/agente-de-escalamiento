@@ -50,8 +50,9 @@ Verdict: **do not close as complete**. This folder contains only `brief.md` and
 `scope.md`; `git ls-files` and `git log -- <path>` show no tracked
 implementation, story artifacts, retrospective, or close commit for this draft.
 
-Corrected disposition: **Backlog/Not Completed**. The idea remains valid as a
-future evidence-capture epic, but it must be renumbered and restarted with
-fresh source data, tests, and story artifacts before implementation.
+Corrected disposition: **Backlog/Not Completed; superseded by E34**. The idea
+remains valuable and is now renumbered as E34 Voice of Customer Evidence
+System. E34 must restart with fresh story artifacts, source data, tests, and
+closure evidence before any complete status can be trusted.
 
 Tag action: no `complete` tag should be created for this draft.

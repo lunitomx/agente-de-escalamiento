@@ -51,8 +51,10 @@ Verdict: **do not close as complete**. This folder contains only `brief.md` and
 `scope.md`; `git ls-files` and `git log -- <path>` show no tracked
 implementation, story artifacts, retrospective, or close commit for this draft.
 
-Corrected disposition: **Backlog/Not Completed**. The idea remains valid as a
-future strategy-skill hardening epic, but it must be renumbered and restarted
-with fresh story artifacts before implementation.
+Corrected disposition: **Backlog/Not Completed; absorbed into E34**. The idea
+remains valid, but not as a separate epic. The valuable work is now scoped as
+S34.4 Strategy Prompt Hardening inside E34 Voice of Customer Evidence System,
+because prompt hardening should consume real customer evidence before producing
+Core Customer, Brand Promise, or Strategy Canvas recommendations.
 
 Tag action: no `complete` tag should be created for this draft.
