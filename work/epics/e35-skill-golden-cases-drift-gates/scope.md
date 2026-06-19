@@ -1,6 +1,6 @@
 # Epic Scope: E35 — Skill Golden Cases & Drift Gates
 
-**Status:** Planned
+**Status:** Complete
 **Created:** 2026-06-18
 **Renumbers and narrows:** E22 Validation, Drift Control & Governance
 **Depends on context from:** E30, E31, E32
@@ -62,11 +62,11 @@ golden cases and release gates for that gap.
 
 ## Done Criteria
 
-- [ ] A golden case fixture format exists and is documented.
-- [ ] At least the selected core skills have golden cases.
-- [ ] Drift checks fail on deliberate methodology/output regressions.
-- [ ] Accepted behavior changes require prompt/version changelog updates.
-- [ ] Release gate evidence can be cited without relying on old E22 draft
+- [x] A golden case fixture format exists and is documented.
+- [x] At least the selected core skills have golden cases.
+- [x] Drift checks fail on deliberate methodology/output regressions.
+- [x] Accepted behavior changes require prompt/version changelog updates.
+- [x] Release gate evidence can be cited without relying on old E22 draft
       status.
 
 ## Implementation Plan
@@ -112,4 +112,4 @@ draft source only.
 | S35.2 Core skill golden cases | Complete | `tests/fixtures/skill_golden_cases/core/*.yaml`, `tests/test_skill_golden_cases.py`, `stories/s35.2-retrospective.md`; gates passed for scoped tests, lint, format, and types. |
 | S35.3 Drift check implementation | Complete | `validators/skill_golden_cases.py`, `tests/test_skill_golden_case_drift.py`, `tests/fixtures/skill_golden_cases/outputs/*.md`; gates passed for drift tests, fixture tests, lint, format, and types. |
 | S35.4 Prompt/version changelog | Complete | `.raise/skill-golden-cases/changelog.yaml`, `tests/test_skill_golden_case_changelog.py`, `validators/skill_golden_cases.py`; gates passed for changelog, drift, fixture, lint, format, and types. |
-| S35.5 Release gate integration | Pending | Not started. |
+| S35.5 Release gate integration | Complete | `scripts/check_skill_golden_cases.py`, `.raise/release/skill-golden-cases.md`, `tests/test_skill_golden_case_gate.py`; release check reports `status: pass`. |
