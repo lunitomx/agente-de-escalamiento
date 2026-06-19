@@ -109,7 +109,7 @@ draft source only.
 | Story | Status | Evidence |
 |---|---|---|
 | S35.1 Golden case fixture contract | Complete | `validators/skill_golden_cases.py`, `tests/test_skill_golden_cases.py`, `stories/s35.1-retrospective.md`; gates passed for scoped tests, lint, format, and types. |
-| S35.2 Core skill golden cases | Pending | Not started. |
+| S35.2 Core skill golden cases | Complete | `tests/fixtures/skill_golden_cases/core/*.yaml`, `tests/test_skill_golden_cases.py`, `stories/s35.2-retrospective.md`; gates passed for scoped tests, lint, format, and types. |
 | S35.3 Drift check implementation | Pending | Not started. |
 | S35.4 Prompt/version changelog | Pending | Not started. |
 | S35.5 Release gate integration | Pending | Not started. |
