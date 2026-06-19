@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -37,8 +39,24 @@ class GoldenCaseOutput(BaseModel):
     output_path: Path
 
 
+class GoldenCaseChangelogEntry(BaseModel):
+    """Review evidence for accepted golden-case expectation changes."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    change_id: str = Field(min_length=1)
+    case_id: str = Field(min_length=1)
+    skill: str = Field(min_length=1)
+    expectation_hash: str = Field(min_length=64, max_length=64)
+    reason: str = Field(min_length=1)
+    reviewer: str = Field(min_length=1)
+    changed_fields: list[str] = Field(min_length=1)
+    expected_behavior_change: str = Field(min_length=1)
+
+
 SkillGoldenCase.model_rebuild()
 GoldenCaseOutput.model_rebuild()
+GoldenCaseChangelogEntry.model_rebuild()
 
 
 def load_golden_cases(fixture_path: Path) -> list[SkillGoldenCase]:
@@ -59,6 +77,31 @@ def load_golden_case_directory(fixtures_dir: Path) -> list[SkillGoldenCase]:
     for fixture_path in fixture_paths:
         cases.extend(load_golden_cases(fixture_path))
     return cases
+
+
+def load_golden_case_changelog(changelog_path: Path) -> list[GoldenCaseChangelogEntry]:
+    """Load accepted golden-case expectation changes from YAML."""
+    data = yaml.safe_load(changelog_path.read_text(encoding="utf-8")) or []
+    if not isinstance(data, list):
+        raise ValueError("Golden case changelog file must contain a list")
+    return [GoldenCaseChangelogEntry.model_validate(item) for item in data]
+
+
+def golden_case_expectation_hash(case: SkillGoldenCase) -> str:
+    """Return a stable hash for expectation-bearing fields."""
+    payload = {
+        "evidence_required": case.evidence_required,
+        "expected_sections": case.expected_sections,
+        "forbidden_claim_patterns": case.forbidden_claim_patterns,
+        "required_methodology_terms": case.required_methodology_terms,
+    }
+    serialized = json.dumps(
+        payload,
+        ensure_ascii=True,
+        separators=(",", ":"),
+        sort_keys=True,
+    )
+    return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
 
 
 def validate_golden_case_file(
@@ -94,6 +137,35 @@ def validate_golden_case_directory(
     for fixture_path in fixture_paths:
         for error in validate_golden_case_file(fixture_path, skills_root):
             errors.append(f"{fixture_path.name}: {error}")
+    return errors
+
+
+def validate_golden_case_changelog(
+    cases: Sequence[SkillGoldenCase],
+    changelog_path: Path,
+) -> list[str]:
+    """Return errors when current expectations lack accepted-change evidence."""
+    try:
+        entries = load_golden_case_changelog(changelog_path)
+    except ValidationError as exc:
+        return [_format_validation_error(error) for error in exc.errors()]
+    except (OSError, ValueError, yaml.YAMLError) as exc:
+        return [str(exc)]
+
+    entry_index = {
+        (entry.case_id, entry.skill, entry.expectation_hash): entry for entry in entries
+    }
+    errors: list[str] = []
+
+    for case in cases:
+        expectation_hash = golden_case_expectation_hash(case)
+        key = (case.case_id, case.skill, expectation_hash)
+        if key not in entry_index:
+            errors.append(
+                f"{case.case_id}: missing changelog entry for expectation hash "
+                f"{expectation_hash}"
+            )
+
     return errors
 
 

@@ -1,0 +1,48 @@
+- change_id: s35.4-initial-cash-case
+  case_id: core-cash-ccc-power-one-operational-analysis
+  skill: scaleup-cash
+  expectation_hash: 3c3273c48f9aaa0219fbdc0b3d5f8539c5c9e475aa77817960753f2ece37a2ee
+  reason: Initial accepted core cash behavior for CCC, Power of One, and operational acceleration analysis.
+  reviewer: S35.4
+  changed_fields:
+    - expected_sections
+    - required_methodology_terms
+    - forbidden_claim_patterns
+    - evidence_required
+  expected_behavior_change: Establish baseline expectations for cash methodology drift checks.
+- change_id: s35.4-initial-execution-case
+  case_id: core-execution-critical-number-rhythm
+  skill: scaleup-execution
+  expectation_hash: bb960e406fd0f016ad003af91a5e14551070bb705286f4f7882236193194d129
+  reason: Initial accepted core execution behavior for Critical Number, rhythms, and accountability.
+  reviewer: S35.4
+  changed_fields:
+    - expected_sections
+    - required_methodology_terms
+    - forbidden_claim_patterns
+    - evidence_required
+  expected_behavior_change: Establish baseline expectations for execution methodology drift checks.
+- change_id: s35.4-initial-people-case
+  case_id: core-people-observed-values-accountability
+  skill: scaleup-people
+  expectation_hash: b192848f9f788053053b237dec22fff3b8606500af6dfd5a20d7ebb94818d406
+  reason: Initial accepted core people behavior for observed values and single accountability.
+  reviewer: S35.4
+  changed_fields:
+    - expected_sections
+    - required_methodology_terms
+    - forbidden_claim_patterns
+    - evidence_required
+  expected_behavior_change: Establish baseline expectations for people methodology drift checks.
+- change_id: s35.4-initial-strategy-case
+  case_id: core-strategy-voc-evidence-gate
+  skill: scaleup-strategy
+  expectation_hash: ac8e7ce14eba46d985dfb36aeebe877fc76633d532b15c649416b0014a3289bc
+  reason: Initial accepted core strategy behavior for Voice of Customer evidence gating.
+  reviewer: S35.4
+  changed_fields:
+    - expected_sections
+    - required_methodology_terms
+    - forbidden_claim_patterns
+    - evidence_required
+  expected_behavior_change: Establish baseline expectations for strategy methodology drift checks.
