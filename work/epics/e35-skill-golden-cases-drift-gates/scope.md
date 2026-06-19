@@ -71,6 +71,9 @@ golden cases and release gates for that gap.
 
 ## Implementation Plan
 
+Detailed story scopes, acceptance criteria, expected files, and gates live in
+`story-map.md`. This scope remains the epic-level source of truth.
+
 | Seq | Story | Rationale | Exit Evidence |
 |---|---|---|---|
 | 1 | S35.1 | Contract first; tests need stable fixture semantics. | Fixture schema/docs and failing/passing examples. |
@@ -100,4 +103,3 @@ golden cases and release gates for that gap.
 No complete tag exists or should exist for E35 until stories, tests, release
 gate evidence, and retrospective are complete. Old E22 remains a superseded
 draft source only.
-

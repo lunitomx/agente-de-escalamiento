@@ -75,6 +75,9 @@ normalize it, and cite it when producing strategy outputs.
 
 ## Implementation Plan
 
+Detailed story scopes, acceptance criteria, expected files, and gates live in
+`story-map.md`. This scope remains the epic-level source of truth.
+
 | Seq | Story | Rationale | Exit Evidence |
 |---|---|---|---|
 | 1 | S34.1 | Contract first; downstream logic needs stable fields. | Schema/tests reject incomplete records. |
@@ -104,4 +107,3 @@ normalize it, and cite it when producing strategy outputs.
 No complete tag exists or should exist for E34 until implementation stories,
 tests, and retrospective are complete. Old E20/E19 draft folders remain source
 context only.
-
