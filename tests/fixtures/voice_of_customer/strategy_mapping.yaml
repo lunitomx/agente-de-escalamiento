@@ -1,0 +1,50 @@
+- id: voc-map-001
+  source_type: interview
+  source_label: Founder interview with Ana
+  captured_at: "2026-06-05"
+  context: Strategy discovery interview.
+  quote: "We need weekly cash clarity so the founder can decide faster."
+  customer_segment: founder-led services company
+  evidence_tags:
+    - core-customer
+    - desired-outcome
+    - promise
+    - language
+  review_status: approved
+  is_fixture: false
+- id: voc-map-002
+  source_type: testimonial
+  source_label: Customer testimonial from Raul
+  captured_at: "2026-06-06"
+  context: Post-engagement testimonial.
+  quote: "The proof was seeing our cash conversion cycle every Friday."
+  customer_segment: founder-led services company
+  evidence_tags:
+    - proof
+    - metric
+  review_status: approved
+  is_fixture: false
+- id: voc-map-003
+  source_type: note
+  source_label: Draft note without approval
+  captured_at: "2026-06-07"
+  context: Internal note.
+  quote: "Maybe they want a full ERP."
+  customer_segment: founder-led services company
+  evidence_tags:
+    - promise
+  review_status: draft
+  is_fixture: false
+- id: voc-map-004
+  source_type: interview
+  source_label: Customer interview with Lucia
+  captured_at: "2026-06-08"
+  context: Churn risk interview.
+  quote: "Weekly calls were too much when there was no clear cash decision."
+  customer_segment: founder-led services company
+  evidence_tags:
+    - objection
+    - negative
+  review_status: approved
+  is_fixture: false
+

@@ -17,6 +17,34 @@ except ImportError as exc:  # pragma: no cover - project dependency
 
 SourceType = Literal["interview", "testimonial", "audio", "review", "survey", "note"]
 ReviewStatus = Literal["draft", "reviewed", "approved", "rejected"]
+StrategyCategory = Literal[
+    "customer_segment",
+    "desired_outcome",
+    "pain",
+    "promised_value",
+    "objection",
+    "proof",
+    "reusable_language",
+]
+
+_CATEGORY_TAGS: dict[StrategyCategory, set[str]] = {
+    "customer_segment": {"segment", "core-customer", "customer-segment"},
+    "desired_outcome": {"outcome", "desired-outcome", "job-to-be-done"},
+    "pain": {"pain", "friction", "problem"},
+    "promised_value": {"promise", "value", "brand-promise"},
+    "objection": {"objection", "risk", "negative"},
+    "proof": {"proof", "result", "metric"},
+    "reusable_language": {"language", "phrase", "words"},
+}
+_REQUIRED_STRATEGY_CATEGORIES: tuple[StrategyCategory, ...] = (
+    "customer_segment",
+    "desired_outcome",
+    "pain",
+    "promised_value",
+    "objection",
+    "proof",
+    "reusable_language",
+)
 
 
 class CustomerEvidenceRecord(BaseModel):
@@ -69,8 +97,35 @@ class NormalizationResult(BaseModel):
     errors: list[str] = Field(default_factory=list)
 
 
+class StrategyInput(BaseModel):
+    """Evidence-backed strategy input for downstream strategy skills."""
+
+    category: StrategyCategory
+    summary: str
+    evidence_ids: list[str] = Field(min_length=1)
+    quotes: list[str] = Field(min_length=1)
+
+
+class StrategyGap(BaseModel):
+    """Missing evidence gap for a strategy category."""
+
+    category: StrategyCategory
+    reason: str
+
+
+class StrategyMappingResult(BaseModel):
+    """Deterministic Voice of Customer to strategy mapping output."""
+
+    inputs: list[StrategyInput]
+    gaps: list[StrategyGap]
+    contradictions: list[dict[str, list[str] | str]] = Field(default_factory=list)
+
+
 RawCustomerQuote.model_rebuild()
 NormalizationResult.model_rebuild()
+StrategyInput.model_rebuild()
+StrategyGap.model_rebuild()
+StrategyMappingResult.model_rebuild()
 
 
 def load_evidence_records(evidence_path: Path) -> list[CustomerEvidenceRecord]:
@@ -136,6 +191,38 @@ def normalize_raw_quotes(raw_quotes: list[Mapping[str, Any]]) -> NormalizationRe
     return NormalizationResult(records=records, duplicates=duplicates, errors=errors)
 
 
+def map_evidence_to_strategy(
+    records: list[CustomerEvidenceRecord],
+) -> StrategyMappingResult:
+    """Map approved customer evidence records into cited strategy inputs."""
+    usable_records = [record for record in records if record.strategy_usable]
+    inputs: list[StrategyInput] = []
+    gaps: list[StrategyGap] = []
+
+    for category in _REQUIRED_STRATEGY_CATEGORIES:
+        category_records = [
+            record
+            for record in usable_records
+            if _record_matches_category(record, category)
+        ]
+        if not category_records:
+            gaps.append(
+                StrategyGap(
+                    category=category,
+                    reason=f"No approved evidence for {category}",
+                )
+            )
+            continue
+        inputs.append(_strategy_input(category, category_records))
+
+    contradictions = _strategy_contradictions(usable_records)
+    return StrategyMappingResult(
+        inputs=inputs,
+        gaps=gaps,
+        contradictions=contradictions,
+    )
+
+
 def _format_validation_error(error: Mapping[str, Any]) -> str:
     location = ".".join(str(part) for part in error.get("loc", ())) or "record"
     message = str(error.get("msg", "invalid value"))
@@ -162,3 +249,50 @@ def _missing_provenance_note(missing: list[str]) -> str | None:
     if not missing:
         return None
     return "Missing provenance: " + ", ".join(missing)
+
+
+def _record_matches_category(
+    record: CustomerEvidenceRecord,
+    category: StrategyCategory,
+) -> bool:
+    tags = {tag.strip().lower() for tag in record.evidence_tags}
+    return bool(tags & _CATEGORY_TAGS[category])
+
+
+def _strategy_input(
+    category: StrategyCategory,
+    records: list[CustomerEvidenceRecord],
+) -> StrategyInput:
+    evidence_ids = [record.id for record in records]
+    quotes = [record.quote for record in records]
+    summary = "; ".join(quotes)
+    return StrategyInput(
+        category=category,
+        summary=summary,
+        evidence_ids=evidence_ids,
+        quotes=quotes,
+    )
+
+
+def _strategy_contradictions(
+    records: list[CustomerEvidenceRecord],
+) -> list[dict[str, list[str] | str]]:
+    negative_records = [
+        record
+        for record in records
+        if any(tag.strip().lower() == "negative" for tag in record.evidence_tags)
+    ]
+    positive_records = [
+        record
+        for record in records
+        if not any(tag.strip().lower() == "negative" for tag in record.evidence_tags)
+    ]
+    if not negative_records or not positive_records:
+        return []
+    return [
+        {
+            "category": "objection",
+            "positive_evidence_ids": [record.id for record in positive_records],
+            "negative_evidence_ids": [record.id for record in negative_records],
+        }
+    ]
