@@ -1,0 +1,14 @@
+- id: voc-001
+  source_type: interview
+  source_label: Customer interview with Ana Ruiz
+  captured_at: "2026-06-01"
+  context: Renewal conversation after 90 days using the service.
+  quote: "I stayed because the team made cash decisions simple every week."
+  customer_segment: founder-led services company
+  evidence_tags:
+    - cash
+    - clarity
+  review_status: approved
+  is_fixture: false
+  notes: Approved for strategy use by operator.
+

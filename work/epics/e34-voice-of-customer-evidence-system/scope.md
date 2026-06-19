@@ -107,3 +107,13 @@ Detailed story scopes, acceptance criteria, expected files, and gates live in
 No complete tag exists or should exist for E34 until implementation stories,
 tests, and retrospective are complete. Old E20/E19 draft folders remain source
 context only.
+
+## Progress
+
+| Story | Status | Evidence |
+|---|---|---|
+| S34.1 Evidence intake schema | Complete | `validators/voice_of_customer.py`, `tests/test_voice_of_customer.py`, `stories/s34.1-retrospective.md`; gates passed for scoped tests, lint, format, and types. |
+| S34.2 Testimonial normalization | Pending | Not started. |
+| S34.3 Voice-to-strategy mapping | Pending | Not started. |
+| S34.4 Strategy prompt hardening | Pending | Not started. |
+| S34.5 Evidence library handoff | Pending | Not started. |
