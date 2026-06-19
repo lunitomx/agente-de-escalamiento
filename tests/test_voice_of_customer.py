@@ -17,6 +17,7 @@ SPEC.loader.exec_module(VOICE_OF_CUSTOMER)
 
 load_evidence_records = VOICE_OF_CUSTOMER.load_evidence_records
 validate_evidence_file = VOICE_OF_CUSTOMER.validate_evidence_file
+normalize_raw_quotes = VOICE_OF_CUSTOMER.normalize_raw_quotes
 
 
 def test_valid_customer_evidence_is_strategy_usable() -> None:
@@ -47,3 +48,79 @@ def test_invalid_review_status_is_rejected() -> None:
     errors = validate_evidence_file(FIXTURES / "invalid_status.yaml")
 
     assert any("review_status" in error for error in errors)
+
+
+def test_complete_raw_quote_normalizes_to_real_evidence() -> None:
+    result = normalize_raw_quotes(
+        [
+            {
+                "quote": "The weekly cash review helped us decide faster.",
+                "source_type": "interview",
+                "source_label": "Founder interview with Maria",
+                "captured_at": "2026-06-02",
+                "context": "Cash acceleration follow-up.",
+                "customer_segment": "founder-led services company",
+                "evidence_tags": ["cash", "speed"],
+            }
+        ]
+    )
+
+    assert result.errors == []
+    assert len(result.records) == 1
+    assert result.records[0].id == "voc-b260540fd2"
+    assert result.records[0].review_status == "approved"
+    assert result.records[0].strategy_usable is True
+
+
+def test_incomplete_raw_quote_preserves_missing_provenance_as_review_gap() -> None:
+    result = normalize_raw_quotes(
+        [
+            {
+                "quote": "They liked the process.",
+                "source_type": "note",
+                "customer_segment": "founder-led services company",
+                "evidence_tags": ["unclear"],
+            }
+        ]
+    )
+
+    assert result.errors == []
+    assert result.records[0].source_label == "REVIEW_REQUIRED: missing source_label"
+    assert result.records[0].context == "REVIEW_REQUIRED: missing context"
+    assert (
+        result.records[0].notes
+        == "Missing provenance: source_label, captured_at, context"
+    )
+    assert result.records[0].is_fixture is True
+    assert result.records[0].review_status == "draft"
+    assert result.records[0].strategy_usable is False
+
+
+def test_duplicate_raw_quotes_are_reported_and_excluded() -> None:
+    result = normalize_raw_quotes(
+        [
+            {
+                "quote": "The weekly cash review helped us decide faster.",
+                "source_type": "interview",
+                "source_label": "Founder interview with Maria",
+                "captured_at": "2026-06-02",
+                "context": "Cash acceleration follow-up.",
+                "customer_segment": "founder-led services company",
+                "evidence_tags": ["cash", "speed"],
+            },
+            {
+                "quote": "The weekly cash review helped us decide faster.",
+                "source_type": "interview",
+                "source_label": "Founder interview with Maria",
+                "captured_at": "2026-06-02",
+                "context": "Duplicate raw quote.",
+                "customer_segment": "founder-led services company",
+                "evidence_tags": ["cash"],
+            },
+        ]
+    )
+
+    assert len(result.records) == 1
+    assert result.duplicates == [
+        "duplicate raw quote for source='Founder interview with Maria'"
+    ]

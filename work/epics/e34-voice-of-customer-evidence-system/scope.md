@@ -113,7 +113,7 @@ context only.
 | Story | Status | Evidence |
 |---|---|---|
 | S34.1 Evidence intake schema | Complete | `validators/voice_of_customer.py`, `tests/test_voice_of_customer.py`, `stories/s34.1-retrospective.md`; gates passed for scoped tests, lint, format, and types. |
-| S34.2 Testimonial normalization | Pending | Not started. |
+| S34.2 Testimonial normalization | Complete | `normalize_raw_quotes`, `RawCustomerQuote`, `NormalizationResult`, `tests/fixtures/voice_of_customer/raw_quotes.yaml`, `stories/s34.2-retrospective.md`; gates passed for scoped tests, lint, format, and types. |
 | S34.3 Voice-to-strategy mapping | Pending | Not started. |
 | S34.4 Strategy prompt hardening | Pending | Not started. |
 | S34.5 Evidence library handoff | Pending | Not started. |
