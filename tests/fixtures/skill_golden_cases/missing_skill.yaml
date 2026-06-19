@@ -1,0 +1,13 @@
+- case_id: missing-skill-case
+  skill: scaleup-missing-skill
+  input_context:
+    user_goal: Exercise a missing skill reference.
+  expected_sections:
+    - Voice of Customer Evidence Gate
+  required_methodology_terms:
+    - evidence ids
+  forbidden_claim_patterns:
+    - "guaranteed success"
+  evidence_required: true
+  notes: This fixture should fail because the skill does not exist.
+
