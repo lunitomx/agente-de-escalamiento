@@ -1,0 +1,19 @@
+- case_id: strategy-evidence-gate
+  skill: scaleup-strategy
+  input_context:
+    user_goal: Build a Brand Promise from customer evidence.
+    available_evidence_ids:
+      - voc-map-001
+  expected_sections:
+    - Voice of Customer Evidence Gate
+    - Recommended Next Tool
+  required_methodology_terms:
+    - map_evidence_to_strategy
+    - evidence ids
+    - do not invent
+  forbidden_claim_patterns:
+    - "best-in-class"
+    - "guaranteed success"
+  evidence_required: true
+  notes: Strategy entrypoint must ask for evidence before strategic claims.
+

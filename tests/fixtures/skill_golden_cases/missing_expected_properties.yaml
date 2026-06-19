@@ -1,0 +1,10 @@
+- case_id: empty-behavior-case
+  skill: scaleup-strategy
+  input_context:
+    user_goal: Exercise missing properties.
+  expected_sections: []
+  required_methodology_terms: []
+  forbidden_claim_patterns: []
+  evidence_required: true
+  notes: This fixture should fail because it has no expected behavior.
+

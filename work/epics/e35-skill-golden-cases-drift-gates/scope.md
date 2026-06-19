@@ -103,3 +103,13 @@ Detailed story scopes, acceptance criteria, expected files, and gates live in
 No complete tag exists or should exist for E35 until stories, tests, release
 gate evidence, and retrospective are complete. Old E22 remains a superseded
 draft source only.
+
+## Progress
+
+| Story | Status | Evidence |
+|---|---|---|
+| S35.1 Golden case fixture contract | Complete | `validators/skill_golden_cases.py`, `tests/test_skill_golden_cases.py`, `stories/s35.1-retrospective.md`; gates passed for scoped tests, lint, format, and types. |
+| S35.2 Core skill golden cases | Pending | Not started. |
+| S35.3 Drift check implementation | Pending | Not started. |
+| S35.4 Prompt/version changelog | Pending | Not started. |
+| S35.5 Release gate integration | Pending | Not started. |
