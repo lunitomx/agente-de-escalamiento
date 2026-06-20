@@ -3,8 +3,8 @@
 ## Conclusion
 
 Trust the E35 closure for its scoped objective: deterministic golden cases,
-drift checks, changelog evidence, and release-check visibility for selected
-core ScaleUp skills.
+deterministic drift checks, changelog evidence, and release-check visibility
+for selected core ScaleUp skills.
 
 ## Scope vs Files Modified
 
@@ -24,7 +24,7 @@ core ScaleUp skills.
 | Selected core skills have golden cases. | Strategy, Cash, People, Execution YAML fixtures. | PASS |
 | Drift checks fail deliberate regressions. | Missing-section, forbidden-claim, missing-evidence tests. | PASS |
 | Accepted behavior changes require changelog updates. | Expectation hash and changelog validation tests. | PASS |
-| Release evidence can be cited without old E22 draft. | Release checklist and JSON report command. | PASS |
+| Release check evidence can be cited without old E22 draft. | Release checklist and JSON report command. | PASS |
 
 ## Verification
 
@@ -45,8 +45,12 @@ core ScaleUp skills.
 
 - E35 covers selected core skills only: Strategy, Cash, People, and Execution.
 - E35 uses deterministic fixtures and output files, not live model calls.
+- E35 does not perform live model evaluation or semantic scoring; the drift
+  check is property/string based.
 - Release integration is a script/checklist because no versioned local RaiSE
   gate registry was found in this repo.
+- The tracked skill catalog validated by E35 is `.claude/skills`; `.agents`
+  may exist as a runtime mirror but is not the tested source in this closure.
 - E35 does not replace E30 pipeline registry validation, E31 runner evidence,
   or E32 closure governance.
 - Aggregate `rai gate check --all -f json` remains not fully green because

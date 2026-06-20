@@ -1,7 +1,13 @@
 # E35 Story Map: Skill Golden Cases & Drift Gates
 
-**Status:** Planned
+**Status:** Complete
 **Planning date:** 2026-06-18
+**Closed:** 2026-06-18
+
+## Closure Note
+
+E35 closed as a deterministic release-check implementation. It does not provide
+a native `rai gate` id, live model evaluation, or semantic scoring.
 
 ## Delivery Strategy
 
@@ -17,7 +23,7 @@ existing E30/E31/E32 validation surfaces instead of duplicating them.
 | 2 | S35.2 Core skill golden cases | Add first representative cases. | Strategy/cash/people/execution fixtures. | Cases cover required methodology properties. |
 | 3 | S35.3 Drift check implementation | Detect behavior regressions. | Drift validator + tests. | Injected drift fails deterministically. |
 | 4 | S35.4 Prompt/version changelog | Track accepted behavior changes. | Changelog contract + validation. | Changed expectations require rationale. |
-| 5 | S35.5 Release gate integration | Make results visible before release. | Gate/checklist integration. | Release review cites golden-case status. |
+| 5 | S35.5 Release check integration | Make results visible before release. | Script/checklist integration. | Release review cites golden-case status. |
 
 ## S35.1 — Golden Case Fixture Contract
 
@@ -181,19 +187,21 @@ case updates do not hide unreviewed methodological drift.
 - `rai gate check gate-format`
 - `rai gate check gate-types`
 
-## S35.5 — Release Gate Integration
+## S35.5 — Release Check Integration
 
 ### User Story
 
 As a release reviewer, I want golden-case status visible in release checks so
-skill changes cannot ship without behavior evidence.
+skill changes cannot ship without deterministic behavior evidence.
 
 ### In Scope
 
-- Add a gate or release checklist entry for golden-case validation.
+- Add a release checklist entry for golden-case validation.
 - Document when the gate is required.
 - Record sample passing/failing report output.
 - Confirm the gate complements E30/E31/E32 rather than duplicating them.
+- Document that the implementation is a versioned script/checklist, not a
+  native `rai gate` id.
 
 ### Out of Scope
 
@@ -204,13 +212,14 @@ skill changes cannot ship without behavior evidence.
 ### Acceptance Criteria
 
 - Release review can cite golden-case pass/fail status.
-- Gate output names failed cases and why they failed.
+- Release check output names failed cases and why they failed.
 - Documentation states how this differs from pipeline registry, runner, and
   closure gates.
 
 ### Likely Files
 
-- `.raise/gates/` or existing gate registration path after discovery in S35.5
+- `scripts/check_skill_golden_cases.py`
+- `.raise/release/skill-golden-cases.md`
 - `validators/skill_golden_cases.py`
 - `tests/test_skill_golden_case_gate.py`
 - `work/epics/e35-skill-golden-cases-drift-gates/final-audit.md`
@@ -234,6 +243,5 @@ skill changes cannot ship without behavior evidence.
 
 - Confirm fixture storage path.
 - Confirm first four skills to cover.
-- Confirm whether release integration should be a standalone validator first or
-  a registered `rai gate` immediately.
-
+- Confirmed in S35.5: release integration is a standalone versioned check
+  because no project-local native `rai gate` registry was found.

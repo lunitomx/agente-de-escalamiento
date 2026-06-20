@@ -7,15 +7,15 @@
 
 ## Objective
 
-Create focused golden cases and drift gates for core ScaleUp skills so
-methodological behavior can be tested before release.
+Create focused golden cases and deterministic drift checks for core ScaleUp
+skills so methodology-critical behavior can be tested before release.
 
 ## Value
 
 E30 made pipelines valid, E31 made them runnable with evidence, and E32 made
 closure truth auditable. The remaining gap is behavioral: a skill can still
 drift methodologically while passing structural validation. E35 adds focused
-golden cases and release gates for that gap.
+golden cases and a release-check workflow for that gap.
 
 ## In Scope
 
@@ -24,7 +24,7 @@ golden cases and release gates for that gap.
 - Drift checks for missing required sections, unsupported claims, and changed
   output shape.
 - Prompt/version changelog that explains accepted behavior changes.
-- Release gate checklist that cites golden-case results.
+- Release check checklist that cites golden-case results.
 
 ## Out of Scope
 
@@ -51,11 +51,12 @@ golden cases and release gates for that gap.
 | S35.2 | Core skill golden cases | M | S35.1 | Add initial cases for strategy, cash, people, and execution skills. |
 | S35.3 | Drift check implementation | M | S35.1, S35.2 | Detect missing methodology sections, unsupported claims, and output-shape regressions. |
 | S35.4 | Prompt/version changelog | S | S35.3 | Record accepted behavior changes with rationale and expected-case updates. |
-| S35.5 | Release gate integration | S | S35.3, S35.4 | Add a release checklist/gate that cites golden-case results. |
+| S35.5 | Release check integration | S | S35.3, S35.4 | Add a versioned release script/checklist that cites golden-case results. |
 
 ## Dependencies
 
-- Existing skill catalog under `.agents/skills/scaleup-*`.
+- Tracked skill catalog under `.claude/skills/scaleup-*`; `.agents/skills`
+  remains a local runtime mirror when present.
 - Existing pipeline registry and runner from E30/E31.
 - Closure governance validator from E32 as a pattern for lightweight
   documentary gates.
@@ -66,7 +67,7 @@ golden cases and release gates for that gap.
 - [x] At least the selected core skills have golden cases.
 - [x] Drift checks fail on deliberate methodology/output regressions.
 - [x] Accepted behavior changes require prompt/version changelog updates.
-- [x] Release gate evidence can be cited without relying on old E22 draft
+- [x] Release check evidence can be cited without relying on old E22 draft
       status.
 
 ## Implementation Plan
@@ -80,7 +81,7 @@ Detailed story scopes, acceptance criteria, expected files, and gates live in
 | 2 | S35.2 | Fixtures must cover representative core workflows. | Initial golden case set for selected skills. |
 | 3 | S35.3 | Drift gate delivers the main value. | Tests fail on injected drift and pass current behavior. |
 | 4 | S35.4 | Expected behavior changes need reviewable history. | Changelog required for accepted updates. |
-| 5 | S35.5 | Release workflow must make results visible. | Gate/checklist cites golden-case report. |
+| 5 | S35.5 | Release workflow must make results visible. | Script/checklist cites golden-case report. |
 
 ## Milestones
 
@@ -112,4 +113,4 @@ draft source only.
 | S35.2 Core skill golden cases | Complete | `tests/fixtures/skill_golden_cases/core/*.yaml`, `tests/test_skill_golden_cases.py`, `stories/s35.2-retrospective.md`; gates passed for scoped tests, lint, format, and types. |
 | S35.3 Drift check implementation | Complete | `validators/skill_golden_cases.py`, `tests/test_skill_golden_case_drift.py`, `tests/fixtures/skill_golden_cases/outputs/*.md`; gates passed for drift tests, fixture tests, lint, format, and types. |
 | S35.4 Prompt/version changelog | Complete | `.raise/skill-golden-cases/changelog.yaml`, `tests/test_skill_golden_case_changelog.py`, `validators/skill_golden_cases.py`; gates passed for changelog, drift, fixture, lint, format, and types. |
-| S35.5 Release gate integration | Complete | `scripts/check_skill_golden_cases.py`, `.raise/release/skill-golden-cases.md`, `tests/test_skill_golden_case_gate.py`; release check reports `status: pass`. |
+| S35.5 Release check integration | Complete | `scripts/check_skill_golden_cases.py`, `.raise/release/skill-golden-cases.md`, `tests/test_skill_golden_case_gate.py`; release check reports `status: pass`. |
