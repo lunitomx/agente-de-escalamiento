@@ -4,10 +4,10 @@ Date: 2026-06-18
 
 | Draft | Evidence found | Contradiction risk | Disposition | Future action |
 |---|---|---|---|---|
-| E19 Strategy Core Skills | `brief.md` and `scope.md` only; no tracked implementation or retrospective. | Numeric E19 can be confused with completed E19 Book Ingestion tags. | Backlog/Not Completed; absorbed into E34. | Implement only as S34.4 Strategy Prompt Hardening after the VoC evidence contract exists. |
-| E20 Voice of Customer & Evidence Capture | `brief.md` and `scope.md` only; no tracked implementation or retrospective. | Numeric E20 can be confused with completed E20 Contextual Skills tags. | Backlog/Not Completed; superseded by E34. | Renumbered as E34 Voice of Customer Evidence System with fresh scope/design artifacts. |
-| E21 Transcript Intelligence for Escala | `brief.md` and `scope.md` only; no tracked implementation or retrospective. | Numeric E21 can be confused with completed E21 Verne Board Member tags. | Backlog/Not Completed; deprecated as an epic. | Do not revive as a full epic; create only a small E18 follow-up for commitment/blocker extraction if needed. |
-| E22 Validation, Drift Control & Governance | `brief.md` and `scope.md` only; no tracked implementation or retrospective. | Numeric E22 can be confused with E22 Verne Audit tags. | Backlog/Not Completed; superseded by E35. | Renumbered and narrowed as E35 Skill Golden Cases & Drift Gates, complementing E30/E31/E32. |
+| E19 Strategy Core Skills | `brief.md` and `scope.md` only; no tracked implementation or retrospective. | Numeric E19 can be confused with completed E19 Book Ingestion tags. | Superseded/Discarded; absorbed into E34. | No active epic remains; delivered only through S34.4 if needed. |
+| E20 Voice of Customer & Evidence Capture | `brief.md` and `scope.md` only; no tracked implementation or retrospective. | Numeric E20 can be confused with completed E20 Contextual Skills tags. | Superseded/Discarded by E34. | No active epic remains; E34 is the trusted implementation. |
+| E21 Transcript Intelligence for Escala | `brief.md` and `scope.md` only; no tracked implementation or retrospective. | Numeric E21 can be confused with completed E21 Verne Board Member tags. | Deprecated/Discarded as an epic. | No active epic remains; create only a small E18 follow-up for commitment/blocker extraction if needed. |
+| E22 Validation, Drift Control & Governance | `brief.md` and `scope.md` only; no tracked implementation or retrospective. | Numeric E22 can be confused with E22 Verne Audit tags. | Superseded/Discarded by E35. | No active epic remains; E35 is the trusted narrowed implementation. |
 
 ## Evidence Commands
 
@@ -17,8 +17,8 @@ Date: 2026-06-18
 
 ## Closure Rule
 
-These drafts are closed as backlog records, not product epics. Do not create
-`epic/e19-*complete`, `epic/e20-*complete`, `epic/e21-*complete`, or
+These drafts are terminal disposition records, not active product epics. Do not
+create `epic/e19-*complete`, `epic/e20-*complete`, `epic/e21-*complete`, or
 `epic/e22-*complete` tags for these draft folders.
 
 ## Renumbering Decision

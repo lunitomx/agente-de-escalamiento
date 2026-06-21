@@ -1,6 +1,6 @@
 # Epic Scope: E23 — Kokoro Agent Package
 
-**Status:** Partial
+**Status:** Deferred/Backlog
 **Dependencies:** E21 (Verne), E22 (Auditoría y correcciones)
 **Tamaño:** XL
 
@@ -100,16 +100,17 @@ habla contigo, usa skills, guarda en markdown, genera HTML cuando lo necesitas.
 
 ## Governance correction
 
-Corrected status: **Partial**. The package, skills, search/synthesis,
+Corrected status: **Deferred/Backlog**. The package, skills, search/synthesis,
 dashboard generation, cross-platform compatibility, optional MCP server, and
 legacy-server compatibility remain evidenced by the retrospective. The open
 criterion "Cada análisis guarda .md en `memoria/` con frontmatter + links" is
 not independently proven in this scope, so E23 must not be treated as an
 unqualified complete closure.
 
-required follow-up: add a focused story that proves end-to-end markdown memory
-creation with frontmatter and links, or explicitly descopes that guarantee from
-the package contract.
+Backlog action: no active epic is currently open from this folder. If the memory
+guarantee still matters, create a focused future story that proves end-to-end
+markdown memory creation with frontmatter and links, or explicitly descope that
+guarantee from a new package contract.
 
 ## Progress Tracking
 

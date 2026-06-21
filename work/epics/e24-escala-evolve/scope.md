@@ -1,6 +1,6 @@
 # Epic Scope: E24 — Escala Evolve (Auto-Mejora)
 
-**Status:** Partial/Backlog
+**Status:** Deferred/Backlog
 **Dependencies:** E23 (Agent-based skills), `~/.escala/memoria/` operativa
 **Tamaño:** M
 
@@ -57,14 +57,14 @@ Un **agente que se mejora a sí mismo**. Cada interacción en Escala deja una hu
 
 ## Governance correction
 
-Corrected status: **Partial/Backlog**. The retrospective claims all five stories
+Corrected status: **Deferred/Backlog**. The retrospective claims all five stories
 were completed, but this scope's Done Criteria are all still open and no
 independent evidence is cited here for the weekly cron, post-session automation,
 or approved auto-patch rollback path.
 
-required follow-up: keep E24 as a backlog/partial epic until each criterion is
-proved with file paths, automation evidence, and tests, or split the unfinished
-automation and auto-patch work into new stories.
+Backlog action: no active epic is currently open from this folder. If evolve is
+revived, split the unfinished automation and auto-patch work into new scoped
+stories with file paths, automation evidence, and tests.
 
 ## Riesgos
 

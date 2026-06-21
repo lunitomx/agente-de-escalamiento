@@ -1,7 +1,8 @@
 # Epic Scope: E22 — Validation, Drift Control & Governance
 
-**Status:** Backlog/Not Completed
+**Status:** Superseded/Discarded
 **Closed as backlog:** 2026-06-18
+**Terminal disposition:** Superseded by E35 Skill Golden Cases & Drift Gates
 
 ## Objective
 
@@ -51,10 +52,14 @@ Verdict: **do not close as complete**. This folder contains only `brief.md` and
 `scope.md`; `git ls-files` and `git log -- <path>` show no tracked
 implementation, story artifacts, retrospective, or close commit for this draft.
 
-Corrected disposition: **Backlog/Not Completed; superseded by E35**. Parts of
+Corrected disposition: **Superseded/Discarded; superseded by E35**. Parts of
 this direction were later addressed by E30/E31 pipeline validation and E32
-closure governance. The remaining valuable gap is now renumbered and narrowed
-as E35 Skill Golden Cases & Drift Gates: golden cases for core skills plus a
-methodological release gate.
+closure governance. The remaining valuable gap was renumbered and narrowed as
+E35 Skill Golden Cases & Drift Gates: golden cases for core skills plus a
+deterministic release check.
+
+Current backlog action: no active epic remains here. Do not count this folder as
+pending product work unless a future scope deliberately reopens a new numbered
+epic.
 
 Tag action: no `complete` tag should be created for this draft.

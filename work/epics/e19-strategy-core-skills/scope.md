@@ -1,7 +1,8 @@
 # Epic Scope: E19 — Strategy Core Skills
 
-**Status:** Backlog/Not Completed
+**Status:** Superseded/Discarded
 **Closed as backlog:** 2026-06-18
+**Terminal disposition:** Absorbed by E34 S34.4 Strategy Prompt Hardening
 
 ## Objective
 
@@ -51,10 +52,15 @@ Verdict: **do not close as complete**. This folder contains only `brief.md` and
 `scope.md`; `git ls-files` and `git log -- <path>` show no tracked
 implementation, story artifacts, retrospective, or close commit for this draft.
 
-Corrected disposition: **Backlog/Not Completed; absorbed into E34**. The idea
-remains valid, but not as a separate epic. The valuable work is now scoped as
-S34.4 Strategy Prompt Hardening inside E34 Voice of Customer Evidence System,
-because prompt hardening should consume real customer evidence before producing
-Core Customer, Brand Promise, or Strategy Canvas recommendations.
+Corrected disposition: **Superseded/Discarded as a standalone epic; absorbed
+into E34**. The idea remains valid, but not as a separate epic. The valuable
+work is now scoped and delivered as S34.4 Strategy Prompt Hardening inside E34
+Voice of Customer Evidence System, because prompt hardening should consume real
+customer evidence before producing Core Customer, Brand Promise, or Strategy
+Canvas recommendations.
+
+Current backlog action: no active epic remains here. Do not count this folder as
+pending product work unless a future scope deliberately reopens a new numbered
+epic.
 
 Tag action: no `complete` tag should be created for this draft.

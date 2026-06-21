@@ -1,7 +1,8 @@
 # Epic Scope: E21 — Transcript Intelligence for Escala
 
-**Status:** Backlog/Not Completed
+**Status:** Deprecated/Discarded
 **Closed as backlog:** 2026-06-18
+**Terminal disposition:** Deprecated as a full epic; optional future E18 story only
 
 ## Objective
 
@@ -51,11 +52,13 @@ Verdict: **do not close as complete**. This folder contains only `brief.md` and
 `scope.md`; `git ls-files` and `git log -- <path>` show no tracked
 implementation, story artifacts, retrospective, or close commit for this draft.
 
-Corrected disposition: **Backlog/Not Completed; deprecated as an epic**. The
-idea overlaps with the completed E18 class-to-skill learning loop, which already
+Corrected disposition: **Deprecated/Discarded as a full epic**. The idea
+overlaps with the completed E18 class-to-skill learning loop, which already
 covers class intake, pattern extraction, skill deltas, and reviewable reports.
 Do not renumber this as a full epic now. If the remaining operational detail is
 still valuable, promote only a small future E18 follow-up story for
 commitment/blocker extraction.
+
+Current backlog action: no active epic remains here.
 
 Tag action: no `complete` tag should be created for this draft.

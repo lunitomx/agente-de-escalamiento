@@ -1,6 +1,6 @@
 # Epic Scope: E19 — Book Ingestion & Knowledge Graph
 
-**Status:** Partial
+**Status:** Deferred/Backlog
 **Dependencies:** E18 (infraestructura base)
 **Tamaño:** XL
 
@@ -48,14 +48,15 @@
 
 ## Governance correction
 
-Corrected status: **Partial**. The retrospective reports parser, entity ingest,
+Corrected status: **Deferred/Backlog**. The retrospective reports parser, entity ingest,
 relationships, API, and integrity tests as completed, but this scope still has
 open Done Criteria and no independent schema documentation check. E19 must not
 be counted as an unqualified complete closure from this scope alone.
 
-required follow-up: either produce independent evidence for the parser/API/schema
-criteria and check them with citations, or create a new product/governance story
-for the remaining schema documentation and proof gaps.
+Backlog action: no active epic is currently open from this folder. If this work
+matters again, create a new numbered story/epic for the remaining schema
+documentation and proof gaps instead of treating the legacy complete tag as
+source of truth.
 
 ## Implementation Plan
 
