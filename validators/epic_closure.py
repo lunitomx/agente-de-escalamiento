@@ -35,9 +35,9 @@ AUDITED_EPIC_RULES: tuple[EpicClosureRule, ...] = (
     EpicClosureRule(
         epic_id="E19",
         path="work/epics/e19-book-ingestion/scope.md",
-        expected_status="partial",
+        expected_status="deferred/backlog",
         allow_open_done_criteria=True,
-        required_phrases=("Governance correction", "required follow-up"),
+        required_phrases=("Governance correction", "Backlog action"),
     ),
     EpicClosureRule(
         epic_id="E22",
@@ -49,16 +49,16 @@ AUDITED_EPIC_RULES: tuple[EpicClosureRule, ...] = (
     EpicClosureRule(
         epic_id="E23",
         path="work/epics/e23-kokoro-agent/scope.md",
-        expected_status="partial",
+        expected_status="deferred/backlog",
         allow_open_done_criteria=True,
-        required_phrases=("Governance correction", "required follow-up"),
+        required_phrases=("Governance correction", "Backlog action"),
     ),
     EpicClosureRule(
         epic_id="E24",
         path="work/epics/e24-escala-evolve/scope.md",
-        expected_status="partial/backlog",
+        expected_status="deferred/backlog",
         allow_open_done_criteria=True,
-        required_phrases=("Governance correction", "required follow-up"),
+        required_phrases=("Governance correction", "Backlog action"),
     ),
     EpicClosureRule(
         epic_id="E29",
@@ -85,30 +85,46 @@ BACKLOG_DRAFT_RULES: tuple[EpicClosureRule, ...] = (
     EpicClosureRule(
         epic_id="E19 Strategy Core Draft",
         path="work/epics/e19-strategy-core-skills/scope.md",
-        expected_status="backlog/not completed",
+        expected_status="superseded/discarded",
         allow_open_done_criteria=True,
-        required_phrases=("Backlog Closure Review", "no `complete` tag"),
+        required_phrases=(
+            "Backlog Closure Review",
+            "Current backlog action",
+            "no `complete` tag",
+        ),
     ),
     EpicClosureRule(
         epic_id="E20 Voice of Customer Draft",
         path="work/epics/e20-voice-of-customer-evidence-capture/scope.md",
-        expected_status="backlog/not completed",
+        expected_status="superseded/discarded",
         allow_open_done_criteria=True,
-        required_phrases=("Backlog Closure Review", "no `complete` tag"),
+        required_phrases=(
+            "Backlog Closure Review",
+            "Current backlog action",
+            "no `complete` tag",
+        ),
     ),
     EpicClosureRule(
         epic_id="E21 Transcript Intelligence Draft",
         path="work/epics/e21-transcript-intelligence-for-escala/scope.md",
-        expected_status="backlog/not completed",
+        expected_status="deprecated/discarded",
         allow_open_done_criteria=True,
-        required_phrases=("Backlog Closure Review", "no `complete` tag"),
+        required_phrases=(
+            "Backlog Closure Review",
+            "Current backlog action",
+            "no `complete` tag",
+        ),
     ),
     EpicClosureRule(
         epic_id="E22 Validation Drift Draft",
         path="work/epics/e22-validation-drift-governance/scope.md",
-        expected_status="backlog/not completed",
+        expected_status="superseded/discarded",
         allow_open_done_criteria=True,
-        required_phrases=("Backlog Closure Review", "no `complete` tag"),
+        required_phrases=(
+            "Backlog Closure Review",
+            "Current backlog action",
+            "no `complete` tag",
+        ),
     ),
 )
 
