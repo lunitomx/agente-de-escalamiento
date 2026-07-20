@@ -65,8 +65,13 @@ None.
 
 ## Verdict
 
-**PASS, pending Gate 3 human confirmation of the documented E36 deferral.**
+**PASS — Gate 3 confirmed by the user on 2026-07-20.**
 
 The implementation is necessary and proportional for the prerequisite bug. No
 code change is required before merge; the remaining question concerns ownership
 of the broader single-source migration, not correctness of this repair.
+
+The user authorized uninterrupted execution of routine local PASS gates and
+accepted that the broader single-source migration remains owned by E36. Future
+pauses are reserved for material scope decisions, critical findings,
+destructive actions, external publication/push, or credentials.
