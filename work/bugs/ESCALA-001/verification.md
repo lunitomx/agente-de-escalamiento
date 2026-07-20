@@ -43,6 +43,18 @@ Executed from commit `435a7df`:
 | `rai gate check gate-format` | Pass |
 | `rai gate check gate-types` | Pass |
 
+`rai gate check --all` was also executed. The four code gates remained green;
+five context-dependent gates reported missing invocation context rather than a
+product defect:
+
+- architecture review for bugfix and story: no review context yet;
+- remote sync: no backlog keys supplied;
+- epic and story closure truth: no closure target supplied.
+
+Those checks belong to their scoped review/closure phases. The bugfix
+architecture review remains mandatory and is not recorded as passed or skipped
+by this verification.
+
 ## Scope Integrity
 
 - Seven legacy scope documents were not rewritten by the fix.
