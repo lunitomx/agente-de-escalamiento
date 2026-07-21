@@ -343,8 +343,57 @@ def test_fingerprint_omits_root_and_dirty_filenames(tmp_path: Path) -> None:
     assert first.branch == "main"
     assert first.dirty_entry_count == 1
     assert len(first.status_sha256) == 64
+    assert len(first.worktree_sha256) == 64
+    assert len(first.config_sha256) == 64
+    assert len(first.index_sha256) == 64
+    assert len(first.refs_sha256) == 64
     assert str(work) not in serialized
     assert private_filename not in serialized
+
+
+def test_fingerprint_detects_content_change_with_same_porcelain_shape(
+    tmp_path: Path,
+) -> None:
+    work, _ = _create_synchronized_repository(tmp_path)
+    dirty_path = work / "already-dirty.txt"
+    dirty_path.write_text("before\n", encoding="utf-8")
+    before = fingerprint_repository(work, label="public_candidate")
+
+    dirty_path.write_text("after\n", encoding="utf-8")
+    after = fingerprint_repository(work, label="public_candidate")
+
+    assert before.status_sha256 == after.status_sha256
+    assert before.worktree_sha256 != after.worktree_sha256
+
+
+def test_fingerprint_detects_config_index_and_ref_changes(tmp_path: Path) -> None:
+    work, _ = _create_synchronized_repository(tmp_path)
+    before = fingerprint_repository(work, label="public_candidate")
+
+    _git(work, "config", "private.review-marker", "redacted-value")
+    (work / "staged.txt").write_text("staged\n", encoding="utf-8")
+    _git(work, "add", "staged.txt")
+    _git(work, "tag", "review-marker")
+    after = fingerprint_repository(work, label="public_candidate")
+    serialized = after.model_dump_json()
+
+    assert before.config_sha256 != after.config_sha256
+    assert before.index_sha256 != after.index_sha256
+    assert before.refs_sha256 != after.refs_sha256
+    assert before.worktree_sha256 != after.worktree_sha256
+    assert "redacted-value" not in serialized
+    assert "staged.txt" not in serialized
+
+
+def test_fingerprint_does_not_modify_index_or_config(tmp_path: Path) -> None:
+    work, _ = _create_synchronized_repository(tmp_path)
+    index_before = (work / ".git/index").read_bytes()
+    config_before = (work / ".git/config").read_bytes()
+
+    fingerprint_repository(work, label="public_candidate")
+
+    assert (work / ".git/index").read_bytes() == index_before
+    assert (work / ".git/config").read_bytes() == config_before
 
 
 def test_receipt_renderers_are_deterministic(tmp_path: Path) -> None:

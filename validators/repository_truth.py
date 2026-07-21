@@ -5,6 +5,7 @@ from __future__ import annotations
 from enum import Enum
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import subprocess
@@ -154,6 +155,10 @@ class RepositoryFingerprint(_StrictModel):
     branch: str = Field(min_length=1, max_length=256)
     dirty_entry_count: int = Field(ge=0)
     status_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    worktree_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    config_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    index_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    refs_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
 
 RepositoryTruthPolicy.model_rebuild()
@@ -250,7 +255,16 @@ def fingerprint_repository(
     head = _read_commit(repository_root, "HEAD")
     branch_result = _run_git(repository_root, "symbolic-ref", "--short", "HEAD")
     status_result = _run_git(repository_root, "status", "--porcelain=v1", "-z")
-    if head is None or status_result is None:
+    config_result = _run_git(repository_root, "config", "--local", "--list", "--null")
+    index_result = _run_git(repository_root, "ls-files", "--stage", "-z")
+    refs_result = _run_git(repository_root, "show-ref")
+    if (
+        head is None
+        or status_result is None
+        or config_result is None
+        or index_result is None
+        or refs_result is None
+    ):
         raise ValueError("repository fingerprint failed")
     branch = _safe_label(branch_result) if branch_result else "detached"
     entries = [entry for entry in status_result.split("\0") if entry]
@@ -259,7 +273,11 @@ def fingerprint_repository(
         head=head,
         branch=branch,
         dirty_entry_count=len(entries),
-        status_sha256=hashlib.sha256(status_result.encode("utf-8")).hexdigest(),
+        status_sha256=_text_sha256(status_result),
+        worktree_sha256=_worktree_sha256(repository_root),
+        config_sha256=_text_sha256(config_result),
+        index_sha256=_text_sha256(index_result),
+        refs_sha256=_text_sha256(refs_result),
     )
 
 
@@ -445,6 +463,7 @@ def _run_git(repository_root: Path, *arguments: str) -> str | None:
             ["git", "-C", str(repository_root), *arguments],
             check=False,
             capture_output=True,
+            env=_read_only_git_environment(),
             text=True,
             timeout=10,
         )
@@ -469,6 +488,7 @@ def _credential_bearing_remote_names(repository_root: Path) -> set[str] | None:
             ],
             check=False,
             capture_output=True,
+            env=_read_only_git_environment(),
             text=True,
             timeout=10,
         )
@@ -537,3 +557,75 @@ def _finding(code: FindingCode, subject: str) -> RepositoryFinding:
 
 def _count_label(value: int | None) -> str:
     return str(value) if value is not None else "unavailable"
+
+
+def _read_only_git_environment() -> dict[str, str]:
+    environment = dict(os.environ)
+    environment["GIT_OPTIONAL_LOCKS"] = "0"
+    return environment
+
+
+def _text_sha256(value: str) -> str:
+    return hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
+def _worktree_sha256(repository_root: Path) -> str:
+    """Hash names, types, modes, links, and bytes outside the root .git dir."""
+    root = repository_root.resolve()
+    if not root.is_dir():
+        raise ValueError("repository fingerprint failed")
+
+    digest = hashlib.sha256()
+    try:
+        for current_root, directory_names, file_names in os.walk(
+            root,
+            topdown=True,
+            followlinks=False,
+        ):
+            current_path = Path(current_root)
+            if current_path == root:
+                directory_names[:] = [
+                    name for name in directory_names if name != ".git"
+                ]
+                file_names = [name for name in file_names if name != ".git"]
+            directory_names.sort()
+            file_names.sort()
+
+            for name in directory_names:
+                path = current_path / name
+                _hash_path_entry(digest, root, path)
+            for name in file_names:
+                path = current_path / name
+                _hash_path_entry(digest, root, path)
+    except OSError:
+        raise ValueError("repository fingerprint failed") from None
+    return digest.hexdigest()
+
+
+def _hash_path_entry(
+    digest: Any,
+    root: Path,
+    path: Path,
+) -> None:
+    relative = path.relative_to(root).as_posix().encode("utf-8")
+    mode = path.lstat().st_mode & 0o7777
+    digest.update(len(relative).to_bytes(8, "big"))
+    digest.update(relative)
+    digest.update(mode.to_bytes(4, "big"))
+
+    if path.is_symlink():
+        digest.update(b"L")
+        target = os.readlink(path).encode("utf-8")
+        digest.update(len(target).to_bytes(8, "big"))
+        digest.update(target)
+        return
+    if path.is_dir():
+        digest.update(b"D")
+        return
+    if path.is_file():
+        digest.update(b"F")
+        with path.open("rb") as handle:
+            for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                digest.update(chunk)
+        return
+    digest.update(b"O")

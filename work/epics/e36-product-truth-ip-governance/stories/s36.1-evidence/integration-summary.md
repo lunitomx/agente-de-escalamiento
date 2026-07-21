@@ -40,9 +40,11 @@ No URL, username, token, credential value, or absolute path was retained.
 - Before/after branch: identical
 - Before/after dirty entry count: `17`
 - Before/after status SHA-256: identical
+- Before/after worktree, config, index, and refs SHA-256: identical
 - Result: `unchanged`
 
-The fingerprint contains no local path or dirty filename.
+The final fingerprint contract contains no local path, filename, config value,
+or ref name and disables Git optional locks during observation.
 
 ## Residual Security Boundary
 
