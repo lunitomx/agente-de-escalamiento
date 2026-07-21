@@ -514,6 +514,98 @@ def scan_exposure_inventory(
     )
 
 
+def render_exposure_inventory_json(receipt: ExposureInventoryReceipt) -> str:
+    """Render a deterministic JSON receipt from sanitized typed fields only."""
+    return (
+        json.dumps(
+            receipt.model_dump(mode="json"),
+            ensure_ascii=True,
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n"
+    )
+
+
+def render_exposure_inventory_markdown(receipt: ExposureInventoryReceipt) -> str:
+    """Render a deterministic human-readable exposure summary without excerpts."""
+    lines = [
+        "# Exposure Inventory Receipt",
+        "",
+        f"- Scan status: `{receipt.scan_status.value}`",
+        f"- Policy SHA-256: `{receipt.policy_sha256}`",
+        "- Verifier source commit: "
+        f"`{receipt.verifier_source_commit or 'unavailable'}`",
+        f"- Distribution default: `{receipt.distribution.default_eligibility.value}`",
+        f"- Generated staging: `{receipt.distribution.generated_staging.value}`",
+        f"- Tracked path count: `{receipt.distribution.tracked_path_count}`",
+        f"- Tracked path set SHA-256: `{receipt.distribution.tracked_path_set_sha256}`",
+        "- Private repository mutation check: "
+        f"`{_mutation_label(receipt.private_repository)}`",
+        "- Public candidate mutation check: "
+        f"`{_mutation_label(receipt.public_candidate)}`",
+        "",
+        "## Risk summary",
+        "",
+        f"- `critical`: `{receipt.risk_summary.critical}`",
+        f"- `high`: `{receipt.risk_summary.high}`",
+        f"- `medium`: `{receipt.risk_summary.medium}`",
+        f"- `low`: `{receipt.risk_summary.low}`",
+        f"- `info`: `{receipt.risk_summary.info}`",
+        "",
+        "## Surfaces",
+        "",
+    ]
+    lines.extend(
+        f"- `{summary.surface.value}`: inspected=`{str(summary.inspected).lower()}`, "
+        f"items=`{summary.item_count}`, unscanned=`{summary.unscanned_count}`"
+        for summary in receipt.surfaces
+    )
+    lines.extend(["", "## Findings", ""])
+    if receipt.findings:
+        lines.extend(
+            f"- `{finding.rule_id}` | `{finding.surface.value}` | "
+            f"`{finding.classification.value}` | `{finding.presence.value}` | "
+            f"`{finding.locator_kind.value}:{finding.locator}` | "
+            f"`{finding.disposition.value}`"
+            for finding in receipt.findings
+        )
+    else:
+        lines.append("- None")
+    lines.extend(["", "## Errors", ""])
+    if receipt.errors:
+        lines.extend(
+            f"- `{error.code.value}`: `{error.subject.value}`"
+            for error in receipt.errors
+        )
+    else:
+        lines.append("- None")
+    return "\n".join(lines) + "\n"
+
+
+def write_exposure_inventory_receipts(
+    receipt: ExposureInventoryReceipt,
+    *,
+    json_output: Path | None = None,
+    markdown_output: Path | None = None,
+) -> None:
+    """Write explicitly requested receipts only after a complete safe scan."""
+    if receipt.scan_status is not ScanStatus.COMPLETE:
+        raise ValueError("incomplete receipt cannot be written")
+    if json_output is not None:
+        json_output.parent.mkdir(parents=True, exist_ok=True)
+        json_output.write_text(
+            render_exposure_inventory_json(receipt),
+            encoding="utf-8",
+        )
+    if markdown_output is not None:
+        markdown_output.parent.mkdir(parents=True, exist_ok=True)
+        markdown_output.write_text(
+            render_exposure_inventory_markdown(receipt),
+            encoding="utf-8",
+        )
+
+
 def _scan_all_surfaces(
     repository_root: Path,
     public_candidate_root: Path,
@@ -934,6 +1026,12 @@ def _mutation_proof(
         after=after,
         unchanged=before == after,
     )
+
+
+def _mutation_label(proof: RepositoryMutationProof | None) -> str:
+    if proof is None:
+        return "unavailable"
+    return "pass" if proof.unchanged else "fail"
 
 
 def _distribution_summary(

@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 from pathlib import Path
 import subprocess
+import sys
 
 import pytest
 from pydantic import ValidationError
@@ -22,8 +23,15 @@ from validators.exposure_inventory import (
     exposure_policy_hash,
     load_exposure_policy,
     ordered_findings,
+    render_exposure_inventory_json,
+    render_exposure_inventory_markdown,
     scan_exposure_inventory,
+    write_exposure_inventory_receipts,
 )
+
+
+ROOT = Path(__file__).resolve().parents[1]
+SCRIPT = ROOT / "scripts/check_exposure_inventory.py"
 
 
 VALID_POLICY = """\
@@ -495,3 +503,168 @@ def test_fingerprint_mismatch_fails_closed_without_mutating_repository(
     }
     assert receipt.private_repository is not None
     assert receipt.private_repository.unchanged is False
+
+
+def test_receipt_renderers_and_explicit_writes_are_deterministic_and_safe(
+    tmp_path: Path,
+) -> None:
+    private, public, sentinel, sensitive_url = _create_inventory_repositories(tmp_path)
+    policy = load_exposure_policy(_write_policy(tmp_path))
+    receipt = scan_exposure_inventory(private, public, policy)
+    json_output = tmp_path / "evidence" / "baseline.json"
+    markdown_output = tmp_path / "evidence" / "baseline.md"
+
+    first_json = render_exposure_inventory_json(receipt)
+    first_markdown = render_exposure_inventory_markdown(receipt)
+    write_exposure_inventory_receipts(
+        receipt,
+        json_output=json_output,
+        markdown_output=markdown_output,
+    )
+
+    assert first_json == render_exposure_inventory_json(receipt)
+    assert first_markdown == render_exposure_inventory_markdown(receipt)
+    assert first_json.endswith("\n")
+    assert first_markdown.endswith("\n")
+    assert json_output.read_text(encoding="utf-8") == first_json
+    assert markdown_output.read_text(encoding="utf-8") == first_markdown
+    assert "# Exposure Inventory Receipt" in first_markdown
+    assert "- Scan status: `complete`" in first_markdown
+    combined = first_json + first_markdown
+    for forbidden in (
+        sentinel,
+        sensitive_url,
+        str(private),
+        str(public),
+        "dirty-private-name.txt",
+        "secret.env",
+    ):
+        assert forbidden not in combined
+
+
+def test_incomplete_receipt_is_not_written(tmp_path: Path) -> None:
+    public = tmp_path / "public"
+    _initialize_repository(public)
+    (public / "README.md").write_text("public\n", encoding="utf-8")
+    _git(public, "add", "README.md")
+    _git(public, "commit", "-m", "public")
+    policy = load_exposure_policy(_write_policy(tmp_path))
+    receipt = scan_exposure_inventory(tmp_path / "missing-private", public, policy)
+    json_output = tmp_path / "must-not-exist.json"
+    markdown_output = tmp_path / "must-not-exist.md"
+
+    with pytest.raises(ValueError, match="incomplete receipt"):
+        write_exposure_inventory_receipts(
+            receipt,
+            json_output=json_output,
+            markdown_output=markdown_output,
+        )
+
+    assert not json_output.exists()
+    assert not markdown_output.exists()
+
+
+def test_cli_complete_scan_writes_byte_identical_safe_receipts(
+    tmp_path: Path,
+) -> None:
+    private, public, sentinel, sensitive_url = _create_inventory_repositories(tmp_path)
+    policy_path = _write_policy(tmp_path)
+    json_output = tmp_path / "evidence" / "baseline.json"
+    markdown_output = tmp_path / "evidence" / "baseline.md"
+    command = [
+        sys.executable,
+        str(SCRIPT),
+        "--repo",
+        str(private),
+        "--public-candidate",
+        str(public),
+        "--policy",
+        str(policy_path),
+        "--format",
+        "json",
+        "--json-output",
+        str(json_output),
+        "--markdown-output",
+        str(markdown_output),
+    ]
+
+    first = subprocess.run(
+        command,
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    first_json = json_output.read_bytes()
+    first_markdown = markdown_output.read_bytes()
+    second = subprocess.run(
+        command,
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert first.returncode == 0
+    assert second.returncode == 0
+    assert first.stderr == ""
+    assert second.stderr == ""
+    assert first.stdout == second.stdout
+    assert first_json == json_output.read_bytes()
+    assert first_markdown == markdown_output.read_bytes()
+    combined = first.stdout + first.stderr + second.stdout + second.stderr
+    combined += json_output.read_text(encoding="utf-8")
+    combined += markdown_output.read_text(encoding="utf-8")
+    for forbidden in (
+        sentinel,
+        sensitive_url,
+        str(private),
+        str(public),
+        "dirty-private-name.txt",
+        "secret.env",
+    ):
+        assert forbidden not in combined
+
+
+def test_cli_incomplete_or_unsafe_scan_prints_only_fixed_error(
+    tmp_path: Path,
+) -> None:
+    public = tmp_path / "public"
+    _initialize_repository(public)
+    (public / "README.md").write_text("public\n", encoding="utf-8")
+    _git(public, "add", "README.md")
+    _git(public, "commit", "-m", "public")
+    secret_path_fragment = "S36-CLI-PRIVATE-CUSTOMER"
+    missing = tmp_path / secret_path_fragment
+    policy_path = _write_policy(tmp_path)
+    json_output = tmp_path / "must-not-exist.json"
+    markdown_output = tmp_path / "must-not-exist.md"
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPT),
+            "--repo",
+            str(missing),
+            "--public-candidate",
+            str(public),
+            "--policy",
+            str(policy_path),
+            "--json-output",
+            str(json_output),
+            "--markdown-output",
+            str(markdown_output),
+        ],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 1
+    assert result.stdout == ""
+    assert result.stderr == "exposure inventory: unable to produce a safe receipt\n"
+    assert secret_path_fragment not in result.stderr
+    assert str(public) not in result.stderr
+    assert not json_output.exists()
+    assert not markdown_output.exists()
