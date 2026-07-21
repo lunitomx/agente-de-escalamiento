@@ -530,6 +530,9 @@ def test_receipt_renderers_and_explicit_writes_are_deterministic_and_safe(
     assert markdown_output.read_text(encoding="utf-8") == first_markdown
     assert "# Exposure Inventory Receipt" in first_markdown
     assert "- Scan status: `complete`" in first_markdown
+    assert "## Finding groups" in first_markdown
+    assert "reference-asset.pdf" not in first_markdown
+    assert len(first_markdown) < len(first_json)
     combined = first_json + first_markdown
     for forbidden in (
         sentinel,

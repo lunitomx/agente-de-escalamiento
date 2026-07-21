@@ -561,14 +561,21 @@ def render_exposure_inventory_markdown(receipt: ExposureInventoryReceipt) -> str
         f"items=`{summary.item_count}`, unscanned=`{summary.unscanned_count}`"
         for summary in receipt.surfaces
     )
-    lines.extend(["", "## Findings", ""])
+    lines.extend(["", "## Finding groups", ""])
     if receipt.findings:
         lines.extend(
-            f"- `{finding.rule_id}` | `{finding.surface.value}` | "
-            f"`{finding.classification.value}` | `{finding.presence.value}` | "
-            f"`{finding.locator_kind.value}:{finding.locator}` | "
-            f"`{finding.disposition.value}`"
-            for finding in receipt.findings
+            f"- `{rule_id}` | `{surface.value}` | `{classification.value}` | "
+            f"`{severity.value}` | `{presence.value}` | "
+            f"`{disposition.value}` | count=`{count}`"
+            for (
+                rule_id,
+                surface,
+                classification,
+                severity,
+                presence,
+                disposition,
+                count,
+            ) in _finding_groups(receipt.findings)
         )
     else:
         lines.append("- None")
@@ -1065,6 +1072,43 @@ def _ordered_errors(errors: Iterable[InventoryError]) -> list[InventoryError]:
         unique.values(),
         key=lambda error: (error.code.value, error.subject.value),
     )
+
+
+def _finding_groups(
+    findings: Iterable[ExposureFinding],
+) -> list[
+    tuple[
+        str,
+        ExposureSurface,
+        ExposureClassification,
+        ExposureSeverity,
+        ExposurePresence,
+        ExposureDisposition,
+        int,
+    ]
+]:
+    counts: dict[
+        tuple[
+            str,
+            ExposureSurface,
+            ExposureClassification,
+            ExposureSeverity,
+            ExposurePresence,
+            ExposureDisposition,
+        ],
+        int,
+    ] = {}
+    for finding in ordered_findings(findings):
+        key = (
+            finding.rule_id,
+            finding.surface,
+            finding.classification,
+            finding.severity,
+            finding.presence,
+            finding.disposition,
+        )
+        counts[key] = counts.get(key, 0) + 1
+    return [(*key, count) for key, count in counts.items()]
 
 
 def _secret_shape_matches(shape: SecretShape, content: bytes) -> bool:
