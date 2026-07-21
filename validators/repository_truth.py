@@ -1,0 +1,382 @@
+"""Typed, read-only verification of canonical Git repository truth."""
+
+from __future__ import annotations
+
+from enum import Enum
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+from typing import Any, Literal
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+
+try:
+    import yaml
+except ImportError as exc:  # pragma: no cover - project dependency
+    raise ImportError("PyYAML required: pip install pyyaml") from exc
+
+
+_SAFE_REMOTE_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+_SAFE_BRANCH_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._/-]*$")
+_COMMIT_PATTERN = re.compile(r"^(?:[0-9a-f]{40}|[0-9a-f]{64})$")
+
+
+class _StrictModel(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+
+class RepositoryRole(str, Enum):
+    PRIVATE_CANONICAL = "private_canonical"
+    GENERATED_ARTIFACT = "generated_artifact"
+
+
+class DistributionMode(str, Enum):
+    ALLOWLISTED_CLEAN_EXPORT = "allowlisted_clean_export"
+
+
+class CheckStatus(str, Enum):
+    PASS = "pass"
+    FAIL = "fail"
+
+
+class CheckId(str, Enum):
+    CANONICAL_REMOTE = "canonical_remote"
+    ALLOWED_REMOTES = "allowed_remotes"
+    BRANCH_EXISTS = "branch_exists"
+    UPSTREAM = "upstream"
+    REMOTE_BRANCH = "remote_branch"
+    SYNCHRONIZED = "synchronized"
+
+
+class FindingCode(str, Enum):
+    INVALID_POLICY = "invalid_policy"
+    GIT_COMMAND_FAILED = "git_command_failed"
+    MISSING_CANONICAL_REMOTE = "missing_canonical_remote"
+    UNEXPECTED_REMOTE = "unexpected_remote"
+    DISALLOWED_REMOTE = "disallowed_remote"
+    CREDENTIAL_BEARING_REMOTE_URL = "credential_bearing_remote_url"
+    MISSING_BRANCH = "missing_branch"
+    MISSING_UPSTREAM = "missing_upstream"
+    WRONG_UPSTREAM = "wrong_upstream"
+    MISSING_REMOTE_BRANCH = "missing_remote_branch"
+    BRANCH_DIVERGED = "branch_diverged"
+
+
+class CanonicalSource(_StrictModel):
+    role: Literal[RepositoryRole.PRIVATE_CANONICAL]
+    remote: str = Field(min_length=1, max_length=128)
+    development_branch: str = Field(min_length=1, max_length=256)
+    required_upstream: str = Field(min_length=3, max_length=385)
+
+    @field_validator("remote")
+    @classmethod
+    def validate_remote(cls, value: str) -> str:
+        return _validate_remote_name(value)
+
+    @field_validator("development_branch")
+    @classmethod
+    def validate_development_branch(cls, value: str) -> str:
+        return _validate_branch_name(value)
+
+    @model_validator(mode="after")
+    def validate_required_upstream(self) -> CanonicalSource:
+        expected = f"{self.remote}/{self.development_branch}"
+        if self.required_upstream != expected:
+            raise ValueError(f"required_upstream must equal {expected!r}")
+        return self
+
+
+class PublicDistribution(_StrictModel):
+    role: Literal[RepositoryRole.GENERATED_ARTIFACT]
+    mode: Literal[DistributionMode.ALLOWLISTED_CLEAN_EXPORT]
+    automatic_mirror: Literal[False]
+
+
+class RepositoryTruthPolicy(_StrictModel):
+    schema_version: Literal[1]
+    canonical_source: CanonicalSource
+    allowed_remotes: list[str] = Field(min_length=1)
+    disallowed_remotes: list[str] = Field(default_factory=list)
+    public_distribution: PublicDistribution
+
+    @field_validator("allowed_remotes", "disallowed_remotes")
+    @classmethod
+    def validate_remote_lists(cls, value: list[str]) -> list[str]:
+        validated = [_validate_remote_name(name) for name in value]
+        if len(set(validated)) != len(validated):
+            raise ValueError("remote lists must not contain duplicates")
+        return sorted(validated)
+
+    @model_validator(mode="after")
+    def validate_remote_policy(self) -> RepositoryTruthPolicy:
+        canonical = self.canonical_source.remote
+        if canonical not in self.allowed_remotes:
+            raise ValueError("canonical remote must be allowed")
+        overlap = set(self.allowed_remotes) & set(self.disallowed_remotes)
+        if overlap:
+            raise ValueError("allowed and disallowed remotes must not overlap")
+        return self
+
+
+class RepositoryCheck(_StrictModel):
+    id: CheckId
+    status: CheckStatus
+
+
+class RepositoryFinding(_StrictModel):
+    code: FindingCode
+    subject: str = Field(min_length=1, max_length=256)
+
+
+class RepositoryTruthReceipt(_StrictModel):
+    schema_version: Literal[1] = 1
+    status: CheckStatus
+    policy_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    verifier_source_commit: str | None = None
+    checked_branch: str
+    checked_branch_commit: str | None = None
+    upstream: str | None = None
+    behind: int | None = Field(default=None, ge=0)
+    ahead: int | None = Field(default=None, ge=0)
+    remotes: list[str]
+    checks: list[RepositoryCheck]
+    findings: list[RepositoryFinding]
+
+
+RepositoryTruthPolicy.model_rebuild()
+RepositoryTruthReceipt.model_rebuild()
+
+
+def load_repository_truth_policy(policy_path: Path) -> RepositoryTruthPolicy:
+    """Load and strictly validate a repository-truth YAML policy."""
+    data: Any = yaml.safe_load(policy_path.read_text(encoding="utf-8"))
+    return RepositoryTruthPolicy.model_validate(data)
+
+
+def repository_truth_policy_hash(policy: RepositoryTruthPolicy) -> str:
+    """Return a stable SHA-256 for normalized policy semantics."""
+    payload = json.dumps(
+        policy.model_dump(mode="json"),
+        ensure_ascii=True,
+        separators=(",", ":"),
+        sort_keys=True,
+    )
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def verify_repository(
+    repository_root: Path,
+    policy: RepositoryTruthPolicy,
+) -> RepositoryTruthReceipt:
+    """Observe Git repository truth without mutating repository state."""
+    checks: list[RepositoryCheck] = []
+    findings: list[RepositoryFinding] = []
+    canonical = policy.canonical_source
+
+    head_commit = _read_commit(repository_root, "HEAD")
+
+    remote_result = _run_git(repository_root, "remote")
+    if remote_result is None:
+        raw_remotes: list[str] = []
+        findings.append(_finding(FindingCode.GIT_COMMAND_FAILED, "remote_inventory"))
+    else:
+        raw_remotes = sorted(line for line in remote_result.splitlines() if line)
+    safe_remotes = sorted(_safe_label(name) for name in raw_remotes)
+
+    canonical_present = canonical.remote in raw_remotes
+    checks.append(_check(CheckId.CANONICAL_REMOTE, canonical_present))
+    if not canonical_present:
+        findings.append(
+            _finding(FindingCode.MISSING_CANONICAL_REMOTE, canonical.remote)
+        )
+
+    remotes_allowed = remote_result is not None
+    for remote in raw_remotes:
+        if remote in policy.disallowed_remotes:
+            remotes_allowed = False
+            findings.append(_finding(FindingCode.DISALLOWED_REMOTE, remote))
+        elif remote not in policy.allowed_remotes:
+            remotes_allowed = False
+            findings.append(_finding(FindingCode.UNEXPECTED_REMOTE, remote))
+    checks.append(_check(CheckId.ALLOWED_REMOTES, remotes_allowed))
+
+    checked_branch = canonical.development_branch
+    branch_commit = _read_commit(
+        repository_root,
+        f"refs/heads/{canonical.development_branch}",
+    )
+    branch_exists = branch_commit is not None
+    checks.append(_check(CheckId.BRANCH_EXISTS, branch_exists))
+    if not branch_exists:
+        findings.append(_finding(FindingCode.MISSING_BRANCH, checked_branch))
+
+    remote_branch_exists = False
+    if canonical_present:
+        remote_branch_exists = _git_ref_exists(
+            repository_root,
+            f"refs/remotes/{canonical.remote}/{canonical.development_branch}",
+        )
+    checks.append(_check(CheckId.REMOTE_BRANCH, remote_branch_exists))
+    if not remote_branch_exists:
+        findings.append(
+            _finding(FindingCode.MISSING_REMOTE_BRANCH, canonical.required_upstream)
+        )
+
+    upstream: str | None = None
+    upstream_correct = False
+    if branch_exists:
+        upstream_result = _run_git(
+            repository_root,
+            "rev-parse",
+            "--abbrev-ref",
+            f"{canonical.development_branch}@{{upstream}}",
+        )
+        if upstream_result:
+            upstream = _safe_label(upstream_result)
+            upstream_correct = upstream_result == canonical.required_upstream
+            if not upstream_correct:
+                findings.append(
+                    _finding(FindingCode.WRONG_UPSTREAM, canonical.development_branch)
+                )
+        else:
+            findings.append(
+                _finding(FindingCode.MISSING_UPSTREAM, canonical.development_branch)
+            )
+    checks.append(_check(CheckId.UPSTREAM, upstream_correct))
+
+    behind: int | None = None
+    ahead: int | None = None
+    synchronized = False
+    if branch_exists and remote_branch_exists and upstream_correct:
+        counts_result = _run_git(
+            repository_root,
+            "rev-list",
+            "--left-right",
+            "--count",
+            f"{canonical.required_upstream}...{canonical.development_branch}",
+        )
+        if counts_result is None:
+            findings.append(
+                _finding(FindingCode.GIT_COMMAND_FAILED, "divergence_check")
+            )
+        else:
+            parsed_counts = _parse_divergence_counts(counts_result)
+            if parsed_counts is None:
+                findings.append(
+                    _finding(FindingCode.GIT_COMMAND_FAILED, "divergence_check")
+                )
+            else:
+                behind, ahead = parsed_counts
+                synchronized = behind == 0 and ahead == 0
+                if not synchronized:
+                    findings.append(
+                        _finding(FindingCode.BRANCH_DIVERGED, checked_branch)
+                    )
+    checks.append(_check(CheckId.SYNCHRONIZED, synchronized))
+
+    status = (
+        CheckStatus.PASS
+        if all(check.status is CheckStatus.PASS for check in checks) and not findings
+        else CheckStatus.FAIL
+    )
+    return RepositoryTruthReceipt(
+        status=status,
+        policy_sha256=repository_truth_policy_hash(policy),
+        verifier_source_commit=head_commit,
+        checked_branch=checked_branch,
+        checked_branch_commit=branch_commit,
+        upstream=upstream,
+        behind=behind,
+        ahead=ahead,
+        remotes=safe_remotes,
+        checks=checks,
+        findings=findings,
+    )
+
+
+def _validate_remote_name(value: str) -> str:
+    if not _SAFE_REMOTE_PATTERN.fullmatch(value):
+        raise ValueError("unsafe Git remote name")
+    return value
+
+
+def _validate_branch_name(value: str) -> str:
+    invalid = (
+        not _SAFE_BRANCH_PATTERN.fullmatch(value)
+        or ".." in value
+        or "//" in value
+        or "@{" in value
+        or value.endswith(("/", ".", ".lock"))
+    )
+    if invalid:
+        raise ValueError("unsafe Git branch name")
+    return value
+
+
+def _safe_label(value: str) -> str:
+    if (
+        _SAFE_BRANCH_PATTERN.fullmatch(value)
+        and ".." not in value
+        and "@{" not in value
+    ):
+        return value
+    digest = hashlib.sha256(value.encode("utf-8")).hexdigest()[:12]
+    return f"redacted-{digest}"
+
+
+def _safe_commit(value: str | None) -> str | None:
+    if value is None:
+        return None
+    normalized = value.strip().lower()
+    return normalized if _COMMIT_PATTERN.fullmatch(normalized) else None
+
+
+def _run_git(repository_root: Path, *arguments: str) -> str | None:
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(repository_root), *arguments],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if result.returncode != 0:
+        return None
+    return result.stdout.strip()
+
+
+def _read_commit(repository_root: Path, reference: str) -> str | None:
+    result = _run_git(repository_root, "rev-parse", "--verify", reference)
+    return _safe_commit(result)
+
+
+def _git_ref_exists(repository_root: Path, reference: str) -> bool:
+    return _run_git(repository_root, "show-ref", "--verify", reference) is not None
+
+
+def _parse_divergence_counts(value: str) -> tuple[int, int] | None:
+    parts = value.split()
+    if len(parts) != 2:
+        return None
+    try:
+        behind, ahead = (int(part) for part in parts)
+    except ValueError:
+        return None
+    if behind < 0 or ahead < 0:
+        return None
+    return behind, ahead
+
+
+def _check(check_id: CheckId, passed: bool) -> RepositoryCheck:
+    return RepositoryCheck(
+        id=check_id,
+        status=CheckStatus.PASS if passed else CheckStatus.FAIL,
+    )
+
+
+def _finding(code: FindingCode, subject: str) -> RepositoryFinding:
+    return RepositoryFinding(code=code, subject=_safe_label(subject))

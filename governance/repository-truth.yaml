@@ -1,0 +1,14 @@
+schema_version: 1
+canonical_source:
+  role: private_canonical
+  remote: origin
+  development_branch: main
+  required_upstream: origin/main
+allowed_remotes:
+  - origin
+disallowed_remotes:
+  - gitlab
+public_distribution:
+  role: generated_artifact
+  mode: allowlisted_clean_export
+  automatic_mirror: false
