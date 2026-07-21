@@ -2,16 +2,25 @@ from __future__ import annotations
 
 from pathlib import Path
 import subprocess
+import sys
 
 import pytest
 from pydantic import ValidationError
 
 from validators.repository_truth import (
     FindingCode,
+    RepositoryTruthReceipt,
+    fingerprint_repository,
     load_repository_truth_policy,
+    render_repository_truth_json,
+    render_repository_truth_markdown,
     repository_truth_policy_hash,
     verify_repository,
 )
+
+
+ROOT = Path(__file__).resolve().parents[1]
+SCRIPT = ROOT / "scripts/check_repository_truth.py"
 
 
 VALID_POLICY = """\
@@ -73,8 +82,8 @@ def _create_synchronized_repository(tmp_path: Path) -> tuple[Path, Path]:
     return work, remote
 
 
-def _finding_codes(receipt: object) -> set[FindingCode]:
-    return {finding.code for finding in receipt.findings}  # type: ignore[attr-defined]
+def _finding_codes(receipt: RepositoryTruthReceipt) -> set[FindingCode]:
+    return {finding.code for finding in receipt.findings}
 
 
 def test_policy_loads_strict_roles_and_has_stable_hash(tmp_path: Path) -> None:
@@ -267,3 +276,178 @@ def test_missing_development_branch_fails_closed(tmp_path: Path) -> None:
 
     assert receipt.status == "fail"
     assert FindingCode.MISSING_BRANCH in _finding_codes(receipt)
+
+
+def test_credential_bearing_url_is_detected_without_disclosure(
+    tmp_path: Path,
+) -> None:
+    work, remote = _create_synchronized_repository(tmp_path)
+    policy = load_repository_truth_policy(_write_policy(tmp_path))
+    sentinel = "S36-SECRET-SENTINEL"
+    sensitive_url = f"https://{sentinel}@example.invalid/private.git"
+    _git(work, "remote", "add", "gitlab", sensitive_url)
+
+    receipt = verify_repository(work, policy)
+    serialized_surfaces = (
+        receipt.model_dump_json(),
+        render_repository_truth_json(receipt),
+        render_repository_truth_markdown(receipt),
+        repr(receipt),
+    )
+
+    assert receipt.status == "fail"
+    assert FindingCode.DISALLOWED_REMOTE in _finding_codes(receipt)
+    assert FindingCode.CREDENTIAL_BEARING_REMOTE_URL in _finding_codes(receipt)
+    for surface in serialized_surfaces:
+        assert sentinel not in surface
+        assert sensitive_url not in surface
+        assert str(remote) not in surface
+
+
+def test_normal_ssh_remote_identity_is_not_a_credential_finding(
+    tmp_path: Path,
+) -> None:
+    work, _ = _create_synchronized_repository(tmp_path)
+    policy = load_repository_truth_policy(_write_policy(tmp_path))
+    _git(work, "remote", "set-url", "origin", "git@example.invalid:owner/repo.git")
+
+    receipt = verify_repository(work, policy)
+
+    assert receipt.status == "pass"
+    assert FindingCode.CREDENTIAL_BEARING_REMOTE_URL not in _finding_codes(receipt)
+
+
+def test_verifier_does_not_mutate_git_configuration_or_refs(tmp_path: Path) -> None:
+    work, _ = _create_synchronized_repository(tmp_path)
+    policy = load_repository_truth_policy(_write_policy(tmp_path))
+    config_before = (work / ".git/config").read_bytes()
+    refs_before = _git(work, "show-ref")
+
+    verify_repository(work, policy)
+
+    assert (work / ".git/config").read_bytes() == config_before
+    assert _git(work, "show-ref") == refs_before
+
+
+def test_fingerprint_omits_root_and_dirty_filenames(tmp_path: Path) -> None:
+    work, _ = _create_synchronized_repository(tmp_path)
+    private_filename = "private-customer-name.txt"
+    (work / private_filename).write_text("not committed\n", encoding="utf-8")
+
+    first = fingerprint_repository(work, label="public_candidate")
+    second = fingerprint_repository(work, label="public_candidate")
+    serialized = first.model_dump_json()
+
+    assert first == second
+    assert first.label == "public_candidate"
+    assert first.branch == "main"
+    assert first.dirty_entry_count == 1
+    assert len(first.status_sha256) == 64
+    assert str(work) not in serialized
+    assert private_filename not in serialized
+
+
+def test_receipt_renderers_are_deterministic(tmp_path: Path) -> None:
+    work, _ = _create_synchronized_repository(tmp_path)
+    policy = load_repository_truth_policy(_write_policy(tmp_path))
+    receipt = verify_repository(work, policy)
+
+    first_json = render_repository_truth_json(receipt)
+    first_markdown = render_repository_truth_markdown(receipt)
+
+    assert first_json == render_repository_truth_json(receipt)
+    assert first_markdown == render_repository_truth_markdown(receipt)
+    assert first_json.endswith("\n")
+    assert first_markdown.endswith("\n")
+    assert '"status": "pass"' in first_json
+    assert "# Repository Truth Receipt" in first_markdown
+    assert "- Status: `pass`" in first_markdown
+
+
+def test_cli_passes_and_writes_byte_identical_receipts(tmp_path: Path) -> None:
+    work, _ = _create_synchronized_repository(tmp_path)
+    policy_path = _write_policy(tmp_path)
+    json_output = tmp_path / "evidence" / "receipt.json"
+    markdown_output = tmp_path / "evidence" / "receipt.md"
+    command = [
+        sys.executable,
+        str(SCRIPT),
+        "--repo",
+        str(work),
+        "--policy",
+        str(policy_path),
+        "--format",
+        "json",
+        "--json-output",
+        str(json_output),
+        "--markdown-output",
+        str(markdown_output),
+    ]
+
+    first = subprocess.run(
+        command,
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    first_json = json_output.read_bytes()
+    first_markdown = markdown_output.read_bytes()
+    second = subprocess.run(
+        command,
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert first.returncode == 0
+    assert second.returncode == 0
+    assert first.stderr == ""
+    assert first.stdout == second.stdout
+    assert first_json == json_output.read_bytes()
+    assert first_markdown == markdown_output.read_bytes()
+
+
+def test_cli_failure_never_prints_sensitive_remote_value(tmp_path: Path) -> None:
+    work, _ = _create_synchronized_repository(tmp_path)
+    policy_path = _write_policy(tmp_path)
+    sentinel = "S36-CLI-SECRET"
+    sensitive_url = f"https://{sentinel}@example.invalid/private.git"
+    _git(work, "remote", "add", "gitlab", sensitive_url)
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPT),
+            "--repo",
+            str(work),
+            "--policy",
+            str(policy_path),
+            "--format",
+            "text",
+        ],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    combined = result.stdout + result.stderr
+
+    assert result.returncode == 1
+    assert sentinel not in combined
+    assert sensitive_url not in combined
+    assert str(work) not in combined
+    assert "credential_bearing_remote_url" in result.stdout
+
+
+def test_command_failure_is_sanitized(tmp_path: Path) -> None:
+    policy = load_repository_truth_policy(_write_policy(tmp_path))
+    missing_repository = tmp_path / "private-local-path"
+
+    receipt = verify_repository(missing_repository, policy)
+    serialized = render_repository_truth_json(receipt)
+
+    assert receipt.status == "fail"
+    assert FindingCode.GIT_COMMAND_FAILED in _finding_codes(receipt)
+    assert str(missing_repository) not in serialized

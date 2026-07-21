@@ -9,6 +9,7 @@ from pathlib import Path
 import re
 import subprocess
 from typing import Any, Literal
+from urllib.parse import urlsplit
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
@@ -44,6 +45,7 @@ class CheckStatus(str, Enum):
 class CheckId(str, Enum):
     CANONICAL_REMOTE = "canonical_remote"
     ALLOWED_REMOTES = "allowed_remotes"
+    REMOTE_CREDENTIALS = "remote_credentials"
     BRANCH_EXISTS = "branch_exists"
     UPSTREAM = "upstream"
     REMOTE_BRANCH = "remote_branch"
@@ -145,8 +147,18 @@ class RepositoryTruthReceipt(_StrictModel):
     findings: list[RepositoryFinding]
 
 
+class RepositoryFingerprint(_StrictModel):
+    schema_version: Literal[1] = 1
+    label: str = Field(min_length=1, max_length=128)
+    head: str = Field(pattern=r"^(?:[0-9a-f]{40}|[0-9a-f]{64})$")
+    branch: str = Field(min_length=1, max_length=256)
+    dirty_entry_count: int = Field(ge=0)
+    status_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
 RepositoryTruthPolicy.model_rebuild()
 RepositoryTruthReceipt.model_rebuild()
+RepositoryFingerprint.model_rebuild()
 
 
 def load_repository_truth_policy(policy_path: Path) -> RepositoryTruthPolicy:
@@ -164,6 +176,91 @@ def repository_truth_policy_hash(policy: RepositoryTruthPolicy) -> str:
         sort_keys=True,
     )
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def render_repository_truth_json(receipt: RepositoryTruthReceipt) -> str:
+    """Render a deterministic JSON receipt with typed, sanitized fields only."""
+    return (
+        json.dumps(
+            receipt.model_dump(mode="json"),
+            ensure_ascii=True,
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n"
+    )
+
+
+def render_repository_truth_markdown(receipt: RepositoryTruthReceipt) -> str:
+    """Render a deterministic human-readable receipt without local paths."""
+    lines = [
+        "# Repository Truth Receipt",
+        "",
+        f"- Status: `{receipt.status.value}`",
+        f"- Policy SHA-256: `{receipt.policy_sha256}`",
+        f"- Verifier source commit: `{receipt.verifier_source_commit or 'unavailable'}`",
+        f"- Checked branch: `{receipt.checked_branch}`",
+        f"- Checked branch commit: `{receipt.checked_branch_commit or 'unavailable'}`",
+        f"- Upstream: `{receipt.upstream or 'unavailable'}`",
+        f"- Behind / ahead: `{_count_label(receipt.behind)} / {_count_label(receipt.ahead)}`",
+        f"- Remotes: `{', '.join(receipt.remotes) or 'none'}`",
+        "",
+        "## Checks",
+        "",
+    ]
+    lines.extend(
+        f"- `{check.id.value}`: `{check.status.value}`" for check in receipt.checks
+    )
+    lines.extend(["", "## Findings", ""])
+    if receipt.findings:
+        lines.extend(
+            f"- `{finding.code.value}`: `{finding.subject}`"
+            for finding in receipt.findings
+        )
+    else:
+        lines.append("- None")
+    return "\n".join(lines) + "\n"
+
+
+def write_repository_truth_receipts(
+    receipt: RepositoryTruthReceipt,
+    *,
+    json_output: Path | None = None,
+    markdown_output: Path | None = None,
+) -> None:
+    """Write only explicitly requested deterministic receipt files."""
+    if json_output is not None:
+        json_output.parent.mkdir(parents=True, exist_ok=True)
+        json_output.write_text(render_repository_truth_json(receipt), encoding="utf-8")
+    if markdown_output is not None:
+        markdown_output.parent.mkdir(parents=True, exist_ok=True)
+        markdown_output.write_text(
+            render_repository_truth_markdown(receipt),
+            encoding="utf-8",
+        )
+
+
+def fingerprint_repository(
+    repository_root: Path,
+    *,
+    label: str,
+) -> RepositoryFingerprint:
+    """Return a path- and filename-free fingerprint of repository state."""
+    safe_label = _validate_branch_name(label)
+    head = _read_commit(repository_root, "HEAD")
+    branch_result = _run_git(repository_root, "symbolic-ref", "--short", "HEAD")
+    status_result = _run_git(repository_root, "status", "--porcelain=v1", "-z")
+    if head is None or status_result is None:
+        raise ValueError("repository fingerprint failed")
+    branch = _safe_label(branch_result) if branch_result else "detached"
+    entries = [entry for entry in status_result.split("\0") if entry]
+    return RepositoryFingerprint(
+        label=safe_label,
+        head=head,
+        branch=branch,
+        dirty_entry_count=len(entries),
+        status_sha256=hashlib.sha256(status_result.encode("utf-8")).hexdigest(),
+    )
 
 
 def verify_repository(
@@ -201,6 +298,15 @@ def verify_repository(
             remotes_allowed = False
             findings.append(_finding(FindingCode.UNEXPECTED_REMOTE, remote))
     checks.append(_check(CheckId.ALLOWED_REMOTES, remotes_allowed))
+
+    credential_remotes = _credential_bearing_remote_names(repository_root)
+    credentials_clear = credential_remotes is not None and not credential_remotes
+    if credential_remotes is None:
+        findings.append(_finding(FindingCode.GIT_COMMAND_FAILED, "remote_url_check"))
+    else:
+        for remote in sorted(credential_remotes):
+            findings.append(_finding(FindingCode.CREDENTIAL_BEARING_REMOTE_URL, remote))
+    checks.append(_check(CheckId.REMOTE_CREDENTIALS, credentials_clear))
 
     checked_branch = canonical.development_branch
     branch_commit = _read_commit(
@@ -349,6 +455,53 @@ def _run_git(repository_root: Path, *arguments: str) -> str | None:
     return result.stdout.strip()
 
 
+def _credential_bearing_remote_names(repository_root: Path) -> set[str] | None:
+    """Inspect URL values in memory and return remote names only."""
+    try:
+        result = subprocess.run(
+            [
+                "git",
+                "-C",
+                str(repository_root),
+                "config",
+                "--get-regexp",
+                r"^remote\..*\.url$",
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if result.returncode == 1:
+        return set()
+    if result.returncode != 0:
+        return None
+
+    credential_remotes: set[str] = set()
+    for line in result.stdout.splitlines():
+        try:
+            key, remote_url = line.split(maxsplit=1)
+        except ValueError:
+            return None
+        match = re.fullmatch(r"remote\.(.+)\.url", key)
+        if match is None:
+            return None
+        if _has_embedded_http_credentials(remote_url):
+            credential_remotes.add(match.group(1))
+    return credential_remotes
+
+
+def _has_embedded_http_credentials(remote_url: str) -> bool:
+    try:
+        parsed = urlsplit(remote_url)
+    except ValueError:
+        authority = remote_url.partition("://")[2].partition("/")[0]
+        return remote_url.startswith(("http://", "https://")) and "@" in authority
+    return parsed.scheme.lower() in {"http", "https"} and parsed.username is not None
+
+
 def _read_commit(repository_root: Path, reference: str) -> str | None:
     result = _run_git(repository_root, "rev-parse", "--verify", reference)
     return _safe_commit(result)
@@ -380,3 +533,7 @@ def _check(check_id: CheckId, passed: bool) -> RepositoryCheck:
 
 def _finding(code: FindingCode, subject: str) -> RepositoryFinding:
     return RepositoryFinding(code=code, subject=_safe_label(subject))
+
+
+def _count_label(value: int | None) -> str:
+    return str(value) if value is not None else "unavailable"
