@@ -1,0 +1,59 @@
+{
+  "ahead": null,
+  "behind": null,
+  "checked_branch": "main",
+  "checked_branch_commit": "6e8f9cb8144fc2cc96baed63506e7c6f43775b10",
+  "checks": [
+    {
+      "id": "canonical_remote",
+      "status": "pass"
+    },
+    {
+      "id": "allowed_remotes",
+      "status": "fail"
+    },
+    {
+      "id": "remote_credentials",
+      "status": "fail"
+    },
+    {
+      "id": "branch_exists",
+      "status": "pass"
+    },
+    {
+      "id": "remote_branch",
+      "status": "pass"
+    },
+    {
+      "id": "upstream",
+      "status": "fail"
+    },
+    {
+      "id": "synchronized",
+      "status": "fail"
+    }
+  ],
+  "findings": [
+    {
+      "code": "disallowed_remote",
+      "subject": "gitlab"
+    },
+    {
+      "code": "credential_bearing_remote_url",
+      "subject": "gitlab"
+    },
+    {
+      "code": "wrong_upstream",
+      "subject": "main"
+    }
+  ],
+  "policy_sha256": "cdcb95dadb9ab137ddf25eee1f0783c5aab8af0dd360533d4607fa9fd4b22d5c",
+  "remotes": [
+    "gitlab",
+    "origin"
+  ],
+  "schema_version": 1,
+  "status": "fail",
+  "upstream": "gitlab/main",
+  "verifier_source_commit": "9e5ed8e0d46e3641be69a624d28a7dd41af09d56"
+}
