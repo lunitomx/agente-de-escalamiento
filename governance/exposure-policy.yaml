@@ -1,0 +1,126 @@
+schema_version: 1
+bounded_surfaces:
+  - worktree
+  - git_head
+  - git_history
+  - local_git_config
+  - distribution_candidate
+  - public_candidate
+max_text_bytes: 1048576
+distribution:
+  default_eligibility: not_eligible
+  generated_staging: not_built
+rules:
+  - id: config.authenticated_remote
+    surfaces: [local_git_config]
+    classification: credential_risk
+    severity: critical
+    locator_kind: remote_name
+    disposition: review_security
+    matchers:
+      path_globs: []
+      content_terms: []
+      secret_shapes: [authenticated_url]
+  - id: internal.raise_state
+    surfaces: [worktree, git_head, public_candidate]
+    classification: internal_path
+    severity: medium
+    locator_kind: relative_path
+    disposition: block_in_s36_5
+    matchers:
+      path_globs: [".raise/**"]
+      content_terms: []
+      secret_shapes: []
+  - id: internal.work_evidence
+    surfaces: [worktree, git_head, git_history, public_candidate]
+    classification: internal_path
+    severity: medium
+    locator_kind: relative_path
+    disposition: block_in_s36_5
+    matchers:
+      path_globs: ["work/**"]
+      content_terms: []
+      secret_shapes: []
+  - id: private.company_state
+    surfaces: [worktree, git_head, public_candidate]
+    classification: private_data
+    severity: critical
+    locator_kind: relative_path
+    disposition: block_in_s36_5
+    matchers:
+      path_globs:
+        - ".scaleup/my-company/**"
+        - ".scaleup/agent/memory/**"
+      content_terms: []
+      secret_shapes: []
+  - id: public.methodology_attribution
+    surfaces: [worktree, git_head, public_candidate]
+    classification: public_vocabulary
+    severity: high
+    locator_kind: relative_path
+    disposition: review_in_s36_3
+    matchers:
+      path_globs:
+        - "*rockefeller*"
+        - "*scaling_up*"
+        - "*verne*"
+      content_terms:
+        - "Gazelles"
+        - "Rockefeller Habits"
+        - "Scaling Up"
+        - "Verne Harnish"
+      secret_shapes: []
+  - id: reference.derived_material
+    surfaces: [worktree, git_head, git_history, public_candidate]
+    classification: derived_reference
+    severity: high
+    locator_kind: relative_path
+    disposition: review_in_s36_3
+    matchers:
+      path_globs:
+        - "metodologias_parsed/**"
+        - "miembro-board/**"
+        - "scaling_up_llamaparse.*"
+        - "escala_server/data/book-knowledge.json"
+      content_terms: []
+      secret_shapes: []
+  - id: reference.raw_asset
+    surfaces: [worktree, git_head, git_history, public_candidate]
+    classification: raw_reference
+    severity: critical
+    locator_kind: relative_path
+    disposition: remove_in_s36_3
+    matchers:
+      path_globs: ["*.pdf"]
+      content_terms: []
+      secret_shapes: []
+  - id: secret.assignment
+    surfaces: [worktree, git_head, public_candidate]
+    classification: secret_candidate
+    severity: high
+    locator_kind: sha256
+    disposition: review_security
+    matchers:
+      path_globs: []
+      content_terms: []
+      secret_shapes: [assignment]
+  - id: secret.bearer_token
+    surfaces: [worktree, git_head, public_candidate]
+    classification: secret_candidate
+    severity: high
+    locator_kind: sha256
+    disposition: review_security
+    matchers:
+      path_globs: []
+      content_terms: []
+      secret_shapes: [bearer_token]
+  - id: secret.private_key
+    surfaces: [worktree, git_head, public_candidate]
+    classification: secret_candidate
+    severity: critical
+    locator_kind: sha256
+    disposition: review_security
+    matchers:
+      path_globs: []
+      content_terms: []
+      secret_shapes: [private_key]
