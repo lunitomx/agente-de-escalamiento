@@ -8,3 +8,13 @@
 | API REST del coaching engine | E10 scope | Medium | Cuando se necesite integración con apps externas |
 | Publicar skills como "tap" de Hermes | E10 scope | Low | Cuando el bundle sea estable y testeado |
 | ScaleUp en Claude Desktop (MCP server) | E10 scope | Medium | Cuando Claude Desktop soporte MCP skills |
+
+## From E36: Product Truth, IP Boundary & Governance
+
+| Item | Origin | Priority | Promotion Condition |
+|------|--------|----------|-------------------|
+| Rewrite private Git history | E36 design | Low | Only after a backup, exposure assessment, migration plan, and explicit destructive-action authorization |
+| Google Drive or OneDrive API/OAuth integration | E36 design | Low | Only if local synced folders are proven insufficient in a later product cycle |
+| Hosted or multi-writer ESCALA runtime | E36 design | Rejected | Incompatible with the local-only product invariant; requires a new product decision |
+| Automated legal approval of license posture | E36 design | Low | Human counsel defines the decision and evidence boundary |
+| Overwrite the existing dirty public candidate repository | E36 gemba | Rejected | Replace only through a reviewed clean-export migration; never synchronize private history into it |

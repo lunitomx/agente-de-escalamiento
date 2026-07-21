@@ -15,6 +15,15 @@ repository, an explicit intellectual-property and secret boundary, unambiguous
 governance identities, and deterministic gates that prevent unsafe material or
 false completion claims from entering a distributable product.
 
+## Value
+
+- **For the owner:** company information remains local and every distributable
+  artifact has a verifiable origin.
+- **For the product team:** one private source replaces manual synchronization
+  between divergent repositories.
+- **For future epics:** E37-E42 inherit executable no-host, evidence, identity,
+  and release contracts instead of prose-only assumptions.
+
 ## Architectural Invariants
 
 1. ESCALA runs on the machine of the person who installs it.
@@ -49,14 +58,14 @@ false completion claims from entering a distributable product.
 
 ## Planned Stories
 
-| ID | Story | Outcome |
-|---|---|---|
-| S36.1 | Canonical Repository & Remote Truth | `origin/main`, branch policy, and private/public roles are explicit and verifiable. |
-| S36.2 | IP, Secret & Reference Exposure Inventory | Current tree, history, remotes, distributable paths, and generated artifacts have a risk-classified inventory. |
-| S36.3 | Reference Removal & Public Vocabulary | Raw source deletion is committed and prohibited public-facing references are removed or blocked. |
-| S36.4 | Typed Governance Taxonomy & Unique IDs | One fail-closed disposition model and collision-free canonical epic identity feed validators and graph build. |
-| S36.5 | Clean Export, License & Third-Party Contract | Allowlist, denylist, license posture, notices, and deterministic export verification are executable. |
-| S36.6 | Master Acceptance Ledger | E37-E42 requirements, evidence, gates, owners, and no-host invariants are baselined. |
+| ID | Story | Size | Depends on | Outcome |
+|---|---|---:|---|---|
+| S36.1 | Canonical Repository & Remote Truth | S | — | `origin/main`, branch policy, and private/public roles are explicit and verifiable. |
+| S36.2 | IP, Secret & Reference Exposure Inventory | M | S36.1 | Current tree, history, remotes, distributable paths, and generated artifacts have a risk-classified inventory. |
+| S36.3 | Reference Removal & Public Vocabulary | M | S36.2 | Raw source deletion is committed and prohibited public-facing references are removed or blocked. |
+| S36.4 | Typed Governance Taxonomy & Unique IDs | M | S36.1 | One fail-closed disposition model and collision-free canonical epic identity feed validators and graph build. |
+| S36.5 | Clean Export, License & Third-Party Contract | L | S36.2, S36.3, S36.4 | Allowlist, denylist, license posture, notices, and deterministic export verification are executable. |
+| S36.6 | Master Acceptance Ledger | S | S36.4, S36.5 | E37-E42 requirements, evidence, gates, owners, and no-host invariants are baselined. |
 
 ## Done Criteria
 
