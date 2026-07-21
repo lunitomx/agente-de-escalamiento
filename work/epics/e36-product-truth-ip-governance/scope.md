@@ -175,7 +175,7 @@ isolation and commit recovery.
 | Story | Size | Status | Actual | Velocity | Notes |
 |-------|:----:|:------:|:------:|:--------:|-------|
 | S36.1 | S | Complete | 44m 06s | 1 S / 44m 06s | Merged locally at `d56a957`; final `origin/main` `0/0` proof remains an E36 close gate |
-| S36.2 | M | Pending | — | Not calibrated | Risk-first inventory; redacted output |
+| S36.2 | M | Complete | 47m 32s | 1 M / 47m 32s | Merged locally at `195eff6`; sanitized baseline and non-mutation proof committed |
 | S36.4 | M | Pending | — | Not calibrated | Parallel governance path |
 | S36.3 | M | Pending | — | Not calibrated | Depends on captured baseline |
 | S36.5 | L | Pending | — | Not calibrated | E2E integration checkpoint |
