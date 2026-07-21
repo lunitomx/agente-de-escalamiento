@@ -560,8 +560,11 @@ def _count_label(value: int | None) -> str:
 
 
 def _read_only_git_environment() -> dict[str, str]:
-    environment = dict(os.environ)
+    environment = {
+        key: value for key, value in os.environ.items() if not key.startswith("GIT_")
+    }
     environment["GIT_OPTIONAL_LOCKS"] = "0"
+    environment["GIT_TERMINAL_PROMPT"] = "0"
     return environment
 
 

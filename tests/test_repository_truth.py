@@ -329,6 +329,34 @@ def test_verifier_does_not_mutate_git_configuration_or_refs(tmp_path: Path) -> N
     assert _git(work, "show-ref") == refs_before
 
 
+def test_verifier_ignores_repository_and_config_git_environment_overrides(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    work, _ = _create_synchronized_repository(tmp_path / "target")
+    decoy, _ = _create_synchronized_repository(tmp_path / "decoy")
+    policy = load_repository_truth_policy(_write_policy(tmp_path))
+    target_commit = _git(work, "rev-parse", "main")
+    sentinel = "S36-ENV-SECRET"
+
+    monkeypatch.setenv("GIT_DIR", str(decoy / ".git"))
+    monkeypatch.setenv("GIT_WORK_TREE", str(decoy))
+    monkeypatch.setenv("GIT_CONFIG_COUNT", "1")
+    monkeypatch.setenv("GIT_CONFIG_KEY_0", "remote.gitlab.url")
+    monkeypatch.setenv(
+        "GIT_CONFIG_VALUE_0",
+        f"https://{sentinel}@example.invalid/private.git",
+    )
+
+    receipt = verify_repository(work, policy)
+    serialized = render_repository_truth_json(receipt)
+
+    assert receipt.status == "pass"
+    assert receipt.checked_branch_commit == target_commit
+    assert receipt.remotes == ["origin"]
+    assert sentinel not in serialized
+
+
 def test_fingerprint_omits_root_and_dirty_filenames(tmp_path: Path) -> None:
     work, _ = _create_synchronized_repository(tmp_path)
     private_filename = "private-customer-name.txt"
