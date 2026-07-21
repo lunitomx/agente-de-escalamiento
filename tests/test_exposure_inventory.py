@@ -1,21 +1,28 @@
 from __future__ import annotations
 
+import hashlib
 from pathlib import Path
+import subprocess
 
 import pytest
 from pydantic import ValidationError
 
+import validators.exposure_inventory as exposure_module
 from validators.exposure_inventory import (
     ExposureClassification,
     ExposureDisposition,
     ExposureFinding,
+    ExposurePresence,
     ExposureSeverity,
     ExposureSurface,
+    InventoryErrorCode,
     LocatorKind,
+    ScanStatus,
     build_risk_summary,
     exposure_policy_hash,
     load_exposure_policy,
     ordered_findings,
+    scan_exposure_inventory,
 )
 
 
@@ -81,6 +88,7 @@ def _finding(
     locator_kind: LocatorKind = LocatorKind.RELATIVE_PATH,
     locator: str = "reference-asset.pdf",
     disposition: ExposureDisposition = ExposureDisposition.REMOVE_IN_S36_3,
+    presence: ExposurePresence = ExposurePresence.PRESENT,
 ) -> ExposureFinding:
     return ExposureFinding(
         rule_id=rule_id,
@@ -90,6 +98,7 @@ def _finding(
         locator_kind=locator_kind,
         locator=locator,
         disposition=disposition,
+        presence=presence,
     )
 
 
@@ -172,6 +181,7 @@ def test_finding_rejects_sensitive_or_unknown_serialized_fields() -> None:
             "locator_kind": "relative_path",
             "locator": "config.txt",
             "disposition": "review_security",
+            "presence": "present",
         },
         {
             "rule_id": "config.authenticated_remote",
@@ -181,6 +191,7 @@ def test_finding_rejects_sensitive_or_unknown_serialized_fields() -> None:
             "locator_kind": "sha256",
             "locator": "a" * 64,
             "disposition": "review_security",
+            "presence": "present",
         },
         {
             "rule_id": "reference.raw_asset",
@@ -190,6 +201,7 @@ def test_finding_rejects_sensitive_or_unknown_serialized_fields() -> None:
             "locator_kind": "relative_path",
             "locator": "reference.pdf",
             "disposition": "review_security",
+            "presence": "present",
         },
     ],
 )
@@ -211,7 +223,7 @@ def test_findings_are_ordered_deterministically() -> None:
     )
     higher = _finding(locator="reference-asset.pdf")
 
-    assert ordered_findings([higher, lower]) == [lower, higher]
+    assert ordered_findings([higher, lower, lower]) == [lower, higher]
     assert ordered_findings([lower, higher]) == [lower, higher]
 
 
@@ -243,3 +255,243 @@ def test_risk_summary_is_complete_and_deterministic() -> None:
         "low": 0,
         "info": 0,
     }
+
+
+def _git(repository: Path, *arguments: str) -> str:
+    result = subprocess.run(
+        ["git", "-C", str(repository), *arguments],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return result.stdout.strip()
+
+
+def _initialize_repository(repository: Path) -> None:
+    repository.mkdir(parents=True)
+    subprocess.run(
+        ["git", "init", "--initial-branch=main", str(repository)],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    _git(repository, "config", "user.email", "tests@example.invalid")
+    _git(repository, "config", "user.name", "Exposure Inventory Tests")
+
+
+def _create_inventory_repositories(
+    tmp_path: Path,
+) -> tuple[Path, Path, str, str]:
+    private = tmp_path / "private-repository"
+    public = tmp_path / "public-candidate"
+    sentinel = "S36-EXPOSURE-SECRET-123456789"
+    sensitive_url = f"https://{sentinel}@example.invalid/private.git"
+
+    _initialize_repository(private)
+    (private / "README.md").write_text("local product\n", encoding="utf-8")
+    (private / "reference-asset.pdf").write_bytes(b"%PDF-binary-reference\x00")
+    (private / "secret.env").write_text(
+        f'api_key = "{sentinel}"\n',
+        encoding="utf-8",
+    )
+    (private / "old-reference.pdf").write_bytes(b"%PDF-historical\x00")
+    _git(private, "add", ".")
+    _git(private, "commit", "-m", "baseline")
+    (private / "old-reference.pdf").unlink()
+    _git(private, "add", "-u")
+    _git(private, "commit", "-m", "remove historical reference")
+    (private / "reference-asset.pdf").unlink()
+    _git(private, "remote", "add", "gitlab", sensitive_url)
+
+    _initialize_repository(public)
+    (public / "README.md").write_text("public candidate\n", encoding="utf-8")
+    _git(public, "add", "README.md")
+    _git(public, "commit", "-m", "public baseline")
+    (public / "dirty-private-name.txt").write_text(sentinel, encoding="utf-8")
+
+    return private, public, sentinel, sensitive_url
+
+
+def _findings_for(
+    receipt: object,
+    *,
+    rule_id: str,
+    surface: ExposureSurface,
+) -> list[ExposureFinding]:
+    findings = getattr(receipt, "findings")
+    return [
+        finding
+        for finding in findings
+        if finding.rule_id == rule_id and finding.surface is surface
+    ]
+
+
+def test_real_git_inventory_keeps_surfaces_distinct_and_complete(
+    tmp_path: Path,
+) -> None:
+    private, public, sentinel, sensitive_url = _create_inventory_repositories(tmp_path)
+    policy = load_exposure_policy(_write_policy(tmp_path))
+
+    receipt = scan_exposure_inventory(private, public, policy)
+    serialized = receipt.model_dump_json()
+
+    worktree_raw = _findings_for(
+        receipt,
+        rule_id="reference.raw_asset",
+        surface=ExposureSurface.WORKTREE,
+    )
+    head_raw = _findings_for(
+        receipt,
+        rule_id="reference.raw_asset",
+        surface=ExposureSurface.GIT_HEAD,
+    )
+    history_raw = _findings_for(
+        receipt,
+        rule_id="reference.raw_asset",
+        surface=ExposureSurface.GIT_HISTORY,
+    )
+    secret_findings = _findings_for(
+        receipt,
+        rule_id="secret.assignment",
+        surface=ExposureSurface.GIT_HEAD,
+    )
+    credential_findings = _findings_for(
+        receipt,
+        rule_id="config.authenticated_remote",
+        surface=ExposureSurface.LOCAL_GIT_CONFIG,
+    )
+
+    assert receipt.scan_status is ScanStatus.COMPLETE
+    assert receipt.errors == []
+    assert receipt.verifier_source_commit == _git(private, "rev-parse", "HEAD")
+    assert [(finding.locator, finding.presence) for finding in worktree_raw] == [
+        ("reference-asset.pdf", ExposurePresence.ABSENT)
+    ]
+    assert [(finding.locator, finding.presence) for finding in head_raw] == [
+        ("reference-asset.pdf", ExposurePresence.PRESENT)
+    ]
+    assert {(finding.locator, finding.presence) for finding in history_raw} == {
+        ("old-reference.pdf", ExposurePresence.HISTORICAL),
+        ("reference-asset.pdf", ExposurePresence.HISTORICAL),
+    }
+    assert len(secret_findings) == 1
+    assert secret_findings[0].locator_kind is LocatorKind.SHA256
+    assert len(secret_findings[0].locator) == 64
+    assert [(finding.locator, finding.presence) for finding in credential_findings] == [
+        ("gitlab", ExposurePresence.PRESENT)
+    ]
+    assert receipt.distribution.default_eligibility == "not_eligible"
+    assert receipt.distribution.generated_staging == "not_built"
+    assert receipt.distribution.tracked_path_count == 3
+    expected_paths = "README.md\nreference-asset.pdf\nsecret.env\n"
+    assert (
+        receipt.distribution.tracked_path_set_sha256
+        == hashlib.sha256(expected_paths.encode("utf-8")).hexdigest()
+    )
+    assert receipt.private_repository is not None
+    assert receipt.private_repository.unchanged is True
+    assert receipt.public_candidate is not None
+    assert receipt.public_candidate.unchanged is True
+    assert (public / "dirty-private-name.txt").read_text(encoding="utf-8") == sentinel
+    for forbidden in (
+        sentinel,
+        sensitive_url,
+        str(private),
+        str(public),
+        "dirty-private-name.txt",
+        "secret.env",
+    ):
+        assert forbidden not in serialized
+
+
+def test_inventory_ignores_inherited_git_environment_overrides(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    private, public, sentinel, _ = _create_inventory_repositories(tmp_path / "target")
+    decoy, _, _, _ = _create_inventory_repositories(tmp_path / "decoy")
+    policy = load_exposure_policy(_write_policy(tmp_path))
+    injected = "S36-INJECTED-GIT-CONFIG-SECRET"
+    expected_commit = _git(private, "rev-parse", "HEAD")
+
+    monkeypatch.setenv("GIT_DIR", str(decoy / ".git"))
+    monkeypatch.setenv("GIT_WORK_TREE", str(decoy))
+    monkeypatch.setenv("GIT_CONFIG_COUNT", "1")
+    monkeypatch.setenv("GIT_CONFIG_KEY_0", "remote.injected.url")
+    monkeypatch.setenv(
+        "GIT_CONFIG_VALUE_0",
+        f"https://{injected}@example.invalid/private.git",
+    )
+
+    receipt = scan_exposure_inventory(private, public, policy)
+    serialized = receipt.model_dump_json()
+
+    assert receipt.scan_status is ScanStatus.COMPLETE
+    assert receipt.verifier_source_commit == expected_commit
+    assert injected not in serialized
+    assert sentinel not in serialized
+    assert "injected" not in {
+        finding.locator
+        for finding in receipt.findings
+        if finding.locator_kind is LocatorKind.REMOTE_NAME
+    }
+
+
+def test_missing_repository_returns_sanitized_incomplete_receipt(
+    tmp_path: Path,
+) -> None:
+    public = tmp_path / "public"
+    _initialize_repository(public)
+    (public / "README.md").write_text("public\n", encoding="utf-8")
+    _git(public, "add", "README.md")
+    _git(public, "commit", "-m", "public")
+    missing = tmp_path / "private-customer-name"
+    policy = load_exposure_policy(_write_policy(tmp_path))
+
+    receipt = scan_exposure_inventory(missing, public, policy)
+    serialized = receipt.model_dump_json()
+
+    assert receipt.scan_status is ScanStatus.INCOMPLETE
+    assert receipt.private_repository is None
+    assert InventoryErrorCode.MISSING_REPOSITORY in {
+        error.code for error in receipt.errors
+    }
+    assert str(missing) not in serialized
+    assert "private-customer-name" not in serialized
+
+
+def test_fingerprint_mismatch_fails_closed_without_mutating_repository(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    private, public, _, _ = _create_inventory_repositories(tmp_path)
+    policy = load_exposure_policy(_write_policy(tmp_path))
+    original = exposure_module.fingerprint_repository
+    call_count = 0
+
+    def mismatching_fingerprint(
+        repository_root: Path,
+        *,
+        label: str,
+    ) -> object:
+        nonlocal call_count
+        call_count += 1
+        fingerprint = original(repository_root, label=label)
+        if call_count == 3:
+            return fingerprint.model_copy(update={"status_sha256": "f" * 64})
+        return fingerprint
+
+    monkeypatch.setattr(
+        exposure_module,
+        "fingerprint_repository",
+        mismatching_fingerprint,
+    )
+
+    receipt = scan_exposure_inventory(private, public, policy)
+
+    assert receipt.scan_status is ScanStatus.INCOMPLETE
+    assert InventoryErrorCode.FINGERPRINT_MISMATCH in {
+        error.code for error in receipt.errors
+    }
+    assert receipt.private_repository is not None
+    assert receipt.private_repository.unchanged is False
