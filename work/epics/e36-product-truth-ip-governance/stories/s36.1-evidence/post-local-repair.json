@@ -1,0 +1,50 @@
+{
+  "ahead": 3,
+  "behind": 0,
+  "checked_branch": "main",
+  "checked_branch_commit": "6e8f9cb8144fc2cc96baed63506e7c6f43775b10",
+  "checks": [
+    {
+      "id": "canonical_remote",
+      "status": "pass"
+    },
+    {
+      "id": "allowed_remotes",
+      "status": "pass"
+    },
+    {
+      "id": "remote_credentials",
+      "status": "pass"
+    },
+    {
+      "id": "branch_exists",
+      "status": "pass"
+    },
+    {
+      "id": "remote_branch",
+      "status": "pass"
+    },
+    {
+      "id": "upstream",
+      "status": "pass"
+    },
+    {
+      "id": "synchronized",
+      "status": "fail"
+    }
+  ],
+  "findings": [
+    {
+      "code": "branch_diverged",
+      "subject": "main"
+    }
+  ],
+  "policy_sha256": "cdcb95dadb9ab137ddf25eee1f0783c5aab8af0dd360533d4607fa9fd4b22d5c",
+  "remotes": [
+    "origin"
+  ],
+  "schema_version": 1,
+  "status": "fail",
+  "upstream": "origin/main",
+  "verifier_source_commit": "9e5ed8e0d46e3641be69a624d28a7dd41af09d56"
+}
