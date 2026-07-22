@@ -12,7 +12,9 @@ from escala_server.workspace.ingestion import (
     SourceRegistry,
     SourceIngestionError,
     build_source_identity,
+    profile_source,
 )
+from escala_server.workspace.authority import WorkspaceConfig
 
 
 def test_registry_reports_declared_capabilities() -> None:
@@ -67,3 +69,53 @@ def test_identity_model_is_closed() -> None:
             source_id="b" * 64,
             absolute_path="/private/company/ventas.csv",  # type: ignore[call-arg]
         )
+
+
+def _config(tmp_path: Path) -> WorkspaceConfig:
+    return WorkspaceConfig(
+        platform="macos",
+        data_root=tmp_path / "data",
+        database_path=tmp_path / "data" / "escala.sqlite",
+        exchange_root=tmp_path / "exchange",
+    )
+
+
+def test_profiles_tabular_sources(tmp_path: Path) -> None:
+    config = _config(tmp_path)
+    config.exchange_root.mkdir()
+    source = config.exchange_root / "ventas.csv"
+    source.write_text(
+        "fecha,cliente,importe\n2026-07-22,Acme,10\n2026-07-23,Beta,20\n",
+        encoding="utf-8",
+    )
+
+    result = profile_source(config, source)
+
+    assert result.status == "ready"
+    assert result.profile is not None
+    table = result.profile.tables[0]
+    assert table.row_count == 3
+    assert table.column_count == 3
+    assert table.header_candidates[0].row_index == 0
+    assert {field.kind for field in table.field_candidates} >= {
+        "date",
+        "entity",
+        "unit",
+    }
+
+
+def test_ambiguous_profile_is_fail_closed(tmp_path: Path) -> None:
+    config = _config(tmp_path)
+    config.exchange_root.mkdir()
+    source = config.exchange_root / "cash.tsv"
+    source.write_text(
+        "fecha\tcliente\timporte\nFecha\tCliente\tImporte\n2026-07-22\tAcme\t10\n",
+        encoding="utf-8",
+    )
+
+    result = profile_source(config, source)
+
+    assert result.status == "needs_clarification"
+    assert result.profile is not None
+    assert result.questions[0].code == "header_row_ambiguous"
+    assert result.questions[0].options == ("row_0", "row_1")
