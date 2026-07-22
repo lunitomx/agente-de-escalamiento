@@ -34,3 +34,11 @@
 |------|--------|----------|-------------------|
 | Consent-based DISC assessment and local director view | Product discovery | Medium | Define consent, named-person access, retention, non-diagnostic language, and a local-only qualification before E40/E42 |
 | Credited knowledge cartridges from company trainings (starting with Cash / Humberto) | Product discovery | High | Obtain rights and formula validation, then qualify the cartridge adapter against synthetic and real local workbooks |
+
+## From E39: Meeting and Team Intelligence
+
+| Item | Origin | Priority | Promotion Condition |
+|------|--------|----------|-------------------|
+| Audio/video transcription and OCR | E39 design | Low | A local sample proves text transcripts are insufficient and a privacy/performance contract exists |
+| Calendar, Slack, Teams, email or issue integrations | E39 design | Low | A new product decision changes the local-files-only boundary and defines credentials/consent |
+| Psychological or performance inference from meeting language | E39 design | Rejected | Requires a separate ethical/product decision; E39 only reports observable evidence |
