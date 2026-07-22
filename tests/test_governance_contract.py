@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import json
 from pathlib import Path
+import subprocess
+import sys
 from typing import Any, Callable
 
 import pytest
@@ -10,19 +13,25 @@ import yaml
 
 from validators.governance_contract import (
     EpicIdentityResolutionCode,
+    GovernanceContractStatus,
+    build_governance_contract_receipt,
     closure_disposition_policy_hash,
     epic_identity_policy_hash,
     load_closure_disposition_policy,
     load_epic_identity_policy,
     load_governance_contract,
+    render_governance_contract_json,
+    render_governance_contract_markdown,
     resolve_epic_identity,
     validate_epic_identity_inventory,
+    write_governance_contract_receipts,
 )
 
 
 ROOT = Path(__file__).resolve().parents[1]
 CLOSURE_POLICY_PATH = ROOT / "governance/closure-dispositions.yaml"
 IDENTITY_POLICY_PATH = ROOT / "governance/epic-identities.yaml"
+SCRIPT = ROOT / "scripts/check_governance_contract.py"
 
 EXPECTED_DISPOSITIONS = {
     "active": (False, False, True, True),
@@ -335,3 +344,114 @@ def test_real_identity_inventory_has_all_ten_canonical_scopes_only() -> None:
     ]
     assert inventory.legacy_scope_paths_present == []
     assert inventory.duplicate_graph_ids == []
+
+
+def test_governance_receipt_is_deterministic_bounded_and_safe(
+    tmp_path: Path,
+) -> None:
+    receipt = build_governance_contract_receipt(
+        ROOT,
+        CLOSURE_POLICY_PATH,
+        IDENTITY_POLICY_PATH,
+    )
+    json_output = tmp_path / "evidence/governance-contract.json"
+    markdown_output = tmp_path / "evidence/governance-contract.md"
+
+    first_json = render_governance_contract_json(receipt)
+    first_markdown = render_governance_contract_markdown(receipt)
+    write_governance_contract_receipts(
+        receipt,
+        json_output=json_output,
+        markdown_output=markdown_output,
+    )
+
+    assert receipt.schema_version == 1
+    assert receipt.status is GovernanceContractStatus.PASS
+    assert receipt.canonical_ids == sorted(EXPECTED_IDENTITIES)
+    assert {
+        item.alias: tuple(item.canonical_ids) for item in receipt.ambiguity_sets
+    } == EXPECTED_AMBIGUITIES
+    assert receipt.canonical_scope_count == 10
+    assert receipt.legacy_scope_count == 0
+    assert receipt.duplicate_graph_id_count == 0
+    assert len(receipt.closure_policy_sha256) == 64
+    assert len(receipt.identity_policy_sha256) == 64
+    assert len(receipt.verifier_source_commit) in {40, 64}
+    assert first_json == render_governance_contract_json(receipt)
+    assert first_markdown == render_governance_contract_markdown(receipt)
+    assert first_json == json_output.read_text(encoding="utf-8")
+    assert first_markdown == markdown_output.read_text(encoding="utf-8")
+    assert len(first_markdown.encode()) < 16 * 1024
+    combined = first_json + first_markdown
+    for forbidden in (str(ROOT), "https://", "S36-PRIVATE-SENTINEL", "source_text"):
+        assert forbidden not in combined
+
+
+def test_governance_cli_is_repeatable_and_has_one_safe_failure(
+    tmp_path: Path,
+) -> None:
+    json_output = tmp_path / "evidence/governance-contract.json"
+    markdown_output = tmp_path / "evidence/governance-contract.md"
+    command = [
+        sys.executable,
+        str(SCRIPT),
+        "--repo",
+        str(ROOT),
+        "--closure-policy",
+        str(CLOSURE_POLICY_PATH),
+        "--identity-policy",
+        str(IDENTITY_POLICY_PATH),
+        "--format",
+        "json",
+        "--json-output",
+        str(json_output),
+        "--markdown-output",
+        str(markdown_output),
+    ]
+
+    first = subprocess.run(
+        command,
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    first_json = json_output.read_bytes()
+    first_markdown = markdown_output.read_bytes()
+    second = subprocess.run(
+        command,
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert first.returncode == second.returncode == 0
+    assert first.stderr == second.stderr == ""
+    assert first.stdout == second.stdout
+    assert json.loads(first.stdout)["status"] == "pass"
+    assert first_json == json_output.read_bytes()
+    assert first_markdown == markdown_output.read_bytes()
+    assert str(ROOT) not in first.stdout
+
+    corrupt = tmp_path / "S36-PRIVATE-SENTINEL.yaml"
+    corrupt.write_text("schema_version: [", encoding="utf-8")
+    failed = subprocess.run(
+        [
+            *command[:5],
+            str(corrupt),
+            *command[6:],
+        ],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert failed.returncode == 1
+    assert failed.stdout == ""
+    assert (
+        failed.stderr
+        == "governance contract: unable to produce a safe passing receipt\n"
+    )
+    assert "S36-PRIVATE-SENTINEL" not in failed.stderr

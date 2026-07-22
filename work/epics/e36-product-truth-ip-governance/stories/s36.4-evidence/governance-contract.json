@@ -1,0 +1,59 @@
+{
+  "ambiguity_sets": [
+    {
+      "alias": "E18",
+      "canonical_ids": [
+        "E1801",
+        "E1802"
+      ]
+    },
+    {
+      "alias": "E19",
+      "canonical_ids": [
+        "E1901",
+        "E1902"
+      ]
+    },
+    {
+      "alias": "E20",
+      "canonical_ids": [
+        "E2001",
+        "E2002"
+      ]
+    },
+    {
+      "alias": "E21",
+      "canonical_ids": [
+        "E2101",
+        "E2102"
+      ]
+    },
+    {
+      "alias": "E22",
+      "canonical_ids": [
+        "E2201",
+        "E2202"
+      ]
+    }
+  ],
+  "canonical_ids": [
+    "E1801",
+    "E1802",
+    "E1901",
+    "E1902",
+    "E2001",
+    "E2002",
+    "E2101",
+    "E2102",
+    "E2201",
+    "E2202"
+  ],
+  "canonical_scope_count": 10,
+  "closure_policy_sha256": "e5b9e9207fce7bbacd3af0a9e93368d6ccf38f979932d10360a2063924f8f023",
+  "duplicate_graph_id_count": 0,
+  "identity_policy_sha256": "eb62cd804fa3b0559d20394e27be583b6daa445c6619938b43d4a1a92d052d52",
+  "legacy_scope_count": 0,
+  "schema_version": 1,
+  "status": "pass",
+  "verifier_source_commit": "0d8f01dd491fa1ceb8920e4e2c93e0df656988b4"
+}

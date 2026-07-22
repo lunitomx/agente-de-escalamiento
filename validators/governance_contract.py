@@ -6,8 +6,10 @@ from collections import Counter, defaultdict
 from enum import Enum
 import hashlib
 import json
+import os
 from pathlib import Path, PurePosixPath
 import re
+import subprocess
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -24,6 +26,7 @@ _EPIC_FOLDER_PATTERN = re.compile(
     r"^work/epics/e([1-9][0-9]*)-[a-z0-9]+(?:-[a-z0-9]+)*$"
 )
 _IDENTITY_REFERENCE_PATTERN = re.compile(r"^[A-Za-z0-9._/\\-]+$")
+_COMMIT_PATTERN = re.compile(r"^(?:[0-9a-f]{40}|[0-9a-f]{64})$")
 
 
 class GovernanceContractError(ValueError):
@@ -248,6 +251,53 @@ class EpicIdentityInventory(_StrictModel):
     duplicate_graph_ids: list[str]
 
 
+class GovernanceContractStatus(str, Enum):
+    PASS = "pass"
+
+
+class GovernanceAmbiguitySet(_StrictModel):
+    alias: str
+    canonical_ids: list[str] = Field(min_length=2)
+
+
+class GovernanceContractReceipt(_StrictModel):
+    """Bounded passing evidence without repository paths or source text."""
+
+    schema_version: Literal[1]
+    status: Literal[GovernanceContractStatus.PASS]
+    closure_policy_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    identity_policy_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    verifier_source_commit: str = Field(pattern=r"^(?:[0-9a-f]{40}|[0-9a-f]{64})$")
+    canonical_ids: list[str] = Field(min_length=1)
+    ambiguity_sets: list[GovernanceAmbiguitySet]
+    canonical_scope_count: int = Field(ge=1)
+    legacy_scope_count: Literal[0]
+    duplicate_graph_id_count: Literal[0]
+
+    @model_validator(mode="after")
+    def validate_receipt(self) -> GovernanceContractReceipt:
+        if self.canonical_ids != sorted(set(self.canonical_ids)):
+            raise ValueError("canonical receipt IDs must be sorted and unique")
+        if self.canonical_scope_count != len(self.canonical_ids):
+            raise ValueError("canonical scope count must match canonical IDs")
+        if self.ambiguity_sets != sorted(
+            self.ambiguity_sets,
+            key=lambda item: item.alias,
+        ):
+            raise ValueError("ambiguity sets must be sorted")
+        aliases = [item.alias for item in self.ambiguity_sets]
+        if aliases != sorted(set(aliases)):
+            raise ValueError("ambiguity aliases must be unique")
+        canonical = set(self.canonical_ids)
+        if any(
+            item.canonical_ids != sorted(set(item.canonical_ids))
+            or not set(item.canonical_ids) <= canonical
+            for item in self.ambiguity_sets
+        ):
+            raise ValueError("ambiguity candidates must be sorted canonical IDs")
+        return self
+
+
 ClosureDisposition.model_rebuild()
 ClosureDispositionPolicy.model_rebuild()
 EpicIdentity.model_rebuild()
@@ -256,6 +306,8 @@ EpicIdentityPolicy.model_rebuild()
 GovernanceContract.model_rebuild()
 EpicIdentityResolution.model_rebuild()
 EpicIdentityInventory.model_rebuild()
+GovernanceAmbiguitySet.model_rebuild()
+GovernanceContractReceipt.model_rebuild()
 
 
 def load_closure_disposition_policy(policy_path: Path) -> ClosureDispositionPolicy:
@@ -364,6 +416,100 @@ def validate_epic_identity_inventory(
     )
 
 
+def build_governance_contract_receipt(
+    repository_root: Path,
+    closure_policy_path: Path,
+    identity_policy_path: Path,
+) -> GovernanceContractReceipt:
+    """Build passing evidence only after cross-policy and inventory checks."""
+    contract = load_governance_contract(closure_policy_path, identity_policy_path)
+    inventory = validate_epic_identity_inventory(repository_root, contract)
+    return GovernanceContractReceipt(
+        schema_version=1,
+        status=GovernanceContractStatus.PASS,
+        closure_policy_sha256=closure_disposition_policy_hash(contract.closure_policy),
+        identity_policy_sha256=epic_identity_policy_hash(contract.identity_policy),
+        verifier_source_commit=_read_git_head(repository_root),
+        canonical_ids=inventory.canonical_ids,
+        ambiguity_sets=[
+            GovernanceAmbiguitySet(
+                alias=item.alias,
+                canonical_ids=item.canonical_ids,
+            )
+            for item in contract.identity_policy.ambiguous_aliases
+        ],
+        canonical_scope_count=len(inventory.canonical_scope_paths),
+        legacy_scope_count=0,
+        duplicate_graph_id_count=0,
+    )
+
+
+def render_governance_contract_json(receipt: GovernanceContractReceipt) -> str:
+    """Render deterministic machine evidence from bounded typed fields."""
+    return (
+        json.dumps(
+            receipt.model_dump(mode="json"),
+            ensure_ascii=True,
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n"
+    )
+
+
+def render_governance_contract_markdown(
+    receipt: GovernanceContractReceipt,
+) -> str:
+    """Render deterministic bounded human evidence."""
+    lines = [
+        "# Governance Contract Receipt",
+        "",
+        f"- Status: `{receipt.status.value}`",
+        f"- Closure policy SHA-256: `{receipt.closure_policy_sha256}`",
+        f"- Identity policy SHA-256: `{receipt.identity_policy_sha256}`",
+        f"- Verifier source commit: `{receipt.verifier_source_commit}`",
+        f"- Canonical scope count: `{receipt.canonical_scope_count}`",
+        f"- Legacy scope count: `{receipt.legacy_scope_count}`",
+        f"- Duplicate graph ID count: `{receipt.duplicate_graph_id_count}`",
+        "",
+        "## Canonical epic IDs",
+        "",
+        *[f"- `{canonical_id}`" for canonical_id in receipt.canonical_ids],
+        "",
+        "## Ambiguous legacy aliases",
+        "",
+        *[
+            f"- `{item.alias}`: "
+            + ", ".join(f"`{candidate}`" for candidate in item.canonical_ids)
+            for item in receipt.ambiguity_sets
+        ],
+    ]
+    return "\n".join(lines) + "\n"
+
+
+def write_governance_contract_receipts(
+    receipt: GovernanceContractReceipt,
+    *,
+    json_output: Path | None = None,
+    markdown_output: Path | None = None,
+) -> None:
+    """Write explicitly requested passing governance receipts."""
+    if receipt.status is not GovernanceContractStatus.PASS:
+        raise ValueError("only a passing governance receipt may be written")
+    if json_output is not None:
+        json_output.parent.mkdir(parents=True, exist_ok=True)
+        json_output.write_text(
+            render_governance_contract_json(receipt),
+            encoding="utf-8",
+        )
+    if markdown_output is not None:
+        markdown_output.parent.mkdir(parents=True, exist_ok=True)
+        markdown_output.write_text(
+            render_governance_contract_markdown(receipt),
+            encoding="utf-8",
+        )
+
+
 def _semantic_hash(model: BaseModel) -> str:
     payload = json.dumps(
         model.model_dump(mode="json"),
@@ -372,6 +518,26 @@ def _semantic_hash(model: BaseModel) -> str:
         sort_keys=True,
     )
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def _read_git_head(repository_root: Path) -> str:
+    environment = os.environ.copy()
+    for key in tuple(environment):
+        if key in {"GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE"} or key.startswith(
+            "GIT_CONFIG_"
+        ):
+            environment.pop(key, None)
+    result = subprocess.run(
+        ["git", "-C", str(repository_root), "rev-parse", "HEAD"],
+        check=False,
+        capture_output=True,
+        env=environment,
+        text=True,
+    )
+    commit = result.stdout.strip()
+    if result.returncode != 0 or _COMMIT_PATTERN.fullmatch(commit) is None:
+        raise GovernanceContractError("unable to resolve verifier source commit")
+    return commit
 
 
 def _validate_epic_id(value: str) -> str:
