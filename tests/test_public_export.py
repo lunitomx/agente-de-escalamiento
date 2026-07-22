@@ -16,7 +16,7 @@ from pydantic import ValidationError
 import yaml
 
 from validators.export import REQUIRED_SECTIONS, validate_export
-from validators.public_boundary import load_public_boundary_policy
+from validators.public_boundary import load_public_boundary_policy, scan_public_content
 from validators.public_export import (
     ArtifactManifest,
     ArtifactRole,
@@ -952,6 +952,13 @@ def test_selected_server_has_no_private_ingester_dependency() -> None:
 
     assert ".data.knowledge_ingester" not in server_source
     assert '"/api/knowledge/ingest"' not in server_source
+
+
+def test_selected_package_metadata_is_source_neutral() -> None:
+    boundary = load_public_boundary_policy(PUBLIC_BOUNDARY_PATH)
+    content = (ROOT / "pyproject.toml").read_bytes()
+
+    assert scan_public_content("pyproject.toml", content, boundary) == []
 
 
 def test_safe_receipt_renderers_are_deterministic_and_bounded(tmp_path: Path) -> None:
