@@ -24,6 +24,7 @@ from validators.master_acceptance import (
     GateEvidenceReceipt,
     MasterAcceptanceError,
     MasterAcceptanceLedger,
+    MasterAcceptanceReceipt,
     MissionReadiness,
     RequirementEvidenceReceipt,
     acceptance_requirement_declaration_hash,
@@ -56,6 +57,14 @@ LEDGER_MARKDOWN_PATH = (
     ROOT / "work/epics/e36-product-truth-ip-governance/master-acceptance-ledger.md"
 )
 SCRIPT = ROOT / "scripts/check_master_acceptance.py"
+BASELINE_JSON_PATH = (
+    ROOT / "work/epics/e36-product-truth-ip-governance/stories/"
+    "s36.6-evidence/baseline.json"
+)
+BASELINE_MARKDOWN_PATH = (
+    ROOT / "work/epics/e36-product-truth-ip-governance/stories/"
+    "s36.6-evidence/baseline.md"
+)
 
 EXPECTED_COUNTS = {
     "E37": 7,
@@ -685,3 +694,46 @@ def test_master_acceptance_cli_has_truthful_modes_and_one_safe_failure(
         == "master acceptance: unable to produce a safe contract receipt\n"
     )
     assert "S36-PRIVATE-SENTINEL" not in failed.stderr
+
+
+def test_versioned_real_baseline_matches_current_contract_semantics() -> None:
+    ledger = load_master_acceptance_ledger(LEDGER_PATH)
+    baseline = MasterAcceptanceReceipt.model_validate_json(
+        BASELINE_JSON_PATH.read_text(encoding="utf-8")
+    )
+    current = build_master_acceptance_receipt(
+        ROOT,
+        ledger,
+        mode=AcceptanceMode.BASELINE,
+    )
+
+    assert baseline.contract_status is ContractStatus.PASS
+    assert baseline.mission_readiness is MissionReadiness.UNPROVED
+    assert baseline.requirement_count == baseline.unproved_count == 42
+    assert baseline.proved_count == 0
+    assert render_master_acceptance_receipt_json(baseline) == (
+        BASELINE_JSON_PATH.read_text(encoding="utf-8")
+    )
+    assert render_master_acceptance_receipt_markdown(baseline) == (
+        BASELINE_MARKDOWN_PATH.read_text(encoding="utf-8")
+    )
+    assert (
+        baseline.model_copy(
+            update={"verifier_source_commit": current.verifier_source_commit}
+        )
+        == current
+    )
+    source_exists = subprocess.run(
+        [
+            "git",
+            "-C",
+            str(ROOT),
+            "cat-file",
+            "-e",
+            f"{baseline.verifier_source_commit}^{{commit}}",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert source_exists.returncode == 0
