@@ -1,7 +1,11 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import hashlib
+import json
 from pathlib import Path
+import subprocess
+import sys
 from typing import Any, Callable
 
 import pytest
@@ -15,13 +19,25 @@ from validators.governance_contract import (
     load_epic_identity_policy,
 )
 from validators.master_acceptance import (
+    AcceptanceMode,
+    ContractStatus,
+    GateEvidenceReceipt,
     MasterAcceptanceError,
     MasterAcceptanceLedger,
+    MissionReadiness,
+    RequirementEvidenceReceipt,
+    acceptance_requirement_declaration_hash,
+    build_master_acceptance_receipt,
     load_master_acceptance_ledger,
     master_acceptance_ledger_hash,
     render_master_acceptance_json,
     render_master_acceptance_markdown,
+    render_master_acceptance_receipt_json,
+    render_master_acceptance_receipt_markdown,
+    render_requirement_evidence_receipt_json,
     validate_master_acceptance_authorities,
+    verification_command_hash,
+    write_master_acceptance_receipts,
 )
 from validators.public_export import (
     load_public_export_policy,
@@ -39,6 +55,7 @@ LEDGER_PATH = (
 LEDGER_MARKDOWN_PATH = (
     ROOT / "work/epics/e36-product-truth-ip-governance/master-acceptance-ledger.md"
 )
+SCRIPT = ROOT / "scripts/check_master_acceptance.py"
 
 EXPECTED_COUNTS = {
     "E37": 7,
@@ -214,6 +231,33 @@ def _write_ledger(tmp_path: Path, data: Any) -> Path:
     return path
 
 
+def _git(repository: Path, *args: str) -> str:
+    completed = subprocess.run(
+        ["git", "-C", str(repository), *args],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return completed.stdout.strip()
+
+
+def _initialize_authority_repository(repository: Path) -> str:
+    governance = repository / "governance"
+    governance.mkdir(parents=True)
+    for source in (
+        CLOSURE_POLICY_PATH,
+        IDENTITY_POLICY_PATH,
+        PUBLIC_EXPORT_POLICY_PATH,
+    ):
+        (governance / source.name).write_bytes(source.read_bytes())
+    _git(repository, "init", "-q")
+    _git(repository, "config", "user.email", "tests@example.invalid")
+    _git(repository, "config", "user.name", "Tests")
+    _git(repository, "add", "governance")
+    _git(repository, "commit", "-q", "-m", "authority baseline")
+    return _git(repository, "rev-parse", "HEAD")
+
+
 def test_strict_master_acceptance_contract_is_complete_and_stable(
     tmp_path: Path,
 ) -> None:
@@ -368,3 +412,276 @@ def test_canonical_ledger_rendering_is_deterministic_and_matches_human_view() ->
     combined = first_json + first_markdown
     for forbidden in (str(ROOT), "https://", "S36-PRIVATE-SENTINEL"):
         assert forbidden not in combined
+
+
+def test_master_ledger_hash_excludes_external_receipt_content_address() -> None:
+    first_data = _ledger_data()
+    first_data["requirements"][0]["delivery_disposition"] = "complete"
+    first_data["requirements"][0]["proof"] = {
+        "state": "proved",
+        "receipt_sha256": "a" * 64,
+    }
+    second_data = deepcopy(first_data)
+    second_data["requirements"][0]["proof"]["receipt_sha256"] = "b" * 64
+
+    first = MasterAcceptanceLedger.model_validate(first_data)
+    second = MasterAcceptanceLedger.model_validate(second_data)
+
+    assert master_acceptance_ledger_hash(first) == master_acceptance_ledger_hash(second)
+
+
+def test_canonical_baseline_receipt_is_pass_but_truthfully_unproved() -> None:
+    ledger = load_master_acceptance_ledger(LEDGER_PATH)
+
+    receipt = build_master_acceptance_receipt(
+        ROOT,
+        ledger,
+        mode=AcceptanceMode.BASELINE,
+    )
+    first_json = render_master_acceptance_receipt_json(receipt)
+    first_markdown = render_master_acceptance_receipt_markdown(receipt)
+
+    assert receipt.contract_status is ContractStatus.PASS
+    assert receipt.mission_readiness is MissionReadiness.UNPROVED
+    assert receipt.epic_filter is None
+    assert receipt.epic_count == 6
+    assert receipt.requirement_count == 42
+    assert receipt.proved_count == 0
+    assert receipt.unproved_count == 42
+    assert receipt.proved_ids == []
+    assert [item.requirement_id for item in receipt.blocking_requirements] == [
+        item.id for item in ledger.requirements
+    ]
+    assert {item.rule_id for item in receipt.blocking_requirements} == {
+        "evidence.missing"
+    }
+    assert first_json == render_master_acceptance_receipt_json(receipt)
+    assert first_markdown == render_master_acceptance_receipt_markdown(receipt)
+    assert len(first_json.encode()) <= ledger.limits.max_receipt_bytes
+    assert len(first_markdown.encode()) <= ledger.limits.max_receipt_bytes
+    combined = first_json + first_markdown
+    for forbidden in (str(ROOT), "https://", "S36-PRIVATE-SENTINEL"):
+        assert forbidden not in combined
+
+
+def test_exact_requirement_receipts_can_prove_one_filtered_epic(
+    tmp_path: Path,
+) -> None:
+    repository = tmp_path / "repository"
+    repository.mkdir()
+    source_commit = _initialize_authority_repository(repository)
+    data = _ledger_data()
+    unproved_ledger = MasterAcceptanceLedger.model_validate(data)
+    ledger_sha256 = master_acceptance_ledger_hash(unproved_ledger)
+
+    for requirement_data in data["requirements"]:
+        if requirement_data["owner"]["epic"] != "E37":
+            continue
+        requirement = next(
+            item
+            for item in unproved_ledger.requirements
+            if item.id == requirement_data["id"]
+        )
+        artifact_path = repository / requirement.evidence.artifact_path
+        artifact_path.parent.mkdir(parents=True, exist_ok=True)
+        artifact_bytes = f"qualified artifact for {requirement.id}\n".encode()
+        artifact_path.write_bytes(artifact_bytes)
+        evidence_receipt = RequirementEvidenceReceipt(
+            schema_version=1,
+            requirement_id=requirement.id,
+            ledger_sha256=ledger_sha256,
+            declaration_sha256=acceptance_requirement_declaration_hash(requirement),
+            source_commit=source_commit,
+            artifact_sha256=hashlib.sha256(artifact_bytes).hexdigest(),
+            command_sha256=verification_command_hash(
+                requirement.evidence.verification_command
+            ),
+            gate_results=[
+                GateEvidenceReceipt(id=gate_id, status="pass")
+                for gate_id in requirement.evidence.required_gates
+            ],
+            platforms=requirement.platforms,
+            result="pass",
+        )
+        receipt_bytes = render_requirement_evidence_receipt_json(
+            evidence_receipt
+        ).encode()
+        receipt_path = repository / requirement.evidence.receipt_path
+        receipt_path.write_bytes(receipt_bytes)
+        requirement_data["delivery_disposition"] = "complete"
+        requirement_data["proof"] = {
+            "state": "proved",
+            "receipt_sha256": hashlib.sha256(receipt_bytes).hexdigest(),
+        }
+
+    proved_ledger = MasterAcceptanceLedger.model_validate(data)
+    receipt = build_master_acceptance_receipt(
+        repository,
+        proved_ledger,
+        mode=AcceptanceMode.READINESS,
+        epic_filter="E37",
+    )
+
+    assert receipt.contract_status is ContractStatus.PASS
+    assert receipt.mission_readiness is MissionReadiness.PROVED
+    assert receipt.epic_filter == "E37"
+    assert receipt.epic_count == 1
+    assert receipt.requirement_count == receipt.proved_count == 7
+    assert receipt.unproved_count == 0
+    assert receipt.proved_ids == [f"REQ-E37-{index:03d}" for index in range(1, 8)]
+    assert receipt.blocking_requirements == []
+
+
+def test_stale_or_failed_proof_is_reported_without_false_contract_failure(
+    tmp_path: Path,
+) -> None:
+    repository = tmp_path / "repository"
+    repository.mkdir()
+    _initialize_authority_repository(repository)
+    data = _ledger_data()
+    data["requirements"][0]["delivery_disposition"] = "complete"
+    data["requirements"][0]["proof"] = {
+        "state": "proved",
+        "receipt_sha256": "a" * 64,
+    }
+    ledger = MasterAcceptanceLedger.model_validate(data)
+
+    receipt = build_master_acceptance_receipt(
+        repository,
+        ledger,
+        mode=AcceptanceMode.READINESS,
+        epic_filter="E37",
+    )
+
+    assert receipt.contract_status is ContractStatus.PASS
+    assert receipt.mission_readiness is MissionReadiness.UNPROVED
+    assert receipt.proved_count == 0
+    assert receipt.unproved_count == 7
+    assert receipt.blocking_requirements[0].requirement_id == "REQ-E37-001"
+    assert receipt.blocking_requirements[0].rule_id == "evidence.missing"
+
+
+def test_master_acceptance_writers_are_explicit_and_non_overwriting(
+    tmp_path: Path,
+) -> None:
+    ledger = load_master_acceptance_ledger(LEDGER_PATH)
+    receipt = build_master_acceptance_receipt(
+        ROOT,
+        ledger,
+        mode=AcceptanceMode.BASELINE,
+    )
+    json_output = tmp_path / "receipts/baseline.json"
+    markdown_output = tmp_path / "receipts/baseline.md"
+
+    write_master_acceptance_receipts(
+        receipt,
+        max_receipt_bytes=ledger.limits.max_receipt_bytes,
+        json_output=json_output,
+        markdown_output=markdown_output,
+    )
+
+    assert json_output.read_text(encoding="utf-8") == (
+        render_master_acceptance_receipt_json(receipt)
+    )
+    assert markdown_output.read_text(encoding="utf-8") == (
+        render_master_acceptance_receipt_markdown(receipt)
+    )
+    with pytest.raises(FileExistsError):
+        write_master_acceptance_receipts(
+            receipt,
+            max_receipt_bytes=ledger.limits.max_receipt_bytes,
+            json_output=json_output,
+        )
+
+
+def test_master_acceptance_cli_has_truthful_modes_and_one_safe_failure(
+    tmp_path: Path,
+) -> None:
+    outputs: list[tuple[bytes, bytes, str]] = []
+    for label in ("first", "second"):
+        json_output = tmp_path / label / "baseline.json"
+        markdown_output = tmp_path / label / "baseline.md"
+        completed = subprocess.run(
+            [
+                sys.executable,
+                str(SCRIPT),
+                "--repo",
+                str(ROOT),
+                "--ledger",
+                str(LEDGER_PATH),
+                "--mode",
+                "baseline",
+                "--format",
+                "json",
+                "--json-output",
+                str(json_output),
+                "--markdown-output",
+                str(markdown_output),
+            ],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        assert completed.returncode == 0
+        assert completed.stderr == ""
+        assert json.loads(completed.stdout)["mission_readiness"] == "unproved"
+        outputs.append(
+            (
+                json_output.read_bytes(),
+                markdown_output.read_bytes(),
+                completed.stdout,
+            )
+        )
+    assert outputs[0] == outputs[1]
+
+    readiness = subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPT),
+            "--repo",
+            str(ROOT),
+            "--ledger",
+            str(LEDGER_PATH),
+            "--mode",
+            "readiness",
+            "--epic",
+            "E37",
+            "--format",
+            "text",
+        ],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert readiness.returncode == 2
+    assert readiness.stderr == ""
+    assert "Mission readiness: `unproved`" in readiness.stdout
+    assert "Epic filter: `E37`" in readiness.stdout
+
+    corrupt = tmp_path / "S36-PRIVATE-SENTINEL.yaml"
+    corrupt.write_text("schema_version: [", encoding="utf-8")
+    failed = subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPT),
+            "--repo",
+            str(ROOT),
+            "--ledger",
+            str(corrupt),
+            "--mode",
+            "baseline",
+        ],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert failed.returncode == 1
+    assert failed.stdout == ""
+    assert (
+        failed.stderr
+        == "master acceptance: unable to produce a safe contract receipt\n"
+    )
+    assert "S36-PRIVATE-SENTINEL" not in failed.stderr

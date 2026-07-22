@@ -5,8 +5,10 @@ from __future__ import annotations
 from enum import Enum
 import hashlib
 import json
+import os
 from pathlib import Path, PurePosixPath
 import re
+import subprocess
 from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -58,6 +60,7 @@ _SLUG_PATTERN = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 _GATE_ID_PATTERN = re.compile(r"^gate-[a-z0-9]+(?:-[a-z0-9]+)*$")
 _DISPOSITION_ID_PATTERN = re.compile(r"^[a-z][a-z0-9-]*(?:/[a-z][a-z0-9-]*)?$")
 _COMMAND_TOKEN_PATTERN = re.compile(r"^[A-Za-z0-9._/-]+$")
+_COMMIT_PATTERN = re.compile(r"^(?:[0-9a-f]{40}|[0-9a-f]{64})$")
 
 
 class MasterAcceptanceError(ValueError):
@@ -452,6 +455,151 @@ class AcceptanceAuthoritySnapshot(_StrictModel):
     publication_authorized: Literal[False]
 
 
+class AcceptanceMode(str, Enum):
+    BASELINE = "baseline"
+    READINESS = "readiness"
+
+
+class ContractStatus(str, Enum):
+    PASS = "pass"
+
+
+class MissionReadiness(str, Enum):
+    PROVED = "proved"
+    UNPROVED = "unproved"
+
+
+class GateEvidenceReceipt(_StrictModel):
+    id: str
+    status: Literal["pass"]
+
+    @field_validator("id")
+    @classmethod
+    def validate_id(cls, value: str) -> str:
+        if _GATE_ID_PATTERN.fullmatch(value) is None:
+            raise ValueError("unsafe gate ID")
+        return value
+
+
+class RequirementEvidenceReceipt(_StrictModel):
+    """Independent passing evidence for one exact acceptance declaration."""
+
+    schema_version: Literal[1]
+    requirement_id: str
+    ledger_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    declaration_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    source_commit: str = Field(pattern=r"^(?:[0-9a-f]{40}|[0-9a-f]{64})$")
+    artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    command_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    gate_results: list[GateEvidenceReceipt] = Field(min_length=1)
+    platforms: list[Platform] = Field(min_length=1)
+    result: Literal["pass"]
+
+    @field_validator("requirement_id")
+    @classmethod
+    def validate_requirement_id(cls, value: str) -> str:
+        if _REQUIREMENT_ID_PATTERN.fullmatch(value) is None:
+            raise ValueError("unsafe acceptance requirement ID")
+        return value
+
+    @field_validator("gate_results")
+    @classmethod
+    def validate_gate_results(
+        cls,
+        values: list[GateEvidenceReceipt],
+    ) -> list[GateEvidenceReceipt]:
+        identifiers = [item.id for item in values]
+        if identifiers != sorted(identifiers):
+            raise ValueError("gate results must be sorted")
+        _reject_duplicates(identifiers, "gate result IDs")
+        return values
+
+    @field_validator("platforms")
+    @classmethod
+    def validate_platforms(cls, values: list[Platform]) -> list[Platform]:
+        if values != sorted(values, key=lambda item: item.value):
+            raise ValueError("platforms must be sorted")
+        _reject_duplicates([item.value for item in values], "platforms")
+        return values
+
+
+class AcceptanceFinding(_StrictModel):
+    requirement_id: str
+    rule_id: EvidenceBlocker
+
+    @field_validator("requirement_id")
+    @classmethod
+    def validate_requirement_id(cls, value: str) -> str:
+        if _REQUIREMENT_ID_PATTERN.fullmatch(value) is None:
+            raise ValueError("unsafe acceptance requirement ID")
+        return value
+
+
+class MasterAcceptanceReceipt(_StrictModel):
+    """Bounded mission evidence with contract and readiness kept separate."""
+
+    schema_version: Literal[1]
+    contract_status: Literal[ContractStatus.PASS]
+    mission_readiness: MissionReadiness
+    mode: AcceptanceMode
+    mission_id: Literal["escala-local-v2-plan-maestro-2607202112"]
+    epic_filter: str | None
+    verifier_source_commit: str = Field(pattern=r"^(?:[0-9a-f]{40}|[0-9a-f]{64})$")
+    ledger_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    ledger_markdown_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    authorities: AcceptanceAuthoritySnapshot
+    epic_count: int = Field(ge=1, le=6)
+    requirement_count: int = Field(ge=1, le=42)
+    proved_count: int = Field(ge=0, le=42)
+    unproved_count: int = Field(ge=0, le=42)
+    proved_ids: list[str]
+    blocking_requirements: list[AcceptanceFinding]
+
+    @field_validator("epic_filter")
+    @classmethod
+    def validate_epic_filter(cls, value: str | None) -> str | None:
+        if value is not None:
+            _validate_epic_id(value)
+        return value
+
+    @field_validator("proved_ids")
+    @classmethod
+    def validate_proved_ids(cls, values: list[str]) -> list[str]:
+        if values != sorted(values):
+            raise ValueError("proved requirement IDs must be sorted")
+        _reject_duplicates(values, "proved requirement IDs")
+        if any(_REQUIREMENT_ID_PATTERN.fullmatch(value) is None for value in values):
+            raise ValueError("unsafe acceptance requirement ID")
+        return values
+
+    @field_validator("blocking_requirements")
+    @classmethod
+    def validate_blocking_requirements(
+        cls,
+        values: list[AcceptanceFinding],
+    ) -> list[AcceptanceFinding]:
+        identifiers = [item.requirement_id for item in values]
+        if identifiers != sorted(identifiers):
+            raise ValueError("blocking requirements must be sorted")
+        _reject_duplicates(identifiers, "blocking requirement IDs")
+        return values
+
+    @model_validator(mode="after")
+    def validate_counts_and_readiness(self) -> MasterAcceptanceReceipt:
+        if self.proved_count + self.unproved_count != self.requirement_count:
+            raise ValueError("acceptance counts must reconcile")
+        if self.proved_count != len(self.proved_ids):
+            raise ValueError("proved count must match proved IDs")
+        if self.unproved_count != len(self.blocking_requirements):
+            raise ValueError("unproved count must match blockers")
+        if self.mission_readiness is MissionReadiness.PROVED:
+            if self.unproved_count != 0 or self.blocking_requirements:
+                raise ValueError("proved readiness cannot contain blockers")
+        elif self.unproved_count == 0:
+            raise ValueError("unproved readiness requires a blocker")
+        return self
+
+
 def load_master_acceptance_ledger(ledger_path: Path) -> MasterAcceptanceLedger:
     """Load one strict local master-acceptance ledger."""
     data: Any = yaml.safe_load(ledger_path.read_text(encoding="utf-8"))
@@ -459,14 +607,40 @@ def load_master_acceptance_ledger(ledger_path: Path) -> MasterAcceptanceLedger:
 
 
 def master_acceptance_ledger_hash(ledger: MasterAcceptanceLedger) -> str:
-    """Return a stable SHA-256 for normalized ledger semantics."""
+    """Hash stable acceptance semantics without dynamic evidence pointers."""
+    data = ledger.model_dump(mode="json")
+    for requirement in data["requirements"]:
+        requirement["delivery_disposition"] = "evidence_controlled"
+        requirement["proof"] = {"state": "evidence_controlled"}
     payload = json.dumps(
-        ledger.model_dump(mode="json"),
+        data,
         ensure_ascii=True,
         separators=(",", ":"),
         sort_keys=True,
     )
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def acceptance_requirement_declaration_hash(
+    requirement: AcceptanceRequirement,
+) -> str:
+    """Hash the stable behavior and proof declaration for one requirement."""
+    data = requirement.model_dump(mode="json")
+    data.pop("delivery_disposition")
+    data.pop("proof")
+    return _json_semantic_hash(data)
+
+
+def verification_command_hash(command: list[str]) -> str:
+    """Hash one validated argv declaration without executing it."""
+    return _json_semantic_hash(command)
+
+
+def render_requirement_evidence_receipt_json(
+    receipt: RequirementEvidenceReceipt,
+) -> str:
+    """Render one future requirement receipt deterministically."""
+    return _render_json_model(receipt)
 
 
 def render_master_acceptance_json(ledger: MasterAcceptanceLedger) -> str:
@@ -596,6 +770,149 @@ def render_master_acceptance_markdown(ledger: MasterAcceptanceLedger) -> str:
     return "\n".join(lines)
 
 
+def build_master_acceptance_receipt(
+    repository_root: Path,
+    ledger: MasterAcceptanceLedger,
+    *,
+    mode: AcceptanceMode,
+    epic_filter: str | None = None,
+) -> MasterAcceptanceReceipt:
+    """Evaluate exact local evidence without executing declared commands."""
+    authorities = validate_master_acceptance_authorities(repository_root, ledger)
+    if epic_filter is not None:
+        _validate_epic_id(epic_filter)
+    selected = [
+        requirement
+        for requirement in ledger.requirements
+        if epic_filter is None or requirement.owner.epic == epic_filter
+    ]
+    if not selected:
+        raise MasterAcceptanceError("acceptance filter has no requirements")
+
+    ledger_sha256 = master_acceptance_ledger_hash(ledger)
+    proved_ids: list[str] = []
+    findings: list[AcceptanceFinding] = []
+    for requirement in selected:
+        finding = _evaluate_requirement_evidence(
+            repository_root,
+            ledger,
+            ledger_sha256,
+            requirement,
+        )
+        if finding is None:
+            proved_ids.append(requirement.id)
+        else:
+            findings.append(finding)
+    readiness = MissionReadiness.PROVED if not findings else MissionReadiness.UNPROVED
+    receipt = MasterAcceptanceReceipt(
+        schema_version=1,
+        contract_status=ContractStatus.PASS,
+        mission_readiness=readiness,
+        mode=mode,
+        mission_id=ledger.mission_id,
+        epic_filter=epic_filter,
+        verifier_source_commit=_read_git_head(repository_root),
+        ledger_sha256=ledger_sha256,
+        ledger_markdown_sha256=hashlib.sha256(
+            render_master_acceptance_markdown(ledger).encode("utf-8")
+        ).hexdigest(),
+        authorities=authorities,
+        epic_count=len({item.owner.epic for item in selected}),
+        requirement_count=len(selected),
+        proved_count=len(proved_ids),
+        unproved_count=len(findings),
+        proved_ids=proved_ids,
+        blocking_requirements=findings,
+    )
+    _require_bounded_receipt(receipt, ledger.limits.max_receipt_bytes)
+    return receipt
+
+
+def render_master_acceptance_receipt_json(
+    receipt: MasterAcceptanceReceipt,
+) -> str:
+    """Render deterministic bounded machine acceptance evidence."""
+    return _render_json_model(receipt)
+
+
+def render_master_acceptance_receipt_markdown(
+    receipt: MasterAcceptanceReceipt,
+) -> str:
+    """Render deterministic bounded human acceptance evidence."""
+    lines = [
+        "# Master Acceptance Receipt",
+        "",
+        f"- Contract status: `{receipt.contract_status.value}`",
+        f"- Mission readiness: `{receipt.mission_readiness.value}`",
+        f"- Mode: `{receipt.mode.value}`",
+        f"- Epic filter: `{receipt.epic_filter or 'all'}`",
+        f"- Verifier source commit: `{receipt.verifier_source_commit}`",
+        f"- Ledger SHA-256: `{receipt.ledger_sha256}`",
+        f"- Ledger Markdown SHA-256: `{receipt.ledger_markdown_sha256}`",
+        f"- Epics: `{receipt.epic_count}`",
+        f"- Requirements: `{receipt.requirement_count}`",
+        f"- Proved: `{receipt.proved_count}`",
+        f"- Unproved: `{receipt.unproved_count}`",
+        "",
+        "## Authority bindings",
+        "",
+        (
+            "- Closure dispositions SHA-256: "
+            f"`{receipt.authorities.closure_dispositions_sha256}`"
+        ),
+        (f"- Epic identities SHA-256: `{receipt.authorities.epic_identities_sha256}`"),
+        (f"- Public export SHA-256: `{receipt.authorities.public_export_sha256}`"),
+        "- Runtime authority: `installer_machine`",
+        "- Authoritative SQLite synchronization: `forbidden`",
+        "- Human legal review: `required`",
+        "- Publication authorized: `false`",
+        "",
+        "## Proved requirement IDs",
+        "",
+    ]
+    lines.extend(f"- `{requirement_id}`" for requirement_id in receipt.proved_ids)
+    if not receipt.proved_ids:
+        lines.append("- None")
+    lines.extend(["", "## Blocking requirement IDs", ""])
+    lines.extend(
+        f"- `{finding.requirement_id}`: `{finding.rule_id.value}`"
+        for finding in receipt.blocking_requirements
+    )
+    if not receipt.blocking_requirements:
+        lines.append("- None")
+    return "\n".join(lines) + "\n"
+
+
+def write_master_acceptance_receipts(
+    receipt: MasterAcceptanceReceipt,
+    *,
+    max_receipt_bytes: int,
+    json_output: Path | None = None,
+    markdown_output: Path | None = None,
+) -> None:
+    """Write only explicitly requested, bounded, non-existing receipt files."""
+    json_content = render_master_acceptance_receipt_json(receipt)
+    markdown_content = render_master_acceptance_receipt_markdown(receipt)
+    if (
+        len(json_content.encode("utf-8")) > max_receipt_bytes
+        or len(markdown_content.encode("utf-8")) > max_receipt_bytes
+    ):
+        raise ValueError("acceptance receipt exceeds configured limit")
+    requested = [path for path in (json_output, markdown_output) if path is not None]
+    if len(requested) != len(set(requested)):
+        raise ValueError("receipt output paths must be unique")
+    if any(path.exists() for path in requested):
+        raise FileExistsError("acceptance receipt output already exists")
+    for path, content in (
+        (json_output, json_content),
+        (markdown_output, markdown_content),
+    ):
+        if path is None:
+            continue
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(content, encoding="utf-8")
+
+
 def validate_master_acceptance_authorities(
     repository_root: Path,
     ledger: MasterAcceptanceLedger,
@@ -668,6 +985,167 @@ def validate_master_acceptance_authorities(
         human_legal_review_status=license_posture.human_review_status,
         publication_authorized=license_posture.publication_authorized,
     )
+
+
+def _evaluate_requirement_evidence(
+    repository_root: Path,
+    ledger: MasterAcceptanceLedger,
+    ledger_sha256: str,
+    requirement: AcceptanceRequirement,
+) -> AcceptanceFinding | None:
+    if isinstance(requirement.proof, UnprovedProof):
+        return AcceptanceFinding(
+            requirement_id=requirement.id,
+            rule_id=requirement.proof.blockers[0],
+        )
+
+    receipt_path = repository_root / requirement.evidence.receipt_path
+    if receipt_path.is_symlink() or not receipt_path.is_file():
+        return AcceptanceFinding(
+            requirement_id=requirement.id,
+            rule_id=EvidenceBlocker.MISSING,
+        )
+    try:
+        receipt_bytes = receipt_path.read_bytes()
+    except OSError:
+        return AcceptanceFinding(
+            requirement_id=requirement.id,
+            rule_id=EvidenceBlocker.FAILED,
+        )
+    if len(receipt_bytes) > ledger.limits.max_receipt_bytes:
+        return AcceptanceFinding(
+            requirement_id=requirement.id,
+            rule_id=EvidenceBlocker.FAILED,
+        )
+    if hashlib.sha256(receipt_bytes).hexdigest() != requirement.proof.receipt_sha256:
+        return AcceptanceFinding(
+            requirement_id=requirement.id,
+            rule_id=EvidenceBlocker.STALE,
+        )
+    try:
+        data: Any = json.loads(receipt_bytes)
+        evidence = RequirementEvidenceReceipt.model_validate(data)
+    except Exception:
+        return AcceptanceFinding(
+            requirement_id=requirement.id,
+            rule_id=EvidenceBlocker.STALE,
+        )
+    if (
+        evidence.requirement_id != requirement.id
+        or evidence.ledger_sha256 != ledger_sha256
+        or evidence.declaration_sha256
+        != acceptance_requirement_declaration_hash(requirement)
+        or evidence.command_sha256
+        != verification_command_hash(requirement.evidence.verification_command)
+        or [item.id for item in evidence.gate_results]
+        != requirement.evidence.required_gates
+        or evidence.platforms != requirement.platforms
+        or not _git_commit_exists(repository_root, evidence.source_commit)
+    ):
+        return AcceptanceFinding(
+            requirement_id=requirement.id,
+            rule_id=EvidenceBlocker.STALE,
+        )
+
+    artifact_path = repository_root / requirement.evidence.artifact_path
+    if artifact_path.is_symlink() or not artifact_path.is_file():
+        return AcceptanceFinding(
+            requirement_id=requirement.id,
+            rule_id=EvidenceBlocker.FAILED,
+        )
+    try:
+        artifact_sha256 = hashlib.sha256(artifact_path.read_bytes()).hexdigest()
+    except OSError:
+        return AcceptanceFinding(
+            requirement_id=requirement.id,
+            rule_id=EvidenceBlocker.FAILED,
+        )
+    if artifact_sha256 != evidence.artifact_sha256:
+        return AcceptanceFinding(
+            requirement_id=requirement.id,
+            rule_id=EvidenceBlocker.FAILED,
+        )
+    return None
+
+
+def _render_json_model(model: BaseModel) -> str:
+    return (
+        json.dumps(
+            model.model_dump(mode="json"),
+            ensure_ascii=True,
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n"
+    )
+
+
+def _json_semantic_hash(value: Any) -> str:
+    payload = json.dumps(
+        value,
+        ensure_ascii=True,
+        separators=(",", ":"),
+        sort_keys=True,
+    )
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def _read_git_head(repository_root: Path) -> str:
+    environment = _sanitized_git_environment()
+    completed = subprocess.run(
+        ["git", "-C", str(repository_root), "rev-parse", "HEAD"],
+        check=False,
+        capture_output=True,
+        env=environment,
+        text=True,
+    )
+    commit = completed.stdout.strip()
+    if completed.returncode != 0 or _COMMIT_PATTERN.fullmatch(commit) is None:
+        raise MasterAcceptanceError("unable to resolve verifier source commit")
+    return commit
+
+
+def _git_commit_exists(repository_root: Path, commit: str) -> bool:
+    if _COMMIT_PATTERN.fullmatch(commit) is None:
+        return False
+    completed = subprocess.run(
+        [
+            "git",
+            "-C",
+            str(repository_root),
+            "cat-file",
+            "-e",
+            f"{commit}^{{commit}}",
+        ],
+        check=False,
+        capture_output=True,
+        env=_sanitized_git_environment(),
+        text=True,
+    )
+    return completed.returncode == 0
+
+
+def _sanitized_git_environment() -> dict[str, str]:
+    environment = os.environ.copy()
+    for key in tuple(environment):
+        if key in {"GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE"} or key.startswith(
+            "GIT_CONFIG_"
+        ):
+            environment.pop(key, None)
+    return environment
+
+
+def _require_bounded_receipt(
+    receipt: MasterAcceptanceReceipt,
+    max_receipt_bytes: int,
+) -> None:
+    if (
+        len(render_master_acceptance_receipt_json(receipt).encode("utf-8"))
+        > max_receipt_bytes
+        or len(render_master_acceptance_receipt_markdown(receipt).encode("utf-8"))
+        > max_receipt_bytes
+    ):
+        raise MasterAcceptanceError("acceptance receipt exceeds configured limit")
 
 
 def _validate_epic_id(value: str) -> str:
