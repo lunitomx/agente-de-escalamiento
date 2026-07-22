@@ -67,7 +67,8 @@ procedencia, supuestos, confianza y límites.
 
 - [x] S38.1 Workbook Understanding — merged `25a7d83` / `daec3fb`; gates
   tests, lint, format and types PASS.
-- [ ] S38.2 Financial Statement Reconstruction
+- [x] S38.2 Financial Statement Reconstruction — merged `8d185bd` / `40c7730`;
+  gates tests, lint, format and types PASS.
 - [ ] S38.3 Cash Decision Coaching
 - [ ] S38.4 Visual Cash Evidence
 
