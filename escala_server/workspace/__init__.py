@@ -10,11 +10,20 @@ from .authority import (
     validate_workspace,
 )
 from .ingestion import (
+    FieldCandidate,
     FormatCapability,
+    HeaderCandidate,
+    IngestionResult,
     SourceIdentity,
     SourceIngestionError,
+    SourceProfile,
+    SourceQuestion,
     SourceRegistry,
+    TableProfile,
     build_source_identity,
+    profile_source,
+    render_ingestion_receipt_json,
+    render_ingestion_receipt_markdown,
 )
 
 __all__ = [
@@ -26,8 +35,17 @@ __all__ = [
     "render_workspace_receipt_markdown",
     "validate_workspace",
     "FormatCapability",
+    "HeaderCandidate",
+    "FieldCandidate",
+    "TableProfile",
+    "SourceProfile",
+    "SourceQuestion",
+    "IngestionResult",
     "SourceIdentity",
     "SourceIngestionError",
     "SourceRegistry",
     "build_source_identity",
+    "profile_source",
+    "render_ingestion_receipt_json",
+    "render_ingestion_receipt_markdown",
 ]

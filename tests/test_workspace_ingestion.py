@@ -18,6 +18,7 @@ from escala_server.workspace.ingestion import (
     render_ingestion_receipt_markdown,
 )
 from escala_server.workspace.authority import WorkspaceConfig
+from escala_server import workspace
 
 
 def test_registry_reports_declared_capabilities() -> None:
@@ -190,3 +191,23 @@ def test_failure_receipts_are_redacted_and_deterministic(tmp_path: Path) -> None
         assert str(tmp_path) not in receipt
         assert "private balance content" not in receipt
         assert "https://" not in receipt
+
+
+def test_public_workspace_seam_profiles_without_canonical_mutation(
+    tmp_path: Path,
+) -> None:
+    config = _config(tmp_path)
+    config.exchange_root.mkdir()
+    source = config.exchange_root / "daily.csv"
+    source.write_text("fecha,cliente,importe\n2026-07-22,Acme,10\n", encoding="utf-8")
+    before_entries = sorted(path.name for path in tmp_path.iterdir())
+
+    result = workspace.profile_source(config, source)
+
+    assert result.status == "ready"
+    assert workspace.render_ingestion_receipt_json(result)
+    assert (
+        workspace.SourceRegistry.default().capability_for("daily.csv").format == "csv"
+    )
+    assert not (config.data_root / "escala.sqlite").exists()
+    assert sorted(path.name for path in tmp_path.iterdir()) == before_entries
