@@ -178,7 +178,7 @@ isolation and commit recovery.
 | S36.2 | M | Complete | 47m 32s | 1 M / 47m 32s | Merged locally at `195eff6`; sanitized baseline and non-mutation proof committed |
 | S36.4 | M | Complete | 1h 05m 33s | 1 M / 1h 05m 33s | Merged locally at `708a1b6`; strict governance contract, 10 canonical identities, and 15/15 close gates passed |
 | S36.3 | M | Complete | 1h 53m 12s | 1 M / 1h 53m 12s | Merged locally at `52baa1a`; 15/15 close gates passed after T7 canonical-import repair |
-| S36.5 | L | Pending | — | Not calibrated | E2E integration checkpoint |
+| S36.5 | L | Complete | 1h 21m 21s | 1 L / 1h 21m 21s | Merged locally at `74be973`; real M3 artifact qualification passed, legal review remains required, publication stays false |
 | S36.6 | S | Pending | — | Not calibrated | Epic-wide acceptance control |
 
 Velocity will be calibrated from completed task evidence, not estimated hours.
