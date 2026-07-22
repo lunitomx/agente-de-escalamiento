@@ -1,0 +1,122 @@
+artifact_type: story-design
+version: 1
+skill: rai-story-design
+created: '2026-07-22T16:05:00Z'
+story: 'S37.3'
+epic: 'E37'
+content:
+  problem: 'S37.2 puede interpretar una fuente, pero todavía no coordina corridas diarias sobre una carpeta ordinaria: los reintentos pueden duplicar trabajo y las entradas peligrosas no tienen una disposición local auditable.'
+  value: 'Un inbox filesystem-only con ledger local permite repetir la corrida sobre una carpeta de Drive/OneDrive sincronizada sin APIs, aceptar cada source_id una sola vez y reportar fallos sin borrar, mover ni escribir SQLite.'
+  approach: 'Agregar escala_server.workspace.inbox con InboxConfig estricto, ledger JSON en el data_root del instalador y reportes JSON/Markdown redacted. El scanner enumera entradas directas de exchange_root, rechaza symlinks/directorios/oversized antes de leer, delega perfilado a S37.2, registra la primera disposición por source_id y escribe el ledger atómicamente. Reintentos vistos devuelven duplicate; bytes nuevos generan una nueva identidad. Los fallos se reportan como needs_clarification o quarantined y el archivo original queda intacto.'
+  complexity: moderate
+  components:
+    - name: 'escala_server.workspace.inbox'
+      change: create
+      purpose: 'Contratos, scan idempotente, ledger local, atomic writes y receipts seguros.'
+    - name: 'escala_server.workspace.__init__'
+      change: modify
+      purpose: 'Exponer la superficie inbox intencional para E38/E39.'
+    - name: 'tests.test_workspace_inbox'
+      change: create
+      purpose: 'Fixtures de dos corridas, bytes cambiados, symlink, large/corrupt/unsupported y no-mutation.'
+    - name: 'work/epics/e37-local-workspace-flexible-ingestion/stories/s37.3-evidence'
+      change: create
+      purpose: 'Receipt real de la corrida end-to-end de carpeta temporal.'
+  decisions:
+    - id: D1
+      title: 'Ledger JSON local, no SQLite ni exchange state'
+      rationale: 'La autoridad sigue en la máquina del instalador y no se añade migración; JSON pequeño en data_root es suficiente para source_id y primera disposición.'
+      body: 'El ledger nunca vive dentro de exchange_root ni se sincroniza por Drive/OneDrive. La escritura usa archivo temporal + os.replace y se rechaza un ledger corrupto sin mutar nada.'
+    - id: D2
+      title: 'Reportar sin mover documentos del usuario'
+      rationale: 'Mover o borrar un archivo de una carpeta sincronizada es destructivo y puede romper el trabajo del empresario o de su equipo.'
+      body: 'Quarantine es una disposición de ledger/receipt local; el documento original queda intacto. La carpeta de reportes está dentro de data_root, no dentro del intercambio.'
+    - id: D3
+      title: 'First disposition wins per source_id'
+      rationale: 'Un rerun de los mismos bytes no debe reabrir un parser ni cambiar el historial; cambiar bytes ya produce otro source_id en S37.2.'
+      body: 'accepted, needs_clarification y quarantined se guardan como primera disposición. Una identidad conocida se devuelve como duplicate y no vuelve a tocar el ledger.'
+    - id: D4
+      title: 'Scanner directo, no watcher ni API'
+      rationale: 'La necesidad actual es una corrida diaria explícita y comprobable, no un daemon ni un servicio remoto.'
+      body: 'Solo se enumeran entradas directas del exchange declarado; subdirectorios se reportan como entry_directory y no se procesan recursivamente.'
+  acceptance_criteria:
+    - id: AC1
+      description: 'Dos scans del mismo exchange producen accepted y luego duplicate para la misma identidad; el ledger no cambia en el segundo scan.'
+      severity: must
+      verifiable: true
+      test_link: 'tests/test_workspace_inbox.py::test_scan_is_idempotent'
+    - id: AC2
+      description: 'Cambiar bytes del mismo nombre genera source_id nuevo y conserva la entrada anterior en el ledger local.'
+      severity: must
+      verifiable: true
+      test_link: 'tests/test_workspace_inbox.py::test_changed_bytes_create_new_identity'
+    - id: AC3
+      description: 'Symlink, directory, oversized, corrupt, unsupported y needs_clarification reciben códigos explícitos; el archivo original y SQLite no se modifican.'
+      severity: must
+      verifiable: true
+      test_link: 'tests/test_workspace_inbox.py::test_failure_dispositions_are_non_destructive'
+    - id: AC4
+      description: 'Ledger, reportes y receipts contienen solo relative_path, source_id, status y codes; no absolute paths, secrets, content or cloud metadata.'
+      severity: must
+      verifiable: true
+      test_link: 'tests/test_workspace_inbox.py::test_receipts_are_redacted_and_deterministic'
+    - id: AC5
+      description: 'La corrida de carpeta temporal representa una carpeta sincronizada ordinaria y no realiza ninguna llamada cloud/OAuth.'
+      severity: must
+      verifiable: true
+    - id: AC6
+      description: 'La API es consumible por E38-E40 sin duplicar identity/profile/authority seams.'
+      severity: should
+      verifiable: true
+    - id: AC7
+      description: 'No watcher, cloud API, OAuth, hosted runtime, SQLite sync, destructive move, OCR ni dependencia nueva.'
+      severity: must_not
+      verifiable: true
+  examples:
+    - title: 'Primera y segunda corrida'
+      language: python
+      code: 'first = scan_inbox(InboxConfig(workspace=config))\nsecond = scan_inbox(InboxConfig(workspace=config))\nassert first.items[0].disposition == "accepted"\nassert second.items[0].disposition == "duplicate"'
+      explanation: 'El ledger local hace idempotente la corrida sin tocar exchange ni SQLite.'
+    - title: 'Fuente cambiada'
+      language: python
+      code: 'source.write_text("fecha,cliente,importe\\n2026-07-22,Acme,11\\n")\nrun = scan_inbox(InboxConfig(workspace=config))\nassert run.items[0].disposition == "accepted"\nassert len(run.ledger.source_ids) == 2'
+      explanation: 'El mismo nombre no equivale a la misma identidad cuando cambian bytes.'
+    - title: 'Entrada peligrosa'
+      language: python
+      code: 'run = scan_inbox(InboxConfig(workspace=config, max_bytes=10))\nassert run.items[0].disposition == "quarantined"\nassert run.items[0].code == "source_too_large"'
+      explanation: 'El scanner reporta el límite sin leer ni mover el documento.'
+  dependencies:
+    - description: 'S37.1 WorkspaceConfig/validate_workspace y S37.2 build_source_identity/profile_source son seams obligatorios.'
+      blocks: true
+    - description: 'Python stdlib json, hashlib, os.replace y pathlib; sin dependencia nueva.'
+      blocks: false
+  legacy_sweep: 'No existe inbox genérico V1. coaching/class_intake.py permanece específico de clases; S37.3 no lo modifica ni crea un segundo source ledger.'
+  drift_risks:
+    - id: AG2
+      description: 'Una nueva implementación podría duplicar identity/profile o receipt rendering.'
+      mitigation: 'Delegar todo el perfilado a S37.2 y mantener ledger/receipt de corrida en un único módulo.'
+    - id: AG4
+      description: 'El scanner puede crecer hacia watcher/quarantine/multiwriter.'
+      mitigation: 'Corrida directa, primera disposición, report-only y JSON local pequeño; todo daemon/API queda fuera.'
+  testing_strategy:
+    - layer: contract
+      name: 'idempotency and changed bytes'
+      purpose: 'Prove first disposition, duplicate rerun and new source identity.'
+    - layer: negative
+      name: 'failure handling'
+      purpose: 'Prove symlink, directory, oversize and profiler failures are explicit and non-destructive.'
+    - layer: storage
+      name: 'atomic local ledger'
+      purpose: 'Prove data-root ledger only, corrupt ledger fail-closed and no SQLite/exchange writes.'
+    - layer: determinism
+      name: 'run receipts'
+      purpose: 'Byte-stable redacted JSON/Markdown for the same ledger/input state.'
+  open_questions:
+    - '¿E38 necesita una lectura del SourceProfile completo o solo source_id + receipt? S37.3 no persiste contenido.'
+    - '¿La UI futura mostrará reportes locales o los exportará a la carpeta de intercambio? Eso pertenece a E41/E42.'
+refs:
+  epic_scope: 'work/epics/e37-local-workspace-flexible-ingestion/scope.md'
+  prior_stories: ['S37.1', 'S37.2']
+metadata:
+  backlog_item: null
+  artifact_emit: unavailable-in-installed-rai-cli
