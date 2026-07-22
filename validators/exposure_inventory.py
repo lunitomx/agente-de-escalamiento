@@ -383,6 +383,16 @@ def exposure_policy_hash(policy: ExposureInventoryPolicy) -> str:
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
+def detect_secret_shapes(content: bytes) -> list[SecretShape]:
+    """Return detected credential shapes without returning any matched value."""
+    return [
+        shape
+        for shape in SecretShape
+        if shape is not SecretShape.AUTHENTICATED_URL
+        and _secret_shape_matches(shape, content)
+    ]
+
+
 def ordered_findings(findings: Iterable[ExposureFinding]) -> list[ExposureFinding]:
     """Return findings in stable surface and domain order."""
     surface_order = {surface: index for index, surface in enumerate(ExposureSurface)}
@@ -806,6 +816,7 @@ def _content_findings(
 ) -> list[ExposureFinding]:
     text = content.decode("utf-8")
     folded_text = text.casefold()
+    detected_secret_shapes = set(detect_secret_shapes(content))
     findings: list[ExposureFinding] = []
     for rule in policy.rules:
         if surface not in rule.surfaces:
@@ -813,7 +824,7 @@ def _content_findings(
         matched = any(
             term.casefold() in folded_text for term in rule.matchers.content_terms
         ) or any(
-            _secret_shape_matches(shape, content)
+            shape in detected_secret_shapes
             for shape in rule.matchers.secret_shapes
             if shape is not SecretShape.AUTHENTICATED_URL
         )

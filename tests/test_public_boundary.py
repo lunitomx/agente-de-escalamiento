@@ -21,6 +21,7 @@ from validators.public_boundary import (
     BoundarySurface,
     PublicCandidateStatus,
     PublicBoundaryFinding,
+    PublicContentViolation,
     PublicPathDisposition,
     classify_public_path,
     group_boundary_findings,
@@ -29,6 +30,7 @@ from validators.public_boundary import (
     public_boundary_policy_hash,
     render_public_boundary_json,
     render_public_boundary_markdown,
+    scan_public_content,
     scan_public_boundary,
     write_public_boundary_receipts,
 )
@@ -210,6 +212,76 @@ def test_generic_validator_does_not_hard_code_prohibited_terms() -> None:
         for rule in policy.vocabulary_rules
         for term in rule.terms
     )
+
+
+def test_source_neutral_content_scan_reports_safe_sorted_violations() -> None:
+    policy = load_public_boundary_policy(POLICY_PATH)
+    private_value = "S36-PRIVATE-PROVENANCE-CONTENT"
+
+    violations = scan_public_content(
+        "coaching/scaling_up-guide.yaml",
+        f"id: guide\nsource: {private_value}\ntext: VerneHandler\n".encode(),
+        policy,
+    )
+
+    assert violations == sorted(
+        violations,
+        key=lambda item: (item.rule_id, item.code.value, item.locator),
+    )
+    assert {
+        BoundaryFindingCode.PROHIBITED_PATH,
+        BoundaryFindingCode.PROHIBITED_TEXT,
+        BoundaryFindingCode.PROHIBITED_YAML_KEY,
+    } <= {item.code for item in violations}
+    assert all(item.locator_kind is BoundaryLocatorKind.SHA256 for item in violations)
+    serialized = json.dumps(
+        [item.model_dump(mode="json") for item in violations],
+        sort_keys=True,
+    )
+    assert private_value not in serialized
+    assert "VerneHandler" not in serialized
+    assert "scaling_up-guide" not in serialized
+    assert "surface" not in serialized
+
+
+@pytest.mark.parametrize(
+    "content",
+    [None, b"\x00binary", b"\xffnot-utf8", b"[unterminated"],
+)
+def test_source_neutral_content_scan_marks_unscannable_content(
+    content: bytes | None,
+) -> None:
+    violations = scan_public_content(
+        "conocimiento/node.yaml",
+        content,
+        load_public_boundary_policy(POLICY_PATH),
+    )
+
+    assert violations == [
+        PublicContentViolation(
+            rule_id="boundary.required_content",
+            code=BoundaryFindingCode.UNSAFE_OR_UNREADABLE,
+            locator_kind=BoundaryLocatorKind.RELATIVE_PATH,
+            locator="conocimiento/node.yaml",
+        )
+    ]
+
+
+def test_source_neutral_content_scan_honors_size_bound_and_clean_content() -> None:
+    policy = load_public_boundary_policy(POLICY_PATH)
+
+    assert (
+        scan_public_content("README.md", b"ESCALA local business system\n", policy)
+        == []
+    )
+    oversized = scan_public_content(
+        "README.md",
+        b"a" * (policy.max_text_bytes + 1),
+        policy,
+    )
+    assert [item.code for item in oversized] == [
+        BoundaryFindingCode.UNSAFE_OR_UNREADABLE
+    ]
 
 
 def test_finding_is_frozen_safe_and_rejects_sensitive_extra_fields() -> None:
