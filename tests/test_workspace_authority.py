@@ -77,3 +77,73 @@ def test_workspace_config_accepts_windows_platform_shape(tmp_path: Path) -> None
     )
 
     assert validate_workspace(config).status == "pass"
+
+
+def test_database_inside_exchange_fails_closed_without_machine_path(
+    tmp_path: Path,
+) -> None:
+    exchange = tmp_path / "exchange"
+    config = WorkspaceConfig(
+        platform="macos",
+        data_root=tmp_path / "data",
+        database_path=exchange / "company.sqlite",
+        exchange_root=exchange,
+    )
+
+    receipt = validate_workspace(config)
+
+    assert receipt.status == "fail"
+    assert {finding.code for finding in receipt.findings} == {
+        "authoritative_sqlite_sync_forbidden"
+    }
+    serialized = render_workspace_receipt_json(receipt)
+    assert str(tmp_path) not in serialized
+    assert "company.sqlite" not in serialized
+
+
+def test_data_and_exchange_roots_cannot_overlap(tmp_path: Path) -> None:
+    root = tmp_path / "shared"
+    config = WorkspaceConfig(
+        platform="macos",
+        data_root=root,
+        database_path=root / "company.sqlite",
+        exchange_root=root,
+    )
+
+    receipt = validate_workspace(config)
+
+    assert receipt.status == "fail"
+    assert {finding.code for finding in receipt.findings} == {"ambiguous_root"}
+
+
+def test_symlink_into_exchange_does_not_bypass_containment(tmp_path: Path) -> None:
+    exchange = tmp_path / "exchange"
+    exchange.mkdir()
+    apparent_data = tmp_path / "apparent-data"
+    apparent_data.symlink_to(exchange, target_is_directory=True)
+    config = WorkspaceConfig(
+        platform="macos",
+        data_root=tmp_path / "data",
+        database_path=apparent_data / "company.sqlite",
+        exchange_root=exchange,
+    )
+
+    receipt = validate_workspace(config)
+
+    assert receipt.status == "fail"
+    assert {finding.code for finding in receipt.findings} == {"symlink_inside_exchange"}
+
+
+def test_workspace_receipt_is_deterministic_across_runs(tmp_path: Path) -> None:
+    exchange = tmp_path / "exchange"
+    config = WorkspaceConfig(
+        platform="macos",
+        data_root=tmp_path / "data",
+        database_path=exchange / "company.sqlite",
+        exchange_root=exchange,
+    )
+
+    first = render_workspace_receipt_json(validate_workspace(config))
+    second = render_workspace_receipt_json(validate_workspace(config))
+
+    assert first == second
