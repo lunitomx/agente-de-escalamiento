@@ -294,6 +294,36 @@ class PublicBoundaryFinding(_StrictModel):
         return self
 
 
+class PublicContentViolation(_StrictModel):
+    """Source-neutral public-content violation with a disclosure-safe locator."""
+
+    rule_id: str = Field(min_length=3, max_length=128)
+    code: BoundaryFindingCode
+    locator_kind: BoundaryLocatorKind
+    locator: str = Field(min_length=1, max_length=1024)
+
+    @field_validator("rule_id")
+    @classmethod
+    def validate_rule_id(cls, value: str) -> str:
+        return _validate_rule_id(value)
+
+    @model_validator(mode="after")
+    def validate_safe_boundary(self) -> PublicContentViolation:
+        allowed_codes = {
+            BoundaryFindingCode.PROHIBITED_PATH,
+            BoundaryFindingCode.PROHIBITED_TEXT,
+            BoundaryFindingCode.PROHIBITED_YAML_KEY,
+            BoundaryFindingCode.UNSAFE_OR_UNREADABLE,
+        }
+        if self.code not in allowed_codes:
+            raise ValueError("unsupported source-neutral violation code")
+        if self.locator_kind is BoundaryLocatorKind.RELATIVE_PATH:
+            _validate_relative_path(self.locator)
+        elif _SHA256_PATTERN.fullmatch(self.locator) is None:
+            raise ValueError("invalid SHA-256 locator")
+        return self
+
+
 class BoundaryFindingGroup(_StrictModel):
     rule_id: str = Field(min_length=3, max_length=128)
     code: BoundaryFindingCode
@@ -458,6 +488,7 @@ VocabularyRule.model_rebuild()
 ExposureBaselineContract.model_rebuild()
 PublicBoundaryPolicy.model_rebuild()
 PublicBoundaryFinding.model_rebuild()
+PublicContentViolation.model_rebuild()
 BoundaryFindingGroup.model_rebuild()
 ExposureBaselineLink.model_rebuild()
 BoundaryError.model_rebuild()
@@ -500,6 +531,120 @@ def classify_public_path(
         if any(rule.disposition is disposition for rule in matching):
             return disposition
     return PublicPathDisposition.NOT_ELIGIBLE
+
+
+def scan_public_content(
+    relative_path: str,
+    content: bytes | None,
+    policy: PublicBoundaryPolicy,
+) -> list[PublicContentViolation]:
+    """Scan one path and byte payload without assuming a repository surface."""
+    safe_path = _validate_relative_path(relative_path)
+    violations: list[PublicContentViolation] = []
+    folded_path = safe_path.casefold()
+    for rule in policy.vocabulary_rules:
+        if VocabularyTarget.PATH in rule.targets and any(
+            term.casefold() in folded_path for term in rule.terms
+        ):
+            violations.append(
+                _source_neutral_violation(
+                    rule.id,
+                    BoundaryFindingCode.PROHIBITED_PATH,
+                    safe_path,
+                    policy,
+                )
+            )
+
+    text = _bounded_text(content, policy.max_text_bytes)
+    if text is None:
+        violations.append(
+            _source_neutral_violation(
+                "boundary.required_content",
+                BoundaryFindingCode.UNSAFE_OR_UNREADABLE,
+                safe_path,
+                policy,
+            )
+        )
+        return _ordered_public_content_violations(violations)
+
+    folded_text = text.casefold()
+    for rule in policy.vocabulary_rules:
+        if VocabularyTarget.TEXT in rule.targets and any(
+            term.casefold() in folded_text for term in rule.terms
+        ):
+            violations.append(
+                _source_neutral_violation(
+                    rule.id,
+                    BoundaryFindingCode.PROHIBITED_TEXT,
+                    safe_path,
+                    policy,
+                )
+            )
+
+    if safe_path.casefold().endswith((".yaml", ".yml")):
+        try:
+            document = yaml.safe_load(text)
+        except yaml.YAMLError:
+            violations.append(
+                _source_neutral_violation(
+                    "boundary.required_content",
+                    BoundaryFindingCode.UNSAFE_OR_UNREADABLE,
+                    safe_path,
+                    policy,
+                )
+            )
+        else:
+            if isinstance(document, dict):
+                for key in policy.forbidden_yaml_root_keys:
+                    if key in document:
+                        violations.append(
+                            _source_neutral_violation(
+                                "public.provenance",
+                                BoundaryFindingCode.PROHIBITED_YAML_KEY,
+                                safe_path,
+                                policy,
+                            )
+                        )
+    return _ordered_public_content_violations(violations)
+
+
+def _source_neutral_violation(
+    rule_id: str,
+    code: BoundaryFindingCode,
+    path: str,
+    policy: PublicBoundaryPolicy,
+) -> PublicContentViolation:
+    if _path_has_prohibited_term(path, policy):
+        locator_kind = BoundaryLocatorKind.SHA256
+        payload = f"{rule_id}\0{path}".encode("utf-8")
+        locator = hashlib.sha256(payload).hexdigest()
+    else:
+        locator_kind = BoundaryLocatorKind.RELATIVE_PATH
+        locator = path
+    return PublicContentViolation(
+        rule_id=rule_id,
+        code=code,
+        locator_kind=locator_kind,
+        locator=locator,
+    )
+
+
+def _ordered_public_content_violations(
+    violations: Iterable[PublicContentViolation],
+) -> list[PublicContentViolation]:
+    unique = {
+        (item.rule_id, item.code, item.locator_kind, item.locator): item
+        for item in violations
+    }
+    return sorted(
+        unique.values(),
+        key=lambda item: (
+            item.rule_id,
+            item.code.value,
+            item.locator_kind.value,
+            item.locator,
+        ),
+    )
 
 
 def group_boundary_findings(
@@ -1076,28 +1221,50 @@ def _scan_required_entries(
             if disposition is not PublicPathDisposition.CANDIDATE_PUBLIC:
                 continue
         candidate_count += 1
-        findings.extend(_path_vocabulary_findings(entry.path, surface, policy))
         content = (
             _read_worktree_content(repository_root / entry.path, entry.mode)
             if worktree
             else _read_head_content(repository_root, entry, surface)
         )
-        text = _bounded_text(content, policy.max_text_bytes)
-        if text is None:
-            unscanned += 1
-            findings.append(_unsafe_content_finding(entry.path, surface, policy))
-            continue
-        content_findings, valid_yaml = _content_vocabulary_findings(
-            entry.path,
-            text,
-            surface,
-            policy,
+        violations = scan_public_content(entry.path, content, policy)
+        findings.extend(
+            _surface_findings_from_violations(
+                violations,
+                path=entry.path,
+                surface=surface,
+                policy=policy,
+            )
         )
-        findings.extend(content_findings)
-        if not valid_yaml:
+        if any(
+            violation.code is BoundaryFindingCode.UNSAFE_OR_UNREADABLE
+            for violation in violations
+        ):
             unscanned += 1
-            findings.append(_unsafe_content_finding(entry.path, surface, policy))
     return findings, unscanned, candidate_count
+
+
+def _surface_findings_from_violations(
+    violations: Iterable[PublicContentViolation],
+    *,
+    path: str,
+    surface: BoundarySurface,
+    policy: PublicBoundaryPolicy,
+) -> list[PublicBoundaryFinding]:
+    return [
+        PublicBoundaryFinding(
+            rule_id=violation.rule_id,
+            code=violation.code,
+            surface=surface,
+            locator_kind=_locator_kind_for_path(path, policy),
+            locator=_locator_for_path(
+                violation.rule_id,
+                surface,
+                path,
+                policy,
+            ),
+        )
+        for violation in violations
+    ]
 
 
 def _path_vocabulary_findings(
@@ -1105,19 +1272,17 @@ def _path_vocabulary_findings(
     surface: BoundarySurface,
     policy: PublicBoundaryPolicy,
 ) -> list[PublicBoundaryFinding]:
-    folded_path = path.casefold()
-    return [
-        PublicBoundaryFinding(
-            rule_id=rule.id,
-            code=BoundaryFindingCode.PROHIBITED_PATH,
-            surface=surface,
-            locator_kind=BoundaryLocatorKind.SHA256,
-            locator=_sensitive_locator(rule.id, surface, path),
-        )
-        for rule in policy.vocabulary_rules
-        if VocabularyTarget.PATH in rule.targets
-        and any(term.casefold() in folded_path for term in rule.terms)
+    violations = [
+        violation
+        for violation in scan_public_content(path, b"", policy)
+        if violation.code is BoundaryFindingCode.PROHIBITED_PATH
     ]
+    return _surface_findings_from_violations(
+        violations,
+        path=path,
+        surface=surface,
+        policy=policy,
+    )
 
 
 def _content_vocabulary_findings(
@@ -1126,43 +1291,29 @@ def _content_vocabulary_findings(
     surface: BoundarySurface,
     policy: PublicBoundaryPolicy,
 ) -> tuple[list[PublicBoundaryFinding], bool]:
-    folded_text = text.casefold()
-    findings = [
-        PublicBoundaryFinding(
-            rule_id=rule.id,
-            code=BoundaryFindingCode.PROHIBITED_TEXT,
-            surface=surface,
-            locator_kind=_locator_kind_for_path(path, policy),
-            locator=_locator_for_path(rule.id, surface, path, policy),
-        )
-        for rule in policy.vocabulary_rules
-        if VocabularyTarget.TEXT in rule.targets
-        and any(term.casefold() in folded_text for term in rule.terms)
+    violations = scan_public_content(path, text.encode("utf-8"), policy)
+    content_violations = [
+        violation
+        for violation in violations
+        if violation.code
+        in {
+            BoundaryFindingCode.PROHIBITED_TEXT,
+            BoundaryFindingCode.PROHIBITED_YAML_KEY,
+        }
     ]
-    if not path.casefold().endswith((".yaml", ".yml")):
-        return findings, True
-    try:
-        document = yaml.safe_load(text)
-    except yaml.YAMLError:
-        return findings, False
-    if isinstance(document, dict):
-        for key in policy.forbidden_yaml_root_keys:
-            if key in document:
-                findings.append(
-                    PublicBoundaryFinding(
-                        rule_id="public.provenance",
-                        code=BoundaryFindingCode.PROHIBITED_YAML_KEY,
-                        surface=surface,
-                        locator_kind=_locator_kind_for_path(path, policy),
-                        locator=_locator_for_path(
-                            "public.provenance",
-                            surface,
-                            path,
-                            policy,
-                        ),
-                    )
-                )
-    return findings, True
+    valid_content = not any(
+        violation.code is BoundaryFindingCode.UNSAFE_OR_UNREADABLE
+        for violation in violations
+    )
+    return (
+        _surface_findings_from_violations(
+            content_violations,
+            path=path,
+            surface=surface,
+            policy=policy,
+        ),
+        valid_content,
+    )
 
 
 def _unsafe_content_finding(

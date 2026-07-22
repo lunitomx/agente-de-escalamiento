@@ -19,7 +19,9 @@ from validators.exposure_inventory import (
     InventoryErrorCode,
     LocatorKind,
     ScanStatus,
+    SecretShape,
     build_risk_summary,
+    detect_secret_shapes,
     exposure_policy_hash,
     load_exposure_policy,
     ordered_findings,
@@ -149,6 +151,47 @@ def test_policy_rejects_unknown_incomplete_or_unsafe_contracts(
 ) -> None:
     with pytest.raises(ValidationError):
         load_exposure_policy(_write_policy(tmp_path, content))
+
+
+@pytest.mark.parametrize(
+    ("content", "expected"),
+    [
+        (b"plain local configuration", []),
+        (b"api_key=S36SECRETASSIGNMENT123", [SecretShape.ASSIGNMENT]),
+        (
+            b"Authorization: Bearer S36.SECRET.BEARER.TOKEN",
+            [SecretShape.BEARER_TOKEN],
+        ),
+        (
+            b"-----BEGIN PRIVATE KEY-----\nS36PRIVATEKEYVALUE\n",
+            [SecretShape.PRIVATE_KEY],
+        ),
+        (
+            b"password=S36SECRETASSIGNMENT123\n"
+            b"Authorization: Bearer S36.SECRET.BEARER.TOKEN\n"
+            b"-----BEGIN PRIVATE KEY-----\nS36PRIVATEKEYVALUE\n",
+            [
+                SecretShape.ASSIGNMENT,
+                SecretShape.BEARER_TOKEN,
+                SecretShape.PRIVATE_KEY,
+            ],
+        ),
+    ],
+)
+def test_detect_secret_shapes_returns_only_sorted_shape_ids(
+    content: bytes,
+    expected: list[SecretShape],
+) -> None:
+    detected = detect_secret_shapes(content)
+
+    assert detected == expected
+    serialized = repr(detected)
+    for private_value in (
+        "S36SECRETASSIGNMENT123",
+        "S36.SECRET.BEARER.TOKEN",
+        "S36PRIVATEKEYVALUE",
+    ):
+        assert private_value not in serialized
 
 
 @pytest.mark.parametrize(
