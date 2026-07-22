@@ -1,0 +1,197 @@
+{
+  "authorities": {
+    "authoritative_sqlite_sync": "forbidden",
+    "closure_dispositions_sha256": "e5b9e9207fce7bbacd3af0a9e93368d6ccf38f979932d10360a2063924f8f023",
+    "data_authority": "installer_machine",
+    "epic_identities_sha256": "eb62cd804fa3b0559d20394e27be583b6daa445c6619938b43d4a1a92d052d52",
+    "human_legal_review_status": "required",
+    "public_export_sha256": "3faf9e3e350ef10a17f3e8634df7fbc6a8ed15dfd6e9cbe99e1769c26ada2cea",
+    "publication_authorized": false,
+    "runtime_authority": "installer_machine",
+    "team_exchange": "ordinary_filesystem_documents_only"
+  },
+  "blocking_requirements": [
+    {
+      "requirement_id": "REQ-E37-001",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E37-002",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E37-003",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E37-004",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E37-005",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E37-006",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E37-007",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E38-001",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E38-002",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E38-003",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E38-004",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E38-005",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E38-006",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E38-007",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E39-001",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E39-002",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E39-003",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E39-004",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E39-005",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E39-006",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E39-007",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E40-001",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E40-002",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E40-003",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E40-004",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E40-005",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E40-006",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E40-007",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E40-008",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E41-001",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E41-002",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E41-003",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E41-004",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E41-005",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E41-006",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E41-007",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E42-001",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E42-002",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E42-003",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E42-004",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E42-005",
+      "rule_id": "evidence.missing"
+    },
+    {
+      "requirement_id": "REQ-E42-006",
+      "rule_id": "evidence.missing"
+    }
+  ],
+  "contract_status": "pass",
+  "epic_count": 6,
+  "epic_filter": null,
+  "ledger_markdown_sha256": "4c35c44f737afcd1cc8dbae31723074193dccbf5968a8e4b90bebd2c4324fa17",
+  "ledger_sha256": "1dbe5c06bdba1488dfeccabd95e99e2936977cd6b1759fb66fd66851a364b8c9",
+  "mission_id": "escala-local-v2-plan-maestro-2607202112",
+  "mission_readiness": "unproved",
+  "mode": "baseline",
+  "proved_count": 0,
+  "proved_ids": [],
+  "requirement_count": 42,
+  "schema_version": 1,
+  "unproved_count": 42,
+  "verifier_source_commit": "e27594395cdba0087f6d7f42e8f36ce2ed3dd4bf"
+}

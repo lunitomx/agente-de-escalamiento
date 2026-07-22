@@ -1,0 +1,836 @@
+schema_version: 1
+mission_id: escala-local-v2-plan-maestro-2607202112
+authorities:
+  closure_dispositions:
+    path: governance/closure-dispositions.yaml
+    sha256: e5b9e9207fce7bbacd3af0a9e93368d6ccf38f979932d10360a2063924f8f023
+    hash_kind: semantic
+  epic_identities:
+    path: governance/epic-identities.yaml
+    sha256: eb62cd804fa3b0559d20394e27be583b6daa445c6619938b43d4a1a92d052d52
+    hash_kind: semantic
+  public_export:
+    path: governance/public-export.yaml
+    sha256: 3faf9e3e350ef10a17f3e8634df7fbc6a8ed15dfd6e9cbe99e1769c26ada2cea
+    hash_kind: semantic
+source_requirements:
+  - id: SRC-CASH-001
+    statement: "Interpret the owner's real financial workbooks, ask questions, reconstruct supported statements, and explain cash decisions without guessing."
+  - id: SRC-CATALOG-001
+    statement: "Produce a Spanish functionality catalog and PDF that truthfully state what works, evidence, limits, prerequisites, and unavailable capabilities."
+  - id: SRC-COACH-001
+    statement: "Guide the owner through People, Strategy, Execution, and Cash, including strategy, vision, priorities, and follow-up."
+  - id: SRC-COCKPIT-001
+    statement: "Provide a visual 0-100 company diagnostic that identifies pain and lets the owner inspect supporting evidence."
+  - id: SRC-EVIDENCE-001
+    statement: "Use only supplied or verified company data, ask material clarifying questions, and distinguish facts, inferences, and unknowns."
+  - id: SRC-INGEST-001
+    statement: "Accept the owner's existing files without requiring an ESCALA template and report unsupported or ambiguous inputs explicitly."
+  - id: SRC-INSTALL-001
+    statement: "Install and operate ESCALA only on the machine of the person who installed it, with a reproducible local lifecycle."
+  - id: SRC-LOCAL-001
+    statement: "Keep runtime and authoritative company state on the installer machine with no hosted ESCALA service or cloud database."
+  - id: SRC-MEETING-001
+    statement: "Review daily and weekly meeting transcripts, extract accountable work, and report team health and trends each day."
+  - id: SRC-QUALIFY-001
+    statement: "Test the complete product as an entrepreneur with a synthetic company and prove every shipped capability and failure boundary."
+  - id: SRC-SHARING-001
+    statement: "Allow team exchange through a user-selected local Google Drive, OneDrive, or plain filesystem folder without cloud APIs."
+  - id: SRC-SQLITE-001
+    statement: "Never place authoritative SQLite or canonical company state in a synchronized or shared folder."
+epics:
+  - id: E37
+    slug: local-workspace-flexible-ingestion
+    title: Local Workspace and Flexible Ingestion
+    stories:
+      - id: S37.1
+        title: Local Workspace and Data Authority
+      - id: S37.2
+        title: Flexible File Ingestion
+      - id: S37.3
+        title: Synced-Folder Inbox and Failure Handling
+    requirement_count: 7
+  - id: E38
+    slug: cash-and-financial-intelligence
+    title: Cash and Financial Intelligence
+    stories:
+      - id: S38.1
+        title: Workbook Understanding
+      - id: S38.2
+        title: Financial Statement Reconstruction
+      - id: S38.3
+        title: Cash Decision Coaching
+      - id: S38.4
+        title: Visual Cash Evidence
+    requirement_count: 7
+  - id: E39
+    slug: meeting-and-team-intelligence
+    title: Meeting and Team Intelligence
+    stories:
+      - id: S39.1
+        title: Transcript Ingestion and Classification
+      - id: S39.2
+        title: Decisions Actions and Rhythm Evidence
+      - id: S39.3
+        title: Cross-Meeting Trends and Executive Review
+      - id: S39.4
+        title: Local Scheduling and Team Exchange
+    requirement_count: 7
+  - id: E40
+    slug: executive-cockpit-and-coaching
+    title: Executive Cockpit and Coaching
+    stories:
+      - id: S40.1
+        title: Guided Onboarding and Diagnostic
+      - id: S40.2
+        title: Visual Cockpit and Pain Drill-Down
+      - id: S40.3
+        title: Strategy and Four-Decision Coaching
+      - id: S40.4
+        title: Persistent Execution and Honest Guidance
+    requirement_count: 8
+  - id: E41
+    slug: local-installation-and-lifecycle
+    title: Local Installation and Lifecycle
+    stories:
+      - id: S41.1
+        title: macOS and Windows Installation
+      - id: S41.2
+        title: Local Runtime and Folder Setup
+      - id: S41.3
+        title: Safe Migration Update and Rollback
+      - id: S41.4
+        title: Release Qualification Gates
+    requirement_count: 7
+  - id: E42
+    slug: product-qualification-and-functional-catalog
+    title: Product Qualification and Functional Catalog
+    stories:
+      - id: S42.1
+        title: Synthetic Entrepreneur End-to-End
+      - id: S42.2
+        title: Shipped Skill Qualification
+      - id: S42.3
+        title: Privacy Tamper and Failure Matrix
+      - id: S42.4
+        title: Functional Catalog PDF and Human Acceptance
+    requirement_count: 6
+requirements:
+  - id: REQ-E37-001
+    owner: {epic: E37, story: S37.1}
+    source_ids: [SRC-LOCAL-001]
+    acceptance: "Runtime and authoritative company state live only on the installer machine."
+    evidence:
+      artifact_path: work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-001.json
+      receipt_path: work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-001.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e37-001]
+      required_gates: [gate-format, gate-lint, gate-req-e37-001, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E37-002
+    owner: {epic: E37, story: S37.1}
+    source_ids: [SRC-LOCAL-001, SRC-SQLITE-001]
+    acceptance: "The authoritative SQLite and data root is rejected when located inside the configured synchronized exchange folder."
+    evidence:
+      artifact_path: work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-002.json
+      receipt_path: work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-002.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e37-002]
+      required_gates: [gate-format, gate-lint, gate-req-e37-002, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E37-003
+    owner: {epic: E37, story: S37.2}
+    source_ids: [SRC-INGEST-001]
+    acceptance: "The owner can submit declared spreadsheet, delimited-text, document, PDF, and transcript formats without adapting them to an ESCALA template; unsupported variants fail explicitly."
+    evidence:
+      artifact_path: work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-003.json
+      receipt_path: work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-003.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e37-003]
+      required_gates: [gate-format, gate-lint, gate-req-e37-003, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E37-004
+    owner: {epic: E37, story: S37.2}
+    source_ids: [SRC-EVIDENCE-001, SRC-INGEST-001]
+    acceptance: "Ingestion infers candidate sheets, tables, headers, units, dates, and entities and asks for clarification when ambiguity is material."
+    evidence:
+      artifact_path: work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-004.json
+      receipt_path: work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-004.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e37-004]
+      required_gates: [gate-format, gate-lint, gate-req-e37-004, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E37-005
+    owner: {epic: E37, story: S37.2}
+    source_ids: [SRC-EVIDENCE-001, SRC-INGEST-001]
+    acceptance: "Every imported source retains a local immutable fingerprint, relative provenance, extraction status, and rerun-safe identity without exposing machine paths."
+    evidence:
+      artifact_path: work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-005.json
+      receipt_path: work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-005.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e37-005]
+      required_gates: [gate-format, gate-lint, gate-req-e37-005, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E37-006
+    owner: {epic: E37, story: S37.3}
+    source_ids: [SRC-SHARING-001]
+    acceptance: "A user-selected local Drive, OneDrive, or plain folder can act as an idempotent inbox using ordinary filesystem operations only."
+    evidence:
+      artifact_path: work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-006.json
+      receipt_path: work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-006.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e37-006]
+      required_gates: [gate-format, gate-lint, gate-req-e37-006, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E37-007
+    owner: {epic: E37, story: S37.3}
+    source_ids: [SRC-EVIDENCE-001, SRC-INGEST-001]
+    acceptance: "Corrupt, encrypted, oversized, duplicate, or unsupported inputs are quarantined or reported without corrupting canonical state or leaking content."
+    evidence:
+      artifact_path: work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-007.json
+      receipt_path: work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-007.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e37-007]
+      required_gates: [gate-format, gate-lint, gate-req-e37-007, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E38-001
+    owner: {epic: E38, story: S38.1}
+    source_ids: [SRC-CASH-001, SRC-INGEST-001]
+    acceptance: "Real owner workbooks are profiled across sheets, tables, formulas, periods, currencies, and units without requiring a fixed template."
+    evidence:
+      artifact_path: work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-001.json
+      receipt_path: work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-001.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e38-001]
+      required_gates: [gate-format, gate-lint, gate-req-e38-001, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E38-002
+    owner: {epic: E38, story: S38.1}
+    source_ids: [SRC-CASH-001, SRC-EVIDENCE-001]
+    acceptance: "Ambiguous financial mappings trigger specific questions and remain unresolved until the owner answers; values are not guessed."
+    evidence:
+      artifact_path: work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-002.json
+      receipt_path: work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-002.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e38-002]
+      required_gates: [gate-format, gate-lint, gate-req-e38-002, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E38-003
+    owner: {epic: E38, story: S38.2}
+    source_ids: [SRC-CASH-001]
+    acceptance: "The system reconstructs a profit-and-loss statement, balance sheet, and cash-flow view when supported by supplied data and states what cannot be derived."
+    evidence:
+      artifact_path: work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-003.json
+      receipt_path: work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-003.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e38-003]
+      required_gates: [gate-format, gate-lint, gate-req-e38-003, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E38-004
+    owner: {epic: E38, story: S38.2}
+    source_ids: [SRC-CASH-001, SRC-EVIDENCE-001]
+    acceptance: "Every reported financial figure links to source workbook, sheet, cell or range provenance and transformation notes."
+    evidence:
+      artifact_path: work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-004.json
+      receipt_path: work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-004.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e38-004]
+      required_gates: [gate-format, gate-lint, gate-req-e38-004, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E38-005
+    owner: {epic: E38, story: S38.3}
+    source_ids: [SRC-CASH-001]
+    acceptance: "Cash-conversion-cycle and Power-of-One analyses use validated inputs, show assumptions, and support scenario comparison."
+    evidence:
+      artifact_path: work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-005.json
+      receipt_path: work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-005.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e38-005]
+      required_gates: [gate-format, gate-lint, gate-req-e38-005, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E38-006
+    owner: {epic: E38, story: S38.3}
+    source_ids: [SRC-CASH-001, SRC-EVIDENCE-001]
+    acceptance: "Missing, inconsistent, stale, or low-confidence financial data is visible and blocks overconfident recommendations."
+    evidence:
+      artifact_path: work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-006.json
+      receipt_path: work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-006.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e38-006]
+      required_gates: [gate-format, gate-lint, gate-req-e38-006, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E38-007
+    owner: {epic: E38, story: S38.4}
+    source_ids: [SRC-CASH-001, SRC-COCKPIT-001]
+    acceptance: "The owner receives a local visual cash report with findings, questions, scenarios, and downloadable evidence."
+    evidence:
+      artifact_path: work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-007.json
+      receipt_path: work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-007.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e38-007]
+      required_gates: [gate-format, gate-lint, gate-req-e38-007, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E39-001
+    owner: {epic: E39, story: S39.1}
+    source_ids: [SRC-INGEST-001, SRC-MEETING-001, SRC-SHARING-001]
+    acceptance: "Daily and weekly transcript files are ingested idempotently from manual input or a configured local inbox."
+    evidence:
+      artifact_path: work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-001.json
+      receipt_path: work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-001.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e39-001]
+      required_gates: [gate-format, gate-lint, gate-req-e39-001, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E39-002
+    owner: {epic: E39, story: S39.1}
+    source_ids: [SRC-EVIDENCE-001, SRC-MEETING-001]
+    acceptance: "Meeting type, date, team, participants mentioned, and source provenance are identified or explicitly left unresolved."
+    evidence:
+      artifact_path: work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-002.json
+      receipt_path: work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-002.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e39-002]
+      required_gates: [gate-format, gate-lint, gate-req-e39-002, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E39-003
+    owner: {epic: E39, story: S39.2}
+    source_ids: [SRC-EVIDENCE-001, SRC-MEETING-001]
+    acceptance: "Decisions, actions, owners, due dates, blockers, risks, and commitments are extracted with transcript evidence and confidence."
+    evidence:
+      artifact_path: work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-003.json
+      receipt_path: work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-003.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e39-003]
+      required_gates: [gate-format, gate-lint, gate-req-e39-003, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E39-004
+    owner: {epic: E39, story: S39.2}
+    source_ids: [SRC-EVIDENCE-001, SRC-MEETING-001]
+    acceptance: "Meeting-rhythm quality is assessed against declared business rules without treating missing transcript evidence as a failure by a person."
+    evidence:
+      artifact_path: work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-004.json
+      receipt_path: work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-004.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e39-004]
+      required_gates: [gate-format, gate-lint, gate-req-e39-004, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E39-005
+    owner: {epic: E39, story: S39.3}
+    source_ids: [SRC-MEETING-001]
+    acceptance: "Repeated blockers, overdue or repeated commitments, unresolved decisions, and cross-meeting trends are detected across time."
+    evidence:
+      artifact_path: work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-005.json
+      receipt_path: work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-005.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e39-005]
+      required_gates: [gate-format, gate-lint, gate-req-e39-005, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E39-006
+    owner: {epic: E39, story: S39.3}
+    source_ids: [SRC-EVIDENCE-001, SRC-MEETING-001]
+    acceptance: "A daily executive review summarizes team health, material changes, questions, and evidence without inventing negative findings."
+    evidence:
+      artifact_path: work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-006.json
+      receipt_path: work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-006.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e39-006]
+      required_gates: [gate-format, gate-lint, gate-req-e39-006, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E39-007
+    owner: {epic: E39, story: S39.4}
+    source_ids: [SRC-LOCAL-001, SRC-MEETING-001, SRC-SHARING-001, SRC-SQLITE-001]
+    acceptance: "Local scheduling and team report exchange operate through the installer machine and ordinary files; no hosted worker, cloud database, or shared SQLite is required."
+    evidence:
+      artifact_path: work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-007.json
+      receipt_path: work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-007.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e39-007]
+      required_gates: [gate-format, gate-lint, gate-req-e39-007, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E40-001
+    owner: {epic: E40, story: S40.1}
+    source_ids: [SRC-COACH-001, SRC-EVIDENCE-001]
+    acceptance: "Guided onboarding builds a validated company profile through questions and preserves unanswered or uncertain fields."
+    evidence:
+      artifact_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-001.json
+      receipt_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-001.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e40-001]
+      required_gates: [gate-format, gate-lint, gate-req-e40-001, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E40-002
+    owner: {epic: E40, story: S40.1}
+    source_ids: [SRC-COACH-001, SRC-COCKPIT-001, SRC-EVIDENCE-001]
+    acceptance: "An initial evidence-backed 0-100 diagnostic scores People, Strategy, Execution, and Cash separately."
+    evidence:
+      artifact_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-002.json
+      receipt_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-002.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e40-002]
+      required_gates: [gate-format, gate-lint, gate-req-e40-002, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E40-003
+    owner: {epic: E40, story: S40.2}
+    source_ids: [SRC-COACH-001, SRC-COCKPIT-001]
+    acceptance: "The cockpit identifies the highest pain or constraint and lets the owner drill from score to evidence, questions, and next action."
+    evidence:
+      artifact_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-003.json
+      receipt_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-003.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e40-003]
+      required_gates: [gate-format, gate-lint, gate-req-e40-003, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E40-004
+    owner: {epic: E40, story: S40.3}
+    source_ids: [SRC-COACH-001, SRC-EVIDENCE-001]
+    acceptance: "Strategy discovery produces a coherent vision and OPSP-style view from owner answers with explicit unresolved decisions."
+    evidence:
+      artifact_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-004.json
+      receipt_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-004.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e40-004]
+      required_gates: [gate-format, gate-lint, gate-req-e40-004, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E40-005
+    owner: {epic: E40, story: S40.3}
+    source_ids: [SRC-COACH-001, SRC-EVIDENCE-001]
+    acceptance: "People, Strategy, Execution, and Cash coaching routes to the right workflows without claiming unsupported analysis."
+    evidence:
+      artifact_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-005.json
+      receipt_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-005.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e40-005]
+      required_gates: [gate-format, gate-lint, gate-req-e40-005, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E40-006
+    owner: {epic: E40, story: S40.4}
+    source_ids: [SRC-COACH-001, SRC-LOCAL-001]
+    acceptance: "Goals, priorities, tasks, owners, due dates, progress, and session continuity persist locally and remain queryable."
+    evidence:
+      artifact_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-006.json
+      receipt_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-006.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e40-006]
+      required_gates: [gate-format, gate-lint, gate-req-e40-006, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E40-007
+    owner: {epic: E40, story: S40.2}
+    source_ids: [SRC-COCKPIT-001, SRC-EVIDENCE-001]
+    acceptance: "One local visual cockpit shows current scores, trends, evidence freshness, blockers, and recommended focus without a hosted UI."
+    evidence:
+      artifact_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-007.json
+      receipt_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-007.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e40-007]
+      required_gates: [gate-format, gate-lint, gate-req-e40-007, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E40-008
+    owner: {epic: E40, story: S40.4}
+    source_ids: [SRC-COACH-001, SRC-EVIDENCE-001]
+    acceptance: "Coaching asks material clarifying questions, distinguishes facts, inferences, and unknowns, and never invents company data."
+    evidence:
+      artifact_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-008.json
+      receipt_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-008.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e40-008]
+      required_gates: [gate-format, gate-lint, gate-req-e40-008, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E41-001
+    owner: {epic: E41, story: S41.1}
+    source_ids: [SRC-INSTALL-001, SRC-LOCAL-001]
+    acceptance: "A fresh supported macOS machine can install the qualified local package with one documented flow and no repository-development layout."
+    evidence:
+      artifact_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-001.json
+      receipt_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-001.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e41-001]
+      required_gates: [gate-format, gate-lint, gate-req-e41-001, gate-tests, gate-types]
+    platforms: [macos]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E41-002
+    owner: {epic: E41, story: S41.1}
+    source_ids: [SRC-INSTALL-001, SRC-LOCAL-001]
+    acceptance: "A fresh supported Windows machine can install the same qualified capability set with recorded platform evidence."
+    evidence:
+      artifact_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-002.json
+      receipt_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-002.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e41-002]
+      required_gates: [gate-format, gate-lint, gate-req-e41-002, gate-tests, gate-types]
+    platforms: [windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E41-003
+    owner: {epic: E41, story: S41.2}
+    source_ids: [SRC-INSTALL-001, SRC-LOCAL-001]
+    acceptance: "The installed product starts, reports local health, version, and data location, and stops cleanly without a hosted ESCALA service."
+    evidence:
+      artifact_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-003.json
+      receipt_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-003.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e41-003]
+      required_gates: [gate-format, gate-lint, gate-req-e41-003, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E41-004
+    owner: {epic: E41, story: S41.3}
+    source_ids: [SRC-INSTALL-001, SRC-LOCAL-001]
+    acceptance: "Schema and configuration migrations create a recoverable backup and support tested rollback or explicit safe-stop semantics."
+    evidence:
+      artifact_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-004.json
+      receipt_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-004.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e41-004]
+      required_gates: [gate-format, gate-lint, gate-req-e41-004, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E41-005
+    owner: {epic: E41, story: S41.3}
+    source_ids: [SRC-INSTALL-001, SRC-QUALIFY-001]
+    acceptance: "Updates consume only independently verified artifacts and preserve user state, version provenance, and rollback evidence."
+    evidence:
+      artifact_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-005.json
+      receipt_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-005.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e41-005]
+      required_gates: [gate-format, gate-lint, gate-req-e41-005, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E41-006
+    owner: {epic: E41, story: S41.2}
+    source_ids: [SRC-INSTALL-001, SRC-SHARING-001, SRC-SQLITE-001]
+    acceptance: "Setup can select and validate an optional local synchronized exchange folder while keeping SQLite and canonical state outside it."
+    evidence:
+      artifact_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-006.json
+      receipt_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-006.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e41-006]
+      required_gates: [gate-format, gate-lint, gate-req-e41-006, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E41-007
+    owner: {epic: E41, story: S41.4}
+    source_ids: [SRC-INSTALL-001, SRC-QUALIFY-001]
+    acceptance: "Installer, update, permissions, offline local runtime, legal-review, and publication gates are tested before any distributable release is authorized."
+    evidence:
+      artifact_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-007.json
+      receipt_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-007.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e41-007]
+      required_gates: [gate-format, gate-lint, gate-req-e41-007, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E42-001
+    owner: {epic: E42, story: S42.1}
+    source_ids: [SRC-QUALIFY-001]
+    acceptance: "A synthetic entrepreneur/company completes the end-to-end local journey from install and ingestion through meetings, cash analysis, strategy, cockpit, and follow-up."
+    evidence:
+      artifact_path: work/epics/e42-product-qualification-and-functional-catalog/evidence/REQ-E42-001.json
+      receipt_path: work/epics/e42-product-qualification-and-functional-catalog/evidence/REQ-E42-001.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e42-001]
+      required_gates: [gate-format, gate-lint, gate-req-e42-001, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E42-002
+    owner: {epic: E42, story: S42.2}
+    source_ids: [SRC-QUALIFY-001]
+    acceptance: "Every shipped ESCALA skill has a current inventory, supported intent, golden success case, negative case, and real invocation receipt."
+    evidence:
+      artifact_path: work/epics/e42-product-qualification-and-functional-catalog/evidence/REQ-E42-002.json
+      receipt_path: work/epics/e42-product-qualification-and-functional-catalog/evidence/REQ-E42-002.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e42-002]
+      required_gates: [gate-format, gate-lint, gate-req-e42-002, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E42-003
+    owner: {epic: E42, story: S42.1}
+    source_ids: [SRC-INSTALL-001, SRC-QUALIFY-001]
+    acceptance: "Fresh-install acceptance is repeated on the declared macOS and Windows matrix with exact versions and artifacts."
+    evidence:
+      artifact_path: work/epics/e42-product-qualification-and-functional-catalog/evidence/REQ-E42-003.json
+      receipt_path: work/epics/e42-product-qualification-and-functional-catalog/evidence/REQ-E42-003.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e42-003]
+      required_gates: [gate-format, gate-lint, gate-req-e42-003, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E42-004
+    owner: {epic: E42, story: S42.3}
+    source_ids: [SRC-EVIDENCE-001, SRC-QUALIFY-001, SRC-SQLITE-001]
+    acceptance: "Privacy, tamper, corrupt-input, interrupted-update, stale-evidence, no-network, and synchronized-SQLite rejection scenarios fail safely."
+    evidence:
+      artifact_path: work/epics/e42-product-qualification-and-functional-catalog/evidence/REQ-E42-004.json
+      receipt_path: work/epics/e42-product-qualification-and-functional-catalog/evidence/REQ-E42-004.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e42-004]
+      required_gates: [gate-format, gate-lint, gate-req-e42-004, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E42-005
+    owner: {epic: E42, story: S42.4}
+    source_ids: [SRC-CATALOG-001, SRC-QUALIFY-001]
+    acceptance: "A validated functionality catalog and Spanish PDF state what works, evidence, limits, prerequisites, and what remains unavailable without mentioning prohibited source material."
+    evidence:
+      artifact_path: work/epics/e42-product-qualification-and-functional-catalog/evidence/REQ-E42-005.json
+      receipt_path: work/epics/e42-product-qualification-and-functional-catalog/evidence/REQ-E42-005.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e42-005]
+      required_gates: [gate-format, gate-lint, gate-req-e42-005, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+  - id: REQ-E42-006
+    owner: {epic: E42, story: S42.4}
+    source_ids: [SRC-CATALOG-001, SRC-EVIDENCE-001, SRC-QUALIFY-001]
+    acceptance: "A requirement-by-requirement final audit plus explicit product-owner human acceptance closes the mission; technical gates alone cannot fabricate acceptance."
+    evidence:
+      artifact_path: work/epics/e42-product-qualification-and-functional-catalog/evidence/REQ-E42-006.json
+      receipt_path: work/epics/e42-product-qualification-and-functional-catalog/evidence/REQ-E42-006.receipt.json
+      verification_command: [.venv/bin/rai, gate, check, gate-req-e42-006]
+      required_gates: [gate-format, gate-lint, gate-req-e42-006, gate-tests, gate-types]
+    platforms: [macos, windows]
+    architecture:
+      runtime_authority: installer_machine
+      data_authority: installer_machine
+      team_exchange: ordinary_filesystem_documents_only
+      authoritative_sqlite_sync: forbidden
+    delivery_disposition: active
+    proof: {state: unproved, blockers: [evidence.missing]}
+limits:
+  max_acceptance_chars: 2048
+  max_command_tokens: 16
+  max_receipt_bytes: 65536
