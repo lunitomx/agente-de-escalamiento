@@ -63,6 +63,14 @@ procedencia, supuestos, confianza y límites.
 | S38.3 | Cash Decision Coaching | L | S38.2 | CCC, Power-of-One y escenarios comparables muestran inputs, supuestos, freshness, confianza y límites. |
 | S38.4 | Visual Cash Evidence | M | S38.2, S38.3 | Un reporte visual local permite ver hallazgos, preguntas, escenarios y descargar evidencia sin runtime hospedado. |
 
+## Progress
+
+- [x] S38.1 Workbook Understanding — merged `25a7d83` / `daec3fb`; gates
+  tests, lint, format and types PASS.
+- [ ] S38.2 Financial Statement Reconstruction
+- [ ] S38.3 Cash Decision Coaching
+- [ ] S38.4 Visual Cash Evidence
+
 ## Master Requirements Owned
 
 | Requirement | Acceptance proof |
