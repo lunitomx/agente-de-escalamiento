@@ -9,6 +9,13 @@ from .authority import (
     render_workspace_receipt_markdown,
     validate_workspace,
 )
+from .ingestion import (
+    FormatCapability,
+    SourceIdentity,
+    SourceIngestionError,
+    SourceRegistry,
+    build_source_identity,
+)
 
 __all__ = [
     "WorkspaceAuthorityError",
@@ -18,4 +25,9 @@ __all__ = [
     "render_workspace_receipt_json",
     "render_workspace_receipt_markdown",
     "validate_workspace",
+    "FormatCapability",
+    "SourceIdentity",
+    "SourceIngestionError",
+    "SourceRegistry",
+    "build_source_identity",
 ]
