@@ -69,7 +69,8 @@ procedencia, supuestos, confianza y límites.
   tests, lint, format and types PASS.
 - [x] S38.2 Financial Statement Reconstruction — merged `8d185bd` / `40c7730`;
   gates tests, lint, format and types PASS.
-- [ ] S38.3 Cash Decision Coaching
+- [x] S38.3 Cash Decision Coaching — merged `d43930e` / `74ba85e`; gates tests,
+  lint, format and types PASS.
 - [ ] S38.4 Visual Cash Evidence
 
 ## Master Requirements Owned
