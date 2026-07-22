@@ -10,7 +10,10 @@ from escala_server.meetings import (
     RhythmRule,
     MeetingIntakeError,
     assess_rhythm,
+    build_executive_review,
+    build_team_signals,
     extract_meeting_facts,
+    MeetingRecord,
     render_meeting_intake_receipt_json,
     scan_meeting_inbox,
 )
@@ -234,3 +237,69 @@ def scan_context(meeting_type: str, meeting_date: date):
         ),
         confidence="high",
     )
+
+
+def test_temporal_analysis_detects_repeated_overdue_unresolved_and_trend(
+    tmp_path: Path,
+) -> None:
+    config = _config(tmp_path)
+    _write_meeting(
+        config,
+        "daily-2026-07-20.transcript",
+        "Tipo: daily\nFecha: 2026-07-20\nEquipo: Operaciones\n"
+        "Participantes: Ana\nDecisión:\n"
+        "Bloqueador: aprobación de compras\n"
+        "Compromiso: Ana — entregar presupuesto — vence: 2026-07-19\n",
+    )
+    _write_meeting(
+        config,
+        "daily-2026-07-21.transcript",
+        "Tipo: daily\nFecha: 2026-07-21\nEquipo: Operaciones\n"
+        "Participantes: Ana\nBloqueador: aprobación de compras\n"
+        "Compromiso: Ana — entregar presupuesto — vence: 2026-07-20\n"
+        "Acción: Ana — actualizar tablero\n",
+    )
+    _write_meeting(
+        config,
+        "daily-2026-07-22.transcript",
+        "Tipo: daily\nFecha: 2026-07-22\nEquipo: Operaciones\n"
+        "Participantes: Ana\nBloqueador: aprobación de compras\n"
+        "Acción: Ana — actualizar tablero\n",
+    )
+
+    records: list[MeetingRecord] = []
+    for filename in sorted(path.name for path in config.exchange_root.iterdir()):
+        intake = scan_meeting_inbox(config)
+        item = next(item for item in intake.items if item.relative_path == filename)
+        extraction = extract_meeting_facts(config, item)
+        assert item.context is not None
+        records.append(MeetingRecord(context=item.context, extraction=extraction))
+
+    analysis = build_team_signals(records, as_of=date(2026, 7, 22))
+    review = build_executive_review(records, as_of=date(2026, 7, 22))
+
+    kinds = {signal.kind for signal in analysis.signals}
+    assert {
+        "repeated_blocker",
+        "overdue_commitment",
+        "repeated_commitment",
+        "trend",
+    } <= kinds
+    assert "unresolved_decision" in kinds
+    assert review.health == "watch"
+    assert review.material_changes
+    assert review.evidence_source_ids
+    assert all(signal.evidence_count >= 1 for signal in review.signals)
+
+
+def test_empty_review_is_evidence_limited_without_negative_findings() -> None:
+    review = build_executive_review((), as_of=date(2026, 7, 22))
+
+    assert review.health == "evidence_limited"
+    assert review.material_changes == ()
+    assert review.signals == ()
+    assert "evidence_missing" in review.questions
+
+
+def _write_meeting(config: WorkspaceConfig, filename: str, text: str) -> None:
+    (config.exchange_root / filename).write_text(text, encoding="utf-8")

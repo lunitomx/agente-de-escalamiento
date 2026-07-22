@@ -26,6 +26,14 @@ FactKind = Literal[
 ]
 FactResultStatus = Literal["ready", "partial", "blocked"]
 RhythmStatus = Literal["supported", "evidence_missing", "unresolved"]
+SignalKind = Literal[
+    "repeated_blocker",
+    "repeated_commitment",
+    "overdue_commitment",
+    "unresolved_decision",
+    "trend",
+]
+ReviewHealth = Literal["watch", "evidence_supported", "evidence_limited", "unresolved"]
 
 
 class _StrictModel(BaseModel):
@@ -183,6 +191,44 @@ class RhythmAssessment(_StrictModel):
     missing_dates: tuple[date, ...] = ()
     person_impact: Literal["not_assessed"] = "not_assessed"
     note_code: str = Field(min_length=1, max_length=80)
+
+
+class MeetingRecord(_StrictModel):
+    """One context plus its extracted facts for temporal analysis."""
+
+    context: MeetingContext
+    extraction: MeetingFactResult
+
+
+class TeamSignal(_StrictModel):
+    """A repeated or temporal signal grounded in one or more sources."""
+
+    signal_id: str = Field(pattern=r"^[0-9a-f]{64}$")
+    kind: SignalKind
+    value: str = Field(min_length=1, max_length=500)
+    evidence_source_ids: tuple[str, ...] = ()
+    evidence_count: int = Field(ge=1)
+    confidence: Confidence
+
+
+class TeamSignalAnalysis(_StrictModel):
+    """Deterministic cross-meeting signal collection."""
+
+    signals: tuple[TeamSignal, ...] = ()
+    evidence_source_ids: tuple[str, ...] = ()
+    findings: tuple[str, ...] = ()
+
+
+class ExecutiveReview(_StrictModel):
+    """Daily executive view with explicit evidence limits."""
+
+    review_id: str = Field(pattern=r"^[0-9a-f]{64}$")
+    review_date: date
+    health: ReviewHealth
+    material_changes: tuple[str, ...] = ()
+    questions: tuple[str, ...] = ()
+    signals: tuple[TeamSignal, ...] = ()
+    evidence_source_ids: tuple[str, ...] = ()
 
 
 def evidence_hash(text: str) -> str:
