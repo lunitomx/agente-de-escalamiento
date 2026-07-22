@@ -1,0 +1,53 @@
+artifact_type: story-design
+version: 1
+skill: rai-story-design
+created: '2026-07-22T15:11:24Z'
+story: 'S37.1'
+epic: 'E37'
+content:
+  summary: 'Establecer una autoridad local explícita para runtime, datos y SQLite, rechazando antes de cualquier apertura una base ubicada dentro de la carpeta de intercambio.'
+  complexity: moderate
+  acceptance_criteria:
+    - id: AC1
+      description: 'WorkspaceConfig estricto acepta una configuración local válida y rechaza campos desconocidos, raíces ausentes o roles ambiguos.'
+      verifiable: true
+    - id: AC2
+      description: 'La contención se evalúa con rutas resueltas y symlinks; database_path dentro de exchange_root produce una disposición fail-closed.'
+      verifiable: true
+    - id: AC3
+      description: 'El seam de apertura autoritativa valida antes de invocar init_db y una configuración inválida deja filesystem y SQLite sin mutación.'
+      verifiable: true
+    - id: AC4
+      description: 'Receipts positivos y negativos son deterministas y redacted: no contienen rutas absolutas, contenido, URLs cloud ni credenciales.'
+      verifiable: true
+    - id: AC5
+      description: 'La capacidad de exchange queda declarada como ordinary_filesystem_documents_only y no realiza llamadas de red, OAuth o APIs de Drive/OneDrive.'
+      verifiable: true
+  integration_points:
+    - module: 'escala_server.workspace.authority'
+      change_type: new
+      files: ['escala_server/workspace/__init__.py', 'escala_server/workspace/authority.py']
+    - module: 'escala_server.daos.schema'
+      change_type: modification
+      files: ['escala_server/daos/schema.py']
+    - module: 'tests.test_workspace_authority'
+      change_type: new
+      files: ['tests/test_workspace_authority.py']
+  decisions:
+    - id: D1
+      choice: 'Modelo Pydantic estricto con rutas internas resueltas y receipt separado sin paths'
+      rationale: 'El proyecto ya usa ConfigDict(extra=forbid); separar el modelo interno del receipt evita filtrar la máquina del instalador.'
+      alternatives_considered: ['Dataclass permisivo', 'Serializar Path directamente en JSON', 'Configurar por nombres Drive/OneDrive']
+    - id: D2
+      choice: 'Comparar containment con Path.resolve(strict=False) y parents, incluyendo symlinks'
+      rationale: 'Los prefijos de strings y los nombres de carpetas no protegen contra traversal, alias o symlink.'
+      alternatives_considered: ['startswith de strings', 'comparar solo rutas no resueltas', 'detectar sincronización por nombre']
+    - id: D3
+      choice: 'Guard wrapper que valida antes del initializer SQLite'
+      rationale: 'Permite probar no mutación y conectar ambos inicializadores existentes sin consolidar esquemas en esta story.'
+      alternatives_considered: ['Cambiar ambos esquemas de inmediato', 'validar después de abrir la conexión', 'duplicar guardas en cada DAO']
+refs:
+  epic_scope: 'work/epics/e37-local-workspace-flexible-ingestion/scope.md'
+metadata:
+  backlog_item: null
+  artifact_emit: unavailable-in-installed-rai-cli
