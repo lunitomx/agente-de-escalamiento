@@ -12,6 +12,15 @@ dependencies = [
     "pyyaml>=6.0",
 ]
 
+[project.entry-points."rai.gates"]
+e37-req-001 = "validators.e37_gates:E37RequirementGate001"
+e37-req-002 = "validators.e37_gates:E37RequirementGate002"
+e37-req-003 = "validators.e37_gates:E37RequirementGate003"
+e37-req-004 = "validators.e37_gates:E37RequirementGate004"
+e37-req-005 = "validators.e37_gates:E37RequirementGate005"
+e37-req-006 = "validators.e37_gates:E37RequirementGate006"
+e37-req-007 = "validators.e37_gates:E37RequirementGate007"
+
 [dependency-groups]
 dev = [
     "pyright>=1.1.0",
