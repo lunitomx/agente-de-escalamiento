@@ -3,6 +3,8 @@
 import sqlite3
 from pathlib import Path
 
+from ..workspace.authority import WorkspaceConfig
+
 
 SCHEMA_SQL = """
 CREATE TABLE IF NOT EXISTS companies (
@@ -56,3 +58,13 @@ def init_db(db_path: str) -> sqlite3.Connection:
     conn.executescript(SCHEMA_SQL)
     conn.commit()
     return conn
+
+
+def init_db_for_workspace(
+    config: "WorkspaceConfig",
+) -> sqlite3.Connection:
+    """Initialize the legacy DAO schema only after local authority validation."""
+
+    from ..workspace.authority import init_authoritative_db
+
+    return init_authoritative_db(config, initializer=init_db)

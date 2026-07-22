@@ -9,9 +9,12 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Literal
+from typing import Callable, Literal, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+
+_InitializerResult = TypeVar("_InitializerResult")
 
 
 class _StrictModel(BaseModel):
@@ -108,6 +111,19 @@ def validate_workspace(config: WorkspaceConfig) -> WorkspaceReceipt:
     return _build_receipt(findings)
 
 
+def init_authoritative_db(
+    config: WorkspaceConfig,
+    initializer: Callable[[str], _InitializerResult],
+) -> _InitializerResult:
+    """Validate authority before invoking an existing SQLite initializer."""
+
+    receipt = validate_workspace(config)
+    if receipt.status != "pass":
+        code = receipt.findings[0].code if receipt.findings else "workspace_invalid"
+        raise WorkspaceAuthorityError(code)
+    return initializer(str(_resolve(config.database_path)))
+
+
 def _resolve(path: Path) -> Path:
     """Resolve a path without requiring a file or directory to exist."""
 
@@ -195,3 +211,27 @@ def render_workspace_receipt_json(receipt: WorkspaceReceipt) -> str:
         sort_keys=True,
         separators=(",", ":"),
     )
+
+
+def render_workspace_receipt_markdown(receipt: WorkspaceReceipt) -> str:
+    """Render the same safe receipt fields as bounded human-readable Markdown."""
+
+    lines = [
+        "# Workspace Authority Receipt",
+        "",
+        f"- status: {receipt.status}",
+        f"- runtime_authority: {receipt.runtime_authority}",
+        f"- data_authority: {receipt.data_authority}",
+        f"- team_exchange: {receipt.team_exchange}",
+        f"- authoritative_sqlite_sync: {receipt.authoritative_sqlite_sync}",
+        "",
+        "## Checks",
+    ]
+    lines.extend(f"- {check.id}: {check.status}" for check in receipt.checks)
+    lines.append("")
+    lines.append("## Findings")
+    if receipt.findings:
+        lines.extend(f"- {finding.code}" for finding in receipt.findings)
+    else:
+        lines.append("- none")
+    return "\n".join(lines) + "\n"

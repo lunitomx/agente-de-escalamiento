@@ -9,10 +9,14 @@ import pytest
 from pydantic import ValidationError
 
 from escala_server.workspace.authority import (
+    WorkspaceAuthorityError,
     WorkspaceConfig,
+    init_authoritative_db,
+    render_workspace_receipt_markdown,
     render_workspace_receipt_json,
     validate_workspace,
 )
+from escala_server.daos.schema import init_db_for_workspace
 
 
 def _valid_config(tmp_path: Path) -> WorkspaceConfig:
@@ -147,3 +151,68 @@ def test_workspace_receipt_is_deterministic_across_runs(tmp_path: Path) -> None:
     second = render_workspace_receipt_json(validate_workspace(config))
 
     assert first == second
+
+
+def test_invalid_workspace_fails_before_sqlite_initializer_or_filesystem_mutation(
+    tmp_path: Path,
+) -> None:
+    exchange = tmp_path / "exchange"
+    exchange.mkdir()
+    config = WorkspaceConfig(
+        platform="macos",
+        data_root=tmp_path / "data",
+        database_path=exchange / "company.sqlite",
+        exchange_root=exchange,
+    )
+    before = sorted(
+        path.relative_to(tmp_path).as_posix() for path in tmp_path.rglob("*")
+    )
+    called = False
+
+    def initializer(_: str):
+        nonlocal called
+        called = True
+        return object()
+
+    with pytest.raises(WorkspaceAuthorityError) as error:
+        init_authoritative_db(config, initializer=initializer)
+
+    after = sorted(
+        path.relative_to(tmp_path).as_posix() for path in tmp_path.rglob("*")
+    )
+    assert error.value.code == "authoritative_sqlite_sync_forbidden"
+    assert called is False
+    assert before == after
+    assert not (exchange / "company.sqlite").exists()
+
+
+def test_valid_workspace_initializes_existing_local_sqlite_schema(
+    tmp_path: Path,
+) -> None:
+    config = _valid_config(tmp_path)
+
+    connection = init_db_for_workspace(config)
+    try:
+        tables = {
+            row[0]
+            for row in connection.execute(
+                "SELECT name FROM sqlite_master WHERE type = 'table'"
+            )
+        }
+    finally:
+        connection.close()
+
+    assert "companies" in tables
+    assert config.database_path.exists()
+    assert not config.exchange_root.exists()
+
+
+def test_markdown_receipt_uses_same_safe_fields_as_json(tmp_path: Path) -> None:
+    receipt = validate_workspace(_valid_config(tmp_path))
+
+    markdown = render_workspace_receipt_markdown(receipt)
+
+    assert "# Workspace Authority Receipt" in markdown
+    assert "status: pass" in markdown
+    assert "installer_machine" in markdown
+    assert str(tmp_path) not in markdown
