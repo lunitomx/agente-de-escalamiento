@@ -11,6 +11,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from .authority import WorkspaceConfig, validate_workspace
+from .ingestion import SourceIngestionError, build_source_identity, profile_source
 
 
 InboxDisposition = Literal[
@@ -104,7 +105,7 @@ class InboxRunResult(_StrictModel):
 
     run_id: str = Field(pattern=r"^[0-9a-f]{64}$")
     items: tuple[InboxItemResult, ...] = ()
-    ledger: InboxLedger = InboxLedger()
+    ledger: InboxLedger = Field(default_factory=InboxLedger)
     ledger_changed: bool = False
 
 
@@ -174,6 +175,9 @@ def scan_inbox(config: InboxConfig) -> InboxRunResult:
     except OSError:
         raise InboxError("exchange_unreadable") from None
 
+    ledger_entries = list(ledger.entries)
+    seen = ledger.by_source_id()
+    ledger_changed = False
     for path in entries:
         relative = path.relative_to(exchange).as_posix()
         if path.is_symlink():
@@ -200,18 +204,74 @@ def scan_inbox(config: InboxConfig) -> InboxRunResult:
             elif path.stat().st_size > config.max_bytes:
                 code = "source_too_large"
             else:
-                code = "profile_pending"
+                code = ""
         except OSError:
             code = "entry_unreadable"
-        items.append(
-            InboxItemResult(
-                relative_path=relative,
-                disposition="quarantined",
-                code=code,
+        if code:
+            items.append(
+                InboxItemResult(
+                    relative_path=relative,
+                    disposition="quarantined",
+                    code=code,
+                )
             )
+            continue
+
+        try:
+            identity = build_source_identity(path, exchange)
+        except SourceIngestionError as exc:
+            items.append(
+                InboxItemResult(
+                    relative_path=relative,
+                    disposition="quarantined",
+                    code=exc.code,
+                )
+            )
+            continue
+        if identity.source_id in seen:
+            items.append(
+                InboxItemResult(
+                    relative_path=relative,
+                    disposition="duplicate",
+                    code="source_seen",
+                    source_id=identity.source_id,
+                )
+            )
+            continue
+
+        result = profile_source(config.workspace, path)
+        if result.status == "ready":
+            disposition: InboxDisposition = "accepted"
+            result_code = "profile_ready"
+        elif result.status == "needs_clarification":
+            disposition = "needs_clarification"
+            result_code = "material_ambiguity"
+        else:
+            disposition = "quarantined"
+            result_code = result.findings[0] if result.findings else result.status
+        item = InboxItemResult(
+            relative_path=relative,
+            disposition=disposition,
+            code=result_code,
+            source_id=identity.source_id,
         )
+        items.append(item)
+        entry = InboxLedgerEntry(
+            source_id=identity.source_id,
+            relative_path=relative,
+            disposition=disposition,
+            codes=tuple(sorted({result_code, *result.findings})),
+        )
+        ledger_entries.append(entry)
+        seen[identity.source_id] = entry
+        ledger_changed = True
 
     safe_items = tuple(items)
+    if ledger_changed:
+        updated_ledger = InboxLedger(entries=tuple(ledger_entries))
+        save_inbox_ledger(config, updated_ledger)
+    else:
+        updated_ledger = ledger
     run_id = hashlib.sha256(
         json.dumps(
             [item.model_dump(mode="json") for item in safe_items],
@@ -219,4 +279,9 @@ def scan_inbox(config: InboxConfig) -> InboxRunResult:
             separators=(",", ":"),
         ).encode("utf-8")
     ).hexdigest()
-    return InboxRunResult(run_id=run_id, items=safe_items, ledger=ledger)
+    return InboxRunResult(
+        run_id=run_id,
+        items=safe_items,
+        ledger=updated_ledger,
+        ledger_changed=ledger_changed,
+    )

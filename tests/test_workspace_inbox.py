@@ -96,3 +96,75 @@ def test_inbox_rejects_directories_symlinks_and_oversized_entries(
     assert by_path["link.csv"].disposition == "quarantined"
     assert by_path["link.csv"].code == "entry_symlink"
     assert link.is_symlink()
+
+
+def test_scan_is_idempotent(tmp_path: Path) -> None:
+    config = _config(tmp_path)
+    config.exchange_root.mkdir()
+    source = config.exchange_root / "ventas.csv"
+    source.write_text("fecha,cliente,importe\n2026-07-22,Acme,10\n", encoding="utf-8")
+
+    first = scan_inbox(InboxConfig(workspace=config))
+    ledger_path = config.data_root / ".escala-inbox-ledger.json"
+    first_ledger_bytes = ledger_path.read_bytes()
+    second = scan_inbox(InboxConfig(workspace=config))
+
+    first_item = next(
+        item for item in first.items if item.relative_path == "ventas.csv"
+    )
+    second_item = next(
+        item for item in second.items if item.relative_path == "ventas.csv"
+    )
+    assert first_item.disposition == "accepted"
+    assert second_item.disposition == "duplicate"
+    assert first_item.source_id == second_item.source_id
+    assert ledger_path.read_bytes() == first_ledger_bytes
+
+
+def test_changed_bytes_create_new_identity(tmp_path: Path) -> None:
+    config = _config(tmp_path)
+    config.exchange_root.mkdir()
+    source = config.exchange_root / "ventas.csv"
+    source.write_text("fecha,cliente,importe\n2026-07-22,Acme,10\n", encoding="utf-8")
+
+    first = scan_inbox(InboxConfig(workspace=config))
+    old_id = next(
+        item.source_id for item in first.items if item.relative_path == "ventas.csv"
+    )
+    source.write_text("fecha,cliente,importe\n2026-07-22,Acme,11\n", encoding="utf-8")
+    second = scan_inbox(InboxConfig(workspace=config))
+
+    new_item = next(item for item in second.items if item.relative_path == "ventas.csv")
+    assert new_item.disposition == "accepted"
+    assert new_item.source_id != old_id
+    assert old_id in second.ledger.source_ids
+    assert new_item.source_id in second.ledger.source_ids
+
+
+def test_failure_dispositions_are_non_destructive(tmp_path: Path) -> None:
+    config = _config(tmp_path)
+    config.exchange_root.mkdir()
+    ambiguous = config.exchange_root / "cash.tsv"
+    ambiguous.write_text(
+        "fecha\tcliente\timporte\nFecha\tCliente\tImporte\n2026-07-22\tAcme\t10\n",
+        encoding="utf-8",
+    )
+    unknown = config.exchange_root / "misterio.bin"
+    unknown.write_bytes(b"private bytes")
+    corrupt = config.exchange_root / "broken.xlsx"
+    corrupt.write_bytes(b"not a zip workbook")
+    before = {path.name: path.read_bytes() for path in (ambiguous, unknown, corrupt)}
+
+    run = scan_inbox(InboxConfig(workspace=config))
+    by_path = {item.relative_path: item for item in run.items}
+
+    assert by_path["cash.tsv"].disposition == "needs_clarification"
+    assert by_path["cash.tsv"].code == "material_ambiguity"
+    assert by_path["misterio.bin"].disposition == "quarantined"
+    assert by_path["misterio.bin"].code == "format_unsupported"
+    assert by_path["broken.xlsx"].disposition == "quarantined"
+    assert by_path["broken.xlsx"].code == "source_unreadable"
+    assert {
+        path.name: path.read_bytes() for path in (ambiguous, unknown, corrupt)
+    } == before
+    assert not (config.data_root / "escala.sqlite").exists()
