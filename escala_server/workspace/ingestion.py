@@ -10,7 +10,10 @@ from __future__ import annotations
 import csv
 import hashlib
 import io
+import re
 import unicodedata
+import xml.etree.ElementTree as ET
+from zipfile import BadZipFile, ZipFile
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
@@ -235,6 +238,10 @@ def profile_source(
             status="provider_unavailable",
             findings=("provider_unavailable",),
         )
+    if capability.format == "xlsx":
+        return _profile_xlsx(identity, source_path)
+    if capability.format in {"text", "transcript"}:
+        return _profile_text(identity, source_path)
     if capability.format not in {"csv", "tsv"}:
         return IngestionResult(
             identity=identity,
@@ -262,6 +269,145 @@ def profile_source(
             findings=("material_ambiguity",),
         )
     return IngestionResult(identity=identity, status="ready", profile=profile)
+
+
+def _profile_text(identity: SourceIdentity, source_path: Path) -> IngestionResult:
+    """Profile UTF-8 text/transcript structure without copying its content."""
+
+    try:
+        text = (
+            source_path.expanduser()
+            .resolve(strict=True)
+            .read_bytes()
+            .decode("utf-8-sig")
+        )
+    except (OSError, UnicodeDecodeError):
+        return IngestionResult(
+            identity=identity, status="corrupt", findings=("source_unreadable",)
+        )
+    lines = text.splitlines()
+    if not lines:
+        return IngestionResult(
+            identity=identity, status="corrupt", findings=("source_empty",)
+        )
+    return IngestionResult(
+        identity=identity,
+        status="ready",
+        profile=SourceProfile(
+            tables=(
+                TableProfile(
+                    table_ordinal=0,
+                    row_count=len(lines),
+                    column_count=1,
+                ),
+            )
+        ),
+    )
+
+
+def _profile_xlsx(
+    identity: SourceIdentity,
+    source_path: Path,
+) -> IngestionResult:
+    """Read a minimal unencrypted XLSX workbook with stdlib ZIP/XML only."""
+
+    try:
+        with ZipFile(source_path.expanduser().resolve(strict=True)) as archive:
+            infos = archive.infolist()
+            if any(info.flag_bits & 0x1 for info in infos):
+                return IngestionResult(
+                    identity=identity,
+                    status="corrupt",
+                    findings=("xlsx_encrypted",),
+                )
+            sheet_names = sorted(
+                name
+                for name in archive.namelist()
+                if name.startswith("xl/worksheets/sheet") and name.endswith(".xml")
+            )
+            if not sheet_names:
+                return IngestionResult(
+                    identity=identity,
+                    status="corrupt",
+                    findings=("xlsx_no_sheets",),
+                )
+            tables: list[TableProfile] = []
+            questions: list[SourceQuestion] = []
+            for ordinal, sheet_name in enumerate(sheet_names):
+                rows = _xlsx_rows(archive.read(sheet_name))
+                profile, sheet_questions = _profile_delimited(rows)
+                if profile.tables:
+                    tables.append(
+                        profile.tables[0].model_copy(update={"table_ordinal": ordinal})
+                    )
+                questions.extend(sheet_questions)
+    except (OSError, BadZipFile, ET.ParseError, KeyError, ValueError):
+        return IngestionResult(
+            identity=identity, status="corrupt", findings=("source_unreadable",)
+        )
+
+    profile = SourceProfile(tables=tuple(tables))
+    if questions:
+        return IngestionResult(
+            identity=identity,
+            status="needs_clarification",
+            profile=profile,
+            questions=tuple(questions),
+            findings=("material_ambiguity",),
+        )
+    return IngestionResult(identity=identity, status="ready", profile=profile)
+
+
+def _xlsx_rows(payload: bytes) -> list[list[str]]:
+    """Convert one worksheet XML payload to bounded row/cell strings."""
+
+    root = ET.fromstring(payload)
+    rows: list[list[str]] = []
+    for row_element in root.iter():
+        if _xml_local(row_element.tag) != "row":
+            continue
+        cells: dict[int, str] = {}
+        for cell in row_element:
+            if _xml_local(cell.tag) != "c":
+                continue
+            coordinate = cell.attrib.get("r", "")
+            match = re.match(r"([A-Za-z]+)", coordinate)
+            if match is None:
+                continue
+            column_index = _column_index(match.group(1))
+            value = ""
+            if cell.attrib.get("t") == "inlineStr":
+                value = "".join(
+                    text or ""
+                    for element in cell.iter()
+                    if _xml_local(element.tag) == "t"
+                    for text in [element.text]
+                )
+            else:
+                value_element = next(
+                    (element for element in cell if _xml_local(element.tag) == "v"),
+                    None,
+                )
+                value = value_element.text or "" if value_element is not None else ""
+            cells[column_index] = value
+        if cells:
+            rows.append([cells.get(index, "") for index in range(max(cells) + 1)])
+    return rows
+
+
+def _xml_local(tag: str) -> str:
+    """Return the local name of a namespaced XML tag."""
+
+    return tag.rsplit("}", 1)[-1]
+
+
+def _column_index(letters: str) -> int:
+    """Convert an XLSX column label such as A or AA to a zero-based index."""
+
+    index = 0
+    for letter in letters.upper():
+        index = index * 26 + (ord(letter) - ord("A") + 1)
+    return index - 1
 
 
 def _profile_delimited(

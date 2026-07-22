@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from zipfile import ZipFile
 
 import pytest
 from pydantic import ValidationError
@@ -119,3 +120,49 @@ def test_ambiguous_profile_is_fail_closed(tmp_path: Path) -> None:
     assert result.profile is not None
     assert result.questions[0].code == "header_row_ambiguous"
     assert result.questions[0].options == ("row_0", "row_1")
+
+
+def _write_minimal_xlsx(path: Path) -> None:
+    sheet = """<?xml version='1.0' encoding='UTF-8'?>
+<worksheet xmlns='http://schemas.openxmlformats.org/spreadsheetml/2006/main'>
+  <sheetData>
+    <row r='1'><c r='A1' t='inlineStr'><is><t>fecha</t></is></c><c r='B1' t='inlineStr'><is><t>cliente</t></is></c><c r='C1' t='inlineStr'><is><t>importe</t></is></c></row>
+    <row r='2'><c r='A2' t='inlineStr'><is><t>2026-07-22</t></is></c><c r='B2' t='inlineStr'><is><t>Acme</t></is></c><c r='C2' t='n'><v>10</v></c></row>
+  </sheetData>
+</worksheet>"""
+    with ZipFile(path, "w") as archive:
+        archive.writestr("xl/worksheets/sheet1.xml", sheet)
+
+
+def test_profiles_xlsx_and_transcript_without_template(tmp_path: Path) -> None:
+    config = _config(tmp_path)
+    config.exchange_root.mkdir()
+    workbook = config.exchange_root / "ventas.xlsx"
+    _write_minimal_xlsx(workbook)
+    transcript = config.exchange_root / "weekly.transcript"
+    transcript.write_text("Acuerdos\nRiesgos\n", encoding="utf-8")
+
+    workbook_result = profile_source(config, workbook)
+    transcript_result = profile_source(config, transcript)
+
+    assert workbook_result.status == "ready"
+    assert workbook_result.profile is not None
+    assert workbook_result.profile.tables[0].row_count == 2
+    assert workbook_result.profile.tables[0].column_count == 3
+    assert transcript_result.status == "ready"
+    assert transcript_result.profile is not None
+    assert transcript_result.profile.tables[0].row_count == 2
+
+
+def test_corrupt_xlsx_is_explicit_and_source_is_unchanged(tmp_path: Path) -> None:
+    config = _config(tmp_path)
+    config.exchange_root.mkdir()
+    workbook = config.exchange_root / "broken.xlsx"
+    workbook.write_bytes(b"not a zip workbook")
+    before = workbook.read_bytes()
+
+    result = profile_source(config, workbook)
+
+    assert result.status == "corrupt"
+    assert result.findings == ("source_unreadable",)
+    assert workbook.read_bytes() == before
