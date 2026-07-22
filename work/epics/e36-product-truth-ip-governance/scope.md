@@ -1,8 +1,9 @@
 ---
 epic_id: "E36"
 title: "Product Truth, IP Boundary & Governance"
-status: "active"
+status: "complete"
 created: "2026-07-21"
+completed: "2026-07-21"
 mission: "escala-local-v2-plan-maestro-2607202112"
 ---
 
@@ -69,26 +70,26 @@ false completion claims from entering a distributable product.
 
 ## Done Criteria
 
-- [ ] Local `main` and canonical private `origin/main` are identical and the
+- [x] Local `main` and canonical private `origin/main` are identical and the
       active upstream cannot silently target the obsolete remote.
-- [ ] The raw reference-book file is absent from the current canonical tree and
+- [x] The raw reference-book file is absent from the current canonical tree and
       the commit preserves an auditable deletion record.
-- [ ] A history/exposure report distinguishes current-tree removal, private
+- [x] A history/exposure report distinguishes current-tree removal, private
       historical presence, and public-export eligibility without claiming an
       unperformed history rewrite.
-- [ ] Secret scanning finds no embedded credential in tracked content or
+- [x] Secret scanning finds no embedded credential in tracked content or
       distributable configuration; unsafe local remote URLs are sanitized.
-- [ ] Public-facing export rules reject prohibited source/author/book references,
+- [x] Public-facing export rules reject prohibited source/author/book references,
       private paths, company data, and non-allowlisted files.
-- [ ] Closure dispositions come from one typed contract and all positive and
+- [x] Closure dispositions come from one typed contract and all positive and
       negative governance tests pass.
-- [ ] Knowledge-graph build reports no duplicate canonical epic IDs for legacy
+- [x] Knowledge-graph build reports no duplicate canonical epic IDs for legacy
       E18-E22 folders.
-- [ ] A clean-export dry run passes its manifest, license, third-party notice,
+- [x] A clean-export dry run passes its manifest, license, third-party notice,
       reference, secret, and provenance checks without publishing externally.
-- [ ] E37-E42 acceptance ledger maps every master-plan requirement to evidence
+- [x] E37-E42 acceptance ledger maps every master-plan requirement to evidence
       and an owning epic/story.
-- [ ] Test, lint, format, and type gates pass before every commit.
+- [x] Test, lint, format, and type gates pass before every commit.
 
 ## Acceptance Evidence
 
@@ -174,7 +175,7 @@ isolation and commit recovery.
 
 | Story | Size | Status | Actual | Velocity | Notes |
 |-------|:----:|:------:|:------:|:--------:|-------|
-| S36.1 | S | Complete | 44m 06s | 1 S / 44m 06s | Merged locally at `d56a957`; final `origin/main` `0/0` proof remains an E36 close gate |
+| S36.1 | S | Complete | 44m 06s | 1 S / 44m 06s | Merged locally at `d56a957`; final private `origin/main` `0/0` receipt passed at E36 close |
 | S36.2 | M | Complete | 47m 32s | 1 M / 47m 32s | Merged locally at `195eff6`; sanitized baseline and non-mutation proof committed |
 | S36.4 | M | Complete | 1h 05m 33s | 1 M / 1h 05m 33s | Merged locally at `708a1b6`; strict governance contract, 10 canonical identities, and 15/15 close gates passed |
 | S36.3 | M | Complete | 1h 53m 12s | 1 M / 1h 53m 12s | Merged locally at `52baa1a`; 15/15 close gates passed after T7 canonical-import repair |
@@ -203,3 +204,12 @@ explicitly removed repeated approval prompts for routine local PASS gates. This
 plan remains inside that authorized scope. E36 still stops for a critical
 finding, credential handling, destructive history operation, or external
 publication/push.
+
+## Final Status
+
+Complete. All six stories are merged, all ten Done Criteria have observable
+evidence, the canonical private branch is synchronized `0/0`, and the current
+allowlisted artifact passes all ten independent technical checks. Human legal
+review remains required and publication authorization remains false. E36 does
+not claim E37-E42 functionality: the master acceptance ledger remains
+truthfully `0/42` until those product epics produce qualifying evidence.
