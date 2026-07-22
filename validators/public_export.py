@@ -7,9 +7,19 @@ import hashlib
 import json
 from pathlib import Path, PurePosixPath
 import re
-from typing import Any, Iterable, Literal
+import shutil
+import subprocess
+import tempfile
+from typing import Any, Iterable, Literal, NoReturn, TypeVar
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    ValidationError,
+    field_validator,
+    model_validator,
+)
 
 from validators.public_boundary import (
     PublicBoundaryPolicy,
@@ -86,6 +96,39 @@ class NoticeStatus(str, Enum):
 
 class DependencyReviewState(str, Enum):
     TECHNICAL_INVENTORY_VERIFIED = "technical_inventory_verified"
+
+
+class ExportBuildFailure(str, Enum):
+    INVALID_REPOSITORY = "invalid_repository"
+    INVALID_SOURCE_REF = "invalid_source_ref"
+    SOURCE_OBJECT_MISSING = "source_object_missing"
+    SOURCE_NOT_COMMIT = "source_not_commit"
+    NON_CURRENT_COMMIT = "non_current_commit"
+    POLICY_SOURCE_MISMATCH = "policy_source_mismatch"
+    INVENTORY_SOURCE_MISMATCH = "inventory_source_mismatch"
+    INVALID_GIT_TREE = "invalid_git_tree"
+    UNSAFE_GIT_PATH = "unsafe_git_path"
+    MISSING_SELECTION = "missing_selection"
+    UNSUPPORTED_GIT_ENTRY = "unsupported_git_entry"
+    CASE_COLLISION = "case_collision"
+    GENERATED_PATH_COLLISION = "generated_path_collision"
+    FILE_LIMIT_EXCEEDED = "file_limit_exceeded"
+    DESTINATION_NOT_ABSOLUTE = "destination_not_absolute"
+    DESTINATION_PARENT_INVALID = "destination_parent_invalid"
+    DESTINATION_EXISTS = "destination_exists"
+    DESTINATION_SYMLINK = "destination_symlink"
+    DESTINATION_IN_REPOSITORY = "destination_in_repository"
+    DESTINATION_SYNCHRONIZED = "destination_synchronized"
+    DESTINATION_OUTSIDE_TEMP = "destination_outside_temp"
+    MATERIALIZATION_FAILED = "materialization_failed"
+
+
+class PublicExportBuildError(ValueError):
+    """Safe, source-neutral build failure containing only a stable rule ID."""
+
+    def __init__(self, failure: ExportBuildFailure) -> None:
+        self.failure = failure
+        super().__init__(failure.value)
 
 
 class ProductIdentity(_StrictModel):
@@ -429,6 +472,39 @@ class PackageMetadata(_StrictModel):
     license: LicensePosture
 
 
+class PublicExportBuildResult(_StrictModel):
+    schema_version: Literal[1] = 1
+    product_id: Literal["escala"]
+    product_version: str = Field(pattern=r"^[0-9]+\.[0-9]+\.[0-9]+$")
+    source_commit: str = Field(pattern=r"^[0-9a-f]{40}$")
+    export_policy_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    third_party_inventory_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    artifact_file_count: int = Field(ge=1)
+    manifest_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    technical_artifact_status: Literal["built_not_verified"]
+    human_legal_review_status: Literal["required"]
+    publication_authorized: Literal[False]
+
+
+class _GitTreeEntry(_StrictModel):
+    mode: str = Field(pattern=r"^[0-9]{6}$")
+    object_type: str = Field(min_length=1, max_length=16)
+    object_id: str = Field(pattern=r"^[0-9a-f]{40}$")
+    path: str = Field(min_length=1)
+
+
+class _SelectedGitEntry(_StrictModel):
+    mode: Literal["100644", "100755"]
+    object_id: str = Field(pattern=r"^[0-9a-f]{40}$")
+    path: str
+
+
+class _MaterializedFile(_StrictModel):
+    path: str
+    mode: Literal["100644", "100755"]
+    content: bytes
+
+
 def load_public_export_policy(policy_path: Path) -> PublicExportPolicy:
     """Load one strict public-export policy from local YAML."""
     data: Any = yaml.safe_load(policy_path.read_text(encoding="utf-8"))
@@ -541,6 +617,408 @@ def render_third_party_notices(inventory: ThirdPartyInventory) -> str:
             ]
         )
     return "\n".join(lines)
+
+
+def render_artifact_manifest(manifest: ArtifactManifest) -> bytes:
+    """Render deterministic non-self-referential artifact metadata."""
+    payload = (
+        json.dumps(
+            manifest.model_dump(mode="json"),
+            ensure_ascii=True,
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n"
+    )
+    return payload.encode("utf-8")
+
+
+def build_public_export(
+    *,
+    repository: Path,
+    destination: Path,
+    source_commit: str,
+    policy: PublicExportPolicy,
+    inventory: ThirdPartyInventory,
+) -> PublicExportBuildResult:
+    """Build a local artifact exclusively from one immutable current commit."""
+    repository_root = _validate_repository(repository)
+    destination_root = _validate_build_destination(
+        destination,
+        repository=repository_root,
+    )
+    _validate_source_commit(repository_root, source_commit)
+    _validate_committed_contracts(
+        repository_root,
+        source_commit=source_commit,
+        policy=policy,
+        inventory=inventory,
+    )
+    tree_entries = _read_git_tree(repository_root, source_commit)
+    selected = _expand_git_selections(policy, tree_entries)
+    files = [
+        _MaterializedFile(
+            path=entry.path,
+            mode=entry.mode,
+            content=_read_git_blob(repository_root, entry.object_id),
+        )
+        for entry in selected
+    ]
+    metadata = build_package_metadata(
+        policy,
+        inventory,
+        source_commit=source_commit,
+    )
+    files.extend(
+        [
+            _MaterializedFile(
+                path=policy.generated_paths.package_metadata,
+                mode="100644",
+                content=render_package_metadata(metadata).encode("utf-8"),
+            ),
+            _MaterializedFile(
+                path=policy.generated_paths.third_party_notices,
+                mode="100644",
+                content=render_third_party_notices(inventory).encode("utf-8"),
+            ),
+        ]
+    )
+    files = sorted(files, key=lambda item: item.path)
+    _validate_materialized_paths(policy, files)
+    manifest = ArtifactManifest(
+        schema_version=1,
+        product_id=policy.product.id,
+        product_version=policy.product.version,
+        source_commit=source_commit,
+        export_policy_sha256=public_export_policy_hash(policy),
+        public_boundary_policy_sha256=policy.bindings.public_boundary.sha256,
+        third_party_inventory_sha256=third_party_inventory_hash(inventory),
+        entries=[
+            ArtifactEntry(
+                path=item.path,
+                mode=item.mode,
+                size_bytes=len(item.content),
+                sha256=hashlib.sha256(item.content).hexdigest(),
+            )
+            for item in files
+        ],
+    )
+    manifest_bytes = render_artifact_manifest(manifest)
+    _materialize_export(
+        destination_root,
+        files=files,
+        manifest_path=policy.generated_paths.manifest,
+        manifest_bytes=manifest_bytes,
+    )
+    return PublicExportBuildResult(
+        product_id=policy.product.id,
+        product_version=policy.product.version,
+        source_commit=source_commit,
+        export_policy_sha256=public_export_policy_hash(policy),
+        third_party_inventory_sha256=third_party_inventory_hash(inventory),
+        artifact_file_count=len(files) + 1,
+        manifest_sha256=hashlib.sha256(manifest_bytes).hexdigest(),
+        technical_artifact_status="built_not_verified",
+        human_legal_review_status=policy.license.human_review_status,
+        publication_authorized=policy.license.publication_authorized,
+    )
+
+
+def _validate_repository(repository: Path) -> Path:
+    if not repository.is_absolute():
+        _fail(ExportBuildFailure.INVALID_REPOSITORY)
+    try:
+        repository_root = repository.resolve(strict=True)
+    except OSError:
+        _fail(ExportBuildFailure.INVALID_REPOSITORY)
+    if not repository_root.is_dir():
+        _fail(ExportBuildFailure.INVALID_REPOSITORY)
+    reported = _git_output(
+        repository_root,
+        "rev-parse",
+        "--show-toplevel",
+        failure=ExportBuildFailure.INVALID_REPOSITORY,
+    )
+    try:
+        reported_root = Path(reported.decode("utf-8").strip()).resolve(strict=True)
+    except (OSError, UnicodeDecodeError):
+        _fail(ExportBuildFailure.INVALID_REPOSITORY)
+    if reported_root != repository_root:
+        _fail(ExportBuildFailure.INVALID_REPOSITORY)
+    return repository_root
+
+
+def _validate_build_destination(destination: Path, *, repository: Path) -> Path:
+    if not destination.is_absolute():
+        _fail(ExportBuildFailure.DESTINATION_NOT_ABSOLUTE)
+    if destination.is_symlink():
+        _fail(ExportBuildFailure.DESTINATION_SYMLINK)
+    if destination.exists():
+        _fail(ExportBuildFailure.DESTINATION_EXISTS)
+    parent = destination.parent
+    if not parent.exists() or not parent.is_dir() or parent.is_symlink():
+        _fail(ExportBuildFailure.DESTINATION_PARENT_INVALID)
+    try:
+        resolved = parent.resolve(strict=True) / destination.name
+        temporary_root = Path(tempfile.gettempdir()).resolve(strict=True)
+    except OSError:
+        _fail(ExportBuildFailure.DESTINATION_PARENT_INVALID)
+    if resolved == repository or resolved.is_relative_to(repository):
+        _fail(ExportBuildFailure.DESTINATION_IN_REPOSITORY)
+    synchronized_markers = (
+        "onedrive",
+        "google drive",
+        "googledrive",
+        "dropbox",
+        "icloud",
+    )
+    folded_parts = [part.casefold() for part in destination.parts]
+    if any(marker in part for marker in synchronized_markers for part in folded_parts):
+        _fail(ExportBuildFailure.DESTINATION_SYNCHRONIZED)
+    if resolved != temporary_root and not resolved.is_relative_to(temporary_root):
+        _fail(ExportBuildFailure.DESTINATION_OUTSIDE_TEMP)
+    return resolved
+
+
+def _validate_source_commit(repository: Path, source_commit: str) -> None:
+    if _COMMIT_PATTERN.fullmatch(source_commit) is None:
+        _fail(ExportBuildFailure.INVALID_SOURCE_REF)
+    object_type = (
+        _git_output(
+            repository,
+            "cat-file",
+            "-t",
+            source_commit,
+            failure=ExportBuildFailure.SOURCE_OBJECT_MISSING,
+        )
+        .decode("ascii", errors="replace")
+        .strip()
+    )
+    if object_type != "commit":
+        _fail(ExportBuildFailure.SOURCE_NOT_COMMIT)
+    head = (
+        _git_output(
+            repository,
+            "rev-parse",
+            "HEAD",
+            failure=ExportBuildFailure.INVALID_REPOSITORY,
+        )
+        .decode("ascii", errors="replace")
+        .strip()
+    )
+    if head != source_commit:
+        _fail(ExportBuildFailure.NON_CURRENT_COMMIT)
+
+
+def _validate_committed_contracts(
+    repository: Path,
+    *,
+    source_commit: str,
+    policy: PublicExportPolicy,
+    inventory: ThirdPartyInventory,
+) -> None:
+    committed_policy = _load_committed_model(
+        repository,
+        source_commit=source_commit,
+        relative_path="governance/public-export.yaml",
+        model_type=PublicExportPolicy,
+        failure=ExportBuildFailure.POLICY_SOURCE_MISMATCH,
+    )
+    if public_export_policy_hash(committed_policy) != public_export_policy_hash(policy):
+        _fail(ExportBuildFailure.POLICY_SOURCE_MISMATCH)
+    committed_inventory = _load_committed_model(
+        repository,
+        source_commit=source_commit,
+        relative_path="governance/third-party.yaml",
+        model_type=ThirdPartyInventory,
+        failure=ExportBuildFailure.INVENTORY_SOURCE_MISMATCH,
+    )
+    inventory_hash = third_party_inventory_hash(inventory)
+    if third_party_inventory_hash(committed_inventory) != inventory_hash:
+        _fail(ExportBuildFailure.INVENTORY_SOURCE_MISMATCH)
+    if policy.bindings.third_party.sha256 != inventory_hash:
+        _fail(ExportBuildFailure.INVENTORY_SOURCE_MISMATCH)
+
+
+_CommittedModelT = TypeVar(
+    "_CommittedModelT",
+    PublicExportPolicy,
+    ThirdPartyInventory,
+)
+
+
+def _load_committed_model(
+    repository: Path,
+    *,
+    source_commit: str,
+    relative_path: str,
+    model_type: type[_CommittedModelT],
+    failure: ExportBuildFailure,
+) -> _CommittedModelT:
+    payload = _git_output(
+        repository,
+        "cat-file",
+        "blob",
+        f"{source_commit}:{relative_path}",
+        failure=failure,
+    )
+    try:
+        data: Any = yaml.safe_load(payload.decode("utf-8"))
+        return model_type.model_validate(data)
+    except (UnicodeDecodeError, yaml.YAMLError, ValidationError):
+        _fail(failure)
+
+
+def _read_git_tree(repository: Path, source_commit: str) -> list[_GitTreeEntry]:
+    payload = _git_output(
+        repository,
+        "ls-tree",
+        "-r",
+        "-z",
+        "--full-tree",
+        source_commit,
+        failure=ExportBuildFailure.INVALID_GIT_TREE,
+    )
+    entries: list[_GitTreeEntry] = []
+    for record in payload.split(b"\0"):
+        if not record:
+            continue
+        try:
+            header, raw_path = record.split(b"\t", maxsplit=1)
+            mode, object_type, object_id = header.decode("ascii").split(" ")
+            path = raw_path.decode("utf-8")
+            entries.append(
+                _GitTreeEntry(
+                    mode=mode,
+                    object_type=object_type,
+                    object_id=object_id,
+                    path=path,
+                )
+            )
+        except (ValueError, UnicodeDecodeError, ValidationError):
+            _fail(ExportBuildFailure.INVALID_GIT_TREE)
+    return entries
+
+
+def _expand_git_selections(
+    policy: PublicExportPolicy,
+    tree_entries: list[_GitTreeEntry],
+) -> list[_SelectedGitEntry]:
+    selected: list[_GitTreeEntry] = []
+    for selection in policy.selections:
+        if selection.kind is SelectionKind.FILE:
+            matches = [entry for entry in tree_entries if entry.path == selection.path]
+        else:
+            matches = [
+                entry for entry in tree_entries if _is_under(entry.path, selection.path)
+            ]
+        if not matches:
+            _fail(ExportBuildFailure.MISSING_SELECTION)
+        selected.extend(matches)
+    if len(selected) + 3 > policy.limits.max_file_count:
+        _fail(ExportBuildFailure.FILE_LIMIT_EXCEEDED)
+    folded: set[str] = set()
+    result: list[_SelectedGitEntry] = []
+    for entry in selected:
+        try:
+            safe_path = _validate_relative_path(entry.path)
+        except ValueError:
+            _fail(ExportBuildFailure.UNSAFE_GIT_PATH)
+        normalized = safe_path.casefold()
+        if normalized in folded:
+            _fail(ExportBuildFailure.CASE_COLLISION)
+        folded.add(normalized)
+        if (
+            entry.object_type != "blob"
+            or entry.mode not in policy.source.allowed_git_modes
+        ):
+            _fail(ExportBuildFailure.UNSUPPORTED_GIT_ENTRY)
+        mode: Literal["100644", "100755"] = (
+            "100755" if entry.mode == "100755" else "100644"
+        )
+        result.append(
+            _SelectedGitEntry(
+                mode=mode,
+                object_id=entry.object_id,
+                path=safe_path,
+            )
+        )
+    return sorted(result, key=lambda item: item.path)
+
+
+def _read_git_blob(repository: Path, object_id: str) -> bytes:
+    return _git_output(
+        repository,
+        "cat-file",
+        "blob",
+        object_id,
+        failure=ExportBuildFailure.INVALID_GIT_TREE,
+    )
+
+
+def _validate_materialized_paths(
+    policy: PublicExportPolicy,
+    files: list[_MaterializedFile],
+) -> None:
+    all_paths = [item.path for item in files]
+    all_paths.append(policy.generated_paths.manifest)
+    folded = [path.casefold() for path in all_paths]
+    if len(folded) != len(set(folded)):
+        _fail(ExportBuildFailure.GENERATED_PATH_COLLISION)
+    for index, first in enumerate(folded):
+        for second in folded[index + 1 :]:
+            if _is_under(first, second) or _is_under(second, first):
+                _fail(ExportBuildFailure.GENERATED_PATH_COLLISION)
+
+
+def _materialize_export(
+    destination: Path,
+    *,
+    files: list[_MaterializedFile],
+    manifest_path: str,
+    manifest_bytes: bytes,
+) -> None:
+    created = False
+    try:
+        destination.mkdir(mode=0o700)
+        created = True
+        for item in files:
+            target = destination.joinpath(*PurePosixPath(item.path).parts)
+            target.parent.mkdir(mode=0o755, parents=True, exist_ok=True)
+            with target.open("xb") as stream:
+                stream.write(item.content)
+            target.chmod(0o755 if item.mode == "100755" else 0o644)
+        manifest_target = destination / manifest_path
+        with manifest_target.open("xb") as stream:
+            stream.write(manifest_bytes)
+        manifest_target.chmod(0o644)
+    except OSError:
+        if created:
+            shutil.rmtree(destination, ignore_errors=True)
+        _fail(ExportBuildFailure.MATERIALIZATION_FAILED)
+
+
+def _git_output(
+    repository: Path,
+    *arguments: str,
+    failure: ExportBuildFailure,
+) -> bytes:
+    try:
+        completed = subprocess.run(
+            ["git", "-C", str(repository), *arguments],
+            check=False,
+            capture_output=True,
+            timeout=10,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        _fail(failure)
+    if completed.returncode != 0:
+        _fail(failure)
+    return completed.stdout
+
+
+def _fail(failure: ExportBuildFailure) -> NoReturn:
+    raise PublicExportBuildError(failure)
 
 
 def _semantic_hash(model: BaseModel) -> str:
