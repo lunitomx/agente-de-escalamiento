@@ -27,3 +27,10 @@
 | Universal parser for every workbook/document variant | E37 design | Rejected | Replace with a new bounded adapter decision; unsupported inputs must remain explicit |
 | Cloud Drive/OneDrive API or OAuth | E37 ADR | Rejected | Only after a new product decision changes the local-only invariant |
 | Multi-writer shared SQLite | E37 ADR | Rejected | Requires abandoning installer-machine data authority and a new ADR |
+
+## From product discovery: People and knowledge cartridges
+
+| Item | Origin | Priority | Promotion Condition |
+|------|--------|----------|-------------------|
+| Consent-based DISC assessment and local director view | Product discovery | Medium | Define consent, named-person access, retention, non-diagnostic language, and a local-only qualification before E40/E42 |
+| Credited knowledge cartridges from company trainings (starting with Cash / Humberto) | Product discovery | High | Obtain rights and formula validation, then qualify the cartridge adapter against synthetic and real local workbooks |
