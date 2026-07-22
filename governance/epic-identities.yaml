@@ -1,0 +1,63 @@
+schema_version: 1
+identities:
+  - canonical_id: E1801
+    folder: work/epics/e1801-class-to-skill-learning-loop
+    closure_disposition: complete
+    legacy_folder_aliases:
+      - work/epics/e18-class-to-skill-learning-loop
+  - canonical_id: E1802
+    folder: work/epics/e1802-escala-server
+    closure_disposition: complete
+    legacy_folder_aliases:
+      - work/epics/e18-escala-server
+  - canonical_id: E1901
+    folder: work/epics/e1901-book-ingestion
+    closure_disposition: deferred/backlog
+    legacy_folder_aliases:
+      - work/epics/e19-book-ingestion
+  - canonical_id: E1902
+    folder: work/epics/e1902-strategy-core-skills
+    closure_disposition: superseded/discarded
+    legacy_folder_aliases:
+      - work/epics/e19-strategy-core-skills
+  - canonical_id: E2001
+    folder: work/epics/e2001-contextual-skills
+    closure_disposition: complete
+    legacy_folder_aliases:
+      - work/epics/e20-contextual-skills
+  - canonical_id: E2002
+    folder: work/epics/e2002-voice-of-customer-evidence-capture
+    closure_disposition: superseded/discarded
+    legacy_folder_aliases:
+      - work/epics/e20-voice-of-customer-evidence-capture
+  - canonical_id: E2101
+    folder: work/epics/e2101-transcript-intelligence-for-escala
+    closure_disposition: deprecated/discarded
+    legacy_folder_aliases:
+      - work/epics/e21-transcript-intelligence-for-escala
+  - canonical_id: E2102
+    folder: work/epics/e2102-verne-board-member
+    closure_disposition: complete
+    legacy_folder_aliases:
+      - work/epics/e21-verne-board-member
+  - canonical_id: E2201
+    folder: work/epics/e2201-validation-drift-governance
+    closure_disposition: superseded/discarded
+    legacy_folder_aliases:
+      - work/epics/e22-validation-drift-governance
+  - canonical_id: E2202
+    folder: work/epics/e2202-verne-audit
+    closure_disposition: absorbed/descoped
+    legacy_folder_aliases:
+      - work/epics/e22-verne-audit
+ambiguous_aliases:
+  - alias: E18
+    canonical_ids: [E1801, E1802]
+  - alias: E19
+    canonical_ids: [E1901, E1902]
+  - alias: E20
+    canonical_ids: [E2001, E2002]
+  - alias: E21
+    canonical_ids: [E2101, E2102]
+  - alias: E22
+    canonical_ids: [E2201, E2202]

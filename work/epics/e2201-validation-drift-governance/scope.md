@@ -1,4 +1,4 @@
-# Epic Scope: E22 — Validation, Drift Control & Governance
+# Epic Scope: E2201 — Validation, Drift Control & Governance
 
 **Status:** Superseded/Discarded
 **Closed as backlog:** 2026-06-18

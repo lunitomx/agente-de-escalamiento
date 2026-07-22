@@ -2,7 +2,7 @@
 
 > **Archivado:** 2026-05-29
 > **Épica original:** E19 (dividida en E19-book-ingestion, E20, E21)
-> **Ver también:** work/epics/e20-contextual-skills/, work/epics/e21-verne-board-member/
+> **Ver también:** work/epics/e2001-contextual-skills/, work/epics/e2102-verne-board-member/
 
 ---
 

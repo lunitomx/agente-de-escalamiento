@@ -1,6 +1,6 @@
 # E12 — Codex Compatibilidad + Auto-Update
 
-**Status:** CANCELLED — Absorbido por E11
+**Status:** Cancelled/Absorbed
 
 ## Objetivo
 

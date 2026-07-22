@@ -6,6 +6,21 @@ from dataclasses import dataclass
 from pathlib import Path
 import re
 
+from pydantic import ValidationError
+
+from validators.governance_contract import (
+    ClosureDispositionPolicy,
+    load_closure_disposition_policy,
+)
+
+try:
+    import yaml
+except ImportError as exc:  # pragma: no cover - project dependency
+    raise ImportError("PyYAML required: pip install pyyaml") from exc
+
+
+_POLICY_ERROR = "governance closure policy: unavailable or invalid"
+
 
 @dataclass(frozen=True)
 class EpicClosureRule:
@@ -33,15 +48,15 @@ AUDITED_EPIC_RULES: tuple[EpicClosureRule, ...] = (
         required_phrases=("Retrospective evidence",),
     ),
     EpicClosureRule(
-        epic_id="E19",
-        path="work/epics/e19-book-ingestion/scope.md",
+        epic_id="E1901",
+        path="work/epics/e1901-book-ingestion/scope.md",
         expected_status="deferred/backlog",
         allow_open_done_criteria=True,
         required_phrases=("Governance correction", "Backlog action"),
     ),
     EpicClosureRule(
-        epic_id="E22",
-        path="work/epics/e22-verne-audit/scope.md",
+        epic_id="E2202",
+        path="work/epics/e2202-verne-audit/scope.md",
         expected_status="absorbed/descoped",
         allow_open_done_criteria=True,
         required_phrases=("Absorption map", "Descoped"),
@@ -83,8 +98,8 @@ AUDITED_EPIC_RULES: tuple[EpicClosureRule, ...] = (
 
 BACKLOG_DRAFT_RULES: tuple[EpicClosureRule, ...] = (
     EpicClosureRule(
-        epic_id="E19 Strategy Core Draft",
-        path="work/epics/e19-strategy-core-skills/scope.md",
+        epic_id="E1902 Strategy Core Draft",
+        path="work/epics/e1902-strategy-core-skills/scope.md",
         expected_status="superseded/discarded",
         allow_open_done_criteria=True,
         required_phrases=(
@@ -94,8 +109,8 @@ BACKLOG_DRAFT_RULES: tuple[EpicClosureRule, ...] = (
         ),
     ),
     EpicClosureRule(
-        epic_id="E20 Voice of Customer Draft",
-        path="work/epics/e20-voice-of-customer-evidence-capture/scope.md",
+        epic_id="E2002 Voice of Customer Draft",
+        path="work/epics/e2002-voice-of-customer-evidence-capture/scope.md",
         expected_status="superseded/discarded",
         allow_open_done_criteria=True,
         required_phrases=(
@@ -105,8 +120,8 @@ BACKLOG_DRAFT_RULES: tuple[EpicClosureRule, ...] = (
         ),
     ),
     EpicClosureRule(
-        epic_id="E21 Transcript Intelligence Draft",
-        path="work/epics/e21-transcript-intelligence-for-escala/scope.md",
+        epic_id="E2101 Transcript Intelligence Draft",
+        path="work/epics/e2101-transcript-intelligence-for-escala/scope.md",
         expected_status="deprecated/discarded",
         allow_open_done_criteria=True,
         required_phrases=(
@@ -116,8 +131,8 @@ BACKLOG_DRAFT_RULES: tuple[EpicClosureRule, ...] = (
         ),
     ),
     EpicClosureRule(
-        epic_id="E22 Validation Drift Draft",
-        path="work/epics/e22-validation-drift-governance/scope.md",
+        epic_id="E2201 Validation Drift Draft",
+        path="work/epics/e2201-validation-drift-governance/scope.md",
         expected_status="superseded/discarded",
         allow_open_done_criteria=True,
         required_phrases=(
@@ -131,15 +146,36 @@ BACKLOG_DRAFT_RULES: tuple[EpicClosureRule, ...] = (
 
 def validate_audited_epic_closures(root: Path) -> list[str]:
     """Return closure governance errors for the E32 audited epic set."""
-    return _validate_epic_rules(root, AUDITED_EPIC_RULES)
+    return _validate_epic_rules_with_policy(root, AUDITED_EPIC_RULES)
 
 
 def validate_backlog_draft_closures(root: Path) -> list[str]:
     """Return governance errors for draft epics closed as backlog."""
-    return _validate_epic_rules(root, BACKLOG_DRAFT_RULES)
+    return _validate_epic_rules_with_policy(root, BACKLOG_DRAFT_RULES)
 
 
-def _validate_epic_rules(root: Path, rules: tuple[EpicClosureRule, ...]) -> list[str]:
+def _validate_epic_rules_with_policy(
+    root: Path,
+    rules: tuple[EpicClosureRule, ...],
+) -> list[str]:
+    try:
+        policy = load_closure_disposition_policy(
+            root / "governance/closure-dispositions.yaml"
+        )
+    except (OSError, UnicodeError, yaml.YAMLError, ValidationError):
+        return [_POLICY_ERROR]
+
+    accepted = {item.id for item in policy.dispositions}
+    if any(rule.expected_status not in accepted for rule in rules):
+        return [_POLICY_ERROR]
+    return _validate_epic_rules(root, rules, policy)
+
+
+def _validate_epic_rules(
+    root: Path,
+    rules: tuple[EpicClosureRule, ...],
+    policy: ClosureDispositionPolicy,
+) -> list[str]:
     errors: list[str] = []
 
     for rule in rules:
@@ -149,7 +185,7 @@ def _validate_epic_rules(root: Path, rules: tuple[EpicClosureRule, ...]) -> list
             continue
 
         text = path.read_text(encoding="utf-8")
-        status = _extract_status(text)
+        status = _extract_status(text, policy)
         if status != rule.expected_status:
             errors.append(
                 f"{rule.epic_id}: expected status {rule.expected_status!r}, got {status!r}"
@@ -178,7 +214,7 @@ def _validate_epic_rules(root: Path, rules: tuple[EpicClosureRule, ...]) -> list
     return errors
 
 
-def _extract_status(text: str) -> str:
+def _extract_status(text: str, policy: ClosureDispositionPolicy) -> str:
     patterns = (
         r'^status:\s*["\']?([^"\'\n]+)',
         r"^\*\*Status:\*\*\s*(.+)$",
@@ -187,27 +223,13 @@ def _extract_status(text: str) -> str:
     for pattern in patterns:
         match = re.search(pattern, text, flags=re.IGNORECASE | re.MULTILINE)
         if match:
-            return _normalize_status(match.group(1))
+            clean = match.group(1).strip()
+            if len(clean) >= 2 and clean[0] == clean[-1] and clean[0] in "\"'":
+                clean = clean[1:-1].strip()
+            clean = re.sub(r"\s+", " ", clean).casefold()
+            canonical = {item.id.casefold(): item.id for item in policy.dispositions}
+            return canonical.get(clean, clean)
     return "unknown"
-
-
-def _normalize_status(value: str) -> str:
-    clean = value.strip().strip('"').strip("'").lower()
-    clean = clean.replace("✅", "").strip()
-    clean = re.sub(r"\s+", " ", clean)
-    if "partial/backlog" in clean:
-        return "partial/backlog"
-    if "backlog/not completed" in clean:
-        return "backlog/not completed"
-    if "absorbed/descoped" in clean:
-        return "absorbed/descoped"
-    if "partial" in clean:
-        return "partial"
-    if "active" in clean:
-        return "active"
-    if "complete" in clean:
-        return "complete"
-    return clean
 
 
 def _open_done_criteria_items(text: str) -> list[str]:

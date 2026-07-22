@@ -1,4 +1,4 @@
-# Epic Scope: E21 — Verne Harnish Board Member
+# Epic Scope: E2102 — Verne Harnish Board Member
 
 **Status:** Complete
 **Dependencies:** E19 (grafo de conocimiento del libro), E18 (infraestructura)

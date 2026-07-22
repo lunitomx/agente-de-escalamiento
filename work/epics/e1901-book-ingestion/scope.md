@@ -1,4 +1,4 @@
-# Epic Scope: E19 — Book Ingestion & Knowledge Graph
+# Epic Scope: E1901 — Book Ingestion & Knowledge Graph
 
 **Status:** Deferred/Backlog
 **Dependencies:** E18 (infraestructura base)
@@ -42,7 +42,7 @@
 - Legacy tag: `epic/e19-complete`
 - Close commit: `e99de9e epic(e19): close with retrospective`
 - Post-close scope patch: `9b4a319 docs: archive e19-board-sintetico vision, patch e19 scope to Complete, add E20 plan`
-- Retrospective evidence: `work/epics/e19-book-ingestion/retrospective.md`
+- Retrospective evidence: `work/epics/e1901-book-ingestion/retrospective.md`
 - Integrity evidence: S19.5 reported 12 integrity tests covering the full book structure.
 - [ ] Documentación del esquema del grafo
 

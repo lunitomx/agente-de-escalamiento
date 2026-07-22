@@ -1,4 +1,4 @@
-# Epic Scope: E22 — Full System Audit (3 Empresas × Todos los Skills)
+# Epic Scope: E2202 — Full System Audit (3 Empresas × Todos los Skills)
 
 **Status:** Absorbed/Descoped
 **Dependencies:** E14 (Cash dashboards), E15 (Strategy dashboards), E16 (People dashboards), E17 (Execution dashboards), E21 (Verne)

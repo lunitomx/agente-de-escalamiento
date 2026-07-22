@@ -1,4 +1,6 @@
-# Epic Scope: E18 — Class-to-Skill Learning Loop
+# Epic Scope: E1801 — Class-to-Skill Learning Loop
+
+**Status:** Complete
 
 ## Objective
 

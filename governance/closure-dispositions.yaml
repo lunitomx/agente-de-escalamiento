@@ -1,0 +1,42 @@
+schema_version: 1
+dispositions:
+  - id: active
+    terminal: false
+    completed: false
+    reviewable: true
+    activation_eligible: true
+  - id: complete
+    terminal: true
+    completed: true
+    reviewable: true
+    activation_eligible: false
+  - id: unresolved/review-required
+    terminal: false
+    completed: false
+    reviewable: true
+    activation_eligible: false
+  - id: deferred/backlog
+    terminal: false
+    completed: false
+    reviewable: true
+    activation_eligible: false
+  - id: cancelled/absorbed
+    terminal: true
+    completed: false
+    reviewable: false
+    activation_eligible: false
+  - id: absorbed/descoped
+    terminal: true
+    completed: false
+    reviewable: false
+    activation_eligible: false
+  - id: superseded/discarded
+    terminal: true
+    completed: false
+    reviewable: false
+    activation_eligible: false
+  - id: deprecated/discarded
+    terminal: true
+    completed: false
+    reviewable: false
+    activation_eligible: false

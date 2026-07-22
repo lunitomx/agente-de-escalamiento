@@ -1,4 +1,4 @@
-# Epic Scope: E19 — Strategy Core Skills
+# Epic Scope: E1902 — Strategy Core Skills
 
 **Status:** Superseded/Discarded
 **Closed as backlog:** 2026-06-18
