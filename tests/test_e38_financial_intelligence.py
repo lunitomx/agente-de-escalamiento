@@ -12,6 +12,8 @@ from escala_server.financial import (
     profile_financial_workbook,
     reconstruct_statements,
     build_cash_decision,
+    write_cash_report,
+    render_cash_report_receipt_json,
     render_cash_decision_receipt_json,
     render_profile_receipt_json,
     resolve_mapping_answers,
@@ -314,4 +316,75 @@ def test_mixed_currency_blocks_cash_decision(tmp_path: Path) -> None:
 
     assert decision.status == "blocked"
     assert "currency_mismatch" in decision.findings
+    assert not decision.recommendations
+
+
+def test_local_cash_report_is_visual_downloadable_and_deterministic(
+    tmp_path: Path,
+) -> None:
+    config = _config(tmp_path)
+    workbook = config.exchange_root / "report.csv"
+    workbook.write_text(
+        "Cuenta,2026-07,Moneda,Unidad\n"
+        "Ventas netas,120000,MXN,pesos\n"
+        "Costo de ventas,70000,MXN,pesos\n"
+        "Gastos operativos,30000,MXN,pesos\n"
+        "Utilidad neta,15000,MXN,pesos\n"
+        "Caja,22000,MXN,pesos\n"
+        "Cuentas por cobrar,18000,MXN,pesos\n"
+        "Inventario,12000,MXN,pesos\n"
+        "Cuentas por pagar,9000,MXN,pesos\n"
+        "Flujo operativo,20000,MXN,pesos\n"
+        "Flujo de inversion,-5000,MXN,pesos\n"
+        "Flujo de financiamiento,-3000,MXN,pesos\n",
+        encoding="utf-8",
+    )
+    profile = profile_financial_workbook(config, workbook)
+    statements = reconstruct_statements(profile, as_of=date(2026, 7, 22))
+    decision = build_cash_decision(
+        statements,
+        as_of=date(2026, 7, 22),
+        scenarios=(
+            CashScenarioRequest(scenario_id="price-plus-one", adjustments={"price": 1}),
+        ),
+    )
+
+    first = write_cash_report(config, decision)
+    second = write_cash_report(config, decision)
+    html = (config.data_root / first.html_path).read_text(encoding="utf-8")
+    markdown = (config.data_root / first.markdown_path).read_text(encoding="utf-8")
+    payload = (config.data_root / first.json_path).read_text(encoding="utf-8")
+
+    assert first.report_id == second.report_id
+    assert first.html_path.startswith(".escala-cash-reports/")
+    assert "Ciclo de Conversión de Efectivo" in html
+    assert "price-plus-one" in html
+    assert "nopal" not in html
+    assert str(tmp_path) not in html + markdown + payload
+    assert "https://" not in html
+    receipt = render_cash_report_receipt_json(first)
+    assert str(tmp_path) not in receipt
+    assert "120000" not in receipt
+    assert (config.exchange_root / "report.csv").read_bytes()
+
+
+def test_blocked_cash_report_shows_questions_without_recommendations(
+    tmp_path: Path,
+) -> None:
+    config = _config(tmp_path)
+    workbook = config.exchange_root / "blocked.csv"
+    workbook.write_text(
+        "Cuenta,2026-07,Moneda\nVentas,100,MXN\nIngresos,100,MXN\n",
+        encoding="utf-8",
+    )
+    profile = profile_financial_workbook(config, workbook)
+    statements = reconstruct_statements(profile, as_of=date(2026, 7, 22))
+    decision = build_cash_decision(statements, as_of=date(2026, 7, 22))
+
+    artifact = write_cash_report(config, decision)
+    html = (config.data_root / artifact.html_path).read_text(encoding="utf-8")
+
+    assert decision.status == "blocked"
+    assert "mapping_unresolved" in html
+    assert "No hay recomendaciones" in html
     assert not decision.recommendations

@@ -33,6 +33,12 @@ from .cash_decision import (
     render_cash_decision_receipt_json,
     render_cash_decision_receipt_markdown,
 )
+from .report import (
+    CashReportArtifact,
+    render_cash_report_receipt_json,
+    render_cash_report_receipt_markdown,
+    write_cash_report,
+)
 
 __all__ = [
     "FinancialWorkbookProfile",
@@ -57,4 +63,8 @@ __all__ = [
     "build_cash_decision",
     "render_cash_decision_receipt_json",
     "render_cash_decision_receipt_markdown",
+    "CashReportArtifact",
+    "render_cash_report_receipt_json",
+    "render_cash_report_receipt_markdown",
+    "write_cash_report",
 ]
