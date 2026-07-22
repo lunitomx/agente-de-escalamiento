@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "story": "S37.2",
+  "status": "pass",
+  "source_commit": "4c21ed4095e16cce046ea3ebbd37418d8014a336",
+  "qualification": {
+    "command": "uv run python <temporary local workspace qualification>",
+    "statuses": {
+      "cash.tsv": "needs_clarification",
+      "estado.pdf": "provider_unavailable",
+      "misterio.bin": "unsupported",
+      "ventas.csv": "ready",
+      "ventas.xlsx": "ready",
+      "weekly.transcript": "ready"
+    },
+    "ambiguous_question": "header_row_ambiguous",
+    "rerun_receipts_equal": true,
+    "changed_bytes_new_identity": true,
+    "exchange_names_unchanged": true,
+    "exchange_unchanged_except_intended_csv": true,
+    "sqlite_created": false,
+    "absolute_root_in_receipts": false
+  },
+  "gates": {
+    "focused_tests": "pass",
+    "lint": "pass",
+    "format": "pass",
+    "types": "pass"
+  },
+  "boundary": {
+    "cloud_api": false,
+    "oauth": false,
+    "hosted_runtime": false,
+    "sqlite_sync": false,
+    "ocr": false,
+    "canonical_state_mutation": false
+  },
+  "master_ledger_state": "unproved",
+  "requirements_ready_for_exact_receipt": [
+    "REQ-E37-003",
+    "REQ-E37-004",
+    "REQ-E37-005"
+  ]
+}
