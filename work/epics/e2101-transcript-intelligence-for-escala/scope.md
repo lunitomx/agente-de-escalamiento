@@ -1,4 +1,4 @@
-# Epic Scope: E21 — Transcript Intelligence for Escala
+# Epic Scope: E2101 — Transcript Intelligence for Escala
 
 **Status:** Deprecated/Discarded
 **Closed as backlog:** 2026-06-18

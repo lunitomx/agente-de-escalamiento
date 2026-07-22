@@ -57,7 +57,7 @@ def test_complete_status_with_open_done_criteria_is_reported(
 def test_backlog_draft_with_complete_status_is_reported(
     governed_root: Path,
 ) -> None:
-    target = governed_root / "work/epics/e19-strategy-core-skills"
+    target = governed_root / "work/epics/e1902-strategy-core-skills"
     target.mkdir(parents=True)
     (target / "scope.md").write_text(
         """# E19
@@ -74,7 +74,7 @@ Tag action: no `complete` tag should be created for this draft.
     errors = validate_backlog_draft_closures(governed_root)
 
     assert any(
-        "E19 Strategy Core Draft: expected status 'superseded/discarded'" in error
+        "E1902 Strategy Core Draft: expected status 'superseded/discarded'" in error
         for error in errors
     )
 
@@ -140,7 +140,7 @@ Backlog action: decide later.
 
 
 def test_superseded_discarded_draft_is_accepted(governed_root: Path) -> None:
-    target = governed_root / "work/epics/e19-strategy-core-skills"
+    target = governed_root / "work/epics/e1902-strategy-core-skills"
     target.mkdir(parents=True)
     (target / "scope.md").write_text(
         """# E19
@@ -158,12 +158,12 @@ Tag action: no `complete` tag should be created for this draft.
     errors = validate_backlog_draft_closures(governed_root)
 
     assert [
-        error for error in errors if error.startswith("E19 Strategy Core Draft:")
+        error for error in errors if error.startswith("E1902 Strategy Core Draft:")
     ] == []
 
 
 def test_deprecated_discarded_draft_is_accepted(governed_root: Path) -> None:
-    target = governed_root / "work/epics/e21-transcript-intelligence-for-escala"
+    target = governed_root / "work/epics/e2101-transcript-intelligence-for-escala"
     target.mkdir(parents=True)
     (target / "scope.md").write_text(
         """# E21
@@ -183,12 +183,12 @@ Tag action: no `complete` tag should be created for this draft.
     assert [
         error
         for error in errors
-        if error.startswith("E21 Transcript Intelligence Draft:")
+        if error.startswith("E2101 Transcript Intelligence Draft:")
     ] == []
 
 
 def test_discarded_draft_requires_no_complete_tag(governed_root: Path) -> None:
-    target = governed_root / "work/epics/e19-strategy-core-skills"
+    target = governed_root / "work/epics/e1902-strategy-core-skills"
     target.mkdir(parents=True)
     (target / "scope.md").write_text(
         """# E19
@@ -205,7 +205,7 @@ Current backlog action: no active epic remains here.
     errors = validate_backlog_draft_closures(governed_root)
 
     assert (
-        "E19 Strategy Core Draft: missing required evidence phrase: no `complete` tag"
+        "E1902 Strategy Core Draft: missing required evidence phrase: no `complete` tag"
     ) in errors
 
 

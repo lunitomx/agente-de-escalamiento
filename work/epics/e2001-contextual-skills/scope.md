@@ -1,4 +1,4 @@
-# Epic Scope: E20 — Contextual Skills (Grafo → Dashboards)
+# Epic Scope: E2001 — Contextual Skills (Grafo → Dashboards)
 
 **Status:** Complete
 **Dependencies:** E19 (grafo poblado)

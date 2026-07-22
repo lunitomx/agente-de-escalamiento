@@ -48,15 +48,15 @@ AUDITED_EPIC_RULES: tuple[EpicClosureRule, ...] = (
         required_phrases=("Retrospective evidence",),
     ),
     EpicClosureRule(
-        epic_id="E19",
-        path="work/epics/e19-book-ingestion/scope.md",
+        epic_id="E1901",
+        path="work/epics/e1901-book-ingestion/scope.md",
         expected_status="deferred/backlog",
         allow_open_done_criteria=True,
         required_phrases=("Governance correction", "Backlog action"),
     ),
     EpicClosureRule(
-        epic_id="E22",
-        path="work/epics/e22-verne-audit/scope.md",
+        epic_id="E2202",
+        path="work/epics/e2202-verne-audit/scope.md",
         expected_status="absorbed/descoped",
         allow_open_done_criteria=True,
         required_phrases=("Absorption map", "Descoped"),
@@ -98,8 +98,8 @@ AUDITED_EPIC_RULES: tuple[EpicClosureRule, ...] = (
 
 BACKLOG_DRAFT_RULES: tuple[EpicClosureRule, ...] = (
     EpicClosureRule(
-        epic_id="E19 Strategy Core Draft",
-        path="work/epics/e19-strategy-core-skills/scope.md",
+        epic_id="E1902 Strategy Core Draft",
+        path="work/epics/e1902-strategy-core-skills/scope.md",
         expected_status="superseded/discarded",
         allow_open_done_criteria=True,
         required_phrases=(
@@ -109,8 +109,8 @@ BACKLOG_DRAFT_RULES: tuple[EpicClosureRule, ...] = (
         ),
     ),
     EpicClosureRule(
-        epic_id="E20 Voice of Customer Draft",
-        path="work/epics/e20-voice-of-customer-evidence-capture/scope.md",
+        epic_id="E2002 Voice of Customer Draft",
+        path="work/epics/e2002-voice-of-customer-evidence-capture/scope.md",
         expected_status="superseded/discarded",
         allow_open_done_criteria=True,
         required_phrases=(
@@ -120,8 +120,8 @@ BACKLOG_DRAFT_RULES: tuple[EpicClosureRule, ...] = (
         ),
     ),
     EpicClosureRule(
-        epic_id="E21 Transcript Intelligence Draft",
-        path="work/epics/e21-transcript-intelligence-for-escala/scope.md",
+        epic_id="E2101 Transcript Intelligence Draft",
+        path="work/epics/e2101-transcript-intelligence-for-escala/scope.md",
         expected_status="deprecated/discarded",
         allow_open_done_criteria=True,
         required_phrases=(
@@ -131,8 +131,8 @@ BACKLOG_DRAFT_RULES: tuple[EpicClosureRule, ...] = (
         ),
     ),
     EpicClosureRule(
-        epic_id="E22 Validation Drift Draft",
-        path="work/epics/e22-validation-drift-governance/scope.md",
+        epic_id="E2201 Validation Drift Draft",
+        path="work/epics/e2201-validation-drift-governance/scope.md",
         expected_status="superseded/discarded",
         allow_open_done_criteria=True,
         required_phrases=(

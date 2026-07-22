@@ -1,4 +1,4 @@
-# Epic Scope: E20 — Voice of Customer & Evidence Capture
+# Epic Scope: E2002 — Voice of Customer & Evidence Capture
 
 **Status:** Superseded/Discarded
 **Closed as backlog:** 2026-06-18
