@@ -15,6 +15,13 @@ from .profiling import (
     render_profile_receipt_markdown,
     resolve_mapping_answers,
 )
+from .statements import (
+    FinancialFigure,
+    FinancialStatements,
+    Provenance,
+    StatementView,
+    reconstruct_statements,
+)
 
 __all__ = [
     "FinancialWorkbookProfile",
@@ -25,4 +32,9 @@ __all__ = [
     "render_profile_receipt_json",
     "render_profile_receipt_markdown",
     "resolve_mapping_answers",
+    "FinancialFigure",
+    "FinancialStatements",
+    "Provenance",
+    "StatementView",
+    "reconstruct_statements",
 ]
