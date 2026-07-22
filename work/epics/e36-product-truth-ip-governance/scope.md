@@ -177,7 +177,7 @@ isolation and commit recovery.
 | S36.1 | S | Complete | 44m 06s | 1 S / 44m 06s | Merged locally at `d56a957`; final `origin/main` `0/0` proof remains an E36 close gate |
 | S36.2 | M | Complete | 47m 32s | 1 M / 47m 32s | Merged locally at `195eff6`; sanitized baseline and non-mutation proof committed |
 | S36.4 | M | Pending | — | Not calibrated | Parallel governance path |
-| S36.3 | M | Pending | — | Not calibrated | Depends on captured baseline |
+| S36.3 | M | Complete | 1h 53m 12s | 1 M / 1h 53m 12s | Merged locally at `52baa1a`; 15/15 close gates passed after T7 canonical-import repair |
 | S36.5 | L | Pending | — | Not calibrated | E2E integration checkpoint |
 | S36.6 | S | Pending | — | Not calibrated | Epic-wide acceptance control |
 
