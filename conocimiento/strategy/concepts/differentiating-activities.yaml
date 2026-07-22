@@ -10,10 +10,6 @@ summary: >
   the specific ways you deliver on your brand promise that are structurally hard to copy.
   In the 7 Strata, differentiating activities are the third component and the operational
   foundation of sustainable competitive advantage.
-source:
-  book_chapter: "THE 7 STRATA OF STRATEGY"
-  file: "metodologias_parsed/strategy_workbook.txt"
-  file_line: 1892
 relationships:
   - type: belongs-to
     target: decision-strategy

@@ -10,12 +10,6 @@ summary: >
   if the promise is broken, e.g., "delivered in 30 minutes or it's free." In the 7 Strata,
   brand promises are the second component: they must fill the Core Customer's NEED (not
   want) and be uniquely deliverable by the company's Differentiating Activities.
-source:
-  book_chapter: "THE 7 STRATA OF STRATEGY"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 822
-  workbook_file: "metodologias_parsed/strategy_workbook.txt"
-  workbook_line: 1284
 relationships:
   - type: belongs-to
     target: decision-strategy

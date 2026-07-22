@@ -44,4 +44,3 @@ Guardar en `work/people/core-values.md`.
 | Next | `/escala-strategy` (los values alimentan al Plan Estratégico de Una Página (OPSP)) |
 
 ---
-*Esta herramienta está inspirada en el Plan Estratégico de Una Página (OPSP), desarrollado por Verne Harnish. Ver [ATTRIBUTIONS.md](../ATTRIBUTIONS.md) para la referencia completa.*

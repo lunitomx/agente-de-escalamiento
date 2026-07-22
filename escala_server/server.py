@@ -303,9 +303,9 @@ def _build_router() -> Router:
     @router.post("/api/knowledge/ingest")
     def knowledge_ingest(payload=None):
         ingester = EscalaRequestHandler.knowledge_ingester
-        json_path = (payload or {}).get(
-            "json_path", "escala_server/data/book-knowledge.json"
-        )
+        json_path = (payload or {}).get("json_path")
+        if not json_path:
+            return {"status": "error", "message": "json_path is required"}
         result = ingester.ingest_all(json_path=json_path)
         return {"data": result, "status": "ok"}
 

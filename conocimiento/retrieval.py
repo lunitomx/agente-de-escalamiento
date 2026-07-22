@@ -1,5 +1,5 @@
 """
-Deterministic retrieval engine for the Scaling Up knowledge ontology.
+Deterministic retrieval engine for the ESCALA knowledge ontology.
 Zero external dependencies — pure file-based, pure Python.
 """
 
@@ -18,7 +18,7 @@ _DEFAULT_KNOWLEDGE_DIR = pathlib.Path(__file__).parent
 
 
 class KnowledgeGraph:
-    """In-memory graph built from `.scaleup/knowledge/` YAML files.
+    """In-memory graph built from `.escala/knowledge/` YAML files.
 
     Load once, query many times — all graph traversals are O(E) worst case.
     """

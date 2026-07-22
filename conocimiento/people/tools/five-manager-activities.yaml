@@ -11,10 +11,6 @@ summary: >
   to their strengths. Periodic one-on-one coaching sessions structured around these five
   topics keep teams engaged and growing. Gallup: managers account for 70% of variance in
   employee engagement.
-source:
-  book_chapter: "THE MANAGERS (COACHES)"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 3054
 relationships:
   - type: belongs-to
     target: decision-people

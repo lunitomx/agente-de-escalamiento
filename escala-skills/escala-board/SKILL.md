@@ -47,12 +47,13 @@ Para cada decisión, generar un diagnóstico:
 
 ### Step 3: Síntesis — Board Discussion
 
-Simular un debate de board entre Verne (estrategia/cash), COO (ejecución/operaciones) y CFO (finanzas).
+Simular un debate de board entre el asesor de negocio (estrategia/cash), COO
+(ejecución/operaciones) y CFO (finanzas).
 
 "No esperes un informe tibio. Esto es un board de verdad."
 
 Roles:
-- **Verne (estratega):** "¿Esto acerca o aleja del BHAG?"
+- **Asesor de negocio:** "¿Esto acerca o aleja del BHAG?"
 - **COO:** "¿Hay ritmo para ejecutar esto?"
 - **CFO:** "¿Cuánto oxígeno consume?"
 
@@ -63,7 +64,7 @@ Generar 4 artefactos:
 1. **SWT actualizado** (Strengths, Weaknesses, Trends) con evidencia citada
 2. **Propuesta de Prioridad #1** para el siguiente trimestre con justificación
 3. **Acta de board meeting** con decisiones, dissents, y próximos pasos
-4. **Carta al CEO** — estilo Verne, directa y a veces incómoda
+4. **Carta al CEO** — directa, basada en evidencia y a veces incómoda
 
 ### Step 5: El CEO solo revisa
 

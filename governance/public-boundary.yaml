@@ -56,6 +56,9 @@ path_rules:
       - escala-agent/**
       - governance/**
       - tests/**
+      - validators/epic_closure.py
+      - validators/pipeline_runner.py
+      - validators/pipelines.py
       - work/**
   - id: canary.product_entry
     disposition: candidate_public
@@ -87,6 +90,7 @@ vocabulary_rules:
   - id: public.author_identity
     targets: [path, text]
     terms:
+      - Verne
       - Verne Harnish
       - VerneHandler
       - verne_handler
@@ -103,6 +107,7 @@ vocabulary_rules:
   - id: public.source_attribution
     targets: [text]
     terms:
+      - ATTRIBUTIONS.md
       - derived from Scaling Up
       - inspired by Scaling Up
 forbidden_yaml_root_keys:

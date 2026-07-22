@@ -9,10 +9,6 @@ summary: >
   World-class companies achieve zero or negative CCC (customers pay before costs are
   incurred). Every 10-day reduction in CCC frees working capital equal to 10 days of
   revenue — often hundreds of thousands of dollars that can fund growth without borrowing.
-source:
-  book_chapter: "SCALING UP CASH"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 1029
 relationships:
   - type: belongs-to
     target: decision-cash

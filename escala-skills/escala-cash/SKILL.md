@@ -52,4 +52,3 @@ Nota: Este sub-agente NO da asesoría financiera. Guía el análisis operativo d
 | Next | Skill específico de Cash |
 
 ---
-*> Esta herramienta está inspirada en los Hábitos de Ejecución, desarrollados por Verne Harnish como parte de su metodología de escalamiento de negocios. Ver [ATTRIBUTIONS.md](../ATTRIBUTIONS.md) para la referencia completa.

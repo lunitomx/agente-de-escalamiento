@@ -140,7 +140,7 @@ def test_history_created_on_first_run(tmp_path):
     import yaml
 
     base = tmp_path
-    history = base / ".scaleup" / "my-company" / "pulse-history.yaml"
+    history = base / ".escala" / "my-company" / "pulse-history.yaml"
     run_with_base(
         {
             "answers": {
@@ -166,7 +166,7 @@ def test_history_appended_on_second_run(tmp_path):
     answers = {"people": 0, "strategy": 0, "execution": 0, "cash": 0, "overall": 0}
     run_with_base({"answers": answers}, base)
     run_with_base({"answers": answers}, base)
-    history = base / ".scaleup" / "my-company" / "pulse-history.yaml"
+    history = base / ".escala" / "my-company" / "pulse-history.yaml"
     data = yaml.safe_load(history.read_text())
     assert len(data["pulses"]) == 2
 
@@ -187,7 +187,7 @@ def test_history_entry_has_required_keys(tmp_path):
         },
         base,
     )
-    history = base / ".scaleup" / "my-company" / "pulse-history.yaml"
+    history = base / ".escala" / "my-company" / "pulse-history.yaml"
     data = yaml.safe_load(history.read_text())
     entry = data["pulses"][0]
     for key in ["date", "answers", "trends", "course_corrections"]:
@@ -275,7 +275,7 @@ def test_course_corrections_for_regressing(tmp_path):
         base,
     )
     corrections = result["artifacts"]["course_corrections"]
-    assert "Execution regressing → run /scaleup-execution" in corrections
+    assert "Execution regressing → run /escala-execution" in corrections
 
 
 def test_no_course_corrections_when_none_regressing(tmp_path):

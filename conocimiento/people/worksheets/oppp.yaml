@@ -9,9 +9,6 @@ summary: >
   life-dimension reminders. Long-term thinking (25-year vision) feeds medium-term targets
   (3-year), which feed annual goals, which feed quarterly actions. Completed by every
   team member to align personal and professional purpose.
-source:
-  file: "scaling_up_llamaparse.txt"
-  file_line: 1962
 relationships:
   - type: belongs-to
     target: decision-people

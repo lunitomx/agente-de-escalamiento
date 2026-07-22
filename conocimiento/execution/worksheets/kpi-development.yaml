@@ -9,9 +9,6 @@ summary: >
   outcome definition to leading activity identification. The output is a KPI card
   for each team member: their lagging metric (what they're ultimately accountable for)
   and 1-2 leading metrics (activities they track daily/weekly to predict the outcome).
-source:
-  file: "metodologias_parsed/execution_workbook.txt"
-  file_line: 1045
 relationships:
   - type: belongs-to
     target: decision-execution

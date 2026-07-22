@@ -31,7 +31,7 @@ Organizar por trimestre:
 Q1 2025:
   People:   FACe inicial con 5 funciones. VP Ventas vacío.
   Strategy: OPSP creado. Core Customer identificado.
-  Execution: Daily huddle iniciado. 8/10 Rockefeller Habits.
+  Execution: Daily huddle iniciado. 8/10 Execution Habits.
   Cash:     CCC 45 días. Margen bruto 32%.
   Eventos:  Contrataste a María como Controller.
 

@@ -6,8 +6,7 @@ manteniendo el mismo nivel de calidad que el Power of One.
 Modo de uso:
     python3 escala_server/cash/generate_dashboards.py
 
-Créditos: Patrón de dashboard interactivo basado en el trabajo de
-Humberto Martínez Barón y Alan Miltz.
+Genera únicamente presentación operativa source-neutral de ESCALA.
 """
 
 from __future__ import annotations

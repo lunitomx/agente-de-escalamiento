@@ -10,10 +10,6 @@ summary: >
   Distinct from Core Values (the "how") and BHAG (the "what"). A strong Core Purpose
   answers: "If we disappeared tomorrow, what would the world lose?" In the OPSP,
   Core Purpose anchors the first column and grounds all strategic decisions.
-source:
-  book_chapter: "THE CORE"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 1496
 relationships:
   - type: belongs-to
     target: decision-strategy

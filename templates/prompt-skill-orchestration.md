@@ -123,7 +123,7 @@ Dado un skill grande, descomponlo así:
 
 ## Contexto de origen
 
-Patrón destilado de la experiencia construyendo ScaleUp Agent AI (coach de Scaling Up con 70 nodos de ontología, 20+ skills).
+Patrón destilado de la experiencia construyendo ESCALA Agent AI (coach de ESCALA con 70 nodos de ontología, 20+ skills).
 
 Principio validado por Emilio Osorio (RaiSE framework): "Si le das a un modelo todo eso en UN solo skill, no lo hará bien. Se tienen que particionar cada fase en un skill y luego orquestarlos."
 

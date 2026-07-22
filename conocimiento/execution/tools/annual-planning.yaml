@@ -9,12 +9,6 @@ summary: >
   The annual session is the most strategic of the five meeting types — it connects
   day-to-day execution back to the 25-year BHAG. Leadership team attends in full.
   Output: updated OPSP, 3-5 annual priorities (Chapters), Q1 Critical Number and Rocks.
-source:
-  book_chapter: "THE MEETING RHYTHM"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 494
-  workbook_file: "metodologias_parsed/execution_workbook.txt"
-  workbook_line: 890
 relationships:
   - type: belongs-to
     target: decision-execution

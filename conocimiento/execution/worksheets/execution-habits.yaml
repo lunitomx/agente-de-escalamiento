@@ -11,9 +11,6 @@ summary: >
   (4) every function has accountable owner, (5) employee input collected weekly,
   (6) customer feedback collected weekly, (7) Core Values visible and alive,
   (8) priorities posted and known, (9) Brand Promise KPIs tracked, (10) OPSP updated.
-source:
-  file: "metodologias_parsed/execution_workbook.txt"
-  file_line: 486
 relationships:
   - type: belongs-to
     target: decision-execution

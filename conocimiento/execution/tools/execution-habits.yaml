@@ -9,12 +9,6 @@ summary: >
   accountability structure, employee and customer feedback loops, and core values
   visibility. Each habit is a yes/no checkable behavior. Companies score themselves
   quarterly and focus improvement on their lowest-scoring habit.
-source:
-  book_chapter: "THE ROCKEFELLER HABITS"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 919
-  workbook_file: "metodologias_parsed/execution_workbook.txt"
-  workbook_line: 486
 relationships:
   - type: belongs-to
     target: decision-execution

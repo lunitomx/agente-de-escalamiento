@@ -10,12 +10,12 @@ from ..core import read_yaml, write_yaml, ensure_dir
 
 REGISTRY_PATH = (
     Path(__file__).parent.parent.parent
-    / ".scaleup"
+    / ".escala"
     / "knowledge"
     / "registry"
     / "worksheets.yaml"
 )
-COMPLETED_DIR = Path(".scaleup/my-company/worksheets")
+COMPLETED_DIR = Path(".escala/my-company/worksheets")
 
 
 def list_worksheets(
@@ -24,7 +24,7 @@ def list_worksheets(
 ) -> list[dict[str, Any]]:
     """List all worksheets, optionally filtered by decision."""
     registry_path = (
-        (base_path / ".scaleup" / "knowledge" / "registry" / "worksheets.yaml")
+        (base_path / ".escala" / "knowledge" / "registry" / "worksheets.yaml")
         if base_path
         else REGISTRY_PATH
     )
@@ -41,7 +41,7 @@ def find_worksheet(
 ) -> dict[str, Any] | None:
     """Find a worksheet by name or ID (case-insensitive)."""
     registry_path = (
-        (base_path / ".scaleup" / "knowledge" / "registry" / "worksheets.yaml")
+        (base_path / ".escala" / "knowledge" / "registry" / "worksheets.yaml")
         if base_path
         else REGISTRY_PATH
     )
@@ -58,7 +58,7 @@ def find_worksheet(
 def get_completed_ids(base_path: Path | None = None) -> list[str]:
     """Get list of completed worksheet IDs from saved files."""
     wdir = (
-        (base_path / ".scaleup" / "my-company" / "worksheets")
+        (base_path / ".escala" / "my-company" / "worksheets")
         if base_path
         else COMPLETED_DIR
     )
@@ -84,7 +84,7 @@ def load_worksheet_content(
     if not node_path:
         return worksheet
     base = base_path or Path(__file__).parent.parent.parent
-    full_path = base / ".scaleup" / "knowledge" / node_path
+    full_path = base / ".escala" / "knowledge" / node_path
     content = read_yaml(full_path)
     return {**worksheet, **content}
 
@@ -131,7 +131,7 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
         lines.extend(
             [
                 "",
-                "Para empezar: `/scaleup-worksheet [nombre]`",
+                "Para empezar: `/escala-worksheet [nombre]`",
                 "Para reanudar: mismo comando si ya empezaste",
             ]
         )
@@ -160,13 +160,13 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
         completed = get_completed_ids(base)
         if worksheet["id"] in completed:
             return {
-                "output": f"Worksheet **{worksheet['name']}** ya está completado. Usa `/scaleup-worksheet list` para ver otros.",
+                "output": f"Worksheet **{worksheet['name']}** ya está completado. Usa `/escala-worksheet list` para ver otros.",
                 "artifacts": {"worksheet": worksheet, "status": "completed"},
                 "errors": [],
             }
 
         state_path = (
-            base / ".scaleup" / "my-company" / "worksheets" / f"{worksheet['id']}.yaml"
+            base / ".escala" / "my-company" / "worksheets" / f"{worksheet['id']}.yaml"
         )
         state = read_yaml(state_path)
         if state and action == "resume":
@@ -266,7 +266,7 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
             }
 
         state_path = (
-            base / ".scaleup" / "my-company" / "worksheets" / f"{worksheet['id']}.yaml"
+            base / ".escala" / "my-company" / "worksheets" / f"{worksheet['id']}.yaml"
         )
         state = read_yaml(state_path)
         if not state:
@@ -274,7 +274,7 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
                 "output": "",
                 "artifacts": {},
                 "errors": [
-                    f"Worksheet '{ws_name}' no iniciado. Usa /scaleup-worksheet {ws_name} primero"
+                    f"Worksheet '{ws_name}' no iniciado. Usa /escala-worksheet {ws_name} primero"
                 ],
             }
 
@@ -315,8 +315,8 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
                 [
                     "",
                     "Próximos pasos sugeridos:",
-                    "- `/scaleup-progress` para ver tu avance general",
-                    "- `/scaleup-worksheet list` para ver otros worksheets",
+                    "- `/escala-progress` para ver tu avance general",
+                    "- `/escala-worksheet list` para ver otros worksheets",
                 ]
             )
 
@@ -383,7 +383,7 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
             }
 
         state_path = (
-            base / ".scaleup" / "my-company" / "worksheets" / f"{worksheet['id']}.yaml"
+            base / ".escala" / "my-company" / "worksheets" / f"{worksheet['id']}.yaml"
         )
         state = read_yaml(state_path)
         fields = state.get("fields", {})

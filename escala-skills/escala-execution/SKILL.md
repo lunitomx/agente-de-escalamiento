@@ -52,4 +52,3 @@ Enfatizar: "La ejecución perfecta de una estrategia mediocre supera la ejecuci�
 | Next | Skill específico de Execution |
 
 ---
-*> Esta herramienta está inspirada en los Hábitos de Ejecución, desarrollados por Verne Harnish como parte de su metodología de escalamiento de negocios. Ver [ATTRIBUTIONS.md](../ATTRIBUTIONS.md) para la referencia completa.

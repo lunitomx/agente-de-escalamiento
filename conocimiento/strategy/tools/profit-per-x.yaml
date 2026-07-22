@@ -10,12 +10,6 @@ summary: >
   employee, profit per transaction. Identifying the right X clarifies resource
   allocation decisions and reveals the true economic engine of the business. Used
   alongside the BHAG in the OPSP's strategic column.
-source:
-  book_chapter: "THE 7 STRATA OF STRATEGY"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 838
-  workbook_file: "metodologias_parsed/strategy_workbook.txt"
-  workbook_line: 362
 relationships:
   - type: belongs-to
     target: decision-strategy

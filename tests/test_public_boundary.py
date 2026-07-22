@@ -543,6 +543,133 @@ def test_candidate_path_text_and_yaml_provenance_are_detected_without_values(
     assert "scaling_up-guide" not in serialized
 
 
+def test_every_policy_term_has_a_negative_path_or_text_fixture() -> None:
+    """Every configured prohibited form is exercised by the canonical policy."""
+    policy = load_public_boundary_policy(POLICY_PATH)
+
+    for rule in policy.vocabulary_rules:
+        for term in rule.terms:
+            if "text" in rule.targets:
+                findings, valid_yaml = boundary_module._content_vocabulary_findings(
+                    "README.md",
+                    f"prefix {term} suffix",
+                    BoundarySurface.PRIVATE_WORKTREE,
+                    policy,
+                )
+                assert valid_yaml is True
+                assert any(finding.rule_id == rule.id for finding in findings)
+            if "path" in rule.targets:
+                findings = boundary_module._path_vocabulary_findings(
+                    f"coaching/{term}.md",
+                    BoundarySurface.PRIVATE_WORKTREE,
+                    policy,
+                )
+                assert any(finding.rule_id == rule.id for finding in findings)
+
+
+def test_generic_business_language_is_not_prohibited() -> None:
+    """ESCALA-owned business concepts remain usable in candidate-public content."""
+    policy = load_public_boundary_policy(POLICY_PATH)
+    content = (
+        "ESCALA People Strategy Execution Cash Power of One daily weekly "
+        "priorities evidence questions local filesystem Google Drive OneDrive"
+    )
+
+    findings, valid_yaml = boundary_module._content_vocabulary_findings(
+        "coaching/business-advisor.md",
+        content,
+        BoundarySurface.PRIVATE_WORKTREE,
+        policy,
+    )
+
+    assert valid_yaml is True
+    assert findings == []
+
+
+def test_real_tracked_worktree_canary_has_no_public_source_findings(
+    tmp_path: Path,
+) -> None:
+    """All indexed candidate-public worktree content passes the live canary."""
+    public = tmp_path / "public-candidate"
+    _initialize_repository(public)
+    (public / "README.md").write_text(
+        "ESCALA local business operating system\n",
+        encoding="utf-8",
+    )
+    _git(public, "add", "README.md")
+    _git(public, "commit", "-m", "neutral public fixture")
+
+    receipt = scan_public_boundary(
+        ROOT,
+        public,
+        load_public_boundary_policy(POLICY_PATH),
+        baseline_path=BASELINE_PATH,
+    )
+    worktree_findings = [
+        finding
+        for finding in receipt.findings
+        if finding.surface is BoundarySurface.PRIVATE_WORKTREE
+    ]
+    worktree_summary = next(
+        summary
+        for summary in receipt.surfaces
+        if summary.surface is BoundarySurface.PRIVATE_WORKTREE
+    )
+
+    assert worktree_summary.unscanned_required_count == 0
+    assert worktree_findings == []
+
+
+def test_public_boundary_guardrail_replaces_attribution_rule() -> None:
+    """Governance requires the executable source-neutral boundary."""
+    guardrails = (ROOT / "governance/guardrails.md").read_text(encoding="utf-8")
+
+    assert "should-content-attribution-003" not in guardrails
+    assert "must-content-public-boundary-003" in guardrails
+    assert "public-boundary.yaml" in guardrails
+
+
+def test_public_entrypoint_states_local_only_and_safe_folder_sharing() -> None:
+    """The product contract is local-only and never recommends syncing SQLite."""
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+
+    assert "no requiere un servidor hospedado" in readme
+    assert "Google Drive" in readme
+    assert "OneDrive" in readme
+    assert "No coloques la base SQLite" in readme
+    assert "/escala-welcome" in readme
+
+
+def test_public_knowledge_yaml_has_no_private_root_provenance() -> None:
+    """All public knowledge YAML remains parseable and source-neutral."""
+    policy = load_public_boundary_policy(POLICY_PATH)
+    yaml_paths = [
+        ROOT / path
+        for path in _git(ROOT, "ls-files", "conocimiento").splitlines()
+        if path.endswith((".yaml", ".yml"))
+        and classify_public_path(policy, path) is PublicPathDisposition.CANDIDATE_PUBLIC
+    ]
+
+    assert len(yaml_paths) >= 78
+    for path in yaml_paths:
+        document = yaml.safe_load(path.read_text(encoding="utf-8"))
+        assert isinstance(document, dict)
+        assert "source" not in document
+
+
+def test_public_core_skills_preserve_operational_behavior() -> None:
+    """Neutralized core skills retain routing, evidence, output, and local state."""
+    for skill_name in ("people", "strategy", "execution", "cash"):
+        content = (ROOT / f"escala-skills/escala-{skill_name}/SKILL.md").read_text(
+            encoding="utf-8"
+        )
+        assert "Check Existing Work" in content
+        assert "Recommend Next Tool" in content
+        assert "## Output" in content
+        assert "work/" in content
+        assert ".escala/" in content
+
+
 def test_missing_repository_returns_sanitized_incomplete_receipt(
     tmp_path: Path,
 ) -> None:

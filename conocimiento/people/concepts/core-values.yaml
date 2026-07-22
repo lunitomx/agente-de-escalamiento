@@ -8,10 +8,6 @@ summary: >
   Discovered through the "Mission to Mars" exercise: identify 5-7 existing employees who
   best represent the culture you want, then extract the gut-level qualities they share.
   Core Values guide hiring, firing, recognition, and strategy — they are lived, not posted.
-source:
-  book_chapter: "THE CORE"
-  file: "metodologias_parsed/people_workbook.txt"
-  file_line: 334
 relationships:
   - type: belongs-to
     target: decision-people

@@ -1,5 +1,5 @@
 """
-Core shared utilities for ScaleUp coaching modules.
+Core shared utilities for ESCALA coaching modules.
 """
 
 import json
@@ -68,11 +68,11 @@ DECISION_LABELS = {
 }
 
 ROUTING_RULES = {
-    "people": "/scaleup-people",
-    "strategy": "/scaleup-strategy",
-    "execution": "/scaleup-execution",
-    "cash": "/scaleup-cash",
-    "overall": "/scaleup-diagnose",
+    "people": "/escala-people",
+    "strategy": "/escala-strategy",
+    "execution": "/escala-execution",
+    "cash": "/escala-cash",
+    "overall": "/escala-diagnose",
 }
 
 

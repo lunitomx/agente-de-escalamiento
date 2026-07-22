@@ -171,13 +171,13 @@ def main():
 
     # migrate
     migrate_parser = subparsers.add_parser(
-        "migrate", help="Import .scaleup/ data into SQLite"
+        "migrate", help="Import .escala/ data into SQLite"
     )
     migrate_parser.add_argument(
         "yaml_root",
         nargs="?",
-        default=".scaleup",
-        help="Path to .scaleup/ directory (default: .scaleup)",
+        default=".escala",
+        help="Path to .escala/ directory (default: .escala)",
     )
     migrate_parser.add_argument(
         "--db-path",

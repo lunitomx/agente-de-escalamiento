@@ -41,4 +41,3 @@ Guardar en `work/execution/ejecucion-habits.md`.
 | Next | `/escala-execution-rhythms` |
 
 ---
-*> Esta herramienta está inspirada en los Hábitos de Ejecución, desarrollados por Verne Harnish como parte de su metodología de escalamiento de negocios. Ver [ATTRIBUTIONS.md](../ATTRIBUTIONS.md) para la referencia completa.

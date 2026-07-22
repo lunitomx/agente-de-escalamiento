@@ -10,12 +10,6 @@ summary: >
   which inform individual Rocks. Every employee should be able to articulate their top
   1-2 Rocks and how they connect to the company's Critical Number. Rocks are set in the
   Quarterly Planning session and reviewed weekly in team meetings.
-source:
-  book_chapter: "THE PRIORITY"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 1455
-  workbook_file: "metodologias_parsed/execution_workbook.txt"
-  workbook_line: 497
 relationships:
   - type: belongs-to
     target: decision-execution

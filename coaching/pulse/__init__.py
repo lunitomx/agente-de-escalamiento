@@ -23,7 +23,7 @@ from ..core import (
 
 DECISIONS = ["people", "strategy", "execution", "cash", "overall"]
 VALID_ANSWER_VALUES = {-1, 0, 1}
-HISTORY_REL_PATH = ".scaleup/my-company/pulse-history.yaml"
+HISTORY_REL_PATH = ".escala/my-company/pulse-history.yaml"
 
 
 # ---------------------------------------------------------------------------
@@ -60,7 +60,7 @@ def _build_course_corrections(trends: dict) -> list[str]:
     for decision in DECISIONS:
         if trends.get(decision) == "regressing":
             label = DECISION_LABELS.get(decision, decision.title())
-            cmd = ROUTING_RULES.get(decision, f"/scaleup-{decision}")
+            cmd = ROUTING_RULES.get(decision, f"/escala-{decision}")
             corrections.append(f"{label} regressing → run {cmd}")
     return corrections
 

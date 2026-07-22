@@ -70,7 +70,7 @@ if __name__ == "__main__":
     path = (
         Path(sys.argv[1])
         if len(sys.argv) > 1
-        else Path(".scaleup/my-company/worksheets")
+        else Path(".escala/my-company/worksheets")
     )
     if path.is_dir():
         all_ok = True

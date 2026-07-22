@@ -9,12 +9,6 @@ summary: >
   and defines the leading KPIs for that function. Forces clarity on ownership. The "e"
   stands for the energy and entrepreneurial spirit the accountable person must bring.
   Rule: one person per function. If you can't name one person, you have an accountability gap.
-source:
-  book_chapter: "THE LEADERS"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 686
-  workbook_file: "metodologias_parsed/people_workbook.txt"
-  workbook_line: 1217
 relationships:
   - type: belongs-to
     target: decision-people

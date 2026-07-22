@@ -9,9 +9,6 @@ summary: >
   BHAG + 3-5 year targets, brand promises/sandbox. Columns 4-7 (execution planning):
   annual priorities, Q1-Q3 rocks and critical numbers. Bottom strip: SWT summary.
   Updated quarterly by the full leadership team in the quarterly planning session.
-source:
-  file: "scaling_up_llamaparse.txt"
-  file_line: 851
 relationships:
   - type: belongs-to
     target: decision-strategy

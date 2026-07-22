@@ -97,4 +97,3 @@ If the gate exits 1, report the error and do not present results as successful.
 | Valid trend values | regressing, stalling, improving |
 
 ---
-*> Esta herramienta está inspirada en los Hábitos de Ejecución, desarrollados por Verne Harnish como parte de su metodología de escalamiento de negocios. Ver [ATTRIBUTIONS.md](../ATTRIBUTIONS.md) para la referencia completa.

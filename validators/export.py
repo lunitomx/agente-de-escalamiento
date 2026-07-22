@@ -4,7 +4,7 @@ Quality gate: validate Action Plan Export file.
 Checks that all 5 required section headers are present in the generated file.
 
 Usage:
-    python .scaleup/agent/validators/export.py <path-to-export-file>
+    python .escala/agent/validators/export.py <path-to-export-file>
 
 Exit codes:
     0 — file is valid

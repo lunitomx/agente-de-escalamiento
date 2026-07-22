@@ -9,10 +9,6 @@ summary: >
   regular one-on-one coaching, and ongoing learning and development. Scored 1 (weak) to
   5 (strong). Results surface the development area most needing a quarterly priority.
   Cultures that invest in all three areas achieve double the growth of those that don't.
-source:
-  book_chapter: "THE MANAGERS (COACHES)"
-  file: "metodologias_parsed/people_workbook.txt"
-  file_line: 1802
 relationships:
   - type: belongs-to
     target: decision-people

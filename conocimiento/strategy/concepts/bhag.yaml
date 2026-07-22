@@ -7,15 +7,9 @@ summary: >
   A 10- to 25-year goal that provides a constant, inspirational summit for the entire
   organization. Coined by Jim Collins and Jerry Porras. The BHAG must be bold enough to
   feel nearly unreachable yet clear enough to energize daily decisions. It answers: "What
-  are we ultimately trying to achieve?" In Scaling Up, the BHAG sits at the top of the
-  OPSP and all strategy flows toward it. A good BHAG requires no explanation — it is
+  are we ultimately trying to achieve?" In a one-page operating plan, the BHAG sits at
+  the top and all strategy flows toward it. A good BHAG requires no explanation — it is
   viscerally understood by every employee.
-source:
-  book_chapter: "THE CORE"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 513
-  workbook_file: "metodologias_parsed/strategy_workbook.txt"
-  workbook_line: 354
 relationships:
   - type: belongs-to
     target: decision-strategy

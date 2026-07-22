@@ -11,12 +11,6 @@ summary: >
   updates, weekly for accountability, monthly for learning and adjustments, quarterly for
   strategy refresh, annually for the full OPSP reset. The rhythm eliminates the need for
   impromptu meetings that disrupt deep work.
-source:
-  book_chapter: "THE MEETING RHYTHM"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 494
-  workbook_file: "metodologias_parsed/execution_workbook.txt"
-  workbook_line: 455
 relationships:
   - type: belongs-to
     target: decision-execution

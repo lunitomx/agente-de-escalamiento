@@ -10,9 +10,6 @@ summary: >
   which 1% change produces the largest cash and profit impact in this specific business.
   The worksheet makes abstract financial theory concrete — leaders see exactly how much
   a 1-day reduction in AR days is worth vs. a 1% price increase.
-source:
-  file: "metodologias_parsed/cash_workbook.txt"
-  file_line: 1042
 relationships:
   - type: belongs-to
     target: decision-cash

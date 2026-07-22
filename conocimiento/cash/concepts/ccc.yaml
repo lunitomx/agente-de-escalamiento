@@ -10,12 +10,6 @@ summary: >
   cash received). The goal is to minimize total CCC days — ideally to zero or negative
   (collect before you deliver). A shorter CCC means the business generates its own
   growth capital without external financing.
-source:
-  book_chapter: "SCALING UP CASH"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 1029
-  workbook_file: "metodologias_parsed/cash_workbook.txt"
-  workbook_line: 608
 relationships:
   - type: belongs-to
     target: decision-cash

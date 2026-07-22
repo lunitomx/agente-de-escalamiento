@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hábitos de Ejecución | ESCALA</title>
+  <title>Hábitos de ejecución | ESCALA</title>
   <link rel="stylesheet" href="../../shared/styles/dashboard-base.css">
   <link rel="stylesheet" href="../../shared/styles/context-panel.css">
   <style>
@@ -42,9 +42,9 @@
 <body>
   <div class="dashboard-container">
     <div class="tool-header">
-      <div class="breadcrumb"><a href="/">Home</a> › <a href="/dashboards/execution/">Ejecución</a> › Hábitos de Ejecución</div>
-      <h1>⚡ Hábitos de Ejecución</h1>
-      <div class="subtitle">Los 10 hábitos para escalar tu negocio</div>
+      <div class="breadcrumb"><a href="/">Home</a> › <a href="/dashboards/execution/">Ejecución</a> › Hábitos de ejecución</div>
+      <h1>⚡ Hábitos de ejecución</h1>
+      <div class="subtitle">Hábitos operativos para escalar tu negocio</div>
     </div>
 
     <div class="company-bar">
@@ -71,14 +71,14 @@
         </div>
         <div>
           <div class="side-card">
-            <h3>🤵 Perspectiva del asesor</h3>
-            <div id="advisor-advice" class="advisor-msg">Carga datos para recibir una perspectiva.</div>
+            <h3>🤵 El asesor observa</h3>
+            <div id="advisor-advice" class="advisor-msg">Carga datos para recibir observaciones.</div>
           </div>
         </div>
       </div>
     </div>
 
-    <p class="attribution">Herramienta local de ESCALA</p>
+    <p class="attribution">Asesoría operativa local · ESCALA</p>
   </div>
 
   <script>
@@ -86,7 +86,7 @@
       'use strict';
       var API_BASE = '';
       var currentCompanyId = '';
-      var METRICS = [{'key': 'daily_huddle', 'label': 'Daily Huddle', 'tip': 'Reunión de 15 min diaria. De pie. Sin sillas.'}, {'key': 'weekly_meeting', 'label': 'Weekly Meeting', 'tip': '90 min semanales para revisar KPIs y prioridades.'}, {'key': 'quarterly', 'label': 'Quarterly Planning', 'tip': 'Off-site trimestral para definir la prioridad del trimestre.'}, {'key': 'theme', 'label': 'Tema del trimestre', 'tip': 'La prioridad #1 para los próximos 90 días.'}];
+      var METRICS = [{"key": "daily_huddle", "label": "Daily Huddle", "tip": "Reuni\u00f3n de 15 min diaria. De pie. Sin sillas."}, {"key": "weekly_meeting", "label": "Weekly Meeting", "tip": "90 min semanales para revisar KPIs y prioridades."}, {"key": "quarterly", "label": "Quarterly Planning", "tip": "Off-site trimestral para definir la prioridad del trimestre."}, {"key": "theme", "label": "Tema del trimestre", "tip": "La prioridad #1 para los pr\u00f3ximos 90 d\u00edas."}];
 
       function init() {
         var xhr = new XMLHttpRequest();
@@ -161,11 +161,11 @@
           container.appendChild(box);
         });
 
-        // Advisor perspective
+        // Local advisor
         var pct = METRICS.length > 0 ? (filled / METRICS.length) * 100 : 0;
         var advisorEl = document.getElementById('advisor-advice');
         var lines = [];
-        lines.push('<strong>Perspectiva:</strong>');
+        lines.push('<strong>El asesor observa:</strong>');
         if (filled === 0) lines.push('Aún no hay datos registrados. Trabaja este tema con ESCALA.');
         else if (pct >= 80) lines.push('✅ Tienes ' + filled + ' de ' + METRICS.length + ' campos. Buen avance. Sigue así.');
         else if (pct >= 50) lines.push('⚠️ Tienes ' + filled + ' de ' + METRICS.length + '. Te falta completar algunos.');

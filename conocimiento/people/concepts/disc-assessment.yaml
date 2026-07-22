@@ -6,13 +6,9 @@ decision: people
 summary: >
   A behavioral framework that maps individuals across four dimensions: Dominance (direct,
   results-driven), Influence (outgoing, enthusiastic), Steadiness (patient, consistent),
-  and Conscientiousness (analytical, precise). Used in Scaling Up to build self-awareness,
+  and Conscientiousness (analytical, precise). Use the assessment to build self-awareness,
   improve team communication, and design complementary leadership teams. Each style brings
   distinct value — effective teams need all four.
-source:
-  book_chapter: "THE TEAM"
-  file: "metodologias_parsed/people_workbook.txt"
-  file_line: 1923
 relationships:
   - type: belongs-to
     target: decision-people

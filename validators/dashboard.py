@@ -4,7 +4,7 @@ Quality gate: validate Progress Dashboard output file.
 Checks that all 4 required section headers are present in the dashboard output.
 
 Usage:
-    python .scaleup/agent/validators/dashboard.py <path-to-dashboard-file>
+    python .escala/agent/validators/dashboard.py <path-to-dashboard-file>
 
 Exit codes:
     0 — file is valid

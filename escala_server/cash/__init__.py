@@ -1,12 +1,7 @@
-"""Power of One — Motor de Simulación de las 7 Palancas Financieras
+"""Power of One — motor local de simulación de siete palancas financieras.
 
-Implementación del "Poder del 1%" basado en la metodología de Alan Miltz
-y Scaling Up. Adaptado del sistema original de Humberto Martínez Barón.
-
-Créditos:
-  - Metodología: Alan Miltz (Scaling Up / Gazelles)
-  - Implementación original: Humberto Martínez Barón
-  - Adaptación: Kokoro (Eduardo Muñoz Luna)
+Los resultados son escenarios operativos, no asesoría financiera. Las entradas,
+fórmulas y supuestos deben validarse con la empresa antes de tomar decisiones.
 
 Las 7 palancas:
   1. PRICE  (precio)          → % mejora = +1% de precio
@@ -351,7 +346,8 @@ class PowerOfOneEngine:
     def benchmark_by_industry(industry: str) -> dict:
         """Retorna benchmarks por industria para métricas clave.
 
-        Fuente: Benchmarks de Scaling Up / Gazelles (Verne Harnish).
+        Son rangos orientativos integrados; deben contrastarse con evidencia
+        documentada de la industria y con la serie histórica de la empresa.
         """
         benchmarks = {
             "retail": {

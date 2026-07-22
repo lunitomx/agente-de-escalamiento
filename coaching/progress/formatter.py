@@ -36,15 +36,15 @@ def format_progress(progress: dict, suggestion: dict | None = None) -> str:
         lines.extend(["", "### Next Step", ""])
         action = suggestion.get("action")
         if action == "diagnose":
-            lines.append("Run `/scaleup-diagnose` to get your baseline scores.")
+            lines.append("Run `/escala-diagnose` to get your baseline scores.")
         elif action == "worksheet":
             lines.append(
-                f"Run `/scaleup-worksheet {suggestion['worksheet_id']}` — {suggestion.get('worksheet_name', '')}"
+                f"Run `/escala-worksheet {suggestion['worksheet_id']}` — {suggestion.get('worksheet_name', '')}"
             )
             lines.append(f"*Reason: {suggestion.get('reason', '')}*")
         elif action == "coaching":
             lines.append(
-                f"Run `/scaleup-{suggestion['decision']}` for deep coaching on {suggestion['decision'].capitalize()}."
+                f"Run `/escala-{suggestion['decision']}` for deep coaching on {suggestion['decision'].capitalize()}."
             )
             lines.append(f"*Reason: {suggestion.get('reason', '')}*")
 

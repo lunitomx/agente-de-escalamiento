@@ -9,10 +9,6 @@ summary: >
   Built through consistent actions: onboarding rituals, recognition practices,
   "actions to live by" for Core Purpose and BHAG. Elements include: symbols,
   slogans, stories, systems, strategies, staff, and skills.
-source:
-  book_chapter: "THE CORE"
-  file: "metodologias_parsed/people_workbook.txt"
-  file_line: 731
 relationships:
   - type: belongs-to
     target: decision-people

@@ -44,4 +44,3 @@ Correr checklist de validación. Guardar en `work/people/fac-chart.md`.
 | Next | `/escala-people-values` o `/escala-people` |
 
 ---
-*Esta herramienta está inspirada en el Mapa de Funciones y Responsabilidades, desarrollado por Verne Harnish. Ver [ATTRIBUTIONS.md](../ATTRIBUTIONS.md) para la referencia completa.*

@@ -19,13 +19,11 @@ DECISION_ORDER = ["people", "strategy", "execution", "cash"]
 
 def _get_worksheets(base_path: Path) -> tuple[list[dict], dict[str, dict]]:
     """Load all worksheets and completed ones."""
-    registry_path = (
-        base_path / ".scaleup" / "knowledge" / "registry" / "worksheets.yaml"
-    )
+    registry_path = base_path / ".escala" / "knowledge" / "registry" / "worksheets.yaml"
     registry = read_yaml(registry_path)
     all_ws = registry.get("worksheets", [])
 
-    wdir = base_path / ".scaleup" / "my-company" / "worksheets"
+    wdir = base_path / ".escala" / "my-company" / "worksheets"
     completed = {}
     if wdir.exists():
         for f in wdir.glob("*.yaml"):
@@ -49,7 +47,7 @@ def run(context: dict) -> dict:
         dict with output, artifacts, errors
     """
     base = Path(context.get("base_path", "."))
-    profile_path = base / ".scaleup" / "agent" / "memory" / "company-profile.yaml"
+    profile_path = base / ".escala" / "agent" / "memory" / "company-profile.yaml"
     profile = read_yaml(profile_path)
     scores = context.get("scores", profile.get("scores", {}))
 
@@ -64,7 +62,7 @@ def run(context: dict) -> dict:
 
     if not scores:
         return {
-            "output": "Aún no tienes diagnóstico. Corre `/scaleup-diagnose` primero para establecer tus scores base.",
+            "output": "Aún no tienes diagnóstico. Corre `/escala-diagnose` primero para establecer tus scores base.",
             "artifacts": {},
             "errors": ["No diagnosis scores found"],
         }
@@ -125,13 +123,13 @@ def run(context: dict) -> dict:
                     "### Siguiente Sugerido",
                     f"- {next_ws['name']} (`{next_ws['id']}`) en {DECISION_LABELS.get(lowest_decision, lowest_decision)}",
                     f"- Dificultad: {next_ws.get('difficulty', '—')} | Tiempo: {next_ws.get('time_estimate', '—')}",
-                    f"- Usa `/scaleup-worksheet {next_ws['id']}` para empezar",
+                    f"- Usa `/escala-worksheet {next_ws['id']}` para empezar",
                     "",
                 ]
             )
 
     lines.append(
-        "> Actualiza tu diagnóstico con `/scaleup-diagnose` para mantener scores al día."
+        "> Actualiza tu diagnóstico con `/escala-diagnose` para mantener scores al día."
     )
 
     total_all = sum(

@@ -10,10 +10,6 @@ summary: >
   revenue growth requires more inventory, more receivables, and more staff before
   the cash from that growth arrives. Understanding working capital consumption per
   unit of growth is essential to avoid the "growth trap" — profitable but cash-starved.
-source:
-  book_chapter: "SCALING UP CASH"
-  file: "metodologias_parsed/cash_workbook.txt"
-  file_line: 434
 relationships:
   - type: belongs-to
     target: decision-cash

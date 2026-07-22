@@ -10,10 +10,6 @@ summary: >
   metric (days to delivery). Every team member should know the company's Critical Number
   and have a personal Critical Number aligned with it — creating clear line of sight from
   individual work to company outcome. Tracked weekly, tied to the Quarterly Theme.
-source:
-  book_chapter: "THE DATA"
-  file: "metodologias_parsed/execution_workbook.txt"
-  file_line: 496
 relationships:
   - type: belongs-to
     target: decision-execution

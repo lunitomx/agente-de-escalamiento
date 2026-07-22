@@ -45,4 +45,3 @@ Guardar en `work/cash/ccc-analysis.md`.
 | Next | `/escala-cash-power1` |
 
 ---
-*Esta herramienta está inspirada en el Ciclo de Conversión de Efectivo, un principio de finanzas corporativas. Ver [ATTRIBUTIONS.md](../ATTRIBUTIONS.md) para la referencia completa.*

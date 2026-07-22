@@ -150,10 +150,10 @@ SCORE_LABELS = {
 PRIORITY_ORDER = ["people", "strategy", "execution", "cash"]
 
 ROUTING_RULES = {
-    "people": "/scaleup-people",
-    "strategy": "/scaleup-strategy",
-    "execution": "/scaleup-execution",
-    "cash": "/scaleup-cash",
+    "people": "/escala-people",
+    "strategy": "/escala-strategy",
+    "execution": "/escala-execution",
+    "cash": "/escala-cash",
 }
 
 
@@ -189,7 +189,7 @@ def run(context: dict) -> dict:
         dict with output, artifacts, errors
     """
     base = Path(context.get("base_path", "."))
-    profile_path = base / ".scaleup" / "agent" / "memory" / "company-profile.yaml"
+    profile_path = base / ".escala" / "agent" / "memory" / "company-profile.yaml"
     profile = read_yaml(profile_path)
 
     answers = context.get("answers", {})
@@ -280,7 +280,7 @@ def run(context: dict) -> dict:
         )
 
     report_lines.append("")
-    report_lines.append("> Para re-evaluar: `/scaleup-diagnose`")
+    report_lines.append("> Para re-evaluar: `/escala-diagnose`")
 
     output = "\n".join(report_lines)
 

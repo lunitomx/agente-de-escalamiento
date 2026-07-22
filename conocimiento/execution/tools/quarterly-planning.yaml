@@ -10,10 +10,6 @@ summary: >
   what didn't, why), review KPIs and Critical Number, SWT update, set new Critical Number,
   set company Rocks, announce Quarterly Theme and celebration. Each department then holds
   its own session to cascade team-level Rocks aligned with the company Rocks.
-source:
-  book_chapter: "THE PRIORITY"
-  file: "metodologias_parsed/execution_workbook.txt"
-  file_line: 606
 relationships:
   - type: belongs-to
     target: decision-execution

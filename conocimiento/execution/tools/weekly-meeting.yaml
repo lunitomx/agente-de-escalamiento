@@ -11,12 +11,6 @@ summary: >
   The "situation room" — a dedicated physical or virtual space with KPIs and Rock status
   visible — supports the weekly meeting. Teams that skip weekly meetings lose alignment
   within two weeks.
-source:
-  book_chapter: "THE MEETING RHYTHM"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 910
-  workbook_file: "metodologias_parsed/execution_workbook.txt"
-  workbook_line: 502
 relationships:
   - type: belongs-to
     target: decision-execution

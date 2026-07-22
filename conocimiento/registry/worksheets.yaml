@@ -3,7 +3,7 @@ type: registry
 name: Worksheet Registry
 name_es: Registro de Hojas de Trabajo
 description: >
-  Central index of all 15 worksheets across the 4 Scaling Up decisions.
+  Central index of all 15 worksheets across the 4 ESCALA decisions.
   Enables deterministic lookup by decision, prerequisite, or output type.
 total_worksheets: 15
 worksheets:

@@ -9,10 +9,6 @@ summary: >
   possibly skilled). Tasks that are loathed and non-core to the role become candidates
   for delegation, automation, or elimination. The goal: maximize time doing work that
   energizes. People are most productive when doing what they love.
-source:
-  book_chapter: "THE TEAM"
-  file: "metodologias_parsed/people_workbook.txt"
-  file_line: 2154
 relationships:
   - type: belongs-to
     target: decision-people

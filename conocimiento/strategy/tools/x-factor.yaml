@@ -10,12 +10,6 @@ summary: >
   Outback Steakhouse's X-Factor was dinner-only hours, allowing them to use smaller
   kitchens profitably. Identifying the X-Factor forces leadership to ask: "What do we
   have that would take a competitor 10 years and unlimited capital to replicate?"
-source:
-  book_chapter: "THE 7 STRATA OF STRATEGY"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 836
-  workbook_file: "metodologias_parsed/strategy_workbook.txt"
-  workbook_line: 362
 relationships:
   - type: belongs-to
     target: decision-strategy

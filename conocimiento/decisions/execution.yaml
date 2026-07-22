@@ -5,9 +5,6 @@ name_es: Ejecucion
 summary: >
   Driving flawless execution through meeting rhythms, priorities, data/KPIs,
   and disciplined operating habits. Eliminates organizational drag and aligns the team.
-source:
-  book_chapter: "SCALING UP EXECUTION"
-  book_line: 4497
 relationships:
   - type: contains
     target: concept-priorities-rocks
@@ -48,4 +45,3 @@ relationships:
 tags: [execution, priorities, meetings, kpis, accountability, habits]
 metadata:
   key_question: "Are all processes running without drama and driving industry-leading profitability?"
-  chapter_range: "Chapters: The Priority, The Data, The Meeting Rhythm"

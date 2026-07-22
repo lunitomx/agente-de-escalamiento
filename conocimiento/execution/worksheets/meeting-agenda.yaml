@@ -4,14 +4,11 @@ name: Meeting Agenda Templates
 name_es: Plantillas de Agenda de Reuniones
 decision: execution
 summary: >
-  Standard agenda templates for each meeting type in the Scaling Up rhythm. Provides
+  Standard agenda templates for each meeting type in the operating rhythm. Provides
   consistent structure so meetings start on time, stay focused, and end with clear
   actions. Templates exist for: Daily Huddle (15 min), Weekly Team Meeting (90 min),
   Monthly Management Meeting (half day). Having a standard agenda eliminates the "what
   do we talk about?" problem and ensures critical data is reviewed every time.
-source:
-  file: "scaling_up_llamaparse.txt"
-  file_line: 910
 relationships:
   - type: belongs-to
     target: decision-execution
