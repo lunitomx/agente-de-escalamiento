@@ -1,7 +1,7 @@
 ---
 epic_id: "E38"
 title: "Cash and Financial Intelligence"
-status: "in_progress"
+status: "complete"
 created: "2026-07-22"
 mission: "escala-local-v2-plan-maestro-2607202112"
 ---
@@ -88,21 +88,32 @@ procedencia, supuestos, confianza y límites.
 
 ## Done Criteria
 
-- [ ] Las cuatro stories completan el ciclo RaiSE y se integran en `main` con
+- [x] Las cuatro stories completan el ciclo RaiSE y se integran en `main` con
       tests, lint, formato y tipos PASS.
-- [ ] Los siete requisitos E38 tienen artefacto y receipt exactos en el ledger
+- [x] Los siete requisitos E38 tienen artefacto y receipt exactos en el ledger
       maestro; ninguno se declara `proved` por presencia de código.
-- [ ] Una empresa sintética entrega un workbook no adaptado, responde una
+- [x] Una empresa sintética entrega un workbook no adaptado, responde una
       aclaración y obtiene statements trazables o estados explícitos de no
       derivabilidad.
-- [ ] Un caso negativo demuestra que un mapping ambiguo, stale, faltante o
+- [x] Un caso negativo demuestra que un mapping ambiguo, stale, faltante o
       inconsistente detiene la recomendación y no muta el workbook original.
-- [ ] CCC, Power-of-One y escenarios muestran supuestos, confidence,
+- [x] CCC, Power-of-One y escenarios muestran supuestos, confidence,
       freshness, procedencia y diferencias comparables.
-- [ ] El reporte visual se genera localmente, es determinista/redacted y no
+- [x] El reporte visual se genera localmente, es determinista/redacted y no
       usa APIs cloud, OAuth, SQLite sincronizada ni rutas absolutas.
-- [ ] E39-E40 pueden consumir perfiles/derivaciones sin duplicar el contrato
+- [x] E39-E40 pueden consumir perfiles/derivaciones sin duplicar el contrato
       de autoridad, procedencia o preguntas.
+
+## Closure Proof
+
+- Estado: `complete` tras la retrospectiva `retrospective.md`.
+- Gates exactos: `gate-req-e38-001` … `gate-req-e38-007` PASS.
+- Readiness del ledger maestro: 7/7 requisitos E38 proved, 0 blockers.
+- Qualification: `scripts/qualify_e38.py` con fixture sintético Nopal Foods.
+- Suite/gates: tests 901 pass / 2 skipped; lint, formato y tipos PASS.
+- Tag local: `epic/e38-complete` (se crea al finalizar el commit de cierre).
+- Límites aceptados: ejecución Windows nativa y aceptación con empresarios
+  reales quedan en E41/E42; la misión global sigue abierta por E39–E42.
 
 ## Acceptance Evidence
 
