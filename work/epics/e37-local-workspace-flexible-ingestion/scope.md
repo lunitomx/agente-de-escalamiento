@@ -1,7 +1,7 @@
 ---
 epic_id: "E37"
 title: "Local Workspace & Flexible Ingestion"
-status: "active"
+status: "designed"
 created: "2026-07-22"
 mission: "escala-local-v2-plan-maestro-2607202112"
 ---
@@ -124,8 +124,15 @@ qué entendió, preguntar por ambigüedades materiales y fallar de forma segura.
 
 ## Implementation Plan
 
-> Se añadirá mediante `/rai-epic-design` y `/rai-epic-plan` después de revisar
-> los módulos actuales y convertir cada requisito en pruebas RED-GREEN-REFACTOR.
+> La secuencia detallada y los checkpoints RED-GREEN-REFACTOR están en
+> `design.md` y se formalizarán mediante `/rai-epic-plan` antes de escribir
+> implementación.
+
+## Design Artifacts
+
+- `design.md` — gemba, contratos, control flow, riesgos y story dependencies.
+- `adr-local-authority-and-inbox.md` — decisión vinculante sobre autoridad
+  local e inbox no destructivo.
 
 ## Progress Tracking
 

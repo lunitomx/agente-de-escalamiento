@@ -18,3 +18,12 @@
 | Hosted or multi-writer ESCALA runtime | E36 design | Rejected | Incompatible with the local-only product invariant; requires a new product decision |
 | Automated legal approval of license posture | E36 design | Low | Human counsel defines the decision and evidence boundary |
 | Overwrite the existing dirty public candidate repository | E36 gemba | Rejected | Replace only through a reviewed clean-export migration; never synchronize private history into it |
+
+## From E37: Local Workspace & Flexible Ingestion
+
+| Item | Origin | Priority | Promotion Condition |
+|------|--------|----------|-------------------|
+| OCR for image-only PDFs | E37 design | Low | A real local sample proves text extraction is insufficient and privacy/performance gates are defined |
+| Universal parser for every workbook/document variant | E37 design | Rejected | Replace with a new bounded adapter decision; unsupported inputs must remain explicit |
+| Cloud Drive/OneDrive API or OAuth | E37 ADR | Rejected | Only after a new product decision changes the local-only invariant |
+| Multi-writer shared SQLite | E37 ADR | Rejected | Requires abandoning installer-machine data authority and a new ADR |
