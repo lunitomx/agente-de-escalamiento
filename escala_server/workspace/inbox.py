@@ -279,9 +279,84 @@ def scan_inbox(config: InboxConfig) -> InboxRunResult:
             separators=(",", ":"),
         ).encode("utf-8")
     ).hexdigest()
-    return InboxRunResult(
+    result = InboxRunResult(
         run_id=run_id,
         items=safe_items,
         ledger=updated_ledger,
         ledger_changed=ledger_changed,
     )
+    _write_inbox_report(config, result)
+    return result
+
+
+def _receipt_payload(result: InboxRunResult) -> dict[str, object]:
+    """Build a bounded receipt payload with no internal paths."""
+
+    return {
+        "schema_version": 1,
+        "run_id": result.run_id,
+        "ledger_changed": result.ledger_changed,
+        "items": tuple(item.model_dump(mode="json") for item in result.items),
+        "ledger": {
+            "schema_version": result.ledger.schema_version,
+            "entries": tuple(
+                entry.model_dump(mode="json") for entry in result.ledger.entries
+            ),
+        },
+    }
+
+
+def render_inbox_receipt_json(result: InboxRunResult) -> str:
+    """Render deterministic JSON for a local inbox run."""
+
+    return json.dumps(
+        _receipt_payload(result),
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+
+
+def render_inbox_receipt_markdown(result: InboxRunResult) -> str:
+    """Render the same safe run fields as bounded Markdown."""
+
+    lines = [
+        "# Inbox Run Receipt",
+        "",
+        f"- run_id: {result.run_id}",
+        f"- ledger_changed: {str(result.ledger_changed).lower()}",
+        f"- ledger_entries: {len(result.ledger.entries)}",
+        "",
+        "## Items",
+    ]
+    if result.items:
+        for item in result.items:
+            source = f" source_id={item.source_id}" if item.source_id else ""
+            lines.append(
+                f"- {item.relative_path}: {item.disposition} ({item.code}){source}"
+            )
+    else:
+        lines.append("- none")
+    lines.extend(["", "## Ledger source IDs"])
+    if result.ledger.entries:
+        lines.extend(f"- {entry.source_id}" for entry in result.ledger.entries)
+    else:
+        lines.append("- none")
+    return "\n".join(lines) + "\n"
+
+
+def _write_inbox_report(config: InboxConfig, result: InboxRunResult) -> None:
+    """Atomically write a report under installer-local data_root."""
+
+    report_dir = (
+        config.workspace.data_root.expanduser().resolve(strict=False)
+        / ".escala-inbox-reports"
+    )
+    report_path = report_dir / f"{result.run_id}.json"
+    temporary = report_path.with_name(f"{report_path.name}.tmp")
+    try:
+        report_dir.mkdir(parents=True, exist_ok=True)
+        temporary.write_text(render_inbox_receipt_json(result), encoding="utf-8")
+        os.replace(temporary, report_path)
+    except OSError:
+        raise InboxError("report_write_failed") from None

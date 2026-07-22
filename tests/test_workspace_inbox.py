@@ -14,6 +14,8 @@ from escala_server.workspace.inbox import (
     InboxLedger,
     InboxLedgerEntry,
     load_inbox_ledger,
+    render_inbox_receipt_json,
+    render_inbox_receipt_markdown,
     scan_inbox,
     save_inbox_ledger,
 )
@@ -168,3 +170,28 @@ def test_failure_dispositions_are_non_destructive(tmp_path: Path) -> None:
         path.name: path.read_bytes() for path in (ambiguous, unknown, corrupt)
     } == before
     assert not (config.data_root / "escala.sqlite").exists()
+
+
+def test_receipts_are_redacted_and_deterministic(tmp_path: Path) -> None:
+    config = _config(tmp_path)
+    config.exchange_root.mkdir()
+    source = config.exchange_root / "ventas.csv"
+    source.write_text("fecha,cliente,importe\n2026-07-22,Acme,10\n", encoding="utf-8")
+
+    run = scan_inbox(InboxConfig(workspace=config))
+    json_receipt = render_inbox_receipt_json(run)
+    markdown_receipt = render_inbox_receipt_markdown(run)
+    report_path = config.data_root / ".escala-inbox-reports" / f"{run.run_id}.json"
+
+    assert json_receipt == render_inbox_receipt_json(run)
+    assert markdown_receipt.endswith("\n")
+    assert report_path.exists()
+    assert report_path.read_text(encoding="utf-8") == json_receipt
+    for receipt in (
+        json_receipt,
+        markdown_receipt,
+        report_path.read_text(encoding="utf-8"),
+    ):
+        assert str(tmp_path) not in receipt
+        assert "Acme" not in receipt
+        assert "https://" not in receipt

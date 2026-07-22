@@ -25,6 +25,19 @@ from .ingestion import (
     render_ingestion_receipt_json,
     render_ingestion_receipt_markdown,
 )
+from .inbox import (
+    InboxConfig,
+    InboxError,
+    InboxItemResult,
+    InboxLedger,
+    InboxLedgerEntry,
+    InboxRunResult,
+    load_inbox_ledger,
+    render_inbox_receipt_json,
+    render_inbox_receipt_markdown,
+    save_inbox_ledger,
+    scan_inbox,
+)
 
 __all__ = [
     "WorkspaceAuthorityError",
@@ -48,4 +61,15 @@ __all__ = [
     "profile_source",
     "render_ingestion_receipt_json",
     "render_ingestion_receipt_markdown",
+    "InboxConfig",
+    "InboxError",
+    "InboxItemResult",
+    "InboxLedger",
+    "InboxLedgerEntry",
+    "InboxRunResult",
+    "load_inbox_ledger",
+    "save_inbox_ledger",
+    "scan_inbox",
+    "render_inbox_receipt_json",
+    "render_inbox_receipt_markdown",
 ]
