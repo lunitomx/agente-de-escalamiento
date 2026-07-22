@@ -56,7 +56,7 @@ El director obtiene visibilidad diaria del ritmo y salud de su equipo basada en 
 ## Story closure checklist
 
 - [x] S39.1 Transcript Intake and Context — merged `a124bd3` / `30d857c`; focused tests, lint, format and types PASS.
-- [ ] S39.2 Evidence Extraction and Rhythm
+- [x] S39.2 Evidence Extraction and Rhythm — merged `8642e6c` / `c5aa559`; focused tests, lint, format and types PASS.
 - [ ] S39.3 Temporal Team Signals and Executive Review
 - [ ] S39.4 Local Scheduling and Report Exchange
 
@@ -128,7 +128,7 @@ The critical path is S39.1 → S39.2 → S39.3 → S39.4. Parallel work is inten
 | Story | Size | Status | Actual | Velocity | Notes |
 |---|:---:|---|---|---|---|
 | S39.1 Transcript Intake and Context | M | Done | one focused cycle | — | Depends on E37; merged `a124bd3` / `30d857c` |
-| S39.2 Evidence Extraction and Rhythm | L | Pending | — | — | Depends on S39.1 |
+| S39.2 Evidence Extraction and Rhythm | L | Done | one focused cycle | — | Depends on S39.1; merged `8642e6c` / `c5aa559` |
 | S39.3 Temporal Team Signals and Executive Review | L | Pending | — | — | Depends on S39.2 |
 | S39.4 Local Scheduling and Report Exchange | M | Pending | — | — | Depends on S39.3 |
 
