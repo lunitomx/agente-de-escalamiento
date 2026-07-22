@@ -35,6 +35,10 @@ El agente te guiará para crear tu perfil de empresa y hacer tu primer diagnóst
   una carpeta sincronizada de Google Drive u OneDrive.
 - No coloques la base SQLite dentro de una carpeta sincronizada; cada
   instalación mantiene su base local y comparte sólo documentos de trabajo.
+- Los reportes de bugs y mejoras se generan localmente con
+  `/escala-bugreport` en `~/.escala/feedback/outbox/`. No hay telemetría ni
+  envío automático; si quieres compartir uno, copia el archivo manualmente a
+  una carpeta sincronizada que tú controles.
 
 ## Comandos disponibles
 
@@ -45,6 +49,12 @@ El agente te guiará para crear tu perfil de empresa y hacer tu primer diagnóst
 | `/escala-welcome` | Primera sesión: crea tu perfil y primer diagnóstico |
 | `/escala-diagnose` | Diagnóstico completo de las 4 decisiones |
 | `/escala-progress` | Dashboard de progreso y madurez |
+
+### Reportes
+
+| Comando | Qué hace |
+|---------|----------|
+| `/escala-bugreport` | Captura un bug o mejora sin leer datos de la empresa y deja un JSON local listo para compartir |
 
 ### People — Personas
 

@@ -17,6 +17,12 @@ Cuando los cargas, el LLM se convierte en un estratega que:
 
 **Cero servidores.** Todo corre dentro del LLM. Tus datos se quedan en tu compu.
 
+Para reportar un bug o una mejora, usa `/escala-bugreport`. El skill sólo toma
+lo que escribas, muestra un preview y, con tu confirmación, crea un JSON local
+en `~/.escala/feedback/outbox/`. No lee la memoria de la empresa ni envía
+telemetría. Puedes copiar el archivo manualmente a una carpeta compartida de
+Google Drive u OneDrive.
+
 ## Instalación
 
 ```bash
@@ -44,6 +50,7 @@ cd agente-de-escalamiento && code .
 | "Hablemos del equipo" | People | FACChart + Valores |
 | "Mejoremos la ejecución" | Execution | 10 Hábitos + Rhythms |
 | "Revísate" | Evolve | Escanea y propone mejoras |
+| "Encontré un bug" | Bugreport | Genera un reporte anónimo local listo para compartir |
 | "Muéstrame" | — | Genera HTML visual |
 
 ## Estructura
@@ -63,6 +70,8 @@ cd agente-de-escalamiento && code .
 │   ├── analisis/             ← Cash, Strategy, People, Execution
 │   ├── dashboard/            ← HTMLs visuales generados
 │   └── evolucion/            ← Propuestas de mejora
+├── feedback/
+│   └── outbox/                ← Reportes anónimos pendientes de compartir
 └── mcp/server.py             ← Opcional (persistencia)
 ```
 
