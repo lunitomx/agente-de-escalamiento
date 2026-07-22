@@ -83,6 +83,54 @@ El director obtiene visibilidad diaria del ritmo y salud de su equipo basada en 
 | Se confunde ausencia de transcript con mal desempeño | Medium/High | Estado `evidence_missing`, reglas declarativas y lenguaje no punitivo. |
 | Carpeta sincronizada termina conteniendo autoridad | Medium/High | Reutilizar `validate_workspace`, receipts de autoridad y gate negativo explícito. |
 
+## Implementation Plan
+
+### Sequence and rationale
+
+1. **S39.1 — Transcript Intake and Context (M)**: risk-first walking skeleton. Proves the E37 seam, idempotency and unresolved context before any extraction can create facts.
+2. **S39.2 — Evidence Extraction and Rhythm (L)**: depends on stable context/provenance. Adds the smallest useful facts and declarative rhythm assessment.
+3. **S39.3 — Temporal Team Signals and Executive Review (L)**: consumes persisted facts and produces the executive outcome; trend rules remain deterministic and fail-closed.
+4. **S39.4 — Local Scheduling and Report Exchange (M)**: finalizes the local delivery seam and validates the no-SQLite-in-exchange invariant around the complete pipeline.
+
+The critical path is S39.1 → S39.2 → S39.3 → S39.4. Parallel work is intentionally avoided: every later story consumes contracts and evidence from the previous story, and splitting the parser/report seams would increase drift without reducing risk.
+
+### Milestones
+
+#### M1 — Walking Skeleton (S39.1)
+
+- Success: the same transcript scanned twice yields one stable source identity; metadata is ready or asks bounded questions; original file and exchange remain unchanged.
+- Demo: local `WorkspaceConfig` + `daily-2026-07-21.transcript` → intake receipt.
+
+#### M2 — Core MVP (S39.2)
+
+- Success: a synthetic daily/weekly pair yields traceable actions, decisions and commitments plus rhythm states `supported`/`evidence_missing`/`unresolved`.
+- Demo: evidence spans point to source IDs and line ranges; confidence is visible without copying transcript text.
+
+#### M3 — Feature Complete (S39.3)
+
+- Success: three meetings surface one repeated blocker, one overdue commitment, one unresolved decision and a material trend; no unsupported negative claim appears.
+- Demo: daily executive review has health, material changes, questions and evidence.
+
+#### M4 — Epic Complete (S39.4)
+
+- Success: local schedule and report exchange write only beneath `data_root`; a deliberate exchange SQLite is rejected; all seven exact gates and quality checks pass.
+- Demo: `run_daily_review` + report artifacts are deterministic and redacted.
+
+### Progress Tracking
+
+| Story | Size | Status | Actual | Velocity | Notes |
+|---|:---:|---|---|---|---|
+| S39.1 Transcript Intake and Context | M | Pending | — | — | Depends on E37 |
+| S39.2 Evidence Extraction and Rhythm | L | Pending | — | — | Depends on S39.1 |
+| S39.3 Temporal Team Signals and Executive Review | L | Pending | — | — | Depends on S39.2 |
+| S39.4 Local Scheduling and Report Exchange | M | Pending | — | — | Depends on S39.3 |
+
+### Sequencing risks
+
+- **Heuristic drift**: use line-level evidence and confidence; no model claims without a matching rule.
+- **Cross-meeting identity mismatch**: source IDs and normalized meeting dates are the only join keys; ambiguous people/team stay unresolved.
+- **Delivery boundary drift**: S39.4 owns the negative authority test before closure; no report path may point into exchange.
+
 ## Legacy sweep
 
 No hay un V1 de inteligencia de reuniones en `escala_server`; los skills textuales históricos de `escala-skills` permanecen como interfaz de coaching y no se reemplazan en esta épica. E39 añade un seam local verificable, no duplica el ledger de E37.
