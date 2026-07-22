@@ -1,0 +1,126 @@
+# ESCALA Local V2 Master Acceptance Ledger
+
+**Mission:** `escala-local-v2-plan-maestro-2607202112`
+
+**Contract inventory:** 42 requirements across 6 epics.
+
+**Initial proof posture:** 0 proved, 42 unproved.
+
+A valid ledger is not a completed product. Mission readiness requires fresh passing evidence for every requirement.
+
+## Authority bindings
+
+| Authority | Path | Semantic SHA-256 |
+|---|---|---|
+| Closure dispositions | `governance/closure-dispositions.yaml` | `e5b9e9207fce7bbacd3af0a9e93368d6ccf38f979932d10360a2063924f8f023` |
+| Epic identities | `governance/epic-identities.yaml` | `eb62cd804fa3b0559d20394e27be583b6daa445c6619938b43d4a1a92d052d52` |
+| Public export | `governance/public-export.yaml` | `3faf9e3e350ef10a17f3e8634df7fbc6a8ed15dfd6e9cbe99e1769c26ada2cea` |
+
+## Product-owner source requirements
+
+| Source ID | Binding statement |
+|---|---|
+| `SRC-CASH-001` | Interpret the owner's real financial workbooks, ask questions, reconstruct supported statements, and explain cash decisions without guessing. |
+| `SRC-CATALOG-001` | Produce a Spanish functionality catalog and PDF that truthfully state what works, evidence, limits, prerequisites, and unavailable capabilities. |
+| `SRC-COACH-001` | Guide the owner through People, Strategy, Execution, and Cash, including strategy, vision, priorities, and follow-up. |
+| `SRC-COCKPIT-001` | Provide a visual 0-100 company diagnostic that identifies pain and lets the owner inspect supporting evidence. |
+| `SRC-EVIDENCE-001` | Use only supplied or verified company data, ask material clarifying questions, and distinguish facts, inferences, and unknowns. |
+| `SRC-INGEST-001` | Accept the owner's existing files without requiring an ESCALA template and report unsupported or ambiguous inputs explicitly. |
+| `SRC-INSTALL-001` | Install and operate ESCALA only on the machine of the person who installed it, with a reproducible local lifecycle. |
+| `SRC-LOCAL-001` | Keep runtime and authoritative company state on the installer machine with no hosted ESCALA service or cloud database. |
+| `SRC-MEETING-001` | Review daily and weekly meeting transcripts, extract accountable work, and report team health and trends each day. |
+| `SRC-QUALIFY-001` | Test the complete product as an entrepreneur with a synthetic company and prove every shipped capability and failure boundary. |
+| `SRC-SHARING-001` | Allow team exchange through a user-selected local Google Drive, OneDrive, or plain filesystem folder without cloud APIs. |
+| `SRC-SQLITE-001` | Never place authoritative SQLite or canonical company state in a synchronized or shared folder. |
+
+## Planned epic inventory
+
+| Epic | Slug | Stories | Requirements |
+|---|---|---|---:|
+| `E37` — Local Workspace and Flexible Ingestion | `local-workspace-flexible-ingestion` | `S37.1`, `S37.2`, `S37.3` | 7 |
+| `E38` — Cash and Financial Intelligence | `cash-and-financial-intelligence` | `S38.1`, `S38.2`, `S38.3`, `S38.4` | 7 |
+| `E39` — Meeting and Team Intelligence | `meeting-and-team-intelligence` | `S39.1`, `S39.2`, `S39.3`, `S39.4` | 7 |
+| `E40` — Executive Cockpit and Coaching | `executive-cockpit-and-coaching` | `S40.1`, `S40.2`, `S40.3`, `S40.4` | 8 |
+| `E41` — Local Installation and Lifecycle | `local-installation-and-lifecycle` | `S41.1`, `S41.2`, `S41.3`, `S41.4` | 7 |
+| `E42` — Product Qualification and Functional Catalog | `product-qualification-and-functional-catalog` | `S42.1`, `S42.2`, `S42.3`, `S42.4` | 6 |
+
+## E37 — Local Workspace and Flexible Ingestion
+
+| Requirement | Owner | Acceptance | Evidence artifact | Verification | Gates | Platforms | State |
+|---|---|---|---|---|---|---|---|
+| `REQ-E37-001` | `S37.1` | Runtime and authoritative company state live only on the installer machine. | `work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-001.json` | `.venv/bin/rai gate check gate-req-e37-001` | `gate-format`, `gate-lint`, `gate-req-e37-001`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E37-002` | `S37.1` | The authoritative SQLite and data root is rejected when located inside the configured synchronized exchange folder. | `work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-002.json` | `.venv/bin/rai gate check gate-req-e37-002` | `gate-format`, `gate-lint`, `gate-req-e37-002`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E37-003` | `S37.2` | The owner can submit declared spreadsheet, delimited-text, document, PDF, and transcript formats without adapting them to an ESCALA template; unsupported variants fail explicitly. | `work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-003.json` | `.venv/bin/rai gate check gate-req-e37-003` | `gate-format`, `gate-lint`, `gate-req-e37-003`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E37-004` | `S37.2` | Ingestion infers candidate sheets, tables, headers, units, dates, and entities and asks for clarification when ambiguity is material. | `work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-004.json` | `.venv/bin/rai gate check gate-req-e37-004` | `gate-format`, `gate-lint`, `gate-req-e37-004`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E37-005` | `S37.2` | Every imported source retains a local immutable fingerprint, relative provenance, extraction status, and rerun-safe identity without exposing machine paths. | `work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-005.json` | `.venv/bin/rai gate check gate-req-e37-005` | `gate-format`, `gate-lint`, `gate-req-e37-005`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E37-006` | `S37.3` | A user-selected local Drive, OneDrive, or plain folder can act as an idempotent inbox using ordinary filesystem operations only. | `work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-006.json` | `.venv/bin/rai gate check gate-req-e37-006` | `gate-format`, `gate-lint`, `gate-req-e37-006`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E37-007` | `S37.3` | Corrupt, encrypted, oversized, duplicate, or unsupported inputs are quarantined or reported without corrupting canonical state or leaking content. | `work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-007.json` | `.venv/bin/rai gate check gate-req-e37-007` | `gate-format`, `gate-lint`, `gate-req-e37-007`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+
+## E38 — Cash and Financial Intelligence
+
+| Requirement | Owner | Acceptance | Evidence artifact | Verification | Gates | Platforms | State |
+|---|---|---|---|---|---|---|---|
+| `REQ-E38-001` | `S38.1` | Real owner workbooks are profiled across sheets, tables, formulas, periods, currencies, and units without requiring a fixed template. | `work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-001.json` | `.venv/bin/rai gate check gate-req-e38-001` | `gate-format`, `gate-lint`, `gate-req-e38-001`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E38-002` | `S38.1` | Ambiguous financial mappings trigger specific questions and remain unresolved until the owner answers; values are not guessed. | `work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-002.json` | `.venv/bin/rai gate check gate-req-e38-002` | `gate-format`, `gate-lint`, `gate-req-e38-002`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E38-003` | `S38.2` | The system reconstructs a profit-and-loss statement, balance sheet, and cash-flow view when supported by supplied data and states what cannot be derived. | `work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-003.json` | `.venv/bin/rai gate check gate-req-e38-003` | `gate-format`, `gate-lint`, `gate-req-e38-003`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E38-004` | `S38.2` | Every reported financial figure links to source workbook, sheet, cell or range provenance and transformation notes. | `work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-004.json` | `.venv/bin/rai gate check gate-req-e38-004` | `gate-format`, `gate-lint`, `gate-req-e38-004`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E38-005` | `S38.3` | Cash-conversion-cycle and Power-of-One analyses use validated inputs, show assumptions, and support scenario comparison. | `work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-005.json` | `.venv/bin/rai gate check gate-req-e38-005` | `gate-format`, `gate-lint`, `gate-req-e38-005`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E38-006` | `S38.3` | Missing, inconsistent, stale, or low-confidence financial data is visible and blocks overconfident recommendations. | `work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-006.json` | `.venv/bin/rai gate check gate-req-e38-006` | `gate-format`, `gate-lint`, `gate-req-e38-006`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E38-007` | `S38.4` | The owner receives a local visual cash report with findings, questions, scenarios, and downloadable evidence. | `work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-007.json` | `.venv/bin/rai gate check gate-req-e38-007` | `gate-format`, `gate-lint`, `gate-req-e38-007`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+
+## E39 — Meeting and Team Intelligence
+
+| Requirement | Owner | Acceptance | Evidence artifact | Verification | Gates | Platforms | State |
+|---|---|---|---|---|---|---|---|
+| `REQ-E39-001` | `S39.1` | Daily and weekly transcript files are ingested idempotently from manual input or a configured local inbox. | `work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-001.json` | `.venv/bin/rai gate check gate-req-e39-001` | `gate-format`, `gate-lint`, `gate-req-e39-001`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E39-002` | `S39.1` | Meeting type, date, team, participants mentioned, and source provenance are identified or explicitly left unresolved. | `work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-002.json` | `.venv/bin/rai gate check gate-req-e39-002` | `gate-format`, `gate-lint`, `gate-req-e39-002`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E39-003` | `S39.2` | Decisions, actions, owners, due dates, blockers, risks, and commitments are extracted with transcript evidence and confidence. | `work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-003.json` | `.venv/bin/rai gate check gate-req-e39-003` | `gate-format`, `gate-lint`, `gate-req-e39-003`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E39-004` | `S39.2` | Meeting-rhythm quality is assessed against declared business rules without treating missing transcript evidence as a failure by a person. | `work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-004.json` | `.venv/bin/rai gate check gate-req-e39-004` | `gate-format`, `gate-lint`, `gate-req-e39-004`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E39-005` | `S39.3` | Repeated blockers, overdue or repeated commitments, unresolved decisions, and cross-meeting trends are detected across time. | `work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-005.json` | `.venv/bin/rai gate check gate-req-e39-005` | `gate-format`, `gate-lint`, `gate-req-e39-005`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E39-006` | `S39.3` | A daily executive review summarizes team health, material changes, questions, and evidence without inventing negative findings. | `work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-006.json` | `.venv/bin/rai gate check gate-req-e39-006` | `gate-format`, `gate-lint`, `gate-req-e39-006`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E39-007` | `S39.4` | Local scheduling and team report exchange operate through the installer machine and ordinary files; no hosted worker, cloud database, or shared SQLite is required. | `work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-007.json` | `.venv/bin/rai gate check gate-req-e39-007` | `gate-format`, `gate-lint`, `gate-req-e39-007`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+
+## E40 — Executive Cockpit and Coaching
+
+| Requirement | Owner | Acceptance | Evidence artifact | Verification | Gates | Platforms | State |
+|---|---|---|---|---|---|---|---|
+| `REQ-E40-001` | `S40.1` | Guided onboarding builds a validated company profile through questions and preserves unanswered or uncertain fields. | `work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-001.json` | `.venv/bin/rai gate check gate-req-e40-001` | `gate-format`, `gate-lint`, `gate-req-e40-001`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E40-002` | `S40.1` | An initial evidence-backed 0-100 diagnostic scores People, Strategy, Execution, and Cash separately. | `work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-002.json` | `.venv/bin/rai gate check gate-req-e40-002` | `gate-format`, `gate-lint`, `gate-req-e40-002`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E40-003` | `S40.2` | The cockpit identifies the highest pain or constraint and lets the owner drill from score to evidence, questions, and next action. | `work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-003.json` | `.venv/bin/rai gate check gate-req-e40-003` | `gate-format`, `gate-lint`, `gate-req-e40-003`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E40-004` | `S40.3` | Strategy discovery produces a coherent vision and OPSP-style view from owner answers with explicit unresolved decisions. | `work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-004.json` | `.venv/bin/rai gate check gate-req-e40-004` | `gate-format`, `gate-lint`, `gate-req-e40-004`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E40-005` | `S40.3` | People, Strategy, Execution, and Cash coaching routes to the right workflows without claiming unsupported analysis. | `work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-005.json` | `.venv/bin/rai gate check gate-req-e40-005` | `gate-format`, `gate-lint`, `gate-req-e40-005`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E40-006` | `S40.4` | Goals, priorities, tasks, owners, due dates, progress, and session continuity persist locally and remain queryable. | `work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-006.json` | `.venv/bin/rai gate check gate-req-e40-006` | `gate-format`, `gate-lint`, `gate-req-e40-006`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E40-007` | `S40.2` | One local visual cockpit shows current scores, trends, evidence freshness, blockers, and recommended focus without a hosted UI. | `work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-007.json` | `.venv/bin/rai gate check gate-req-e40-007` | `gate-format`, `gate-lint`, `gate-req-e40-007`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E40-008` | `S40.4` | Coaching asks material clarifying questions, distinguishes facts, inferences, and unknowns, and never invents company data. | `work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-008.json` | `.venv/bin/rai gate check gate-req-e40-008` | `gate-format`, `gate-lint`, `gate-req-e40-008`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+
+## E41 — Local Installation and Lifecycle
+
+| Requirement | Owner | Acceptance | Evidence artifact | Verification | Gates | Platforms | State |
+|---|---|---|---|---|---|---|---|
+| `REQ-E41-001` | `S41.1` | A fresh supported macOS machine can install the qualified local package with one documented flow and no repository-development layout. | `work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-001.json` | `.venv/bin/rai gate check gate-req-e41-001` | `gate-format`, `gate-lint`, `gate-req-e41-001`, `gate-tests`, `gate-types` | `macos` | `unproved` |
+| `REQ-E41-002` | `S41.1` | A fresh supported Windows machine can install the same qualified capability set with recorded platform evidence. | `work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-002.json` | `.venv/bin/rai gate check gate-req-e41-002` | `gate-format`, `gate-lint`, `gate-req-e41-002`, `gate-tests`, `gate-types` | `windows` | `unproved` |
+| `REQ-E41-003` | `S41.2` | The installed product starts, reports local health, version, and data location, and stops cleanly without a hosted ESCALA service. | `work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-003.json` | `.venv/bin/rai gate check gate-req-e41-003` | `gate-format`, `gate-lint`, `gate-req-e41-003`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E41-004` | `S41.3` | Schema and configuration migrations create a recoverable backup and support tested rollback or explicit safe-stop semantics. | `work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-004.json` | `.venv/bin/rai gate check gate-req-e41-004` | `gate-format`, `gate-lint`, `gate-req-e41-004`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E41-005` | `S41.3` | Updates consume only independently verified artifacts and preserve user state, version provenance, and rollback evidence. | `work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-005.json` | `.venv/bin/rai gate check gate-req-e41-005` | `gate-format`, `gate-lint`, `gate-req-e41-005`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E41-006` | `S41.2` | Setup can select and validate an optional local synchronized exchange folder while keeping SQLite and canonical state outside it. | `work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-006.json` | `.venv/bin/rai gate check gate-req-e41-006` | `gate-format`, `gate-lint`, `gate-req-e41-006`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E41-007` | `S41.4` | Installer, update, permissions, offline local runtime, legal-review, and publication gates are tested before any distributable release is authorized. | `work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-007.json` | `.venv/bin/rai gate check gate-req-e41-007` | `gate-format`, `gate-lint`, `gate-req-e41-007`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+
+## E42 — Product Qualification and Functional Catalog
+
+| Requirement | Owner | Acceptance | Evidence artifact | Verification | Gates | Platforms | State |
+|---|---|---|---|---|---|---|---|
+| `REQ-E42-001` | `S42.1` | A synthetic entrepreneur/company completes the end-to-end local journey from install and ingestion through meetings, cash analysis, strategy, cockpit, and follow-up. | `work/epics/e42-product-qualification-and-functional-catalog/evidence/REQ-E42-001.json` | `.venv/bin/rai gate check gate-req-e42-001` | `gate-format`, `gate-lint`, `gate-req-e42-001`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E42-002` | `S42.2` | Every shipped ESCALA skill has a current inventory, supported intent, golden success case, negative case, and real invocation receipt. | `work/epics/e42-product-qualification-and-functional-catalog/evidence/REQ-E42-002.json` | `.venv/bin/rai gate check gate-req-e42-002` | `gate-format`, `gate-lint`, `gate-req-e42-002`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E42-003` | `S42.1` | Fresh-install acceptance is repeated on the declared macOS and Windows matrix with exact versions and artifacts. | `work/epics/e42-product-qualification-and-functional-catalog/evidence/REQ-E42-003.json` | `.venv/bin/rai gate check gate-req-e42-003` | `gate-format`, `gate-lint`, `gate-req-e42-003`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E42-004` | `S42.3` | Privacy, tamper, corrupt-input, interrupted-update, stale-evidence, no-network, and synchronized-SQLite rejection scenarios fail safely. | `work/epics/e42-product-qualification-and-functional-catalog/evidence/REQ-E42-004.json` | `.venv/bin/rai gate check gate-req-e42-004` | `gate-format`, `gate-lint`, `gate-req-e42-004`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E42-005` | `S42.4` | A validated functionality catalog and Spanish PDF state what works, evidence, limits, prerequisites, and what remains unavailable without mentioning prohibited source material. | `work/epics/e42-product-qualification-and-functional-catalog/evidence/REQ-E42-005.json` | `.venv/bin/rai gate check gate-req-e42-005` | `gate-format`, `gate-lint`, `gate-req-e42-005`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+| `REQ-E42-006` | `S42.4` | A requirement-by-requirement final audit plus explicit product-owner human acceptance closes the mission; technical gates alone cannot fabricate acceptance. | `work/epics/e42-product-qualification-and-functional-catalog/evidence/REQ-E42-006.json` | `.venv/bin/rai gate check gate-req-e42-006` | `gate-format`, `gate-lint`, `gate-req-e42-006`, `gate-tests`, `gate-types` | `macos`, `windows` | `unproved` |
+
+## Binding invariants
+
+- Runtime authority: `installer_machine`.
+- Authoritative data: `installer_machine`.
+- Team exchange: `ordinary_filesystem_documents_only`.
+- Authoritative SQLite synchronization: `forbidden`.
+- Hosted ESCALA service, cloud database, OAuth, Drive API, and OneDrive API remain forbidden by the bound public-export authority.
+- Human legal review remains required and publication authorization remains false.

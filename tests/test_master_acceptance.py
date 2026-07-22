@@ -19,6 +19,8 @@ from validators.master_acceptance import (
     MasterAcceptanceLedger,
     load_master_acceptance_ledger,
     master_acceptance_ledger_hash,
+    render_master_acceptance_json,
+    render_master_acceptance_markdown,
     validate_master_acceptance_authorities,
 )
 from validators.public_export import (
@@ -31,6 +33,12 @@ ROOT = Path(__file__).resolve().parents[1]
 CLOSURE_POLICY_PATH = ROOT / "governance/closure-dispositions.yaml"
 IDENTITY_POLICY_PATH = ROOT / "governance/epic-identities.yaml"
 PUBLIC_EXPORT_POLICY_PATH = ROOT / "governance/public-export.yaml"
+LEDGER_PATH = (
+    ROOT / "work/epics/e36-product-truth-ip-governance/master-acceptance-ledger.yaml"
+)
+LEDGER_MARKDOWN_PATH = (
+    ROOT / "work/epics/e36-product-truth-ip-governance/master-acceptance-ledger.md"
+)
 
 EXPECTED_COUNTS = {
     "E37": 7,
@@ -65,6 +73,28 @@ EXPECTED_EPICS = {
         "product-qualification-and-functional-catalog",
         ("S42.1", "S42.2", "S42.3", "S42.4"),
     ),
+}
+EXPECTED_OWNER_STORIES = {
+    "E37": (1, 1, 2, 2, 2, 3, 3),
+    "E38": (1, 1, 2, 2, 3, 3, 4),
+    "E39": (1, 1, 2, 2, 3, 3, 4),
+    "E40": (1, 1, 2, 3, 3, 4, 2, 4),
+    "E41": (1, 1, 2, 3, 3, 2, 4),
+    "E42": (1, 2, 1, 3, 4, 4),
+}
+EXPECTED_SOURCE_IDS = {
+    "SRC-CASH-001",
+    "SRC-COACH-001",
+    "SRC-COCKPIT-001",
+    "SRC-EVIDENCE-001",
+    "SRC-INGEST-001",
+    "SRC-INSTALL-001",
+    "SRC-LOCAL-001",
+    "SRC-MEETING-001",
+    "SRC-QUALIFY-001",
+    "SRC-SHARING-001",
+    "SRC-SQLITE-001",
+    "SRC-CATALOG-001",
 }
 
 
@@ -280,3 +310,61 @@ def test_master_acceptance_rejects_authority_hash_drift(tmp_path: Path) -> None:
 
     with pytest.raises(MasterAcceptanceError, match="authority contract mismatch"):
         validate_master_acceptance_authorities(ROOT, ledger)
+
+
+def test_canonical_master_acceptance_ledger_matches_approved_plan() -> None:
+    ledger = load_master_acceptance_ledger(LEDGER_PATH)
+
+    assert ledger.mission_id == "escala-local-v2-plan-maestro-2607202112"
+    assert {item.id for item in ledger.source_requirements} == EXPECTED_SOURCE_IDS
+    assert [(item.id, item.slug, item.requirement_count) for item in ledger.epics] == [
+        (epic, slug, EXPECTED_COUNTS[epic])
+        for epic, (slug, _) in EXPECTED_EPICS.items()
+    ]
+    assert len(ledger.requirements) == 42
+    assert {item.id: item.owner.story for item in ledger.requirements} == {
+        f"REQ-{epic}-{index:03d}": f"S{epic[1:]}.{story_index}"
+        for epic, owners in EXPECTED_OWNER_STORIES.items()
+        for index, story_index in enumerate(owners, start=1)
+    }
+    assert all(item.proof.state == "unproved" for item in ledger.requirements)
+    assert all(
+        [blocker.value for blocker in item.proof.blockers] == ["evidence.missing"]
+        for item in ledger.requirements
+        if item.proof.state == "unproved"
+    )
+    assert next(
+        item for item in ledger.requirements if item.id == "REQ-E41-001"
+    ).platforms == ["macos"]
+    assert next(
+        item for item in ledger.requirements if item.id == "REQ-E41-002"
+    ).platforms == ["windows"]
+    assert "without adapting them to an ESCALA template" in next(
+        item.acceptance for item in ledger.requirements if item.id == "REQ-E37-003"
+    )
+    assert "profit-and-loss statement, balance sheet, and cash-flow view" in next(
+        item.acceptance for item in ledger.requirements if item.id == "REQ-E38-003"
+    )
+    assert "synthetic entrepreneur/company" in next(
+        item.acceptance for item in ledger.requirements if item.id == "REQ-E42-001"
+    )
+    assert "Spanish PDF" in next(
+        item.acceptance for item in ledger.requirements if item.id == "REQ-E42-005"
+    )
+
+
+def test_canonical_ledger_rendering_is_deterministic_and_matches_human_view() -> None:
+    ledger = load_master_acceptance_ledger(LEDGER_PATH)
+
+    first_json = render_master_acceptance_json(ledger)
+    first_markdown = render_master_acceptance_markdown(ledger)
+
+    assert first_json == render_master_acceptance_json(ledger)
+    assert first_markdown == render_master_acceptance_markdown(ledger)
+    assert first_markdown == LEDGER_MARKDOWN_PATH.read_text(encoding="utf-8")
+    assert first_markdown.count("| `REQ-E") == 42
+    assert "**Contract inventory:** 42 requirements across 6 epics." in first_markdown
+    assert "**Initial proof posture:** 0 proved, 42 unproved." in first_markdown
+    combined = first_json + first_markdown
+    for forbidden in (str(ROOT), "https://", "S36-PRIVATE-SENTINEL"):
+        assert forbidden not in combined

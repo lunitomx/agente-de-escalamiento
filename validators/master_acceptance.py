@@ -469,6 +469,133 @@ def master_acceptance_ledger_hash(ledger: MasterAcceptanceLedger) -> str:
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
+def render_master_acceptance_json(ledger: MasterAcceptanceLedger) -> str:
+    """Render the canonical ledger as deterministic semantic JSON."""
+    return (
+        json.dumps(
+            ledger.model_dump(mode="json"),
+            ensure_ascii=True,
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n"
+    )
+
+
+def render_master_acceptance_markdown(ledger: MasterAcceptanceLedger) -> str:
+    """Render the complete human acceptance view from typed ledger data."""
+    proved_count = sum(
+        isinstance(requirement.proof, ProvedProof)
+        for requirement in ledger.requirements
+    )
+    unproved_count = len(ledger.requirements) - proved_count
+    lines = [
+        "# ESCALA Local V2 Master Acceptance Ledger",
+        "",
+        f"**Mission:** `{ledger.mission_id}`",
+        "",
+        (
+            f"**Contract inventory:** {len(ledger.requirements)} requirements "
+            f"across {len(ledger.epics)} epics."
+        ),
+        "",
+        (
+            f"**Initial proof posture:** {proved_count} proved, "
+            f"{unproved_count} unproved."
+        ),
+        "",
+        (
+            "A valid ledger is not a completed product. Mission readiness requires "
+            "fresh passing evidence for every requirement."
+        ),
+        "",
+        "## Authority bindings",
+        "",
+        "| Authority | Path | Semantic SHA-256 |",
+        "|---|---|---|",
+    ]
+    for authority_name, binding in (
+        ("Closure dispositions", ledger.authorities.closure_dispositions),
+        ("Epic identities", ledger.authorities.epic_identities),
+        ("Public export", ledger.authorities.public_export),
+    ):
+        lines.append(f"| {authority_name} | `{binding.path}` | `{binding.sha256}` |")
+    lines.extend(
+        [
+            "",
+            "## Product-owner source requirements",
+            "",
+            "| Source ID | Binding statement |",
+            "|---|---|",
+        ]
+    )
+    lines.extend(
+        f"| `{source.id}` | {_markdown_cell(source.statement)} |"
+        for source in ledger.source_requirements
+    )
+    lines.extend(
+        [
+            "",
+            "## Planned epic inventory",
+            "",
+            "| Epic | Slug | Stories | Requirements |",
+            "|---|---|---|---:|",
+        ]
+    )
+    for epic in ledger.epics:
+        stories = ", ".join(f"`{story.id}`" for story in epic.stories)
+        lines.append(
+            f"| `{epic.id}` — {_markdown_cell(epic.title)} | `{epic.slug}` | "
+            f"{stories} | {epic.requirement_count} |"
+        )
+    for epic in ledger.epics:
+        lines.extend(
+            [
+                "",
+                f"## {epic.id} — {epic.title}",
+                "",
+                (
+                    "| Requirement | Owner | Acceptance | Evidence artifact | "
+                    "Verification | Gates | Platforms | State |"
+                ),
+                "|---|---|---|---|---|---|---|---|",
+            ]
+        )
+        for requirement in ledger.requirements:
+            if requirement.owner.epic != epic.id:
+                continue
+            command = " ".join(requirement.evidence.verification_command)
+            gates = ", ".join(
+                f"`{gate_id}`" for gate_id in requirement.evidence.required_gates
+            )
+            platforms = ", ".join(
+                f"`{platform.value}`" for platform in requirement.platforms
+            )
+            lines.append(
+                f"| `{requirement.id}` | `{requirement.owner.story}` | "
+                f"{_markdown_cell(requirement.acceptance)} | "
+                f"`{requirement.evidence.artifact_path}` | `{command}` | "
+                f"{gates} | {platforms} | `{requirement.proof.state}` |"
+            )
+    lines.extend(
+        [
+            "",
+            "## Binding invariants",
+            "",
+            "- Runtime authority: `installer_machine`.",
+            "- Authoritative data: `installer_machine`.",
+            "- Team exchange: `ordinary_filesystem_documents_only`.",
+            "- Authoritative SQLite synchronization: `forbidden`.",
+            "- Hosted ESCALA service, cloud database, OAuth, Drive API, and "
+            "OneDrive API remain forbidden by the bound public-export authority.",
+            "- Human legal review remains required and publication authorization "
+            "remains false.",
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
 def validate_master_acceptance_authorities(
     repository_root: Path,
     ledger: MasterAcceptanceLedger,
@@ -594,6 +721,10 @@ def _validate_safe_text(value: str, label: str) -> str:
     ):
         raise ValueError(f"unsafe {label}")
     return value
+
+
+def _markdown_cell(value: str) -> str:
+    return value.replace("|", "\\|").replace("\n", " ")
 
 
 def _reject_duplicates(values: list[str], label: str) -> None:
