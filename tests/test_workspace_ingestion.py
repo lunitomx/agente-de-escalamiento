@@ -14,6 +14,8 @@ from escala_server.workspace.ingestion import (
     SourceIngestionError,
     build_source_identity,
     profile_source,
+    render_ingestion_receipt_json,
+    render_ingestion_receipt_markdown,
 )
 from escala_server.workspace.authority import WorkspaceConfig
 
@@ -166,3 +168,25 @@ def test_corrupt_xlsx_is_explicit_and_source_is_unchanged(tmp_path: Path) -> Non
     assert result.status == "corrupt"
     assert result.findings == ("source_unreadable",)
     assert workbook.read_bytes() == before
+
+
+def test_failure_receipts_are_redacted_and_deterministic(tmp_path: Path) -> None:
+    config = _config(tmp_path)
+    config.exchange_root.mkdir()
+    pdf = config.exchange_root / "estado.pdf"
+    pdf.write_bytes(b"%PDF-1.7 private balance content")
+    unknown = config.exchange_root / "misterio.bin"
+    unknown.write_bytes(b"private bytes")
+
+    pdf_result = profile_source(config, pdf)
+    unknown_result = profile_source(config, unknown)
+
+    assert pdf_result.status == "provider_unavailable"
+    assert unknown_result.status == "unsupported"
+    pdf_json = render_ingestion_receipt_json(pdf_result)
+    assert pdf_json == render_ingestion_receipt_json(pdf_result)
+    assert render_ingestion_receipt_markdown(pdf_result).endswith("\n")
+    for receipt in (pdf_json, render_ingestion_receipt_markdown(pdf_result)):
+        assert str(tmp_path) not in receipt
+        assert "private balance content" not in receipt
+        assert "https://" not in receipt

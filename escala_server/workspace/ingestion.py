@@ -10,6 +10,7 @@ from __future__ import annotations
 import csv
 import hashlib
 import io
+import json
 import re
 import unicodedata
 import xml.etree.ElementTree as ET
@@ -526,3 +527,68 @@ def _field_kind(value: str) -> FieldKind | None:
     }:
         return "unit"
     return None
+
+
+def _receipt_payload(result: IngestionResult) -> dict[str, object]:
+    """Build a bounded receipt payload from non-sensitive result fields."""
+
+    return {
+        "schema_version": 1,
+        "status": result.status,
+        "identity": result.identity.model_dump(mode="json"),
+        "findings": tuple(sorted(set(result.findings))),
+        "questions": tuple(
+            question.model_dump(mode="json") for question in result.questions
+        ),
+        "profile": (
+            result.profile.model_dump(mode="json")
+            if result.profile is not None
+            else None
+        ),
+    }
+
+
+def render_ingestion_receipt_json(result: IngestionResult) -> str:
+    """Render deterministic JSON with relative provenance and no source data."""
+
+    return json.dumps(
+        _receipt_payload(result),
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+
+
+def render_ingestion_receipt_markdown(result: IngestionResult) -> str:
+    """Render the same bounded fields for a human-readable local receipt."""
+
+    lines = [
+        "# Source Ingestion Receipt",
+        "",
+        f"- status: {result.status}",
+        f"- relative_path: {result.identity.relative_path}",
+        f"- format: {result.identity.format}",
+        f"- content_sha256: {result.identity.content_sha256}",
+        f"- source_id: {result.identity.source_id}",
+        "",
+        "## Findings",
+    ]
+    lines.extend(f"- {finding}" for finding in sorted(set(result.findings)))
+    if not result.findings:
+        lines.append("- none")
+    lines.extend(["", "## Questions"])
+    if result.questions:
+        for question in result.questions:
+            lines.append(f"- {question.code}: {', '.join(question.options)}")
+    else:
+        lines.append("- none")
+    lines.extend(["", "## Tables"])
+    if result.profile is not None and result.profile.tables:
+        for table in result.profile.tables:
+            lines.append(
+                f"- table_{table.table_ordinal}: rows={table.row_count}, "
+                f"columns={table.column_count}"
+            )
+    else:
+        lines.append("- none")
+    return "\n".join(lines) + "\n"
