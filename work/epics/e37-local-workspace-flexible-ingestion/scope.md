@@ -1,7 +1,7 @@
 ---
 epic_id: "E37"
 title: "Local Workspace & Flexible Ingestion"
-status: "planned"
+status: "in_progress"
 created: "2026-07-22"
 mission: "escala-local-v2-plan-maestro-2607202112"
 ---
@@ -159,7 +159,7 @@ implementación del registry, siempre que cada commit mantenga el ciclo TDD.
 
 | Story | Size | Status | Actual | Velocity | Notes |
 |---|:---:|:---:|:---:|:---:|---|
-| S37.1 | M | pending | — | — | First risk: local authority and SQLite-sync rejection. |
+| S37.1 | M | complete | 17m02s | 1 M / 17m02s | Merged locally at `0d66f11` review + close gates; 12 focused tests, 858 full-suite passed / 2 skipped; requirements remain unproved until master receipts. |
 | S37.2 | L | pending | — | — | Registry, profiling, clarification and source identity. |
 | S37.3 | M | pending | — | — | Real inbox, idempotency, quarantine and safe receipts. |
 
@@ -181,7 +181,7 @@ implementación del registry, siempre que cada commit mantenga el ciclo TDD.
 
 | Story | Size | Status | Actual | Notes |
 |---|:---:|:---:|:---:|---|
-| S37.1 | M | pending | — | Autoridad local y rechazo de SQLite sincronizado. |
+| S37.1 | M | complete | 17m02s | Autoridad local y rechazo de SQLite sincronizado; close gates PASS, requisitos E37 todavía `unproved` en el ledger maestro. |
 | S37.2 | L | pending | — | Perfilado e ingestión flexible con aclaraciones. |
 | S37.3 | M | pending | — | Inbox idempotente, cuarentena y receipts seguros. |
 
