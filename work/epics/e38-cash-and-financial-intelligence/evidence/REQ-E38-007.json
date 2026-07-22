@@ -1,0 +1,14 @@
+{
+  "evidence": "Reporte HTML/Markdown/JSON local fue determinista y uso paths relativos.",
+  "fixture": "synthetic-nopal-foods",
+  "negative_cases": [
+    "mapping_ambiguous",
+    "formula_without_cached_value",
+    "stale_input",
+    "currency_mismatch",
+    "source_not_mutated"
+  ],
+  "requirement_id": "REQ-E38-007",
+  "schema_version": 1,
+  "status": "pass"
+}

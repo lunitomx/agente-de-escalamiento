@@ -20,6 +20,13 @@ e37-req-004 = "validators.e37_gates:E37RequirementGate004"
 e37-req-005 = "validators.e37_gates:E37RequirementGate005"
 e37-req-006 = "validators.e37_gates:E37RequirementGate006"
 e37-req-007 = "validators.e37_gates:E37RequirementGate007"
+e38-req-001 = "validators.e38_gates:E38RequirementGate001"
+e38-req-002 = "validators.e38_gates:E38RequirementGate002"
+e38-req-003 = "validators.e38_gates:E38RequirementGate003"
+e38-req-004 = "validators.e38_gates:E38RequirementGate004"
+e38-req-005 = "validators.e38_gates:E38RequirementGate005"
+e38-req-006 = "validators.e38_gates:E38RequirementGate006"
+e38-req-007 = "validators.e38_gates:E38RequirementGate007"
 
 [dependency-groups]
 dev = [

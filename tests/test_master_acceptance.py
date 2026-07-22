@@ -416,7 +416,13 @@ def test_canonical_master_acceptance_ledger_matches_approved_plan() -> None:
         for epic, owners in EXPECTED_OWNER_STORIES.items()
         for index, story_index in enumerate(owners, start=1)
     }
-    assert all(item.proof.state == "unproved" for item in ledger.requirements)
+    proved_ids = {
+        item.id for item in ledger.requirements if item.proof.state == "proved"
+    }
+    assert proved_ids == {
+        *(f"REQ-E37-{index:03d}" for index in range(1, 8)),
+        *(f"REQ-E38-{index:03d}" for index in range(1, 8)),
+    }
     assert all(
         [blocker.value for blocker in item.proof.blockers] == ["evidence.missing"]
         for item in ledger.requirements
@@ -453,10 +459,10 @@ def test_canonical_ledger_rendering_is_deterministic_and_matches_human_view() ->
     assert first_markdown == LEDGER_MARKDOWN_PATH.read_text(encoding="utf-8")
     assert first_markdown.count("| `REQ-E") == 42
     assert first_markdown.count(".receipt.json`") == 42
-    assert first_markdown.count("`evidence.missing`") == 42
+    assert first_markdown.count("`evidence.missing`") == 28
     assert "| Requirement | Owner | Sources | Acceptance |" in first_markdown
     assert "**Contract inventory:** 42 requirements across 6 epics." in first_markdown
-    assert "**Initial proof posture:** 0 proved, 42 unproved." in first_markdown
+    assert "**Initial proof posture:** 14 proved, 28 unproved." in first_markdown
     combined = first_json + first_markdown
     for forbidden in (str(ROOT), "https://", "S36-PRIVATE-SENTINEL"):
         assert forbidden not in combined
@@ -494,11 +500,14 @@ def test_canonical_baseline_receipt_is_pass_but_truthfully_unproved() -> None:
     assert receipt.epic_filter is None
     assert receipt.epic_count == 6
     assert receipt.requirement_count == 42
-    assert receipt.proved_count == 0
-    assert receipt.unproved_count == 42
-    assert receipt.proved_ids == []
+    assert receipt.proved_count == 14
+    assert receipt.unproved_count == 28
+    assert receipt.proved_ids == [
+        *(f"REQ-E37-{index:03d}" for index in range(1, 8)),
+        *(f"REQ-E38-{index:03d}" for index in range(1, 8)),
+    ]
     assert [item.requirement_id for item in receipt.blocking_requirements] == [
-        item.id for item in ledger.requirements
+        item.id for item in ledger.requirements if item.proof.state == "unproved"
     ]
     assert {item.rule_id for item in receipt.blocking_requirements} == {
         "evidence.missing"
@@ -712,9 +721,9 @@ def test_master_acceptance_cli_has_truthful_modes_and_one_safe_failure(
         capture_output=True,
         text=True,
     )
-    assert readiness.returncode == 2
+    assert readiness.returncode == 0
     assert readiness.stderr == ""
-    assert "Mission readiness: `unproved`" in readiness.stdout
+    assert "Mission readiness: `proved`" in readiness.stdout
     assert "Epic filter: `E37`" in readiness.stdout
 
     corrupt = tmp_path / "S36-PRIVATE-SENTINEL.yaml"
@@ -757,8 +766,9 @@ def test_versioned_real_baseline_matches_current_contract_semantics() -> None:
 
     assert baseline.contract_status is ContractStatus.PASS
     assert baseline.mission_readiness is MissionReadiness.UNPROVED
-    assert baseline.requirement_count == baseline.unproved_count == 42
-    assert baseline.proved_count == 0
+    assert baseline.requirement_count == 42
+    assert baseline.unproved_count == 28
+    assert baseline.proved_count == 14
     assert render_master_acceptance_receipt_json(baseline) == (
         BASELINE_JSON_PATH.read_text(encoding="utf-8")
     )

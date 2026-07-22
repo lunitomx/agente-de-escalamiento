@@ -1,0 +1,71 @@
+{
+  "architecture": {
+    "authoritative_sqlite_sync": "forbidden",
+    "data_authority": "installer_machine",
+    "runtime_authority": "installer_machine",
+    "team_exchange": "ordinary_filesystem_documents_only"
+  },
+  "checks": [
+    {
+      "evidence": "Perfiló workbook flexible por estructura, periodo, moneda, unidad y formulas.",
+      "id": "REQ-E38-001",
+      "status": "pass"
+    },
+    {
+      "evidence": "Mapping ambiguo genero pregunta ordinal y se resolvio solo tras respuesta.",
+      "id": "REQ-E38-002",
+      "status": "pass"
+    },
+    {
+      "evidence": "P&L, balance y cash-flow view se reconstruyeron con derivaciones explicitas.",
+      "id": "REQ-E38-003",
+      "status": "pass"
+    },
+    {
+      "evidence": "Figures conservaron source_id, workbook relativo, hoja, celda y transformation.",
+      "id": "REQ-E38-004",
+      "status": "pass"
+    },
+    {
+      "evidence": "CCC, Power-of-One y escenario price-plus-one compartieron inputs y assumptions.",
+      "id": "REQ-E38-005",
+      "status": "pass"
+    },
+    {
+      "evidence": "Caso stale quedo blocked y sin recommendations.",
+      "id": "REQ-E38-006",
+      "status": "pass"
+    },
+    {
+      "evidence": "Reporte HTML/Markdown/JSON local fue determinista y uso paths relativos.",
+      "id": "REQ-E38-007",
+      "status": "pass"
+    }
+  ],
+  "company_fixture": "synthetic-nopal-foods",
+  "epic": "E38",
+  "negative_cases": [
+    "mapping_ambiguous",
+    "formula_without_cached_value",
+    "stale_input",
+    "currency_mismatch",
+    "source_not_mutated"
+  ],
+  "requirements_proved": [
+    "REQ-E38-001",
+    "REQ-E38-002",
+    "REQ-E38-003",
+    "REQ-E38-004",
+    "REQ-E38-005",
+    "REQ-E38-006",
+    "REQ-E38-007"
+  ],
+  "schema_version": 1,
+  "status": "pass",
+  "verification_commands": [
+    "uv run rai gate check gate-tests --scope tests/test_e38_financial_intelligence.py",
+    "uv run rai gate check gate-lint",
+    "uv run rai gate check gate-format",
+    "uv run rai gate check gate-types"
+  ]
+}

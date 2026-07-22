@@ -1,0 +1,14 @@
+{
+  "evidence": "P&L, balance y cash-flow view se reconstruyeron con derivaciones explicitas.",
+  "fixture": "synthetic-nopal-foods",
+  "negative_cases": [
+    "mapping_ambiguous",
+    "formula_without_cached_value",
+    "stale_input",
+    "currency_mismatch",
+    "source_not_mutated"
+  ],
+  "requirement_id": "REQ-E38-003",
+  "schema_version": 1,
+  "status": "pass"
+}

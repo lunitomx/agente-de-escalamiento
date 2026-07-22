@@ -1,0 +1,36 @@
+{
+  "artifact_sha256": "2e0bd4580e78194db72e907960e54e8a87c560972b003557a2d91cb014b53ad7",
+  "command_sha256": "922cafbd362859169130762e1e26cd7265bcf886ed55cebe5c7880da2304f8d5",
+  "declaration_sha256": "81a93d864c55b9360e17713353e04af7dd7b501e5dc4272e7afa7eb9598c50ff",
+  "gate_results": [
+    {
+      "id": "gate-format",
+      "status": "pass"
+    },
+    {
+      "id": "gate-lint",
+      "status": "pass"
+    },
+    {
+      "id": "gate-req-e38-006",
+      "status": "pass"
+    },
+    {
+      "id": "gate-tests",
+      "status": "pass"
+    },
+    {
+      "id": "gate-types",
+      "status": "pass"
+    }
+  ],
+  "ledger_sha256": "1dbe5c06bdba1488dfeccabd95e99e2936977cd6b1759fb66fd66851a364b8c9",
+  "platforms": [
+    "macos",
+    "windows"
+  ],
+  "requirement_id": "REQ-E38-006",
+  "result": "pass",
+  "schema_version": 1,
+  "source_commit": "14bd0777881b502efe30971400289e7c912bd2de"
+}

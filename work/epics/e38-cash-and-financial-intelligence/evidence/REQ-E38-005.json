@@ -1,0 +1,14 @@
+{
+  "evidence": "CCC, Power-of-One y escenario price-plus-one compartieron inputs y assumptions.",
+  "fixture": "synthetic-nopal-foods",
+  "negative_cases": [
+    "mapping_ambiguous",
+    "formula_without_cached_value",
+    "stale_input",
+    "currency_mismatch",
+    "source_not_mutated"
+  ],
+  "requirement_id": "REQ-E38-005",
+  "schema_version": 1,
+  "status": "pass"
+}
