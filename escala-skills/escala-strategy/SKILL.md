@@ -55,4 +55,3 @@ Siempre conectar: "La estrategia debe caber en una página. Si no puedes explica
 | Next | Skill específico de Strategy |
 
 ---
-*Esta herramienta está inspirada en los 7 Estratos de Estrategia, desarrollados por Verne Harnish. Ver [ATTRIBUTIONS.md](../ATTRIBUTIONS.md) para la referencia completa.*

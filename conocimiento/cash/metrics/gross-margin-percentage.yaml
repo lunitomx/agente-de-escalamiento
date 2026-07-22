@@ -10,10 +10,6 @@ summary: >
   pricing decision, cost reduction, and product mix change affects GM%. Growing
   companies must protect GM% as they scale — operational efficiency gains should
   flow to the bottom line, not be consumed by revenue growth costs.
-source:
-  book_chapter: "SCALING UP CASH"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 1627
 relationships:
   - type: belongs-to
     target: decision-cash

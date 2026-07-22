@@ -1,5 +1,5 @@
 /**
- * ScaleUp Context Panel — Knowledge sidebar for dashboards
+ * ESCALA Context Panel — Knowledge sidebar for dashboards
  *
  * Auto-detects dashboard category from URL path and fetches
  * relevant context from the knowledge graph API.
@@ -35,7 +35,7 @@
     influencers: 'execution',
     'meeting-rhythms': 'execution',
     priorities: 'execution',
-    'rockefeller-habits': 'execution',
+    'execution-habits': 'execution',
     'vision-summary': 'execution',
     www: 'execution',
   };
@@ -64,7 +64,7 @@
     panel.className = 'collapsed'; // Start collapsed by default
     panel.innerHTML =
       '<div class="context-panel-header">' +
-        '<h3>📘 Contexto de Scaling Up</h3>' +
+        '<h3>📘 Contexto operativo</h3>' +
         '<div class="context-category" id="context-category"></div>' +
       '</div>' +
       '<div class="context-panel-body" id="context-panel-body">' +
@@ -75,7 +75,7 @@
     toggle.id = 'context-panel-toggle';
     toggle.className = 'context-panel-toggle';
     toggle.textContent = '📘';
-    toggle.title = 'Abrir contexto de Scaling Up';
+    toggle.title = 'Abrir contexto operativo';
     toggle.addEventListener('click', function () {
       var isCollapsed = panel.classList.toggle('collapsed');
       toggle.textContent = isCollapsed ? '📘' : '✕';

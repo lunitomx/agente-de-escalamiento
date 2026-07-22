@@ -9,10 +9,6 @@ summary: >
   collection inefficiency, customer financial stress, or invoicing delays. Every
   1-day reduction in DSO frees working capital equal to 1 day of revenue. Tracked
   via the Power of One worksheet — DSO is lever 5 of the 7 financial levers.
-source:
-  book_chapter: "SCALING UP CASH"
-  file: "metodologias_parsed/cash_workbook.txt"
-  file_line: 963
 relationships:
   - type: belongs-to
     target: decision-cash

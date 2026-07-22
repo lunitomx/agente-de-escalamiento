@@ -7,13 +7,6 @@ summary: >
   Maps the complete cash cycle from the moment you spend a dollar to the moment
   you get it back. Breaks down into three sub-cycles: sales cycle, make/production
   cycle, and delivery/collection cycle. Measured in days.
-source:
-  book_chapter: "Cash Conversion Cycle (CCC)"
-  book_line: 5960
-  file: "scaling_up_llamaparse.txt"
-  file_line: 5960
-  workbook_file: "metodologias_parsed/cash_workbook.txt"
-  workbook_line: 608
 relationships:
   - type: belongs-to
     target: decision-cash

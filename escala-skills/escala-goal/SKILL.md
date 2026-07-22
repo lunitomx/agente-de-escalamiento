@@ -64,4 +64,3 @@ Filtro activo: toda recomendación se evalúa contra esta meta.
 | Filter | Active in all coaching skills |
 
 ---
-*Esta herramienta está inspirada en el marco de metas SMART, desarrollado por George T. Doran. Ver [ATTRIBUTIONS.md](../ATTRIBUTIONS.md) para la referencia completa.*

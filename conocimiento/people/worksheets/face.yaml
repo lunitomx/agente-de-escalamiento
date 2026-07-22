@@ -9,9 +9,6 @@ summary: >
   per function. Complete by taking the P&L, Balance Sheet, and Cash Flow statement
   and assigning a person to each line — then derive the appropriate results/outcomes
   for each function.
-source:
-  file: "metodologias_parsed/people_workbook.txt"
-  file_line: 1217
 relationships:
   - type: belongs-to
     target: decision-people

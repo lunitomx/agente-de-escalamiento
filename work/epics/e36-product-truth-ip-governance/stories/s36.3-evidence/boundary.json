@@ -1,0 +1,1620 @@
+{
+  "baseline": {
+    "baseline_sha256": "3ae688c34b8cb13dcf96bd72198aeee6e4eace0a432b413cc654d1c279943dce",
+    "policy_sha256": "7eec173c0b2a132b15a3a1dfda8cfdeeac36e27621a1bf5a70a0fe37b61c7b0c",
+    "raw_surface_states": {
+      "git_head": "present",
+      "git_history": "historical",
+      "worktree": "absent"
+    },
+    "scan_status": "complete",
+    "verifier_source_commit": "e863f781600a99c476e0f1182ddcc8552983b7e3"
+  },
+  "errors": [],
+  "finding_groups": [
+    {
+      "code": "prohibited_text",
+      "count": 16,
+      "rule_id": "public.author_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_path",
+      "count": 2,
+      "rule_id": "public.execution_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "count": 8,
+      "rule_id": "public.execution_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "count": 86,
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "count": 78,
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "count": 19,
+      "rule_id": "public.source_attribution",
+      "surface": "public_candidate_head"
+    }
+  ],
+  "findings": [
+    {
+      "code": "prohibited_text",
+      "locator": "ATTRIBUTIONS.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.author_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "CODEX.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.author_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-cash-acceleration/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.author_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-cash-power1/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.author_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-cash/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.author_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-close-capture/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.author_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-execution-habits/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.author_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-execution/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.author_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-people-fac/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.author_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-people-values/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.author_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-people/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.author_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-pulse/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.author_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-strategy-7strata/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.author_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-strategy-opsp/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.author_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-strategy-swot/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.author_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-strategy/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.author_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_path",
+      "locator": "315db007a6894be7b6fb2b52d608c6f6780360c36909d70fbba6e6abca87772e",
+      "locator_kind": "sha256",
+      "rule_id": "public.execution_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_path",
+      "locator": "50a3f71cf1a121f04d8aec7dec98c603343a4dbeb4bf12d2f42900bc9e80b2e0",
+      "locator_kind": "sha256",
+      "rule_id": "public.execution_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "ATTRIBUTIONS.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.execution_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "CODEX.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.execution_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/decisions/execution.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.execution_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/execution/metrics/meeting-health-score.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.execution_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/ontology/schema.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.execution_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/registry/worksheets.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.execution_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "315db007a6894be7b6fb2b52d608c6f6780360c36909d70fbba6e6abca87772e",
+      "locator_kind": "sha256",
+      "rule_id": "public.execution_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "50a3f71cf1a121f04d8aec7dec98c603343a4dbeb4bf12d2f42900bc9e80b2e0",
+      "locator_kind": "sha256",
+      "rule_id": "public.execution_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "ATTRIBUTIONS.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "CODEX.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "coaching/progress/__init__.py",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "coaching/progress/formatter.py",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "coaching/router/__init__.py",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "coaching/router/engine.py",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "coaching/summary/formatter.py",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "coaching/welcome/__init__.py",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "coaching/welcome/engine.py",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "coaching/welcome/formatter.py",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "coaching/worksheet/__init__.py",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conftest.py",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/cash/concepts/cash-acceleration.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/cash/concepts/ccc.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/cash/concepts/gross-margin.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/cash/concepts/revenue-per-employee.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/cash/concepts/working-capital.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/cash/metrics/ccc-days.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/cash/metrics/days-sales-outstanding.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/cash/metrics/gross-margin-percentage.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/cash/metrics/revenue-per-employee.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/cash/tools/ar-optimization.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/cash/tools/ccc-analysis.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/cash/tools/power-of-one.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/cash/tools/pricing-lever.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/cash/tools/simple-numbers.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/cash/worksheets/cash-flow-forecast.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/cash/worksheets/ccc-worksheet.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/decisions/cash.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/decisions/execution.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/decisions/people.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/decisions/strategy.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/execution/concepts/leading-indicators.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/execution/concepts/meeting-rhythm.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/execution/concepts/priorities-rocks.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/execution/concepts/quarterly-theme.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/execution/metrics/meeting-health-score.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/execution/metrics/rock-completion-rate.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/execution/tools/annual-planning.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/execution/tools/daily-huddle.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/execution/tools/scoreboard.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/execution/tools/weekly-meeting.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/execution/worksheets/meeting-agenda.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/ontology/node-types.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/ontology/schema.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/people/concepts/disc-assessment.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/people/concepts/employee-engagement.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/people/concepts/right-people-right-seats.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/people/metrics/employee-satisfaction.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/people/metrics/rehire-rate.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/people/metrics/role-fit-score.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/people/tools/face.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/people/tools/five-manager-activities.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/people/tools/oppp.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/people/tools/pace.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/people/tools/topgrading.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/people/worksheets/oppp.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/registry/worksheets.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/retrieval.py",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/strategy/concepts/bhag.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/strategy/concepts/brand-promise.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/strategy/concepts/core-customer.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/strategy/concepts/core-purpose.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/strategy/metrics/brand-promise-kept-rate.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/strategy/metrics/profit-per-x-value.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/strategy/metrics/revenue-growth-rate.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/strategy/tools/7-strata.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/strategy/tools/opsp.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/strategy/tools/profit-per-x.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/strategy/tools/swt.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/strategy/tools/x-factor.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/strategy/worksheets/7-strata.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/strategy/worksheets/opsp.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "conocimiento/strategy/worksheets/swt.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-start-load-profile/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "validators/dashboard.py",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "validators/diagnose.py",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "validators/export.py",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "validators/memory.py",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "validators/progress.py",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "validators/pulse.py",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "validators/session.py",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "validators/summary_validator.py",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "validators/welcome.py",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "validators/worksheet.py",
+      "locator_kind": "relative_path",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "e1f385d1efe536957b4cffe15ffa039c97550072b726a4d381a9374c61fb7059",
+      "locator_kind": "sha256",
+      "rule_id": "public.product_identity",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/cash/concepts/cash-acceleration.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/cash/concepts/ccc.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/cash/concepts/gross-margin.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/cash/concepts/revenue-per-employee.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/cash/concepts/working-capital.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/cash/metrics/ccc-days.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/cash/metrics/days-sales-outstanding.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/cash/metrics/gross-margin-percentage.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/cash/metrics/revenue-per-employee.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/cash/tools/ar-optimization.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/cash/tools/ccc-analysis.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/cash/tools/power-of-one.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/cash/tools/pricing-lever.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/cash/tools/simple-numbers.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/cash/worksheets/cash-flow-forecast.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/cash/worksheets/ccc-worksheet.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/cash/worksheets/power-of-one.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/decisions/cash.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/decisions/execution.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/decisions/people.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/decisions/strategy.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/execution/concepts/critical-number.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/execution/concepts/leading-indicators.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/execution/concepts/meeting-rhythm.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/execution/concepts/priorities-rocks.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/execution/concepts/quarterly-theme.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/execution/metrics/critical-number-value.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/execution/metrics/meeting-health-score.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/execution/metrics/rock-completion-rate.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/execution/tools/annual-planning.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/execution/tools/daily-huddle.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/execution/tools/quarterly-planning.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/execution/tools/scoreboard.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/execution/tools/weekly-meeting.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/execution/worksheets/kpi-development.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/execution/worksheets/meeting-agenda.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/execution/worksheets/quarterly-priorities.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/people/concepts/core-values.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/people/concepts/culture.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/people/concepts/disc-assessment.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/people/concepts/employee-engagement.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/people/concepts/love-loathe.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/people/concepts/right-people-right-seats.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/people/metrics/employee-satisfaction.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/people/metrics/rehire-rate.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/people/metrics/role-fit-score.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/people/metrics/values-alignment-score.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/people/tools/face.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/people/tools/five-manager-activities.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/people/tools/oppp.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/people/tools/pace.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/people/tools/team-assessment.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/people/tools/topgrading.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/people/worksheets/face.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/people/worksheets/love-loathe.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/people/worksheets/oppp.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/people/worksheets/team-growth.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/stages/growth.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/strategy/concepts/bhag.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/strategy/concepts/brand-promise.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/strategy/concepts/core-customer.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/strategy/concepts/core-purpose.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/strategy/concepts/differentiating-activities.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/strategy/metrics/brand-promise-kept-rate.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/strategy/metrics/profit-per-x-value.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/strategy/metrics/revenue-growth-rate.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/strategy/tools/7-strata.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/strategy/tools/opsp.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/strategy/tools/profit-per-x.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/strategy/tools/sandbox.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/strategy/tools/swt.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/strategy/tools/x-factor.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/strategy/worksheets/7-strata.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/strategy/worksheets/core-customer.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/strategy/worksheets/opsp.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "conocimiento/strategy/worksheets/swt.yaml",
+      "locator_kind": "relative_path",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "16fae94535276203b07e82e4838cf14b6ab4a344c425e98995d92697af8a7876",
+      "locator_kind": "sha256",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_yaml_key",
+      "locator": "73654903a1802c4d99780363799d6503a829ef7bcb69a6a284690269e756663a",
+      "locator_kind": "sha256",
+      "rule_id": "public.provenance",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "LICENSE",
+      "locator_kind": "relative_path",
+      "rule_id": "public.source_attribution",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "README.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.source_attribution",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-cash-acceleration/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.source_attribution",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-cash-ccc/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.source_attribution",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-cash-power1/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.source_attribution",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-cash/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.source_attribution",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-close-capture/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.source_attribution",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-execution-habits/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.source_attribution",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-execution/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.source_attribution",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-goal/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.source_attribution",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-people-fac/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.source_attribution",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-people-topgrading/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.source_attribution",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-people-values/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.source_attribution",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-people/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.source_attribution",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-pulse/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.source_attribution",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-strategy-7strata/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.source_attribution",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-strategy-opsp/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.source_attribution",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-strategy-swot/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.source_attribution",
+      "surface": "public_candidate_head"
+    },
+    {
+      "code": "prohibited_text",
+      "locator": "escala-skills/escala-strategy/SKILL.md",
+      "locator_kind": "relative_path",
+      "rule_id": "public.source_attribution",
+      "surface": "public_candidate_head"
+    }
+  ],
+  "path_summary": {
+    "candidate_public_count": 285,
+    "candidate_public_set_sha256": "05ef611554dc8d02680642fd8be44bc5905bb4eeda9a4d44c5a6649ce45187ba",
+    "denied_count": 829,
+    "denied_set_sha256": "d4031ef2a40aa9bf590bde42c97066aae9a9dc119970e3ca80f6cdc4f53d7927",
+    "not_eligible_count": 66,
+    "not_eligible_set_sha256": "8b43daa1b5a06c7ca64d653576ad3e76ee4f0534505fe94d7d373208f930df68"
+  },
+  "policy_sha256": "2fff50579bbbd4684a114bdb08739b5fbe8f9258c2ec1582782fec14ef810412",
+  "private_repository": {
+    "after": {
+      "branch": "story/s36.3/reference-removal-public-vocabulary",
+      "config_sha256": "1471c4457ec319268d20985b6181b185c673c049098658be5fa2c59f0462dc2f",
+      "dirty_entry_count": 0,
+      "head": "44ddf72f55e4dc9b6601e968045f8c25179f738c",
+      "index_sha256": "29eb7d6b79c752e4e9e6772bfe48bc6fad9d5943324c6ea629505c435bb6f3af",
+      "label": "private_repository",
+      "refs_sha256": "8c3c69e6e69aedbf19c0dafe037affe5bfd65dcd31a9050b54a7b09d21bc70a1",
+      "schema_version": 1,
+      "status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "worktree_sha256": "da273799aea09252b7a72c4ce5e63c03ea8b413dc8a2ca67dc3dcc1742e653dd"
+    },
+    "before": {
+      "branch": "story/s36.3/reference-removal-public-vocabulary",
+      "config_sha256": "1471c4457ec319268d20985b6181b185c673c049098658be5fa2c59f0462dc2f",
+      "dirty_entry_count": 0,
+      "head": "44ddf72f55e4dc9b6601e968045f8c25179f738c",
+      "index_sha256": "29eb7d6b79c752e4e9e6772bfe48bc6fad9d5943324c6ea629505c435bb6f3af",
+      "label": "private_repository",
+      "refs_sha256": "8c3c69e6e69aedbf19c0dafe037affe5bfd65dcd31a9050b54a7b09d21bc70a1",
+      "schema_version": 1,
+      "status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "worktree_sha256": "da273799aea09252b7a72c4ce5e63c03ea8b413dc8a2ca67dc3dcc1742e653dd"
+    },
+    "unchanged": true
+  },
+  "public_candidate": {
+    "after": {
+      "branch": "main",
+      "config_sha256": "35da478707037efd1d45f3d62b7c5bf24d6c217a3a35077caa68be748b9e268c",
+      "dirty_entry_count": 17,
+      "head": "7e62accc7a4df009b8a68abf0bb178ad02c963f0",
+      "index_sha256": "c1c4c25e3c87868433331c1416fbaa2059d4c156d9d6c669fda5e5e1e0a8ebfd",
+      "label": "public_candidate",
+      "refs_sha256": "e3eb68d7fd9aca228fc53d3b467d38fcef69f0bdf0839e177219f7f1de53f24e",
+      "schema_version": 1,
+      "status_sha256": "7de1ccaa65300cc786cc4215cb83c3447d6436c78340be9113b66a94c908f94b",
+      "worktree_sha256": "900d14d780d178c44369fb7b749a37c5481fa3f69c140392808ad1bb86cc4a53"
+    },
+    "before": {
+      "branch": "main",
+      "config_sha256": "35da478707037efd1d45f3d62b7c5bf24d6c217a3a35077caa68be748b9e268c",
+      "dirty_entry_count": 17,
+      "head": "7e62accc7a4df009b8a68abf0bb178ad02c963f0",
+      "index_sha256": "c1c4c25e3c87868433331c1416fbaa2059d4c156d9d6c669fda5e5e1e0a8ebfd",
+      "label": "public_candidate",
+      "refs_sha256": "e3eb68d7fd9aca228fc53d3b467d38fcef69f0bdf0839e177219f7f1de53f24e",
+      "schema_version": 1,
+      "status_sha256": "7de1ccaa65300cc786cc4215cb83c3447d6436c78340be9113b66a94c908f94b",
+      "worktree_sha256": "900d14d780d178c44369fb7b749a37c5481fa3f69c140392808ad1bb86cc4a53"
+    },
+    "unchanged": true
+  },
+  "public_candidate_finding_count": 209,
+  "public_candidate_status": "legacy_findings_unresolved",
+  "raw_asset": {
+    "git_head": "absent",
+    "git_history": "historical",
+    "worktree": "absent"
+  },
+  "schema_version": 1,
+  "status": "pass",
+  "surfaces": [
+    {
+      "candidate_public_count": 285,
+      "inspected": true,
+      "surface": "private_worktree",
+      "tracked_count": 1180,
+      "unscanned_required_count": 0
+    },
+    {
+      "candidate_public_count": 285,
+      "inspected": true,
+      "surface": "private_head",
+      "tracked_count": 1180,
+      "unscanned_required_count": 0
+    },
+    {
+      "candidate_public_count": 0,
+      "inspected": true,
+      "surface": "private_history",
+      "tracked_count": 1324,
+      "unscanned_required_count": 0
+    },
+    {
+      "candidate_public_count": 173,
+      "inspected": true,
+      "surface": "public_candidate_head",
+      "tracked_count": 173,
+      "unscanned_required_count": 0
+    }
+  ],
+  "verifier_source_commit": "44ddf72f55e4dc9b6601e968045f8c25179f738c"
+}

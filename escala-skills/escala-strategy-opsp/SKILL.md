@@ -92,4 +92,3 @@ Plan Estratégico de Una Página (OPSP) guardado. Todas las secciones completada
 - [ ] El Plan Estratégico de Una Página (OPSP) completo cabe en una página conceptualmente
 
 ---
-*Esta herramienta está inspirada en el Plan Estratégico de Una Página (OPSP), desarrollado por Verne Harnish. Ver [ATTRIBUTIONS.md](../ATTRIBUTIONS.md) para la referencia completa.*

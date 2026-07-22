@@ -1,0 +1,114 @@
+schema_version: 1
+max_text_bytes: 1048576
+default_disposition: not_eligible
+precedence:
+  - denied
+  - candidate_public
+baseline:
+  locator: work/epics/e36-product-truth-ip-governance/stories/s36.2-evidence/baseline.json
+  sha256: 3ae688c34b8cb13dcf96bd72198aeee6e4eace0a432b413cc654d1c279943dce
+  scan_status: complete
+  policy_sha256: 7eec173c0b2a132b15a3a1dfda8cfdeeac36e27621a1bf5a70a0fe37b61c7b0c
+  verifier_source_commit: e863f781600a99c476e0f1182ddcc8552983b7e3
+  raw_rule_id: reference.raw_asset
+  raw_surface_states:
+    worktree: absent
+    git_head: present
+    git_history: historical
+path_rules:
+  - id: deny.raw_reference
+    disposition: denied
+    deny_class: raw
+    globs:
+      - "Verne Harnish - Scaling Up_ How a Few Companies Make It...and Why the Rest Don't (Rockefeller Habits 2.0)-Gazelles, Inc. (2014).pdf"
+  - id: deny.derived_reference
+    disposition: denied
+    deny_class: derived
+    globs:
+      - ATTRIBUTIONS.md
+      - escala_server/data/**
+      - metodologias_parsed/**
+      - miembro-board/**
+      - scaling_up_llamaparse.md
+      - scaling_up_llamaparse.txt
+  - id: deny.private_state
+    disposition: denied
+    deny_class: private
+    globs:
+      - .scaleup/agent/memory/**
+      - .scaleup/my-company/**
+  - id: deny.internal_control_plane
+    disposition: denied
+    deny_class: internal
+    globs:
+      - .agents/**
+      - .claude/**
+      - .raise/**
+      - .scaleup/agent/identity/**
+      - .scaleup/agent/sub-agents/**
+      - .scaleup/agent/validators/**
+      - .scaleup/coaching/**
+      - .scaleup/knowledge/**
+      - AGENTS.md
+      - CLAUDE.md
+      - CODEX.md
+      - HERMES.md
+      - escala-agent/**
+      - governance/**
+      - tests/**
+      - validators/epic_closure.py
+      - validators/pipeline_runner.py
+      - validators/pipelines.py
+      - work/**
+  - id: canary.product_entry
+    disposition: candidate_public
+    deny_class: null
+    globs:
+      - LICENSE
+      - README.md
+      - install.sh
+      - uninstall.sh
+      - update.sh
+  - id: canary.product_source
+    disposition: candidate_public
+    deny_class: null
+    globs:
+      - coaching/**
+      - conocimiento/**
+      - escala-skills/**
+      - escala_server/**
+      - scripts/**
+      - templates/**
+      - validators/**
+vocabulary_rules:
+  - id: public.product_identity
+    targets: [path, text]
+    terms:
+      - ScaleUp
+      - Scaling Up
+      - scaling_up
+  - id: public.author_identity
+    targets: [path, text]
+    terms:
+      - Verne
+      - Verne Harnish
+      - VerneHandler
+      - verne_handler
+  - id: public.company_identity
+    targets: [path, text]
+    terms:
+      - Gazelles
+  - id: public.execution_identity
+    targets: [path, text]
+    terms:
+      - Rockefeller Habits
+      - rockefeller-habits
+      - rockefeller_habits
+  - id: public.source_attribution
+    targets: [text]
+    terms:
+      - ATTRIBUTIONS.md
+      - derived from Scaling Up
+      - inspired by Scaling Up
+forbidden_yaml_root_keys:
+  - source

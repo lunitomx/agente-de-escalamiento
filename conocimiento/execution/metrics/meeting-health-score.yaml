@@ -7,20 +7,16 @@ summary: >
   A composite score measuring the quality and consistency of the meeting rhythm.
   Assessed via a brief end-of-meeting feedback round (1-5 scale): Did we start on time?
   Did we cover the right topics? Did we end with clear actions? Are we making better
-  decisions faster? Scaling Up suggests taking 3 minutes at the end of each weekly
-  meeting to rate the meeting and identify one improvement for next week. Trending
+  decisions faster? Reserve 3 minutes at the end of each weekly meeting to rate the
+  meeting and identify one improvement for next week. Trending
   upward scores indicate a maturing execution culture.
-source:
-  book_chapter: "THE MEETING RHYTHM"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 910
 relationships:
   - type: belongs-to
     target: decision-execution
   - type: measured-by
-    target: tool-rockefeller-habits
+    target: tool-execution-habits
 tags: [execution, metric, meetings, health, rhythm, improvement]
 metadata:
   unit: score (1-5)
   direction: higher_better
-  benchmark: "4+ is healthy; below 3 signals meeting structure needs redesign, not just discipline"
+  benchmark: "Use the team's documented target and inspect the trend over time"

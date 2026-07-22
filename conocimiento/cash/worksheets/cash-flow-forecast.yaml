@@ -9,10 +9,6 @@ summary: >
   be accurate and long enough to catch a cash crisis before it hits. Updated weekly —
   the act of updating forces awareness of upcoming large payments and collection gaps.
   Companies that run 13-week forecasts never get blindsided by cash shortfalls.
-source:
-  book_chapter: "SCALING UP CASH"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 8286
 relationships:
   - type: belongs-to
     target: decision-cash

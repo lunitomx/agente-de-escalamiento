@@ -9,9 +9,6 @@ summary: >
   members, regular one-on-one coaching, and ongoing learning and development. The average
   score per area surfaces the biggest gap. The worksheet then prompts a quarterly priority
   to address the weakest area with a specific, concrete action.
-source:
-  file: "metodologias_parsed/people_workbook.txt"
-  file_line: 1837
 relationships:
   - type: belongs-to
     target: decision-people

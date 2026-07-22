@@ -7,9 +7,6 @@ summary: >
   The quarterly planning template for setting the Critical Number, 3-5 company Rocks,
   and Quarterly Theme. Also captures the prior quarter's Rock completion review. Output
   feeds the OPSP quarterly columns and cascades to team and individual Rock worksheets.
-source:
-  file: "metodologias_parsed/execution_workbook.txt"
-  file_line: 869
 relationships:
   - type: belongs-to
     target: decision-execution

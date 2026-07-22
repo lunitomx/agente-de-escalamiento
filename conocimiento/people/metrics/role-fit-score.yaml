@@ -9,10 +9,6 @@ summary: >
   assessment and OPPP alignment. The right seat is not just competency — it is energized
   competency. Low role fit scores predict disengagement and eventual attrition even among
   values-aligned employees.
-source:
-  book_chapter: "THE TEAM"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 667
 relationships:
   - type: belongs-to
     target: decision-people

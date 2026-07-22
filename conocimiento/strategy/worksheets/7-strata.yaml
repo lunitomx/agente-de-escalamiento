@@ -9,9 +9,6 @@ summary: >
   includes the stratum description, examples, and blank fields to complete.
   Completing this worksheet reveals whether the strategy is genuinely differentiated
   or derivative. The output feeds directly into OPSP columns 2-3.
-source:
-  file: "scaling_up_llamaparse.txt"
-  file_line: 3755
 relationships:
   - type: belongs-to
     target: decision-strategy

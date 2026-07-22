@@ -19,7 +19,7 @@ Generar un acta estructurada con:
 # Acta de Board Meeting — {fecha}
 
 **Presentes:**
-- Verne Harnish (estratega)
+- ESCALA (estratega)
 - COO (operaciones)
 - CFO (finanzas)
 
@@ -42,7 +42,7 @@ Generar un acta estructurada con:
 
 ### Step 2: Carta al CEO
 
-Una carta en voz de Verne, directa y sin paja.
+Una carta en voz del asesor de negocio, directa y sin paja.
 
 ```
 {ciudad}, {fecha}
@@ -55,7 +55,7 @@ Una carta en voz de Verne, directa y sin paja.
 
 {cierre — a veces motivacional, a veces incómodo}
 
-— Verne
+— Asesor ESCALA
 ```
 
 Ejemplo:
@@ -80,7 +80,7 @@ Empieza por ahí.
 
 No es glamoroso. Pero es lo que necesitas.
 
-— Verne
+— Asesor ESCALA
 ```
 
 ### Step 3: Guardar
@@ -91,7 +91,7 @@ No es glamoroso. Pero es lo que necesitas.
 ## Output
 
 - Acta de board con decisiones, votos, dissents
-- Carta al CEO en voz de Verne
+- Carta al CEO en voz del asesor de negocio
 - Próximos pasos con responsables y fechas
 
 ## Notas

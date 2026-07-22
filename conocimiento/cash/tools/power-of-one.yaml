@@ -11,12 +11,6 @@ summary: >
   in the specific business. Almost always, a 1% price increase has 5-10x more impact
   than a 1% increase in volume — because volume growth consumes cash while price
   improvement does not.
-source:
-  book_chapter: "THE POWER OF ONE"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 1042
-  workbook_file: "metodologias_parsed/cash_workbook.txt"
-  workbook_line: 838
 relationships:
   - type: belongs-to
     target: decision-cash

@@ -44,7 +44,8 @@ Evaluar qué herramientas ya se han completado.
 
 Adaptar la guía al tamaño y contexto de la empresa. Una startup de 15 personas necesita algo diferente que una empresa de 200.
 
-Siempre conectar con el "por qué" del libro: sin las personas correctas, la estrategia y ejecución no funcionan.
+Siempre conectar con el porqué operativo: sin las personas correctas, la
+estrategia y la ejecución no funcionan.
 
 ## Output
 
@@ -54,4 +55,3 @@ Siempre conectar con el "por qué" del libro: sin las personas correctas, la est
 | Next | Skill específico de People |
 
 ---
-*Esta herramienta está inspirada en el Mapa de Funciones y Responsabilidades, desarrollado por Verne Harnish. Ver [ATTRIBUTIONS.md](../ATTRIBUTIONS.md) para la referencia completa.*

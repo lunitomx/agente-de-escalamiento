@@ -42,4 +42,3 @@ Guardar en `work/strategy/7-strata.md`.
 | Next | `/escala-strategy-opsp` (para integrar al Plan Estratégico de Una Página (OPSP)) |
 
 ---
-*Esta herramienta está inspirada en los 7 Estratos de Estrategia, desarrollados por Verne Harnish. Ver [ATTRIBUTIONS.md](../ATTRIBUTIONS.md) para la referencia completa.*

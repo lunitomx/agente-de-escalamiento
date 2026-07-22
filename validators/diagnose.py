@@ -31,7 +31,7 @@ def validate_diagnosis_scores(
 
     scores = data.get("scores", {}) if isinstance(data, dict) else {}
     if not scores:
-        return ["No scores found in profile. Run /scaleup-diagnose first."]
+        return ["No scores found in profile. Run /escala-diagnose first."]
 
     for dec in required_decisions:
         score = scores.get(dec)
@@ -55,7 +55,7 @@ if __name__ == "__main__":
     path = (
         Path(sys.argv[1])
         if len(sys.argv) > 1
-        else Path(".scaleup/agent/memory/company-profile.yaml")
+        else Path(".escala/agent/memory/company-profile.yaml")
     )
     errors = validate_diagnosis_scores(path)
     if errors:

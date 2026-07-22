@@ -8,10 +8,10 @@ from pathlib import Path
 PRIORITY_ORDER = ["people", "strategy", "execution", "cash"]
 
 SUB_AGENT_COMMANDS = {
-    "people": "/scaleup-people",
-    "strategy": "/scaleup-strategy",
-    "execution": "/scaleup-execution",
-    "cash": "/scaleup-cash",
+    "people": "/escala-people",
+    "strategy": "/escala-strategy",
+    "execution": "/escala-execution",
+    "cash": "/escala-cash",
 }
 
 SUB_AGENT_LABELS = {
@@ -48,7 +48,7 @@ def run(context: dict) -> dict:
     base = Path(context.get("base_path", "."))
     action = context.get("action", "route")
 
-    profile_path = base / ".scaleup" / "agent" / "memory" / "company-profile.yaml"
+    profile_path = base / ".escala" / "agent" / "memory" / "company-profile.yaml"
     profile = read_yaml(profile_path)
     scores = context.get("scores", profile.get("scores", {}))
 
@@ -68,7 +68,7 @@ def run(context: dict) -> dict:
             [
                 "",
                 "Para ir a un sub-agente específico, usa su comando directamente.",
-                "O corre `/scaleup-diagnose` para que el router decida por ti.",
+                "O corre `/escala-diagnose` para que el router decida por ti.",
             ]
         )
         return {
@@ -83,7 +83,7 @@ def run(context: dict) -> dict:
                 "output": "",
                 "artifacts": {},
                 "errors": [
-                    "No hay scores de diagnóstico. Corre `/scaleup-diagnose` primero."
+                    "No hay scores de diagnóstico. Corre `/escala-diagnose` primero."
                 ],
             }
 

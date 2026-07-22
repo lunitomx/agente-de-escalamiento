@@ -10,10 +10,10 @@ from typing import Any
 DECISIONS = ["people", "strategy", "execution", "cash"]
 
 SUB_AGENTS = {
-    "people": {"skill": "scaleup-people", "label": "People Coach"},
-    "strategy": {"skill": "scaleup-strategy", "label": "Strategy Coach"},
-    "execution": {"skill": "scaleup-execution", "label": "Execution Coach"},
-    "cash": {"skill": "scaleup-cash", "label": "Cash Coach"},
+    "people": {"skill": "escala-people", "label": "People Coach"},
+    "strategy": {"skill": "escala-strategy", "label": "Strategy Coach"},
+    "execution": {"skill": "escala-execution", "label": "Execution Coach"},
+    "cash": {"skill": "escala-cash", "label": "Cash Coach"},
 }
 
 

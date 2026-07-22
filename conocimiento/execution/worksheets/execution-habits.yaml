@@ -1,0 +1,37 @@
+id: worksheet-execution-habits
+type: worksheet
+name: Execution Habits Checklist Worksheet
+name_es: Hoja de Verificacion de Habitos de Ejecucion
+decision: execution
+summary: >
+  The 10-item checklist scored quarterly by the leadership team. Each habit is rated
+  yes/no or 1-5. The team identifies the lowest-scoring habit and makes it the focus
+  for the next 90 days. The 10 habits: (1) leadership team aligned on priorities,
+  (2) each employee knows Critical Number, (3) meeting rhythm established,
+  (4) every function has accountable owner, (5) employee input collected weekly,
+  (6) customer feedback collected weekly, (7) Core Values visible and alive,
+  (8) priorities posted and known, (9) Brand Promise KPIs tracked, (10) OPSP updated.
+relationships:
+  - type: belongs-to
+    target: decision-execution
+  - type: implements
+    target: tool-execution-habits
+tags: [execution, worksheet, execution-habits, checklist, quarterly, scoring]
+metadata:
+  fields:
+    - "Habit 1: Leadership team aligned on priorities (yes/no + score 1-5)"
+    - "Habit 2: Each employee knows the Critical Number (yes/no)"
+    - "Habit 3: Meeting rhythm in place — daily, weekly, monthly, quarterly, annual (score 0-5)"
+    - "Habit 4: Every function and process has one accountable person (yes/no)"
+    - "Habit 5: Employee insights collected and shared weekly (yes/no)"
+    - "Habit 6: Customer insights collected and shared weekly (yes/no)"
+    - "Habit 7: Core Values and Purpose visible and lived (score 1-5)"
+    - "Habit 8: Company priorities and Critical Number posted everywhere (yes/no)"
+    - "Habit 9: Brand Promise KPIs tracked weekly (yes/no)"
+    - "Habit 10: OPSP updated quarterly, all employees aware (yes/no)"
+    - "Total score and lowest habit identification"
+    - "Next 90-day focus habit and improvement action"
+  output: "Execution health score + one focused improvement priority for the quarter"
+  difficulty: beginner
+  time_estimate: "30 minutes"
+  frequency: quarterly

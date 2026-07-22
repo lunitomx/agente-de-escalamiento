@@ -4,18 +4,11 @@ name: Revenue per Employee
 name_es: Ingresos por Empleado
 decision: cash
 summary: >
-  A labor efficiency metric: total revenue divided by total headcount. Scaling Up and
-  Simple Numbers use this as a proxy for whether the company is scaling productively.
-  World-class companies generate $150K–$500K+ revenue per employee depending on industry.
-  Declining revenue per employee signals that hiring is outpacing revenue growth —
+  A labor efficiency metric: total revenue divided by total headcount. Use it as a proxy
+  for whether the company is scaling productively. Declining revenue per employee signals
+  that hiring may be outpacing revenue growth —
   a common warning sign before a cash crisis. Growing companies should increase revenue
   per employee over time as systems and processes improve efficiency.
-source:
-  book_chapter: "SCALING UP CASH"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 3132
-  workbook_file: "metodologias_parsed/cash_workbook.txt"
-  workbook_line: 91
 relationships:
   - type: belongs-to
     target: decision-cash
@@ -27,6 +20,6 @@ tags: [cash, revenue-per-employee, efficiency, headcount, scaling, Simple-Number
 metadata:
   difficulty: beginner
   application: >
-    Track monthly: total revenue ÷ total headcount. If declining, pause hiring until
-    revenue per employee recovers. Industry benchmark varies: services $150K+,
-    SaaS $200K+, manufacturing $250K+.
+    Track monthly: total revenue ÷ total headcount. If declining, investigate hiring,
+    pricing, delivery capacity, and revenue quality before adding headcount. Compare with
+    a documented industry benchmark and the company's own baseline.

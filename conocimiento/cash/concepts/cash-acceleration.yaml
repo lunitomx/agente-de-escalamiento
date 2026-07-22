@@ -11,12 +11,6 @@ summary: >
   discounts, upfront payments), (5) extend payables strategically (pay on due date,
   not early). The best cash strategy is to redesign the business model so cash arrives
   before costs are incurred.
-source:
-  book_chapter: "SCALING UP CASH"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 8286
-  workbook_file: "metodologias_parsed/cash_workbook.txt"
-  workbook_line: 704
 relationships:
   - type: belongs-to
     target: decision-cash

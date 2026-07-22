@@ -21,7 +21,7 @@ cat .escala/agent/memory/company-profile.yaml
 
 From the YAML, extract:
 - `company.name` — company name
-- `company.growth_stage` — startup / scaleup / established / enterprise
+- `company.growth_stage` — startup / scaling / established / enterprise
 - `company.employees` — employee count
 - `company.industry` — sector
 - `scores.people`, `scores.strategy`, `scores.execution`, `scores.cash` — diagnosis scores (1-5)

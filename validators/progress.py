@@ -64,9 +64,9 @@ def validate_progress(
 if __name__ == "__main__":
     import sys
 
-    profile_path = Path(".scaleup/agent/memory/company-profile.yaml")
-    registry_path = Path(".scaleup/knowledge/registry/worksheets.yaml")
-    ws_dir = Path(".scaleup/my-company/worksheets")
+    profile_path = Path(".escala/agent/memory/company-profile.yaml")
+    registry_path = Path(".escala/knowledge/registry/worksheets.yaml")
+    ws_dir = Path(".escala/my-company/worksheets")
 
     errors = validate_progress(profile_path, registry_path, ws_dir)
     if errors:

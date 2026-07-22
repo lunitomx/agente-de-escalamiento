@@ -11,10 +11,6 @@ summary: >
   failures, relationships with managers). Reduces mis-hires by forcing candidates to be
   truthful about their track record. Pair with reference checks from managers the candidate
   reports to, not just peers.
-source:
-  book_chapter: "THE TEAM"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 739
 relationships:
   - type: belongs-to
     target: decision-people

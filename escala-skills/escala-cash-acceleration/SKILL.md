@@ -19,7 +19,7 @@ Si no existen → sugerir hacer CCC y Análisis Power of One primero.
 
 ### Step 2: Explore Strategies
 
-Categorías de estrategias del libro:
+Categorías de estrategias operativas:
 1. **Cycle time** — Reducir tiempo en cada etapa del CCC
 2. **Pricing model** — Cobrar antes (subscriptions, deposits, prepago)
 3. **Collection** — Acelerar cobro (incentivos, automatización)
@@ -42,4 +42,3 @@ Crear plan con timeline y responsable. Guardar en `work/cash/acceleration-strate
 | Next | `/escala-progress` |
 
 ---
-*> Esta herramienta está inspirada en los Hábitos de Ejecución, desarrollados por Verne Harnish como parte de su metodología de escalamiento de negocios. Ver [ATTRIBUTIONS.md](../ATTRIBUTIONS.md) para la referencia completa.

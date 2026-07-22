@@ -88,7 +88,7 @@ def validate_context_bundle(profile_path: pathlib.Path) -> list[str]:
 
     company = data.get("company", {})
     if not company.get("name"):
-        errors.append("Company name is empty — run /scaleup-welcome first")
+        errors.append("Company name is empty — run /escala-welcome first")
 
     scores = data.get("scores", {})
     for key in ("people", "strategy", "execution", "cash"):

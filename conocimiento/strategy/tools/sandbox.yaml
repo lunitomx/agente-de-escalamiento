@@ -10,10 +10,6 @@ summary: >
   sandbox is specific enough to be winnable (e.g., "B2B SaaS companies in Mexico City
   with 50-200 employees") and large enough to achieve the BHAG. In the 7 Strata,
   sandbox appears in the fourth column of the OPSP alongside differentiating activities.
-source:
-  book_chapter: "THE 7 STRATA OF STRATEGY"
-  file: "metodologias_parsed/strategy_workbook.txt"
-  file_line: 1998
 relationships:
   - type: belongs-to
     target: decision-strategy

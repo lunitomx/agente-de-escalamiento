@@ -9,9 +9,6 @@ summary: >
   or "loathe" (draining). Tasks that are loathed and non-core to the role are candidates
   for delegation, automation, or elimination. Results inform role redesign and quarterly
   personal priorities. Pair with DiSC and Gallup StrengthsFinder for deeper insight.
-source:
-  file: "metodologias_parsed/people_workbook.txt"
-  file_line: 2227
 relationships:
   - type: belongs-to
     target: decision-people

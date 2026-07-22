@@ -41,7 +41,7 @@ def format_summary(profile: dict) -> str:
         for decision, score in scored.items():
             lines.append(f"- **{decision.capitalize()}:** {score}/5")
     else:
-        lines.extend(["", "*No diagnosis scores yet — run `/scaleup-diagnose` next.*"])
+        lines.extend(["", "*No diagnosis scores yet — run `/escala-diagnose` next.*"])
 
     focus = profile.get("focus")
     if focus:

@@ -10,12 +10,6 @@ summary: >
   visible throughout the company, a mid-quarter check-in, and a defined celebration if
   the Critical Number is hit. The celebration is announced upfront — it is not a surprise.
   Themes create energy, focus, and shared identity around execution.
-source:
-  book_chapter: "THE PRIORITY"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 957
-  workbook_file: "metodologias_parsed/execution_workbook.txt"
-  workbook_line: 498
 relationships:
   - type: belongs-to
     target: decision-execution

@@ -11,12 +11,6 @@ summary: >
   Step 4: track progress quarterly. The goal is not just incremental improvement but
   structural redesign — moving toward a negative CCC where customers pay before costs
   are incurred.
-source:
-  book_chapter: "SCALING UP CASH"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 1063
-  workbook_file: "metodologias_parsed/cash_workbook.txt"
-  workbook_line: 696
 relationships:
   - type: belongs-to
     target: decision-cash

@@ -6,8 +6,7 @@ manteniendo el mismo nivel de calidad que el Power of One.
 Modo de uso:
     python3 escala_server/cash/generate_dashboards.py
 
-Créditos: Patrón de dashboard interactivo basado en el trabajo de
-Humberto Martínez Barón y Alan Miltz.
+Genera únicamente presentación operativa source-neutral de ESCALA.
 """
 
 from __future__ import annotations
@@ -388,9 +387,9 @@ DASHBOARDS = {
     # ── Execution ───────────────────────────────────────────────
     "execution": [
         {
-            "id": "rockefeller-habits",
-            "title": "Hábitos Rockefeller",
-            "subtitle": "Los 10 hábitos para escalar tu negocio",
+            "id": "execution-habits",
+            "title": "Hábitos de ejecución",
+            "subtitle": "Hábitos operativos para escalar tu negocio",
             "desc": "Los hábitos diarios, semanales, mensuales y trimestrales que mantienen tu negocio en ritmo de crecimiento.",
             "metrics": [
                 {
@@ -565,7 +564,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{TITLE} | ScaleUp</title>
+  <title>{TITLE} | ESCALA</title>
   <link rel="stylesheet" href="../../shared/styles/dashboard-base.css">
   <link rel="stylesheet" href="../../shared/styles/context-panel.css">
   <style>
@@ -592,7 +591,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
 
     .side-card { background: white; border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 12px; }
     .side-card h3 { margin: 0 0 10px; font-size: 0.85rem; color: #0f172a; }
-    .verne-msg { font-size: 0.82rem; line-height: 1.5; color: #334155; }
+    .advisor-msg { font-size: 0.82rem; line-height: 1.5; color: #334155; }
 
     .no-data { text-align: center; padding: 60px 20px; color: #94a3b8; }
     .no-data .big-icon { font-size: 3rem; margin-bottom: 12px; }
@@ -614,7 +613,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       <select id="company-select" onchange="onCompanyChange()">
         <option value="">— Seleccionar —</option>
       </select>
-      <span style="font-size:0.8rem;color:#94a3b8;">Los datos se cargan de lo que trabajaste con Kokoro.</span>
+      <span style="font-size:0.8rem;color:#94a3b8;">Los datos se cargan de lo que trabajaste con ESCALA.</span>
     </div>
 
     <div class="desc-card">{DESC}</div>
@@ -622,8 +621,8 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     <div id="no-data" class="no-data" style="display:block;">
       <div class="big-icon">{ICON}</div>
       <h3>Sin datos aún</h3>
-      <p>Dile a Kokoro en la conversación que quiere trabajar este tema.<br>
-      Kokoro te guiará, guardará los resultados, y aquí aparecerán.</p>
+      <p>Dile a ESCALA en la conversación que quieres trabajar este tema.<br>
+      ESCALA te guiará, guardará los resultados, y aquí aparecerán.</p>
     </div>
 
     <div id="content-area" style="display:none;">
@@ -633,14 +632,14 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         </div>
         <div>
           <div class="side-card">
-            <h3>🤵 Verne opina</h3>
-            <div id="verne-advice" class="verne-msg">Carga datos para que Verne opine.</div>
+            <h3>🤵 El asesor observa</h3>
+            <div id="advisor-advice" class="advisor-msg">Carga datos para recibir observaciones.</div>
           </div>
         </div>
       </div>
     </div>
 
-    <p class="attribution">Metodología: <strong>Alan Miltz / Verne Harnish</strong> · Powered by Kokoro</p>
+    <p class="attribution">Asesoría operativa local · ESCALA</p>
   </div>
 
   <script>
@@ -723,18 +722,18 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
           container.appendChild(box);
         });
 
-        // Verne
+        // Local advisor
         var pct = METRICS.length > 0 ? (filled / METRICS.length) * 100 : 0;
-        var verneEl = document.getElementById('verne-advice');
+        var advisorEl = document.getElementById('advisor-advice');
         var lines = [];
-        lines.push('<strong>Verne dice:</strong>');
-        if (filled === 0) lines.push('Aún no hay datos registrados. Trabaja este tema con Kokoro.');
+        lines.push('<strong>El asesor observa:</strong>');
+        if (filled === 0) lines.push('Aún no hay datos registrados. Trabaja este tema con ESCALA.');
         else if (pct >= 80) lines.push('✅ Tienes ' + filled + ' de ' + METRICS.length + ' campos. Buen avance. Sigue así.');
         else if (pct >= 50) lines.push('⚠️ Tienes ' + filled + ' de ' + METRICS.length + '. Te falta completar algunos.');
-        else lines.push('apenas ' + filled + ' de ' + METRICS.length + '. Trabaja este tema con Kokoro.');
+        else lines.push('apenas ' + filled + ' de ' + METRICS.length + '. Trabaja este tema con ESCALA.');
         lines.push('');
         lines.push('💡 <em>Lo que no se mide no se gestiona.</em>');
-        verneEl.innerHTML = lines.join('<br>');
+        advisorEl.innerHTML = lines.join('<br>');
       }
 
       function escapeHtml(s) {

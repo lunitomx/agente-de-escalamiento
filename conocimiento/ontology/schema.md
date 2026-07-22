@@ -1,8 +1,8 @@
-# ScaleUp Ontology Schema
+# ESCALA Ontology Schema
 
 ## Overview
 
-The ScaleUp knowledge base is a structured domain ontology — a graph of nodes and relationships that represents the Scaling Up methodology. Each node is a YAML file. Relationships are declared as adjacency lists within each node.
+The ESCALA knowledge base is a structured domain ontology — a graph of nodes and relationships that represents the ESCALA methodology. Each node is a YAML file. Relationships are declared as adjacency lists within each node.
 
 ## Node Types
 
@@ -10,7 +10,7 @@ The ScaleUp knowledge base is a structured domain ontology — a graph of nodes 
 |------|-------------|---------|
 | `decision` | The 4 core decisions | People, Strategy, Execution, Cash |
 | `concept` | Principles and frameworks | "Right people right seats", "One thing" |
-| `tool` | Actionable frameworks/checklists | FACe/PACe, 7 Strata, Rockefeller Habits |
+| `tool` | Actionable frameworks/checklists | FACe/PACe, 7 Strata, Execution Habits |
 | `worksheet` | Completable templates with fields | OPSP, CCC worksheet, OPPP |
 | `stage` | Business maturity stages | Startup, Growth, Scaling, Expansion |
 | `metric` | Measurable KPIs | CCC days, NPS, Employee turnover |
@@ -46,7 +46,6 @@ Every node is a YAML file with these fields:
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `source` | object | `{book_chapter, book_line, workbook}` — pointer to LlamaParse content |
 | `tags` | list | Keywords for search |
 | `metadata` | object | Type-specific metadata |
 
@@ -62,7 +61,7 @@ Every node is a YAML file with these fields:
 ## Directory Structure
 
 ```
-.scaleup/knowledge/
+.escala/knowledge/
 ├── ontology/
 │   ├── schema.md              # This file
 │   └── node-types.yaml        # Formal type definitions
@@ -98,6 +97,6 @@ Every node is a YAML file with these fields:
 
 1. **One node = one file** — inspectable, editable, diffable
 2. **Adjacency list** — relationships declared in each node, not in a separate file
-3. **Source pointers** — every node traces back to LlamaParse content (chapter + line)
+3. **Operational content** — nodes contain reusable guidance, not private provenance
 4. **Bilingual** — name + name_es for all nodes
 5. **No embeddings** — deterministic retrieval via symbolic traversal

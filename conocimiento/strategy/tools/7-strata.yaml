@@ -11,12 +11,6 @@ summary: >
   10x-100x underlying advantage), (6) Profit per X (the economic engine metric),
   (7) BHAG (the 25-year goal). Working through all seven reveals whether the strategy
   is truly differentiated or merely aspirational.
-source:
-  book_chapter: "THE 7 STRATA OF STRATEGY"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 815
-  workbook_file: "metodologias_parsed/strategy_workbook.txt"
-  workbook_line: 419
 relationships:
   - type: belongs-to
     target: decision-strategy

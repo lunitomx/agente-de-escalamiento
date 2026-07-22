@@ -2,7 +2,7 @@
 
 > Empresa: {company_name} | Fecha: {date}
 
-## Cadencia de Reuniones Scaling Up
+## Cadencia de Reuniones ESCALA
 
 ---
 

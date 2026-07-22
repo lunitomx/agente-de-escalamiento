@@ -1,5 +1,5 @@
 ---
-description: 'Configura tus ritmos Scaling Up: Daily Huddle, Weekly Meeting, Quarterly Off-site. Guía paso a paso para conectar Zoom, Meet, Teams o lo que uses.'
+description: 'Configura tus ritmos ESCALA: Daily Huddle, Weekly Meeting, Quarterly Off-site. Guía paso a paso para conectar Zoom, Meet, Teams o lo que uses.'
 name: escala-rhythm-setup
 ---
 
@@ -7,7 +7,7 @@ name: escala-rhythm-setup
 
 ## Purpose
 
-Los ritmos son el latido de Scaling Up: Daily Huddle (15 min), Weekly Meeting (90 min), Quarterly Off-site (1 día). Este skill te guía para configurarlos — no importa si usas Zoom, Google Meet, Teams, o te reúnes en persona. Solo necesitas que alguien grabe o tome notas.
+Los ritmos son el latido de ESCALA: Daily Huddle (15 min), Weekly Meeting (90 min), Quarterly Off-site (1 día). Este skill te guía para configurarlos — no importa si usas Zoom, Google Meet, Teams, o te reúnes en persona. Solo necesitas que alguien grabe o tome notas.
 
 ## Steps
 
@@ -23,7 +23,7 @@ Los ritmos son el latido de Scaling Up: Daily Huddle (15 min), Weekly Meeting (9
 
 ### Step 2: Configurar Daily Huddle
 
-**Formato Scaling Up:**
+**Formato ESCALA:**
 - 15 minutos máximo. De pie.
 - 3 secciones: Logros de ayer, Prioridades de hoy, Obstáculos
 - Misma hora todos los días
@@ -43,7 +43,7 @@ Los ritmos son el latido de Scaling Up: Daily Huddle (15 min), Weekly Meeting (9
 
 ### Step 3: Configurar Weekly Meeting
 
-**Formato Scaling Up:**
+**Formato ESCALA:**
 - 90 minutos. Mismo día, misma hora cada semana.
 - Agenda: 5 min good news, 10 min KPIs, 30 min Prioridad #1, 30 min WWW, 15 min cierre
 
@@ -53,7 +53,7 @@ Los ritmos son el latido de Scaling Up: Daily Huddle (15 min), Weekly Meeting (9
 
 ### Step 4: Configurar Quarterly Off-site
 
-**Formato Scaling Up:**
+**Formato ESCALA:**
 - 1 día completo fuera de la oficina
 - Agenda: SWT review, Prioridad #1 próximo trimestre, Tema, KPIs, People review
 - 2 semanas antes del cierre de trimestre

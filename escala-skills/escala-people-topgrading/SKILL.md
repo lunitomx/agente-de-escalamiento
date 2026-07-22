@@ -41,4 +41,3 @@ Crear scorecard para el próximo puesto a contratar. Guardar en `work/people/`.
 | Job Scorecard | `work/people/job-scorecard-{role}.md` |
 
 ---
-*Esta herramienta está inspirada en la metodología Topgrading, desarrollada por Brad Smart. Ver [ATTRIBUTIONS.md](../ATTRIBUTIONS.md) para la referencia completa.*

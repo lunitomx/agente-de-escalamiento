@@ -5,7 +5,7 @@ Validates the last entry in pulse-history.yaml contains all required keys,
 valid answer values, and valid trend values.
 
 Usage:
-    python3 .scaleup/agent/validators/pulse.py <path-to-pulse-history.yaml>
+    python3 .escala/agent/validators/pulse.py <path-to-pulse-history.yaml>
 
 Exit codes:
     0 — file is valid (or pulses list is empty)

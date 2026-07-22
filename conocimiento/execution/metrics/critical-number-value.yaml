@@ -9,10 +9,6 @@ summary: >
   At quarter end, the actual vs. target gap determines whether the Quarterly Theme
   celebration is triggered. The Critical Number is the single most important execution
   metric each quarter — everything else is context.
-source:
-  book_chapter: "THE DATA"
-  file: "metodologias_parsed/execution_workbook.txt"
-  file_line: 496
 relationships:
   - type: belongs-to
     target: decision-execution

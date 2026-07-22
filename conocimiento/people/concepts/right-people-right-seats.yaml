@@ -8,11 +8,6 @@ summary: >
   fits the company's core values (right person) AND has the skills and passion
   for their specific role (right seat). Misalignment in either dimension
   creates organizational drag.
-source:
-  book_chapter: "THE TEAM"
-  book_line: 1972
-  file: "scaling_up_llamaparse.txt"
-  file_line: 667
 relationships:
   - type: belongs-to
     target: decision-people

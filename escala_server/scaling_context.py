@@ -1,7 +1,7 @@
-"""Coaching Skill Helper — access Scaling Up context from coaching sessions.
+"""Coaching Skill Helper — access ESCALA context from coaching sessions.
 
 Provides a simple function that any Escala coaching skill can import
-to retrieve relevant context from the Scaling Up knowledge graph.
+to retrieve relevant context from the ESCALA knowledge graph.
 
 Usage::
 
@@ -34,7 +34,7 @@ def get_scaling_context(
     tool: str | None = None,
     db_path: str | None = None,
 ) -> dict:
-    """Get relevant context from the Scaling Up knowledge graph.
+    """Get relevant context from the ESCALA knowledge graph.
 
     Args:
         category: Filter by category (cash, strategy, people, execution).

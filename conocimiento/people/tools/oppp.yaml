@@ -10,10 +10,6 @@ summary: >
   (quarterly priorities). The 5Fs — Faith, Family, Friends, Fitness, Finance — serve as
   reminders of life dimensions to balance. Used to align personal and professional goals
   so individuals feel their work serves their whole life.
-source:
-  book_chapter: "THE LEADERS"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 1721
 relationships:
   - type: belongs-to
     target: decision-people

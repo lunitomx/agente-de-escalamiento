@@ -9,10 +9,6 @@ summary: >
   rating per value (consistently demonstrates / sometimes demonstrates / rarely demonstrates).
   A person can be highly competent but values-misaligned — that person must eventually
   exit. Core Values alignment is non-negotiable; skill gaps can be trained, values cannot.
-source:
-  book_chapter: "THE CORE"
-  file: "metodologias_parsed/people_workbook.txt"
-  file_line: 541
 relationships:
   - type: belongs-to
     target: decision-people

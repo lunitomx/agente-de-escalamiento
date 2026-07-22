@@ -9,10 +9,6 @@ summary: >
   means the company is hiring faster than it is growing — a leading indicator of
   future cash pressure. Simple Numbers uses this metric alongside gross margin per
   employee to diagnose whether growth is value-creating or value-destroying.
-source:
-  book_chapter: "SCALING UP CASH"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 3132
 relationships:
   - type: belongs-to
     target: decision-cash

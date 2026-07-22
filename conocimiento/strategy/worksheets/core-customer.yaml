@@ -8,9 +8,6 @@ summary: >
   team through listing real individual customers, extracting shared attributes (wants,
   needs, fears), and drafting a 10-20 word Core Customer description. Also includes
   analysis of how the Core Customer's needs drive brand promise design.
-source:
-  file: "metodologias_parsed/strategy_workbook.txt"
-  file_line: 949
 relationships:
   - type: belongs-to
     target: decision-strategy

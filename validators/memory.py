@@ -15,7 +15,7 @@ except ImportError as e:
 
 
 _REQUIRED_COMPANY_FIELDS = {"name"}
-_VALID_STAGES = {"startup", "scaleup", "established", "enterprise", ""}
+_VALID_STAGES = {"startup", "scaling", "established", "enterprise", ""}
 _SCORE_KEYS = ("people", "strategy", "execution", "cash")
 
 

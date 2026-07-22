@@ -73,7 +73,7 @@ def run(context: dict) -> dict:
     base = Path(context.get("base_path", "."))
     action = context.get("action", "detect")
 
-    profile_path = base / ".scaleup" / "agent" / "memory" / "company-profile.yaml"
+    profile_path = base / ".escala" / "agent" / "memory" / "company-profile.yaml"
 
     if action == "detect":
         scores = context.get("scores", read_yaml(profile_path).get("scores", {}))
@@ -103,7 +103,7 @@ def run(context: dict) -> dict:
             )
             lines.append(f"Basado en score promedio: {avg}/5")
         lines.append("")
-        lines.append("Para cambiar manualmente: `/scaleup-level --set shu|ha|ri`")
+        lines.append("Para cambiar manualmente: `/escala-level --set shu|ha|ri`")
         return {
             "output": "\n".join(lines),
             "artifacts": {

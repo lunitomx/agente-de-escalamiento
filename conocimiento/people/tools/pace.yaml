@@ -9,10 +9,6 @@ summary: >
   outcome, and the process KPIs. While FACe shows vertical accountability (who owns each
   function), PACe reveals horizontal accountability (who owns each value-creating flow).
   The "e" stands for the same energy as in FACe.
-source:
-  book_chapter: "THE LEADERS"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 719
 relationships:
   - type: belongs-to
     target: decision-people

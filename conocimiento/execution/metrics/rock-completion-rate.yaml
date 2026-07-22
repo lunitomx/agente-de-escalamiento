@@ -5,15 +5,10 @@ name_es: Tasa de Completacion de Rocas
 decision: execution
 summary: >
   The percentage of quarterly Rocks completed by the end of the quarter. A Rock is
-  complete when the defined outcome is fully achieved — not "mostly done." Scaling Up
-  benchmark: 80%+ completion rate signals healthy execution discipline. Below 60%
-  indicates that Rocks are too ambitious, under-resourced, or being displaced by
-  operational fires — a structural execution problem that must be diagnosed, not
-  ignored. Tracked at both company and individual levels.
-source:
-  book_chapter: "THE PRIORITY"
-  file: "metodologias_parsed/execution_workbook.txt"
-  file_line: 533
+  complete when the defined outcome is fully achieved — not "mostly done." A declining
+  rate may indicate that Rocks are too ambitious, under-resourced, or displaced by
+  operational fires. Diagnose the system and evidence before attributing failure to an
+  individual. Track at both company and individual levels.
 relationships:
   - type: belongs-to
     target: decision-execution
@@ -23,4 +18,4 @@ tags: [execution, metric, rocks, completion, quarterly, accountability]
 metadata:
   unit: percentage
   direction: higher_better
-  benchmark: "80%+ is healthy; below 60% signals execution system failure, not individual failure"
+  benchmark: "Compare with the committed quarterly target and prior quarters"

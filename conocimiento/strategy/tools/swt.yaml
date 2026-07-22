@@ -10,12 +10,6 @@ summary: >
   (external forces shaping the industry — macro, competitive, technological). The key
   insight: opportunities are derived from the intersection of your strengths and
   favorable trends. SWT output feeds the bottom of the OPSP and informs annual priorities.
-source:
-  book_chapter: "THE ONE-PAGE STRATEGIC PLAN"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 804
-  workbook_file: "metodologias_parsed/strategy_workbook.txt"
-  workbook_line: 348
 relationships:
   - type: belongs-to
     target: decision-strategy

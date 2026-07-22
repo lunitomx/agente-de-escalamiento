@@ -4,7 +4,7 @@ Checks that a '## Session Summary' section header is present as a
 top-level markdown heading (anchored at start of line).
 
 Usage:
-    python .scaleup/agent/validators/summary_validator.py <path-to-session-log>
+    python .escala/agent/validators/summary_validator.py <path-to-session-log>
 
 Exit codes:
     0 — file is valid (## Session Summary present)

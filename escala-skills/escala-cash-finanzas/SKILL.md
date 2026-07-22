@@ -36,7 +36,7 @@ Del Balance extraer:
 
 Validar con el usuario: "Esto es lo que extraje. ¿Son correctos estos números?"
 
-### Step 3: Calcular métricas Scaling Up
+### Step 3: Calcular métricas ESCALA
 
 **Power of One — 7 palancas:**
 1. Precio (+1%) → impacto en EBIT y Cash
@@ -82,4 +82,4 @@ Preguntar: "¿Quieres que simulemos escenarios? Puedo calcular qué pasa si mejo
 
 - Este skill NO programa nada. Usa las capacidades nativas de Claude Code/Codex para leer documentos, extraer números y hacer cálculos.
 - Si el usuario no tiene estados financieros formales, guiarlo con preguntas simples: "¿Cuánto vendiste el mes pasado? ¿Cuánto te costó? ¿Cuánto tienes en caja?"
-- Los cálculos del Power of One siguen la metodología de Alan Miltz tal como está en el libro Scaling Up.
+- Mostrar fórmulas, periodos y supuestos; validar cada cifra extraída con el usuario antes de recomendar una acción.

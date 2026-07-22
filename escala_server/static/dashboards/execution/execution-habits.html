@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hábitos de ejecución | ESCALA</title>
+  <link rel="stylesheet" href="../../shared/styles/dashboard-base.css">
+  <link rel="stylesheet" href="../../shared/styles/context-panel.css">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f1f5f9; color: #1e293b; padding: 24px; }
+    .tool-header { margin-bottom: 20px; }
+    .tool-header h1 { font-size: 1.3rem; color: #0f172a; }
+    .tool-header .subtitle { font-size: 0.85rem; color: #64748b; margin-top: 4px; }
+    .tool-header .breadcrumb { font-size: 0.8rem; color: #64748b; }
+
+    .company-bar { margin-bottom: 16px; background: white; border-radius: 8px; padding: 14px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .company-bar select { padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.9rem; flex: 1; min-width: 200px; background: #f8fafc; }
+    .company-bar label { font-weight: 600; color: #475569; }
+
+    .grid { display: grid; grid-template-columns: 1fr 280px; gap: 16px; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+
+    .desc-card { background: white; border-radius: 8px; padding: 14px 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); font-size: 0.85rem; color: #475569; }
+
+    .fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+    .field { background: white; border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .field .f-label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: flex; align-items: center; gap: 4px; }
+    .field .f-val { font-size: 1rem; font-weight: 600; color: #334155; }
+    .field .f-val.empty { color: #94a3b8; font-style: italic; font-weight: 400; }
+
+    .side-card { background: white; border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 12px; }
+    .side-card h3 { margin: 0 0 10px; font-size: 0.85rem; color: #0f172a; }
+    .advisor-msg { font-size: 0.82rem; line-height: 1.5; color: #334155; }
+
+    .no-data { text-align: center; padding: 60px 20px; color: #94a3b8; }
+    .no-data .big-icon { font-size: 3rem; margin-bottom: 12px; }
+    .no-data p { font-size: 0.85rem; line-height: 1.5; }
+
+    .attribution { margin-top: 24px; font-size: 0.7rem; color: #94a3b8; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 12px; }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <div class="tool-header">
+      <div class="breadcrumb"><a href="/">Home</a> › <a href="/dashboards/execution/">Ejecución</a> › Hábitos de ejecución</div>
+      <h1>⚡ Hábitos de ejecución</h1>
+      <div class="subtitle">Hábitos operativos para escalar tu negocio</div>
+    </div>
+
+    <div class="company-bar">
+      <label for="company-select">🏢 Empresa:</label>
+      <select id="company-select" onchange="onCompanyChange()">
+        <option value="">— Seleccionar —</option>
+      </select>
+      <span style="font-size:0.8rem;color:#94a3b8;">Los datos se cargan de lo que trabajaste con ESCALA.</span>
+    </div>
+
+    <div class="desc-card">Los hábitos diarios, semanales, mensuales y trimestrales que mantienen tu negocio en ritmo de crecimiento.</div>
+
+    <div id="no-data" class="no-data" style="display:block;">
+      <div class="big-icon">⚡</div>
+      <h3>Sin datos aún</h3>
+      <p>Dile a ESCALA en la conversación que quieres trabajar este tema.<br>
+      ESCALA te guiará, guardará los resultados, y aquí aparecerán.</p>
+    </div>
+
+    <div id="content-area" style="display:none;">
+      <div class="grid">
+        <div>
+          <div class="fields" id="fields-container"></div>
+        </div>
+        <div>
+          <div class="side-card">
+            <h3>🤵 El asesor observa</h3>
+            <div id="advisor-advice" class="advisor-msg">Carga datos para recibir observaciones.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="attribution">Asesoría operativa local · ESCALA</p>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+      var API_BASE = '';
+      var currentCompanyId = '';
+      var METRICS = [{"key": "daily_huddle", "label": "Daily Huddle", "tip": "Reuni\u00f3n de 15 min diaria. De pie. Sin sillas."}, {"key": "weekly_meeting", "label": "Weekly Meeting", "tip": "90 min semanales para revisar KPIs y prioridades."}, {"key": "quarterly", "label": "Quarterly Planning", "tip": "Off-site trimestral para definir la prioridad del trimestre."}, {"key": "theme", "label": "Tema del trimestre", "tip": "La prioridad #1 para los pr\u00f3ximos 90 d\u00edas."}];
+
+      function init() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', API_BASE + '/api/companies', true);
+        xhr.onload = function() {
+          if (xhr.status === 200) {
+            try {
+              var resp = JSON.parse(xhr.responseText);
+              (resp.data || []).forEach(function(c) {
+                var opt = document.createElement('option');
+                opt.value = c.id;
+                opt.textContent = c.name;
+                document.getElementById('company-select').appendChild(opt);
+              });
+            } catch(e) {}
+          }
+        };
+        xhr.send();
+      }
+
+      window.onCompanyChange = function() {
+        var sel = document.getElementById('company-select');
+        currentCompanyId = sel.value;
+        if (!currentCompanyId) { showNone(); return; }
+        loadData();
+      };
+
+      function loadData() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', API_BASE + '/api/worksheets/execution/execution-habits', true);
+        xhr.onload = function() {
+          if (xhr.status === 200) {
+            try {
+              var resp = JSON.parse(xhr.responseText);
+              var payload = resp.data || {};
+              var saved = payload.data || payload.variables || payload;
+              if (saved && Object.keys(saved).length > 0) {
+                showData(saved);
+                return;
+              }
+            } catch(e) {}
+          }
+          showNone();
+        };
+        xhr.send();
+      }
+
+      function showNone() {
+        document.getElementById('no-data').style.display = 'block';
+        document.getElementById('content-area').style.display = 'none';
+      }
+
+      function showData(data) {
+        document.getElementById('no-data').style.display = 'none';
+        document.getElementById('content-area').style.display = 'block';
+
+        var container = document.getElementById('fields-container');
+        container.innerHTML = '';
+        var filled = 0;
+
+        METRICS.forEach(function(m) {
+          var val = data[m.key];
+          if (val !== undefined && val !== null && val !== '') filled++;
+
+          var box = document.createElement('div');
+          box.className = 'field';
+          var displayVal = (val !== undefined && val !== null && val !== '') ? val : '—';
+          var cls = (val !== undefined && val !== null && val !== '') ? '' : 'empty';
+          box.innerHTML =
+            '<div class="f-label">' + m.label + ' <span style="font-size:0.6rem;color:#94a3b8;cursor:help;" title="' + m.tip + '">?</span></div>' +
+            '<div class="f-val ' + cls + '">' + escapeHtml(String(displayVal)) + '</div>';
+          container.appendChild(box);
+        });
+
+        // Local advisor
+        var pct = METRICS.length > 0 ? (filled / METRICS.length) * 100 : 0;
+        var advisorEl = document.getElementById('advisor-advice');
+        var lines = [];
+        lines.push('<strong>El asesor observa:</strong>');
+        if (filled === 0) lines.push('Aún no hay datos registrados. Trabaja este tema con ESCALA.');
+        else if (pct >= 80) lines.push('✅ Tienes ' + filled + ' de ' + METRICS.length + ' campos. Buen avance. Sigue así.');
+        else if (pct >= 50) lines.push('⚠️ Tienes ' + filled + ' de ' + METRICS.length + '. Te falta completar algunos.');
+        else lines.push('apenas ' + filled + ' de ' + METRICS.length + '. Trabaja este tema con ESCALA.');
+        lines.push('');
+        lines.push('💡 <em>Lo que no se mide no se gestiona.</em>');
+        advisorEl.innerHTML = lines.join('<br>');
+      }
+
+      function escapeHtml(s) {
+        var d = document.createElement('div');
+        d.textContent = s;
+        return d.innerHTML;
+      }
+
+      init();
+    })();
+  </script>
+  <script src="../../shared/js/context-panel.js"></script>
+</body>
+</html>

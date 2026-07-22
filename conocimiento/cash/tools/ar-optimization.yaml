@@ -10,10 +10,6 @@ summary: >
   early-payment discounts (e.g., 2% net-10), (4) automate payment reminders at day 15,
   30, 45, (5) implement ACH/credit card payment to eliminate check delays. Every 10-day
   reduction in DSO frees significant working capital — often more than a revenue increase.
-source:
-  book_chapter: "SCALING UP CASH"
-  file: "metodologias_parsed/cash_workbook.txt"
-  file_line: 963
 relationships:
   - type: belongs-to
     target: decision-cash

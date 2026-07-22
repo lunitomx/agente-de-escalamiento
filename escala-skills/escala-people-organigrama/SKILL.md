@@ -1,5 +1,5 @@
 ---
-description: 'Lee tu organigrama real (Excel, Sheets, PDF, o lo que tengas) y lo mapea al FACe de Scaling Up. Detecta huecos, duplicidades y personas overloaded.'
+description: 'Lee tu organigrama real (Excel, Sheets, PDF, o lo que tengas) y lo mapea al FACe de ESCALA. Detecta huecos, duplicidades y personas overloaded.'
 name: escala-people-organigrama
 ---
 

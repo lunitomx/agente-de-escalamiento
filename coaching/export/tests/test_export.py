@@ -61,7 +61,7 @@ def test_reads_annual_goal(tmp_path):
     """run() should read annual-goal.md content."""
     from coaching.export import run
 
-    goal_dir = tmp_path / ".scaleup" / "my-company"
+    goal_dir = tmp_path / ".escala" / "my-company"
     goal_dir.mkdir(parents=True)
     (goal_dir / "annual-goal.md").write_text("## Meta del Año\n\nDuplicar revenue.")
     result = run({"base_path": str(tmp_path)})
@@ -73,7 +73,7 @@ def test_reads_quarterly_focus(tmp_path):
     """run() should read quarterly-focus.md content."""
     from coaching.export import run
 
-    qf_dir = tmp_path / ".scaleup" / "my-company"
+    qf_dir = tmp_path / ".escala" / "my-company"
     qf_dir.mkdir(parents=True)
     (qf_dir / "quarterly-focus.md").write_text("## Q2 2026\n\nRock 1: Deploy product.")
     result = run({"base_path": str(tmp_path)})
@@ -84,7 +84,7 @@ def test_reads_tasks(tmp_path):
     """run() should read tasks.md content."""
     from coaching.export import run
 
-    task_dir = tmp_path / ".scaleup" / "my-company"
+    task_dir = tmp_path / ".escala" / "my-company"
     task_dir.mkdir(parents=True)
     (task_dir / "tasks.md").write_text("## In Progress\n\n- Task A")
     result = run({"base_path": str(tmp_path)})
@@ -95,7 +95,7 @@ def test_reads_profile(tmp_path):
     """run() should read profile.md for company name context."""
     from coaching.export import run
 
-    prof_dir = tmp_path / ".scaleup" / "my-company"
+    prof_dir = tmp_path / ".escala" / "my-company"
     prof_dir.mkdir(parents=True)
     (prof_dir / "profile.md").write_text("# Mi Empresa\n\n- **Nombre:** Acme Corp")
     result = run({"base_path": str(tmp_path)})
@@ -107,7 +107,7 @@ def test_reads_yaml_scores(tmp_path):
     import yaml
     from coaching.export import run
 
-    mem_dir = tmp_path / ".scaleup" / "agent" / "memory"
+    mem_dir = tmp_path / ".escala" / "agent" / "memory"
     mem_dir.mkdir(parents=True)
     (mem_dir / "company-profile.yaml").write_text(
         yaml.dump({"scores": {"people": 3, "strategy": 2, "execution": 4, "cash": 1}})
@@ -124,7 +124,7 @@ def test_missing_optional_files_graceful(tmp_path):
     """run() should not error when optional files are missing."""
     from coaching.export import run
 
-    # No .scaleup dir at all — all files missing
+    # No .escala dir at all — all files missing
     result = run({"base_path": str(tmp_path)})
     assert result["errors"] == []
     assert isinstance(result["artifacts"].get("missing_optional"), list)
@@ -209,7 +209,7 @@ def test_scores_table_in_output(tmp_path):
     import yaml
     from coaching.export import run
 
-    mem_dir = tmp_path / ".scaleup" / "agent" / "memory"
+    mem_dir = tmp_path / ".escala" / "agent" / "memory"
     mem_dir.mkdir(parents=True)
     (mem_dir / "company-profile.yaml").write_text(
         yaml.dump({"scores": {"people": 3, "strategy": 2, "execution": 4, "cash": 1}})

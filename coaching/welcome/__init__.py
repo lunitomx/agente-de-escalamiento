@@ -21,7 +21,7 @@ def run(context: dict) -> dict:
         dict with output, artifacts, errors
     """
     base = Path(context.get("base_path", "."))
-    profile_path = base / ".scaleup" / "agent" / "memory" / "company-profile.yaml"
+    profile_path = base / ".escala" / "agent" / "memory" / "company-profile.yaml"
 
     name = context.get("company_name", "").strip()
     industry = context.get("industry", "").strip()
@@ -73,16 +73,16 @@ def run(context: dict) -> dict:
     if methodology == "lean-canvas":
         output_lines.append(
             "Como startup en etapa temprana, te recomiendo empezar con un **Lean Canvas** "
-            "para clarificar tu modelo de negocio antes de sumergirte en Scaling Up."
+            "para clarificar tu modelo de negocio antes de sumergirte en ESCALA."
         )
     elif methodology == "bmc":
         output_lines.append(
             "Tienes un modelo de negocio establecido. Pasemos directo al diagnóstico "
-            "de las 4 decisiones con `/scaleup-diagnose`."
+            "de las 4 decisiones con `/escala-diagnose`."
         )
     else:
         output_lines.append(
-            "Tu perfil está listo. Siguiente paso: `/scaleup-diagnose` para evaluar "
+            "Tu perfil está listo. Siguiente paso: `/escala-diagnose` para evaluar "
             "tu situación actual en las 4 decisiones."
         )
 

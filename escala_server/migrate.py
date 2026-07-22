@@ -1,6 +1,6 @@
-"""YAML migration — import .scaleup/ data into SQLite.
+"""YAML migration — import .escala/ data into SQLite.
 
-Reads existing YAML data from .scaleup/my-company/ and imports
+Reads existing YAML data from .escala/my-company/ and imports
 into the Escala SQLite database. Idempotent — can be run multiple
 times safely.
 """
@@ -29,7 +29,7 @@ def read_yaml_file(path: Path) -> Any:
 
 
 def migrate_from_yaml(db_path: str, yaml_root: str) -> dict[str, Any]:
-    """Import .scaleup/ YAML data into SQLite database.
+    """Import .escala/ YAML data into SQLite database.
 
     Reads YAML files from yaml_root/my-company/ and imports:
     - Profile (profile.md) → companies table
@@ -42,7 +42,7 @@ def migrate_from_yaml(db_path: str, yaml_root: str) -> dict[str, Any]:
 
     Args:
         db_path: Path to the SQLite database file
-        yaml_root: Root of the .scaleup/ directory
+        yaml_root: Root of the .escala/ directory
 
     Returns:
         Summary dict with import counts and log path

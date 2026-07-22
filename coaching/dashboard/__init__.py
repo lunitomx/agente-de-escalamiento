@@ -32,7 +32,7 @@ SCORE_LEVELS = {
     5: "Optimizado",
 }
 
-HISTORY_REL_PATH = ".scaleup/my-company/pulse-history.yaml"
+HISTORY_REL_PATH = ".escala/my-company/pulse-history.yaml"
 
 
 # ---------------------------------------------------------------------------
@@ -42,7 +42,7 @@ HISTORY_REL_PATH = ".scaleup/my-company/pulse-history.yaml"
 
 def _read_scores(base: Path) -> dict:
     """Return diagnosis scores from company-profile.yaml, or empty dict."""
-    yaml_path = base / ".scaleup" / "agent" / "memory" / "company-profile.yaml"
+    yaml_path = base / ".escala" / "agent" / "memory" / "company-profile.yaml"
     profile = read_yaml(yaml_path)
     return profile.get("scores") or {}
 
@@ -68,7 +68,7 @@ def _build_scores_section(base: Path) -> tuple[str, dict]:
     # Treat all-zero or empty scores as "no diagnosis yet"
     has_data = any(isinstance(v, int) and v > 0 for v in scores.values())
     if not has_data:
-        body = "No diagnosis yet. Run /scaleup-diagnose first."
+        body = "No diagnosis yet. Run /escala-diagnose first."
         return body, {}
     return _scores_table(scores), scores
 
@@ -137,13 +137,13 @@ def _build_attention(pulses: list[dict]) -> list[tuple[str, str, str]]:
         trend = last.get("trends", {}).get(decision)
         if trend == "regressing":
             label = DECISION_LABELS.get(decision, decision.title())
-            cmd = ROUTING_RULES.get(decision, f"/scaleup-{decision}")
+            cmd = ROUTING_RULES.get(decision, f"/escala-{decision}")
             attention.append((decision, label, f"regressing → run {cmd}"))
         elif trend == "stalling" and prev is not None:
             prev_trend = prev.get("trends", {}).get(decision)
             if prev_trend == "stalling":
                 label = DECISION_LABELS.get(decision, decision.title())
-                cmd = ROUTING_RULES.get(decision, f"/scaleup-{decision}")
+                cmd = ROUTING_RULES.get(decision, f"/escala-{decision}")
                 attention.append((decision, label, f"stalling 2+ pulses → run {cmd}"))
     return attention
 
@@ -155,13 +155,13 @@ def _build_attention(pulses: list[dict]) -> list[tuple[str, str, str]]:
 
 def _section_pulse_history(pulses: list[dict]) -> str:
     if not pulses:
-        return "No pulse data yet. Run /scaleup-pulse to start tracking."
+        return "No pulse data yet. Run /escala-pulse to start tracking."
     return _build_history_table(pulses)
 
 
 def _section_wins(pulses: list[dict]) -> str:
     if not pulses:
-        return "No pulse data yet. Run /scaleup-pulse to start tracking."
+        return "No pulse data yet. Run /escala-pulse to start tracking."
     wins = _build_wins(pulses[-1])
     if not wins:
         return "No improving trends in the latest pulse."
@@ -173,7 +173,7 @@ def _section_wins(pulses: list[dict]) -> str:
 
 def _section_attention(pulses: list[dict]) -> str:
     if not pulses:
-        return "No pulse data yet. Run /scaleup-pulse to start tracking."
+        return "No pulse data yet. Run /escala-pulse to start tracking."
     items = _build_attention(pulses)
     if not items:
         return "No attention areas detected. Keep up the momentum!"
@@ -211,7 +211,7 @@ def run(context: dict) -> dict:
 
     # --- Assemble full dashboard ---
     sections = [
-        "# ScaleUp Progress Dashboard",
+        "# ESCALA Progress Dashboard",
         "",
         "## Current Scores",
         "",

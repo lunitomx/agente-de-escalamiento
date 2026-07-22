@@ -4,18 +4,12 @@ name: One-Page Strategic Plan (OPSP)
 name_es: Plan Estrategico de Una Pagina (OPSP)
 decision: strategy
 summary: >
-  The central tool of Scaling Up — consolidates vision, strategy, and execution on one
-  page. Seven columns: Core Values/Purpose (column 1), BHAG + 3-5 year targets (column 2),
+  A one-page plan that consolidates vision, strategy, and execution. Seven columns:
+  Core Values/Purpose (column 1), BHAG + 3-5 year targets (column 2),
   brand promises + sandbox (column 3), annual priorities/critical number (column 4),
   quarterly rocks (columns 5-7). The first three columns are strategic thinking (informed
   by 7 Strata); the last four are execution planning. Updated quarterly by the full
   leadership team. The SWT summary appears at the bottom.
-source:
-  book_chapter: "THE ONE-PAGE STRATEGIC PLAN"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 841
-  workbook_file: "metodologias_parsed/strategy_workbook.txt"
-  workbook_line: 2434
 relationships:
   - type: belongs-to
     target: decision-strategy

@@ -171,13 +171,13 @@ def main():
 
     # migrate
     migrate_parser = subparsers.add_parser(
-        "migrate", help="Import .scaleup/ data into SQLite"
+        "migrate", help="Import .escala/ data into SQLite"
     )
     migrate_parser.add_argument(
         "yaml_root",
         nargs="?",
-        default=".scaleup",
-        help="Path to .scaleup/ directory (default: .scaleup)",
+        default=".escala",
+        help="Path to .escala/ directory (default: .escala)",
     )
     migrate_parser.add_argument(
         "--db-path",
@@ -204,37 +204,41 @@ def main():
         help="SQLite database path",
     )
 
-    # ── verne ──
-    verne_parser = subparsers.add_parser("verne", help="Consultar a Verne Harnish")
-    verne_sub = verne_parser.add_subparsers(dest="verne_command")
-    verne_ask_parser = verne_sub.add_parser("ask", help="Preguntar a Verne")
-    verne_ask_parser.add_argument("question", nargs="+", help="Pregunta para Verne")
-    verne_ask_parser.add_argument(
+    # ── advisor ──
+    advisor_parser = subparsers.add_parser(
+        "advisor", help="Consultar al asesor de negocio local"
+    )
+    advisor_sub = advisor_parser.add_subparsers(dest="advisor_command")
+    advisor_ask_parser = advisor_sub.add_parser("ask", help="Preguntar al asesor")
+    advisor_ask_parser.add_argument(
+        "question", nargs="+", help="Pregunta para el asesor"
+    )
+    advisor_ask_parser.add_argument(
         "--db-path",
         default=str(Path.home() / ".escala" / "escala.db"),
         help="SQLite database path",
     )
 
-    verne_review_parser = verne_sub.add_parser(
+    advisor_review_parser = advisor_sub.add_parser(
         "review-daily", help="Revisar un daily huddle"
     )
-    verne_review_parser.add_argument(
+    advisor_review_parser.add_argument(
         "daily_text", nargs="+", help="Texto del daily huddle"
     )
-    verne_review_parser.add_argument(
+    advisor_review_parser.add_argument(
         "--db-path",
         default=str(Path.home() / ".escala" / "escala.db"),
         help="SQLite database path",
     )
 
-    verne_debate_parser = verne_sub.add_parser(
-        "debate", help="Debatir una decisión estratégica con Verne"
+    advisor_debate_parser = advisor_sub.add_parser(
+        "debate", help="Debatir una decisión estratégica con el asesor"
     )
-    verne_debate_parser.add_argument(
+    advisor_debate_parser.add_argument(
         "decision", nargs="+", help="Decisión estratégica a debatir"
     )
-    verne_debate_parser.add_argument("--context", help="Contexto de la empresa")
-    verne_debate_parser.add_argument(
+    advisor_debate_parser.add_argument("--context", help="Contexto de la empresa")
+    advisor_debate_parser.add_argument(
         "--db-path",
         default=str(Path.home() / ".escala" / "escala.db"),
         help="SQLite database path",
@@ -254,8 +258,8 @@ def main():
         cmd_inicia(args)
     elif args.command == "cierra":
         cmd_cierra(args)
-    elif args.command == "verne":
-        cmd_verne(args)
+    elif args.command == "advisor":
+        cmd_advisor(args)
     else:
         parser.print_help()
 
@@ -295,25 +299,25 @@ def cmd_cierra(args):
     print(f"  Summary: {result.summary}")
     print()
 
-    # Verne's perspective (S21.4)
-    from escala_server.verne_handler import VerneHandler
+    # Local advisor perspective
+    from escala_server.business_advisor import BusinessAdvisorHandler
 
-    verne = VerneHandler(args.db_path)
-    vp = verne.session_perspective(
+    advisor = BusinessAdvisorHandler(args.db_path)
+    perspective = advisor.session_perspective(
         category=getattr(result, "category", None),
         changes_count=result.changes_count,
         company=getattr(result, "company", None),
     )
-    print(vp.get("perspective", ""))
+    print(perspective.get("perspective", ""))
 
 
-def cmd_verne(args):
-    """Dispatch Verne subcommands."""
-    from escala_server.verne_handler import VerneHandler
+def cmd_advisor(args):
+    """Dispatch local business-advisor subcommands."""
+    from escala_server.business_advisor import BusinessAdvisorHandler
 
-    if args.verne_command == "ask":
+    if args.advisor_command == "ask":
         question = " ".join(args.question)
-        handler = VerneHandler(args.db_path)
+        handler = BusinessAdvisorHandler(args.db_path)
         result = handler.ask(question)
         print()
         print(result.get("answer", ""))
@@ -325,17 +329,17 @@ def cmd_verne(args):
         if result.get("principles_applied"):
             print(f"⚖️  Principios: {', '.join(result['principles_applied'])}")
         print(f"🏷️  Categoría: {result.get('category', 'general')}".capitalize())
-    elif args.verne_command == "review-daily":
+    elif args.advisor_command == "review-daily":
         daily_text = " ".join(args.daily_text)
-        handler = VerneHandler(args.db_path)
+        handler = BusinessAdvisorHandler(args.db_path)
         result = handler.review_daily(daily_text)
         print()
         print(result.get("observations", ""))
         print()
-    elif args.verne_command == "debate":
+    elif args.advisor_command == "debate":
         decision = " ".join(args.decision)
         context = getattr(args, "context", None)
-        handler = VerneHandler(args.db_path)
+        handler = BusinessAdvisorHandler(args.db_path)
         result = handler.board_debate(decision=decision, context=context)
         print()
         print(result.get("response", ""))
@@ -346,23 +350,25 @@ def cmd_verne(args):
                 print(f"  {i}. {q}")
         print()
     else:
-        print("Comandos de Verne: ask, review-daily, debate")
+        print("Comandos del asesor: ask, review-daily, debate")
         print()
-        print('  escala verne ask "tu pregunta"')
-        print("    → Verne responde desde su framework de 4 Decisiones")
-        print('    Ej: escala verne ask "cómo mejoro mi flujo de efectivo"')
+        print('  escala advisor ask "tu pregunta"')
+        print("    → El asesor responde desde las 4 áreas del negocio")
+        print('    Ej: escala advisor ask "cómo mejoro mi flujo de efectivo"')
         print()
-        print('  escala verne review-daily "logros de ayer, planes de hoy, obstáculos"')
-        print("    → Verne califica tu daily (0-12) contra Rockefeller Habits")
         print(
-            '    Ej: escala verne review-daily "ayer vendí 5, hoy voy a cobrar, no tengo maíz"'
+            '  escala advisor review-daily "logros de ayer, planes de hoy, obstáculos"'
+        )
+        print("    → El asesor califica la estructura de tu daily (0-12)")
+        print(
+            '    Ej: escala advisor review-daily "ayer vendí 5, hoy voy a cobrar, no tengo maíz"'
         )
         print()
-        print('  escala verne debate "decisión estratégica"')
-        print("    → Verne analiza tu decisión con las 4 Decisiones")
-        print('    Ej: escala verne debate "deberíamos abrir un nuevo local"')
+        print('  escala advisor debate "decisión estratégica"')
+        print("    → El asesor analiza tu decisión en las 4 áreas del negocio")
+        print('    Ej: escala advisor debate "deberíamos abrir un nuevo local"')
         print()
-        print("  También puedes preguntarle 'quién eres' para conocerlo.")
+        print("  También puedes preguntarle 'quién eres' para conocer su alcance.")
 
 
 if __name__ == "__main__":

@@ -3,7 +3,7 @@ type: registry
 name: Worksheet Registry
 name_es: Registro de Hojas de Trabajo
 description: >
-  Central index of all 15 worksheets across the 4 Scaling Up decisions.
+  Central index of all 15 worksheets across the 4 ESCALA decisions.
   Enables deterministic lookup by decision, prerequisite, or output type.
 total_worksheets: 15
 worksheets:
@@ -123,10 +123,10 @@ worksheets:
 
   # ── EXECUTION (4) ──────────────────────────────────────────────────────────
 
-  - id: worksheet-rockefeller-habits
+  - id: worksheet-execution-habits
     decision: execution
-    name: Rockefeller Habits Checklist Worksheet
-    node_path: execution/worksheets/rockefeller-habits.yaml
+    name: Execution Habits Checklist Worksheet
+    node_path: execution/worksheets/execution-habits.yaml
     prerequisites: [worksheet-opsp]
     outputs:
       - habits score (0-10 per habit)
@@ -140,7 +140,7 @@ worksheets:
     decision: execution
     name: Quarterly Priorities and Rocks Worksheet
     node_path: execution/worksheets/quarterly-priorities.yaml
-    prerequisites: [worksheet-opsp, worksheet-rockefeller-habits]
+    prerequisites: [worksheet-opsp, worksheet-execution-habits]
     outputs:
       - company Critical Number for the quarter
       - 3-5 company Rocks with owners and deadlines
@@ -167,7 +167,7 @@ worksheets:
     decision: execution
     name: Meeting Rhythm Agenda Templates Worksheet
     node_path: execution/worksheets/meeting-agenda.yaml
-    prerequisites: [worksheet-rockefeller-habits]
+    prerequisites: [worksheet-execution-habits]
     outputs:
       - daily huddle agenda (15 min)
       - weekly meeting agenda (60-90 min)

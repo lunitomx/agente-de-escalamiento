@@ -10,12 +10,6 @@ summary: >
   No problem-solving in the huddle — stuck items get a follow-up meeting with the
   relevant people only. The daily huddle replaces dozens of ad-hoc interruptions
   throughout the day. Conducted at the same time, standing up, every business day.
-source:
-  book_chapter: "THE MEETING RHYTHM"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 323
-  workbook_file: "metodologias_parsed/execution_workbook.txt"
-  workbook_line: 501
 relationships:
   - type: belongs-to
     target: decision-execution

@@ -1,4 +1,4 @@
-# Diagnóstico ScaleUp — {company_name}
+# Diagnóstico ESCALA — {company_name}
 
 > Fecha: {date}
 

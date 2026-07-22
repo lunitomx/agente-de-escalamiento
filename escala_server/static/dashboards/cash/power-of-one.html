@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Power of One — 7 Palancas | ScaleUp</title>
+  <title>Power of One — 7 Palancas | ESCALA</title>
   <link rel="stylesheet" href="../../shared/styles/dashboard-base.css">
   <link rel="stylesheet" href="../../shared/styles/context-panel.css">
   <style>
@@ -80,9 +80,9 @@
     .side-panel { display: flex; flex-direction: column; gap: 12px; }
     .side-card { background: white; border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
     .side-card h3 { margin: 0 0 10px; font-size: 0.85rem; color: #0f172a; display: flex; align-items: center; gap: 6px; }
-    .verne-msg { font-size: 0.82rem; line-height: 1.5; color: #334155; }
-    .verne-msg strong { color: #0f172a; }
-    .verne-msg .principle { display: inline-block; background: #dbeafe; color: #1d4ed8; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; margin: 2px; }
+    .advisor-msg { font-size: 0.82rem; line-height: 1.5; color: #334155; }
+    .advisor-msg strong { color: #0f172a; }
+    .advisor-msg .principle { display: inline-block; background: #dbeafe; color: #1d4ed8; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; margin: 2px; }
 
     .priority-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.82rem; }
     .priority-item:last-child { border-bottom: none; }
@@ -104,7 +104,7 @@
     <div class="tool-header">
       <div class="breadcrumb"><a href="/">Home</a> › <a href="/" onclick="event.preventDefault();window.location.href='/'">Cash</a> › Power of One</div>
       <h1>🔄 Power of One — Las 7 Palancas</h1>
-      <div class="subtitle">Mejora 1% en cada palanca y mira el efecto en tu bolsillo. Basado en Alan Miltz / Scaling Up.</div>
+      <div class="subtitle">Simula cambios en cada palanca y observa el efecto estimado en efectivo y utilidad.</div>
     </div>
 
     <div class="company-bar">
@@ -183,12 +183,12 @@
         <div class="levers" id="levers-container"></div>
       </div>
 
-      <!-- Side panel: Verne + Prioridades -->
+      <!-- Side panel: advisor + priorities -->
       <div class="side-col">
         <div class="side-panel">
           <div class="side-card">
-            <h3>🤵 Verne opina</h3>
-            <div id="verne-advice" class="verne-msg">Selecciona una empresa y ajusta las palancas para ver qué dice Verne.</div>
+            <h3>🤵 El asesor observa</h3>
+            <div id="advisor-advice" class="advisor-msg">Selecciona una empresa y ajusta las palancas para recibir observaciones.</div>
           </div>
           <div class="side-card" id="priorities-card" style="display:none;">
             <h3>🎯 Prioridades</h3>
@@ -198,9 +198,7 @@
       </div>
     </div>
 
-    <p class="attribution">
-      Metodología: <strong>Alan Miltz</strong> · Implementación original: <strong>Humberto Martínez Barón</strong> · Adaptación: Kokoro (Eduardo Muñoz Luna)
-    </p>
+    <p class="attribution">Simulación operativa local · ESCALA</p>
   </div>
 
   <script>
@@ -404,7 +402,7 @@
               if (resp.status === 'ok') {
                 lastResult = resp.data;
                 renderResults(resp.data);
-                renderVerne(resp.data);
+                renderAdvisor(resp.data);
               }
             } catch(e) {}
           }
@@ -461,25 +459,25 @@
         });
       };
 
-      // ── Verne advice ──────────────────────────────────────────
-      function renderVerne(data) {
-        var el = document.getElementById('verne-advice');
+      // ── Local advisor observations ────────────────────────────
+      function renderAdvisor(data) {
+        var el = document.getElementById('advisor-advice');
         if (!el) return;
 
         var hasAdj = LEVER_IDS.some(function(k) { return adjustments[k] !== 0; });
         if (!hasAdj) {
-          el.innerHTML = 'Ajusta las palancas con los botones +1 / -1 para ver qué opina Verne de tus prioridades.';
+          el.innerHTML = 'Ajusta las palancas con los botones +1 / -1 para comparar prioridades.';
           return;
         }
 
         var best = (data.priorities || [])[0];
-        if (!best) { el.innerHTML = 'Verne espera tus ajustes...'; return; }
+        if (!best) { el.innerHTML = 'El asesor espera tus ajustes...'; return; }
 
         var labelMap = {};
         LEVERS.forEach(function(l) { labelMap[l.id] = l.label; });
 
         var lines = [];
-        lines.push('<strong>Verne dice:</strong>');
+        lines.push('<strong>El asesor observa:</strong>');
         lines.push('');
 
         // Best priority
@@ -491,7 +489,7 @@
         lines.push('   📊 Dificultad: ' + best.difficulty + '/5');
         lines.push('');
 
-        // Rockefeller principle
+        // Operating principle
         var principles = {
           price: 'Keep Things Simple · No Surprises',
           volume: 'Routine Sets You Free',
@@ -502,7 +500,7 @@
           ap_days: 'No Surprises · Keep Things Simple',
         };
         var princ = principles[best.lever] || 'Keep Things Simple';
-        lines.push('⚖️ <strong>Principio Rockefeller:</strong>');
+        lines.push('⚖️ <strong>Principio operativo:</strong>');
         princ.split('·').forEach(function(p) {
           lines.push('   <span class="principle">' + p.trim() + '</span>');
         });

@@ -79,7 +79,7 @@ def test_result_has_errors_key():
 
 def test_scores_table_has_header(tmp_path):
     """When scores > 0 exist, table has | Decision header."""
-    profile_dir = tmp_path / ".scaleup" / "agent" / "memory"
+    profile_dir = tmp_path / ".escala" / "agent" / "memory"
     profile_dir.mkdir(parents=True)
     profile = {
         "company": {"name": "TestCo"},
@@ -96,7 +96,7 @@ def test_scores_table_has_header(tmp_path):
 
 def test_scores_table_level_mapping(tmp_path):
     """Score 3 maps to Emergente, score 4 maps to Establecido."""
-    profile_dir = tmp_path / ".scaleup" / "agent" / "memory"
+    profile_dir = tmp_path / ".escala" / "agent" / "memory"
     profile_dir.mkdir(parents=True)
     profile = {
         "scores": {"people": 3, "strategy": 4, "execution": 2, "cash": 1},
@@ -124,7 +124,7 @@ def test_scores_graceful_missing_file():
 
 def test_scores_all_zeros_treated_as_no_diagnosis(tmp_path):
     """All-zero scores (not yet diagnosed) → show placeholder, not empty table."""
-    profile_dir = tmp_path / ".scaleup" / "agent" / "memory"
+    profile_dir = tmp_path / ".escala" / "agent" / "memory"
     profile_dir.mkdir(parents=True)
     profile = {
         "scores": {"people": 0, "strategy": 0, "execution": 0, "cash": 0},
@@ -139,7 +139,7 @@ def test_scores_all_zeros_treated_as_no_diagnosis(tmp_path):
 
 def test_scores_in_artifacts(tmp_path):
     """Scores are returned in artifacts."""
-    profile_dir = tmp_path / ".scaleup" / "agent" / "memory"
+    profile_dir = tmp_path / ".escala" / "agent" / "memory"
     profile_dir.mkdir(parents=True)
     profile = {
         "scores": {"people": 3, "strategy": 2, "execution": 2, "cash": 3},
@@ -159,8 +159,8 @@ def test_scores_in_artifacts(tmp_path):
 
 
 def _make_pulse_dir(tmp_path: Path) -> Path:
-    """Create .scaleup/my-company/ dir structure under tmp_path."""
-    pulse_dir = tmp_path / ".scaleup" / "my-company"
+    """Create .escala/my-company/ dir structure under tmp_path."""
+    pulse_dir = tmp_path / ".escala" / "my-company"
     pulse_dir.mkdir(parents=True)
     return pulse_dir
 
@@ -186,7 +186,7 @@ def test_pulse_history_table_structure(tmp_path):
                     "cash": "stalling",
                     "overall": "stalling",
                 },
-                "course_corrections": ["Execution regressing → run /scaleup-execution"],
+                "course_corrections": ["Execution regressing → run /escala-execution"],
             }
         ]
     }
@@ -438,7 +438,7 @@ def test_no_pulse_history_graceful():
 
 def test_scores_null_treated_as_no_diagnosis(tmp_path):
     """scores: null in YAML → no crash, shows placeholder."""
-    profile_dir = tmp_path / ".scaleup" / "agent" / "memory"
+    profile_dir = tmp_path / ".escala" / "agent" / "memory"
     profile_dir.mkdir(parents=True)
     (profile_dir / "company-profile.yaml").write_text("scores: null\n")
 
@@ -451,7 +451,7 @@ def test_scores_null_treated_as_no_diagnosis(tmp_path):
 
 def test_pulses_null_graceful(tmp_path):
     """pulses: null in YAML → no crash, shows placeholder in pulse sections."""
-    pulse_dir = tmp_path / ".scaleup" / "my-company"
+    pulse_dir = tmp_path / ".escala" / "my-company"
     pulse_dir.mkdir(parents=True)
     (pulse_dir / "pulse-history.yaml").write_text("pulses: null\n")
 

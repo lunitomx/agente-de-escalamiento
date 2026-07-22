@@ -18,10 +18,10 @@ GROWTH_STAGES = {
         "label": "Growth",
         "label_es": "Crecimiento",
     },
-    "scaleup": {
+    "scaling": {
         "min_employees": 51,
         "max_employees": 250,
-        "label": "Scale-Up",
+        "label": "Scaling",
         "label_es": "Escalamiento",
     },
     "enterprise": {

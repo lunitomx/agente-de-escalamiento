@@ -11,12 +11,6 @@ summary: >
   wrong differentiating activities, and a sandbox that is too broad to win in.
   In the 7 Strata, Core Customer is the first component — it defines who everything
   else is designed for.
-source:
-  book_chapter: "THE 7 STRATA OF STRATEGY"
-  file: "scaling_up_llamaparse.txt"
-  file_line: 819
-  workbook_file: "metodologias_parsed/strategy_workbook.txt"
-  workbook_line: 767
 relationships:
   - type: belongs-to
     target: decision-strategy
