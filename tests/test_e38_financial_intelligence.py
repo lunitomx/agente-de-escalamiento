@@ -7,9 +7,12 @@ from datetime import date
 from zipfile import ZipFile
 
 from escala_server.financial import (
+    CashScenarioRequest,
     MappingAnswer,
     profile_financial_workbook,
     reconstruct_statements,
+    build_cash_decision,
+    render_cash_decision_receipt_json,
     render_profile_receipt_json,
     resolve_mapping_answers,
 )
@@ -223,3 +226,92 @@ def test_formula_without_cached_value_is_not_a_financial_fact(tmp_path: Path) ->
     assert statements.pnl.status == "partial"
     assert "net_profit" in statements.pnl.missing
     assert "formula_without_cached_value" in statements.findings
+
+
+def _cash_statements(
+    tmp_path: Path,
+    *,
+    period: str = "2026-07",
+    second_currency: str | None = None,
+):
+    config = _config(tmp_path)
+    workbook = config.exchange_root / "cash.csv"
+    balance_currency = second_currency or "MXN"
+    workbook.write_text(
+        f"Cuenta,{period},Moneda,Unidad\n"
+        f"Ventas netas,120000,MXN,pesos\n"
+        f"Costo de ventas,70000,MXN,pesos\n"
+        f"Gastos operativos,30000,MXN,pesos\n"
+        f"Utilidad neta,15000,MXN,pesos\n"
+        f"Caja,22000,{balance_currency},pesos\n"
+        f"Cuentas por cobrar,18000,{balance_currency},pesos\n"
+        f"Inventario,12000,{balance_currency},pesos\n"
+        f"Cuentas por pagar,9000,{balance_currency},pesos\n"
+        f"Flujo operativo,20000,{balance_currency},pesos\n"
+        f"Flujo de inversion,-5000,{balance_currency},pesos\n"
+        f"Flujo de financiamiento,-3000,{balance_currency},pesos\n",
+        encoding="utf-8",
+    )
+    profile = profile_financial_workbook(config, workbook)
+    return reconstruct_statements(profile, as_of=date(2026, 7, 22))
+
+
+def test_cash_decision_exposes_ccc_assumptions_and_comparable_scenarios(
+    tmp_path: Path,
+) -> None:
+    statements = _cash_statements(tmp_path)
+
+    decision = build_cash_decision(
+        statements,
+        as_of=date(2026, 7, 22),
+        scenarios=(
+            CashScenarioRequest(scenario_id="price-plus-one", adjustments={"price": 1}),
+            CashScenarioRequest(
+                scenario_id="ar-minus-one-day", adjustments={"ar_days": 1}
+            ),
+        ),
+    )
+
+    assert decision.status == "ready"
+    assert decision.assumptions is not None
+    assert decision.baseline is not None
+    assert decision.assumptions.days_per_year == 365
+    assert decision.assumptions.annualization_factor == 12
+    assert decision.baseline.metrics["ccc_days"] > 0
+    assert {scenario.scenario_id for scenario in decision.scenarios} == {
+        "price-plus-one",
+        "ar-minus-one-day",
+    }
+    assert (
+        next(
+            scenario
+            for scenario in decision.scenarios
+            if scenario.scenario_id == "price-plus-one"
+        ).combined_cash_impact
+        > 0
+    )
+    assert decision.recommendations
+    receipt = render_cash_decision_receipt_json(decision)
+    assert str(tmp_path) not in receipt
+    assert "120000" not in receipt
+
+
+def test_stale_inputs_block_cash_recommendations(tmp_path: Path) -> None:
+    statements = _cash_statements(tmp_path, period="2025-01")
+
+    decision = build_cash_decision(statements, as_of=date(2026, 7, 22))
+
+    assert decision.status == "blocked"
+    assert "stale_input" in decision.findings
+    assert not decision.recommendations
+    assert not decision.scenarios
+
+
+def test_mixed_currency_blocks_cash_decision(tmp_path: Path) -> None:
+    statements = _cash_statements(tmp_path, second_currency="USD")
+
+    decision = build_cash_decision(statements, as_of=date(2026, 7, 22))
+
+    assert decision.status == "blocked"
+    assert "currency_mismatch" in decision.findings
+    assert not decision.recommendations
