@@ -15,6 +15,17 @@ ContextStatus = Literal["ready", "unresolved"]
 MeetingItemStatus = Literal["ready", "unresolved", "duplicate", "rejected"]
 EvidenceOrigin = Literal["line", "filename"]
 Confidence = Literal["high", "medium", "low"]
+FactKind = Literal[
+    "decision",
+    "action",
+    "owner",
+    "due_date",
+    "blocker",
+    "risk",
+    "commitment",
+]
+FactResultStatus = Literal["ready", "partial", "blocked"]
+RhythmStatus = Literal["supported", "evidence_missing", "unresolved"]
 
 
 class _StrictModel(BaseModel):
@@ -128,6 +139,50 @@ class MeetingRunResult(_StrictModel):
     items: tuple[MeetingItemResult, ...] = ()
     ledger: MeetingLedger = Field(default_factory=MeetingLedger)
     ledger_changed: bool = False
+
+
+class MeetingFact(_StrictModel):
+    """One explicitly labelled meeting fact with line provenance."""
+
+    fact_id: str = Field(pattern=r"^[0-9a-f]{64}$")
+    source_id: str = Field(pattern=r"^[0-9a-f]{64}$")
+    kind: FactKind
+    value: str = Field(min_length=1, max_length=1000)
+    owner: str | None = None
+    due_date: date | None = None
+    evidence: MeetingProvenance
+    confidence: Confidence
+
+
+class MeetingFactResult(_StrictModel):
+    """Extraction result that can be partial but never overconfident."""
+
+    status: FactResultStatus
+    source_id: str = Field(pattern=r"^[0-9a-f]{64}$")
+    facts: tuple[MeetingFact, ...] = ()
+    questions: tuple[MeetingQuestion, ...] = ()
+    findings: tuple[str, ...] = ()
+
+
+class RhythmRule(_StrictModel):
+    """Declared business expectation; it is not a performance score."""
+
+    rule_id: str = Field(min_length=1, max_length=80)
+    meeting_type: MeetingType
+    cadence_days: int = Field(ge=1, le=31)
+
+
+class RhythmAssessment(_StrictModel):
+    """Observed versus missing evidence for one declared rhythm rule."""
+
+    status: RhythmStatus
+    rule_id: str
+    meeting_type: MeetingType
+    observed_dates: tuple[date, ...] = ()
+    expected_dates: tuple[date, ...] = ()
+    missing_dates: tuple[date, ...] = ()
+    person_impact: Literal["not_assessed"] = "not_assessed"
+    note_code: str = Field(min_length=1, max_length=80)
 
 
 def evidence_hash(text: str) -> str:

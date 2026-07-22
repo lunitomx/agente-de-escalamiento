@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
+from datetime import date
 import json
 from pathlib import Path
 
 from escala_server.meetings import (
+    RhythmRule,
     MeetingIntakeError,
+    assess_rhythm,
+    extract_meeting_facts,
     render_meeting_intake_receipt_json,
     scan_meeting_inbox,
 )
@@ -131,3 +135,102 @@ def test_missing_exchange_fails_with_stable_code(tmp_path: Path) -> None:
         assert error.code == "exchange_missing"
     else:  # pragma: no cover - assertion guard
         raise AssertionError("missing exchange must fail closed")
+
+
+def test_extracts_required_facts_with_provenance_and_attachments(
+    tmp_path: Path,
+) -> None:
+    config = _config(tmp_path)
+    source = config.exchange_root / "daily-2026-07-21.transcript"
+    source.write_text(
+        "Tipo: daily\n"
+        "Fecha: 2026-07-21\n"
+        "Equipo: Operaciones\n"
+        "Participantes: Ana, Luis\n"
+        "Decisión: Mantener proveedor A\n"
+        "Acción: Ana — revisar inventario — vence: 2026-07-25\n"
+        "Bloqueador: aprobación de compras\n"
+        "Riesgo: proveedor atrasado\n"
+        "Compromiso: Luis entregará presupuesto\n"
+        "Responsable: Ana\n"
+        "Vence: 2026-07-25\n",
+        encoding="utf-8",
+    )
+
+    intake = scan_meeting_inbox(config)
+    result = extract_meeting_facts(config, intake.items[0])
+
+    assert result.status == "ready"
+    assert {fact.kind for fact in result.facts} >= {
+        "decision",
+        "action",
+        "blocker",
+        "risk",
+        "commitment",
+        "owner",
+        "due_date",
+    }
+    action = next(fact for fact in result.facts if fact.kind == "action")
+    assert action.owner == "Ana"
+    assert action.due_date == date(2026, 7, 25)
+    assert action.confidence == "high"
+    assert action.evidence.source_id == intake.items[0].source_id
+    assert action.evidence.line_start == 6
+    assert all(fact.value for fact in result.facts)
+
+
+def test_changed_source_blocks_stale_extraction(tmp_path: Path) -> None:
+    config = _config(tmp_path)
+    source = config.exchange_root / "daily-2026-07-21.transcript"
+    source.write_text(
+        "Tipo: daily\nFecha: 2026-07-21\nEquipo: Operaciones\n"
+        "Participantes: Ana\nAcción: Ana — revisar inventario\n",
+        encoding="utf-8",
+    )
+    intake = scan_meeting_inbox(config)
+    source.write_text(
+        source.read_text(encoding="utf-8") + "Riesgo: cambio\n", encoding="utf-8"
+    )
+
+    result = extract_meeting_facts(config, intake.items[0])
+
+    assert result.status == "blocked"
+    assert "source_changed" in result.findings
+    assert not result.facts
+
+
+def test_rhythm_reports_missing_evidence_without_person_failure() -> None:
+    context = scan_context("daily", date(2026, 7, 20))
+
+    assessment = assess_rhythm(
+        (context,),
+        RhythmRule(rule_id="daily", meeting_type="daily", cadence_days=1),
+        period_start=date(2026, 7, 20),
+        period_end=date(2026, 7, 22),
+    )
+
+    assert assessment.status == "evidence_missing"
+    assert assessment.missing_dates == (date(2026, 7, 21), date(2026, 7, 22))
+    assert assessment.person_impact == "not_assessed"
+
+
+def scan_context(meeting_type: str, meeting_date: date):
+    """Build a context through the public intake seam for rhythm tests."""
+
+    from escala_server.meetings import MeetingContext, MeetingProvenance
+
+    return MeetingContext(
+        context_status="ready",
+        meeting_type=meeting_type,  # type: ignore[arg-type]
+        meeting_date=meeting_date,
+        team="Operaciones",
+        participants=("Ana",),
+        provenance=MeetingProvenance(
+            source_id="a" * 64,
+            relative_path="daily.transcript",
+            line_start=1,
+            line_end=1,
+            evidence_sha256="b" * 64,
+        ),
+        confidence="high",
+    )
