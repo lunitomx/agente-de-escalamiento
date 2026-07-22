@@ -1,7 +1,7 @@
 ---
 epic_id: "E37"
 title: "Local Workspace & Flexible Ingestion"
-status: "designed"
+status: "planned"
 created: "2026-07-22"
 mission: "escala-local-v2-plan-maestro-2607202112"
 ---
@@ -124,9 +124,52 @@ qué entendió, preguntar por ambigüedades materiales y fallar de forma segura.
 
 ## Implementation Plan
 
-> La secuencia detallada y los checkpoints RED-GREEN-REFACTOR están en
-> `design.md` y se formalizarán mediante `/rai-epic-plan` antes de escribir
-> implementación.
+E37 se planifica como un walking skeleton con riesgo primero. No existe un
+registro formal de aprendizaje de `rai-epic-design` ni un archivo de
+calibración de velocidad disponible; los tamaños se mantienen como hipótesis y
+los tiempos reales se anotarán por story, sin convertirlos en fechas objetivo.
+Los patrones de grafo consultados favorecen boundary-first, gates fail-closed y
+un checkpoint E2E real antes del cierre.
+
+### Story Sequence
+
+| Order | Story | Size | Dependencies | Milestone | Rationale and what it enables |
+|:-----:|---|:---:|---|---|---|
+| 1 | S37.1 Local Workspace & Data Authority | M | E36 (hard) | M1 Walking Skeleton | Prueba primero el riesgo de autoridad y evita abrir SQLite en una carpeta de intercambio; habilita cualquier procesamiento seguro. |
+| 2 | S37.2 Flexible File Ingestion | L | S37.1 (hard) | M2 Profile MVP | Construye el contrato de fuente, adapters y preguntas sobre una frontera ya segura; habilita la integración del inbox. |
+| 3 | S37.3 Synced-Folder Inbox & Failure Handling | M | S37.1 + S37.2 (hard) | M3 E2E / Epic Complete | Integra enum, fingerprint, reintento, duplicado y cuarentena contra una carpeta temporal real; es la demostración que une todos los contratos. |
+
+Critical path: `E36 → S37.1 → S37.2 → S37.3 → E37 close`.
+
+No se programa trabajo de stories en paralelo: las tres tocan el mismo límite
+de autoridad y el processor no puede ser confiable antes del modelo de fuente.
+Dentro de S37.2 sí pueden prepararse fixtures de formatos en paralelo con la
+implementación del registry, siempre que cada commit mantenga el ciclo TDD.
+
+### Milestones
+
+| Milestone | Stories | Success criteria | Demonstrable capability |
+|---|---|---|---|
+| **M1: Local Authority Walking Skeleton** | S37.1 | Guards de path y symlink, macOS/Windows-style fixtures, tests/lint/format/types pass; SQLite dentro del exchange falla antes de abrir. | Configurar un workspace y ver un receipt seguro de autoridad. |
+| **M2: Flexible Profile MVP** | S37.1–S37.2 | Registry tipado, perfiles de texto/tablas y adapters declarados; unknown/ambiguous/provider-missing inputs generan estados explícitos y preguntas. | Entregar CSV/TSV/XLSX/documento/PDF/transcript y saber qué se entendió o qué falta. |
+| **M3: Real Inbox Integration** | S37.1–S37.3 | Una carpeta temporal ordinaria procesa entradas válidas, duplica cero fuentes al repetir, aísla inválidos y deja DB/receipts sin filtraciones ni mutación indebida. | Repetir la corrida diaria sobre una carpeta sincronizada simulada con una empresa sintética. |
+| **M4: Epic Complete** | S37.1–S37.3 + exit audit | REQ-E37-001…007 tienen artifacts/receipts y gates PASS; scope, retrospective y ledger reflejan la evidencia, no planes. | E37 listo para que E38 consuma perfiles confirmados. |
+
+### Progress Tracking
+
+| Story | Size | Status | Actual | Velocity | Notes |
+|---|:---:|:---:|:---:|:---:|---|
+| S37.1 | M | pending | — | — | First risk: local authority and SQLite-sync rejection. |
+| S37.2 | L | pending | — | — | Registry, profiling, clarification and source identity. |
+| S37.3 | M | pending | — | — | Real inbox, idempotency, quarantine and safe receipts. |
+
+### Sequencing Risks
+
+| Risk | Impact | Mitigation |
+|---|---|---|
+| Un parser local no cubre los workbooks/documentos reales | High | S37.2 mantiene adapters pequeños, capability reporting y `unsupported`; E42 prueba con empresa sintética antes de ampliar promesas. |
+| La guarda de autoridad falla en symlinks o diferencias de paths | High | S37.1 usa resolución real, containment estricto y fixtures de ambos separadores/plataformas. |
+| El E2E modifica la carpeta de intercambio o duplica estado | High | S37.3 usa inbox read-only, fingerprint antes de persistir, no-mutation assertions y receipts redacted. |
 
 ## Design Artifacts
 
