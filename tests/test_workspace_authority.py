@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import tempfile
 
 import pytest
 from pydantic import ValidationError
@@ -216,3 +217,22 @@ def test_markdown_receipt_uses_same_safe_fields_as_json(tmp_path: Path) -> None:
     assert "status: pass" in markdown
     assert "installer_machine" in markdown
     assert str(tmp_path) not in markdown
+
+
+def test_direct_exchange_target_stays_direct_even_when_temp_root_has_symlink() -> None:
+    with tempfile.TemporaryDirectory(prefix="s371-direct-") as temporary_root:
+        root = Path(temporary_root)
+        exchange = root / "exchange"
+        config = WorkspaceConfig(
+            platform="macos",
+            data_root=root / "data",
+            database_path=exchange / "company.sqlite",
+            exchange_root=exchange,
+        )
+
+        receipt = validate_workspace(config)
+
+    assert receipt.status == "fail"
+    assert {finding.code for finding in receipt.findings} == {
+        "authoritative_sqlite_sync_forbidden"
+    }

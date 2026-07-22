@@ -101,7 +101,7 @@ def validate_workspace(config: WorkspaceConfig) -> WorkspaceReceipt:
             database_path, exchange_root, config.platform
         )
         if database_in_exchange:
-            if _path_has_symlink(config.database_path):
+            if _path_has_symlink(config.database_path, config.exchange_root):
                 findings.append("symlink_inside_exchange")
             else:
                 findings.append("authoritative_sqlite_sync_forbidden")
@@ -150,16 +150,19 @@ def _paths_overlap(first: Path, second: Path, platform: str) -> bool:
     )
 
 
-def _path_has_symlink(path: Path) -> bool:
-    """Detect a symlink in the path's existing or prospective parents."""
+def _path_has_symlink(path: Path, stop_at: Path | None = None) -> bool:
+    """Detect a symlink in the declared path before its relevant boundary."""
 
     current = path.expanduser()
+    boundary = stop_at.expanduser() if stop_at is not None else None
     for candidate in (current, *current.parents):
         try:
             if candidate.is_symlink():
                 return True
         except OSError:
             return True
+        if boundary is not None and candidate == boundary:
+            break
     return False
 
 
