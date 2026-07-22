@@ -3,16 +3,21 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+import subprocess
+import sys
 from typing import Any, Callable
 
 import pytest
 from pydantic import ValidationError
 import yaml
 
+import validators.public_boundary as boundary_module
 from validators.public_boundary import (
     BoundaryFindingCode,
     BoundaryLocatorKind,
+    BoundaryStatus,
     BoundarySurface,
+    PublicCandidateStatus,
     PublicBoundaryFinding,
     PublicPathDisposition,
     classify_public_path,
@@ -20,6 +25,10 @@ from validators.public_boundary import (
     load_exposure_baseline_link,
     load_public_boundary_policy,
     public_boundary_policy_hash,
+    render_public_boundary_json,
+    render_public_boundary_markdown,
+    scan_public_boundary,
+    write_public_boundary_receipts,
 )
 
 
@@ -31,6 +40,11 @@ BASELINE_PATH = (
     / "s36.2-evidence/baseline.json"
 )
 BASELINE_SHA256 = "3ae688c34b8cb13dcf96bd72198aeee6e4eace0a432b413cc654d1c279943dce"
+SCRIPT = ROOT / "scripts/check_public_boundary.py"
+RAW_ASSET_PATH = (
+    "Verne Harnish - Scaling Up_ How a Few Companies Make It...and Why the Rest "
+    "Don't (Rockefeller Habits 2.0)-Gazelles, Inc. (2014).pdf"
+)
 
 
 def _write_policy(tmp_path: Path, data: dict[str, Any]) -> Path:
@@ -299,3 +313,527 @@ def test_baseline_link_rejects_hash_or_surface_drift(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError):
         load_exposure_baseline_link(tmp_path, policy)
+
+
+def _git(repository: Path, *arguments: str) -> str:
+    result = subprocess.run(
+        ["git", "-C", str(repository), *arguments],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return result.stdout.strip()
+
+
+def _initialize_repository(repository: Path) -> None:
+    repository.mkdir(parents=True)
+    subprocess.run(
+        ["git", "init", "--initial-branch=main", str(repository)],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    _git(repository, "config", "user.email", "boundary@example.invalid")
+    _git(repository, "config", "user.name", "Boundary Tests")
+
+
+def _create_boundary_repositories(
+    tmp_path: Path,
+    *,
+    raw_in_head: bool,
+) -> tuple[Path, Path, str]:
+    private = tmp_path / "private-repository"
+    public = tmp_path / "public-candidate"
+    sentinel = "S36-PUBLIC-BOUNDARY-SENTINEL-123456789"
+
+    _initialize_repository(private)
+    (private / "README.md").write_text(
+        "Local business operating system\n",
+        encoding="utf-8",
+    )
+    (private / RAW_ASSET_PATH).write_bytes(b"%PDF-private-reference\x00")
+    _git(private, "add", "README.md", RAW_ASSET_PATH)
+    _git(private, "commit", "-m", "private baseline")
+    (private / RAW_ASSET_PATH).unlink()
+    if not raw_in_head:
+        _git(private, "add", "-u")
+        _git(private, "commit", "-m", "remove current raw asset")
+
+    _initialize_repository(public)
+    (public / "README.md").write_text(
+        "Gazelles legacy public candidate\n",
+        encoding="utf-8",
+    )
+    _git(public, "add", "README.md")
+    _git(public, "commit", "-m", "public baseline")
+    (public / "dirty-private-name.txt").write_text(sentinel, encoding="utf-8")
+
+    return private, public, sentinel
+
+
+def test_real_git_scan_keeps_current_history_and_public_candidate_distinct(
+    tmp_path: Path,
+) -> None:
+    private, public, sentinel = _create_boundary_repositories(
+        tmp_path,
+        raw_in_head=True,
+    )
+    policy = load_public_boundary_policy(POLICY_PATH)
+
+    receipt = scan_public_boundary(
+        private,
+        public,
+        policy,
+        baseline_path=BASELINE_PATH,
+    )
+    serialized = receipt.model_dump_json()
+
+    assert receipt.status is BoundaryStatus.FAIL
+    assert receipt.errors == []
+    assert receipt.verifier_source_commit == _git(private, "rev-parse", "HEAD")
+    assert receipt.raw_asset is not None
+    assert receipt.raw_asset.model_dump(mode="json") == {
+        "worktree": "absent",
+        "git_head": "present",
+        "git_history": "historical",
+    }
+    assert receipt.public_candidate_status is (
+        PublicCandidateStatus.LEGACY_FINDINGS_UNRESOLVED
+    )
+    assert receipt.public_candidate_finding_count == 1
+    assert receipt.path_summary is not None
+    assert receipt.path_summary.candidate_public_count == 1
+    assert receipt.path_summary.denied_count == 1
+    assert receipt.path_summary.not_eligible_count == 0
+    assert receipt.private_repository is not None
+    assert receipt.private_repository.unchanged is True
+    assert receipt.public_candidate is not None
+    assert receipt.public_candidate.unchanged is True
+    assert (public / "dirty-private-name.txt").read_text(encoding="utf-8") == sentinel
+    assert any(
+        finding.code is BoundaryFindingCode.RAW_ASSET_TRACKED
+        and finding.locator_kind is BoundaryLocatorKind.SHA256
+        for finding in receipt.findings
+    )
+    for forbidden in (
+        sentinel,
+        "Gazelles",
+        RAW_ASSET_PATH,
+        str(private),
+        str(public),
+        "dirty-private-name.txt",
+    ):
+        assert forbidden not in serialized
+
+
+def test_scan_ignores_inherited_git_environment_and_dirty_public_content(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    private, public, sentinel = _create_boundary_repositories(
+        tmp_path / "target",
+        raw_in_head=False,
+    )
+    decoy, _, _ = _create_boundary_repositories(
+        tmp_path / "decoy",
+        raw_in_head=True,
+    )
+    injected = "S36-INJECTED-GIT-SECRET"
+    expected_head = _git(private, "rev-parse", "HEAD")
+    monkeypatch.setenv("GIT_DIR", str(decoy / ".git"))
+    monkeypatch.setenv("GIT_WORK_TREE", str(decoy))
+    monkeypatch.setenv("GIT_CONFIG_COUNT", "1")
+    monkeypatch.setenv("GIT_CONFIG_KEY_0", "remote.injected.url")
+    monkeypatch.setenv(
+        "GIT_CONFIG_VALUE_0",
+        f"https://{injected}@example.invalid/private.git",
+    )
+
+    receipt = scan_public_boundary(
+        private,
+        public,
+        load_public_boundary_policy(POLICY_PATH),
+        baseline_path=BASELINE_PATH,
+    )
+    serialized = receipt.model_dump_json()
+
+    assert receipt.status is BoundaryStatus.PASS
+    assert receipt.verifier_source_commit == expected_head
+    assert injected not in serialized
+    assert sentinel not in serialized
+
+
+def test_worktree_and_head_content_are_scanned_as_independent_surfaces(
+    tmp_path: Path,
+) -> None:
+    private, public, _ = _create_boundary_repositories(
+        tmp_path,
+        raw_in_head=False,
+    )
+    (private / "README.md").write_text(
+        "Gazelles appears only in the dirty worktree\n",
+        encoding="utf-8",
+    )
+
+    receipt = scan_public_boundary(
+        private,
+        public,
+        load_public_boundary_policy(POLICY_PATH),
+        baseline_path=BASELINE_PATH,
+    )
+
+    assert receipt.status is BoundaryStatus.FAIL
+    private_source_findings = [
+        finding
+        for finding in receipt.findings
+        if finding.rule_id == "public.company_identity"
+        and finding.surface is not BoundarySurface.PUBLIC_CANDIDATE_HEAD
+    ]
+    assert [finding.surface for finding in private_source_findings] == [
+        BoundarySurface.PRIVATE_WORKTREE
+    ]
+
+
+def test_candidate_path_text_and_yaml_provenance_are_detected_without_values(
+    tmp_path: Path,
+) -> None:
+    private, public, _ = _create_boundary_repositories(
+        tmp_path,
+        raw_in_head=False,
+    )
+    named_path = private / "coaching/scaling_up-guide.md"
+    named_path.parent.mkdir(parents=True)
+    named_path.write_text("Use VerneHandler here\n", encoding="utf-8")
+    yaml_path = private / "conocimiento/node.yaml"
+    yaml_path.parent.mkdir(parents=True)
+    yaml_path.write_text(
+        "id: node\nsource: S36-PRIVATE-PROVENANCE-VALUE\n",
+        encoding="utf-8",
+    )
+    _git(
+        private,
+        "add",
+        named_path.relative_to(private).as_posix(),
+        yaml_path.relative_to(private).as_posix(),
+    )
+    _git(private, "commit", "-m", "add prohibited candidate fixtures")
+
+    receipt = scan_public_boundary(
+        private,
+        public,
+        load_public_boundary_policy(POLICY_PATH),
+        baseline_path=BASELINE_PATH,
+    )
+    serialized = receipt.model_dump_json()
+
+    assert receipt.status is BoundaryStatus.FAIL
+    assert {
+        BoundaryFindingCode.PROHIBITED_PATH,
+        BoundaryFindingCode.PROHIBITED_TEXT,
+        BoundaryFindingCode.PROHIBITED_YAML_KEY,
+    } <= {finding.code for finding in receipt.findings}
+    assert all(
+        finding.locator_kind is BoundaryLocatorKind.SHA256
+        for finding in receipt.findings
+        if finding.code is BoundaryFindingCode.PROHIBITED_PATH
+    )
+    assert "S36-PRIVATE-PROVENANCE-VALUE" not in serialized
+    assert "scaling_up-guide" not in serialized
+
+
+def test_missing_repository_returns_sanitized_incomplete_receipt(
+    tmp_path: Path,
+) -> None:
+    _, public, _ = _create_boundary_repositories(
+        tmp_path / "valid",
+        raw_in_head=False,
+    )
+    secret_fragment = "S36-PRIVATE-MISSING-CUSTOMER"
+    missing = tmp_path / secret_fragment
+
+    receipt = scan_public_boundary(
+        missing,
+        public,
+        load_public_boundary_policy(POLICY_PATH),
+        baseline_path=BASELINE_PATH,
+    )
+
+    assert receipt.status is BoundaryStatus.INCOMPLETE
+    assert receipt.private_repository is None
+    assert secret_fragment not in receipt.model_dump_json()
+    assert str(missing) not in repr(receipt)
+
+
+def test_fingerprint_mismatch_fails_closed(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    private, public, _ = _create_boundary_repositories(
+        tmp_path,
+        raw_in_head=False,
+    )
+    original = boundary_module.fingerprint_repository
+    call_count = 0
+
+    def mismatching_fingerprint(
+        repository_root: Path,
+        *,
+        label: str,
+    ) -> object:
+        nonlocal call_count
+        call_count += 1
+        fingerprint = original(repository_root, label=label)
+        if call_count == 3:
+            return fingerprint.model_copy(update={"status_sha256": "f" * 64})
+        return fingerprint
+
+    monkeypatch.setattr(
+        boundary_module,
+        "fingerprint_repository",
+        mismatching_fingerprint,
+    )
+
+    receipt = scan_public_boundary(
+        private,
+        public,
+        load_public_boundary_policy(POLICY_PATH),
+        baseline_path=BASELINE_PATH,
+    )
+
+    assert receipt.status is BoundaryStatus.INCOMPLETE
+    assert receipt.private_repository is not None
+    assert receipt.private_repository.unchanged is False
+    assert any(error.code.value == "fingerprint_mismatch" for error in receipt.errors)
+
+
+def test_denied_and_unknown_binary_content_is_not_promoted_or_scanned(
+    tmp_path: Path,
+) -> None:
+    private, public, _ = _create_boundary_repositories(
+        tmp_path,
+        raw_in_head=False,
+    )
+    denied = private / "escala_server/data/private.bin"
+    denied.parent.mkdir(parents=True)
+    denied.write_bytes(b"Gazelles\x00private")
+    unknown = private / "customer-private.bin"
+    unknown.write_bytes(b"Gazelles\x00private")
+    _git(private, "add", denied.relative_to(private).as_posix(), unknown.name)
+    _git(private, "commit", "-m", "private denied and unknown content")
+
+    receipt = scan_public_boundary(
+        private,
+        public,
+        load_public_boundary_policy(POLICY_PATH),
+        baseline_path=BASELINE_PATH,
+    )
+
+    assert receipt.status is BoundaryStatus.PASS
+    assert receipt.path_summary is not None
+    assert receipt.path_summary.denied_count == 1
+    assert receipt.path_summary.not_eligible_count == 1
+    assert all(
+        finding.locator not in {denied.relative_to(private).as_posix(), unknown.name}
+        for finding in receipt.findings
+    )
+
+
+@pytest.mark.parametrize("unsafe_kind", ["binary", "non_utf8", "oversized", "symlink"])
+def test_required_worktree_or_head_content_fails_closed(
+    tmp_path: Path,
+    unsafe_kind: str,
+) -> None:
+    private, public, _ = _create_boundary_repositories(
+        tmp_path,
+        raw_in_head=False,
+    )
+    required = private / "coaching/required.md"
+    required.parent.mkdir(parents=True)
+    if unsafe_kind == "binary":
+        required.write_bytes(b"required\x00binary")
+    elif unsafe_kind == "non_utf8":
+        required.write_bytes(b"required\xfftext")
+    elif unsafe_kind == "oversized":
+        required.write_bytes(b"x" * 1_048_577)
+    else:
+        target = private / "private-target.txt"
+        target.write_text("private", encoding="utf-8")
+        required.symlink_to(target)
+    _git(private, "add", required.relative_to(private).as_posix())
+    _git(private, "commit", "-m", f"add {unsafe_kind} required content")
+
+    receipt = scan_public_boundary(
+        private,
+        public,
+        load_public_boundary_policy(POLICY_PATH),
+        baseline_path=BASELINE_PATH,
+    )
+
+    assert receipt.status is BoundaryStatus.INCOMPLETE
+    assert any(
+        finding.code is BoundaryFindingCode.UNSAFE_OR_UNREADABLE
+        for finding in receipt.findings
+    )
+
+
+def test_malformed_required_yaml_fails_closed_without_serializing_values(
+    tmp_path: Path,
+) -> None:
+    private, public, _ = _create_boundary_repositories(
+        tmp_path,
+        raw_in_head=False,
+    )
+    sentinel = "S36-MALFORMED-YAML-PRIVATE-VALUE"
+    malformed = private / "conocimiento/bad.yaml"
+    malformed.parent.mkdir(parents=True)
+    malformed.write_text(f"source: [{sentinel}\n", encoding="utf-8")
+    _git(private, "add", malformed.relative_to(private).as_posix())
+    _git(private, "commit", "-m", "add malformed required yaml")
+
+    receipt = scan_public_boundary(
+        private,
+        public,
+        load_public_boundary_policy(POLICY_PATH),
+        baseline_path=BASELINE_PATH,
+    )
+
+    assert receipt.status is BoundaryStatus.INCOMPLETE
+    assert sentinel not in receipt.model_dump_json()
+
+
+def test_renderers_and_writers_are_deterministic_bounded_and_safe(
+    tmp_path: Path,
+) -> None:
+    private, public, sentinel = _create_boundary_repositories(
+        tmp_path,
+        raw_in_head=False,
+    )
+    receipt = scan_public_boundary(
+        private,
+        public,
+        load_public_boundary_policy(POLICY_PATH),
+        baseline_path=BASELINE_PATH,
+    )
+    json_output = tmp_path / "evidence/boundary.json"
+    markdown_output = tmp_path / "evidence/boundary.md"
+
+    first_json = render_public_boundary_json(receipt)
+    first_markdown = render_public_boundary_markdown(receipt)
+    write_public_boundary_receipts(
+        receipt,
+        json_output=json_output,
+        markdown_output=markdown_output,
+    )
+
+    assert receipt.status is BoundaryStatus.PASS
+    assert first_json == render_public_boundary_json(receipt)
+    assert first_markdown == render_public_boundary_markdown(receipt)
+    assert first_json == json_output.read_text(encoding="utf-8")
+    assert first_markdown == markdown_output.read_text(encoding="utf-8")
+    assert len(first_markdown.encode()) < 32 * 1024
+    combined = first_json + first_markdown
+    for forbidden in (
+        sentinel,
+        "Gazelles",
+        RAW_ASSET_PATH,
+        str(private),
+        str(public),
+        "dirty-private-name.txt",
+    ):
+        assert forbidden not in combined
+
+
+def test_nonpassing_receipt_is_not_written(tmp_path: Path) -> None:
+    private, public, _ = _create_boundary_repositories(
+        tmp_path,
+        raw_in_head=True,
+    )
+    receipt = scan_public_boundary(
+        private,
+        public,
+        load_public_boundary_policy(POLICY_PATH),
+        baseline_path=BASELINE_PATH,
+    )
+    json_output = tmp_path / "must-not-exist.json"
+    markdown_output = tmp_path / "must-not-exist.md"
+
+    with pytest.raises(ValueError, match="passing receipt"):
+        write_public_boundary_receipts(
+            receipt,
+            json_output=json_output,
+            markdown_output=markdown_output,
+        )
+
+    assert not json_output.exists()
+    assert not markdown_output.exists()
+
+
+def test_cli_writes_safe_receipts_and_failure_is_fixed(tmp_path: Path) -> None:
+    private, public, sentinel = _create_boundary_repositories(
+        tmp_path,
+        raw_in_head=False,
+    )
+    json_output = tmp_path / "evidence/boundary.json"
+    markdown_output = tmp_path / "evidence/boundary.md"
+    command = [
+        sys.executable,
+        str(SCRIPT),
+        "--repo",
+        str(private),
+        "--public-candidate",
+        str(public),
+        "--policy",
+        str(POLICY_PATH),
+        "--baseline",
+        str(BASELINE_PATH),
+        "--format",
+        "json",
+        "--json-output",
+        str(json_output),
+        "--markdown-output",
+        str(markdown_output),
+    ]
+
+    first = subprocess.run(
+        command,
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    first_json = json_output.read_bytes()
+    first_markdown = markdown_output.read_bytes()
+    second = subprocess.run(
+        command,
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert first.returncode == 0
+    assert second.returncode == 0
+    assert first.stderr == second.stderr == ""
+    assert first.stdout == second.stdout
+    assert first_json == json_output.read_bytes()
+    assert first_markdown == markdown_output.read_bytes()
+    assert sentinel not in first.stdout
+
+    failed = subprocess.run(
+        [
+            *command[:2],
+            "--repo",
+            str(tmp_path / "S36-PRIVATE-MISSING-ROOT"),
+            *command[4:],
+        ],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert failed.returncode == 1
+    assert failed.stdout == ""
+    assert (
+        failed.stderr == "public boundary: unable to produce a safe passing receipt\n"
+    )
+    assert "S36-PRIVATE-MISSING-ROOT" not in failed.stderr
