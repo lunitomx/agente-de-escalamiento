@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 from pathlib import Path
+from datetime import date
 from zipfile import ZipFile
 
 from escala_server.financial import (
     MappingAnswer,
     profile_financial_workbook,
+    reconstruct_statements,
     render_profile_receipt_json,
     resolve_mapping_answers,
 )
@@ -124,6 +126,7 @@ def test_ambiguous_mapping_asks_owner_before_resolving(tmp_path: Path) -> None:
         (MappingAnswer(target="revenue", candidate_id=question.options[0]),),
     )
     assert answered.mapping_status == "resolved"
+    assert answered.confirmed_mappings[0].candidate_id == question.options[0]
     assert not [q for q in answered.questions if q.target == "revenue"]
 
 
@@ -143,3 +146,80 @@ def test_formula_without_cached_value_and_receipt_are_safe(tmp_path: Path) -> No
     assert str(tmp_path) not in receipt
     assert "100" not in receipt
     assert workbook.read_bytes() == before
+
+
+def test_reconstructs_statements_with_figure_provenance(tmp_path: Path) -> None:
+    config = _config(tmp_path)
+    workbook = config.exchange_root / "nopal-foods.csv"
+    workbook.write_text(
+        "Cuenta,2026-07,Moneda,Unidad\n"
+        "Ventas netas,120000,MXN,pesos\n"
+        "Costo de ventas,70000,MXN,pesos\n"
+        "Gastos operativos,30000,MXN,pesos\n"
+        "Utilidad neta,15000,MXN,pesos\n"
+        "Caja,22000,MXN,pesos\n"
+        "Cuentas por cobrar,18000,MXN,pesos\n"
+        "Inventario,12000,MXN,pesos\n"
+        "Cuentas por pagar,9000,MXN,pesos\n"
+        "Flujo operativo,20000,MXN,pesos\n"
+        "Flujo de inversion,-5000,MXN,pesos\n"
+        "Flujo de financiamiento,-3000,MXN,pesos\n",
+        encoding="utf-8",
+    )
+
+    profile = profile_financial_workbook(config, workbook)
+    statements = reconstruct_statements(profile, as_of=date(2026, 7, 22))
+
+    assert statements.status == "ready"
+    assert statements.pnl.status == "ready"
+    gross_profit = next(
+        figure for figure in statements.pnl.figures if figure.account == "gross_profit"
+    )
+    assert gross_profit.value == 50000
+    assert gross_profit.provenance.transformation == "revenue - cogs"
+    assert gross_profit.provenance.relative_path == "nopal-foods.csv"
+    assert gross_profit.provenance.sheet == "nopal-foods"
+    assert gross_profit.provenance.cell_range == "nopal-foods!B2 - nopal-foods!B3"
+    assert statements.balance.status == "ready"
+    assert statements.cash_flow.status == "ready"
+    net_change = next(
+        figure
+        for figure in statements.cash_flow.figures
+        if figure.account == "net_cash_change"
+    )
+    assert net_change.value == 12000
+
+
+def test_unresolved_mapping_blocks_statement_reconstruction(tmp_path: Path) -> None:
+    config = _config(tmp_path)
+    workbook = config.exchange_root / "ambiguous-statements.csv"
+    workbook.write_text(
+        "Cuenta,2026-07,Moneda\nVentas,100,MXN\nIngresos,100,MXN\n"
+        "Costo de ventas,50,MXN\nGastos operativos,20,MXN\n",
+        encoding="utf-8",
+    )
+
+    profile = profile_financial_workbook(config, workbook)
+    statements = reconstruct_statements(profile, as_of=date(2026, 7, 22))
+
+    assert statements.status == "blocked"
+    assert "mapping_unresolved" in statements.findings
+    assert statements.questions
+    assert statements.pnl.status == "not_derivable"
+
+
+def test_formula_without_cached_value_is_not_a_financial_fact(tmp_path: Path) -> None:
+    config = _config(tmp_path)
+    workbook = config.exchange_root / "missing-cached.csv"
+    workbook.write_text(
+        "Cuenta,2026-07,Moneda\nVentas netas,100,MXN\nCosto de ventas,50,MXN\n"
+        "Gastos operativos,20,MXN\nUtilidad neta,=B2-B3,MXN\n",
+        encoding="utf-8",
+    )
+
+    profile = profile_financial_workbook(config, workbook)
+    statements = reconstruct_statements(profile, as_of=date(2026, 7, 22))
+
+    assert statements.pnl.status == "partial"
+    assert "net_profit" in statements.pnl.missing
+    assert "formula_without_cached_value" in statements.findings

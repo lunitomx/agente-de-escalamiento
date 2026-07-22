@@ -115,6 +115,7 @@ class FinancialWorkbookProfile(_StrictModel):
     sheets: tuple[FinancialSheetProfile, ...] = ()
     mapping_candidates: tuple[MappingCandidate, ...] = ()
     questions: tuple[MappingQuestion, ...] = ()
+    confirmed_mappings: tuple[MappingAnswer, ...] = ()
     findings: tuple[str, ...] = ()
     raw_sheets: tuple[RawSheet, ...] = ()
 
@@ -256,6 +257,12 @@ def resolve_mapping_answers(
             "status": status,
             "mapping_status": "unresolved" if remaining else "resolved",
             "questions": tuple(remaining),
+            "confirmed_mappings": tuple(
+                sorted(
+                    (*profile.confirmed_mappings, *answers),
+                    key=lambda answer: answer.target,
+                )
+            ),
         }
     )
 
@@ -284,9 +291,10 @@ def render_profile_receipt_markdown(profile: FinancialWorkbookProfile) -> str:
         "",
         "## Findings",
     ]
-    lines.extend(f"- {finding}" for finding in profile.findings) or lines.append(
-        "- none"
-    )
+    if profile.findings:
+        lines.extend(f"- {finding}" for finding in profile.findings)
+    else:
+        lines.append("- none")
     lines.extend(["", "## Questions"])
     if profile.questions:
         lines.extend(
