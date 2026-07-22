@@ -1,0 +1,126 @@
+artifact_type: story-design
+version: 1
+skill: rai-story-design
+created: '2026-07-22T16:00:00Z'
+story: 'S37.2'
+epic: 'E37'
+content:
+  problem: 'E37 tiene la autoridad local, pero todavía no puede recibir un archivo real del empresario, explicar qué entendió o detenerse ante una ambigüedad sin convertirlo en una plantilla nueva.'
+  value: 'Un perfilador local y determinista permite entregar CSV/TSV/XLSX/texto sin migración previa, pedir una aclaración verificable y reusar la misma fuente sin duplicar identidad ni filtrar rutas de máquina.'
+  approach: 'Crear un contrato Pydantic estricto y una registry cerrada de adapters stdlib. Cada corrida valida el workspace y la contención del archivo, calcula fingerprint e identidad, perfila estructura sin escribir SQLite y devuelve un resultado explícito: ready, needs_clarification, unsupported, provider_unavailable o corrupt. El receipt público contiene únicamente códigos, ordinales y procedencia relativa.'
+  complexity: complex
+  components:
+    - name: 'escala_server.workspace.ingestion'
+      change: create
+      purpose: 'Contratos tipados, registry, identidad, profiling tabular/texto y receipts redacted.'
+    - name: 'escala_server.workspace.__init__'
+      change: modify
+      purpose: 'Exponer solo la API estable de ingestión junto con la autoridad existente.'
+    - name: 'tests.test_workspace_ingestion'
+      change: create
+      purpose: 'Fixtures reales temporales y pruebas de éxito, ambigüedad, bytes cambiados, corrupción y no filtración.'
+    - name: 'work/epics/e37-local-workspace-flexible-ingestion/stories/s37.2-evidence'
+      change: create
+      purpose: 'Receipt de calificación separado del ledger maestro.'
+  decisions:
+    - id: D1
+      title: 'API local cerrada, sin plugin ni nube'
+      rationale: 'Los formatos y los estados son parte del contrato E37; una registry cerrada mantiene capability reporting reproducible y evita ejecutar código externo o realizar llamadas cloud.'
+      body: 'CSV/TSV, XLSX básico mediante zipfile/XML stdlib y texto plano se soportan localmente. PDF, formatos desconocidos, archivos cifrados y proveedores no disponibles producen una disposición explícita; no se promete OCR ni parsing universal.'
+    - id: D2
+      title: 'Identidad por ruta relativa y bytes'
+      rationale: 'SHA-256 de bytes y la procedencia relativa permiten rerun-safe sin revelar el root del instalador.'
+      body: 'source_id = sha256("v1\\0" + relative_posix_path + "\\0" + content_sha256). El receipt nunca serializa Path absoluto ni contenido, y no depende de mtime.'
+    - id: D3
+      title: 'Ambigüedad material fail-closed'
+      rationale: 'Elegir una fila de encabezados, fecha o entidad por heurística cuando hay empate puede contaminar E38-E40.'
+      body: 'Si dos candidatos tienen la misma prioridad, se devuelve needs_clarification con códigos y opciones ordinales; ninguna corrida de S37.2 escribe estado canónico.'
+    - id: D4
+      title: 'No reutilizar class intake como parser genérico'
+      rationale: 'coaching/class_intake.py:20-59 es específico de clases, persiste YAML y serializa rutas absolutas.'
+      body: 'El V1 coexiste porque sigue sirviendo al flujo didáctico ELN; S37.2 no lo modifica ni lo convierte en autoridad de fuentes empresariales.'
+  acceptance_criteria:
+    - id: AC1
+      description: 'La registry informa capability y estado estable para csv, tsv, xlsx, texto/transcript, pdf y extensiones desconocidas sin network.'
+      severity: must
+      verifiable: true
+      test_link: 'tests/test_workspace_ingestion.py::test_registry_reports_declared_capabilities'
+    - id: AC2
+      description: 'CSV/TSV y XLSX básico perfilan filas/columnas, header candidates, date/entity/unit field kinds y no exigen plantilla.'
+      severity: must
+      verifiable: true
+      test_link: 'tests/test_workspace_ingestion.py::test_profiles_tabular_sources'
+    - id: AC3
+      description: 'Empates materiales producen needs_clarification con question codes ordinales y no mutan SQLite, inbox ni archivos fuente.'
+      severity: must
+      verifiable: true
+      test_link: 'tests/test_workspace_ingestion.py::test_ambiguous_profile_is_fail_closed'
+    - id: AC4
+      description: 'Fingerprint, relative provenance, source_id y receipt son byte-estables al repetir; cambiar bytes cambia la identidad.'
+      severity: must
+      verifiable: true
+      test_link: 'tests/test_workspace_ingestion.py::test_identity_is_rerun_safe'
+    - id: AC5
+      description: 'Unsupported, provider_unavailable y corrupt son outcomes explícitos y los JSON/Markdown no filtran paths absolutos, contenido o URLs.'
+      severity: must
+      verifiable: true
+      test_link: 'tests/test_workspace_ingestion.py::test_failure_receipts_are_redacted'
+    - id: AC6
+      description: 'El contrato queda consumible por S37.3 sin mover archivos ni persistir estado durante el profiling.'
+      severity: should
+      verifiable: true
+    - id: AC7
+      description: 'No se introduce API cloud, OAuth, hosted runtime, OCR, universal parser ni dependencia externa nueva.'
+      severity: must_not
+      verifiable: true
+  examples:
+    - title: 'CSV listo'
+      language: python
+      code: 'result = profile_source(config, exchange / "ventas.csv")\nassert result.status == "ready"\nassert result.identity.relative_path == "ventas.csv"\nassert "/" not in result.receipt_json  # no absolute machine path'
+      explanation: 'Un archivo válido queda descrito por estructura y procedencia relativa.'
+    - title: 'Empate de encabezados'
+      language: python
+      code: 'result = profile_source(config, exchange / "cash.tsv")\nassert result.status == "needs_clarification"\nassert result.questions[0].code == "header_row_ambiguous"\nassert result.questions[0].options == ("row_0", "row_1")'
+      explanation: 'La pregunta es accionable pero no expone valores del workbook.'
+    - title: 'Fuente no disponible'
+      language: python
+      code: 'result = profile_source(config, exchange / "estado.pdf")\nassert result.status in {"provider_unavailable", "unsupported"}\nassert result.receipt_json.count(str(exchange)) == 0'
+      explanation: 'Una limitación local se comunica con código estable y sin fingir extracción.'
+  dependencies:
+    - description: 'S37.1 WorkspaceConfig y validate_workspace son la guardia previa.'
+      blocks: true
+    - description: 'Python stdlib csv, hashlib, zipfile y xml.etree; Pydantic ya es dependencia del proyecto.'
+      blocks: false
+  legacy_sweep: 'coaching/class_intake.py:20-59 permanece como V1 específico de clases ELN porque sus callers y su persistencia YAML son didácticos; S37.2 crea un contrato empresarial separado y no deja un importer genérico huérfano.'
+  drift_risks:
+    - id: AG2
+      description: 'Podría duplicarse la resolución de paths o los receipts de autoridad.'
+      mitigation: 'Reusar validate_workspace y mantener el redaction/identity en un solo módulo nuevo.'
+    - id: AG4
+      description: 'La story L toca varios formatos y puede dispersar adapters.'
+      mitigation: 'Walking skeleton cerrado: registry + CSV/TSV + XLSX/text, capability explícita para lo restante y nada de OCR/universal parser.'
+    - id: HISTORICAL-STORY-ACCRETION
+      description: 'El gate global ya reporta tokens S37.1/S37.2/S37.3 en tests/master ledger por diseño del ledger futuro.'
+      mitigation: 'Tratarlo como warning histórico; la evidencia de esta story queda en tests y receipt separado.'
+  testing_strategy:
+    - layer: unit
+      name: 'strict models and registry'
+      purpose: 'Rechazar extensiones/configuración desconocidas y reportar capability cerrada.'
+    - layer: contract
+      name: 'tabular/text profiling'
+      purpose: 'Probar header/date/entity/unit detection and no-template behavior with CSV/TSV/XLSX fixtures.'
+    - layer: negative
+      name: 'ambiguity, corruption, encryption and unsupported'
+      purpose: 'Prove explicit safe outcomes and no source/database mutation.'
+    - layer: determinism
+      name: 'identity and redacted receipts'
+      purpose: 'Byte-equal reruns, changed-byte identity, relative paths only.'
+  open_questions:
+    - '¿S37.3 debe guardar el SourceProfile completo o únicamente el receipt y el source_id? La story no persiste ninguno todavía.'
+    - '¿Qué semántica de unidades requiere E38 después de que el profiler solo clasifique candidatos por ordinal?'
+refs:
+  epic_scope: 'work/epics/e37-local-workspace-flexible-ingestion/scope.md'
+  prior_story: 'S37.1 / escala_server.workspace.authority'
+metadata:
+  backlog_item: null
+  artifact_emit: unavailable-in-installed-rai-cli
