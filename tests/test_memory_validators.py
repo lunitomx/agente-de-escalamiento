@@ -3,13 +3,16 @@
 from __future__ import annotations
 
 import pathlib
-import sys
 
 
-sys.path.insert(
-    0, str(pathlib.Path(__file__).resolve().parent.parent / ".scaleup" / "agent")
-)
+import validators.memory as memory_module
 from validators.memory import render_profile_markdown, validate_company_profile
+
+
+def test_imports_canonical_public_validator() -> None:
+    expected = pathlib.Path(__file__).resolve().parent.parent / "validators/memory.py"
+
+    assert pathlib.Path(memory_module.__file__).resolve() == expected
 
 
 class TestValidateCompanyProfile:
@@ -23,7 +26,7 @@ class TestValidateCompanyProfile:
             tmp_path,
             (
                 "company:\n  name: Acme\n  industry: tech\n  employees: 50\n"
-                "  growth_stage: scaleup\n  years_in_business: 10\n  revenue_range: 5M-10M\n"
+                "  growth_stage: scaling\n  years_in_business: 10\n  revenue_range: 5M-10M\n"
                 "  current_challenges: [hiring, cash flow]\n"
                 "scores:\n  people: 3\n  strategy: 2\n  execution: 4\n  cash: 1\n"
                 "  last_diagnosis: '2026-04-25'\n"
@@ -88,7 +91,7 @@ class TestRenderProfileMarkdown:
         p = tmp_path / "profile.yaml"
         p.write_text(
             "company:\n  name: Acme Corp\n  industry: tech\n  employees: 50\n"
-            "  growth_stage: scaleup\n  years_in_business: 10\n"
+            "  growth_stage: scaling\n  years_in_business: 10\n"
             "scores:\n  people: 3\n  strategy: 2\n  execution: 4\n  cash: 1\n"
             "focus: {}\ndiagnosis_history: []\n"
         )
