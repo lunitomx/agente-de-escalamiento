@@ -1,7 +1,7 @@
 ---
 epic_id: "E37"
 title: "Local Workspace & Flexible Ingestion"
-status: "in_progress"
+status: "complete"
 created: "2026-07-22"
 mission: "escala-local-v2-plan-maestro-2607202112"
 ---
@@ -88,19 +88,38 @@ qué entendió, preguntar por ambigüedades materiales y fallar de forma segura.
 
 ## Done Criteria
 
-- [ ] Las tres historias completan el ciclo RaiSE completo y sus ramas se
+- [x] Las tres historias completan el ciclo RaiSE completo y sus ramas se
       integran en `main` con gates de tests, lint, formato y tipos.
-- [ ] Los siete requisitos E37 tienen artefacto y receipt verificables en el
+- [x] Los siete requisitos E37 tienen artefacto y receipt verificables en el
       ledger maestro; ningún estado `unproved` se presenta como terminado.
-- [ ] Un caso sintético end-to-end demuestra ingestión desde una carpeta
+- [x] Un caso sintético end-to-end demuestra ingestión desde una carpeta
       ordinaria, reejecución sin duplicados, pregunta de ambigüedad y
       cuarentena de una entrada inválida.
-- [ ] Un caso negativo demuestra que SQLite autoritativo dentro del inbox
+- [x] Un caso negativo demuestra que SQLite autoritativo dentro del inbox
       sincronizado es rechazado y que el estado canónico permanece intacto.
-- [ ] Los recibos no contienen rutas absolutas, secretos, contenido sensible ni
+- [x] Los recibos no contienen rutas absolutas, secretos, contenido sensible ni
       llamadas a APIs cloud.
-- [ ] La implementación queda consumible por E38-E40 sin duplicar el contrato
+- [x] La implementación queda consumible por E38-E40 sin duplicar el contrato
       de autoridad o la identificación de fuentes.
+
+## Epic Close Audit
+
+- **Resultado:** `pass`; los tres stories (`S37.1`, `S37.2`, `S37.3`) están
+  integrados en `main`.
+- **Master acceptance:** `REQ-E37-001` a `REQ-E37-007` están `proved` (7/7),
+  con artefacto, receipt y gate específico en
+  `evidence/master-acceptance-e37.json`.
+- **E2E local:** la qualification de `S37.3` demuestra primera aceptación,
+  duplicado en reejecución, nueva identidad al cambiar bytes, ambigüedad y
+  cuarentena; la qualification de `S37.1` demuestra rechazo de SQLite
+  sincronizado antes de inicializarlo.
+- **Quality gates:** `gate-format`, `gate-lint`, `gate-tests`, `gate-types` y
+  `gate-req-e37-001`…`gate-req-e37-007` pasan en la máquina local.
+- **Plataforma:** la ejecución de esta auditoría fue en macOS; la cobertura
+  Windows es una revisión de contrato y rutas declarada por el ledger, no una
+  ejecución nativa Windows inventada.
+- **Boundary:** no se usaron API de Drive/OneDrive, OAuth, runtime hospedado,
+  base cloud ni telemetría; SQLite y ledger permanecen bajo `data_root` local.
 
 ## Acceptance Evidence
 
@@ -159,9 +178,9 @@ implementación del registry, siempre que cada commit mantenga el ciclo TDD.
 
 | Story | Size | Status | Actual | Velocity | Notes |
 |---|:---:|:---:|:---:|:---:|---|
-| S37.1 | M | complete | 17m02s | 1 M / 17m02s | Merged locally at `0d66f11` review + close gates; 12 focused tests, 858 full-suite passed / 2 skipped; requirements remain unproved until master receipts. |
-| S37.2 | L | complete | 17m59s | 1 L / 17m59s | Merged locally after qualification at `12e5344`; 10 focused tests, 868 full-suite passed / 2 skipped; REQ-E37-003..005 evidence ready but master ledger remains unproved. |
-| S37.3 | M | complete | ~9m53s | 1 M / ~9m53s | Merged locally after qualification at `0d6512f`; 8 focused tests, 876 full-suite passed / 2 skipped; REQ-E37-006..007 evidence ready but master ledger remains unproved. |
+| S37.1 | M | complete | 17m02s | 1 M / 17m02s | Merged locally at `0d66f11`; 12 focused tests, 858 full-suite passed / 2 skipped; REQ-E37-001..002 proved by the E37 master receipts. |
+| S37.2 | L | complete | 17m59s | 1 L / 17m59s | Merged locally after qualification at `12e5344`; 10 focused tests, 868 full-suite passed / 2 skipped; REQ-E37-003..005 proved by the E37 master receipts. |
+| S37.3 | M | complete | ~9m53s | 1 M / ~9m53s | Merged locally after qualification at `0d6512f`; 8 focused tests, 876 full-suite passed / 2 skipped; REQ-E37-006..007 proved by the E37 master receipts. |
 
 ### Sequencing Risks
 
@@ -181,9 +200,9 @@ implementación del registry, siempre que cada commit mantenga el ciclo TDD.
 
 | Story | Size | Status | Actual | Notes |
 |---|:---:|:---:|:---:|---|
-| S37.1 | M | complete | 17m02s | Autoridad local y rechazo de SQLite sincronizado; close gates PASS, requisitos E37 todavía `unproved` en el ledger maestro. |
-| S37.2 | L | complete | 17m59s | Perfilado CSV/TSV/XLSX/text, aclaraciones fail-closed, identidad rerun-safe y receipts redacted; close gates PASS, requisitos E37 todavía `unproved`. |
-| S37.3 | M | complete | ~9m53s | Inbox idempotente, report-only failure handling y receipts seguros; close gates PASS, requisitos E37 todavía `unproved`. |
+| S37.1 | M | complete | 17m02s | Autoridad local y rechazo de SQLite sincronizado; close gates PASS y REQ-E37-001..002 proved. |
+| S37.2 | L | complete | 17m59s | Perfilado CSV/TSV/XLSX/text, aclaraciones fail-closed, identidad rerun-safe y receipts redacted; close gates PASS y REQ-E37-003..005 proved. |
+| S37.3 | M | complete | ~9m53s | Inbox idempotente, report-only failure handling y receipts seguros; close gates PASS y REQ-E37-006..007 proved. |
 
 ## Dependencies
 

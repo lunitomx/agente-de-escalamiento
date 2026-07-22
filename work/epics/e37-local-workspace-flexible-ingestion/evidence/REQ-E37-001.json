@@ -1,0 +1,26 @@
+{
+  "artifact_type": "e37-requirement-qualification",
+  "boundary": {
+    "authoritative_sqlite_sync": "forbidden",
+    "cloud_api": false,
+    "data_authority": "installer_machine",
+    "exchange": "ordinary_filesystem_documents_only",
+    "hosted_runtime": false,
+    "oauth": false,
+    "runtime_authority": "installer_machine"
+  },
+  "epic_id": "E37",
+  "evidence_source": "work/epics/e37-local-workspace-flexible-ingestion/stories/s37.1-evidence/qualification.json",
+  "focused_tests": "tests/test_workspace_authority.py",
+  "gate": "gate-req-e37-001",
+  "platforms": {
+    "macos": "observed",
+    "windows": "path_contract_reviewed"
+  },
+  "requirement_id": "REQ-E37-001",
+  "result": "pass",
+  "schema_version": 1,
+  "source_commit": "d972605",
+  "story_id": "S37.1",
+  "summary": "Workspace receipts and database initialization keep runtime and authoritative company state on the installer machine."
+}

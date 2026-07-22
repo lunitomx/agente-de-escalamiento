@@ -1,0 +1,25 @@
+{
+  "artifact_type": "e37-requirement-qualification",
+  "boundary": {
+    "cloud_api": false,
+    "destructive_move": false,
+    "exchange": "ordinary_filesystem_documents_only",
+    "hosted_runtime": false,
+    "oauth": false,
+    "sqlite_sync": false
+  },
+  "epic_id": "E37",
+  "evidence_source": "work/epics/e37-local-workspace-flexible-ingestion/stories/s37.3-evidence/qualification.json",
+  "focused_tests": "tests/test_workspace_inbox.py",
+  "gate": "gate-req-e37-006",
+  "platforms": {
+    "macos": "observed",
+    "windows": "path_contract_reviewed"
+  },
+  "requirement_id": "REQ-E37-006",
+  "result": "pass",
+  "schema_version": 1,
+  "source_commit": "d972605",
+  "story_id": "S37.3",
+  "summary": "A plain local folder can be scanned through filesystem operations; reruns report duplicates and changed bytes receive a new identity."
+}

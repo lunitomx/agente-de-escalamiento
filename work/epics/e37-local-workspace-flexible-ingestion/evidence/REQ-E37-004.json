@@ -1,0 +1,25 @@
+{
+  "artifact_type": "e37-requirement-qualification",
+  "boundary": {
+    "absolute_paths_in_receipts": false,
+    "canonical_state_mutation": false,
+    "cloud_api": false,
+    "oauth": false,
+    "hosted_runtime": false,
+    "sqlite_sync": false
+  },
+  "epic_id": "E37",
+  "evidence_source": "work/epics/e37-local-workspace-flexible-ingestion/stories/s37.2-evidence/qualification.json",
+  "focused_tests": "tests/test_workspace_ingestion.py",
+  "gate": "gate-req-e37-004",
+  "platforms": {
+    "macos": "observed",
+    "windows": "path_contract_reviewed"
+  },
+  "requirement_id": "REQ-E37-004",
+  "result": "pass",
+  "schema_version": 1,
+  "source_commit": "d972605",
+  "story_id": "S37.2",
+  "summary": "Structural profiles expose tables, rows, columns, headers, dates, entities, and units; equal header candidates create bounded clarification questions."
+}

@@ -1,7 +1,7 @@
 ---
 epic_id: "E37"
 title: "Local Workspace & Flexible Ingestion"
-status: "active"
+status: "complete"
 created: "2026-07-22"
 mission: "escala-local-v2-plan-maestro-2607202112"
 ---
