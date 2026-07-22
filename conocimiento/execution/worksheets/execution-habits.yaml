@@ -1,7 +1,7 @@
-id: worksheet-rockefeller-habits
+id: worksheet-execution-habits
 type: worksheet
-name: Rockefeller Habits Checklist Worksheet
-name_es: Hoja de Verificacion de Habitos Rockefeller
+name: Execution Habits Checklist Worksheet
+name_es: Hoja de Verificacion de Habitos de Ejecucion
 decision: execution
 summary: >
   The 10-item checklist scored quarterly by the leadership team. Each habit is rated
@@ -18,8 +18,8 @@ relationships:
   - type: belongs-to
     target: decision-execution
   - type: implements
-    target: tool-rockefeller-habits
-tags: [execution, worksheet, rockefeller-habits, checklist, quarterly, scoring]
+    target: tool-execution-habits
+tags: [execution, worksheet, execution-habits, checklist, quarterly, scoring]
 metadata:
   fields:
     - "Habit 1: Leadership team aligned on priorities (yes/no + score 1-5)"

@@ -1,5 +1,5 @@
-# Verne Response Templates — cargado por VerneHandler
-# Una entrada por cada categoría de decisión Scaling Up + general
+# Business Advisor response templates
+# One entry for each ESCALA business category plus a general fallback
 
 people:
   diagnosis: "Eso suena a un tema de **People**. Déjame preguntarte algo directo:"
@@ -51,7 +51,7 @@ cash:
   reframe: "El efectivo es el oxígeno. El Power of One no miente — mejora 1% en cada palanca y verás lo que pasa."
 
 general:
-  diagnosis: "Déjame ponerme mis lentes de Verne y ver esto desde las **4 Decisiones**:"
+  diagnosis: "Voy a revisar esto desde las **4 áreas del negocio**:"
   questions:
     - "People: ¿Quién es responsable de esto?"
     - "Strategy: ¿Esto está alineado con tu Core Customer y Brand Promise?"

@@ -1,5 +1,5 @@
-# Daily Review Checklist — Rockefeller Habits
-# Cargado por VerneHandler para evaluar daily huddles
+# Daily Review Checklist — execution habits
+# Loaded by BusinessAdvisorHandler to evaluate daily huddles
 
 logros_ayer:
   keywords: ["ayer", "logré", "completé", "terminé", "hicimos", "achieved", "yesterday"]
@@ -29,4 +29,4 @@ prioridad_1:
   keywords: ["prioridad #1", "critical number", "tema del trimestre", "priority #1", "number one", "theme"]
   label: "Conexión con Prioridad #1 del trimestre"
   weight: 2
-  message_missing: "No vinculaste tu daily con la Prioridad #1 del trimestre. Rockefeller Habit: todo debe conectar con la línea de meta de 90 días."
+  message_missing: "No vinculaste tu daily con la Prioridad #1 del trimestre. Todo debe conectar con la línea de meta de 90 días."

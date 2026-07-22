@@ -100,7 +100,7 @@ DIAGNOSE_QUESTIONS = {
             {
                 "id": "execution_q5",
                 "text": "¿El feedback de clientes y empleados se recolecta y actúa sistemáticamente?",
-                "concept": "tool-rockefeller-habits",
+                "concept": "tool-execution-habits",
             },
         ],
     },

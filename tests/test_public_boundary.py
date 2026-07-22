@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import hashlib
+import importlib
+import importlib.util
 import json
 from pathlib import Path
 import subprocess
@@ -837,3 +839,95 @@ def test_cli_writes_safe_receipts_and_failure_is_fixed(tmp_path: Path) -> None:
         failed.stderr == "public boundary: unable to produce a safe passing receipt\n"
     )
     assert "S36-PRIVATE-MISSING-ROOT" not in failed.stderr
+
+
+def test_runtime_identity_migration_paths_and_handler_are_atomic() -> None:
+    tracked = set(_git(ROOT, "ls-files").splitlines())
+    migrations = {
+        "conocimiento/execution/tools/rockefeller-habits.yaml": (
+            "conocimiento/execution/tools/execution-habits.yaml"
+        ),
+        "conocimiento/execution/worksheets/rockefeller-habits.yaml": (
+            "conocimiento/execution/worksheets/execution-habits.yaml"
+        ),
+        "conocimiento/coaching/verne-templates.yaml": (
+            "conocimiento/coaching/advisor-templates.yaml"
+        ),
+        "escala_server/verne_handler.py": "escala_server/business_advisor.py",
+        "escala_server/static/dashboards/execution/rockefeller-habits.html": (
+            "escala_server/static/dashboards/execution/execution-habits.html"
+        ),
+        "templates/rockefeller-habits-checklist.md": (
+            "templates/execution-habits-checklist.md"
+        ),
+        "tests/test_verne_handler.py": "tests/test_business_advisor.py",
+    }
+
+    for old_path, new_path in migrations.items():
+        assert old_path not in tracked
+        assert new_path in tracked
+
+    assert importlib.util.find_spec("escala_server.verne_handler") is None
+    module = importlib.import_module("escala_server.business_advisor")
+    assert hasattr(module, "BusinessAdvisorHandler")
+    assert not hasattr(module, "VerneHandler")
+
+
+def test_execution_identity_migration_keeps_graph_and_registry_resolvable() -> None:
+    tool_path = ROOT / "conocimiento/execution/tools/execution-habits.yaml"
+    worksheet_path = ROOT / "conocimiento/execution/worksheets/execution-habits.yaml"
+    registry_path = ROOT / "conocimiento/registry/worksheets.yaml"
+
+    tool = yaml.safe_load(tool_path.read_text(encoding="utf-8"))
+    worksheet = yaml.safe_load(worksheet_path.read_text(encoding="utf-8"))
+    registry = yaml.safe_load(registry_path.read_text(encoding="utf-8"))
+
+    assert tool["id"] == "tool-execution-habits"
+    assert worksheet["id"] == "worksheet-execution-habits"
+    assert "worksheet-execution-habits" in {
+        relation["target"] for relation in tool["relationships"]
+    }
+    assert "tool-execution-habits" in {
+        relation["target"] for relation in worksheet["relationships"]
+    }
+    registry_entry = next(
+        entry
+        for entry in registry["worksheets"]
+        if entry["id"] == "worksheet-execution-habits"
+    )
+    assert registry_entry["node_path"] == "execution/worksheets/execution-habits.yaml"
+    assert worksheet_path.exists()
+
+
+def test_runtime_callers_use_only_source_neutral_migration_symbols() -> None:
+    runtime_files = [
+        ROOT / "coaching/diagnose/__init__.py",
+        ROOT / "conocimiento/decisions/execution.yaml",
+        ROOT / "conocimiento/execution/metrics/meeting-health-score.yaml",
+        ROOT / "conocimiento/registry/worksheets.yaml",
+        ROOT / "escala_server/business_advisor.py",
+        ROOT / "escala_server/cash/generate_dashboards.py",
+        ROOT / "escala_server/cli.py",
+        ROOT / "escala_server/server.py",
+        ROOT / "escala_server/static/dashboards/execution/execution-habits.html",
+        ROOT / "escala_server/static/shared/js/context-panel.js",
+    ]
+    prohibited_migration_tokens = (
+        "VerneHandler",
+        "verne_handler",
+        "tool-rockefeller-habits",
+        "worksheet-rockefeller-habits",
+        "rockefeller-habits.html",
+        "rockefeller-habits-checklist.md",
+    )
+
+    for path in runtime_files:
+        content = path.read_text(encoding="utf-8")
+        assert all(token not in content for token in prohibited_migration_tokens)
+
+    assert "BusinessAdvisorHandler" in (ROOT / "escala_server/server.py").read_text(
+        encoding="utf-8"
+    )
+    assert "execution-habits" in (
+        ROOT / "escala_server/static/shared/js/context-panel.js"
+    ).read_text(encoding="utf-8")

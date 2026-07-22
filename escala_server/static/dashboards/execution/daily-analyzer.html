@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daily Analyzer | ScaleUp</title>
+  <title>Daily Analyzer | ESCALA</title>
   <link rel="stylesheet" href="../../shared/styles/dashboard-base.css">
   <link rel="stylesheet" href="../../shared/styles/context-panel.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -45,8 +45,8 @@
     .side-panel { display: flex; flex-direction: column; gap: 12px; }
     .side-card { background: white; border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
     .side-card h3 { margin: 0 0 10px; font-size: 0.85rem; color: #0f172a; }
-    .verne-msg { font-size: 0.82rem; line-height: 1.5; color: #334155; }
-    .verne-msg strong { color: #0f172a; }
+    .advisor-msg { font-size: 0.82rem; line-height: 1.5; color: #334155; }
+    .advisor-msg strong { color: #0f172a; }
 
     .history-list { max-height: 300px; overflow-y: auto; }
     .history-item { padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.8rem; }
@@ -67,7 +67,7 @@
     <div class="tool-header">
       <div class="breadcrumb"><a href="/">Home</a> › Ejecución › Daily Analyzer</div>
       <h1>📊 Daily Analyzer</h1>
-      <div class="subtitle">Tus dailys analizados contra los Rockefeller Habits. <strong>Kokoro</strong> interpreta, Verne opina, tú actúas.</div>
+      <div class="subtitle">Tus dailys analizados contra hábitos de ejecución. <strong>ESCALA</strong> interpreta, el asesor observa y tú actúas.</div>
     </div>
 
     <div class="company-bar">
@@ -83,14 +83,14 @@
         <div id="no-data" class="no-data" style="display:none;">
           <div class="big-icon">📋</div>
           <h3>No hay dailys analizados aún</h3>
-          <p>Dile a Kokoro en la conversación: <em>"analiza mi daily"</em> y pega tu transcript.<br>
-          Kokoro lo procesa, Verne lo califica, y aquí aparecen los resultados.</p>
+          <p>Dile a ESCALA en la conversación: <em>"analiza mi daily"</em> y pega tu transcript.<br>
+          ESCALA lo procesa, el asesor lo califica y aquí aparecen los resultados.</p>
         </div>
 
         <div id="content-area" style="display:none;">
           <div class="score-card">
             <div id="big-score" class="big-score gray">—</div>
-            <div class="score-label">Score Rockefeller</div>
+            <div class="score-label">Puntuación de ejecución</div>
             <div class="sub">Sobre 12 puntos posibles</div>
           </div>
 
@@ -110,8 +110,8 @@
 
       <div class="side-panel">
         <div class="side-card">
-          <h3>🤵 Verne opina</h3>
-          <div id="verne-advice" class="verne-msg">Carga un daily para que Verne te dé su perspectiva.</div>
+          <h3>🤵 El asesor observa</h3>
+          <div id="advisor-advice" class="advisor-msg">Carga un daily para recibir observaciones.</div>
         </div>
         <div class="side-card" id="history-card" style="display:none;">
           <h3>📜 Últimos análsis</h3>
@@ -120,7 +120,7 @@
       </div>
     </div>
 
-    <p class="attribution">Rockefeller Habits · Metodología Verne Harnish · Powered by Kokoro</p>
+    <p class="attribution">Análisis operativo local · ESCALA</p>
   </div>
 
   <script>
@@ -247,22 +247,22 @@
           }
         });
 
-        // Verne
-        var verneEl = document.getElementById('verne-advice');
-        var verneLines = [];
-        verneLines.push('<strong>Verne dice:</strong>');
-        if (pct >= 80) verneLines.push('✅ Buen daily. Tienes los elementos clave. Sigue así.');
-        else if (pct >= 50) verneLines.push('⚠️ Daily incompleto. Te falta estructura.');
-        else verneLines.push('❌ Esto no es un Daily Huddle. Es una lista de tareas.');
-        verneLines.push('');
+        // Local advisor
+        var advisorEl = document.getElementById('advisor-advice');
+        var advisorLines = [];
+        advisorLines.push('<strong>El asesor observa:</strong>');
+        if (pct >= 80) advisorLines.push('✅ Buen daily. Tienes los elementos clave. Sigue así.');
+        else if (pct >= 50) advisorLines.push('⚠️ Daily incompleto. Te falta estructura.');
+        else advisorLines.push('❌ Esto no es un Daily Huddle. Es una lista de tareas.');
+        advisorLines.push('');
         var missing = data.elements_missing || [];
         if (missing.length > 0) {
-          verneLines.push('📋 <strong>Te falta:</strong>');
-          missing.forEach(function(m) { verneLines.push('  • ' + m); });
+          advisorLines.push('📋 <strong>Te falta:</strong>');
+          missing.forEach(function(m) { advisorLines.push('  • ' + m); });
         }
-        verneLines.push('');
-        verneLines.push('💡 <em>15 minutos. De pie. Logros, prioridades, obstáculos. Nada más.</em>');
-        verneEl.innerHTML = verneLines.join('<br>');
+        advisorLines.push('');
+        advisorLines.push('💡 <em>15 minutos. De pie. Logros, prioridades, obstáculos. Nada más.</em>');
+        advisorEl.innerHTML = advisorLines.join('<br>');
 
         document.getElementById('history-card').style.display = 'block';
       }

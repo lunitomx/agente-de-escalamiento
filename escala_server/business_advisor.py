@@ -1,13 +1,13 @@
-"""Verne Harnish — Board Member Handler.
+"""ESCALA business-advisor handler.
 
-Provides Verne-style answers to business questions using the Alma
-document (S21.1) and the E19 knowledge graph.
+Provides source-neutral answers to business questions using the local
+knowledge graph.
 
 Usage::
 
-    from escala_server.verne_handler import VerneHandler
+    from escala_server.business_advisor import BusinessAdvisorHandler
 
-    handler = VerneHandler("~/.escala/escala.db")
+    handler = BusinessAdvisorHandler("~/.escala/escala.db")
     result = handler.ask("¿Cuál es mi CCC?")
     # -> {"answer": "...", "entities_used": [...], "category": "cash", ...}
 """
@@ -164,27 +164,25 @@ _CATEGORY_KEYWORDS: dict[str, list[str]] = {
     ],
 }
 
-# ── Verne response templates — loaded from YAML at init ──────────
-# See conocimiento/coaching/verne-templates.yaml
+# ── Advisor response templates — loaded from YAML at init ──────────
+# See conocimiento/coaching/advisor-templates.yaml
 # See conocimiento/coaching/daily-checklist.yaml
 
 
-class VerneHandler:
-    """Handle Verne-style answers to business questions."""
+class BusinessAdvisorHandler:
+    """Handle source-neutral business-advisor questions."""
 
     def __init__(self, db_path: str | None = None) -> None:
         if db_path is None:
             db_path = str(Path.home() / ".escala" / "escala.db")
         self.graph = GraphEngine(db_path)
         self.knowledge = KnowledgeHandler(self.graph)
-        self._alma: str | None = None
-
-        # Load Verne templates from YAML
+        # Load advisor templates from YAML
         _coaching_dir = (
             Path(__file__).resolve().parent.parent / "conocimiento" / "coaching"
         )
         self._templates = yaml.safe_load(
-            (_coaching_dir / "verne-templates.yaml").read_text(encoding="utf-8")
+            (_coaching_dir / "advisor-templates.yaml").read_text(encoding="utf-8")
         )
         self._checklist = yaml.safe_load(
             (_coaching_dir / "daily-checklist.yaml").read_text(encoding="utf-8")
@@ -194,7 +192,7 @@ class VerneHandler:
     # ── public API ────────────────────────────────────────────────────
 
     def ask(self, question: str, context: dict | None = None) -> dict:
-        """Answer a business question in Verne Harnish's voice.
+        """Answer a business question using local ESCALA guidance.
 
         Args:
             question: The question to answer (e.g. "¿Cómo mejoro mi flujo de caja?")
@@ -206,7 +204,7 @@ class VerneHandler:
         if not question or not question.strip():
             return {
                 "status": "error",
-                "message": "No question provided. Verne espera una pregunta.",
+                "message": "No question provided. El asesor espera una pregunta.",
             }
 
         # 0. Check for identity questions (C6)
@@ -215,16 +213,16 @@ class VerneHandler:
             "quién eres",
             "quien eres",
             "who are you",
-            "quién eres verne",
-            "quien es verne",
+            "quién es el asesor",
+            "quien es el asesor",
         ):
             return {
                 "answer": (
-                    "**Verne:** Soy Verne Harnish, fundador de Gazelles y autor de *Scaling Up*.\n\n"
-                    "Llevo 30 años ayudando a empresas a escalar. Mi framework son las **4 Decisiones**:\n"
+                    "**Asesor:** Soy el asesor de negocio local de ESCALA.\n\n"
+                    "Analizo la empresa desde **4 áreas operativas**:\n"
                     "  - **People:** La gente correcta en los asientos correctos\n"
                     "  - **Strategy:** Diferenciación real que importa al cliente\n"
-                    "  - **Execution:** Ritmo imparable con Rockefeller Habits\n"
+                    "  - **Execution:** Ritmos, prioridades y responsabilidad\n"
                     "  - **Cash:** Flujo de efectivo para crecer sin morir\n\n"
                     "Puedes preguntarme:\n"
                     '  • `ask` — "¿cómo mejoro mi flujo de caja?"\n'
@@ -263,7 +261,7 @@ class VerneHandler:
     # ── daily review ───────────────────────────────────────────────────
 
     def review_daily(self, daily_text: str) -> dict:
-        """Review a daily huddle summary against Rockefeller Habits.
+        """Review a daily huddle summary against execution habits.
 
         Args:
             daily_text: The daily huddle summary text (free form or JSON).
@@ -289,7 +287,7 @@ class VerneHandler:
         # Build observations
         observations: list[str] = []
         observations.append(
-            f"**Puntuación Rockefeller:** {score}/{self._max_score} ({score_percent}%)"
+            f"**Puntuación de ejecución:** {score}/{self._max_score} ({score_percent}%)"
         )
 
         if score_percent >= 80:
@@ -316,7 +314,7 @@ class VerneHandler:
                     f"  - ❌ {self._checklist[item_id]['message_missing']}"
                 )
 
-        # Verne's closing
+        # Advisor closing
         if missing:
             observations.append(
                 "\n*Un daily sin estructura no es un huddle — es ruido. "
@@ -383,7 +381,7 @@ class VerneHandler:
         changes_count: int = 0,
         company: str | None = None,
     ) -> dict:
-        """Provide Verne's board member perspective at session close.
+        """Provide a business-advisor perspective at session close.
 
         Args:
             category:      The category worked on (cash/strategy/people/execution).
@@ -397,7 +395,7 @@ class VerneHandler:
 
         parts: list[str] = []
         company_line = f"de **{company}**" if company else ""
-        parts.append(f"**Verne** (perspectiva de board {company_line}):\n")
+        parts.append(f"**Asesor** (perspectiva de negocio {company_line}):\n")
 
         # Opening
         if changes_count > 0:
@@ -444,7 +442,7 @@ class VerneHandler:
         Args:
             decision: Strategic decision to debate.
             context:  Optional company context.
-            history:  Prior turns [{user: ..., verne: ...}, ...].
+            history:  Prior turns with user and advisor context.
 
         Returns:
             dict with response, turn_number, next_questions, and status.
@@ -453,8 +451,8 @@ class VerneHandler:
             return {
                 "status": "error",
                 "message": (
-                    "No decision provided. Verne necesita una decisión para debatir.\n"
-                    'Ej: escala verne debate "deberíamos abrir un nuevo local"'
+                    "No decision provided. El asesor necesita una decisión para debatir.\n"
+                    'Ej: escala advisor debate "deberíamos abrir un nuevo local"'
                 ),
             }
 
@@ -466,7 +464,7 @@ class VerneHandler:
             # First turn: full board analysis
             company_line = f" de **{context}**" if context else ""
             lines.append(
-                f"**Verne** (modo board{company_line}):\n"
+                f"**Asesor** (modo debate{company_line}):\n"
                 f"Analicemos esta decisión con las **4 Decisiones**:\n"
             )
 
@@ -511,7 +509,7 @@ class VerneHandler:
             last_user_short = (
                 (last_user[:80] + "...") if len(last_user) > 80 else last_user
             )
-            lines.append("**Verne:**\n")
+            lines.append("**Asesor:**\n")
             lines.append(
                 f'Sobre lo que dices: *"{last_user_short}"* — déjame darte mi perspectiva.\n'
             )
@@ -573,7 +571,7 @@ class VerneHandler:
     # ── internal methods ──────────────────────────────────────────────
 
     def _classify_question(self, question: str) -> str:
-        """Classify a question into a Verne category using keyword matching."""
+        """Classify a question into a business category using keyword matching."""
         q_lower = question.lower()
 
         scores: dict[str, int] = {}
@@ -620,11 +618,11 @@ class VerneHandler:
         template: dict[str, Any],
         entities: list[dict[str, Any]],
     ) -> str:
-        """Build a structured Verne-style answer."""
+        """Build a structured source-neutral answer."""
         lines: list[str] = []
 
-        # Opening — Verne's diagnosis
-        lines.append(f"**Verne:** {template['diagnosis']}\n")
+        # Opening diagnosis
+        lines.append(f"**Asesor:** {template['diagnosis']}\n")
 
         # Entity context (if found)
         if entities:
@@ -640,7 +638,7 @@ class VerneHandler:
 
             lines.append("")
 
-        # Verne's characteristic questions (C5: shuffled for variety)
+        # Diagnostic questions (shuffled for variety)
         questions = list(template.get("questions", []))
         if questions:
             import random

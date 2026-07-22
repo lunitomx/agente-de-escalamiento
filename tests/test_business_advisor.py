@@ -1,4 +1,4 @@
-"""Tests for the VerneHandler."""
+"""Tests for the source-neutral BusinessAdvisorHandler."""
 
 from __future__ import annotations
 
@@ -6,23 +6,24 @@ import json
 from pathlib import Path
 
 import pytest
+import yaml
 
 
-class TestVerneHandler:
-    """Test Verne Harnish board member handler."""
+class TestBusinessAdvisorHandler:
+    """Test the local business-advisor handler."""
 
     @pytest.fixture
     def handler(self):
-        from escala_server.verne_handler import VerneHandler
+        from escala_server.business_advisor import BusinessAdvisorHandler
 
-        return VerneHandler(":memory:")
+        return BusinessAdvisorHandler(":memory:")
 
     def test_ask_cash_question(self, handler):
-        """A cash-related question returns cash category and Verne's voice."""
+        """A cash-related question returns cash category and advisor framing."""
         result = handler.ask("¿Cómo mejoro mi flujo de efectivo?")
         assert result["status"] == "ok"
         assert result["category"] == "cash"
-        assert "Verne" in result["answer"]
+        assert "Asesor" in result["answer"]
         assert "Cash" in result["answer"]
         assert len(result.get("principles_applied", [])) > 0
 
@@ -78,12 +79,12 @@ class TestVerneHandler:
         assert category == "execution"
 
     def test_answer_structure(self, handler):
-        """Answer includes Verne voice, questions, and call to action."""
+        """Answer includes advisor framing, questions, and call to action."""
         result = handler.ask("¿Cómo reduzco mi CCC?")
         assert result["status"] == "ok"
         answer = result["answer"]
-        # Verne's voice
-        assert "**Verne:**" in answer
+        # Advisor framing
+        assert "**Asesor:**" in answer
         # Has questions
         assert "?" in answer
         # Has principles
@@ -166,7 +167,7 @@ class TestVerneHandler:
         history = [
             {
                 "user": "Creo que tenemos el equipo para esto",
-                "verne": "... análisis ...",
+                "advisor": "... análisis ...",
             }
         ]
         result = handler.board_debate(
@@ -184,28 +185,39 @@ class TestVerneHandler:
 
     # ── coherence tests (S21.6) ────────────────────────────────────
 
-    def test_coherence_alma_has_4d_framework(self):
-        """The alma document references the 4 Decisions framework."""
-        alma = Path("miembro-board/verne-harnish.md").read_text()
-        assert "4 Decisiones" in alma
-        assert "People" in alma
-        assert "Strategy" in alma
-        assert "Execution" in alma
-        assert "Cash" in alma
+    def test_coherence_templates_cover_business_categories(self):
+        """Advisor templates cover all four business categories."""
+        templates = yaml.safe_load(
+            Path("conocimiento/coaching/advisor-templates.yaml").read_text()
+        )
+        assert {"People", "Strategy", "Execution", "Cash"} == {
+            key.title() for key in templates if key != "general"
+        }
 
-    def test_coherence_alma_has_rockefeller_habits(self):
-        """The alma document references Rockefeller Habits."""
-        alma = Path("miembro-board/verne-harnish.md").read_text()
-        assert "Rockefeller Habits" in alma
-        assert "Daily Huddle" in alma
-        assert "No Surprises" in alma
+    def test_coherence_daily_checklist_keeps_execution_structure(self):
+        """The daily checklist retains the five weighted execution signals."""
+        checklist = yaml.safe_load(
+            Path("conocimiento/coaching/daily-checklist.yaml").read_text()
+        )
+        assert len(checklist) == 5
+        assert sum(item["weight"] for item in checklist.values()) == 12
+        assert "Daily Huddle" in " ".join(
+            item["message_missing"] for item in checklist.values()
+        )
 
-    def test_coherence_alma_has_verne_questions(self):
-        """The alma document includes Verne's characteristic questions."""
-        alma = Path("miembro-board/verne-harnish.md").read_text()
-        assert "Core Customer" in alma
-        assert "Cash Conversion Cycle" in alma
-        assert "BHAG" in alma
+    def test_coherence_templates_keep_diagnostic_questions(self):
+        """Advisor templates retain the business diagnostic questions."""
+        templates = yaml.safe_load(
+            Path("conocimiento/coaching/advisor-templates.yaml").read_text()
+        )
+        questions = " ".join(
+            question
+            for template in templates.values()
+            for question in template["questions"]
+        )
+        assert "Core Customer" in questions
+        assert "Cash Conversion Cycle" in questions
+        assert "BHAG" in questions
 
     def test_coherence_ask_uses_framework(self, handler):
         """Answers reference the correct framework for the category."""
@@ -232,7 +244,7 @@ class TestVerneHandler:
         assert "Healthy Conflict" in r["answer"] or "Delegate" in r["answer"]
 
     def test_coherence_answer_structure(self, handler):
-        """Every answer has Verne's voice + questions + call to action."""
+        """Every answer has advisor framing, questions, and a call to action."""
         for question in [
             "¿Cómo mejoro mi cash flow?",
             "¿Necesito un daily huddle?",
@@ -240,8 +252,8 @@ class TestVerneHandler:
             "¿Debo contratar más gente?",
         ]:
             result = handler.ask(question)
-            assert "**Verne:**" in result["answer"], (
-                f"Missing Verne voice for: {question}"
+            assert "**Asesor:**" in result["answer"], (
+                f"Missing advisor framing for: {question}"
             )
             assert "?" in result["answer"], f"Missing questions for: {question}"
             assert "¿Qué vas a hacer" in result["answer"], (
@@ -256,6 +268,29 @@ class TestVerneHandler:
         assert data["meta"]["relationships_count"] == 59
         names = [e["name"] for e in data["entities"]]
         assert "Power of One" in names
-        assert "Rockefeller Habits" in names
         assert "4D Framework" in names
         assert len(names) == 42
+
+
+def test_advisor_routes_replace_legacy_public_routes() -> None:
+    """The local API exposes only the source-neutral advisor route family."""
+    from escala_server.server import _build_router
+
+    router = _build_router()
+    for method, path in (
+        ("POST", "/api/advisor/ask"),
+        ("GET", "/api/advisor/ask"),
+        ("POST", "/api/advisor/review-daily"),
+        ("POST", "/api/advisor/debate"),
+    ):
+        handler, _ = router.dispatch(method, path)
+        assert handler is not None
+
+    for method, path in (
+        ("POST", "/api/verne/ask"),
+        ("GET", "/api/verne/ask"),
+        ("POST", "/api/verne/review-daily"),
+        ("POST", "/api/verne/debate"),
+    ):
+        handler, _ = router.dispatch(method, path)
+        assert handler is None

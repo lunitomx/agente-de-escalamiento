@@ -18,7 +18,7 @@ relationships:
   - type: belongs-to
     target: decision-execution
   - type: measured-by
-    target: tool-rockefeller-habits
+    target: tool-execution-habits
 tags: [execution, metric, meetings, health, rhythm, improvement]
 metadata:
   unit: score (1-5)

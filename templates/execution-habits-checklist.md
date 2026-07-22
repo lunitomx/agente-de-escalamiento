@@ -1,4 +1,4 @@
-# Rockefeller Habits Checklist
+# Lista de Hábitos de Ejecución
 
 > Empresa: {company_name} | Fecha: {date}
 

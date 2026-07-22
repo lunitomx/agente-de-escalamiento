@@ -1,12 +1,11 @@
-id: tool-rockefeller-habits
+id: tool-execution-habits
 type: tool
-name: Rockefeller Habits Checklist
-name_es: Lista de Habitos Rockefeller
+name: Execution Habits Checklist
+name_es: Lista de Habitos de Ejecucion
 decision: execution
 summary: >
   Ten fundamental execution habits that, when practiced consistently, drive organizational
-  alignment and performance. Named after John D. Rockefeller's operational discipline.
-  The 10 habits cover: priorities clarity, critical data visibility, meeting rhythm,
+  alignment and performance. The habits cover: priorities clarity, critical data visibility, meeting rhythm,
   accountability structure, employee and customer feedback loops, and core values
   visibility. Each habit is a yes/no checkable behavior. Companies score themselves
   quarterly and focus improvement on their lowest-scoring habit.
@@ -20,12 +19,12 @@ relationships:
   - type: belongs-to
     target: decision-execution
   - type: implements
-    target: worksheet-rockefeller-habits
+    target: worksheet-execution-habits
   - type: measured-by
     target: metric-meeting-health-score
   - type: requires
     target: tool-face
-tags: [execution, rockefeller-habits, checklist, accountability, alignment]
+tags: [execution, execution-habits, checklist, accountability, alignment]
 metadata:
   difficulty: beginner
   time_estimate: "30 min to score; 90-day cycles to improve"
