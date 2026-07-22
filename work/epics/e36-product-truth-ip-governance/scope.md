@@ -179,7 +179,7 @@ isolation and commit recovery.
 | S36.4 | M | Complete | 1h 05m 33s | 1 M / 1h 05m 33s | Merged locally at `708a1b6`; strict governance contract, 10 canonical identities, and 15/15 close gates passed |
 | S36.3 | M | Complete | 1h 53m 12s | 1 M / 1h 53m 12s | Merged locally at `52baa1a`; 15/15 close gates passed after T7 canonical-import repair |
 | S36.5 | L | Complete | 1h 21m 21s | 1 L / 1h 21m 21s | Merged locally at `74be973`; real M3 artifact qualification passed, legal review remains required, publication stays false |
-| S36.6 | S | Pending | — | Not calibrated | Epic-wide acceptance control |
+| S36.6 | S | Complete | 49m 43s | 1 S / 49m 43s | Merged locally at `c2bd8a0`; 42 requirements baselined, 15/15 close gates passed, mission remains truthfully 0/42 pending E37-E42 |
 
 Velocity will be calibrated from completed task evidence, not estimated hours.
 Every story records its commit(s), focused tests, full gates, receipts, and any
