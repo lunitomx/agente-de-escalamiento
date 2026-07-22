@@ -1,0 +1,33 @@
+{
+  "artifact_type": "story-local-workspace-qualification",
+  "schema_version": 1,
+  "story_id": "S37.1",
+  "epic_id": "E37",
+  "source_commit": "f14ad924479cd3ecfa9e5b2d74055df072217299",
+  "status": "pass",
+  "platform_observed": "macos",
+  "focused_tests": 12,
+  "full_tests": 860,
+  "quality_gates": {
+    "tests": "pass",
+    "lint": "pass",
+    "format": "pass",
+    "types": "pass"
+  },
+  "manual_flow": {
+    "valid_workspace_receipt": "pass",
+    "valid_database_created_under_local_data": true,
+    "invalid_workspace_receipt": "fail",
+    "invalid_code": "authoritative_sqlite_sync_forbidden",
+    "invalid_database_created_under_exchange": false,
+    "invalid_run_non_mutating": true,
+    "receipt_paths_redacted": true,
+    "network_or_cloud_api_used": false
+  },
+  "requirements_ready_for_master_ledger": [
+    "REQ-E37-001",
+    "REQ-E37-002"
+  ],
+  "master_ledger_state": "unproved",
+  "master_ledger_note": "This story receipt is implementation evidence; the master acceptance ledger is updated only with its exact declaration and requirement gate receipts during story/epic close."
+}
