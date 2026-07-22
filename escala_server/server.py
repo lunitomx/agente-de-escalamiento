@@ -26,7 +26,6 @@ class EscalaRequestHandler(BaseHTTPRequestHandler):
     worksheets: WorksheetsHandler = None  # type: ignore
     sessions: SessionsHandler = None  # type: ignore
     memory: MemoryHandler = None  # type: ignore
-    knowledge_ingester: Any = None  # type: ignore[annotation-unchecked]
     knowledge: Any = None  # type: ignore[annotation-unchecked]
     advisor: Any = None  # type: ignore[annotation-unchecked]
 
@@ -196,7 +195,6 @@ def make_server(
     EscalaRequestHandler.worksheets = WorksheetsHandler(db_path)
     EscalaRequestHandler.sessions = SessionsHandler(db_path)
     EscalaRequestHandler.memory = MemoryHandler(db_path)
-    EscalaRequestHandler.knowledge_ingester = _build_knowledge_ingester(db_path)
     EscalaRequestHandler.knowledge = KnowledgeHandler(GraphEngine(db_path))
     EscalaRequestHandler.advisor = BusinessAdvisorHandler(db_path)
 
@@ -298,17 +296,6 @@ def _build_router() -> Router:
     def memory_create_relationship(payload=None):
         return EscalaRequestHandler.memory.create_relationship(payload or {})
 
-    # ── Knowledge ingestion routes ──────────────────────────────
-
-    @router.post("/api/knowledge/ingest")
-    def knowledge_ingest(payload=None):
-        ingester = EscalaRequestHandler.knowledge_ingester
-        json_path = (payload or {}).get("json_path")
-        if not json_path:
-            return {"status": "error", "message": "json_path is required"}
-        result = ingester.ingest_all(json_path=json_path)
-        return {"data": result, "status": "ok"}
-
     # ── Knowledge API routes (S19.4) ────────────────────────────
 
     @router.get("/api/knowledge/search")
@@ -385,10 +372,3 @@ def _build_router() -> Router:
         }
 
     return router
-
-
-def _build_knowledge_ingester(db_path: str):
-    """Build a KnowledgeIngester instance for the given db_path."""
-    from .data.knowledge_ingester import KnowledgeIngester
-
-    return KnowledgeIngester(db_path=db_path)

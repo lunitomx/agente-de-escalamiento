@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import shutil
 import stat
 import subprocess
 from typing import Any, Callable
@@ -29,9 +30,11 @@ from validators.public_export import (
     load_third_party_inventory,
     public_export_policy_hash,
     render_package_metadata,
+    render_artifact_manifest,
     render_third_party_notices,
     third_party_inventory_hash,
     validate_export_selections,
+    verify_public_export,
 )
 
 
@@ -93,6 +96,11 @@ def _create_git_fixture(
     executable.parent.mkdir()
     executable.write_bytes(b"#!/bin/sh\nexit 0\n")
     executable.chmod(0o755)
+    (repository / "module.py").write_bytes(b"import json\n")
+    vendored_source = ROOT / "escala_server/static/shared/vendor/chart.umd.min.js"
+    vendored_target = repository / "escala_server/static/shared/vendor/chart.umd.min.js"
+    vendored_target.parent.mkdir(parents=True)
+    vendored_target.write_bytes(vendored_source.read_bytes())
     _write_fixture_policy(
         repository,
         selections
@@ -131,6 +139,37 @@ def _add_index_entry(
         object_id = completed.stdout.decode("ascii").strip()
     _git(repository, "update-index", "--add", "--cacheinfo", mode, object_id, path)
     _git(repository, "commit", "--quiet", "-m", f"add {mode} fixture")
+
+
+def _build_artifact_fixture(
+    tmp_path: Path,
+    *,
+    selections: list[dict[str, str]] | None = None,
+) -> tuple[Path, PublicExportPolicy, ThirdPartyInventory]:
+    repository, commit, policy, inventory = _create_git_fixture(
+        tmp_path,
+        selections=selections,
+    )
+    artifact = tmp_path / "artifact"
+    build_public_export(
+        repository=repository,
+        destination=artifact,
+        source_commit=commit,
+        policy=policy,
+        inventory=inventory,
+    )
+    return artifact, policy, inventory
+
+
+def _rehash_artifact_file(artifact: Path, relative_path: str) -> None:
+    manifest_path = artifact / "ESCALA-MANIFEST.json"
+    payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+    content = artifact.joinpath(*relative_path.split("/")).read_bytes()
+    entry = next(item for item in payload["entries"] if item["path"] == relative_path)
+    entry["size_bytes"] = len(content)
+    entry["sha256"] = hashlib.sha256(content).hexdigest()
+    manifest = ArtifactManifest.model_validate(payload)
+    manifest_path.write_bytes(render_artifact_manifest(manifest))
 
 
 def test_canonical_export_and_dependency_contracts_load_deterministically() -> None:
@@ -682,3 +721,227 @@ def test_builder_rejects_unsafe_destination(
             policy=policy,
             inventory=inventory,
         )
+
+
+def test_independent_verifier_passes_valid_artifact_with_named_checks(
+    tmp_path: Path,
+) -> None:
+    artifact, policy, inventory = _build_artifact_fixture(tmp_path)
+    boundary = load_public_boundary_policy(PUBLIC_BOUNDARY_PATH)
+
+    result = verify_public_export(
+        artifact=artifact,
+        policy=policy,
+        inventory=inventory,
+        boundary_policy=boundary,
+    )
+
+    assert result.technical_artifact_status == "pass"
+    assert result.human_legal_review_status == "required"
+    assert result.publication_authorized is False
+    assert result.violations == []
+    assert all(check.status == "pass" for check in result.checks)
+    assert [check.id for check in result.checks] == sorted(
+        check.id for check in result.checks
+    )
+
+
+@pytest.mark.parametrize(
+    ("tamper", "expected_rule"),
+    [
+        ("added", "artifact.unexpected_path"),
+        ("removed", "artifact.missing_path"),
+        ("changed", "artifact.hash_mismatch"),
+        ("renamed", "artifact.missing_path"),
+        ("mode", "artifact.mode_mismatch"),
+        ("symlink", "artifact.unsafe_entry"),
+        ("unsafe", "artifact.unsafe_path"),
+        ("manifest", "artifact.manifest_invalid"),
+        ("metadata", "artifact.hash_mismatch"),
+    ],
+)
+def test_independent_verifier_fails_closed_on_filesystem_or_metadata_tamper(
+    tmp_path: Path,
+    tamper: str,
+    expected_rule: str,
+) -> None:
+    artifact, policy, inventory = _build_artifact_fixture(tmp_path)
+    readme = artifact / "README.md"
+    if tamper == "added":
+        (artifact / "unexpected.txt").write_bytes(b"unexpected\n")
+    elif tamper == "removed":
+        readme.unlink()
+    elif tamper == "changed":
+        readme.write_bytes(b"changed bytes\n")
+    elif tamper == "renamed":
+        readme.rename(artifact / "RENAMED.md")
+    elif tamper == "mode":
+        readme.chmod(0o755)
+    elif tamper == "symlink":
+        readme.unlink()
+        os.symlink("LICENSE", readme)
+    elif tamper == "unsafe":
+        (artifact / "unsafe\\name").write_bytes(b"unsafe path\n")
+    elif tamper == "manifest":
+        (artifact / "ESCALA-MANIFEST.json").write_bytes(b"{invalid")
+    else:
+        (artifact / "ESCALA-PACKAGE.json").write_bytes(b"{}\n")
+
+    result = verify_public_export(
+        artifact=artifact,
+        policy=policy,
+        inventory=inventory,
+        boundary_policy=load_public_boundary_policy(PUBLIC_BOUNDARY_PATH),
+    )
+
+    assert result.technical_artifact_status == "fail"
+    assert expected_rule in {violation.rule_id for violation in result.violations}
+    serialized = result.model_dump_json()
+    assert str(tmp_path) not in serialized
+    assert "changed bytes" not in serialized
+
+
+@pytest.mark.parametrize(
+    ("content", "expected_rule"),
+    [
+        (b"Derived from Scaling Up.\n", "public.source_attribution"),
+        (b"API_KEY=super-secret-value\n", "credential.assignment"),
+        (
+            b'<script src="https://cdn.example.invalid/runtime.js"></script>\n',
+            "local.hosted_runtime_dependency",
+        ),
+        (b"from googleapiclient import drive\n", "local.cloud_api_requirement"),
+    ],
+)
+def test_independent_verifier_detects_public_secret_and_hosted_content(
+    tmp_path: Path,
+    content: bytes,
+    expected_rule: str,
+) -> None:
+    artifact, policy, inventory = _build_artifact_fixture(tmp_path)
+    (artifact / "README.md").write_bytes(content)
+    _rehash_artifact_file(artifact, "README.md")
+
+    result = verify_public_export(
+        artifact=artifact,
+        policy=policy,
+        inventory=inventory,
+        boundary_policy=load_public_boundary_policy(PUBLIC_BOUNDARY_PATH),
+    )
+
+    assert result.technical_artifact_status == "fail"
+    assert expected_rule in {violation.rule_id for violation in result.violations}
+    assert "super-secret-value" not in result.model_dump_json()
+
+
+def test_independent_verifier_rejects_private_database_and_synchronized_roots(
+    tmp_path: Path,
+) -> None:
+    artifact, policy, inventory = _build_artifact_fixture(tmp_path)
+    private_state = artifact / ".scaleup/my-company/state.yaml"
+    private_state.parent.mkdir(parents=True)
+    private_state.write_bytes(b"private: true\n")
+    (artifact / "company.sqlite").write_bytes(b"SQLite format 3\0")
+
+    first = verify_public_export(
+        artifact=artifact,
+        policy=policy,
+        inventory=inventory,
+        boundary_policy=load_public_boundary_policy(PUBLIC_BOUNDARY_PATH),
+    )
+    assert {"artifact.denied_path", "local.database_payload"} <= {
+        violation.rule_id for violation in first.violations
+    }
+
+    synchronized_parent = tmp_path / "OneDrive"
+    synchronized_parent.mkdir()
+    synchronized_artifact = synchronized_parent / "artifact-copy"
+    shutil.copytree(artifact, synchronized_artifact)
+    second = verify_public_export(
+        artifact=synchronized_artifact,
+        policy=policy,
+        inventory=inventory,
+        boundary_policy=load_public_boundary_policy(PUBLIC_BOUNDARY_PATH),
+    )
+    assert "local.synchronized_artifact_root" in {
+        violation.rule_id for violation in second.violations
+    }
+
+
+def test_independent_verifier_allows_relative_assets_loopback_and_documentation_urls(
+    tmp_path: Path,
+) -> None:
+    artifact, policy, inventory = _build_artifact_fixture(tmp_path)
+    allowed = b"\n".join(
+        [
+            b'<script src="../../shared/vendor/chart.umd.min.js"></script>',
+            b'fetch("http://localhost:8080/api/health")',
+            b"Documentation: https://docs.example.invalid/local-agent",
+            b"Updater source: https://github.com/example/local-product",
+        ]
+    )
+    (artifact / "README.md").write_bytes(allowed)
+    _rehash_artifact_file(artifact, "README.md")
+
+    result = verify_public_export(
+        artifact=artifact,
+        policy=policy,
+        inventory=inventory,
+        boundary_policy=load_public_boundary_policy(PUBLIC_BOUNDARY_PATH),
+    )
+
+    assert result.technical_artifact_status == "pass"
+
+
+def test_independent_verifier_rejects_unmapped_import_and_vendored_header_drift(
+    tmp_path: Path,
+) -> None:
+    module_selection = [{"path": "module.py", "kind": "file", "role": "local_runtime"}]
+    artifact, policy, inventory = _build_artifact_fixture(
+        tmp_path,
+        selections=module_selection,
+    )
+    (artifact / "module.py").write_bytes(b"import requests\n")
+    _rehash_artifact_file(artifact, "module.py")
+    result = verify_public_export(
+        artifact=artifact,
+        policy=policy,
+        inventory=inventory,
+        boundary_policy=load_public_boundary_policy(PUBLIC_BOUNDARY_PATH),
+    )
+    assert "dependency.unmapped_import" in {
+        violation.rule_id for violation in result.violations
+    }
+
+    vendor_tmp = tmp_path / "vendor-case"
+    vendor_tmp.mkdir()
+    vendor_selection = [
+        {
+            "path": "escala_server/static/shared/vendor/chart.umd.min.js",
+            "kind": "file",
+            "role": "local_runtime",
+        }
+    ]
+    vendor_artifact, vendor_policy, vendor_inventory = _build_artifact_fixture(
+        vendor_tmp,
+        selections=vendor_selection,
+    )
+    vendor_path = vendor_artifact / vendor_selection[0]["path"]
+    vendor_path.write_bytes(b"/* Chart.js MIT */\n")
+    _rehash_artifact_file(vendor_artifact, vendor_selection[0]["path"])
+    vendor_result = verify_public_export(
+        artifact=vendor_artifact,
+        policy=vendor_policy,
+        inventory=vendor_inventory,
+        boundary_policy=load_public_boundary_policy(PUBLIC_BOUNDARY_PATH),
+    )
+    assert "dependency.vendored_evidence" in {
+        violation.rule_id for violation in vendor_result.violations
+    }
+
+
+def test_selected_server_has_no_private_ingester_dependency() -> None:
+    server_source = (ROOT / "escala_server/server.py").read_text(encoding="utf-8")
+
+    assert ".data.knowledge_ingester" not in server_source
+    assert '"/api/knowledge/ingest"' not in server_source

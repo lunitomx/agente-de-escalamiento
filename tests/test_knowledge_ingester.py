@@ -231,11 +231,12 @@ class TestKnowledgeIngester:
 
 
 class TestKnowledgeIngestRoute:
-    """Verify knowledge ingest route is registered correctly."""
+    """Keep the source-specific ingester outside the portable public server."""
 
-    def test_ingest_route_registered(self):
+    def test_ingest_route_is_not_registered_on_public_server(self):
         from escala_server.server import _build_router
 
         router = _build_router()
         handler, params = router.dispatch("POST", "/api/knowledge/ingest")
-        assert handler is not None
+        assert handler is None
+        assert params == {}

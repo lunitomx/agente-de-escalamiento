@@ -101,6 +101,17 @@ class TestCORSHandler:
         assert "Access-Control-Allow-Headers" in headers
 
 
+def test_daily_analyzer_uses_vendored_chart_runtime() -> None:
+    dashboard = (
+        PROJECT_ROOT / "escala_server/static/dashboards/execution/daily-analyzer.html"
+    ).read_text(encoding="utf-8")
+    vendor = PROJECT_ROOT / "escala_server/static/shared/vendor/chart.umd.min.js"
+
+    assert "../../shared/vendor/chart.umd.min.js" in dashboard
+    assert "cdn.jsdelivr.net" not in dashboard
+    assert vendor.is_file()
+
+
 # ─── Handler Tests ────────────────────────────────────────────
 
 

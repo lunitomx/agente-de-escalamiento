@@ -2,13 +2,17 @@
 
 from __future__ import annotations
 
+import ast
 from enum import Enum
 import hashlib
 import json
+import os
 from pathlib import Path, PurePosixPath
 import re
 import shutil
+import stat
 import subprocess
+import sys
 import tempfile
 from typing import Any, Iterable, Literal, NoReturn, TypeVar
 
@@ -22,11 +26,14 @@ from pydantic import (
 )
 
 from validators.public_boundary import (
+    BoundaryFindingCode,
     PublicBoundaryPolicy,
     PublicPathDisposition,
     classify_public_path,
     public_boundary_policy_hash,
+    scan_public_content,
 )
+from validators.exposure_inventory import detect_secret_shapes
 
 try:
     import yaml
@@ -40,6 +47,41 @@ _IMPORT_PATTERN = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 _SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 _COMMIT_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 _UNSAFE_PATH_CHARACTERS = frozenset("*?[]")
+_RUNTIME_EXTERNAL_PATTERN = re.compile(
+    rb"(?i)(?:<(?:script|link)\b[^>]*(?:src|href)\s*=\s*|"
+    rb"(?:fetch|websocket)\s*\(\s*)[\"']https?://"
+    rb"(?!localhost(?::|/)|127\.0\.0\.1(?::|/)|\[::1\](?::|/))"
+)
+_CLOUD_API_PATTERN = re.compile(
+    rb"(?i)\b(?:googleapiclient|oauth2client|msgraph|graph\.microsoft\.com|"
+    rb"drive\.files|client_secret)\b"
+)
+_TELEMETRY_PATTERN = re.compile(
+    rb"(?i)\b(?:sentry_sdk|segment\.io|mixpanel|telemetry_endpoint)\b"
+)
+_SYNC_MARKERS = ("onedrive", "google drive", "googledrive", "dropbox", "icloud")
+_DATABASE_SUFFIXES = (".db", ".sqlite", ".sqlite3")
+_BINARY_SUFFIXES = (
+    ".gif",
+    ".ico",
+    ".jpeg",
+    ".jpg",
+    ".png",
+    ".woff",
+    ".woff2",
+)
+_VERIFICATION_CHECK_IDS = (
+    "artifact_root",
+    "credentials",
+    "dependencies",
+    "file_integrity",
+    "license_posture",
+    "local_only",
+    "manifest_contract",
+    "package_metadata",
+    "path_set",
+    "public_boundary",
+)
 
 
 class _StrictModel(BaseModel):
@@ -486,6 +528,81 @@ class PublicExportBuildResult(_StrictModel):
     publication_authorized: Literal[False]
 
 
+class VerificationStatus(str, Enum):
+    PASS = "pass"
+    FAIL = "fail"
+
+
+class ArtifactLocatorKind(str, Enum):
+    RELATIVE_PATH = "relative_path"
+    SHA256 = "sha256"
+
+
+class ArtifactVerificationViolation(_StrictModel):
+    check_id: str = Field(pattern=r"^[a-z][a-z0-9_]*$")
+    rule_id: str = Field(pattern=r"^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$")
+    locator_kind: ArtifactLocatorKind
+    locator: str = Field(min_length=1, max_length=1024)
+
+    @model_validator(mode="after")
+    def validate_locator(self) -> ArtifactVerificationViolation:
+        if self.locator_kind is ArtifactLocatorKind.RELATIVE_PATH:
+            _validate_relative_path(self.locator)
+        elif _SHA256_PATTERN.fullmatch(self.locator) is None:
+            raise ValueError("invalid artifact locator hash")
+        return self
+
+
+class ArtifactVerificationCheck(_StrictModel):
+    id: str = Field(pattern=r"^[a-z][a-z0-9_]*$")
+    status: VerificationStatus
+    violation_count: int = Field(ge=0)
+
+    @model_validator(mode="after")
+    def validate_count(self) -> ArtifactVerificationCheck:
+        if (self.status is VerificationStatus.PASS) != (self.violation_count == 0):
+            raise ValueError("check status must match its violation count")
+        return self
+
+
+class PublicExportVerificationResult(_StrictModel):
+    schema_version: Literal[1] = 1
+    product_id: Literal["escala"]
+    product_version: str = Field(pattern=r"^[0-9]+\.[0-9]+\.[0-9]+$")
+    source_commit: str | None = Field(default=None, pattern=r"^[0-9a-f]{40}$")
+    export_policy_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    third_party_inventory_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    manifest_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+    artifact_file_count: int = Field(ge=0)
+    technical_artifact_status: VerificationStatus
+    human_legal_review_status: Literal["required"]
+    publication_authorized: Literal[False]
+    checks: list[ArtifactVerificationCheck]
+    violations: list[ArtifactVerificationViolation]
+
+    @model_validator(mode="after")
+    def validate_result(self) -> PublicExportVerificationResult:
+        if self.checks != sorted(self.checks, key=lambda item: item.id):
+            raise ValueError("verification checks must be sorted")
+        expected_violations = sorted(
+            self.violations,
+            key=lambda item: (item.check_id, item.rule_id, item.locator),
+        )
+        if self.violations != expected_violations:
+            raise ValueError("verification violations must be sorted")
+        if (self.technical_artifact_status is VerificationStatus.PASS) != (
+            not self.violations
+        ):
+            raise ValueError("technical status must match violations")
+        return self
+
+
+class _ArtifactFile(_StrictModel):
+    path: str
+    mode: int = Field(ge=0)
+    content: bytes | None
+
+
 class _GitTreeEntry(_StrictModel):
     mode: str = Field(pattern=r"^[0-9]{6}$")
     object_type: str = Field(min_length=1, max_length=16)
@@ -721,6 +838,684 @@ def build_public_export(
         technical_artifact_status="built_not_verified",
         human_legal_review_status=policy.license.human_review_status,
         publication_authorized=policy.license.publication_authorized,
+    )
+
+
+def verify_public_export(
+    *,
+    artifact: Path,
+    policy: PublicExportPolicy,
+    inventory: ThirdPartyInventory,
+    boundary_policy: PublicBoundaryPolicy,
+) -> PublicExportVerificationResult:
+    """Independently verify staged bytes without calling or trusting the builder."""
+    violations: list[ArtifactVerificationViolation] = []
+    files = _enumerate_artifact_files(
+        artifact,
+        boundary_policy=boundary_policy,
+        violations=violations,
+    )
+    manifest_path = policy.generated_paths.manifest
+    manifest_file = files.get(manifest_path)
+    manifest: ArtifactManifest | None = None
+    manifest_sha256: str | None = None
+    if manifest_file is None or manifest_file.content is None:
+        _append_artifact_violation(
+            violations,
+            check_id="manifest_contract",
+            rule_id="artifact.manifest_invalid",
+            relative_path=manifest_path,
+            boundary_policy=boundary_policy,
+        )
+    else:
+        manifest_sha256 = hashlib.sha256(manifest_file.content).hexdigest()
+        try:
+            manifest = ArtifactManifest.model_validate_json(manifest_file.content)
+        except (ValidationError, ValueError):
+            _append_artifact_violation(
+                violations,
+                check_id="manifest_contract",
+                rule_id="artifact.manifest_invalid",
+                relative_path=manifest_path,
+                boundary_policy=boundary_policy,
+            )
+        else:
+            if render_artifact_manifest(manifest) != manifest_file.content:
+                _append_artifact_violation(
+                    violations,
+                    check_id="manifest_contract",
+                    rule_id="artifact.manifest_nondeterministic",
+                    relative_path=manifest_path,
+                    boundary_policy=boundary_policy,
+                )
+            _verify_manifest_contract(
+                manifest,
+                policy=policy,
+                inventory=inventory,
+                boundary_policy=boundary_policy,
+                violations=violations,
+            )
+    if manifest is not None:
+        _verify_exact_artifact_files(
+            files,
+            manifest=manifest,
+            manifest_path=manifest_path,
+            boundary_policy=boundary_policy,
+            violations=violations,
+        )
+        _verify_generated_metadata(
+            files,
+            manifest=manifest,
+            policy=policy,
+            inventory=inventory,
+            boundary_policy=boundary_policy,
+            violations=violations,
+        )
+    _verify_payload_boundaries(
+        artifact,
+        files=files,
+        policy=policy,
+        inventory=inventory,
+        boundary_policy=boundary_policy,
+        violations=violations,
+    )
+    ordered_violations = _ordered_artifact_violations(violations)
+    checks = [
+        ArtifactVerificationCheck(
+            id=check_id,
+            status=(
+                VerificationStatus.FAIL
+                if any(item.check_id == check_id for item in ordered_violations)
+                else VerificationStatus.PASS
+            ),
+            violation_count=sum(
+                item.check_id == check_id for item in ordered_violations
+            ),
+        )
+        for check_id in sorted(_VERIFICATION_CHECK_IDS)
+    ]
+    return PublicExportVerificationResult(
+        product_id=policy.product.id,
+        product_version=policy.product.version,
+        source_commit=manifest.source_commit if manifest is not None else None,
+        export_policy_sha256=public_export_policy_hash(policy),
+        third_party_inventory_sha256=third_party_inventory_hash(inventory),
+        manifest_sha256=manifest_sha256,
+        artifact_file_count=len(files),
+        technical_artifact_status=(
+            VerificationStatus.FAIL if ordered_violations else VerificationStatus.PASS
+        ),
+        human_legal_review_status=policy.license.human_review_status,
+        publication_authorized=policy.license.publication_authorized,
+        checks=checks,
+        violations=ordered_violations,
+    )
+
+
+def _enumerate_artifact_files(
+    artifact: Path,
+    *,
+    boundary_policy: PublicBoundaryPolicy,
+    violations: list[ArtifactVerificationViolation],
+) -> dict[str, _ArtifactFile]:
+    files: dict[str, _ArtifactFile] = {}
+    if not artifact.is_absolute() or artifact.is_symlink() or not artifact.is_dir():
+        _append_artifact_violation(
+            violations,
+            check_id="artifact_root",
+            rule_id="artifact.invalid_root",
+            relative_path="artifact-root",
+            boundary_policy=boundary_policy,
+            force_hash=True,
+        )
+        return files
+    if _path_has_sync_marker(artifact):
+        _append_artifact_violation(
+            violations,
+            check_id="local_only",
+            rule_id="local.synchronized_artifact_root",
+            relative_path="artifact-root",
+            boundary_policy=boundary_policy,
+            force_hash=True,
+        )
+    pending = [artifact]
+    while pending:
+        directory = pending.pop()
+        try:
+            entries = sorted(os.scandir(directory), key=lambda item: item.name)
+        except OSError:
+            _append_artifact_violation(
+                violations,
+                check_id="artifact_root",
+                rule_id="artifact.unreadable",
+                relative_path="artifact-root",
+                boundary_policy=boundary_policy,
+                force_hash=True,
+            )
+            continue
+        for entry in entries:
+            entry_path = Path(entry.path)
+            relative_path = entry_path.relative_to(artifact).as_posix()
+            try:
+                safe_path = _validate_relative_path(relative_path)
+            except ValueError:
+                _append_artifact_violation(
+                    violations,
+                    check_id="artifact_root",
+                    rule_id="artifact.unsafe_path",
+                    relative_path=relative_path,
+                    boundary_policy=boundary_policy,
+                    force_hash=True,
+                )
+                safe_path = relative_path
+            try:
+                metadata = entry.stat(follow_symlinks=False)
+            except OSError:
+                _append_artifact_violation(
+                    violations,
+                    check_id="artifact_root",
+                    rule_id="artifact.unreadable",
+                    relative_path=safe_path,
+                    boundary_policy=boundary_policy,
+                    force_hash=safe_path != relative_path,
+                )
+                continue
+            if stat.S_ISLNK(metadata.st_mode):
+                _append_artifact_violation(
+                    violations,
+                    check_id="artifact_root",
+                    rule_id="artifact.unsafe_entry",
+                    relative_path=safe_path,
+                    boundary_policy=boundary_policy,
+                    force_hash=safe_path != relative_path,
+                )
+                files[safe_path] = _ArtifactFile(
+                    path=safe_path,
+                    mode=stat.S_IMODE(metadata.st_mode),
+                    content=None,
+                )
+                continue
+            if stat.S_ISDIR(metadata.st_mode):
+                pending.append(entry_path)
+                continue
+            if not stat.S_ISREG(metadata.st_mode):
+                _append_artifact_violation(
+                    violations,
+                    check_id="artifact_root",
+                    rule_id="artifact.unsafe_entry",
+                    relative_path=safe_path,
+                    boundary_policy=boundary_policy,
+                    force_hash=safe_path != relative_path,
+                )
+                continue
+            try:
+                content = entry_path.read_bytes()
+            except OSError:
+                content = None
+                _append_artifact_violation(
+                    violations,
+                    check_id="artifact_root",
+                    rule_id="artifact.unreadable",
+                    relative_path=safe_path,
+                    boundary_policy=boundary_policy,
+                    force_hash=safe_path != relative_path,
+                )
+            files[safe_path] = _ArtifactFile(
+                path=safe_path,
+                mode=stat.S_IMODE(metadata.st_mode),
+                content=content,
+            )
+    return files
+
+
+def _verify_manifest_contract(
+    manifest: ArtifactManifest,
+    *,
+    policy: PublicExportPolicy,
+    inventory: ThirdPartyInventory,
+    boundary_policy: PublicBoundaryPolicy,
+    violations: list[ArtifactVerificationViolation],
+) -> None:
+    mismatched = (
+        manifest.product_id != policy.product.id
+        or manifest.product_version != policy.product.version
+        or manifest.export_policy_sha256 != public_export_policy_hash(policy)
+        or manifest.public_boundary_policy_sha256
+        != public_boundary_policy_hash(boundary_policy)
+        or manifest.public_boundary_policy_sha256
+        != policy.bindings.public_boundary.sha256
+        or manifest.third_party_inventory_sha256
+        != third_party_inventory_hash(inventory)
+        or manifest.third_party_inventory_sha256 != policy.bindings.third_party.sha256
+    )
+    if mismatched:
+        _append_artifact_violation(
+            violations,
+            check_id="manifest_contract",
+            rule_id="artifact.manifest_contract_mismatch",
+            relative_path=policy.generated_paths.manifest,
+            boundary_policy=boundary_policy,
+        )
+
+
+def _verify_exact_artifact_files(
+    files: dict[str, _ArtifactFile],
+    *,
+    manifest: ArtifactManifest,
+    manifest_path: str,
+    boundary_policy: PublicBoundaryPolicy,
+    violations: list[ArtifactVerificationViolation],
+) -> None:
+    expected = {entry.path: entry for entry in manifest.entries}
+    expected_paths = set(expected) | {manifest_path}
+    actual_paths = set(files)
+    for path in sorted(expected_paths - actual_paths):
+        _append_artifact_violation(
+            violations,
+            check_id="path_set",
+            rule_id="artifact.missing_path",
+            relative_path=path,
+            boundary_policy=boundary_policy,
+        )
+    for path in sorted(actual_paths - expected_paths):
+        _append_artifact_violation(
+            violations,
+            check_id="path_set",
+            rule_id="artifact.unexpected_path",
+            relative_path=path,
+            boundary_policy=boundary_policy,
+            force_hash=_path_is_unsafe(path, boundary_policy),
+        )
+    for path, expected_entry in expected.items():
+        actual = files.get(path)
+        if actual is None or actual.content is None:
+            continue
+        expected_mode = 0o755 if expected_entry.mode == "100755" else 0o644
+        if actual.mode != expected_mode:
+            _append_artifact_violation(
+                violations,
+                check_id="file_integrity",
+                rule_id="artifact.mode_mismatch",
+                relative_path=path,
+                boundary_policy=boundary_policy,
+            )
+        if (
+            len(actual.content) != expected_entry.size_bytes
+            or hashlib.sha256(actual.content).hexdigest() != expected_entry.sha256
+        ):
+            _append_artifact_violation(
+                violations,
+                check_id="file_integrity",
+                rule_id="artifact.hash_mismatch",
+                relative_path=path,
+                boundary_policy=boundary_policy,
+            )
+    manifest_file = files.get(manifest_path)
+    if manifest_file is not None and manifest_file.mode != 0o644:
+        _append_artifact_violation(
+            violations,
+            check_id="file_integrity",
+            rule_id="artifact.mode_mismatch",
+            relative_path=manifest_path,
+            boundary_policy=boundary_policy,
+        )
+
+
+def _verify_generated_metadata(
+    files: dict[str, _ArtifactFile],
+    *,
+    manifest: ArtifactManifest,
+    policy: PublicExportPolicy,
+    inventory: ThirdPartyInventory,
+    boundary_policy: PublicBoundaryPolicy,
+    violations: list[ArtifactVerificationViolation],
+) -> None:
+    expected_metadata = render_package_metadata(
+        build_package_metadata(
+            policy,
+            inventory,
+            source_commit=manifest.source_commit,
+        )
+    ).encode("utf-8")
+    metadata_file = files.get(policy.generated_paths.package_metadata)
+    if metadata_file is None or metadata_file.content != expected_metadata:
+        _append_artifact_violation(
+            violations,
+            check_id="package_metadata",
+            rule_id="artifact.metadata_mismatch",
+            relative_path=policy.generated_paths.package_metadata,
+            boundary_policy=boundary_policy,
+        )
+    notices_file = files.get(policy.generated_paths.third_party_notices)
+    expected_notices = render_third_party_notices(inventory).encode("utf-8")
+    if notices_file is None or notices_file.content != expected_notices:
+        _append_artifact_violation(
+            violations,
+            check_id="package_metadata",
+            rule_id="artifact.notices_mismatch",
+            relative_path=policy.generated_paths.third_party_notices,
+            boundary_policy=boundary_policy,
+        )
+
+
+def _verify_payload_boundaries(
+    artifact: Path,
+    *,
+    files: dict[str, _ArtifactFile],
+    policy: PublicExportPolicy,
+    inventory: ThirdPartyInventory,
+    boundary_policy: PublicBoundaryPolicy,
+    violations: list[ArtifactVerificationViolation],
+) -> None:
+    vendored_locators = {
+        evidence.locator
+        for dependency in inventory.entries
+        if dependency.bundling is BundlingState.BUNDLED_SOURCE
+        for evidence in dependency.source_evidence
+    }
+    for path, artifact_file in sorted(files.items()):
+        content = artifact_file.content
+        try:
+            safe_path = _validate_relative_path(path)
+        except ValueError:
+            continue
+        if (
+            classify_public_path(boundary_policy, safe_path)
+            is PublicPathDisposition.DENIED
+        ):
+            _append_artifact_violation(
+                violations,
+                check_id="public_boundary",
+                rule_id="artifact.denied_path",
+                relative_path=safe_path,
+                boundary_policy=boundary_policy,
+                force_hash=True,
+            )
+        public_violations = scan_public_content(safe_path, content, boundary_policy)
+        for public_violation in public_violations:
+            if (
+                safe_path in vendored_locators
+                and public_violation.code is BoundaryFindingCode.PROHIBITED_TEXT
+            ):
+                continue
+            if (
+                public_violation.code is BoundaryFindingCode.UNSAFE_OR_UNREADABLE
+                and safe_path.casefold().endswith(_BINARY_SUFFIXES)
+            ):
+                continue
+            violations.append(
+                ArtifactVerificationViolation(
+                    check_id="public_boundary",
+                    rule_id=public_violation.rule_id,
+                    locator_kind=ArtifactLocatorKind(
+                        public_violation.locator_kind.value
+                    ),
+                    locator=public_violation.locator,
+                )
+            )
+        if safe_path.casefold().endswith(_DATABASE_SUFFIXES):
+            _append_artifact_violation(
+                violations,
+                check_id="local_only",
+                rule_id="local.database_payload",
+                relative_path=safe_path,
+                boundary_policy=boundary_policy,
+                force_hash=True,
+            )
+        if content is None or not _is_text_content(
+            content, policy.limits.max_text_bytes
+        ):
+            continue
+        for shape in detect_secret_shapes(content):
+            _append_artifact_violation(
+                violations,
+                check_id="credentials",
+                rule_id=f"credential.{shape.value}",
+                relative_path=safe_path,
+                boundary_policy=boundary_policy,
+            )
+        if _RUNTIME_EXTERNAL_PATTERN.search(content):
+            _append_artifact_violation(
+                violations,
+                check_id="local_only",
+                rule_id="local.hosted_runtime_dependency",
+                relative_path=safe_path,
+                boundary_policy=boundary_policy,
+            )
+        if _CLOUD_API_PATTERN.search(content):
+            _append_artifact_violation(
+                violations,
+                check_id="local_only",
+                rule_id="local.cloud_api_requirement",
+                relative_path=safe_path,
+                boundary_policy=boundary_policy,
+            )
+        if _TELEMETRY_PATTERN.search(content):
+            _append_artifact_violation(
+                violations,
+                check_id="local_only",
+                rule_id="local.telemetry_dependency",
+                relative_path=safe_path,
+                boundary_policy=boundary_policy,
+            )
+    _verify_python_dependencies(
+        files,
+        inventory=inventory,
+        boundary_policy=boundary_policy,
+        violations=violations,
+    )
+    _verify_vendored_dependencies(
+        files,
+        inventory=inventory,
+        boundary_policy=boundary_policy,
+        violations=violations,
+    )
+    _verify_license_posture(
+        files,
+        boundary_policy=boundary_policy,
+        violations=violations,
+    )
+    if _path_has_sync_marker(artifact):
+        return
+
+
+def _verify_python_dependencies(
+    files: dict[str, _ArtifactFile],
+    *,
+    inventory: ThirdPartyInventory,
+    boundary_policy: PublicBoundaryPolicy,
+    violations: list[ArtifactVerificationViolation],
+) -> None:
+    known_external = {
+        import_name for entry in inventory.entries for import_name in entry.import_names
+    }
+    internal = {
+        PurePosixPath(path).parts[0].removesuffix(".py")
+        for path in files
+        if PurePosixPath(path).parts
+    }
+    for path, artifact_file in sorted(files.items()):
+        if not path.endswith(".py") or artifact_file.content is None:
+            continue
+        try:
+            tree = ast.parse(artifact_file.content, filename="artifact.py")
+        except (SyntaxError, ValueError):
+            _append_artifact_violation(
+                violations,
+                check_id="dependencies",
+                rule_id="dependency.invalid_python",
+                relative_path=path,
+                boundary_policy=boundary_policy,
+            )
+            continue
+        import_roots: set[str] = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                import_roots.update(
+                    alias.name.split(".", maxsplit=1)[0] for alias in node.names
+                )
+            elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
+                import_roots.add(node.module.split(".", maxsplit=1)[0])
+        unknown = (
+            import_roots - set(sys.stdlib_module_names) - known_external - internal
+        )
+        if unknown:
+            _append_artifact_violation(
+                violations,
+                check_id="dependencies",
+                rule_id="dependency.unmapped_import",
+                relative_path=path,
+                boundary_policy=boundary_policy,
+            )
+
+
+def _verify_vendored_dependencies(
+    files: dict[str, _ArtifactFile],
+    *,
+    inventory: ThirdPartyInventory,
+    boundary_policy: PublicBoundaryPolicy,
+    violations: list[ArtifactVerificationViolation],
+) -> None:
+    for dependency in inventory.entries:
+        if dependency.bundling is not BundlingState.BUNDLED_SOURCE:
+            continue
+        for evidence in dependency.source_evidence:
+            artifact_file = files.get(evidence.locator)
+            if artifact_file is None:
+                continue
+            content = artifact_file.content or b""
+            required = (
+                dependency.name.encode("utf-8"),
+                dependency.observed_version.encode("utf-8"),
+                dependency.license_identifier.encode("utf-8"),
+            )
+            if any(token not in content for token in required):
+                _append_artifact_violation(
+                    violations,
+                    check_id="dependencies",
+                    rule_id="dependency.vendored_evidence",
+                    relative_path=evidence.locator,
+                    boundary_policy=boundary_policy,
+                )
+
+
+def _verify_license_posture(
+    files: dict[str, _ArtifactFile],
+    *,
+    boundary_policy: PublicBoundaryPolicy,
+    violations: list[ArtifactVerificationViolation],
+) -> None:
+    license_file = files.get("LICENSE")
+    if license_file is None:
+        return
+    content = (license_file.content or b"").decode("utf-8", errors="replace").casefold()
+    required = (
+        "todos los derechos reservados",
+        "no se ha seleccionado una licencia formal",
+        "no representa una aprobación legal",
+        "ni una autorización para publicar",
+    )
+    forbidden = (
+        "exclusivamente con fines educativos",
+        "no está autorizado el uso comercial",
+        "recurso educativo abierto",
+    )
+    if any(value not in content for value in required) or any(
+        value in content for value in forbidden
+    ):
+        _append_artifact_violation(
+            violations,
+            check_id="license_posture",
+            rule_id="license.posture_mismatch",
+            relative_path="LICENSE",
+            boundary_policy=boundary_policy,
+        )
+
+
+def _append_artifact_violation(
+    violations: list[ArtifactVerificationViolation],
+    *,
+    check_id: str,
+    rule_id: str,
+    relative_path: str,
+    boundary_policy: PublicBoundaryPolicy,
+    force_hash: bool = False,
+) -> None:
+    locator_kind, locator = _safe_artifact_locator(
+        relative_path,
+        boundary_policy=boundary_policy,
+        force_hash=force_hash,
+    )
+    violations.append(
+        ArtifactVerificationViolation(
+            check_id=check_id,
+            rule_id=rule_id,
+            locator_kind=locator_kind,
+            locator=locator,
+        )
+    )
+
+
+def _safe_artifact_locator(
+    relative_path: str,
+    *,
+    boundary_policy: PublicBoundaryPolicy,
+    force_hash: bool,
+) -> tuple[ArtifactLocatorKind, str]:
+    try:
+        safe_path = _validate_relative_path(relative_path)
+        denied = (
+            classify_public_path(boundary_policy, safe_path)
+            is PublicPathDisposition.DENIED
+        )
+    except ValueError:
+        denied = True
+        safe_path = relative_path
+    if force_hash or denied:
+        return (
+            ArtifactLocatorKind.SHA256,
+            hashlib.sha256(safe_path.encode("utf-8", errors="replace")).hexdigest(),
+        )
+    return ArtifactLocatorKind.RELATIVE_PATH, safe_path
+
+
+def _path_is_unsafe(path: str, boundary_policy: PublicBoundaryPolicy) -> bool:
+    try:
+        safe_path = _validate_relative_path(path)
+        return (
+            classify_public_path(boundary_policy, safe_path)
+            is PublicPathDisposition.DENIED
+        )
+    except ValueError:
+        return True
+
+
+def _path_has_sync_marker(path: Path) -> bool:
+    return any(
+        marker in part.casefold() for marker in _SYNC_MARKERS for part in path.parts
+    )
+
+
+def _is_text_content(content: bytes, max_bytes: int) -> bool:
+    if len(content) > max_bytes or b"\0" in content:
+        return False
+    try:
+        content.decode("utf-8")
+    except UnicodeDecodeError:
+        return False
+    return True
+
+
+def _ordered_artifact_violations(
+    violations: list[ArtifactVerificationViolation],
+) -> list[ArtifactVerificationViolation]:
+    unique = {
+        (item.check_id, item.rule_id, item.locator_kind, item.locator): item
+        for item in violations
+    }
+    return sorted(
+        unique.values(),
+        key=lambda item: (item.check_id, item.rule_id, item.locator),
     )
 
 
