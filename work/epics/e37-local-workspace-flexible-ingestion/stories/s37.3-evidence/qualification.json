@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "story": "S37.3",
+  "status": "pass",
+  "source_commit": "3a9b36b6c60d8239289d432cf7330dbff6eb4b25",
+  "qualification": {
+    "command": "uv run python <temporary ordinary-folder inbox qualification>",
+    "first_csv": "accepted",
+    "second_csv": "duplicate",
+    "changed_csv": "accepted",
+    "changed_identity": true,
+    "ledger_entries_after_change": 5,
+    "first_failure_codes": {
+      "big.csv": "source_too_large",
+      "broken.xlsx": "source_unreadable",
+      "link.csv": "entry_symlink",
+      "misterio.bin": "format_unsupported",
+      "nested": "entry_directory",
+      "target.csv": "profile_ready",
+      "ventas.csv": "profile_ready"
+    },
+    "exchange_names_unchanged": true,
+    "only_csv_bytes_changed": true,
+    "sqlite_created": false,
+    "report_written": true,
+    "absolute_root_in_receipt": false,
+    "cloud_api_used": false,
+    "symlink_created": true
+  },
+  "gates": {
+    "focused_tests": "pass",
+    "lint": "pass",
+    "format": "pass",
+    "types": "pass"
+  },
+  "boundary": {
+    "cloud_api": false,
+    "oauth": false,
+    "hosted_runtime": false,
+    "sqlite_sync": false,
+    "destructive_move": false,
+    "canonical_state_mutation": false
+  },
+  "master_ledger_state": "unproved",
+  "requirements_ready_for_exact_receipt": [
+    "REQ-E37-006",
+    "REQ-E37-007"
+  ]
+}
