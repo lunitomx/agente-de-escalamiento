@@ -11,6 +11,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from .profiling import (
     FinancialWorkbookProfile,
+    MappingQuestion,
     MappingCandidate,
     MappingTarget,
     RawCell,
@@ -63,7 +64,7 @@ class FinancialStatements(_StrictModel):
     pnl: StatementView
     balance: StatementView
     cash_flow: StatementView
-    questions: tuple[object, ...] = ()
+    questions: tuple[MappingQuestion, ...] = ()
     findings: tuple[str, ...] = ()
 
 

@@ -12,6 +12,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from escala_server.cash import FinancialInputs, LEVER_META, PowerOfOneEngine
 
+from .profiling import MappingQuestion
 from .statements import FinancialFigure, FinancialStatements, Provenance
 
 
@@ -79,7 +80,7 @@ class CashDecision(_StrictModel):
     scenarios: tuple[CashScenarioResult, ...] = ()
     recommendations: tuple[str, ...] = ()
     findings: tuple[str, ...] = ()
-    questions: tuple[object, ...] = ()
+    questions: tuple[MappingQuestion, ...] = ()
 
 
 _REQUIRED_ACCOUNTS = (
