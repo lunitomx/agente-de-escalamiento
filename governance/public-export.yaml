@@ -1,0 +1,289 @@
+schema_version: 1
+product:
+  id: escala
+  version: 1.0.0
+source:
+  required_ref: explicit_full_head_commit
+  allowed_git_modes: ["100644", "100755"]
+bindings:
+  public_boundary:
+    path: governance/public-boundary.yaml
+    sha256: 2fff50579bbbd4684a114bdb08739b5fbe8f9258c2ec1582782fec14ef810412
+    hash_kind: semantic
+  exposure_baseline:
+    path: work/epics/e36-product-truth-ip-governance/stories/s36.2-evidence/baseline.json
+    sha256: 3ae688c34b8cb13dcf96bd72198aeee6e4eace0a432b413cc654d1c279943dce
+    hash_kind: content
+  closure_dispositions:
+    path: governance/closure-dispositions.yaml
+    sha256: e5b9e9207fce7bbacd3af0a9e93368d6ccf38f979932d10360a2063924f8f023
+    hash_kind: semantic
+  epic_identities:
+    path: governance/epic-identities.yaml
+    sha256: eb62cd804fa3b0559d20394e27be583b6daa445c6619938b43d4a1a92d052d52
+    hash_kind: semantic
+  third_party:
+    path: governance/third-party.yaml
+    sha256: b7729a5601792e2a64eca11d2fc9dd4f677f4cb0d649b2582d4e1bed7105a04d
+    hash_kind: semantic
+selections:
+  - path: LICENSE
+    kind: file
+    role: operator_documentation
+  - path: README.md
+    kind: file
+    role: operator_documentation
+  - path: coaching/__init__.py
+    kind: file
+    role: local_runtime
+  - path: coaching/core/__init__.py
+    kind: file
+    role: local_runtime
+  - path: coaching/dashboard/__init__.py
+    kind: file
+    role: local_runtime
+  - path: coaching/dashboard/__main__.py
+    kind: file
+    role: local_runtime
+  - path: coaching/diagnose/__init__.py
+    kind: file
+    role: local_runtime
+  - path: coaching/diagnose/__main__.py
+    kind: file
+    role: local_runtime
+  - path: coaching/diagnose/engine.py
+    kind: file
+    role: local_runtime
+  - path: coaching/diagnose/formatter.py
+    kind: file
+    role: local_runtime
+  - path: coaching/export/__init__.py
+    kind: file
+    role: local_runtime
+  - path: coaching/export/__main__.py
+    kind: file
+    role: local_runtime
+  - path: coaching/level/__init__.py
+    kind: file
+    role: local_runtime
+  - path: coaching/level/__main__.py
+    kind: file
+    role: local_runtime
+  - path: coaching/level/engine.py
+    kind: file
+    role: local_runtime
+  - path: coaching/level/formatter.py
+    kind: file
+    role: local_runtime
+  - path: coaching/progress/__init__.py
+    kind: file
+    role: local_runtime
+  - path: coaching/progress/__main__.py
+    kind: file
+    role: local_runtime
+  - path: coaching/progress/engine.py
+    kind: file
+    role: local_runtime
+  - path: coaching/progress/formatter.py
+    kind: file
+    role: local_runtime
+  - path: coaching/pulse/__init__.py
+    kind: file
+    role: local_runtime
+  - path: coaching/pulse/__main__.py
+    kind: file
+    role: local_runtime
+  - path: coaching/router/__init__.py
+    kind: file
+    role: local_runtime
+  - path: coaching/router/__main__.py
+    kind: file
+    role: local_runtime
+  - path: coaching/router/engine.py
+    kind: file
+    role: local_runtime
+  - path: coaching/summary/__init__.py
+    kind: file
+    role: local_runtime
+  - path: coaching/summary/__main__.py
+    kind: file
+    role: local_runtime
+  - path: coaching/summary/engine.py
+    kind: file
+    role: local_runtime
+  - path: coaching/summary/formatter.py
+    kind: file
+    role: local_runtime
+  - path: coaching/welcome/__init__.py
+    kind: file
+    role: local_runtime
+  - path: coaching/welcome/__main__.py
+    kind: file
+    role: local_runtime
+  - path: coaching/welcome/engine.py
+    kind: file
+    role: local_runtime
+  - path: coaching/welcome/formatter.py
+    kind: file
+    role: local_runtime
+  - path: coaching/worksheet/__init__.py
+    kind: file
+    role: local_runtime
+  - path: coaching/worksheet/__main__.py
+    kind: file
+    role: local_runtime
+  - path: coaching/worksheet/engine.py
+    kind: file
+    role: local_runtime
+  - path: coaching/worksheet/formatter.py
+    kind: file
+    role: local_runtime
+  - path: conocimiento
+    kind: tree
+    role: business_knowledge
+  - path: escala-skills
+    kind: tree
+    role: agent_skill
+  - path: escala_server/README.md
+    kind: file
+    role: operator_documentation
+  - path: escala_server/__init__.py
+    kind: file
+    role: local_runtime
+  - path: escala_server/__main__.py
+    kind: file
+    role: local_runtime
+  - path: escala_server/business_advisor.py
+    kind: file
+    role: local_runtime
+  - path: escala_server/cash
+    kind: tree
+    role: local_runtime
+  - path: escala_server/cli.py
+    kind: file
+    role: local_runtime
+  - path: escala_server/cors.py
+    kind: file
+    role: local_runtime
+  - path: escala_server/daos
+    kind: tree
+    role: local_runtime
+  - path: escala_server/diff.py
+    kind: file
+    role: local_runtime
+  - path: escala_server/graph_engine.py
+    kind: file
+    role: local_runtime
+  - path: escala_server/handlers.py
+    kind: file
+    role: local_runtime
+  - path: escala_server/knowledge_handler.py
+    kind: file
+    role: local_runtime
+  - path: escala_server/memory_engine.py
+    kind: file
+    role: local_runtime
+  - path: escala_server/migrate.py
+    kind: file
+    role: local_runtime
+  - path: escala_server/router.py
+    kind: file
+    role: local_runtime
+  - path: escala_server/scaling_context.py
+    kind: file
+    role: local_runtime
+  - path: escala_server/schema.py
+    kind: file
+    role: local_runtime
+  - path: escala_server/server.py
+    kind: file
+    role: local_runtime
+  - path: escala_server/session
+    kind: tree
+    role: local_runtime
+  - path: escala_server/static
+    kind: tree
+    role: local_runtime
+  - path: install.sh
+    kind: file
+    role: installer_or_updater
+  - path: pyproject.toml
+    kind: file
+    role: installer_or_updater
+  - path: scripts/escala-server
+    kind: file
+    role: local_runtime
+  - path: templates
+    kind: tree
+    role: business_template
+  - path: uninstall.sh
+    kind: file
+    role: installer_or_updater
+  - path: update.sh
+    kind: file
+    role: installer_or_updater
+  - path: validators/__init__.py
+    kind: file
+    role: business_validator
+  - path: validators/dashboard.py
+    kind: file
+    role: business_validator
+  - path: validators/diagnose.py
+    kind: file
+    role: business_validator
+  - path: validators/export.py
+    kind: file
+    role: business_validator
+  - path: validators/memory.py
+    kind: file
+    role: business_validator
+  - path: validators/progress.py
+    kind: file
+    role: business_validator
+  - path: validators/pulse.py
+    kind: file
+    role: business_validator
+  - path: validators/session.py
+    kind: file
+    role: business_validator
+  - path: validators/summary_validator.py
+    kind: file
+    role: business_validator
+  - path: validators/tasks.py
+    kind: file
+    role: business_validator
+  - path: validators/voice_of_customer.py
+    kind: file
+    role: business_validator
+  - path: validators/welcome.py
+    kind: file
+    role: business_validator
+  - path: validators/worksheet.py
+    kind: file
+    role: business_validator
+generated_paths:
+  package_metadata: ESCALA-PACKAGE.json
+  third_party_notices: THIRD_PARTY_NOTICES.md
+  manifest: ESCALA-MANIFEST.json
+local_only:
+  runtime_mode: local_machine_only
+  hosted_product_service: forbidden
+  cloud_database: forbidden
+  telemetry: forbidden
+  oauth_requirement: forbidden
+  drive_api_requirement: forbidden
+  onedrive_api_requirement: forbidden
+  authoritative_sqlite_in_sync_folder: forbidden
+  team_sharing: ordinary_filesystem_documents_only
+license:
+  license_status: no_formal_distribution_license_selected
+  interim_posture: proprietary_no_license_grant
+  human_review_gate: human_legal_and_ip_release_review
+  human_review_status: required
+  approval_evidence_status: absent
+  publication_authorized: false
+  allowed_artifact_use: internal_technical_validation_only
+limits:
+  max_text_bytes: 1048576
+  max_receipt_bytes: 32768
+  max_file_count: 10000

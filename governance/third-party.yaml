@@ -1,0 +1,225 @@
+schema_version: 1
+human_legal_review_status: required
+publication_authorized: false
+entries:
+  - id: annotated-types
+    name: annotated-types
+    relationship: transitive
+    purpose: Runtime annotation helpers required by Pydantic.
+    parents: [pydantic]
+    version_constraint: ">=0.6.0"
+    observed_version: 0.7.0
+    import_names: [annotated_types]
+    source_evidence:
+      - kind: observed_local_metadata
+        locator: local-metadata/annotated-types-0.7.0
+    bundling: installed_by_package_manager
+    license_identifier: MIT
+    license_status: declared_license_file
+    notice_required: false
+    notice_status: not_applicable
+    review_state: technical_inventory_verified
+  - id: bash
+    name: Bash
+    relationship: system_prerequisite
+    purpose: Executes the local install, update, and uninstall scripts.
+    parents: []
+    version_constraint: system-compatible
+    observed_version: not-pinned
+    import_names: []
+    source_evidence:
+      - kind: script_shebang
+        locator: install.sh
+    bundling: external_system
+    license_identifier: external-terms
+    license_status: external_terms
+    notice_required: false
+    notice_status: not_applicable
+    review_state: technical_inventory_verified
+  - id: chart-js
+    name: Chart.js
+    relationship: vendored
+    purpose: Renders local interactive business dashboards in the browser.
+    parents: []
+    version_constraint: 4.5.1
+    observed_version: 4.5.1
+    import_names: []
+    source_evidence:
+      - kind: vendored_header
+        locator: escala_server/static/shared/vendor/chart.umd.min.js
+    bundling: bundled_source
+    license_identifier: MIT
+    license_status: declared_header
+    notice_required: true
+    notice_status: included
+    review_state: technical_inventory_verified
+  - id: git
+    name: Git
+    relationship: system_prerequisite
+    purpose: Supplies immutable source objects and optional local update transport.
+    parents: []
+    version_constraint: system-compatible
+    observed_version: not-pinned
+    import_names: []
+    source_evidence:
+      - kind: operator_contract
+        locator: README.md
+    bundling: external_system
+    license_identifier: external-terms
+    license_status: external_terms
+    notice_required: false
+    notice_status: not_applicable
+    review_state: technical_inventory_verified
+  - id: kurkle-color
+    name: "@kurkle/color"
+    relationship: vendored
+    purpose: Provides color parsing embedded in the vendored Chart.js bundle.
+    parents: [chart-js]
+    version_constraint: 0.3.2
+    observed_version: 0.3.2
+    import_names: []
+    source_evidence:
+      - kind: vendored_header
+        locator: escala_server/static/shared/vendor/chart.umd.min.js
+    bundling: bundled_source
+    license_identifier: MIT
+    license_status: declared_header
+    notice_required: true
+    notice_status: included
+    review_state: technical_inventory_verified
+  - id: local-agent-runner
+    name: Compatible local agent runner
+    relationship: system_prerequisite
+    purpose: Runs ESCALA skills locally on the installer machine.
+    parents: []
+    version_constraint: user-selected-compatible-runner
+    observed_version: user-selected
+    import_names: []
+    source_evidence:
+      - kind: operator_contract
+        locator: README.md
+    bundling: external_system
+    license_identifier: external-terms
+    license_status: external_terms
+    notice_required: false
+    notice_status: not_applicable
+    review_state: technical_inventory_verified
+  - id: pydantic
+    name: Pydantic
+    relationship: direct
+    purpose: Enforces strict typed data contracts at local file boundaries.
+    parents: []
+    version_constraint: ">=2.0"
+    observed_version: 2.13.4
+    import_names: [pydantic]
+    source_evidence:
+      - kind: project_metadata
+        locator: pyproject.toml
+    bundling: installed_by_package_manager
+    license_identifier: MIT
+    license_status: declared_metadata
+    notice_required: false
+    notice_status: not_applicable
+    review_state: technical_inventory_verified
+  - id: pydantic-core
+    name: pydantic-core
+    relationship: transitive
+    purpose: Supplies Pydantic validation runtime primitives.
+    parents: [pydantic]
+    version_constraint: resolver-owned-by-pydantic
+    observed_version: 2.46.4
+    import_names: [pydantic_core]
+    source_evidence:
+      - kind: observed_local_metadata
+        locator: local-metadata/pydantic-core-2.46.4
+    bundling: installed_by_package_manager
+    license_identifier: MIT
+    license_status: declared_metadata
+    notice_required: false
+    notice_status: not_applicable
+    review_state: technical_inventory_verified
+  - id: python
+    name: Python
+    relationship: system_prerequisite
+    purpose: Executes all local ESCALA Python modules and CLIs.
+    parents: []
+    version_constraint: ">=3.10"
+    observed_version: 3.14.3
+    import_names: []
+    source_evidence:
+      - kind: project_metadata
+        locator: pyproject.toml
+    bundling: external_system
+    license_identifier: PSF-2.0
+    license_status: external_terms
+    notice_required: false
+    notice_status: not_applicable
+    review_state: technical_inventory_verified
+  - id: pyyaml
+    name: PyYAML
+    relationship: direct
+    purpose: Reads and writes local company, knowledge, and policy YAML files.
+    parents: []
+    version_constraint: ">=6.0"
+    observed_version: 6.0.3
+    import_names: [yaml]
+    source_evidence:
+      - kind: project_metadata
+        locator: pyproject.toml
+    bundling: installed_by_package_manager
+    license_identifier: MIT
+    license_status: declared_license_file
+    notice_required: false
+    notice_status: not_applicable
+    review_state: technical_inventory_verified
+  - id: setuptools
+    name: setuptools
+    relationship: direct
+    purpose: Builds and installs the local Python package from source.
+    parents: []
+    version_constraint: ">=64"
+    observed_version: 82.0.1
+    import_names: []
+    source_evidence:
+      - kind: project_metadata
+        locator: pyproject.toml
+    bundling: installed_by_package_manager
+    license_identifier: MIT
+    license_status: declared_metadata
+    notice_required: false
+    notice_status: not_applicable
+    review_state: technical_inventory_verified
+  - id: typing-extensions
+    name: typing-extensions
+    relationship: transitive
+    purpose: Supplies compatibility typing primitives used by Pydantic runtime.
+    parents: [pydantic, pydantic-core, typing-inspection]
+    version_constraint: ">=4.14.1"
+    observed_version: 4.16.0
+    import_names: [typing_extensions]
+    source_evidence:
+      - kind: observed_local_metadata
+        locator: local-metadata/typing-extensions-4.16.0
+    bundling: installed_by_package_manager
+    license_identifier: PSF-2.0
+    license_status: declared_metadata
+    notice_required: false
+    notice_status: not_applicable
+    review_state: technical_inventory_verified
+  - id: typing-inspection
+    name: typing-inspection
+    relationship: transitive
+    purpose: Supplies runtime typing inspection used by Pydantic.
+    parents: [pydantic]
+    version_constraint: ">=0.4.2"
+    observed_version: 0.4.2
+    import_names: [typing_inspection]
+    source_evidence:
+      - kind: observed_local_metadata
+        locator: local-metadata/typing-inspection-0.4.2
+    bundling: installed_by_package_manager
+    license_identifier: MIT
+    license_status: declared_metadata
+    notice_required: false
+    notice_status: not_applicable
+    review_state: technical_inventory_verified
