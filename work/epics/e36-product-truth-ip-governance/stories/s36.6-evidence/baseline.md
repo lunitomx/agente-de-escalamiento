@@ -4,9 +4,9 @@
 - Mission readiness: `unproved`
 - Mode: `baseline`
 - Epic filter: `all`
-- Verifier source commit: `869e654a7e7da94d2304ff746c805b4366b25275`
+- Verifier source commit: `e27594395cdba0087f6d7f42e8f36ce2ed3dd4bf`
 - Ledger SHA-256: `1dbe5c06bdba1488dfeccabd95e99e2936977cd6b1759fb66fd66851a364b8c9`
-- Ledger Markdown SHA-256: `f45fce73fd1f08de0e75d541ce71fab8112c91dfb05f4c6d27f0ca1c769f7140`
+- Ledger Markdown SHA-256: `4c35c44f737afcd1cc8dbae31723074193dccbf5968a8e4b90bebd2c4324fa17`
 - Epics: `6`
 - Requirements: `42`
 - Proved: `0`

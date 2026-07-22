@@ -2,12 +2,12 @@
 
 ## Qualified source
 
-- Source commit: `869e654a7e7da94d2304ff746c805b4366b25275`
-- Source tree: `91444d9ab7933d40dc11ff133a2f7450f0cee625`
+- Source commit: `e27594395cdba0087f6d7f42e8f36ce2ed3dd4bf`
+- Source tree: `2748bfcf6aa994ec80e96587079fc05aa40334a0`
 - Ledger semantic SHA-256:
   `1dbe5c06bdba1488dfeccabd95e99e2936977cd6b1759fb66fd66851a364b8c9`
 - Rendered ledger SHA-256:
-  `f45fce73fd1f08de0e75d541ce71fab8112c91dfb05f4c6d27f0ca1c769f7140`
+  `4c35c44f737afcd1cc8dbae31723074193dccbf5968a8e4b90bebd2c4324fa17`
 
 ## Double-run evidence
 
@@ -16,11 +16,11 @@ and current typed authorities in separate new system-temporary directories.
 
 - Both exit codes: `0`.
 - JSON receipt A/B SHA-256:
-  `2ac11e3591fa4c8b4024b5ef50bf1d6f15929759ce19fc987c6031ebf77d01a6`.
+  `fbff51a338fe0bef8a0205ead1561e4e9c50136c16bedf2826b30fbd81acf5ea`.
 - Markdown receipt A/B SHA-256:
-  `d1875666e9dfc43de4840c9ce2ab797e735292e97f1128c98690a197de2ce37d`.
+  `376e832e4c46dafd5775ee37788c0ccea94464eb71edd71ba6d5c397471c47ac`.
 - JSON stdout A/B SHA-256:
-  `2ac11e3591fa4c8b4024b5ef50bf1d6f15929759ce19fc987c6031ebf77d01a6`.
+  `fbff51a338fe0bef8a0205ead1561e4e9c50136c16bedf2826b30fbd81acf5ea`.
 - JSON, Markdown, stdout, and empty stderr are byte-identical between runs.
 - Canonical ledger Markdown is byte-identical to a fresh renderer result.
 
@@ -56,3 +56,8 @@ sentinel name nor a machine path, URL, source value, or raw exception.
   real observations.
 - No remote, public candidate, hosted service, Drive/OneDrive API, SQLite,
   push, publication, or external system was mutated.
+
+This receipt supersedes the pre-review baseline only as current qualification
+evidence. The earlier receipt remains auditable in Git history. The rerun was
+mandatory because review changed the human renderer and reviewable-disposition
+contract; no stale receipt was relabeled as current.
