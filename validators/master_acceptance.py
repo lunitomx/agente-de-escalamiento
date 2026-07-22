@@ -264,7 +264,7 @@ class EvidenceBlocker(str, Enum):
 
 class UnprovedProof(_StrictModel):
     state: Literal["unproved"]
-    blockers: list[EvidenceBlocker] = Field(min_length=1)
+    blockers: list[EvidenceBlocker] = Field(min_length=1, max_length=1)
 
     @field_validator("blockers")
     @classmethod
@@ -729,10 +729,11 @@ def render_master_acceptance_markdown(ledger: MasterAcceptanceLedger) -> str:
                 f"## {epic.id} — {epic.title}",
                 "",
                 (
-                    "| Requirement | Owner | Acceptance | Evidence artifact | "
-                    "Verification | Gates | Platforms | State |"
+                    "| Requirement | Owner | Sources | Acceptance | "
+                    "Evidence artifact | Evidence receipt | Verification | "
+                    "Gates | Platforms | State | Blocker |"
                 ),
-                "|---|---|---|---|---|---|---|---|",
+                "|---|---|---|---|---|---|---|---|---|---|---|",
             ]
         )
         for requirement in ledger.requirements:
@@ -745,11 +746,21 @@ def render_master_acceptance_markdown(ledger: MasterAcceptanceLedger) -> str:
             platforms = ", ".join(
                 f"`{platform.value}`" for platform in requirement.platforms
             )
+            sources = ", ".join(
+                f"`{source_id}`" for source_id in requirement.source_ids
+            )
+            blocker = (
+                requirement.proof.blockers[0].value
+                if isinstance(requirement.proof, UnprovedProof)
+                else "none"
+            )
             lines.append(
                 f"| `{requirement.id}` | `{requirement.owner.story}` | "
-                f"{_markdown_cell(requirement.acceptance)} | "
-                f"`{requirement.evidence.artifact_path}` | `{command}` | "
-                f"{gates} | {platforms} | `{requirement.proof.state}` |"
+                f"{sources} | {_markdown_cell(requirement.acceptance)} | "
+                f"`{requirement.evidence.artifact_path}` | "
+                f"`{requirement.evidence.receipt_path}` | `{command}` | "
+                f"{gates} | {platforms} | `{requirement.proof.state}` | "
+                f"`{blocker}` |"
             )
     lines.extend(
         [
@@ -901,7 +912,7 @@ def write_master_acceptance_receipts(
     requested = [path for path in (json_output, markdown_output) if path is not None]
     if len(requested) != len(set(requested)):
         raise ValueError("receipt output paths must be unique")
-    if any(path.exists() for path in requested):
+    if any(path.exists() or path.is_symlink() for path in requested):
         raise FileExistsError("acceptance receipt output already exists")
     for path, content in (
         (json_output, json_content),
@@ -954,7 +965,7 @@ def validate_master_acceptance_authorities(
         if isinstance(requirement.proof, ProvedProof):
             if not disposition.completed:
                 raise MasterAcceptanceError("authority contract mismatch")
-        elif disposition.completed or not disposition.activation_eligible:
+        elif disposition.completed or not disposition.reviewable:
             raise MasterAcceptanceError("authority contract mismatch")
 
     local_only = export_policy.local_only

@@ -315,6 +315,14 @@ def test_strict_master_acceptance_contract_is_complete_and_stable(
         lambda data: data["requirements"][0].update(
             {"proof": {"state": "proved", "blockers": []}}
         ),
+        lambda data: data["requirements"][0].update(
+            {
+                "proof": {
+                    "state": "unproved",
+                    "blockers": ["evidence.failed", "evidence.stale"],
+                }
+            }
+        ),
         lambda data: data["epics"][0].update({"requirement_count": 6}),
         lambda data: data["requirements"].pop(),
         lambda data: data["source_requirements"].append(
@@ -363,6 +371,34 @@ def test_master_acceptance_rejects_authority_hash_drift(tmp_path: Path) -> None:
 
     with pytest.raises(MasterAcceptanceError, match="authority contract mismatch"):
         validate_master_acceptance_authorities(ROOT, ledger)
+
+
+@pytest.mark.parametrize(
+    "disposition",
+    ["unresolved/review-required", "deferred/backlog"],
+)
+def test_reviewable_unproved_dispositions_remain_valid_but_not_proved(
+    tmp_path: Path,
+    disposition: str,
+) -> None:
+    data = _ledger_data()
+    data["requirements"][0]["delivery_disposition"] = disposition
+    data["requirements"][0]["proof"] = {
+        "state": "unproved",
+        "blockers": ["evidence.failed"],
+    }
+    ledger = load_master_acceptance_ledger(_write_ledger(tmp_path, data))
+
+    validate_master_acceptance_authorities(ROOT, ledger)
+    receipt = build_master_acceptance_receipt(
+        ROOT,
+        ledger,
+        mode=AcceptanceMode.READINESS,
+        epic_filter="E37",
+    )
+
+    assert receipt.mission_readiness is MissionReadiness.UNPROVED
+    assert receipt.blocking_requirements[0].rule_id == "evidence.failed"
 
 
 def test_canonical_master_acceptance_ledger_matches_approved_plan() -> None:
@@ -416,6 +452,9 @@ def test_canonical_ledger_rendering_is_deterministic_and_matches_human_view() ->
     assert first_markdown == render_master_acceptance_markdown(ledger)
     assert first_markdown == LEDGER_MARKDOWN_PATH.read_text(encoding="utf-8")
     assert first_markdown.count("| `REQ-E") == 42
+    assert first_markdown.count(".receipt.json`") == 42
+    assert first_markdown.count("`evidence.missing`") == 42
+    assert "| Requirement | Owner | Sources | Acceptance |" in first_markdown
     assert "**Contract inventory:** 42 requirements across 6 epics." in first_markdown
     assert "**Initial proof posture:** 0 proved, 42 unproved." in first_markdown
     combined = first_json + first_markdown
@@ -602,6 +641,15 @@ def test_master_acceptance_writers_are_explicit_and_non_overwriting(
             json_output=json_output,
         )
 
+    broken_symlink = tmp_path / "receipts/broken-link.json"
+    broken_symlink.symlink_to(tmp_path / "missing-target.json")
+    with pytest.raises(FileExistsError):
+        write_master_acceptance_receipts(
+            receipt,
+            max_receipt_bytes=ledger.limits.max_receipt_bytes,
+            json_output=broken_symlink,
+        )
+
 
 def test_master_acceptance_cli_has_truthful_modes_and_one_safe_failure(
     tmp_path: Path,
@@ -719,21 +767,45 @@ def test_versioned_real_baseline_matches_current_contract_semantics() -> None:
     )
     assert (
         baseline.model_copy(
-            update={"verifier_source_commit": current.verifier_source_commit}
+            update={
+                "verifier_source_commit": current.verifier_source_commit,
+                "ledger_markdown_sha256": current.ledger_markdown_sha256,
+            }
         )
         == current
     )
-    source_exists = subprocess.run(
+    source_ledger = subprocess.run(
         [
             "git",
             "-C",
             str(ROOT),
-            "cat-file",
-            "-e",
-            f"{baseline.verifier_source_commit}^{{commit}}",
+            "show",
+            (
+                f"{baseline.verifier_source_commit}:work/epics/"
+                "e36-product-truth-ip-governance/master-acceptance-ledger.yaml"
+            ),
         ],
-        check=False,
+        check=True,
         capture_output=True,
         text=True,
     )
-    assert source_exists.returncode == 0
+    source_markdown = subprocess.run(
+        [
+            "git",
+            "-C",
+            str(ROOT),
+            "show",
+            (
+                f"{baseline.verifier_source_commit}:work/epics/"
+                "e36-product-truth-ip-governance/master-acceptance-ledger.md"
+            ),
+        ],
+        check=True,
+        capture_output=True,
+    )
+    source_data: Any = yaml.safe_load(source_ledger.stdout)
+    source_model = MasterAcceptanceLedger.model_validate(source_data)
+    assert master_acceptance_ledger_hash(source_model) == baseline.ledger_sha256
+    assert hashlib.sha256(source_markdown.stdout).hexdigest() == (
+        baseline.ledger_markdown_sha256
+    )
