@@ -8,6 +8,7 @@ from pathlib import Path
 import shutil
 import stat
 import subprocess
+import sys
 from typing import Any, Callable
 
 import pytest
@@ -31,10 +32,16 @@ from validators.public_export import (
     public_export_policy_hash,
     render_package_metadata,
     render_artifact_manifest,
+    render_public_export_build_json,
+    render_public_export_build_markdown,
+    render_public_export_verification_json,
+    render_public_export_verification_markdown,
     render_third_party_notices,
     third_party_inventory_hash,
     validate_export_selections,
     verify_public_export,
+    write_public_export_build_receipts,
+    write_public_export_verification_receipts,
 )
 
 
@@ -945,3 +952,257 @@ def test_selected_server_has_no_private_ingester_dependency() -> None:
 
     assert ".data.knowledge_ingester" not in server_source
     assert '"/api/knowledge/ingest"' not in server_source
+
+
+def test_safe_receipt_renderers_are_deterministic_and_bounded(tmp_path: Path) -> None:
+    repository, commit, policy, inventory = _create_git_fixture(tmp_path)
+    artifact = tmp_path / "artifact"
+    build_result = build_public_export(
+        repository=repository,
+        destination=artifact,
+        source_commit=commit,
+        policy=policy,
+        inventory=inventory,
+    )
+    verification = verify_public_export(
+        artifact=artifact,
+        policy=policy,
+        inventory=inventory,
+        boundary_policy=load_public_boundary_policy(PUBLIC_BOUNDARY_PATH),
+    )
+
+    build_json = render_public_export_build_json(build_result, policy)
+    build_markdown = render_public_export_build_markdown(build_result, policy)
+    verification_json = render_public_export_verification_json(verification, policy)
+    verification_markdown = render_public_export_verification_markdown(
+        verification,
+        policy,
+    )
+
+    assert build_json == render_public_export_build_json(build_result, policy)
+    assert build_markdown == render_public_export_build_markdown(build_result, policy)
+    assert verification_json == render_public_export_verification_json(
+        verification, policy
+    )
+    assert verification_markdown == render_public_export_verification_markdown(
+        verification, policy
+    )
+    assert len(build_json.encode("utf-8")) <= policy.limits.max_receipt_bytes
+    assert len(build_markdown.encode("utf-8")) <= policy.limits.max_receipt_bytes
+    assert len(verification_json.encode("utf-8")) <= policy.limits.max_receipt_bytes
+    assert len(verification_markdown.encode("utf-8")) <= policy.limits.max_receipt_bytes
+    build_payload = json.loads(build_json)
+    verify_payload = json.loads(verification_json)
+    assert build_payload["technical_artifact_status"] == "built_not_verified"
+    assert verify_payload["technical_artifact_status"] == "pass"
+    assert build_payload["human_legal_review_status"] == "required"
+    assert verify_payload["human_legal_review_status"] == "required"
+    assert build_payload["publication_authorized"] is False
+    assert verify_payload["publication_authorized"] is False
+
+
+def test_receipt_writers_only_create_explicit_passing_outputs(tmp_path: Path) -> None:
+    repository, commit, policy, inventory = _create_git_fixture(tmp_path)
+    artifact = tmp_path / "artifact"
+    build_result = build_public_export(
+        repository=repository,
+        destination=artifact,
+        source_commit=commit,
+        policy=policy,
+        inventory=inventory,
+    )
+    verification = verify_public_export(
+        artifact=artifact,
+        policy=policy,
+        inventory=inventory,
+        boundary_policy=load_public_boundary_policy(PUBLIC_BOUNDARY_PATH),
+    )
+    build_json = tmp_path / "receipts/build.json"
+    verify_markdown = tmp_path / "receipts/verify.md"
+
+    write_public_export_build_receipts(
+        build_result,
+        policy,
+        json_output=build_json,
+    )
+    write_public_export_verification_receipts(
+        verification,
+        policy,
+        markdown_output=verify_markdown,
+    )
+
+    assert build_json.is_file()
+    assert verify_markdown.is_file()
+    assert not (tmp_path / "receipts/build.md").exists()
+    assert not (tmp_path / "receipts/verify.json").exists()
+
+    (artifact / "README.md").write_bytes(b"tampered\n")
+    failed = verify_public_export(
+        artifact=artifact,
+        policy=policy,
+        inventory=inventory,
+        boundary_policy=load_public_boundary_policy(PUBLIC_BOUNDARY_PATH),
+    )
+    with pytest.raises(ValueError):
+        write_public_export_verification_receipts(
+            failed,
+            policy,
+            json_output=tmp_path / "receipts/failed.json",
+        )
+    assert not (tmp_path / "receipts/failed.json").exists()
+
+
+def test_build_and_verify_clis_are_separate_deterministic_and_local(
+    tmp_path: Path,
+) -> None:
+    repository, commit, _, _ = _create_git_fixture(tmp_path)
+    build_script = ROOT / "scripts/build_public_export.py"
+    verify_script = ROOT / "scripts/verify_public_export.py"
+    build_outputs: list[str] = []
+    artifacts: list[Path] = []
+    for suffix in ("a", "b"):
+        artifact = tmp_path / f"artifact-{suffix}"
+        artifacts.append(artifact)
+        completed = subprocess.run(
+            [
+                sys.executable,
+                str(build_script),
+                "--repo",
+                str(repository),
+                "--policy",
+                str(repository / "governance/public-export.yaml"),
+                "--inventory",
+                str(repository / "governance/third-party.yaml"),
+                "--destination",
+                str(artifact),
+                "--source-commit",
+                commit,
+                "--format",
+                "json",
+                "--json-output",
+                str(tmp_path / f"build-{suffix}.json"),
+                "--markdown-output",
+                str(tmp_path / f"build-{suffix}.md"),
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=20,
+        )
+        assert completed.returncode == 0
+        assert completed.stderr == ""
+        build_outputs.append(completed.stdout)
+    assert build_outputs[0] == build_outputs[1]
+    assert (artifacts[0] / "ESCALA-MANIFEST.json").read_bytes() == (
+        artifacts[1] / "ESCALA-MANIFEST.json"
+    ).read_bytes()
+
+    verification = subprocess.run(
+        [
+            sys.executable,
+            str(verify_script),
+            "--artifact",
+            str(artifacts[0]),
+            "--policy",
+            str(repository / "governance/public-export.yaml"),
+            "--inventory",
+            str(repository / "governance/third-party.yaml"),
+            "--public-boundary",
+            str(PUBLIC_BOUNDARY_PATH),
+            "--format",
+            "json",
+            "--json-output",
+            str(tmp_path / "verify.json"),
+            "--markdown-output",
+            str(tmp_path / "verify.md"),
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=20,
+    )
+    assert verification.returncode == 0
+    assert verification.stderr == ""
+    assert json.loads(verification.stdout)["technical_artifact_status"] == "pass"
+    assert (tmp_path / "verify.json").is_file()
+    assert (tmp_path / "verify.md").is_file()
+
+    verify_source = verify_script.read_text(encoding="utf-8")
+    assert "build_public_export" not in verify_source
+    assert "publish" not in verify_source.casefold()
+    assert "public-candidate" not in verify_source
+
+
+def test_clis_return_fixed_safe_failures_without_writing_receipts(
+    tmp_path: Path,
+) -> None:
+    repository, commit, policy, inventory = _create_git_fixture(tmp_path)
+    sentinel = "super-secret-value"
+    malformed_policy = tmp_path / f"{sentinel}-policy.yaml"
+    malformed_policy.write_text(f"credential: {sentinel}\n", encoding="utf-8")
+    failed_json = tmp_path / "failed-build.json"
+    build_failure = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts/build_public_export.py"),
+            "--repo",
+            str(repository),
+            "--policy",
+            str(malformed_policy),
+            "--inventory",
+            str(repository / "governance/third-party.yaml"),
+            "--destination",
+            str(tmp_path / "failed-artifact"),
+            "--source-commit",
+            commit,
+            "--json-output",
+            str(failed_json),
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=20,
+    )
+    assert build_failure.returncode == 2
+    assert build_failure.stdout == ""
+    assert build_failure.stderr == "public export build: failed safely\n"
+    assert sentinel not in build_failure.stderr
+    assert str(tmp_path) not in build_failure.stderr
+    assert not failed_json.exists()
+
+    artifact = tmp_path / "artifact"
+    build_public_export(
+        repository=repository,
+        destination=artifact,
+        source_commit=commit,
+        policy=policy,
+        inventory=inventory,
+    )
+    (artifact / "README.md").write_text(sentinel, encoding="utf-8")
+    failed_verify_json = tmp_path / "failed-verify.json"
+    verify_failure = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts/verify_public_export.py"),
+            "--artifact",
+            str(artifact),
+            "--policy",
+            str(repository / "governance/public-export.yaml"),
+            "--inventory",
+            str(repository / "governance/third-party.yaml"),
+            "--public-boundary",
+            str(PUBLIC_BOUNDARY_PATH),
+            "--json-output",
+            str(failed_verify_json),
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=20,
+    )
+    assert verify_failure.returncode == 3
+    assert verify_failure.stdout == ""
+    assert verify_failure.stderr == "public export verification: failed safely\n"
+    assert sentinel not in verify_failure.stderr
+    assert str(tmp_path) not in verify_failure.stderr
+    assert not failed_verify_json.exists()

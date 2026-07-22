@@ -750,6 +750,136 @@ def render_artifact_manifest(manifest: ArtifactManifest) -> bytes:
     return payload.encode("utf-8")
 
 
+def render_public_export_build_json(
+    result: PublicExportBuildResult,
+    policy: PublicExportPolicy,
+) -> str:
+    """Render a bounded deterministic build receipt without machine paths."""
+    content = (
+        json.dumps(
+            result.model_dump(mode="json"),
+            ensure_ascii=True,
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n"
+    )
+    return _bounded_receipt(content, policy)
+
+
+def render_public_export_build_markdown(
+    result: PublicExportBuildResult,
+    policy: PublicExportPolicy,
+) -> str:
+    """Render the three separate build, legal, and publication states."""
+    content = "\n".join(
+        [
+            "# ESCALA Public Export Build Receipt",
+            "",
+            f"- Product: `{result.product_id}` `{result.product_version}`",
+            f"- Source commit: `{result.source_commit}`",
+            f"- Export policy SHA-256: `{result.export_policy_sha256}`",
+            f"- Third-party inventory SHA-256: `{result.third_party_inventory_sha256}`",
+            f"- Artifact file count: `{result.artifact_file_count}`",
+            f"- Manifest SHA-256: `{result.manifest_sha256}`",
+            f"- Technical artifact status: `{result.technical_artifact_status}`",
+            f"- Human legal review status: `{result.human_legal_review_status}`",
+            f"- Publication authorized: `{str(result.publication_authorized).lower()}`",
+            "",
+        ]
+    )
+    return _bounded_receipt(content, policy)
+
+
+def render_public_export_verification_json(
+    result: PublicExportVerificationResult,
+    policy: PublicExportPolicy,
+) -> str:
+    """Render a bounded deterministic independent-verification receipt."""
+    content = (
+        json.dumps(
+            result.model_dump(mode="json"),
+            ensure_ascii=True,
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n"
+    )
+    return _bounded_receipt(content, policy)
+
+
+def render_public_export_verification_markdown(
+    result: PublicExportVerificationResult,
+    policy: PublicExportPolicy,
+) -> str:
+    """Render bounded named checks and safe locators without content excerpts."""
+    lines = [
+        "# ESCALA Public Export Verification Receipt",
+        "",
+        f"- Product: `{result.product_id}` `{result.product_version}`",
+        f"- Source commit: `{result.source_commit or 'unavailable'}`",
+        f"- Export policy SHA-256: `{result.export_policy_sha256}`",
+        f"- Third-party inventory SHA-256: `{result.third_party_inventory_sha256}`",
+        f"- Manifest SHA-256: `{result.manifest_sha256 or 'unavailable'}`",
+        f"- Artifact file count: `{result.artifact_file_count}`",
+        f"- Technical artifact status: `{result.technical_artifact_status.value}`",
+        f"- Human legal review status: `{result.human_legal_review_status}`",
+        f"- Publication authorized: `{str(result.publication_authorized).lower()}`",
+        "",
+        "## Checks",
+        "",
+    ]
+    lines.extend(
+        f"- `{check.id}`: `{check.status.value}` (violations=`{check.violation_count}`)"
+        for check in result.checks
+    )
+    lines.extend(["", "## Violations", ""])
+    if result.violations:
+        lines.extend(
+            f"- `{item.check_id}` | `{item.rule_id}` | "
+            f"`{item.locator_kind.value}` | `{item.locator}`"
+            for item in result.violations
+        )
+    else:
+        lines.append("- None")
+    lines.append("")
+    return _bounded_receipt("\n".join(lines), policy)
+
+
+def write_public_export_build_receipts(
+    result: PublicExportBuildResult,
+    policy: PublicExportPolicy,
+    *,
+    json_output: Path | None = None,
+    markdown_output: Path | None = None,
+) -> None:
+    """Write only explicitly requested successful build receipts."""
+    _write_explicit_receipts(
+        json_content=render_public_export_build_json(result, policy),
+        markdown_content=render_public_export_build_markdown(result, policy),
+        json_output=json_output,
+        markdown_output=markdown_output,
+    )
+
+
+def write_public_export_verification_receipts(
+    result: PublicExportVerificationResult,
+    policy: PublicExportPolicy,
+    *,
+    json_output: Path | None = None,
+    markdown_output: Path | None = None,
+) -> None:
+    """Write only explicitly requested technically passing receipts."""
+    if result.technical_artifact_status is not VerificationStatus.PASS:
+        raise ValueError("only a passing verification receipt may be written")
+    _write_explicit_receipts(
+        json_content=render_public_export_verification_json(result, policy),
+        markdown_content=render_public_export_verification_markdown(result, policy),
+        json_output=json_output,
+        markdown_output=markdown_output,
+    )
+
+
 def build_public_export(
     *,
     repository: Path,
@@ -1517,6 +1647,36 @@ def _ordered_artifact_violations(
         unique.values(),
         key=lambda item: (item.check_id, item.rule_id, item.locator),
     )
+
+
+def _bounded_receipt(content: str, policy: PublicExportPolicy) -> str:
+    if len(content.encode("utf-8")) > policy.limits.max_receipt_bytes:
+        raise ValueError("receipt_size_exceeded")
+    return content
+
+
+def _write_explicit_receipts(
+    *,
+    json_content: str,
+    markdown_content: str,
+    json_output: Path | None,
+    markdown_output: Path | None,
+) -> None:
+    outputs = [path for path in (json_output, markdown_output) if path is not None]
+    folded = [str(path.absolute()).casefold() for path in outputs]
+    if len(folded) != len(set(folded)):
+        raise ValueError("receipt outputs must be distinct")
+    if any(path.exists() or path.is_symlink() for path in outputs):
+        raise ValueError("receipt output already exists")
+    for path in outputs:
+        path.parent.mkdir(parents=True, exist_ok=True)
+    for path, content in (
+        (json_output, json_content),
+        (markdown_output, markdown_content),
+    ):
+        if path is not None:
+            with path.open("x", encoding="utf-8") as stream:
+                stream.write(content)
 
 
 def _validate_repository(repository: Path) -> Path:
