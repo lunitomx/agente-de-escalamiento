@@ -9,10 +9,12 @@ from pydantic import ValidationError
 
 from escala_server.workspace.authority import WorkspaceConfig
 from escala_server.workspace.inbox import (
+    InboxConfig,
     InboxError,
     InboxLedger,
     InboxLedgerEntry,
     load_inbox_ledger,
+    scan_inbox,
     save_inbox_ledger,
 )
 
@@ -67,3 +69,30 @@ def test_ledger_contract_forbids_machine_paths() -> None:
             codes=(),
             absolute_path="/private/company/ventas.csv",  # type: ignore[call-arg]
         )
+
+
+def test_inbox_rejects_directories_symlinks_and_oversized_entries(
+    tmp_path: Path,
+) -> None:
+    config = _config(tmp_path)
+    config.exchange_root.mkdir()
+    (config.exchange_root / "big.csv").write_text("1234567890", encoding="utf-8")
+    (config.exchange_root / "nested").mkdir()
+    target = config.exchange_root / "target.csv"
+    target.write_text("fecha,cliente,importe\n2026-07-22,Acme,10\n", encoding="utf-8")
+    link = config.exchange_root / "link.csv"
+    try:
+        link.symlink_to(target)
+    except OSError:
+        pytest.skip("symlinks unavailable in this environment")
+
+    run = scan_inbox(InboxConfig(workspace=config, max_bytes=5))
+    by_path = {item.relative_path: item for item in run.items}
+
+    assert by_path["big.csv"].disposition == "quarantined"
+    assert by_path["big.csv"].code == "source_too_large"
+    assert by_path["nested"].disposition == "quarantined"
+    assert by_path["nested"].code == "entry_directory"
+    assert by_path["link.csv"].disposition == "quarantined"
+    assert by_path["link.csv"].code == "entry_symlink"
+    assert link.is_symlink()
