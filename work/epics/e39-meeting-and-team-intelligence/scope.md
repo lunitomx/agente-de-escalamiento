@@ -53,6 +53,13 @@ El director obtiene visibilidad diaria del ritmo y salud de su equipo basada en 
 | S39.3 | Temporal Team Signals and Executive Review | L | S39.2 | REQ-E39-005, REQ-E39-006 | El sistema detecta patrones entre reuniones y genera una revisión ejecutiva diaria sin inventar negativos. |
 | S39.4 | Local Scheduling and Report Exchange | M | S39.3 | REQ-E39-007 | La agenda local y el intercambio de reportes usan solo la máquina instaladora y archivos ordinarios. |
 
+## Story closure checklist
+
+- [x] S39.1 Transcript Intake and Context — merged `a124bd3` / `30d857c`; focused tests, lint, format and types PASS.
+- [ ] S39.2 Evidence Extraction and Rhythm
+- [ ] S39.3 Temporal Team Signals and Executive Review
+- [ ] S39.4 Local Scheduling and Report Exchange
+
 ## Done criteria
 
 - [ ] Las cuatro stories completan start → design → plan → implement → review → close, con commits y retrospectivas.
@@ -120,7 +127,7 @@ The critical path is S39.1 → S39.2 → S39.3 → S39.4. Parallel work is inten
 
 | Story | Size | Status | Actual | Velocity | Notes |
 |---|:---:|---|---|---|---|
-| S39.1 Transcript Intake and Context | M | Pending | — | — | Depends on E37 |
+| S39.1 Transcript Intake and Context | M | Done | one focused cycle | — | Depends on E37; merged `a124bd3` / `30d857c` |
 | S39.2 Evidence Extraction and Rhythm | L | Pending | — | — | Depends on S39.1 |
 | S39.3 Temporal Team Signals and Executive Review | L | Pending | — | — | Depends on S39.2 |
 | S39.4 Local Scheduling and Report Exchange | M | Pending | — | — | Depends on S39.3 |
