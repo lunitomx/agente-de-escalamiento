@@ -1,0 +1,45 @@
+artifact_type: story-design
+version: 1
+skill: rai-story-design
+created: '2026-07-22T21:10:00-06:00'
+story: 'S40.2'
+epic: 'E40'
+content:
+  summary: 'Project the E40 diagnostic into a local, evidence-drillable cockpit and deterministic HTML/JSON artifacts.'
+  complexity: complex
+  acceptance_criteria:
+    - id: AC1
+      description: 'Supported pain is selected deterministically and drills to evidence, freshness, questions and action.'
+      verifiable: true
+    - id: AC2
+      description: 'All four decision cards show score/status and evidence-limited states remain honest.'
+      verifiable: true
+    - id: AC3
+      description: 'HTML/JSON artifacts are escaped, deterministic and below data_root only.'
+      verifiable: true
+    - id: AC4
+      description: 'Invalid workspace authority fails before a write.'
+      verifiable: true
+  integration_points:
+    - module: 'escala_server.executive.cockpit'
+      change_type: new
+      files: ['escala_server/executive/cockpit.py']
+    - module: 'escala_server.executive.models'
+      change_type: modification
+      files: ['escala_server/executive/models.py']
+    - module: 'tests.test_e40_executive_cockpit'
+      change_type: modification
+      files: ['tests/test_e40_executive_cockpit.py']
+  decisions:
+    - id: D1
+      choice: 'Local HTML/JSON pair instead of a hosted UI.'
+      rationale: 'The product invariant is installer-local and the visual surface is inspectable without a service.'
+      alternatives_considered: ['Extend legacy HTTP dashboards', 'Add a React/Vite frontend']
+    - id: D2
+      choice: 'Select lowest supported score; use evidence-limited status for unknowns.'
+      rationale: 'Missing evidence must not become a negative pain claim.'
+      alternatives_considered: ['Select any missing decision as zero', 'Rank by number of questions']
+refs:
+  backlog_item: 'eLuna-002'
+  epic_scope: 'work/epics/e40-executive-cockpit-and-coaching/scope.md'
+metadata: {}
