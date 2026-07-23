@@ -4,7 +4,7 @@
 
 **Contract inventory:** 42 requirements across 6 epics.
 
-**Initial proof posture:** 29 proved, 13 unproved.
+**Initial proof posture:** 36 proved, 6 unproved.
 
 A valid ledger is not a completed product. Mission readiness requires fresh passing evidence for every requirement.
 
