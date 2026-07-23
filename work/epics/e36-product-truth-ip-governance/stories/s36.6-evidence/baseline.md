@@ -4,13 +4,13 @@
 - Mission readiness: `unproved`
 - Mode: `baseline`
 - Epic filter: `all`
-- Verifier source commit: `b0c20d114398cb45f618878ea0133ad682f1f70f`
+- Verifier source commit: `d48cc7488f7449577cbc6236eb7965d862e87a93`
 - Ledger SHA-256: `1dbe5c06bdba1488dfeccabd95e99e2936977cd6b1759fb66fd66851a364b8c9`
-- Ledger Markdown SHA-256: `d14e32b8f62cb8570eceafa8eddb5967348efe90b650f6c25414b03592e72bd2`
+- Ledger Markdown SHA-256: `ea3961177d81dc131da3efd337ee78a5707344ea43257cfba32dda1ceabf0b47`
 - Epics: `6`
 - Requirements: `42`
-- Proved: `14`
-- Unproved: `28`
+- Proved: `21`
+- Unproved: `21`
 
 ## Authority bindings
 
@@ -38,16 +38,16 @@
 - `REQ-E38-005`
 - `REQ-E38-006`
 - `REQ-E38-007`
+- `REQ-E39-001`
+- `REQ-E39-002`
+- `REQ-E39-003`
+- `REQ-E39-004`
+- `REQ-E39-005`
+- `REQ-E39-006`
+- `REQ-E39-007`
 
 ## Blocking requirement IDs
 
-- `REQ-E39-001`: `evidence.missing`
-- `REQ-E39-002`: `evidence.missing`
-- `REQ-E39-003`: `evidence.missing`
-- `REQ-E39-004`: `evidence.missing`
-- `REQ-E39-005`: `evidence.missing`
-- `REQ-E39-006`: `evidence.missing`
-- `REQ-E39-007`: `evidence.missing`
 - `REQ-E40-001`: `evidence.missing`
 - `REQ-E40-002`: `evidence.missing`
 - `REQ-E40-003`: `evidence.missing`

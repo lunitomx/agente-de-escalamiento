@@ -422,6 +422,7 @@ def test_canonical_master_acceptance_ledger_matches_approved_plan() -> None:
     assert proved_ids == {
         *(f"REQ-E37-{index:03d}" for index in range(1, 8)),
         *(f"REQ-E38-{index:03d}" for index in range(1, 8)),
+        *(f"REQ-E39-{index:03d}" for index in range(1, 8)),
     }
     assert all(
         [blocker.value for blocker in item.proof.blockers] == ["evidence.missing"]
@@ -459,10 +460,10 @@ def test_canonical_ledger_rendering_is_deterministic_and_matches_human_view() ->
     assert first_markdown == LEDGER_MARKDOWN_PATH.read_text(encoding="utf-8")
     assert first_markdown.count("| `REQ-E") == 42
     assert first_markdown.count(".receipt.json`") == 42
-    assert first_markdown.count("`evidence.missing`") == 28
+    assert first_markdown.count("`evidence.missing`") == 21
     assert "| Requirement | Owner | Sources | Acceptance |" in first_markdown
     assert "**Contract inventory:** 42 requirements across 6 epics." in first_markdown
-    assert "**Initial proof posture:** 14 proved, 28 unproved." in first_markdown
+    assert "**Initial proof posture:** 21 proved, 21 unproved." in first_markdown
     combined = first_json + first_markdown
     for forbidden in (str(ROOT), "https://", "S36-PRIVATE-SENTINEL"):
         assert forbidden not in combined
@@ -500,11 +501,12 @@ def test_canonical_baseline_receipt_is_pass_but_truthfully_unproved() -> None:
     assert receipt.epic_filter is None
     assert receipt.epic_count == 6
     assert receipt.requirement_count == 42
-    assert receipt.proved_count == 14
-    assert receipt.unproved_count == 28
+    assert receipt.proved_count == 21
+    assert receipt.unproved_count == 21
     assert receipt.proved_ids == [
         *(f"REQ-E37-{index:03d}" for index in range(1, 8)),
         *(f"REQ-E38-{index:03d}" for index in range(1, 8)),
+        *(f"REQ-E39-{index:03d}" for index in range(1, 8)),
     ]
     assert [item.requirement_id for item in receipt.blocking_requirements] == [
         item.id for item in ledger.requirements if item.proof.state == "unproved"
@@ -767,8 +769,8 @@ def test_versioned_real_baseline_matches_current_contract_semantics() -> None:
     assert baseline.contract_status is ContractStatus.PASS
     assert baseline.mission_readiness is MissionReadiness.UNPROVED
     assert baseline.requirement_count == 42
-    assert baseline.unproved_count == 28
-    assert baseline.proved_count == 14
+    assert baseline.unproved_count == 21
+    assert baseline.proved_count == 21
     assert render_master_acceptance_receipt_json(baseline) == (
         BASELINE_JSON_PATH.read_text(encoding="utf-8")
     )
