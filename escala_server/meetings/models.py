@@ -34,6 +34,8 @@ SignalKind = Literal[
     "trend",
 ]
 ReviewHealth = Literal["watch", "evidence_supported", "evidence_limited", "unresolved"]
+ScheduleFrequency = Literal["daily", "weekly"]
+ReportStatus = Literal["pass", "fail"]
 
 
 class _StrictModel(BaseModel):
@@ -229,6 +231,39 @@ class ExecutiveReview(_StrictModel):
     questions: tuple[str, ...] = ()
     signals: tuple[TeamSignal, ...] = ()
     evidence_source_ids: tuple[str, ...] = ()
+
+
+class LocalSchedule(_StrictModel):
+    """Pull-based schedule manifest owned by the installer machine."""
+
+    schedule_id: str = Field(pattern=r"^[0-9a-f]{64}$")
+    frequency: ScheduleFrequency
+    run_date: date
+    manifest_path: str = Field(min_length=1, max_length=200)
+
+
+class MeetingReportArtifact(_StrictModel):
+    """Relative local report artifacts for one executive review."""
+
+    report_id: str = Field(pattern=r"^[0-9a-f]{64}$")
+    review_id: str = Field(pattern=r"^[0-9a-f]{64}$")
+    html_path: str = Field(min_length=1, max_length=240)
+    markdown_path: str = Field(min_length=1, max_length=240)
+    json_path: str = Field(min_length=1, max_length=240)
+    source_ids: tuple[str, ...] = ()
+
+
+class MeetingExchangeReceipt(_StrictModel):
+    """Safe authority check for the ordinary filesystem exchange."""
+
+    status: ReportStatus
+    runtime_authority: Literal["installer_machine"] = "installer_machine"
+    data_authority: Literal["installer_machine"] = "installer_machine"
+    team_exchange: Literal["ordinary_filesystem_documents_only"] = (
+        "ordinary_filesystem_documents_only"
+    )
+    authoritative_sqlite_sync: Literal["forbidden"] = "forbidden"
+    findings: tuple[str, ...] = ()
 
 
 def evidence_hash(text: str) -> str:

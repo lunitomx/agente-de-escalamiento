@@ -369,8 +369,8 @@ requirements:
       data_authority: installer_machine
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
-    delivery_disposition: active
-    proof: {state: unproved, blockers: [evidence.missing]}
+    delivery_disposition: complete
+    proof: {state: proved, receipt_sha256: 899fa4a7cc0d39c3ef572a08094622836712ba5698b293da22bc6c0a6b0e1fc7}
   - id: REQ-E39-002
     owner: {epic: E39, story: S39.1}
     source_ids: [SRC-EVIDENCE-001, SRC-MEETING-001]
@@ -386,8 +386,8 @@ requirements:
       data_authority: installer_machine
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
-    delivery_disposition: active
-    proof: {state: unproved, blockers: [evidence.missing]}
+    delivery_disposition: complete
+    proof: {state: proved, receipt_sha256: 8511d44e0da4421b8884d7c3a5d7962bce767f249fc5be77136258b2d8117de1}
   - id: REQ-E39-003
     owner: {epic: E39, story: S39.2}
     source_ids: [SRC-EVIDENCE-001, SRC-MEETING-001]
@@ -403,8 +403,8 @@ requirements:
       data_authority: installer_machine
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
-    delivery_disposition: active
-    proof: {state: unproved, blockers: [evidence.missing]}
+    delivery_disposition: complete
+    proof: {state: proved, receipt_sha256: 0b6cd171c67a03d7b5f603e129e535c9e5811104084c957d0402f1fe1c600128}
   - id: REQ-E39-004
     owner: {epic: E39, story: S39.2}
     source_ids: [SRC-EVIDENCE-001, SRC-MEETING-001]
@@ -420,8 +420,8 @@ requirements:
       data_authority: installer_machine
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
-    delivery_disposition: active
-    proof: {state: unproved, blockers: [evidence.missing]}
+    delivery_disposition: complete
+    proof: {state: proved, receipt_sha256: 5ad99969b9b3f6d775ebbd72a327bed17fbacd25dd69eb5735ad72badcd05c42}
   - id: REQ-E39-005
     owner: {epic: E39, story: S39.3}
     source_ids: [SRC-MEETING-001]
@@ -437,8 +437,8 @@ requirements:
       data_authority: installer_machine
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
-    delivery_disposition: active
-    proof: {state: unproved, blockers: [evidence.missing]}
+    delivery_disposition: complete
+    proof: {state: proved, receipt_sha256: 8c3d1f40538de76582bc1fc0e5641e2a3072bb5d069171262e4c45df11abf80b}
   - id: REQ-E39-006
     owner: {epic: E39, story: S39.3}
     source_ids: [SRC-EVIDENCE-001, SRC-MEETING-001]
@@ -454,8 +454,8 @@ requirements:
       data_authority: installer_machine
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
-    delivery_disposition: active
-    proof: {state: unproved, blockers: [evidence.missing]}
+    delivery_disposition: complete
+    proof: {state: proved, receipt_sha256: e998646ac274f082c8932fa9552d7353bf20c34afe91752678d7ace420a33447}
   - id: REQ-E39-007
     owner: {epic: E39, story: S39.4}
     source_ids: [SRC-LOCAL-001, SRC-MEETING-001, SRC-SHARING-001, SRC-SQLITE-001]
@@ -471,8 +471,8 @@ requirements:
       data_authority: installer_machine
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
-    delivery_disposition: active
-    proof: {state: unproved, blockers: [evidence.missing]}
+    delivery_disposition: complete
+    proof: {state: proved, receipt_sha256: 2077efea36d955d60f637ba9d8f0660d88e884f4e3f862f1b786fb55b8ea3daa}
   - id: REQ-E40-001
     owner: {epic: E40, story: S40.1}
     source_ids: [SRC-COACH-001, SRC-EVIDENCE-001]
