@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from datetime import date
 import hashlib
 import json
 from pathlib import Path
@@ -54,7 +53,9 @@ from validators.master_acceptance import (  # noqa: E402
 EVIDENCE_DIR = ROOT / "work/epics/e40-executive-cockpit-and-coaching/evidence"
 EVIDENCE_PATH = EVIDENCE_DIR / "master-acceptance-e40.json"
 MARKDOWN_PATH = EVIDENCE_DIR / "master-acceptance-e40.md"
-LEDGER_PATH = ROOT / "work/epics/e36-product-truth-ip-governance/master-acceptance-ledger.yaml"
+LEDGER_PATH = (
+    ROOT / "work/epics/e36-product-truth-ip-governance/master-acceptance-ledger.yaml"
+)
 REQUIREMENTS = [f"REQ-E40-{index:03d}" for index in range(1, 9)]
 
 
@@ -75,14 +76,22 @@ def main() -> int:
                 ProfileAnswer(key="industry", value="alimentos", status="fact"),
                 ProfileAnswer(key="stage", value="regional", status="fact"),
                 ProfileAnswer(key="employees", value=28, status="fact"),
-                ProfileAnswer(key="critical_number", value="margen bruto", status="fact"),
+                ProfileAnswer(
+                    key="critical_number", value="margen bruto", status="fact"
+                ),
             )
         )
         diagnostic = build_diagnostic(
             (
-                DiagnosticAnswer(decision="people", score=64, source_ids=("people-001",)),
-                DiagnosticAnswer(decision="strategy", score=51, source_ids=("strategy-001",)),
-                DiagnosticAnswer(decision="execution", score=73, source_ids=("execution-001",)),
+                DiagnosticAnswer(
+                    decision="people", score=64, source_ids=("people-001",)
+                ),
+                DiagnosticAnswer(
+                    decision="strategy", score=51, source_ids=("strategy-001",)
+                ),
+                DiagnosticAnswer(
+                    decision="execution", score=73, source_ids=("execution-001",)
+                ),
                 DiagnosticAnswer(
                     decision="cash",
                     score=42,
@@ -96,8 +105,12 @@ def main() -> int:
         artifact = write_cockpit(config, cockpit)
         strategy_partial = build_strategy_plan(
             (
-                StrategyAnswer(key="purpose", value="hacer accesible la comida sana", status="fact"),
-                StrategyAnswer(key="bhag", value="100 tiendas en 10 años", status="fact"),
+                StrategyAnswer(
+                    key="purpose", value="hacer accesible la comida sana", status="fact"
+                ),
+                StrategyAnswer(
+                    key="bhag", value="100 tiendas en 10 años", status="fact"
+                ),
             )
         )
         strategy_ready = build_strategy_plan(
@@ -116,9 +129,19 @@ def main() -> int:
             )
         )
         route = route_coaching(CoachingRequest(decision="cash"), diagnostic)
-        unsupported_route = route_coaching(CoachingRequest(decision="people"), build_diagnostic(()))
+        unsupported_route = route_coaching(
+            CoachingRequest(decision="people"), build_diagnostic(())
+        )
         state = ExecutionState(
-            goals=(Goal(id="g1", title="Cobrar cartera", owner="Ana", due_date="2026-08-01", progress=40),),
+            goals=(
+                Goal(
+                    id="g1",
+                    title="Cobrar cartera",
+                    owner="Ana",
+                    due_date="2026-08-01",
+                    progress=40,
+                ),
+            ),
             priorities=(
                 Priority(
                     id="p1",
@@ -169,14 +192,46 @@ def main() -> int:
             invalid_authority = False
 
         checks = [
-            {"id": "REQ-E40-001", "status": "pass", "evidence": "Nopal Foods profile validated with five required facts and no unresolved fields."},
-            {"id": "REQ-E40-002", "status": "pass", "evidence": "People, Strategy, Execution and Cash each received a deterministic attributed 0-100 assessment."},
-            {"id": "REQ-E40-003", "status": "pass", "evidence": "Cash was selected as supported pain and drilled to cash-001, freshness, blocker and next action."},
-            {"id": "REQ-E40-004", "status": "pass", "evidence": "Partial OPSP retained purpose/BHAG and exposed unresolved critical sections; complete plan remained owner-supplied."},
-            {"id": "REQ-E40-005", "status": "pass", "evidence": "Explicit Cash routed to /escala-cash; People without evidence returned supported=false and a question."},
-            {"id": "REQ-E40-006", "status": "pass", "evidence": "Goals, priority, task, owner, due dates, progress and session continuity round-tripped through local execution.json."},
-            {"id": "REQ-E40-007", "status": "pass", "evidence": "Cockpit HTML/JSON were written below data_root with relative artifact paths and no exchange writes."},
-            {"id": "REQ-E40-008", "status": "pass", "evidence": "Guidance preserved facts, inference and unknown CCC while asking a material question; invalid authority failed closed."},
+            {
+                "id": "REQ-E40-001",
+                "status": "pass",
+                "evidence": "Nopal Foods profile validated with five required facts and no unresolved fields.",
+            },
+            {
+                "id": "REQ-E40-002",
+                "status": "pass",
+                "evidence": "People, Strategy, Execution and Cash each received a deterministic attributed 0-100 assessment.",
+            },
+            {
+                "id": "REQ-E40-003",
+                "status": "pass",
+                "evidence": "Cash was selected as supported pain and drilled to cash-001, freshness, blocker and next action.",
+            },
+            {
+                "id": "REQ-E40-004",
+                "status": "pass",
+                "evidence": "Partial OPSP retained purpose/BHAG and exposed unresolved critical sections; complete plan remained owner-supplied.",
+            },
+            {
+                "id": "REQ-E40-005",
+                "status": "pass",
+                "evidence": "Explicit Cash routed to /escala-cash; People without evidence returned supported=false and a question.",
+            },
+            {
+                "id": "REQ-E40-006",
+                "status": "pass",
+                "evidence": "Goals, priority, task, owner, due dates, progress and session continuity round-tripped through local execution.json.",
+            },
+            {
+                "id": "REQ-E40-007",
+                "status": "pass",
+                "evidence": "Cockpit HTML/JSON were written below data_root with relative artifact paths and no exchange writes.",
+            },
+            {
+                "id": "REQ-E40-008",
+                "status": "pass",
+                "evidence": "Guidance preserved facts, inference and unknown CCC while asking a material question; invalid authority failed closed.",
+            },
         ]
         assert profile.status == "ready"
         assert diagnostic.status == "supported"
@@ -187,7 +242,9 @@ def main() -> int:
         assert route.supported and route.skill == "/escala-cash"
         assert not unsupported_route.supported and unsupported_route.questions
         assert loaded_state == state and state_receipt.path.endswith("execution.json")
-        assert guidance.status == "evidence_limited" and guidance.unknowns == ("cash_conversion_cycle",)
+        assert guidance.status == "evidence_limited" and guidance.unknowns == (
+            "cash_conversion_cycle",
+        )
         assert "&lt;" not in render_cockpit_html(cockpit)
         assert invalid_authority
 
@@ -301,7 +358,8 @@ def _write_requirement_receipts(checks: list[dict[str, str]]) -> None:
         artifact_path = ROOT / requirement.evidence.artifact_path
         artifact_path.parent.mkdir(parents=True, exist_ok=True)
         artifact_bytes = (
-            json.dumps(artifact_payload, ensure_ascii=False, sort_keys=True, indent=2) + "\n"
+            json.dumps(artifact_payload, ensure_ascii=False, sort_keys=True, indent=2)
+            + "\n"
         ).encode("utf-8")
         artifact_path.write_bytes(artifact_bytes)
         evidence_receipt = RequirementEvidenceReceipt(
