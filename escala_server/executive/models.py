@@ -287,3 +287,109 @@ class CoachingRoute(_StrictModel):
     evidence_status: EvidenceStatus
     rationale: str = Field(min_length=1, max_length=240)
     questions: tuple[str, ...] = ()
+
+
+class Goal(_StrictModel):
+    """One persisted company goal."""
+
+    id: str = Field(min_length=1, max_length=80)
+    title: str = Field(min_length=1, max_length=200)
+    owner: str = Field(min_length=1, max_length=120)
+    due_date: str | None = Field(default=None, pattern=r"^\d{4}-\d{2}-\d{2}$")
+    progress: int = Field(default=0, ge=0, le=100)
+    status: Literal["pending", "in_progress", "done"] = "pending"
+
+    @field_validator("id")
+    @classmethod
+    def validate_id(cls, value: str) -> str:
+        return _validate_safe_id(value, "goal id")
+
+
+class Priority(_StrictModel):
+    """One persisted quarterly/annual priority."""
+
+    id: str = Field(min_length=1, max_length=80)
+    title: str = Field(min_length=1, max_length=200)
+    owner: str = Field(min_length=1, max_length=120)
+    due_date: str | None = Field(default=None, pattern=r"^\d{4}-\d{2}-\d{2}$")
+    progress: int = Field(default=0, ge=0, le=100)
+    status: Literal["pending", "in_progress", "done"] = "pending"
+
+    @field_validator("id")
+    @classmethod
+    def validate_id(cls, value: str) -> str:
+        return _validate_safe_id(value, "priority id")
+
+
+class ExecutionTask(_StrictModel):
+    """One persisted task linked to a priority."""
+
+    id: str = Field(min_length=1, max_length=80)
+    title: str = Field(min_length=1, max_length=200)
+    owner: str = Field(min_length=1, max_length=120)
+    due_date: str | None = Field(default=None, pattern=r"^\d{4}-\d{2}-\d{2}$")
+    priority_id: str | None = None
+    progress: int = Field(default=0, ge=0, le=100)
+    status: Literal["pending", "in_progress", "done"] = "pending"
+
+    @field_validator("id")
+    @classmethod
+    def validate_id(cls, value: str) -> str:
+        return _validate_safe_id(value, "task id")
+
+    @field_validator("priority_id")
+    @classmethod
+    def validate_priority_id(cls, value: str | None) -> str | None:
+        return _validate_safe_id(value, "priority id") if value is not None else None
+
+
+class SessionContinuity(_StrictModel):
+    """Explicit next-session handoff without a machine timestamp/path."""
+
+    session_id: str = Field(default="unspecified", min_length=1, max_length=80)
+    next_prompt: str = Field(default="", max_length=240)
+    pending_questions: tuple[str, ...] = ()
+
+    @field_validator("session_id")
+    @classmethod
+    def validate_session_id(cls, value: str) -> str:
+        return _validate_safe_id(value, "session id")
+
+
+class ExecutionState(_StrictModel):
+    """Locally persisted execution and session continuity snapshot."""
+
+    schema_version: Literal[1] = 1
+    goals: tuple[Goal, ...] = ()
+    priorities: tuple[Priority, ...] = ()
+    tasks: tuple[ExecutionTask, ...] = ()
+    continuity: SessionContinuity = Field(default_factory=SessionContinuity)
+
+
+class StateReceipt(_StrictModel):
+    """Redacted local state receipt with a stable relative path."""
+
+    schema_version: Literal[1] = 1
+    path: str = Field(pattern=r"^\.escala-executive/execution\.json$")
+    content_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class GuidanceRequest(_StrictModel):
+    """Explicit context supplied to the honest guidance seam."""
+
+    topic: str = Field(min_length=1, max_length=120)
+    facts: tuple[str, ...] = ()
+    inferences: tuple[str, ...] = ()
+    unknowns: tuple[str, ...] = ()
+    question: str = Field(default="", max_length=240)
+
+
+class HonestGuidance(_StrictModel):
+    """Guidance that keeps facts, inferences and unknowns separate."""
+
+    status: Literal["supported", "evidence_limited"]
+    facts: tuple[str, ...] = ()
+    inferences: tuple[str, ...] = ()
+    unknowns: tuple[str, ...] = ()
+    questions: tuple[str, ...] = ()
+    next_action: str = Field(min_length=1, max_length=240)
