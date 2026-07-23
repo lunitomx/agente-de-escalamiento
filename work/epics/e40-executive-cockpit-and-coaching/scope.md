@@ -1,7 +1,7 @@
 ---
 epic_id: "E40"
 title: "Executive Cockpit and Coaching"
-status: "in_progress"
+status: "complete"
 created: "2026-07-22"
 mission: "escala-local-v2-plan-maestro-2607202112"
 ---
@@ -52,20 +52,27 @@ Permitir que un empresario construya un perfil de compañía mediante preguntas,
 
 ## Done Criteria
 
+## Story closure checklist
+
+- [x] S40.1 Guided Onboarding and Diagnostic — merged `c66989c` / `9b46160`; focused tests, lint, format and types PASS.
+- [x] S40.2 Visual Cockpit and Pain Drill-Down — merged `ed27b37` / `75b0a6f`; focused tests, lint, format and types PASS.
+- [x] S40.3 Strategy and Four-Decision Coaching — merged `36108da` / `15e9ebf`; focused tests, lint, format and types PASS.
+- [x] S40.4 Persistent Execution and Honest Guidance — merged `40bced3` / `4b0b9f9`; focused tests, lint, format and types PASS.
+
 **Per story:**
 
-- [ ] Código con anotaciones de tipo y modelos Pydantic cerrados.
-- [ ] Tests focalizados y negative cases pasan.
-- [ ] `gate-format`, `gate-lint`, `gate-tests`, `gate-types` pasan.
-- [ ] Retrospectiva de story y commit de cierre existen.
+- [x] Código con anotaciones de tipo y modelos Pydantic cerrados.
+- [x] Tests focalizados y negative cases pasan.
+- [x] `gate-format`, `gate-lint`, `gate-tests`, `gate-types` pasan.
+- [x] Retrospectiva de story y commit de cierre existen.
 
 **Epic complete:**
 
-- [ ] S40.1–S40.4 completas y sus ocho requirements tienen JSON + receipt exactos.
-- [ ] Fixture sintético demuestra onboarding, diagnóstico, cockpit, estrategia, routing, persistencia y guidance honesto.
-- [ ] El cockpit se escribe solo bajo `data_root`, es determinista y no expone rutas, endpoints o texto privado en receipts.
-- [ ] Readiness del ledger: 8/8 E40 proved; suite completa y gates de cierre pasan.
-- [ ] Retrospectiva y tag local `epic/e40-complete`; sin push/publicación sin autorización.
+- [x] S40.1–S40.4 completas y sus ocho requirements tienen JSON + receipt exactos.
+- [x] Fixture sintético demuestra onboarding, diagnóstico, cockpit, estrategia, routing, persistencia y guidance honesto.
+- [x] El cockpit se escribe solo bajo `data_root`, es determinista y no expone rutas, endpoints o texto privado en receipts.
+- [x] Readiness del ledger: 8/8 E40 proved; suite completa y gates de cierre pasan.
+- [x] Retrospectiva y tag local `epic/e40-complete`; sin push/publicación sin autorización.
 
 ## Dependencies
 
@@ -142,10 +149,10 @@ Evidence/gates:  tests ───────────────► qualific
 
 | Story | Size | Status | Actual | Velocity | Notes |
 |-------|:----:|:------:|:------:|:--------:|-------|
-| S40.1 Guided Onboarding and Diagnostic | L | Pending | — | — | Foundation; REQ-E40-001/002 |
-| S40.2 Visual Cockpit and Pain Drill-Down | L | Pending | — | — | REQ-E40-003/007 |
-| S40.3 Strategy and Four-Decision Coaching | L | Pending | — | — | REQ-E40-004/005 |
-| S40.4 Persistent Execution and Honest Guidance | M | Pending | — | — | REQ-E40-006/008 |
+| S40.1 Guided Onboarding and Diagnostic | L | Done | one focused cycle | — | REQ-E40-001/002; merged `c66989c` / `9b46160` |
+| S40.2 Visual Cockpit and Pain Drill-Down | L | Done | one focused cycle | — | REQ-E40-003/007; merged `ed27b37` / `75b0a6f` |
+| S40.3 Strategy and Four-Decision Coaching | L | Done | one focused cycle | — | REQ-E40-004/005; merged `36108da` / `15e9ebf` |
+| S40.4 Persistent Execution and Honest Guidance | M | Done | one focused cycle | — | REQ-E40-006/008; merged `40bced3` / `4b0b9f9` |
 
 ### Sequencing Risks
 
