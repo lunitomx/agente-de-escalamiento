@@ -229,3 +229,61 @@ class CockpitArtifact(_StrictModel):
     html_path: str = Field(pattern=r"^\.escala-executive/cockpit\.html$")
     json_path: str = Field(pattern=r"^\.escala-executive/cockpit\.json$")
     content_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class StrategyAnswer(_StrictModel):
+    """One owner answer for an OPSP/vision section."""
+
+    key: str = Field(min_length=2, max_length=64)
+    value: str | int | float | bool | None
+    status: FieldStatus
+    source_ids: tuple[str, ...] = ()
+    question: str | None = Field(default=None, max_length=240)
+
+    @field_validator("key")
+    @classmethod
+    def validate_key(cls, value: str) -> str:
+        if _SAFE_KEY.fullmatch(value) is None:
+            raise ValueError("strategy key must be a safe snake_case field")
+        return value
+
+    @field_validator("source_ids")
+    @classmethod
+    def validate_source_ids(cls, value: tuple[str, ...]) -> tuple[str, ...]:
+        return tuple(_validate_safe_id(item, "source_id") for item in value)
+
+
+class StrategyPlan(_StrictModel):
+    """Partial or ready OPSP-style strategy plan from explicit answers."""
+
+    schema_version: Literal[1] = 1
+    vision: str | None = None
+    purpose: str | None = None
+    bhag: str | None = None
+    sandbox: str | None = None
+    brand_promise: str | None = None
+    profit_per_x: str | None = None
+    annual_goal: str | None = None
+    critical_number: str | None = None
+    source_ids: tuple[str, ...] = ()
+    unresolved: tuple[str, ...] = ()
+    questions: tuple[str, ...] = ()
+    status: Literal["ready", "needs_clarification"]
+
+
+class CoachingRequest(_StrictModel):
+    """Owner request for an explicit or diagnostic-derived decision route."""
+
+    decision: Decision | None = None
+    question: str = Field(default="", max_length=240)
+
+
+class CoachingRoute(_StrictModel):
+    """Safe route to an existing four-decision skill."""
+
+    decision: Decision
+    skill: str = Field(pattern=r"^/escala-(people|strategy|execution|cash)$")
+    supported: bool
+    evidence_status: EvidenceStatus
+    rationale: str = Field(min_length=1, max_length=240)
+    questions: tuple[str, ...] = ()

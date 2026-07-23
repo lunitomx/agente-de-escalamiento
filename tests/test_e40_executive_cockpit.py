@@ -9,10 +9,14 @@ from escala_server.executive import (
     DiagnosticAnswer,
     EvidenceItem,
     ExecutiveDiagnostic,
+    CoachingRequest,
+    StrategyAnswer,
     ProfileAnswer,
     build_company_profile,
     build_diagnostic,
     render_cockpit_html,
+    build_strategy_plan,
+    route_coaching,
     write_cockpit,
 )
 from escala_server.executive.models import Decision
@@ -243,3 +247,78 @@ def test_write_cockpit_rejects_authoritative_database_inside_exchange(
 
     with pytest.raises(WorkspaceAuthorityError):
         write_cockpit(config, build_cockpit(_supported_diagnostic()))
+
+
+def test_strategy_plan_preserves_vision_and_unresolved_opsp_sections() -> None:
+    plan = build_strategy_plan(
+        (
+            StrategyAnswer(
+                key="purpose", value="hacer accesible la comida sana", status="fact"
+            ),
+            StrategyAnswer(key="bhag", value="100 tiendas en 10 años", status="fact"),
+            StrategyAnswer(
+                key="brand_promise", value="entrega en 30 minutos", status="fact"
+            ),
+        )
+    )
+
+    assert plan.status == "needs_clarification"
+    assert plan.purpose == "hacer accesible la comida sana"
+    assert plan.bhag == "100 tiendas en 10 años"
+    assert "critical_number" in plan.unresolved
+    assert any("critical_number" in question for question in plan.questions)
+
+
+def test_complete_strategy_plan_is_ready_without_fabricating_values() -> None:
+    keys = (
+        "vision",
+        "purpose",
+        "bhag",
+        "sandbox",
+        "brand_promise",
+        "profit_per_x",
+        "annual_goal",
+        "critical_number",
+    )
+    plan = build_strategy_plan(
+        tuple(
+            StrategyAnswer(key=key, value=f"owner-{key}", status="fact") for key in keys
+        )
+    )
+
+    assert plan.status == "ready"
+    assert plan.unresolved == ()
+    assert plan.critical_number == "owner-critical_number"
+
+
+def test_coaching_routes_explicit_cash_request_to_existing_skill() -> None:
+    route = route_coaching(
+        CoachingRequest(decision="cash", question="Quiero analizar mi caja."),
+        _supported_diagnostic(),
+    )
+
+    assert route.skill == "/escala-cash"
+    assert route.supported is True
+    assert route.decision == "cash"
+    assert "solicitud" in route.rationale.lower()
+
+
+def test_coaching_default_route_uses_lowest_supported_decision() -> None:
+    route = route_coaching(CoachingRequest(), _supported_diagnostic())
+
+    assert route.decision == "cash"
+    assert route.skill == "/escala-cash"
+    assert route.supported is True
+
+
+def test_coaching_does_not_claim_unsupported_people_analysis() -> None:
+    diagnostic = build_diagnostic(
+        (DiagnosticAnswer(decision="cash", score=55, source_ids=("cash-source",)),)
+    )
+    route = route_coaching(CoachingRequest(decision="people"), diagnostic)
+
+    assert route.decision == "people"
+    assert route.skill == "/escala-people"
+    assert route.supported is False
+    assert route.questions
+    assert "evidencia" in route.questions[0].lower()
