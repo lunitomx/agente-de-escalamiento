@@ -1,0 +1,16 @@
+{
+  "evidence": "An optional exchange root was configured as document-only while data_root and SQLite remained outside it.",
+  "negative_cases": [
+    "cross_platform_bundle_rejected",
+    "authoritative_sqlite_in_exchange_rejected",
+    "tampered_update_rejected_before_writes",
+    "interrupted_migration_safe_stop_with_backup"
+  ],
+  "platforms": [
+    "macos",
+    "windows"
+  ],
+  "requirement_id": "REQ-E41-006",
+  "schema_version": 1,
+  "status": "pass"
+}

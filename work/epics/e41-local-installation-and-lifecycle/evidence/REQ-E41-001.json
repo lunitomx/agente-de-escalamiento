@@ -1,0 +1,15 @@
+{
+  "evidence": "A clean macOS target installed the archive into app/data roots without repository layout or network access.",
+  "negative_cases": [
+    "cross_platform_bundle_rejected",
+    "authoritative_sqlite_in_exchange_rejected",
+    "tampered_update_rejected_before_writes",
+    "interrupted_migration_safe_stop_with_backup"
+  ],
+  "platforms": [
+    "macos"
+  ],
+  "requirement_id": "REQ-E41-001",
+  "schema_version": 1,
+  "status": "pass"
+}

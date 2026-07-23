@@ -1,0 +1,16 @@
+{
+  "evidence": "Schema migration created a local backup and interrupted migration returned safe_stop with rollback_available.",
+  "negative_cases": [
+    "cross_platform_bundle_rejected",
+    "authoritative_sqlite_in_exchange_rejected",
+    "tampered_update_rejected_before_writes",
+    "interrupted_migration_safe_stop_with_backup"
+  ],
+  "platforms": [
+    "macos",
+    "windows"
+  ],
+  "requirement_id": "REQ-E41-004",
+  "schema_version": 1,
+  "status": "pass"
+}

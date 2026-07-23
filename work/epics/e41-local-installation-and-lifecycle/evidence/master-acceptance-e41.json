@@ -1,0 +1,202 @@
+{
+  "architecture": {
+    "authoritative_sqlite_sync": "forbidden",
+    "data_authority": "installer_machine",
+    "runtime_authority": "installer_machine",
+    "team_exchange": "ordinary_filesystem_documents_only"
+  },
+  "artifacts": {
+    "macos_install": {
+      "authoritative_sqlite_sync": "forbidden",
+      "checks": [
+        {
+          "id": "bundle_manifest",
+          "status": "pass"
+        },
+        {
+          "id": "workspace_authority",
+          "status": "pass"
+        },
+        {
+          "id": "canonical_state_local",
+          "status": "pass"
+        },
+        {
+          "id": "no_repository_layout",
+          "status": "pass"
+        },
+        {
+          "id": "offline_runtime",
+          "status": "pass"
+        }
+      ],
+      "data_authority": "installer_machine",
+      "exchange_configured": true,
+      "findings": [],
+      "network_required": false,
+      "platform": "macos",
+      "repository_layout": false,
+      "runtime_authority": "installer_machine",
+      "schema_version": 1,
+      "status": "pass",
+      "team_exchange": "ordinary_filesystem_documents_only",
+      "version": "1.0.0"
+    },
+    "migration": {
+      "backup_id": "ac94630dab43ff2e1ebf2fe1a434145c48b259bd66bddb9ea8730f94594f359a",
+      "backup_relative_path": ".escala-backups/ac94630dab43ff2e1ebf2fe1a434145c48b259bd66bddb9ea8730f94594f359a.zip",
+      "current_schema": 2,
+      "previous_schema": 1,
+      "rollback_available": true,
+      "safe_stop_reason": null,
+      "schema_version": 1,
+      "status": "pass"
+    },
+    "rollback": {
+      "artifact_sha256": "18ea56da28d9d26debaeca250eaf32c839df87e97abeb399e6faf66514dba557",
+      "backup_id": "6956da72e599bbd6414bf9bd93aec5161f007423892eb8ef7e051b23c9ae5604",
+      "backup_relative_path": ".escala-backups/6956da72e599bbd6414bf9bd93aec5161f007423892eb8ef7e051b23c9ae5604.zip",
+      "current_version": "1.0.0",
+      "data_authority": "installer_machine",
+      "previous_version": "1.0.0",
+      "rollback_available": true,
+      "runtime_authority": "installer_machine",
+      "safe_stop_reason": null,
+      "schema_version": 1,
+      "source_commit": "e289b138c70074084d86656809fc203f47445ce8",
+      "status": "pass",
+      "verification": "verified"
+    },
+    "safe_stop": {
+      "backup_id": "a5bb801a121d3874221b1c7c42b754b58361b68730501046ecd97ba42dcf3e8b",
+      "backup_relative_path": ".escala-backups/a5bb801a121d3874221b1c7c42b754b58361b68730501046ecd97ba42dcf3e8b.zip",
+      "current_schema": 2,
+      "previous_schema": 2,
+      "rollback_available": true,
+      "safe_stop_reason": "migration_interrupted",
+      "schema_version": 1,
+      "status": "safe_stop"
+    },
+    "schedule": {
+      "frequency": "daily",
+      "kind": "launchd",
+      "network_required": false,
+      "platform": "macos",
+      "relative_path": ".escala-schedules/review.plist",
+      "schema_version": 1,
+      "status": "pass"
+    },
+    "update": {
+      "artifact_sha256": "18ea56da28d9d26debaeca250eaf32c839df87e97abeb399e6faf66514dba557",
+      "backup_id": "6956da72e599bbd6414bf9bd93aec5161f007423892eb8ef7e051b23c9ae5604",
+      "backup_relative_path": ".escala-backups/6956da72e599bbd6414bf9bd93aec5161f007423892eb8ef7e051b23c9ae5604.zip",
+      "current_version": "1.1.0",
+      "data_authority": "installer_machine",
+      "previous_version": "1.0.0",
+      "rollback_available": true,
+      "runtime_authority": "installer_machine",
+      "safe_stop_reason": null,
+      "schema_version": 1,
+      "source_commit": "e289b138c70074084d86656809fc203f47445ce8",
+      "status": "pass",
+      "verification": "verified"
+    },
+    "windows_install": {
+      "authoritative_sqlite_sync": "forbidden",
+      "checks": [
+        {
+          "id": "bundle_manifest",
+          "status": "pass"
+        },
+        {
+          "id": "workspace_authority",
+          "status": "pass"
+        },
+        {
+          "id": "canonical_state_local",
+          "status": "pass"
+        },
+        {
+          "id": "no_repository_layout",
+          "status": "pass"
+        },
+        {
+          "id": "offline_runtime",
+          "status": "pass"
+        }
+      ],
+      "data_authority": "installer_machine",
+      "exchange_configured": true,
+      "findings": [],
+      "network_required": false,
+      "platform": "windows",
+      "repository_layout": false,
+      "runtime_authority": "installer_machine",
+      "schema_version": 1,
+      "status": "pass",
+      "team_exchange": "ordinary_filesystem_documents_only",
+      "version": "1.0.0"
+    }
+  },
+  "checks": [
+    {
+      "evidence": "A clean macOS target installed the archive into app/data roots without repository layout or network access.",
+      "id": "REQ-E41-001",
+      "status": "pass"
+    },
+    {
+      "evidence": "A clean Windows target used the same manifest capability set with platform-specific recorded evidence.",
+      "id": "REQ-E41-002",
+      "status": "pass"
+    },
+    {
+      "evidence": "Both simulated platforms started and stopped a local marker runtime reporting health, version and data_root.",
+      "id": "REQ-E41-003",
+      "status": "pass"
+    },
+    {
+      "evidence": "Schema migration created a local backup and interrupted migration returned safe_stop with rollback_available.",
+      "id": "REQ-E41-004",
+      "status": "pass"
+    },
+    {
+      "evidence": "A hash-verified update preserved company state, version provenance and a tested rollback receipt; tampering failed before writes.",
+      "id": "REQ-E41-005",
+      "status": "pass"
+    },
+    {
+      "evidence": "An optional exchange root was configured as document-only while data_root and SQLite remained outside it.",
+      "id": "REQ-E41-006",
+      "status": "pass"
+    },
+    {
+      "evidence": "macOS/Windows install, runtime, offline schedule, permissions/authority, update, rollback, corruption and publication-boundary checks passed.",
+      "id": "REQ-E41-007",
+      "status": "pass"
+    }
+  ],
+  "epic": "E41",
+  "negative_cases": [
+    "cross_platform_bundle_rejected",
+    "authoritative_sqlite_in_exchange_rejected",
+    "tampered_update_rejected_before_writes",
+    "interrupted_migration_safe_stop_with_backup",
+    "offline_schedule_contains_no_network_action",
+    "runtime_state_is_local_and_hosted_service_false"
+  ],
+  "platform_matrix": [
+    "macos",
+    "windows"
+  ],
+  "requirements_proved": [
+    "REQ-E41-001",
+    "REQ-E41-002",
+    "REQ-E41-003",
+    "REQ-E41-004",
+    "REQ-E41-005",
+    "REQ-E41-006",
+    "REQ-E41-007"
+  ],
+  "schema_version": 1,
+  "status": "pass"
+}

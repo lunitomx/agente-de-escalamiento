@@ -42,6 +42,16 @@ e40-req-005 = "validators.e40_gates:E40RequirementGate005"
 e40-req-006 = "validators.e40_gates:E40RequirementGate006"
 e40-req-007 = "validators.e40_gates:E40RequirementGate007"
 e40-req-008 = "validators.e40_gates:E40RequirementGate008"
+e41-req-001 = "validators.e41_gates:E41RequirementGate001"
+e41-req-002 = "validators.e41_gates:E41RequirementGate002"
+e41-req-003 = "validators.e41_gates:E41RequirementGate003"
+e41-req-004 = "validators.e41_gates:E41RequirementGate004"
+e41-req-005 = "validators.e41_gates:E41RequirementGate005"
+e41-req-006 = "validators.e41_gates:E41RequirementGate006"
+e41-req-007 = "validators.e41_gates:E41RequirementGate007"
+
+[project.scripts]
+escala = "escala_server.lifecycle.cli:main"
 
 [dependency-groups]
 dev = [
@@ -80,7 +90,7 @@ testpaths = [
 ]
 
 [tool.setuptools.packages.find]
-include = ["coaching*", "validators*"]
+include = ["coaching*", "validators*", "escala_server*"]
 
 [tool.setuptools.package-data]
 "conocimiento" = ["**/*.yaml", "**/*.yml"]

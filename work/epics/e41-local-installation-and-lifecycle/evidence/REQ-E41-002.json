@@ -1,0 +1,15 @@
+{
+  "evidence": "A clean Windows target used the same manifest capability set with platform-specific recorded evidence.",
+  "negative_cases": [
+    "cross_platform_bundle_rejected",
+    "authoritative_sqlite_in_exchange_rejected",
+    "tampered_update_rejected_before_writes",
+    "interrupted_migration_safe_stop_with_backup"
+  ],
+  "platforms": [
+    "windows"
+  ],
+  "requirement_id": "REQ-E41-002",
+  "schema_version": 1,
+  "status": "pass"
+}
