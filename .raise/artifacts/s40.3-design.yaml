@@ -1,0 +1,42 @@
+artifact_type: story-design
+version: 1
+skill: rai-story-design
+created: '2026-07-22T21:25:00-06:00'
+story: 'S40.3'
+epic: 'E40'
+content:
+  summary: 'Turn owner answers into an honest partial OPSP/vision and route supported coaching requests to the existing four decision skills.'
+  complexity: complex
+  acceptance_criteria:
+    - id: AC1
+      description: 'Vision and OPSP-style fields are preserved with unresolved material decisions.'
+      verifiable: true
+    - id: AC2
+      description: 'Explicit or diagnostic-derived routes use the existing four skill commands.'
+      verifiable: true
+    - id: AC3
+      description: 'Unsupported routes are marked supported=false and ask a bounded question.'
+      verifiable: true
+  integration_points:
+    - module: 'escala_server.executive.coaching'
+      change_type: new
+      files: ['escala_server/executive/coaching.py']
+    - module: 'escala_server.executive.models'
+      change_type: modification
+      files: ['escala_server/executive/models.py']
+    - module: 'tests.test_e40_executive_cockpit'
+      change_type: modification
+      files: ['tests/test_e40_executive_cockpit.py']
+  decisions:
+    - id: D1
+      choice: 'Partial OPSP is first-class; missing fields are not defaulted.'
+      rationale: 'The skill asks an owner for explicit strategic choices and E40 must preserve uncertainty.'
+      alternatives_considered: ['Generate a complete generic OPSP', 'Reject incomplete strategy entirely']
+    - id: D2
+      choice: 'Route by explicit decision first, otherwise lowest supported score.'
+      rationale: 'Preserves user intent while retaining deterministic diagnostic guidance.'
+      alternatives_considered: ['Always route lowest score', 'Route by keyword heuristics only']
+refs:
+  backlog_item: 'eLuna-002'
+  epic_scope: 'work/epics/e40-executive-cockpit-and-coaching/scope.md'
+metadata: {}
