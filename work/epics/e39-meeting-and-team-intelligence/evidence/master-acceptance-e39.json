@@ -1,0 +1,72 @@
+{
+  "architecture": {
+    "authoritative_sqlite_sync": "forbidden",
+    "data_authority": "installer_machine",
+    "runtime_authority": "installer_machine",
+    "team_exchange": "ordinary_filesystem_documents_only"
+  },
+  "checks": [
+    {
+      "evidence": "Tres transcripts fueron aceptados y el segundo scan devolvio source_seen sin duplicar el ledger.",
+      "id": "REQ-E39-001",
+      "status": "pass"
+    },
+    {
+      "evidence": "Meeting type/date/team/participants y provenance por lineas quedaron ready o unresolved con preguntas acotadas.",
+      "id": "REQ-E39-002",
+      "status": "pass"
+    },
+    {
+      "evidence": "Facts de decision/action/owner/due_date/blocker/risk/commitment conservaron source_id, linea y confidence.",
+      "id": "REQ-E39-003",
+      "status": "pass"
+    },
+    {
+      "evidence": "RhythmRule produjo supported para evidencia completa y evidence_missing/not_assessed para ventana incompleta.",
+      "id": "REQ-E39-004",
+      "status": "pass"
+    },
+    {
+      "evidence": "Timeline sintetico detecto repeated blocker, repeated/overdue commitment, unresolved decision y trend.",
+      "id": "REQ-E39-005",
+      "status": "pass"
+    },
+    {
+      "evidence": "Executive review local mostro watch, material changes, questions y source IDs sin inventar negativos.",
+      "id": "REQ-E39-006",
+      "status": "pass"
+    },
+    {
+      "evidence": "Schedule y HTML/Markdown/JSON quedaron bajo data_root; exchange SQLite fue rechazado.",
+      "id": "REQ-E39-007",
+      "status": "pass"
+    }
+  ],
+  "company_fixture": "synthetic-nopal-foods",
+  "epic": "E39",
+  "negative_cases": [
+    "duplicate_source",
+    "context_unresolved",
+    "source_changed",
+    "evidence_missing_not_assessed",
+    "exchange_sqlite_forbidden",
+    "source_not_mutated"
+  ],
+  "requirements_proved": [
+    "REQ-E39-001",
+    "REQ-E39-002",
+    "REQ-E39-003",
+    "REQ-E39-004",
+    "REQ-E39-005",
+    "REQ-E39-006",
+    "REQ-E39-007"
+  ],
+  "schema_version": 1,
+  "status": "pass",
+  "verification_commands": [
+    "uv run rai gate check gate-tests --scope tests/test_e39_meeting_intelligence.py",
+    "uv run rai gate check gate-lint",
+    "uv run rai gate check gate-format",
+    "uv run rai gate check gate-types"
+  ]
+}

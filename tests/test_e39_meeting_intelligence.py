@@ -13,7 +13,12 @@ from escala_server.meetings import (
     build_executive_review,
     build_team_signals,
     extract_meeting_facts,
+    render_meeting_report_receipt_json,
     MeetingRecord,
+    ExecutiveReview,
+    schedule_daily_review,
+    validate_report_exchange,
+    write_executive_report,
     render_meeting_intake_receipt_json,
     scan_meeting_inbox,
 )
@@ -303,3 +308,46 @@ def test_empty_review_is_evidence_limited_without_negative_findings() -> None:
 
 def _write_meeting(config: WorkspaceConfig, filename: str, text: str) -> None:
     (config.exchange_root / filename).write_text(text, encoding="utf-8")
+
+
+def test_local_schedule_and_report_are_deterministic_and_escaped(
+    tmp_path: Path,
+) -> None:
+    config = _config(tmp_path)
+    review = ExecutiveReview(
+        review_id="a" * 64,
+        review_date=date(2026, 7, 22),
+        health="watch",
+        material_changes=("<script>alert('x')</script>",),
+        questions=("evidence_missing",),
+    )
+
+    first_schedule = schedule_daily_review(config, run_date=date(2026, 7, 22))
+    second_schedule = schedule_daily_review(config, run_date=date(2026, 7, 22))
+    first_report = write_executive_report(config, review)
+    second_report = write_executive_report(config, review)
+
+    assert first_schedule == second_schedule
+    assert first_report == second_report
+    assert first_report.html_path.startswith(".escala-meeting-reports/")
+    html = (config.data_root / first_report.html_path).read_text(encoding="utf-8")
+    markdown = (config.data_root / first_report.markdown_path).read_text(
+        encoding="utf-8"
+    )
+    assert "&lt;script&gt;" in html
+    assert "<script>" not in html
+    assert "evidence_missing" in markdown
+    assert str(tmp_path) not in html + markdown
+    receipt = render_meeting_report_receipt_json(first_report)
+    assert str(tmp_path) not in receipt
+    assert "alert('x')" not in receipt
+
+
+def test_exchange_authority_rejects_sqlite_state(tmp_path: Path) -> None:
+    config = _config(tmp_path)
+    (config.exchange_root / "shared.sqlite").write_bytes(b"not-authority")
+
+    receipt = validate_report_exchange(config)
+
+    assert receipt.status == "fail"
+    assert "authoritative_sqlite_sync_forbidden" in receipt.findings

@@ -1,0 +1,15 @@
+{
+  "evidence": "Tres transcripts fueron aceptados y el segundo scan devolvio source_seen sin duplicar el ledger.",
+  "fixture": "synthetic-nopal-foods",
+  "negative_cases": [
+    "duplicate_source",
+    "context_unresolved",
+    "source_changed",
+    "evidence_missing_not_assessed",
+    "exchange_sqlite_forbidden",
+    "source_not_mutated"
+  ],
+  "requirement_id": "REQ-E39-001",
+  "schema_version": 1,
+  "status": "pass"
+}
