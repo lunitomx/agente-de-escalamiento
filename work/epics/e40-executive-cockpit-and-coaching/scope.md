@@ -28,7 +28,7 @@ Permitir que un empresario construya un perfil de compañía mediante preguntas,
 |---|---|:---:|:---:|---|---|
 | S40.1 | Guided Onboarding and Diagnostic | L | Done | REQ-E40-001, REQ-E40-002 | Construir perfil validado y scores 0–100 separados a partir de respuestas y evidencia suministrada. |
 | S40.2 | Visual Cockpit and Pain Drill-Down | L | Done | REQ-E40-003, REQ-E40-007 | Mostrar scores, tendencias, frescura, bloqueadores y drill-down local hacia evidencia, preguntas y acción. |
-| S40.3 | Strategy and Four-Decision Coaching | L | Pending | REQ-E40-004, REQ-E40-005 | Producir visión/OPSP con pendientes y enrutar People, Strategy, Execution o Cash sin sobreafirmar. |
+| S40.3 | Strategy and Four-Decision Coaching | L | Done | REQ-E40-004, REQ-E40-005 | Producir visión/OPSP con pendientes y enrutar People, Strategy, Execution o Cash sin sobreafirmar. |
 | S40.4 | Persistent Execution and Honest Guidance | M | Pending | REQ-E40-006, REQ-E40-008 | Persistir objetivos, prioridades, tareas y continuidad local; hacer preguntas materiales y separar hechos de inferencias. |
 
 ## Scope
