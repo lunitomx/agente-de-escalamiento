@@ -1,0 +1,48 @@
+artifact_type: story-design
+version: 1
+skill: rai-story-design
+created: '2026-07-22T20:55:00-06:00'
+story: 'S40.1'
+epic: 'E40'
+content:
+  summary: 'Create a strict local onboarding and evidence-backed 0-100 diagnostic so an entrepreneur can see four decision scores without invented data.'
+  complexity: complex
+  acceptance_criteria:
+    - id: AC1
+      description: 'Profile facts, inferences, unknowns and material questions are preserved.'
+      verifiable: true
+    - id: AC2
+      description: 'People, Strategy, Execution and Cash receive deterministic bounded scores when attributed evidence exists.'
+      verifiable: true
+    - id: AC3
+      description: 'Missing/ambiguous data yields evidence_limited questions rather than a negative claim.'
+      verifiable: true
+    - id: AC4
+      description: 'Unsafe/path-bearing evidence and arbitrary fields fail closed.'
+      verifiable: true
+  integration_points:
+    - module: 'escala_server.executive.models'
+      change_type: new
+      files: ['escala_server/executive/models.py']
+    - module: 'escala_server.executive.onboarding'
+      change_type: new
+      files: ['escala_server/executive/onboarding.py']
+    - module: 'escala_server.executive.diagnostic'
+      change_type: new
+      files: ['escala_server/executive/diagnostic.py']
+    - module: 'tests.test_e40_executive_cockpit'
+      change_type: new
+      files: ['tests/test_e40_executive_cockpit.py']
+  decisions:
+    - id: D1
+      choice: 'Immutable closed Pydantic models with explicit unknown/evidence states.'
+      rationale: 'Matches E37-E39 contracts and prevents untracked claims at the boundary.'
+      alternatives_considered: ['Reuse legacy YAML dicts', 'Use dataclasses with open dictionaries']
+    - id: D2
+      choice: 'Require source IDs or explicit owner_input attribution for supported scores.'
+      rationale: 'A score must be traceable while remaining usable before a file exists.'
+      alternatives_considered: ['Score every answer regardless of provenance', 'Treat missing as zero']
+refs:
+  backlog_item: 'eLuna-002'
+  epic_scope: 'work/epics/e40-executive-cockpit-and-coaching/scope.md'
+metadata: {}
