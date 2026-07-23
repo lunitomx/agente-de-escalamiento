@@ -4,7 +4,7 @@
 - Mission readiness: `unproved`
 - Mode: `baseline`
 - Epic filter: `all`
-- Verifier source commit: `d48cc7488f7449577cbc6236eb7965d862e87a93`
+- Verifier source commit: `56e14e3778fc99c48e26863381c20d6097afffdf`
 - Ledger SHA-256: `1dbe5c06bdba1488dfeccabd95e99e2936977cd6b1759fb66fd66851a364b8c9`
 - Ledger Markdown SHA-256: `ea3961177d81dc131da3efd337ee78a5707344ea43257cfba32dda1ceabf0b47`
 - Epics: `6`
