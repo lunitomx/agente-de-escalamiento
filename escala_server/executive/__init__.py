@@ -8,6 +8,13 @@ from .cockpit import (
 )
 from .coaching import build_strategy_plan, route_coaching
 from .diagnostic import build_diagnostic
+from .guidance import build_honest_guidance
+from .persistence import (
+    PersistenceError,
+    load_execution_state,
+    save_execution_state,
+    save_state,
+)
 from .models import (
     CockpitArtifact,
     CockpitCard,
@@ -27,6 +34,14 @@ from .models import (
     PainDrillDown,
     StrategyAnswer,
     StrategyPlan,
+    ExecutionState,
+    ExecutionTask,
+    Goal,
+    GuidanceRequest,
+    HonestGuidance,
+    Priority,
+    SessionContinuity,
+    StateReceipt,
 )
 from .onboarding import build_company_profile
 
@@ -36,25 +51,38 @@ __all__ = [
     "CockpitCard",
     "CoachingRequest",
     "CoachingRoute",
+    "ExecutionState",
+    "ExecutionTask",
     "CompanyProfile",
     "DiagnosticAnswer",
     "DecisionAssessment",
     "EvidenceItem",
     "ExecutiveDiagnostic",
     "ExecutiveCockpit",
+    "Goal",
+    "GuidanceRequest",
+    "HonestGuidance",
     "OnboardingQuestion",
     "OnboardingResult",
     "ProfileAnswer",
     "ProfileField",
+    "Priority",
+    "SessionContinuity",
+    "StateReceipt",
     "PainDrillDown",
     "StrategyAnswer",
     "StrategyPlan",
     "build_cockpit",
     "build_company_profile",
     "build_diagnostic",
+    "build_honest_guidance",
     "build_strategy_plan",
     "render_cockpit_html",
     "render_cockpit_json",
     "write_cockpit",
     "route_coaching",
+    "PersistenceError",
+    "load_execution_state",
+    "save_execution_state",
+    "save_state",
 ]

@@ -10,13 +10,23 @@ from escala_server.executive import (
     EvidenceItem,
     ExecutiveDiagnostic,
     CoachingRequest,
+    ExecutionState,
+    ExecutionTask,
+    Goal,
+    GuidanceRequest,
+    Priority,
+    PersistenceError,
+    SessionContinuity,
     StrategyAnswer,
     ProfileAnswer,
     build_company_profile,
     build_diagnostic,
     render_cockpit_html,
     build_strategy_plan,
+    build_honest_guidance,
+    load_execution_state,
     route_coaching,
+    save_execution_state,
     write_cockpit,
 )
 from escala_server.executive.models import Decision
@@ -322,3 +332,120 @@ def test_coaching_does_not_claim_unsupported_people_analysis() -> None:
     assert route.supported is False
     assert route.questions
     assert "evidencia" in route.questions[0].lower()
+
+
+def test_execution_state_round_trips_goals_priorities_tasks_and_continuity(
+    tmp_path: Path,
+) -> None:
+    exchange = tmp_path / "exchange"
+    exchange.mkdir()
+    config = WorkspaceConfig(
+        platform="macos",
+        data_root=tmp_path / "data",
+        database_path=tmp_path / "data" / "escala.sqlite",
+        exchange_root=exchange,
+    )
+    state = ExecutionState(
+        goals=(
+            Goal(
+                id="g1",
+                title="Cobrar cartera",
+                owner="Ana",
+                due_date="2026-08-01",
+                progress=40,
+            ),
+        ),
+        priorities=(
+            Priority(
+                id="p1",
+                title="Reducir días de cobro",
+                owner="Ana",
+                due_date="2026-07-31",
+                progress=25,
+            ),
+        ),
+        tasks=(
+            ExecutionTask(
+                id="t1",
+                title="Confirmar saldos",
+                owner="Luis",
+                due_date="2026-07-25",
+                priority_id="p1",
+                progress=10,
+            ),
+        ),
+        continuity=SessionContinuity(
+            session_id="session-1",
+            next_prompt="Confirmar CCC",
+            pending_questions=("cash_conversion_cycle",),
+        ),
+    )
+
+    receipt = save_execution_state(config, state)
+    loaded = load_execution_state(config)
+
+    assert loaded == state
+    assert receipt.path == ".escala-executive/execution.json"
+    assert (config.data_root / ".escala-executive" / "execution.json").is_file()
+    assert list(exchange.iterdir()) == []
+
+
+def test_execution_state_rejects_database_inside_exchange(tmp_path: Path) -> None:
+    exchange = tmp_path / "exchange"
+    exchange.mkdir()
+    config = WorkspaceConfig(
+        platform="macos",
+        data_root=tmp_path / "data",
+        database_path=exchange / "shared.sqlite",
+        exchange_root=exchange,
+    )
+    state = ExecutionState(continuity=SessionContinuity(session_id="session-1"))
+
+    with pytest.raises(WorkspaceAuthorityError):
+        save_execution_state(config, state)
+
+
+def test_corrupt_execution_state_fails_without_empty_fallback(tmp_path: Path) -> None:
+    exchange = tmp_path / "exchange"
+    exchange.mkdir()
+    config = WorkspaceConfig(
+        platform="macos",
+        data_root=tmp_path / "data",
+        database_path=tmp_path / "data" / "escala.sqlite",
+        exchange_root=exchange,
+    )
+    output_dir = config.data_root / ".escala-executive"
+    output_dir.mkdir(parents=True)
+    (output_dir / "execution.json").write_text("{not-json", encoding="utf-8")
+
+    with pytest.raises(PersistenceError):
+        load_execution_state(config)
+
+
+def test_honest_guidance_separates_facts_inferences_and_unknowns() -> None:
+    guidance = build_honest_guidance(
+        GuidanceRequest(
+            topic="cash",
+            facts=("Ventas de junio: 1.2M",),
+            inferences=("Cobranza podría ser el cuello de botella",),
+            unknowns=("cash_conversion_cycle",),
+            question="¿Cuál es nuestro CCC?",
+        )
+    )
+
+    assert guidance.status == "evidence_limited"
+    assert guidance.facts == ("Ventas de junio: 1.2M",)
+    assert guidance.inferences == ("Cobranza podría ser el cuello de botella",)
+    assert guidance.unknowns == ("cash_conversion_cycle",)
+    assert guidance.questions == ("¿Cuál es nuestro CCC?",)
+    assert "cash_conversion_cycle" in guidance.next_action
+
+
+def test_honest_guidance_does_not_invent_when_question_is_unbounded() -> None:
+    guidance = build_honest_guidance(GuidanceRequest(topic="strategy"))
+
+    assert guidance.status == "evidence_limited"
+    assert guidance.facts == ()
+    assert guidance.inferences == ()
+    assert guidance.unknowns == ("strategy",)
+    assert guidance.questions
