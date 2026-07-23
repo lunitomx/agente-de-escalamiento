@@ -1,0 +1,15 @@
+{
+  "evidence": "Goals, priority, task, owner, due dates, progress and session continuity round-tripped through local execution.json.",
+  "fixture": "synthetic-nopal-foods",
+  "negative_cases": [
+    "missing_profile_field",
+    "missing_decision_evidence",
+    "html_escaping",
+    "exchange_sqlite_forbidden",
+    "corrupt_state_rejected",
+    "unsupported_route_no_claim"
+  ],
+  "requirement_id": "REQ-E40-006",
+  "schema_version": 1,
+  "status": "pass"
+}

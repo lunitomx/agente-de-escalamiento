@@ -1,0 +1,15 @@
+{
+  "evidence": "People, Strategy, Execution and Cash each received a deterministic attributed 0-100 assessment.",
+  "fixture": "synthetic-nopal-foods",
+  "negative_cases": [
+    "missing_profile_field",
+    "missing_decision_evidence",
+    "html_escaping",
+    "exchange_sqlite_forbidden",
+    "corrupt_state_rejected",
+    "unsupported_route_no_claim"
+  ],
+  "requirement_id": "REQ-E40-002",
+  "schema_version": 1,
+  "status": "pass"
+}

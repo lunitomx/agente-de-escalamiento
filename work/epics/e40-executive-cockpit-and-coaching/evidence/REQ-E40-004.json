@@ -1,0 +1,15 @@
+{
+  "evidence": "Partial OPSP retained purpose/BHAG and exposed unresolved critical sections; complete plan remained owner-supplied.",
+  "fixture": "synthetic-nopal-foods",
+  "negative_cases": [
+    "missing_profile_field",
+    "missing_decision_evidence",
+    "html_escaping",
+    "exchange_sqlite_forbidden",
+    "corrupt_state_rejected",
+    "unsupported_route_no_claim"
+  ],
+  "requirement_id": "REQ-E40-004",
+  "schema_version": 1,
+  "status": "pass"
+}

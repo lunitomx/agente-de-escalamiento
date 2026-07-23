@@ -12,38 +12,6 @@
   },
   "blocking_requirements": [
     {
-      "requirement_id": "REQ-E40-001",
-      "rule_id": "evidence.missing"
-    },
-    {
-      "requirement_id": "REQ-E40-002",
-      "rule_id": "evidence.missing"
-    },
-    {
-      "requirement_id": "REQ-E40-003",
-      "rule_id": "evidence.missing"
-    },
-    {
-      "requirement_id": "REQ-E40-004",
-      "rule_id": "evidence.missing"
-    },
-    {
-      "requirement_id": "REQ-E40-005",
-      "rule_id": "evidence.missing"
-    },
-    {
-      "requirement_id": "REQ-E40-006",
-      "rule_id": "evidence.missing"
-    },
-    {
-      "requirement_id": "REQ-E40-007",
-      "rule_id": "evidence.missing"
-    },
-    {
-      "requirement_id": "REQ-E40-008",
-      "rule_id": "evidence.missing"
-    },
-    {
       "requirement_id": "REQ-E41-001",
       "rule_id": "evidence.missing"
     },
@@ -99,12 +67,12 @@
   "contract_status": "pass",
   "epic_count": 6,
   "epic_filter": null,
-  "ledger_markdown_sha256": "ea3961177d81dc131da3efd337ee78a5707344ea43257cfba32dda1ceabf0b47",
+  "ledger_markdown_sha256": "d3849de7d4000698870df0ab6c777393213126a4ddd386ec12d9a04ca264aa79",
   "ledger_sha256": "1dbe5c06bdba1488dfeccabd95e99e2936977cd6b1759fb66fd66851a364b8c9",
   "mission_id": "escala-local-v2-plan-maestro-2607202112",
   "mission_readiness": "unproved",
   "mode": "baseline",
-  "proved_count": 21,
+  "proved_count": 29,
   "proved_ids": [
     "REQ-E37-001",
     "REQ-E37-002",
@@ -126,10 +94,18 @@
     "REQ-E39-004",
     "REQ-E39-005",
     "REQ-E39-006",
-    "REQ-E39-007"
+    "REQ-E39-007",
+    "REQ-E40-001",
+    "REQ-E40-002",
+    "REQ-E40-003",
+    "REQ-E40-004",
+    "REQ-E40-005",
+    "REQ-E40-006",
+    "REQ-E40-007",
+    "REQ-E40-008"
   ],
   "requirement_count": 42,
   "schema_version": 1,
-  "unproved_count": 21,
-  "verifier_source_commit": "56e14e3778fc99c48e26863381c20d6097afffdf"
+  "unproved_count": 13,
+  "verifier_source_commit": "73195dd1ca8d8f1d3d5f09756dd31864368ff932"
 }

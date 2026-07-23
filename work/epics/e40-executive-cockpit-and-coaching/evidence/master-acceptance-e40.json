@@ -1,0 +1,78 @@
+{
+  "architecture": {
+    "authoritative_sqlite_sync": "forbidden",
+    "data_authority": "installer_machine",
+    "runtime_authority": "installer_machine",
+    "team_exchange": "ordinary_filesystem_documents_only"
+  },
+  "checks": [
+    {
+      "evidence": "Nopal Foods profile validated with five required facts and no unresolved fields.",
+      "id": "REQ-E40-001",
+      "status": "pass"
+    },
+    {
+      "evidence": "People, Strategy, Execution and Cash each received a deterministic attributed 0-100 assessment.",
+      "id": "REQ-E40-002",
+      "status": "pass"
+    },
+    {
+      "evidence": "Cash was selected as supported pain and drilled to cash-001, freshness, blocker and next action.",
+      "id": "REQ-E40-003",
+      "status": "pass"
+    },
+    {
+      "evidence": "Partial OPSP retained purpose/BHAG and exposed unresolved critical sections; complete plan remained owner-supplied.",
+      "id": "REQ-E40-004",
+      "status": "pass"
+    },
+    {
+      "evidence": "Explicit Cash routed to /escala-cash; People without evidence returned supported=false and a question.",
+      "id": "REQ-E40-005",
+      "status": "pass"
+    },
+    {
+      "evidence": "Goals, priority, task, owner, due dates, progress and session continuity round-tripped through local execution.json.",
+      "id": "REQ-E40-006",
+      "status": "pass"
+    },
+    {
+      "evidence": "Cockpit HTML/JSON were written below data_root with relative artifact paths and no exchange writes.",
+      "id": "REQ-E40-007",
+      "status": "pass"
+    },
+    {
+      "evidence": "Guidance preserved facts, inference and unknown CCC while asking a material question; invalid authority failed closed.",
+      "id": "REQ-E40-008",
+      "status": "pass"
+    }
+  ],
+  "company_fixture": "synthetic-nopal-foods",
+  "epic": "E40",
+  "negative_cases": [
+    "missing_profile_field",
+    "missing_decision_evidence",
+    "html_escaping",
+    "exchange_sqlite_forbidden",
+    "corrupt_state_rejected",
+    "unsupported_route_no_claim"
+  ],
+  "requirements_proved": [
+    "REQ-E40-001",
+    "REQ-E40-002",
+    "REQ-E40-003",
+    "REQ-E40-004",
+    "REQ-E40-005",
+    "REQ-E40-006",
+    "REQ-E40-007",
+    "REQ-E40-008"
+  ],
+  "schema_version": 1,
+  "status": "pass",
+  "verification_commands": [
+    "uv run rai gate check gate-tests --scope tests/test_e40_executive_cockpit.py",
+    "uv run rai gate check gate-lint",
+    "uv run rai gate check gate-format",
+    "uv run rai gate check gate-types"
+  ]
+}

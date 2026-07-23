@@ -488,8 +488,8 @@ requirements:
       data_authority: installer_machine
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
-    delivery_disposition: active
-    proof: {state: unproved, blockers: [evidence.missing]}
+    delivery_disposition: complete
+    proof: {state: proved, receipt_sha256: 04d0bb76dd08ee2454776e942dba48b4afc5d6f75137582dfc5a033a062c63b7}
   - id: REQ-E40-002
     owner: {epic: E40, story: S40.1}
     source_ids: [SRC-COACH-001, SRC-COCKPIT-001, SRC-EVIDENCE-001]
@@ -505,8 +505,8 @@ requirements:
       data_authority: installer_machine
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
-    delivery_disposition: active
-    proof: {state: unproved, blockers: [evidence.missing]}
+    delivery_disposition: complete
+    proof: {state: proved, receipt_sha256: c8f3381a3fcf4f67d61862ec00ac42afa7e7acd7df9483cf1cc3b041c9ee60c9}
   - id: REQ-E40-003
     owner: {epic: E40, story: S40.2}
     source_ids: [SRC-COACH-001, SRC-COCKPIT-001]
@@ -522,8 +522,8 @@ requirements:
       data_authority: installer_machine
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
-    delivery_disposition: active
-    proof: {state: unproved, blockers: [evidence.missing]}
+    delivery_disposition: complete
+    proof: {state: proved, receipt_sha256: f5bc396af28333ce5b0e3a70f522a4aa41ad0c051ee8616cf18568fd701711fe}
   - id: REQ-E40-004
     owner: {epic: E40, story: S40.3}
     source_ids: [SRC-COACH-001, SRC-EVIDENCE-001]
@@ -539,8 +539,8 @@ requirements:
       data_authority: installer_machine
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
-    delivery_disposition: active
-    proof: {state: unproved, blockers: [evidence.missing]}
+    delivery_disposition: complete
+    proof: {state: proved, receipt_sha256: 9b1468048129250d6fc6b0fd5daa96349c8510db16b1677421a9c9c05653b871}
   - id: REQ-E40-005
     owner: {epic: E40, story: S40.3}
     source_ids: [SRC-COACH-001, SRC-EVIDENCE-001]
@@ -556,8 +556,8 @@ requirements:
       data_authority: installer_machine
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
-    delivery_disposition: active
-    proof: {state: unproved, blockers: [evidence.missing]}
+    delivery_disposition: complete
+    proof: {state: proved, receipt_sha256: 03b02d78e98d6587531603281c77a7d4194069b8cd3b15c629ac140481f4a2b8}
   - id: REQ-E40-006
     owner: {epic: E40, story: S40.4}
     source_ids: [SRC-COACH-001, SRC-LOCAL-001]
@@ -573,8 +573,8 @@ requirements:
       data_authority: installer_machine
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
-    delivery_disposition: active
-    proof: {state: unproved, blockers: [evidence.missing]}
+    delivery_disposition: complete
+    proof: {state: proved, receipt_sha256: 228e8121f577626292fe9230368ff3681c2d70968ba88c5214b8e1921d07b0a7}
   - id: REQ-E40-007
     owner: {epic: E40, story: S40.2}
     source_ids: [SRC-COCKPIT-001, SRC-EVIDENCE-001]
@@ -590,8 +590,8 @@ requirements:
       data_authority: installer_machine
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
-    delivery_disposition: active
-    proof: {state: unproved, blockers: [evidence.missing]}
+    delivery_disposition: complete
+    proof: {state: proved, receipt_sha256: e5d45d4036bdd5d8b408f5eafa8bef24968e5bbfbf32162f1de5f0aa07ef7e12}
   - id: REQ-E40-008
     owner: {epic: E40, story: S40.4}
     source_ids: [SRC-COACH-001, SRC-EVIDENCE-001]
@@ -607,8 +607,8 @@ requirements:
       data_authority: installer_machine
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
-    delivery_disposition: active
-    proof: {state: unproved, blockers: [evidence.missing]}
+    delivery_disposition: complete
+    proof: {state: proved, receipt_sha256: d4a664546937463cedf332d9af4d2825ca9df3a82bd30a5d111eafa512bec6ee}
   - id: REQ-E41-001
     owner: {epic: E41, story: S41.1}
     source_ids: [SRC-INSTALL-001, SRC-LOCAL-001]
