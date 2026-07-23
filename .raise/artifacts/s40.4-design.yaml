@@ -1,0 +1,48 @@
+artifact_type: story-design
+version: 1
+skill: rai-story-design
+created: '2026-07-22T21:45:00-06:00'
+story: 'S40.4'
+epic: 'E40'
+content:
+  summary: 'Persist local execution continuity and produce guidance that separates facts, inferences and unknowns.'
+  complexity: moderate
+  acceptance_criteria:
+    - id: AC1
+      description: 'Execution state round-trips goals, priorities, tasks, owners, due dates, progress and continuity locally.'
+      verifiable: true
+    - id: AC2
+      description: 'Authority validation fails before invalid exchange writes.'
+      verifiable: true
+    - id: AC3
+      description: 'Guidance labels facts/inferences/unknowns and asks material questions.'
+      verifiable: true
+    - id: AC4
+      description: 'Corrupt state does not produce an invented fallback.'
+      verifiable: true
+  integration_points:
+    - module: 'escala_server.executive.persistence'
+      change_type: new
+      files: ['escala_server/executive/persistence.py']
+    - module: 'escala_server.executive.guidance'
+      change_type: new
+      files: ['escala_server/executive/guidance.py']
+    - module: 'escala_server.executive.models'
+      change_type: modification
+      files: ['escala_server/executive/models.py']
+    - module: 'tests.test_e40_executive_cockpit'
+      change_type: modification
+      files: ['tests/test_e40_executive_cockpit.py']
+  decisions:
+    - id: D1
+      choice: 'Use a deterministic derived JSON snapshot below data_root.'
+      rationale: 'Keeps E37 SQLite authority unchanged while making continuity inspectable and portable as local files.'
+      alternatives_considered: ['Add new SQLite tables', 'Write state into exchange folder']
+    - id: D2
+      choice: 'Guidance returns explicit lists for facts, inferences and unknowns.'
+      rationale: 'The director can see what is known and what must be verified before acting.'
+      alternatives_considered: ['Return one prose paragraph', 'Collapse inference into fact']
+refs:
+  backlog_item: 'eLuna-002'
+  epic_scope: 'work/epics/e40-executive-cockpit-and-coaching/scope.md'
+metadata: {}
