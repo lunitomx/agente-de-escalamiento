@@ -42,3 +42,11 @@
 | Audio/video transcription and OCR | E39 design | Low | A local sample proves text transcripts are insufficient and a privacy/performance contract exists |
 | Calendar, Slack, Teams, email or issue integrations | E39 design | Low | A new product decision changes the local-files-only boundary and defines credentials/consent |
 | Psychological or performance inference from meeting language | E39 design | Rejected | Requires a separate ethical/product decision; E39 only reports observable evidence |
+
+## From E43-E46: Agentic learning roadmap
+
+| Item | Origin | Priority | Promotion Condition |
+|------|--------|----------|-------------------|
+| Centralized cross-company learning or model training | E46 design | Rejected | Requires a new product decision, data agreements, anonymization review, legal approval, and a change to the local-only boundary |
+| Automatic application of skill, prompt, or code changes | E46 design | Rejected | E46 may prepare evidence and a reversible proposal; a named human must approve each promotion |
+| Permanent multi-agent execution for ordinary questions | E45 design | Rejected | Only reconsider if a measured pilot proves more business value than its added time and complexity |
