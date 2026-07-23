@@ -177,3 +177,55 @@ class ExecutiveDiagnostic(_StrictModel):
             if item.decision == decision:
                 return item
         raise KeyError(decision)
+
+
+class CockpitCard(_StrictModel):
+    """One visual decision card projected from a diagnostic assessment."""
+
+    decision: Decision
+    score: int | None = Field(default=None, ge=0, le=100)
+    status: EvidenceStatus
+    freshness: Freshness = "unknown"
+    evidence_count: int = Field(ge=0)
+    blockers: tuple[str, ...] = ()
+    questions: tuple[str, ...] = ()
+    recommended_action: str = Field(min_length=1, max_length=240)
+
+
+class PainDrillDown(_StrictModel):
+    """Evidence-first explanation of the selected pain/focus."""
+
+    decision: Decision | None = None
+    score: int | None = Field(default=None, ge=0, le=100)
+    source_ids: tuple[str, ...] = ()
+    freshness: Freshness = "unknown"
+    blockers: tuple[str, ...] = ()
+    questions: tuple[str, ...] = ()
+    next_action: str = Field(min_length=1, max_length=240)
+
+
+class ExecutiveCockpit(_StrictModel):
+    """Local visual cockpit projection with an honest focus state."""
+
+    schema_version: Literal[1] = 1
+    cards: tuple[CockpitCard, ...]
+    focus_decision: Decision | None = None
+    drill_down: PainDrillDown
+    status: Literal["supported", "evidence_limited", "unresolved"]
+
+    def card_for(self, decision: Decision) -> CockpitCard:
+        """Return a card for a known decision."""
+
+        for card in self.cards:
+            if card.decision == decision:
+                return card
+        raise KeyError(decision)
+
+
+class CockpitArtifact(_StrictModel):
+    """Safe relative paths and content hash for a local cockpit export."""
+
+    schema_version: Literal[1] = 1
+    html_path: str = Field(pattern=r"^\.escala-executive/cockpit\.html$")
+    json_path: str = Field(pattern=r"^\.escala-executive/cockpit\.json$")
+    content_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")

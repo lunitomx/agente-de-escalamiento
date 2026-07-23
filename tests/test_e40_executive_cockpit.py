@@ -2,15 +2,21 @@ from __future__ import annotations
 
 import pytest
 from pydantic import ValidationError
+from pathlib import Path
 
 from escala_server.executive import (
+    build_cockpit,
     DiagnosticAnswer,
     EvidenceItem,
+    ExecutiveDiagnostic,
     ProfileAnswer,
     build_company_profile,
     build_diagnostic,
+    render_cockpit_html,
+    write_cockpit,
 )
 from escala_server.executive.models import Decision
+from escala_server.workspace.authority import WorkspaceAuthorityError, WorkspaceConfig
 
 
 def test_profile_preserves_unknowns_and_material_questions() -> None:
@@ -123,3 +129,117 @@ def test_closed_models_reject_arbitrary_fields() -> None:
         ProfileAnswer.model_validate(
             {"key": "industry", "value": "alimentos", "status": "fact", "leaked": "no"}
         )
+
+
+def _supported_diagnostic() -> ExecutiveDiagnostic:
+    return build_diagnostic(
+        (
+            DiagnosticAnswer(
+                decision="people", score=64, source_ids=("people-source",)
+            ),
+            DiagnosticAnswer(
+                decision="strategy", score=51, source_ids=("strategy-source",)
+            ),
+            DiagnosticAnswer(
+                decision="execution", score=73, source_ids=("execution-source",)
+            ),
+            DiagnosticAnswer(
+                decision="cash",
+                score=42,
+                source_ids=("cash-source",),
+                freshness="stale",
+                blocker="Cobranza atrasada",
+            ),
+        )
+    )
+
+
+def test_cockpit_selects_supported_pain_and_drills_to_evidence() -> None:
+    cockpit = build_cockpit(_supported_diagnostic())
+
+    assert cockpit.focus_decision == "cash"
+    assert cockpit.drill_down.source_ids == ("cash-source",)
+    assert cockpit.drill_down.freshness == "stale"
+    assert cockpit.drill_down.blockers == ("Cobranza atrasada",)
+    assert cockpit.drill_down.next_action
+    assert len(cockpit.cards) == 4
+
+
+def test_cockpit_does_not_turn_missing_evidence_into_pain() -> None:
+    diagnostic = build_diagnostic(
+        (
+            DiagnosticAnswer(
+                decision="people", score=70, source_ids=("people-source",)
+            ),
+            DiagnosticAnswer(decision="cash", score=55, source_ids=("cash-source",)),
+        )
+    )
+
+    cockpit = build_cockpit(diagnostic)
+
+    assert cockpit.focus_decision == "cash"
+    assert cockpit.card_for("strategy").status == "evidence_limited"
+    assert cockpit.card_for("strategy").score is None
+
+
+def test_cockpit_html_is_escaped_and_deterministic() -> None:
+    diagnostic = build_diagnostic(
+        (
+            DiagnosticAnswer(
+                decision="cash",
+                score=30,
+                source_ids=("cash-source",),
+                blocker="<script>alert('x')</script>",
+            ),
+        )
+    )
+    first = render_cockpit_html(build_cockpit(diagnostic))
+    second = render_cockpit_html(build_cockpit(diagnostic))
+
+    assert first == second
+    assert "&lt;script&gt;" in first
+    assert "<script>alert" not in first
+    assert "https://" not in first
+
+
+def test_write_cockpit_is_local_deterministic_and_does_not_touch_exchange(
+    tmp_path: Path,
+) -> None:
+    root = tmp_path
+    exchange = root / "exchange"
+    exchange.mkdir()
+    config = WorkspaceConfig(
+        platform="macos",
+        data_root=root / "data",
+        database_path=root / "data" / "escala.sqlite",
+        exchange_root=exchange,
+    )
+    cockpit = build_cockpit(_supported_diagnostic())
+
+    first = write_cockpit(config, cockpit)
+    first_html = (config.data_root / ".escala-executive" / "cockpit.html").read_text()
+    second = write_cockpit(config, cockpit)
+    second_html = (config.data_root / ".escala-executive" / "cockpit.html").read_text()
+
+    assert first == second
+    assert first_html == second_html
+    assert first.html_path == ".escala-executive/cockpit.html"
+    assert first.json_path == ".escala-executive/cockpit.json"
+    assert list(exchange.iterdir()) == []
+
+
+def test_write_cockpit_rejects_authoritative_database_inside_exchange(
+    tmp_path: Path,
+) -> None:
+    root = tmp_path
+    exchange = root / "exchange"
+    exchange.mkdir()
+    config = WorkspaceConfig(
+        platform="macos",
+        data_root=root / "data",
+        database_path=exchange / "shared.sqlite",
+        exchange_root=exchange,
+    )
+
+    with pytest.raises(WorkspaceAuthorityError):
+        write_cockpit(config, build_cockpit(_supported_diagnostic()))
