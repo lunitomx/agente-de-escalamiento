@@ -1,6 +1,7 @@
 ---
-description: 'Sub-agente Cash. Guía la decisión de Cash: Ciclo de Conversión de Efectivo (CCC), Power
-  of One, cash acceleration strategies.'
+description: >-
+  Sub-agente Cash. Guía la decisión de Cash: CCC, Power of One, cash
+  acceleration. Backend engine en escala_server/cash/.
 name: escala-cash
 ---
 
@@ -8,20 +9,14 @@ name: escala-cash
 
 ## Purpose
 
-Entry point del sub-agente de Cash. Evalúa salud financiera operativa y guía optimización del flujo de efectivo.
-
-## Context
-
-**When to use:** Cuando el diagnóstico ruta a Cash, o el usuario quiere optimizar flujo de efectivo.
+Entry point del sub-agente de Cash. Evalúa salud financiera operativa y guía
+optimización del flujo de efectivo. Usa el motor backend en `escala_server/cash/`.
 
 ## Steps
 
 ### Step 1: Load Context
 
-Leer:
-- `.escala/agent/sub-agents/cash.md`
-- `.escala/agent/memory/company-profile.yaml`
-- `.escala/knowledge/cash/overview.md`
+Leer `.escala/agent/sub-agents/cash.md`, company profile, overview.
 
 ### Step 2: Check Existing Work
 
@@ -33,16 +28,22 @@ ls work/cash/ 2>/dev/null
 
 | Estado | Recomendación |
 |--------|--------------|
-| Sin trabajo previo | `/escala-cash-ccc` — mapear Ciclo de Conversión de Efectivo (CCC) |
-| CCC mapeado | `/escala-cash-power1` — análisis Análisis Power of One |
-| Análisis Power of One hecho | `/escala-cash-acceleration` — estrategias de aceleración |
-| Todo hecho | Re-mapear CCC, medir mejoras |
+| Sin trabajo previo | `/escala-cash-ccc` — mapear CCC |
+| CCC mapeado | `/escala-cash-power1` — Power of One |
+| Power of One hecho | `/escala-cash-acceleration` |
+| Todo hecho | Re-mapear, medir mejoras |
 
-### Step 4: Guide
+### Step 4: Use Backend Engine
 
-Enfatizar: "El cash es el oxígeno del crecimiento. El crecimiento chupa cash — si no lo gestionas, el éxito mismo puede matarte."
+Para cálculos precisos, usar `POST /api/cash/power-of-one` con financials + adjustments.
+El motor está en `escala_server/cash/__init__.py` (PowerOfOneEngine).
 
-Nota: Este sub-agente NO da asesoría financiera. Guía el análisis operativo del ciclo de cash usando las herramientas de Escalamiento de Negocios.
+## Language Rules
+
+- NO usar jerga financiera sin tooltip: "días en cobrar" en vez de "DSO"
+- Benchmarks por industria en `escala-cash-power1`
+- Dar crédito: Alan Miltz (metodología) · Humberto Martínez Barón (implementación)
+- Verne debe opinar después de cada cálculo
 
 ## Output
 
@@ -50,5 +51,8 @@ Nota: Este sub-agente NO da asesoría financiera. Guía el análisis operativo d
 |------|-------------|
 | Work artifacts | `work/cash/` |
 | Next | Skill específico de Cash |
+| Backend engine | `escala_server/cash/__init__.py` |
 
 ---
+
+*Metodología: Alan Miltz. Implementación original: Humberto Martínez Barón. Adaptación: Kokoro.*

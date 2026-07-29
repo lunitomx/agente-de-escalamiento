@@ -1,47 +1,43 @@
 ---
-description: 'Mapea el Ciclo de Conversión de Efectivo (CCC) completo: sales cycle, delivery cycle
-  y collection cycle en días.'
+description: >-
+  Mapea el Ciclo de Conversión de Efectivo (CCC) con DSO/DIO/DPO (365 días).
+  Basado en Alan Miltz. Identifica qué aprieta el cash flow.
 name: escala-cash-ccc
 ---
 
-# Escalamiento Cash — Ciclo de Conversión de Efectivo (CCC)
+# Escalamiento Cash — CCC (Ciclo de Efectivo)
 
 ## Purpose
 
-Mapear el CCC completo de la empresa: cuántos días tarda un peso invertido en regresar como cash cobrado.
+Mapear el CCC: días que tarda tu dinero en regresar como cash. Identificar
+si el problema es cobro, inventario o pagos.
+
+## ⚠️ Reglas
+
+Base **365 días**, NO 30. Idioma humano (tooltips). Fórmulas:
+
+```
+DSO = Cuentas x Cobrar / (Ventas Anuales / 365)
+DIO = Inventario / (COGS Anual / 365)
+DPO = Cuentas x Pagar / (COGS Anual / 365)
+CCC = DSO + DIO - DPO
+```
+
+| CCC | Significa |
+|-----|-----------|
+| > 60d | Peligro. Cobranza urgente |
+| 30-60d | Regular. Revisar componente más largo |
+| < 30d | Sano |
+| Negativo | Proveedores te financian (común en SaaS) |
 
 ## Steps
 
-### Step 1: Load Context
-
-Leer `.escala/knowledge/cash/tools/cash-conversion-cycle.md`.
-Cargar template `templates/cash-conversion-cycle.md`.
-
-### Step 2: Map Sales Cycle
-
-Cuántos días desde primer contacto hasta contrato firmado. Desglosar etapas.
-
-### Step 3: Map Delivery Cycle
-
-Cuántos días desde contrato hasta entrega completada.
-
-### Step 4: Map Collection Cycle
-
-Cuántos días desde facturación hasta dinero en banco.
-
-### Step 5: Calculate & Identify Opportunities
-
-CCC = Sales + Delivery + Collection. Identificar qué componente es más largo y dónde hay oportunidades de reducción.
-
-### Step 6: Save
-
-Guardar en `work/cash/ccc-analysis.md`.
-
-## Output
-
-| Item | Destination |
-|------|-------------|
-| CCC Analysis | `work/cash/ccc-analysis.md` |
-| Next | `/escala-cash-power1` |
+1. Preguntar datos en humano: ventas, costo, cuentas x cobrar, inventario, cuentas x pagar
+2. Calcular DSO/DIO/DPO/CCC
+3. Identificar cuál de los 3 aprieta más
+4. Recomendar acción con Verne
+5. Guardar en `work/cash/ccc-analysis.md`
 
 ---
+
+*Metodología: Alan Miltz. Implementación: Humberto Martínez Barón. Adaptación: Kokoro.*
