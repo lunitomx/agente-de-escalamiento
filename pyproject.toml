@@ -8,6 +8,7 @@ version = "1.0.0"
 description = "Motor de coaching del Agente de Escalamiento"
 requires-python = ">=3.10"
 dependencies = [
+    "fpdf2>=2.8.7",
     "pydantic>=2.0",
     "pyyaml>=6.0",
 ]

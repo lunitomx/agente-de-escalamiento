@@ -527,13 +527,15 @@ def _maybe_generate_pdf(markdown_text: str) -> str:
             from fpdf import FPDF  # type: ignore[import-untyped]
         except ImportError:
             return "fpdf import failed"
+        from fpdf.enums import XPos, YPos  # type: ignore[import-untyped]
+
         pdf = FPDF()
         pdf.add_page()
-        pdf.set_font("Arial", size=12)
+        pdf.set_font("Helvetica", size=12)
         for line in markdown_text.splitlines():
             # FPDF's cell/encoding can choke on some characters; replace common ones.
             safe_line = line.encode("latin-1", "replace").decode("latin-1")
-            pdf.cell(0, 6, safe_line, ln=True)
+            pdf.cell(0, 6, safe_line, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
         pdf.output(str(CATALOG_PDF_PATH))
         return "generated"
 
