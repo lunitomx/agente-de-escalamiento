@@ -325,3 +325,41 @@ class TestRun:
         )
         assert result["errors"]
         assert any("horizon" in err.lower() for err in result["errors"])
+
+
+class TestSkillAdapterSmoke:
+    def test_skill_context_returns_expected_contract(self):
+        """Simulate the JSON context the escala-decision skill sends."""
+        from coaching.decision import run
+
+        context = {
+            "action": "question",
+            "question": "¿Debería contratar a María para ventas?",
+            "base_path": ".",
+        }
+        result = run(context)
+        assert "output" in result
+        assert "artifacts" in result
+        assert "errors" in result
+        assert result["errors"] == []
+        assert result["artifacts"]["draft"]["area"] == "people"
+
+    def test_skill_confirm_context_persists(self, tmp_path):
+        from coaching.decision import run
+
+        context = {
+            "action": "confirm",
+            "draft": {
+                "decision": "reducir días de cobro",
+                "area": "cash",
+                "horizon": "corto",
+                "outcome": "mejorar cash flow",
+            },
+            "base_path": str(tmp_path),
+        }
+        result = run(context)
+        assert result["errors"] == []
+        assert result["artifacts"]["action"] == "confirmed"
+        assert (
+            tmp_path / ".scaleup" / "agent" / "memory" / "company-profile.yaml"
+        ).exists()
