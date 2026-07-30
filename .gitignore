@@ -53,6 +53,7 @@ Thumbs.db
 .agents/
 .hermes/
 .codex/
+.codex-plugin/
 
 # === Generated user data (exports, not source) ===
 .scaleup/my-company/exports/
