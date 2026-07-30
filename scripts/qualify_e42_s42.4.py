@@ -18,7 +18,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-EVIDENCE_DIR = ROOT / "work/epics/e42-product-qualification-and-functional-catalog/evidence"
+EVIDENCE_DIR = (
+    ROOT / "work/epics/e42-product-qualification-and-functional-catalog/evidence"
+)
 SKILLS_DIR = ROOT / "escala-skills"
 CATALOG_PATH = EVIDENCE_DIR / "catalog.md"
 CATALOG_PDF_PATH = EVIDENCE_DIR / "catalog.pdf"
@@ -149,7 +151,9 @@ def _inventory_from_s42_2(
                 positive_case=_as_string_or_none(raw.get("positive_case")),
                 negative_case=_as_string_or_none(raw.get("negative_case")),
                 demonstrated=bool(raw.get("demonstrated", False)),
-                demonstration_method=str(raw.get("demonstration_method", "not-invoked")),
+                demonstration_method=str(
+                    raw.get("demonstration_method", "not-invoked")
+                ),
             )
         )
     return skills
@@ -165,7 +169,11 @@ def _inventory_from_filesystem() -> list[SkillEntry]:
         if not skill_file.is_file():
             continue
         text = skill_file.read_text(encoding="utf-8")
-        description = _front_matter_value(text, "description") or _first_heading_paragraph(text) or "Skill descubierto"
+        description = (
+            _front_matter_value(text, "description")
+            or _first_heading_paragraph(text)
+            or "Skill descubierto"
+        )
         skills.append(
             SkillEntry(
                 id=skill_dir.name,
@@ -252,7 +260,11 @@ def _platform_text(platform_matrix: object) -> str:
         names = sorted(platform_matrix.keys())
         return ", ".join(str(name) for name in names) if names else "pendiente"
     if isinstance(platform_matrix, list):
-        return ", ".join(str(p) for p in platform_matrix) if platform_matrix else "pendiente"
+        return (
+            ", ".join(str(p) for p in platform_matrix)
+            if platform_matrix
+            else "pendiente"
+        )
     return "pendiente"
 
 
@@ -267,10 +279,10 @@ def _render_catalog(
     lines: list[str] = [
         "# Catálogo funcional de ESCALA",
         "",
-        f"- **Épica:** E42 — Producto probado y catálogo verdadero",
-        f"- **Historia:** S42.4 — Catálogo, PDF y aceptación humana",
+        "- **Épica:** E42 — Producto probado y catálogo verdadero",
+        "- **Historia:** S42.4 — Catálogo, PDF y aceptación humana",
         f"- **Commit fuente:** `{source_commit}`",
-        f"- **Generado:** automáticamente desde la evidencia de S42.1, S42.2 y S42.3",
+        "- **Generado:** automáticamente desde la evidencia de S42.1, S42.2 y S42.3",
         "",
         "> Este documento traduce la evidencia técnica a lenguaje de negocio. Cada afirmación enlaza con el recibo de evidencia que la respalda. La aceptación humana requisito por requisito se registra aparte.",
         "",
@@ -326,9 +338,7 @@ def _render_catalog(
                 step_id = step.get("id", "paso")
                 description = step.get("description", "Paso del recorrido")
                 status = step.get("status", "unknown")
-                rows.append(
-                    f"| {step_id} | {description} | S42.1 | {status} |"
-                )
+                rows.append(f"| {step_id} | {description} | S42.1 | {status} |")
 
     # Skill rows derived from S42.2 or the live inventory.
     skill_source = "S42.2" if s42_2 else "inventario local"
@@ -380,11 +390,15 @@ def _render_catalog(
         for scenario in scenarios:
             if isinstance(scenario, dict):
                 scenario_id = scenario.get("id", "escenario")
-                message = scenario.get("business_message", scenario.get("expected", "—"))
+                message = scenario.get(
+                    "business_message", scenario.get("expected", "—")
+                )
                 status = scenario.get("status", "unknown")
                 lines.append(f"| {scenario_id} | {message} | {status} |")
     else:
-        lines.append("| Escenarios de seguridad y recuperación | Resultado comprensible y recuperable, sin pérdida de datos locales | pendiente |")
+        lines.append(
+            "| Escenarios de seguridad y recuperación | Resultado comprensible y recuperable, sin pérdida de datos locales | pendiente |"
+        )
     lines.append("")
 
     # Requirements mapping.
@@ -426,11 +440,17 @@ def _render_catalog(
 
     limitations: list[str] = []
     if s42_1 is None:
-        limitations.append("El recorrido completo aún no ha sido registrado (falta evidencia S42.1).")
+        limitations.append(
+            "El recorrido completo aún no ha sido registrado (falta evidencia S42.1)."
+        )
     if s42_2 is None:
-        limitations.append("El inventario de skills aún no ha sido probado con invocaciones reales (falta evidencia S42.2).")
+        limitations.append(
+            "El inventario de skills aún no ha sido probado con invocaciones reales (falta evidencia S42.2)."
+        )
     if s42_3 is None:
-        limitations.append("Los escenarios de seguridad y recuperación aún no han sido ejecutados (falta evidencia S42.3).")
+        limitations.append(
+            "Los escenarios de seguridad y recuperación aún no han sido ejecutados (falta evidencia S42.3)."
+        )
     if not skills:
         limitations.append("No se encontró ningún skill en `escala-skills/`.")
 
@@ -447,7 +467,9 @@ def _render_catalog(
             if isinstance(dup, dict):
                 skills_dup = dup.get("skills", "")
                 reason = dup.get("reason", "")
-                limitations.append(f"Skill posiblemente duplicado: {skills_dup} ({reason}).")
+                limitations.append(
+                    f"Skill posiblemente duplicado: {skills_dup} ({reason})."
+                )
 
     if not limitations:
         limitations.append("Ninguna limitación registrada en la evidencia disponible.")

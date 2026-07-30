@@ -13,7 +13,6 @@ import json
 import subprocess
 import sys
 import tempfile
-import zipfile
 from pathlib import Path
 from typing import Any, Literal
 
@@ -39,8 +38,7 @@ VERSION = "1.0.0"
 def main() -> int:
     source_commit = _source_commit()
     evidence_dir = (
-        ROOT
-        / "work/epics/e42-product-qualification-and-functional-catalog/evidence"
+        ROOT / "work/epics/e42-product-qualification-and-functional-catalog/evidence"
     )
     evidence_dir.mkdir(parents=True, exist_ok=True)
 
@@ -181,7 +179,9 @@ def main() -> int:
     print(f"S42.1 local qualification: {status.upper()}")
     print(f"Evidence JSON: {evidence_path}")
     print(f"Evidence MD:   {markdown_path}")
-    print(f"Journey steps: {len(journey_steps)} | Negative cases: {len(negative_cases)}")
+    print(
+        f"Journey steps: {len(journey_steps)} | Negative cases: {len(negative_cases)}"
+    )
     print(f"Blockers: {len(blockers)}")
     for blocker in blockers:
         print(f"  - {blocker}")
@@ -403,7 +403,8 @@ def _run_negative_authority_cases() -> list[dict[str, Any]]:
             "status": "pass"
             if receipt.status == "fail"
             and any(
-                f.code == "authoritative_sqlite_sync_forbidden" for f in receipt.findings
+                f.code == "authoritative_sqlite_sync_forbidden"
+                for f in receipt.findings
             )
             else "fail",
         }
@@ -426,8 +427,7 @@ def _run_negative_advisor_cases(
             "expected": "status=error y mensaje explicativo",
             "observed": f"status={empty_ask.get('status')}, message={empty_ask.get('message')}",
             "status": "pass"
-            if empty_ask.get("status") == "error"
-            and empty_ask.get("message")
+            if empty_ask.get("status") == "error" and empty_ask.get("message")
             else "fail",
         }
     )
@@ -440,8 +440,7 @@ def _run_negative_advisor_cases(
             "expected": "status=ok y observaciones explicativas",
             "observed": f"status={empty_daily.get('status')}, score={empty_daily.get('score')}",
             "status": "pass"
-            if empty_daily.get("status") == "ok"
-            and empty_daily.get("observations")
+            if empty_daily.get("status") == "ok" and empty_daily.get("observations")
             else "fail",
         }
     )
@@ -599,7 +598,9 @@ def _render_markdown(evidence: dict[str, Any], source_commit: str) -> str:
         lines.append(f"- runtime_stop_status: {matrix['runtime_stop_status']}")
         lines.append(f"- network_required: {matrix['network_required']}")
         lines.append(f"- hosted_service: {matrix['hosted_service']}")
-        lines.append(f"- authoritative_sqlite_sync: {matrix['authoritative_sqlite_sync']}")
+        lines.append(
+            f"- authoritative_sqlite_sync: {matrix['authoritative_sqlite_sync']}"
+        )
         lines.append(f"- overall_status: {matrix['overall_status']}")
         lines.append("")
     lines.extend(["", "## Pasos del recorrido", ""])
