@@ -233,3 +233,95 @@ class TestFormatter:
             {"decision": "x", "area": "cash", "horizon": "inmediato", "outcome": "y"}
         )
         assert "confirmada" in text.lower()
+
+
+class TestRun:
+    def test_clear_question_returns_proposed_draft(self):
+        from coaching.decision import run
+
+        result = run(
+            {
+                "action": "question",
+                "question": "¿Debería contratar a María para ventas?",
+            }
+        )
+        assert result["errors"] == []
+        assert "Ficha de decisión propuesta" in result["output"]
+        assert result["artifacts"]["action"] == "propose"
+        assert result["artifacts"]["draft"]["area"] == "people"
+
+    def test_ambiguous_question_returns_clarification(self):
+        from coaching.decision import run
+
+        result = run({"action": "question", "question": "Necesito mejorar el cash"})
+        assert result["errors"] == []
+        assert "Antes de continuar" in result["output"]
+        assert result["artifacts"]["action"] == "clarify"
+        assert result["artifacts"]["draft"]["area"] == "cash"
+
+    def test_confirm_persists_draft(self, tmp_path):
+        from coaching.decision import run
+
+        base = tmp_path
+        draft = {
+            "decision": "contratar a María en ventas",
+            "area": "people",
+            "horizon": "inmediato",
+            "outcome": "cubrir la vacante y mejorar cobertura comercial",
+        }
+        result = run({"action": "confirm", "draft": draft, "base_path": str(base)})
+        assert result["errors"] == []
+        assert "confirmada" in result["output"].lower()
+
+        profile = (
+            base / ".scaleup" / "agent" / "memory" / "company-profile.yaml"
+        ).read_text()
+        assert "contratar a María en ventas" in profile
+        assert "current_decision" in profile
+
+    def test_correct_updates_draft(self):
+        from coaching.decision import run
+
+        draft = {
+            "decision": "contratar a María en ventas",
+            "area": "people",
+            "horizon": "inmediato",
+            "outcome": "cubrir la vacante y mejorar cobertura comercial",
+        }
+        result = run(
+            {"action": "correct", "draft": draft, "corrections": {"area": "execution"}}
+        )
+        assert result["errors"] == []
+        assert result["artifacts"]["draft"]["area"] == "execution"
+        assert "Ficha de decisión propuesta" in result["output"]
+
+    def test_missing_question_returns_error(self):
+        from coaching.decision import run
+
+        result = run({"action": "question"})
+        assert result["errors"]
+        assert "question" in result["errors"][0].lower()
+
+    def test_invalid_action_returns_error(self):
+        from coaching.decision import run
+
+        result = run({"action": "unknown"})
+        assert result["errors"]
+        assert "action" in result["errors"][0].lower()
+
+    def test_confirm_validates_incomplete_draft(self):
+        from coaching.decision import run
+
+        result = run(
+            {
+                "action": "confirm",
+                "draft": {
+                    "decision": "x",
+                    "area": "people",
+                    "horizon": None,
+                    "outcome": "y",
+                },
+            }
+        )
+        assert result["errors"]
+        assert any("horizon" in err.lower() for err in result["errors"])
