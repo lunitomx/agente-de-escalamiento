@@ -374,3 +374,37 @@ class TestRun:
         result = run({"base_path": str(tmp_path)})
         assert result["errors"]
         assert "/escala-decision" in result["errors"][0]
+
+
+class TestSkillAdapterSmoke:
+    def test_skill_context_returns_evidence_package(self, tmp_path):
+        """Simulate the JSON context the escala-evidence skill sends."""
+        from coaching.evidence import run
+
+        profile = {
+            "focus": {
+                "current_decision": {
+                    "decision": "contratar a María en ventas",
+                    "area": "people",
+                    "horizon": "inmediato",
+                    "outcome": "cubrir la vacante",
+                    "confirmed": "2026-05-06",
+                }
+            }
+        }
+        profile_path = (
+            tmp_path / ".escala" / "agent" / "memory" / "company-profile.yaml"
+        )
+        profile_path.parent.mkdir(parents=True, exist_ok=True)
+        import yaml
+
+        profile_path.write_text(yaml.dump(profile))
+
+        context = {"base_path": str(tmp_path)}
+        result = run(context)
+        assert "output" in result
+        assert "artifacts" in result
+        assert "errors" in result
+        assert result["errors"] == []
+        assert result["artifacts"]["action"] == "evidence_package"
+        assert "package" in result["artifacts"]
