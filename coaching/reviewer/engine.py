@@ -9,6 +9,7 @@ from __future__ import annotations
 from coaching.evidence.models import DecisionRef, EvidencePackage
 from coaching.selector.models import SelectionReceipt
 
+from .formatter import format_report
 from .models import ReviewAction, ReviewFinding, ReviewReport, ReviewResult
 
 
@@ -41,25 +42,6 @@ def _alignment_finding(
             recommendation="Revisar la selección de herramienta antes de responder.",
         )
     return None
-
-
-def _basic_output(action: ReviewAction, report: ReviewReport) -> str:
-    if action == "reviewed":
-        tool_label = report.tool or "ninguna herramienta"
-        return (
-            f"## Revisión de calidad\n\n"
-            f"La recomendación puede avanzar para **{report.area.title()}** "
-            f"usando **{tool_label}**."
-        )
-    if action == "clarify":
-        return (
-            "## Revisión de calidad: falta información\n\n"
-            "Se encontraron advertencias que deben resolverse antes de responder."
-        )
-    return (
-        "## Revisión de calidad: bloqueada\n\n"
-        "Se detectó un problema crítico que impide generar una recomendación segura."
-    )
 
 
 def review(
@@ -181,6 +163,6 @@ def review(
     return ReviewResult(
         action=action,
         report=report,
-        output=_basic_output(action, report),
+        output=format_report(report),
         questions=questions if action != "reviewed" else [],
     )

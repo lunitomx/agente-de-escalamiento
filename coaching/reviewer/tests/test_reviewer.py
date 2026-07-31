@@ -11,7 +11,9 @@ import pytest
 from pydantic import ValidationError
 
 from coaching.evidence.models import DecisionRef, EvidencePackage, EvidenceSource
+from coaching.reviewer import run
 from coaching.reviewer.engine import review
+from coaching.reviewer.formatter import format_report
 from coaching.reviewer.models import ReviewFinding, ReviewReport, ReviewResult
 from coaching.selector.models import SelectionReceipt
 
@@ -225,3 +227,129 @@ class TestReview:
         selection = _build_selection(tool=None, evidence_used=[])
         result = review(package.decision_ref, package, selection)
         assert result.action == "clarify"
+
+
+class TestFormatter:
+    def test_format_reviewed(self):
+        report = ReviewReport(
+            decision="¿Cuánto cash tengo?",
+            area="cash",
+            tool="cash_analysis",
+            findings=[],
+            can_proceed=True,
+        )
+        output = format_report(report)
+        assert "## Revisión de calidad" in output
+        assert "La recomendación puede avanzar" in output
+        assert "Cash" in output
+
+    def test_format_clarify(self):
+        report = ReviewReport(
+            decision="¿Cuánto cash tengo?",
+            area="cash",
+            tool="cash_analysis",
+            findings=[
+                ReviewFinding(
+                    kind="unknown",
+                    severity="warning",
+                    source_ids=["old"],
+                    message="Fuente desactualizada.",
+                )
+            ],
+            can_proceed=False,
+        )
+        output = format_report(report)
+        assert "## Revisión de calidad: falta información" in output
+        assert "⚠️" in output
+
+    def test_format_blocked(self):
+        report = ReviewReport(
+            decision="¿Cuánto cash tengo?",
+            area="cash",
+            tool="cash_analysis",
+            findings=[
+                ReviewFinding(
+                    kind="contradiction",
+                    severity="critical",
+                    source_ids=["a", "b"],
+                    message="Contradicción detectada.",
+                )
+            ],
+            can_proceed=False,
+        )
+        output = format_report(report)
+        assert "## Revisión de calidad: bloqueada" in output
+        assert "❌" in output
+
+
+class TestRun:
+    def _build_context(self, package: EvidencePackage, selection: SelectionReceipt):
+        return {
+            "base_path": ".",
+            "decision": package.decision_ref.model_dump(),
+            "package": package.model_dump(),
+            "selection": {"action": "tool_selected", "receipt": selection.model_dump()},
+        }
+
+    def test_run_reviewed(self):
+        package = _build_package([_build_source({"source_id": "worksheet-cash-ccc"})])
+        selection = _build_selection(evidence_used=["worksheet-cash-ccc"])
+        result = run(self._build_context(package, selection))
+        assert result["errors"] == []
+        assert result["artifacts"]["action"] == "reviewed"
+        assert result["artifacts"]["report"]["can_proceed"] is True
+
+    def test_run_clarify(self):
+        package = _build_package(
+            [],
+            missing=[
+                _build_source(
+                    {
+                        "source_id": "worksheet-cash-ccc",
+                        "source_type": "worksheet",
+                        "title": "Cash Conversion Cycle Worksheet",
+                        "status": "missing",
+                        "confidence": "low",
+                        "reason": "No encontrado.",
+                    }
+                )
+            ],
+        )
+        selection = _build_selection(tool=None, evidence_used=[])
+        result = run(self._build_context(package, selection))
+        assert result["errors"] == []
+        assert result["artifacts"]["action"] == "clarify"
+
+    def test_run_blocked(self):
+        package = _build_package(
+            [
+                _build_source({"source_id": "a", "confidence": "low"}),
+                _build_source({"source_id": "b", "confidence": "low"}),
+            ]
+        )
+        selection = _build_selection(evidence_used=["a", "b"])
+        result = run(self._build_context(package, selection))
+        assert result["errors"] == []
+        assert result["artifacts"]["action"] == "blocked"
+
+    def test_run_missing_package_returns_error(self):
+        selection = _build_selection()
+        result = run(
+            {
+                "base_path": ".",
+                "decision": _build_decision().model_dump(),
+                "selection": {"receipt": selection.model_dump()},
+            }
+        )
+        assert result["errors"]
+
+    def test_run_missing_selection_returns_error(self):
+        package = _build_package([])
+        result = run(
+            {
+                "base_path": ".",
+                "decision": _build_decision().model_dump(),
+                "package": package.model_dump(),
+            }
+        )
+        assert result["errors"]
