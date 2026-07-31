@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from coaching.evidence.models import EvidencePackage, EvidenceSource
 
+from .formatter import format_clarify, format_selection
 from .models import SelectionReceipt, SelectionResult, ToolSelection
 
 TOOL_CATALOG: dict[str, ToolSelection] = {
@@ -174,7 +175,7 @@ def select_tool(package: EvidencePackage) -> SelectionResult:
         return SelectionResult(
             action="tool_selected",
             receipt=receipt,
-            output=f"## Herramienta seleccionada: {tool.label}",
+            output=format_selection(receipt, package),
         )
 
     questions = list(package.questions)
@@ -196,6 +197,6 @@ def select_tool(package: EvidencePackage) -> SelectionResult:
     return SelectionResult(
         action="clarify",
         receipt=receipt,
-        output="## Falta información para elegir una herramienta",
+        output=format_clarify(receipt, questions, package),
         questions=questions,
     )
