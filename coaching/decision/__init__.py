@@ -17,7 +17,7 @@ from .engine import (
 )
 from .formatter import format_clarification, format_confirmed, format_draft
 
-PROFILE_REL_PATH = Path(".scaleup") / "agent" / "memory" / "company-profile.yaml"
+PROFILE_REL_PATH = Path(".escala") / "agent" / "memory" / "company-profile.yaml"
 
 VALID_ACTIONS = ["question", "confirm", "correct"]
 

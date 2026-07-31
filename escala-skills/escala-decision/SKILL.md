@@ -116,7 +116,7 @@ print(json.dumps(result, indent=2, ensure_ascii=False))
 
 | Item | Destination |
 |------|-------------|
-| Ficha confirmada | `.scaleup/agent/memory/company-profile.yaml` → `focus.current_decision` |
+| Ficha confirmada | `.escala/agent/memory/company-profile.yaml` → `focus.current_decision` |
 | Siguiente paso | S43.2 arma el paquete de evidencia |
 
 ## Notes

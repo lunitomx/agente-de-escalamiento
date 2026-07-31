@@ -274,7 +274,7 @@ class TestRun:
         assert "confirmada" in result["output"].lower()
 
         profile = (
-            base / ".scaleup" / "agent" / "memory" / "company-profile.yaml"
+            base / ".escala" / "agent" / "memory" / "company-profile.yaml"
         ).read_text()
         assert "contratar a María en ventas" in profile
         assert "current_decision" in profile
@@ -361,5 +361,5 @@ class TestSkillAdapterSmoke:
         assert result["errors"] == []
         assert result["artifacts"]["action"] == "confirmed"
         assert (
-            tmp_path / ".scaleup" / "agent" / "memory" / "company-profile.yaml"
+            tmp_path / ".escala" / "agent" / "memory" / "company-profile.yaml"
         ).exists()
