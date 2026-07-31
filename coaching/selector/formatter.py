@@ -20,7 +20,7 @@ _AREA_HINTS: dict[str, str] = {
 
 _AREA_NEXT_STEP: dict[str, str] = {
     "cash": "profundizar en CCC, Power of One y aceleración de cash",
-    "execution": "revisar ritmos, prioridades y Rockefeller Habits",
+    "execution": "revisar ritmos, prioridades y disciplinas de ejecución",
     "people": "revisar estructura, valores y talento",
     "strategy": "revisar OPSP, diferenciación y los 7 Strata",
 }

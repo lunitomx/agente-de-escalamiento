@@ -1,7 +1,7 @@
 ---
 epic_id: "E43"
 title: "Reliable Coaching Loop"
-status: "planned"
+status: "done"
 depends_on: ["E42"]
 created: "2026-07-23"
 ---

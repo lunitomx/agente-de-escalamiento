@@ -1,5 +1,5 @@
 ---
-description: 'Elegir la herramienta de análisis de Scaling Up más adecuada para una decisión confirmada y su paquete de evidencia.'
+description: 'Elegir la herramienta de análisis ESCALA más adecuada para una decisión confirmada y su paquete de evidencia.'
 name: escala-selector
 ---
 
@@ -8,7 +8,7 @@ name: escala-selector
 ## Purpose
 
 Una vez que S43.1 aclaró la decisión y S43.2 armó el paquete de evidencia, este
-skill selecciona la herramienta de análisis de Scaling Up que mejor calza con la
+skill selecciona la herramienta de análisis ESCALA que mejor calza con la
 pregunta del empresario y los datos disponibles. Si falta el dato mínimo, no
 fuerza una herramienta: pide la información faltante.
 

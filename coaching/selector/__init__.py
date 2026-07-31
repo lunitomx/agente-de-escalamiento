@@ -1,5 +1,5 @@
 """
-Selector module — choose the best Scaling Up analysis tool for a confirmed
+Selector module — choose the best ESCALA analysis tool for a confirmed
 decision and its evidence package.
 """
 
