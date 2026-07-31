@@ -25,7 +25,7 @@ recibe una recomendación que puede verificar, entender y convertir en acción.
 | S43.2 | Armar el paquete de evidencia | M | Done | Muestra documentos usados, periodo, datos faltantes y nivel de certeza. |
 | S43.3 | Elegir la herramienta adecuada | M | Done | Usa el análisis local de workbook, reuniones, contexto o tareas según la necesidad. |
 | S43.4 | Revisar antes de responder | M | Done | Detecta contradicciones, cálculos dudosos y afirmaciones sin fuente. |
-| S43.5 | Entregar la respuesta ejecutiva | S | Pending | Presenta qué veo, por qué importa, qué no sé, acción y pregunta siguiente. |
+| S43.5 | Entregar la respuesta ejecutiva | S | Done | Presenta qué veo, por qué importa, qué no sé, acción y pregunta siguiente. |
 | S43.6 | Calificar las cuatro decisiones | M | Pending | Demuestra el ciclo con casos de People, Strategy, Execution y Cash. |
 
 ## S43.1 — Aclarar la decisión
