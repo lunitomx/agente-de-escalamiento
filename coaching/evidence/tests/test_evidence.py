@@ -292,3 +292,85 @@ class TestEvidenceEngine:
         assert len(package.not_trustworthy) == 1
         assert package.not_trustworthy[0].source_id == "worksheet-ccc"
         assert "incompleto" in package.not_trustworthy[0].reason.lower()
+
+
+class TestFormatter:
+    def test_format_package_no_absolute_paths(self):
+        from coaching.evidence.formatter import format_package
+        from coaching.evidence.models import (
+            DecisionRef,
+            EvidencePackage,
+            EvidenceSource,
+        )
+
+        package = EvidencePackage(
+            decision_ref=DecisionRef(
+                decision="contratar a María en ventas",
+                area="people",
+                horizon="inmediato",
+                outcome="cubrir la vacante",
+            ),
+            sources=[
+                EvidenceSource(
+                    source_id="session-2026-05-06",
+                    source_type="session_log",
+                    title="Sesión 2026-05-06",
+                    decision="people",
+                    status="available",
+                    period="2026-05-06",
+                    confidence="high",
+                    reason="Sesión reciente.",
+                    locator=".escala/my-company/sessions/2026-05-06.md",
+                )
+            ],
+            missing=[],
+            not_trustworthy=[],
+            questions=[],
+        )
+        text = format_package(package)
+        assert "contratar a María en ventas" in text
+        assert "/Users/" not in text
+        assert ".escala" not in text
+
+
+class TestRun:
+    def test_run_with_confirmed_decision_returns_package(self, tmp_path):
+        from coaching.evidence import run
+
+        profile = {
+            "focus": {
+                "current_decision": {
+                    "decision": "contratar a María en ventas",
+                    "area": "people",
+                    "horizon": "inmediato",
+                    "outcome": "cubrir la vacante",
+                    "confirmed": "2026-05-06",
+                }
+            }
+        }
+        profile_path = (
+            tmp_path / ".escala" / "agent" / "memory" / "company-profile.yaml"
+        )
+        profile_path.parent.mkdir(parents=True, exist_ok=True)
+        import yaml
+
+        profile_path.write_text(yaml.dump(profile))
+
+        result = run({"base_path": str(tmp_path)})
+        assert result["errors"] == []
+        assert result["artifacts"]["action"] == "evidence_package"
+        assert "Paquete de evidencia" in result["output"]
+        assert result["artifacts"]["package"]["decision_ref"]["area"] == "people"
+
+    def test_run_without_decision_returns_error(self, tmp_path):
+        from coaching.evidence import run
+
+        profile_path = (
+            tmp_path / ".escala" / "agent" / "memory" / "company-profile.yaml"
+        )
+        profile_path.parent.mkdir(parents=True, exist_ok=True)
+        profile_path.write_text("focus:\n")
+
+        result = run({"base_path": str(tmp_path)})
+        assert result["errors"]
+        assert "/escala-decision" in result["errors"][0]
