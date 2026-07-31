@@ -22,8 +22,8 @@ recibe una recomendación que puede verificar, entender y convertir en acción.
 | ID | Historia | Tamaño | Estado | Demostración de valor |
 |---|---|:---:|:---:|---|
 | S43.1 | Aclarar la decisión | S | Done | ESCALA confirma qué se quiere decidir, área afectada y resultado esperado. |
-| S43.2 | Armar el paquete de evidencia | M | Pending | Muestra documentos usados, periodo, datos faltantes y nivel de certeza. |
-| S43.3 | Elegir la herramienta adecuada | M | Pending | Usa el análisis local de workbook, reuniones, contexto o tareas según la necesidad. |
+| S43.2 | Armar el paquete de evidencia | M | Done | Muestra documentos usados, periodo, datos faltantes y nivel de certeza. |
+| S43.3 | Elegir la herramienta adecuada | M | Done | Usa el análisis local de workbook, reuniones, contexto o tareas según la necesidad. |
 | S43.4 | Revisar antes de responder | M | Pending | Detecta contradicciones, cálculos dudosos y afirmaciones sin fuente. |
 | S43.5 | Entregar la respuesta ejecutiva | S | Pending | Presenta qué veo, por qué importa, qué no sé, acción y pregunta siguiente. |
 | S43.6 | Calificar las cuatro decisiones | M | Pending | Demuestra el ciclo con casos de People, Strategy, Execution y Cash. |
@@ -169,7 +169,7 @@ no se integra hasta que S43.5 defina el formato final de respuesta.
 | Story | Estado | Evidencia esperada |
 |---|---|---|
 | S43.1 | Pending | Fichas de decisión y casos de aclaración. |
-| S43.2 | Pending | Paquetes de evidencia y rechazos seguros. |
+| S43.2 | Done | Paquetes de evidencia y rechazos seguros. |
 | S43.3 | Pending | Recibos de elección de análisis. |
 | S43.4 | Pending | Casos de contradicción, cálculo y pregunta faltante. |
 | S43.5 | Pending | Respuestas ejecutivas aprobadas por empresarios. |
@@ -221,7 +221,7 @@ no se integra hasta que S43.5 defina el formato final de respuesta.
 | Story | Size | Status | Actual | Velocity | Notes |
 |---|---|:---:|:---:|:---:|:---|
 | S43.1 | S | Done | 27m | 7.2 | Primera story en secuencia. |
-| S43.2 | M | Pending | — | — | Bloqueada por S43.1. |
+| S43.2 | M | Done | — | — | Completada en merge 1ea8b33. |
 | S43.3 | M | Pending | — | — | Bloqueada por S43.2. |
 | S43.4 | M | Pending | — | — | Bloqueada por S43.3. |
 | S43.5 | S | Pending | — | — | Bloqueada por S43.4. |
