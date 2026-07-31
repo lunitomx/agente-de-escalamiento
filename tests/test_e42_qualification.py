@@ -22,7 +22,9 @@ SCRIPTS = [
     ("scripts/qualify_e42_s42.3.py", "s42.3-security-recovery.json"),
     ("scripts/qualify_e42_s42.4.py", "s42.4-catalog-receipt.json"),
 ]
-EVIDENCE_DIR = ROOT / "work/epics/e42-product-qualification-and-functional-catalog/evidence"
+EVIDENCE_DIR = (
+    ROOT / "work/epics/e42-product-qualification-and-functional-catalog/evidence"
+)
 
 
 @pytest.mark.e2e

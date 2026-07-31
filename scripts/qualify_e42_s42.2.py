@@ -32,7 +32,9 @@ from coaching.welcome import run as welcome_run  # noqa: E402
 
 
 SKILLS_DIR = ROOT / "escala-skills"
-EVIDENCE_DIR = ROOT / "work/epics/e42-product-qualification-and-functional-catalog/evidence"
+EVIDENCE_DIR = (
+    ROOT / "work/epics/e42-product-qualification-and-functional-catalog/evidence"
+)
 EVIDENCE_PATH = EVIDENCE_DIR / "s42.2-skill-inventory.json"
 
 
@@ -374,7 +376,10 @@ def _detect_duplicates(inventory: list[dict[str, Any]]) -> list[dict[str, str]]:
         by_stem.setdefault(normalized, []).append(name)
 
     known_overlaps = {
-        "execution-prioriti": ["escala-execution-priorities", "escala-execution-prioridad"],
+        "execution-prioriti": [
+            "escala-execution-priorities",
+            "escala-execution-prioridad",
+        ],
         "execution-rhythm": ["escala-execution-rhythms", "escala-rhythm-weekly"],
         "people-organigram": ["escala-people-organigrama", "escala-people-fac"],
     }
@@ -402,7 +407,13 @@ def _detect_duplicates(inventory: list[dict[str, Any]]) -> list[dict[str, str]]:
 def _detect_obsolete(inventory: list[dict[str, Any]]) -> list[dict[str, str]]:
     """Flag skills that mention deprecated or obsolete artifacts."""
     flagged: list[dict[str, str]] = []
-    obsolete_markers = ["deprecado", "deprecated", "obsoleto", "obsolete", "old command"]
+    obsolete_markers = [
+        "deprecado",
+        "deprecated",
+        "obsoleto",
+        "obsolete",
+        "old command",
+    ]
     for item in inventory:
         text = " ".join(
             [item["description"], item["business_problem"], item["delivered_result"]]
@@ -441,20 +452,48 @@ def _seed_workspace(base: Path) -> None:
         "coaching": {"level": "shu", "level_source": "auto"},
     }
     (memory / "company-profile.yaml").write_text(
-        yaml.dump(profile, default_flow_style=False, allow_unicode=True, sort_keys=False),
+        yaml.dump(
+            profile, default_flow_style=False, allow_unicode=True, sort_keys=False
+        ),
         encoding="utf-8",
     )
 
     worksheets = {
         "worksheets": [
-            {"id": "people-1", "name": "Core Values", "decision": "people", "difficulty": "easy", "time_estimate": "30m"},
-            {"id": "strategy-1", "name": "OPSP", "decision": "strategy", "difficulty": "hard", "time_estimate": "2h"},
-            {"id": "execution-1", "name": "Quarterly Priorities", "decision": "execution", "difficulty": "medium", "time_estimate": "1h"},
-            {"id": "cash-1", "name": "CCC Analysis", "decision": "cash", "difficulty": "medium", "time_estimate": "1h"},
+            {
+                "id": "people-1",
+                "name": "Core Values",
+                "decision": "people",
+                "difficulty": "easy",
+                "time_estimate": "30m",
+            },
+            {
+                "id": "strategy-1",
+                "name": "OPSP",
+                "decision": "strategy",
+                "difficulty": "hard",
+                "time_estimate": "2h",
+            },
+            {
+                "id": "execution-1",
+                "name": "Quarterly Priorities",
+                "decision": "execution",
+                "difficulty": "medium",
+                "time_estimate": "1h",
+            },
+            {
+                "id": "cash-1",
+                "name": "CCC Analysis",
+                "decision": "cash",
+                "difficulty": "medium",
+                "time_estimate": "1h",
+            },
         ]
     }
     (registry / "worksheets.yaml").write_text(
-        yaml.dump(worksheets, default_flow_style=False, allow_unicode=True, sort_keys=False),
+        yaml.dump(
+            worksheets, default_flow_style=False, allow_unicode=True, sort_keys=False
+        ),
         encoding="utf-8",
     )
 

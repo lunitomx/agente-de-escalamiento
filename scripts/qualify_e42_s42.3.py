@@ -23,7 +23,6 @@ from escala_server.lifecycle import (  # noqa: E402
     LifecycleError,
     LifecycleRuntime,
     ScheduleRequest,
-    UpdateManager,
     build_install_bundle,
     build_native_schedule,
     install_package,
@@ -195,7 +194,9 @@ def _evidence_is_fresh(path: Path, current_commit: str) -> bool:
     )
 
 
-def _scenario_tampered_package(root: Path, request: InstallRequest) -> dict[str, object]:
+def _scenario_tampered_package(
+    root: Path, request: InstallRequest
+) -> dict[str, object]:
     """A verified update must reject any post-creation tampering."""
 
     payload = root / "update.bin"
@@ -215,7 +216,9 @@ def _scenario_tampered_package(root: Path, request: InstallRequest) -> dict[str,
 
     return {
         "id": "tampered_package",
-        "status": "pass" if observed == "artifact_hash_mismatch" and preserved else "fail",
+        "status": "pass"
+        if observed == "artifact_hash_mismatch" and preserved
+        else "fail",
         "expected": "verify_update_artifact rejects tampered artifact and version stays at 1.0.0",
         "observed": observed,
         "business_message": (
