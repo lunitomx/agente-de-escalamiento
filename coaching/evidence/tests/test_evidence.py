@@ -152,3 +152,143 @@ class TestDomainConstants:
 
     def test_safe_locator_prefix(self):
         assert SAFE_LOCATOR_PREFIX == ".escala/"
+
+
+class TestEvidenceEngine:
+    def test_available_source_classified_high_confidence(self):
+        from coaching.evidence.engine import discover_sources
+        from coaching.evidence.models import DecisionRef
+
+        decision = DecisionRef(
+            decision="contratar a María en ventas",
+            area="people",
+            horizon="inmediato",
+            outcome="cubrir la vacante",
+        )
+        local_sources = {
+            "sessions": [
+                {
+                    "id": "session-2026-05-06",
+                    "date": "2026-05-06",
+                    "decision_focus": "people",
+                    "worksheets_completed": ["FACE Worksheet"],
+                    "locator": ".escala/my-company/sessions/2026-05-06.md",
+                }
+            ],
+            "worksheets": [
+                {
+                    "id": "worksheet-face",
+                    "name": "FACE Worksheet",
+                    "decision": "people",
+                    "completed": True,
+                    "date": "2026-05-06",
+                    "locator": ".escala/my-company/worksheets/face.yaml",
+                }
+            ],
+            "tasks": [],
+            "metrics": [],
+            "registry": {"worksheets": []},
+        }
+        package = discover_sources(decision, local_sources, today="2026-05-10")
+
+        assert len(package.sources) == 2
+        assert any(s.source_id == "session-2026-05-06" for s in package.sources)
+        assert any(s.source_id == "worksheet-face" for s in package.sources)
+        assert all(s.status == "available" for s in package.sources)
+        assert package.sources[0].confidence == "high"
+
+    def test_missing_source_generates_clarification_question(self):
+        from coaching.evidence.engine import discover_sources
+        from coaching.evidence.models import DecisionRef
+
+        decision = DecisionRef(
+            decision="contratar a María en ventas",
+            area="people",
+            horizon="inmediato",
+            outcome="cubrir la vacante",
+        )
+        registry_worksheets = [
+            {
+                "id": "worksheet-topgrading",
+                "decision": "people",
+                "name": "Topgrading Interview Guide",
+            }
+        ]
+        local_sources = {
+            "sessions": [],
+            "worksheets": [],
+            "tasks": [],
+            "metrics": [],
+            "registry": {"worksheets": registry_worksheets},
+        }
+        package = discover_sources(decision, local_sources, today="2026-05-10")
+
+        assert len(package.missing) == 1
+        assert package.missing[0].source_id == "worksheet-topgrading"
+        assert package.missing[0].status == "missing"
+        assert len(package.questions) == 1
+        assert "topgrading" in package.questions[0].lower()
+
+    def test_outdated_source_marked_not_trustworthy(self):
+        from coaching.evidence.engine import discover_sources
+        from coaching.evidence.models import DecisionRef
+
+        decision = DecisionRef(
+            decision="contratar a María en ventas",
+            area="people",
+            horizon="inmediato",
+            outcome="cubrir la vacante",
+        )
+        local_sources = {
+            "sessions": [
+                {
+                    "id": "session-2025-01-10",
+                    "date": "2025-01-10",
+                    "decision_focus": "people",
+                    "worksheets_completed": [],
+                    "locator": ".escala/my-company/sessions/2025-01-10.md",
+                }
+            ],
+            "worksheets": [],
+            "tasks": [],
+            "metrics": [],
+            "registry": {"worksheets": []},
+        }
+        package = discover_sources(decision, local_sources, today="2026-05-10")
+
+        assert len(package.not_trustworthy) == 1
+        assert package.not_trustworthy[0].source_id == "session-2025-01-10"
+        assert package.not_trustworthy[0].status == "not_trustworthy"
+        assert "desactualizada" in package.not_trustworthy[0].reason.lower()
+
+    def test_incomplete_worksheet_marked_not_trustworthy(self):
+        from coaching.evidence.engine import discover_sources
+        from coaching.evidence.models import DecisionRef
+
+        decision = DecisionRef(
+            decision="¿Podemos pagar la nómina de agosto?",
+            area="cash",
+            horizon="inmediato",
+            outcome="evitar crisis de liquidez",
+        )
+        local_sources = {
+            "sessions": [],
+            "worksheets": [
+                {
+                    "id": "worksheet-ccc",
+                    "name": "Cash Conversion Cycle Worksheet",
+                    "decision": "cash",
+                    "completed": False,
+                    "date": "2026-07-15",
+                    "locator": ".escala/my-company/worksheets/ccc-worksheet.yaml",
+                }
+            ],
+            "tasks": [],
+            "metrics": [],
+            "registry": {"worksheets": []},
+        }
+        package = discover_sources(decision, local_sources, today="2026-07-31")
+
+        assert len(package.not_trustworthy) == 1
+        assert package.not_trustworthy[0].source_id == "worksheet-ccc"
+        assert "incompleto" in package.not_trustworthy[0].reason.lower()
