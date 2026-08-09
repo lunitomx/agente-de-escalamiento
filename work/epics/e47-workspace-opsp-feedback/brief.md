@@ -3,7 +3,7 @@ epic_id: "E47"
 title: "Coherencia del viaje instalado: Workspace, OPSP y Feedback"
 status: "started"
 created: "2026-08-09"
-jira_key: null
+jira_key: "ESCALA-1"
 ---
 
 # E47 — Coherencia del viaje instalado: Workspace, OPSP y Feedback
