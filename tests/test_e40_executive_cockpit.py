@@ -285,6 +285,7 @@ def test_complete_strategy_plan_is_ready_without_fabricating_values() -> None:
     assert plan.status == "ready"
     assert plan.unresolved == ()
     assert plan.critical_number == "owner-annual_critical_number"
+    assert plan.brand_promise == "owner-brand_promises"
 
 
 def _complete_opsp_answers() -> tuple[StrategyAnswer, ...]:

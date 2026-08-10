@@ -30,6 +30,10 @@ STRATEGY_FIELDS: tuple[str, ...] = (
     "annual_goal",
     "critical_number",
 )
+LEGACY_FIELD_ALIASES = {
+    "brand_promise": "brand_promises",
+    "critical_number": "annual_critical_number",
+}
 OPSP_COLUMNS: tuple[tuple[str, bool], ...] = (
     ("Core Values and Purpose", False),
     ("BHAG and Key Capabilities", False),
@@ -112,8 +116,8 @@ def build_strategy_plan(answers: Iterable[StrategyAnswer]) -> StrategyPlan:
 
     for key in STRATEGY_FIELDS:
         answer = answer_map.get(key)
-        if key == "critical_number" and answer is None:
-            answer = answer_map.get("annual_critical_number")
+        if answer is None and key in LEGACY_FIELD_ALIASES:
+            answer = answer_map.get(LEGACY_FIELD_ALIASES[key])
         if answer is not None:
             source_ids.update(answer.source_ids)
         if answer is None or answer.status != "fact" or answer.value is None:
