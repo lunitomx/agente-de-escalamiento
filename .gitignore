@@ -46,6 +46,9 @@ Thumbs.db
 .vscode/
 .idea/
 
+# === Per-worktree MCP runtime ===
+.mcp.json
+
 # === Claude Code local settings (per-developer) ===
 .claude/settings.local.json
 

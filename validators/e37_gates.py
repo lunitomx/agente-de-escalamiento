@@ -8,7 +8,7 @@ import subprocess
 import sys
 from typing import ClassVar
 
-from raise_cli.gates.models import GateContext, GateResult
+from validators.gate_contract import GateContext, GateResult
 
 
 REQUIREMENT_STORIES: dict[str, str] = {

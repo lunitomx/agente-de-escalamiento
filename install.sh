@@ -96,6 +96,16 @@ for p in "${PLATAFORMAS[@]}"; do
 done
 
 # ----------------------
+# Configurar RaiSE MCP para Codex (sin tocar el estado global del usuario)
+# ----------------------
+if [[ " ${PLATAFORMAS[*]} " == *" codex "* ]]; then
+    echo ""
+    echo -e "  ${CYAN}Configurando RaiSE MCP para Codex...${NC}"
+    "$SCRIPT_DIR/scripts/configure_codex_mcp.sh" "$SCRIPT_DIR" || \
+        echo -e "    ${AMARILLO}⚠ No se pudo configurar RaiSE MCP automáticamente.${NC}"
+fi
+
+# ----------------------
 # Instalar paquete Python (coaching + validators)
 # ----------------------
 echo ""
