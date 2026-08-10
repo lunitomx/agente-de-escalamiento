@@ -8,7 +8,7 @@ import subprocess
 
 import pytest
 
-from raise_cli.gates.models import GateContext
+from validators.gate_contract import GateContext
 from validators import e37_gates
 
 
