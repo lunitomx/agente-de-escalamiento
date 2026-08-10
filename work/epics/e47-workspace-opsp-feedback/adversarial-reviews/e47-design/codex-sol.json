@@ -1,0 +1,42 @@
+{
+  "confidence": "El diseño está bien delimitado para iniciar S47.1; falta reproducir con una prueba versionada el drift del provisionador antes de afirmar su causa exacta.",
+  "claims": [
+    {
+      "target": "MCP-first en Codex sin abrir ~/.rai",
+      "verdict": "holds",
+      "critique": "El diseño podría haber confundido una limitación del sandbox con falta de credenciales.",
+      "evidence": "La evidencia registrada separa la base global sensible de la ruta MCP y el alcance prohíbe ampliar esa raíz; la decisión no exige acceso a secretos.",
+      "fix": "S47.1 debe probar el mensaje de fallback y documentar cuándo el CLI sí es válido fuera de Codex."
+    },
+    {
+      "target": "El provisionador ensucia el worktree con escala_coaching.egg-info",
+      "verdict": "weak",
+      "critique": "El hecho fue observado, pero los archivos fuente de provisión y la secuencia exacta aún no están anclados en una prueba reproducible del repositorio.",
+      "evidence": "El .mcp.json sí usa el comando bare rai-mcp-pipeline y install.sh ejecuta pip install -e; ninguno, por sí solo, prueba cuál componente deja el directorio durante rai worktree register.",
+      "fix": "La primera prueba RED de S47.1 debe reproducir un worktree limpio, fijar el resultado esperado y sólo entonces atribuir/corregir el origen."
+    },
+    {
+      "target": "Instalación no materializa recursos requeridos por OPSP",
+      "verdict": "holds",
+      "critique": "Podría existir una ruta de bundle que incluyera implícitamente los recursos.",
+      "evidence": "install.sh enlaza escala-skills e instala el paquete editable; lifecycle/installer.py copia app/escala_server y manifest.json. OPSP requiere rutas .escala, templates/opsp.md y work/strategy/opsp.md que no aparecen en esas rutas.",
+      "fix": "S47.2 debe fijar una raíz de recursos y una prueba para instalación limpia y actualización existente."
+    },
+    {
+      "target": "WorksheetDAO permite persistir OPSP versionado",
+      "verdict": "holds",
+      "critique": "Un DAO genérico podría no preservar versiones o aceptar estado estructurado.",
+      "evidence": "WorksheetDAO.save serializa dict, calcula versión desde el anterior y get obtiene la última versión por category/tool.",
+      "fix": "S47.4 debe validar el modelo Pydantic antes de save y usar una clave de herramienta estable; el DAO no sustituye el contrato OPSP."
+    },
+    {
+      "target": "Feedback contextual debe reemplazar el contrato actual de JSON",
+      "verdict": "weak",
+      "critique": "Cambiar a contexto visible/Markdown puede debilitar la frontera de anonimato que el skill existente protege.",
+      "evidence": "El skill actual prohíbe transcripts y cualquier contexto automático, exige consentimiento y guarda JSON local. La nueva necesidad está confirmada por el usuario, pero aún no define reglas de redacción para texto conversacional visible.",
+      "fix": "S47.5 debe mantener consentimiento explícito, incluir una lista concreta de redacción y probar que el usuario puede eliminar datos antes del guardado Markdown."
+    }
+  ],
+  "blind_spot": "El diseño asume que todas las superficies instaladas de los skills pueden actualizarse de forma coordinada; falta el inventario exacto de copias, enlaces y consumidores antes de S47.2.",
+  "overreach": "No crear una nueva base ni integración automática de Jira es proporcional. Sería sobrealcance separar físicamente ~/.rai en este epic porque pertenece al producto de RaiSE, no a ESCALA."
+}
