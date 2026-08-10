@@ -370,6 +370,22 @@ def test_strategy_plan_keeps_unknown_cells_and_questions_explicit() -> None:
     assert "¿Ana asume esta acción del primer trimestre?" in plan.questions
 
 
+def test_strategy_plan_requires_accountability_for_execution_cells() -> None:
+    answers = tuple(
+        StrategyAnswer(key=answer.key, value=answer.value, status=answer.status)
+        if answer.key == "q1_actions"
+        else answer
+        for answer in _complete_opsp_answers()
+    )
+
+    plan = build_strategy_plan(answers)
+
+    assert plan.rows[0].cells[4].value == "owner-q1_actions"
+    assert plan.rows[0].cells[4].accountability is None
+    assert "q1_actions_accountability" in plan.unresolved
+    assert plan.status == "needs_clarification"
+
+
 def test_strategy_answer_rejects_empty_accountability_owner() -> None:
     with pytest.raises(ValidationError):
         StrategyAnswer(

@@ -148,6 +148,11 @@ def build_strategy_plan(answers: Iterable[StrategyAnswer]) -> StrategyPlan:
                 and value is not None
                 else None
             )
+            if is_fact and column >= 4 and accountability is None:
+                unresolved.append(f"{key}_accountability")
+                questions.append(
+                    f"¿Quién asume la accountability de {key.replace('_', ' ')}?"
+                )
             cells.append(
                 OPSPCell(
                     key=key,
