@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 import subprocess
 
-from raise_cli.gates.models import GateContext
+from validators.gate_contract import GateContext
 
 from validators import e41_gates
 

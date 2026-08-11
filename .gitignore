@@ -32,6 +32,7 @@ node_modules/
 __pycache__/
 *.pyc
 *.pyo
+*.egg-info/
 uv.lock
 
 # === Environment & Secrets ===
@@ -45,6 +46,9 @@ Thumbs.db
 # === IDE ===
 .vscode/
 .idea/
+
+# === Per-worktree MCP runtime ===
+.mcp.json
 
 # === Claude Code local settings (per-developer) ===
 .claude/settings.local.json

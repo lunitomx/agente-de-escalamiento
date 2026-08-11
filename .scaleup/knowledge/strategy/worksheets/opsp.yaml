@@ -6,8 +6,10 @@ decision: strategy
 summary: >
   The completable OPSP template — a single page with seven columns capturing the
   company's full strategic plan. Columns 1-3 (strategic thinking): Core Values/Purpose,
-  BHAG + 3-5 year targets, brand promises/sandbox. Columns 4-7 (execution planning):
-  annual priorities, Q1-Q3 rocks and critical numbers. Bottom strip: SWT summary.
+  BHAG + 3-5 year targets and Key Capabilities, brand promises/sandbox.
+  Columns 4-7 (execution planning): annual priorities, Q1-Q3 rocks and critical
+  numbers. Actions / Goals / Targets are the three rows across the page, and
+  each execution cell includes Your Accountability. Bottom strip: SWT summary.
   Updated quarterly by the full leadership team in the quarterly planning session.
 source:
   file: "scaling_up_llamaparse.txt"
@@ -21,10 +23,12 @@ tags: [strategy, worksheet, OPSP, planning, quarterly, alignment]
 metadata:
   fields:
     - "Column 1: Core Values (4-5 values) + Core Purpose (1 sentence)"
-    - "Column 2: BHAG (10-25 year goal) + 3-5 year targets (3-5 measurable goals)"
+    - "Column 2: BHAG (10-25 year goal) + 3-5 year targets + Key Capabilities"
     - "Column 3: Brand Promises (2-3 promises) + Sandbox (who/where)"
     - "Column 4: Annual Priority / Critical Number + Key Thrusts (3-5 annual priorities)"
-    - "Columns 5-7: Quarterly Rocks per leadership team member"
+    - "Columns 4-7: annual and quarterly execution planning"
+    - "Rows: Actions / Goals / Targets across columns 1-7"
+    - "Your Accountability: named person for every execution cell"
     - "Column headers: Q1, Q2, Q3 with Critical Number and Celebration"
     - "Bottom: SWT summary (top 3 Strengths, Weaknesses, Trends)"
   output: "Full company strategic + execution plan on one page, aligned leadership team"
