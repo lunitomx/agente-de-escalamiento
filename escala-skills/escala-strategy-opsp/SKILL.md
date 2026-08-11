@@ -21,8 +21,8 @@ Guiar al usuario paso a paso para completar su Plan Estratégico de Una Página 
 ### Step 1: Load Verified Context
 
 Leer las fuentes instaladas que sí existen:
-- `.scaleup/knowledge/strategy/tools/opsp.yaml`
-- `.scaleup/knowledge/strategy/worksheets/opsp.yaml`
+- `conocimiento/strategy/tools/opsp.yaml`
+- `conocimiento/strategy/worksheets/opsp.yaml`
 - evidencia y perfil de empresa disponibles, sólo si el usuario los confirma.
 
 No declares que existe una plantilla, un archivo previo ni un plan guardado si
