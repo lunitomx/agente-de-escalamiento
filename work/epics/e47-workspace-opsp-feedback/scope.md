@@ -18,12 +18,17 @@ Hacer que el recorrido instalado de ESCALA sea coherente y recuperable: Codex op
 
 | ID | Historia | Tamaño | Estado | Termina cuando |
 |---|---|:---:|:---:|---|
-| S47.1 | Contrato Workspace Codex/MCP (`ESCALA-2`) | 5 | In progress | CLI en sandbox falla de forma comprensible; Codex usa MCP; el provisionado no ensucia el worktree. |
-| S47.2 | Instalador, recursos y migración | 8 | Pending | Nueva y existente instalación reciben recursos/skills compatibles sin duplicados. |
-| S47.3 | OPSP completo y coherente | 5 | Pending | La guía representa columnas, filas, responsables y capacidades sin contradicciones. |
-| S47.4 | Persistir, reanudar y exportar OPSP | 8 | Pending | Estado estructurado y Markdown local permiten continuar y exportar el plan. |
-| S47.5 | Feedback contextual local | 5 | Pending | El usuario confirma bug/mejora y recibe un Markdown redactado, sin envío automático. |
-| S47.6 | Calificación y release | 5 | Pending | Casos de instalación, regresión y límites de privacidad pasan con evidencia. |
+| S47.1 | Contrato Workspace Codex/MCP (`ESCALA-2`) | 5 | Done | CLI en sandbox falla de forma comprensible; Codex usa MCP; el provisionado no ensucia el worktree. |
+| S47.2 | Instalador, recursos y migración (`ESCALA-3`) | 8 | Done | Nueva y existente instalación reciben recursos/skills compatibles sin duplicados. |
+| S47.3 | OPSP completo y coherente (`ESCALA-4`) | 5 | Done | La guía representa columnas, filas, responsables y capacidades sin contradicciones. |
+| S47.4 | Persistir, reanudar y exportar OPSP (`ESCALA-8`) | 8 | Pending | Estado estructurado y Markdown local permiten continuar y exportar el plan. |
+| S47.5 | Feedback contextual local (`ESCALA-9`) | 5 | Pending | El usuario confirma bug/mejora y recibe un Markdown redactado, sin envío automático. |
+| S47.6 | Calificación y release (`ESCALA-10`) | 5 | Pending | Casos de instalación, regresión y límites de privacidad pasan con evidencia. |
+| S47.7 | Sincronizar clones del repo (`ESCALA-5`) | 3 | Pending | Un fix en `escala-skills/` llega al clon que sirve los symlinks activos (`agente-de-escalamiento`) sin pasos manuales olvidables. |
+| S47.8 | Evitar contaminación cross-repo en `rai graph query` (`ESCALA-6`) | 3 | Pending | `rai graph query`/`raise_graph_query` no devuelven símbolos de otros repos cuando faltan embeddings locales; el fallback server-semantic queda explícito o desactivado por default. |
+| S47.9 | Company State Document como Project de ChatGPT (`ESCALA-7`) | 5 | Pending | El mismo documento de estado de empresa que usa S47.4/S47.3 en Claude es subible a un Project de ChatGPT (web y desktop) con instrucciones equivalentes. |
+
+**Nota de alcance (2026-08-10):** S47.7-S47.9 se agregaron durante una auditoría de producto (comparación contra PRD, parking lot, y arquitectura de LifeOS/danielmiessler) que encontró: (a) los dos clones locales del repo divergieron y solo uno sirve los symlinks activos de los coaches, (b) `rai graph query` sin `--strategy` cae a un fallback cross-repo que contamina el contexto de las skills `rai-*`, (c) el alcance de plataforma es Claude + ChatGPT (ambos, no genérico). No forman parte del diseño original de E47 pero comparten su objetivo de coherencia del viaje instalado.
 
 ## Criterios de terminación
 
