@@ -1,7 +1,7 @@
 ---
 epic_id: "E43"
 title: "Reliable Coaching Loop"
-status: "planned"
+status: "done"
 depends_on: ["E42"]
 created: "2026-07-23"
 ---
@@ -21,12 +21,12 @@ recibe una recomendación que puede verificar, entender y convertir en acción.
 
 | ID | Historia | Tamaño | Estado | Demostración de valor |
 |---|---|:---:|:---:|---|
-| S43.1 | Aclarar la decisión | S | Pending | ESCALA confirma qué se quiere decidir, área afectada y resultado esperado. |
-| S43.2 | Armar el paquete de evidencia | M | Pending | Muestra documentos usados, periodo, datos faltantes y nivel de certeza. |
-| S43.3 | Elegir la herramienta adecuada | M | Pending | Usa el análisis local de workbook, reuniones, contexto o tareas según la necesidad. |
-| S43.4 | Revisar antes de responder | M | Pending | Detecta contradicciones, cálculos dudosos y afirmaciones sin fuente. |
-| S43.5 | Entregar la respuesta ejecutiva | S | Pending | Presenta qué veo, por qué importa, qué no sé, acción y pregunta siguiente. |
-| S43.6 | Calificar las cuatro decisiones | M | Pending | Demuestra el ciclo con casos de People, Strategy, Execution y Cash. |
+| S43.1 | Aclarar la decisión | S | Done | ESCALA confirma qué se quiere decidir, área afectada y resultado esperado. |
+| S43.2 | Armar el paquete de evidencia | M | Done | Muestra documentos usados, periodo, datos faltantes y nivel de certeza. |
+| S43.3 | Elegir la herramienta adecuada | M | Done | Usa el análisis local de workbook, reuniones, contexto o tareas según la necesidad. |
+| S43.4 | Revisar antes de responder | M | Done | Detecta contradicciones, cálculos dudosos y afirmaciones sin fuente. |
+| S43.5 | Entregar la respuesta ejecutiva | S | Done | Presenta qué veo, por qué importa, qué no sé, acción y pregunta siguiente. |
+| S43.6 | Calificar las cuatro decisiones | M | Done | Demuestra el ciclo con casos de People, Strategy, Execution y Cash. |
 
 ## S43.1 — Aclarar la decisión
 
@@ -169,7 +169,7 @@ no se integra hasta que S43.5 defina el formato final de respuesta.
 | Story | Estado | Evidencia esperada |
 |---|---|---|
 | S43.1 | Pending | Fichas de decisión y casos de aclaración. |
-| S43.2 | Pending | Paquetes de evidencia y rechazos seguros. |
+| S43.2 | Done | Paquetes de evidencia y rechazos seguros. |
 | S43.3 | Pending | Recibos de elección de análisis. |
 | S43.4 | Pending | Casos de contradicción, cálculo y pregunta faltante. |
 | S43.5 | Pending | Respuestas ejecutivas aprobadas por empresarios. |
@@ -188,3 +188,47 @@ no se integra hasta que S43.5 defina el formato final de respuesta.
 
 - Explicación visual del camino de evidencia → evaluar después de aceptación de
   S43.5; no es necesaria para probar el valor.
+
+## Implementation Plan
+
+### Story Sequence
+
+| Order | Story | Size | Dependencies | Rationale | Enables |
+|:---:|:---|:---:|:---|:---|:---|
+| 1 | S43.1 — Aclarar la decisión | S | — | Sin decisión clara, el resto analiza lo equivocado. | S43.2-S43.5 |
+| 2 | S43.2 — Armar el paquete de evidencia | M | S43.1 | La evidencia debe existir antes de elegir herramientas. | S43.3-S43.4 |
+| 3 | S43.3 — Elegir la herramienta adecuada | M | S43.2 | Prueba el primer recorrido real sin crear una plataforma nueva. | S43.4-S43.5 |
+| 4 | S43.4 — Revisar antes de responder | M | S43.3 | El riesgo principal es recomendar sin revisar contradicciones. | S43.5 |
+| 5 | S43.5 — Entregar la respuesta ejecutiva | S | S43.4 | Convierte el comportamiento interno en valor visible para el dueño. | S43.6 |
+| 6 | S43.6 — Calificar las cuatro decisiones | M | S43.5 | Extiende el patrón solo después de probar Cash y Weekly. | Gate E44 |
+
+### Milestones
+
+| Milestone | Stories | Success Criteria |
+|---|---|---|
+| M1 — Primer recorrido confiable | S43.1-S43.3 | Cash o Weekly llega de pregunta a evidencia y análisis sin dato inventado. |
+| M2 — Revisión visible | S43.4-S43.5 | Una contradicción se detecta y la respuesta ejecutiva explica su límite. |
+| M3 — Cuatro decisiones | S43.6 | Los cuatro pilares pasan casos positivos y negativos. |
+| M4 — Gate E44 | — | E42/E43 muestran mejor confianza y trazabilidad que la línea base. |
+
+### Parallel Work Streams
+
+- Después de S43.2, la preparación de casos de S43.6 puede avanzar en paralelo;
+  no se integra hasta que S43.5 defina el formato final de respuesta.
+
+### Progress Tracking
+
+| Story | Size | Status | Actual | Velocity | Notes |
+|---|---|:---:|:---:|:---:|:---|
+| S43.1 | S | Done | 27m | 7.2 | Primera story en secuencia. |
+| S43.2 | M | Done | — | — | Completada en merge 1ea8b33. |
+| S43.3 | M | Pending | — | — | Bloqueada por S43.2. |
+| S43.4 | M | Pending | — | — | Bloqueada por S43.3. |
+| S43.5 | S | Pending | — | — | Bloqueada por S43.4. |
+| S43.6 | M | Pending | — | — | Preparación puede empezar tras S43.2; integración tras S43.5. |
+
+### Sequencing Risks
+
+1. **Convertir la revisión en preguntas interminables** — Mitigación: una pregunta a la vez y detenerse cuando no cambie la decisión.
+2. **Confundir fuente disponible con fuente confiable** — Mitigación: marcar procedencia, periodo y certeza por separado.
+3. **Añadir una capa paralela a los flujos existentes** — Mitigación: reutilizar pipelines, ingesta, Cash, reuniones y coaching actuales.

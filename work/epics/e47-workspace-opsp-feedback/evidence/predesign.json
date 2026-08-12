@@ -1,0 +1,42 @@
+{
+  "schema_version": "2",
+  "epic_id": "E47",
+  "jira_key": "ESCALA-1",
+  "source_commit": "f13c5b1c1f0e4f810a2eaec041756e4f1977487e",
+  "registry_hash": "715ffd49b37df93ccbfc92cdda10c427289a84619e6918a735028edf03c3e577",
+  "graph_revision": "available; cross-project hits excluded from implementation claims",
+  "claims": [
+    {
+      "intent": "Codex workspace contract",
+      "queries": ["workspace provisioning Codex MCP", "rai-mcp-pipeline", "worktree register"],
+      "hits": [".mcp.json", "install.sh", "RaiSE worktree provisioner runtime evidence"],
+      "disposition": "extend",
+      "evidence": "The repository ships a tracked .mcp.json with a bare rai-mcp-pipeline command. A real RaiSE worktree provision created escala_coaching.egg-info and then rejected its own Git-visible drift.",
+      "jira_refs": ["ESCALA-1", "ESCALA-2"]
+    },
+    {
+      "intent": "installed resources are usable",
+      "queries": ["install.sh escala skills", "lifecycle installer package"],
+      "hits": ["install.sh", "escala_server/lifecycle/installer.py"],
+      "disposition": "extend",
+      "evidence": "install.sh symlinks skills and installs an editable package; the local bundle ships escala_server only. Neither path materializes the resources required by installed strategy skills.",
+      "jira_refs": ["ESCALA-1"]
+    },
+    {
+      "intent": "OPSP persistence and export",
+      "queries": ["one page strategic plan OPSP persistence", "WorksheetDAO strategy"],
+      "hits": ["escala-skills/escala-strategy-opsp/SKILL.md", "escala_server/daos/worksheet_dao.py", "escala_server/executive/cockpit.py"],
+      "disposition": "extend",
+      "evidence": "The OPSP skill is conversational and references missing .escala/template paths. WorksheetDAO already versions arbitrary structured payloads and the executive layer already represents a partial strategy plan.",
+      "jira_refs": ["ESCALA-1"]
+    },
+    {
+      "intent": "local contextual feedback",
+      "queries": ["local feedback bug report privacy", "escala bugreport"],
+      "hits": ["escala-skills/escala-bugreport/SKILL.md", "tests/test_bugreport_skill.py"],
+      "disposition": "extend",
+      "evidence": "A local-only fail-closed report exists, but it forbids reading the visible chat and emits JSON. E47 needs a user-confirmed Markdown report based only on the active conversation.",
+      "jira_refs": ["ESCALA-1"]
+    }
+  ]
+}

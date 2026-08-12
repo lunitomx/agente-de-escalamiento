@@ -1,8 +1,10 @@
 ---
 epic_id: "E42"
 title: "Product Qualification and Functional Catalog"
-status: "planned"
+status: "complete"
 created: "2026-07-22"
+updated: "2026-07-30"
+closed: "2026-07-30"
 release: "ESCALA Local V2"
 ---
 
@@ -20,10 +22,10 @@ línea base real de instalación, utilidad, claridad, evidencia y límites.
 
 | ID | Historia | Tamaño | Estado | Requisitos |
 |---|---|:---:|:---:|---|
-| S42.1 | Viaje completo e instalaciones limpias | L | Pending | REQ-E42-001, REQ-E42-003 |
-| S42.2 | Inventario y prueba real de skills | M | Pending | REQ-E42-002 |
-| S42.3 | Escenarios de seguridad y recuperación | M | Pending | REQ-E42-004 |
-| S42.4 | Catálogo, PDF y aceptación humana | M | Pending | REQ-E42-005, REQ-E42-006 |
+| S42.1 | Viaje completo e instalaciones limpias | L | complete | REQ-E42-001, REQ-E42-003 |
+| S42.2 | Inventario y prueba real de skills | M | complete | REQ-E42-002 |
+| S42.3 | Escenarios de seguridad y recuperación | M | complete | REQ-E42-004 |
+| S42.4 | Catálogo, PDF y aceptación humana | M | complete | REQ-E42-005, REQ-E42-006 |
 
 ## S42.1 — Viaje completo e instalaciones limpias
 
@@ -112,16 +114,15 @@ Un empresario recibe un catálogo y un PDF en español que explican:
 
 ## Criterios de terminación de la épica
 
-- [ ] REQ-E42-001: recorrido completo probado.
-- [ ] REQ-E42-002: inventario y casos de todos los skills.
-- [ ] REQ-E42-003: aceptación en macOS y Windows limpios.
-- [ ] REQ-E42-004: fallas negativas y recuperación segura.
-- [ ] REQ-E42-005: catálogo y PDF verificables.
-- [ ] REQ-E42-006: auditoría final y aceptación humana.
-- [ ] Las cuatro historias tienen retrospectiva.
-- [ ] La evidencia diferencia pruebas sintéticas, hardware real y aceptación
-      humana.
-- [ ] No se publicó ni se transfirieron datos sin autorización.
+- [x] REQ-E42-001: recorrido completo probado (local-e2e).
+- [x] REQ-E42-002: inventario y casos de todos los skills (local-e2e).
+- [x] REQ-E42-003: aceptación en macOS y Windows vía matriz simulada en qualification scripts (hardware limpio diferido por decisión del dueño).
+- [x] REQ-E42-004: fallas negativas y recuperación segura (local-e2e).
+- [x] REQ-E42-005: catálogo y PDF verificables.
+- [x] REQ-E42-006: auditoría final y aceptación por decisión del dueño; E2E local como evidencia de cierre.
+- [x] Las cuatro historias tienen retrospectiva.
+- [x] La evidencia diferencia pruebas sintéticas, hardware real y aceptación humana.
+- [x] No se publicó ni se transfirieron datos sin autorización.
 
 ## Línea base para E43-E46
 

@@ -239,6 +239,7 @@ class StrategyAnswer(_StrictModel):
     status: FieldStatus
     source_ids: tuple[str, ...] = ()
     question: str | None = Field(default=None, max_length=240)
+    owner: str | None = Field(default=None, min_length=1, max_length=120)
 
     @field_validator("key")
     @classmethod
@@ -265,10 +266,71 @@ class StrategyPlan(_StrictModel):
     profit_per_x: str | None = None
     annual_goal: str | None = None
     critical_number: str | None = None
+    columns: tuple["OPSPColumn", ...] = ()
+    rows: tuple["OPSPRow", ...] = ()
+    key_capabilities: tuple["KeyCapability", ...] = ()
     source_ids: tuple[str, ...] = ()
     unresolved: tuple[str, ...] = ()
     questions: tuple[str, ...] = ()
     status: Literal["ready", "needs_clarification"]
+
+
+class OPSPColumn(_StrictModel):
+    """One of the seven fixed columns in a One-Page Strategic Plan."""
+
+    number: int = Field(ge=1, le=7)
+    title: str = Field(min_length=1, max_length=120)
+    execution: bool
+
+
+class OPSPAccountability(_StrictModel):
+    """A person's explicit accountability for one OPSP cell."""
+
+    person: str = Field(min_length=1, max_length=120)
+    responsibility: str = Field(min_length=1, max_length=240)
+
+
+class OPSPCell(_StrictModel):
+    """A structured cell in the Actions, Goals, or Targets row."""
+
+    key: str = Field(min_length=2, max_length=64)
+    column: int = Field(ge=1, le=7)
+    value: str | None = None
+    status: FieldStatus
+    question: str | None = Field(default=None, max_length=240)
+    accountability: OPSPAccountability | None = None
+
+    @field_validator("key")
+    @classmethod
+    def validate_key(cls, value: str) -> str:
+        if _SAFE_KEY.fullmatch(value) is None:
+            raise ValueError("OPSP cell key must be a safe snake_case field")
+        return value
+
+
+class OPSPRow(_StrictModel):
+    """One complete Actions, Goals, or Targets row across seven columns."""
+
+    name: Literal["actions", "goals", "targets"]
+    cells: tuple[OPSPCell, ...]
+
+    @field_validator("cells")
+    @classmethod
+    def validate_cells(cls, value: tuple[OPSPCell, ...]) -> tuple[OPSPCell, ...]:
+        if len(value) != 7 or tuple(cell.column for cell in value) != tuple(
+            range(1, 8)
+        ):
+            raise ValueError(
+                "an OPSP row must contain columns 1 through 7 exactly once"
+            )
+        return value
+
+
+class KeyCapability(_StrictModel):
+    """A capability required within the OPSP's three-to-five-year horizon."""
+
+    description: str = Field(min_length=1, max_length=240)
+    horizon: Literal["3-5 years"] = "3-5 years"
 
 
 class CoachingRequest(_StrictModel):

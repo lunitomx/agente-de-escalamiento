@@ -275,30 +275,125 @@ def test_strategy_plan_preserves_vision_and_unresolved_opsp_sections() -> None:
     assert plan.status == "needs_clarification"
     assert plan.purpose == "hacer accesible la comida sana"
     assert plan.bhag == "100 tiendas en 10 años"
-    assert "critical_number" in plan.unresolved
-    assert any("critical_number" in question for question in plan.questions)
+    assert "annual_critical_number" in plan.unresolved
+    assert any("annual_critical_number" in question for question in plan.questions)
 
 
 def test_complete_strategy_plan_is_ready_without_fabricating_values() -> None:
-    keys = (
-        "vision",
-        "purpose",
-        "bhag",
-        "sandbox",
-        "brand_promise",
-        "profit_per_x",
-        "annual_goal",
-        "critical_number",
-    )
-    plan = build_strategy_plan(
-        tuple(
-            StrategyAnswer(key=key, value=f"owner-{key}", status="fact") for key in keys
-        )
-    )
+    plan = build_strategy_plan(_complete_opsp_answers())
 
     assert plan.status == "ready"
     assert plan.unresolved == ()
-    assert plan.critical_number == "owner-critical_number"
+    assert plan.critical_number == "owner-annual_critical_number"
+    assert plan.brand_promise == "owner-brand_promises"
+
+
+def _complete_opsp_answers() -> tuple[StrategyAnswer, ...]:
+    keys = (
+        "vision",
+        "core_values",
+        "key_capabilities",
+        "brand_promises",
+        "annual_priorities",
+        "q1_actions",
+        "q2_actions",
+        "q3_actions",
+        "purpose",
+        "bhag",
+        "sandbox",
+        "annual_goal",
+        "q1_goals",
+        "q2_goals",
+        "q3_goals",
+        "values_commitments",
+        "three_to_five_year_targets",
+        "profit_per_x",
+        "annual_critical_number",
+        "q1_critical_number",
+        "q2_critical_number",
+        "q3_critical_number",
+    )
+    return tuple(
+        StrategyAnswer(
+            key=key,
+            value=f"owner-{key}",
+            status="fact",
+            owner="Ana",
+        )
+        for key in keys
+    )
+
+
+def test_strategy_plan_models_the_full_one_page_structure() -> None:
+    plan = build_strategy_plan(_complete_opsp_answers())
+
+    assert [column.number for column in plan.columns] == list(range(1, 8))
+    assert [column.execution for column in plan.columns] == [
+        False,
+        False,
+        False,
+        True,
+        True,
+        True,
+        True,
+    ]
+    assert [row.name for row in plan.rows] == ["actions", "goals", "targets"]
+    assert all(
+        [cell.column for cell in row.cells] == list(range(1, 8)) for row in plan.rows
+    )
+    assert plan.key_capabilities[0].horizon == "3-5 years"
+    q1_actions = plan.rows[0].cells[4]
+    assert q1_actions.accountability is not None
+    assert q1_actions.accountability.person == "Ana"
+    assert q1_actions.accountability.responsibility == "owner-q1_actions"
+    assert plan.status == "ready"
+
+
+def test_strategy_plan_keeps_unknown_cells_and_questions_explicit() -> None:
+    plan = build_strategy_plan(
+        (
+            StrategyAnswer(
+                key="q1_actions",
+                value="Cerrar entrevistas de clientes",
+                status="inference",
+                owner="Ana",
+                question="¿Ana asume esta acción del primer trimestre?",
+            ),
+        )
+    )
+
+    q1_actions = plan.rows[0].cells[4]
+    assert q1_actions.status == "inference"
+    assert q1_actions.value is None
+    assert q1_actions.accountability is None
+    assert "q1_actions" in plan.unresolved
+    assert "¿Ana asume esta acción del primer trimestre?" in plan.questions
+
+
+def test_strategy_plan_requires_accountability_for_execution_cells() -> None:
+    answers = tuple(
+        StrategyAnswer(key=answer.key, value=answer.value, status=answer.status)
+        if answer.key == "q1_actions"
+        else answer
+        for answer in _complete_opsp_answers()
+    )
+
+    plan = build_strategy_plan(answers)
+
+    assert plan.rows[0].cells[4].value == "owner-q1_actions"
+    assert plan.rows[0].cells[4].accountability is None
+    assert "q1_actions_accountability" in plan.unresolved
+    assert plan.status == "needs_clarification"
+
+
+def test_strategy_answer_rejects_empty_accountability_owner() -> None:
+    with pytest.raises(ValidationError):
+        StrategyAnswer(
+            key="q1_actions",
+            value="Cerrar entrevistas de clientes",
+            status="fact",
+            owner="",
+        )
 
 
 def test_coaching_routes_explicit_cash_request_to_existing_skill() -> None:

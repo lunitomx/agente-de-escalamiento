@@ -32,6 +32,8 @@ node_modules/
 __pycache__/
 *.pyc
 *.pyo
+*.egg-info/
+uv.lock
 
 # === Environment & Secrets ===
 .env
@@ -45,6 +47,9 @@ Thumbs.db
 .vscode/
 .idea/
 
+# === Per-worktree MCP runtime ===
+.mcp.json
+
 # === Claude Code local settings (per-developer) ===
 .claude/settings.local.json
 
@@ -53,6 +58,7 @@ Thumbs.db
 .agents/
 .hermes/
 .codex/
+.codex-plugin/
 
 # === Generated user data (exports, not source) ===
 .scaleup/my-company/exports/
