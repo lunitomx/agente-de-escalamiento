@@ -64,7 +64,21 @@ def test_opsp_resources_define_one_execution_model_without_missing_templates() -
         assert "Actions / Goals / Targets" in text
         assert "Your Accountability" in text
         assert "Key Capabilities" in text
-        assert "S47.4" in text
+
+    # S47.4 shipped real persistence for the live, coach-facing catalog
+    # (escala-skills/) — the deferral marker is gone there, replaced by an
+    # assertion that persistence is actually wired. The .agents/.claude
+    # scaleup- mirrors are a separate, not-yet-canonical catalog (parity
+    # between the two is deferred catalog cleanup, not part of S47.4) and
+    # still honestly defer persistence.
+    escala_text = (ROOT / "escala-skills/escala-strategy-opsp/SKILL.md").read_text(
+        encoding="utf-8"
+    )
+    assert "coaching.strategy_opsp" in escala_text
+    assert ".escala/my-company/opsp.yaml" in escala_text
+
+    for skill_path in skill_paths[1:]:
+        assert "S47.4" in skill_path.read_text(encoding="utf-8")
 
 
 def test_7strata_requires_evidence_ids_for_differentiation_claims() -> None:
