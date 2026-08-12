@@ -1,0 +1,10 @@
+.env
+.env.local
+.envrc
+.claude/settings.local.json
+.hermes/config.yaml
+.raise/manifest.yaml
+.agents/
+governance/
+.codex/
+.codex-plugin/
