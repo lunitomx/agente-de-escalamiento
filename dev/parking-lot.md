@@ -50,3 +50,13 @@
 | Centralized cross-company learning or model training | E46 design | Rejected | Requires a new product decision, data agreements, anonymization review, legal approval, and a change to the local-only boundary |
 | Automatic application of skill, prompt, or code changes | E46 design | Rejected | E46 may prepare evidence and a reversible proposal; a named human must approve each promotion |
 | Permanent multi-agent execution for ordinary questions | E45 design | Rejected | Only reconsider if a measured pilot proves more business value than its added time and complexity |
+
+## From E47: Coherencia del viaje instalado (audit-driven tangents, 2026-08-11)
+
+| Item | Origin | Priority | Promotion Condition |
+|------|--------|----------|-------------------|
+| Consolidar catálogo escala-*/scaleup-* (62 + 39 skills, parcialmente duplicados) | Auditoría de producto vs. LifeOS | High | Aplicar el criterio Bitter Pill (¿un modelo con memoria real haría innecesario este skill?) a cada uno; fusionar al core Python o eliminar |
+| Decidir un solo repo de trabajo canónico entre ScaliingUPAI desarrollo y agente-de-escalamiento (mismo remoto, clones divergidos) | Auditoría E47 | Medium | `scripts/sync_live_clone.sh` mitiga el síntoma; falta decidir cuál clon es el de trabajo real |
+| Confirmar/rechazar el fix de visibilidad de `rai graph query` cross-repo en raise-commons (rama `fix/graph-query-cross-repo-gate`, commit `d0dc7bc11`, sin push) | Hallazgo lateral E47 (fuera de alcance del producto) | Low | Revisar cuando se trabaje en raise-commons directamente — no bloquea ESCALA |
+| `governance/guardrails.md` no está trackeado en git pero varios tests lo leen como si existiera | Higiene de working tree detectada durante E47 | Medium | Comitear el archivo o quitar la dependencia de los tests que lo leen |
+| Extender persistencia de OPSP (S47.4) a los mirrors `scaleup-strategy-opsp` en `.agents/.claude` | S47.4 (escala-skills solamente) | Low | Cuando se decida la consolidación de catálogo arriba — evita duplicar trabajo dos veces |
