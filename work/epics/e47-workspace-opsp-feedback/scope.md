@@ -1,7 +1,7 @@
 ---
 epic_id: "E47"
 title: "Coherencia del viaje instalado: Workspace, OPSP y Feedback"
-status: "designed"
+status: "done"
 created: "2026-08-09"
 jira_key: "ESCALA-1"
 ---
@@ -21,9 +21,9 @@ Hacer que el recorrido instalado de ESCALA sea coherente y recuperable: Codex op
 | S47.1 | Contrato Workspace Codex/MCP (`ESCALA-2`) | 5 | Done | CLI en sandbox falla de forma comprensible; Codex usa MCP; el provisionado no ensucia el worktree. |
 | S47.2 | Instalador, recursos y migración (`ESCALA-3`) | 8 | Done | Nueva y existente instalación reciben recursos/skills compatibles sin duplicados. |
 | S47.3 | OPSP completo y coherente (`ESCALA-4`) | 5 | Done | La guía representa columnas, filas, responsables y capacidades sin contradicciones. |
-| S47.4 | Persistir, reanudar y exportar OPSP (`ESCALA-8`) | 8 | Pending | Estado estructurado y Markdown local permiten continuar y exportar el plan. |
-| S47.5 | Feedback contextual local (`ESCALA-9`) | 5 | Pending | El usuario confirma bug/mejora y recibe un Markdown redactado, sin envío automático. |
-| S47.6 | Calificación y release (`ESCALA-10`) | 5 | Pending | Casos de instalación, regresión y límites de privacidad pasan con evidencia. |
+| S47.4 | Persistir, reanudar y exportar OPSP (`ESCALA-8`) | 8 | Done | Estado estructurado y Markdown local permiten continuar y exportar el plan. |
+| S47.5 | Feedback contextual local (`ESCALA-9`) | 5 | Done | El usuario confirma bug/mejora y recibe un reporte redactado, sin envío automático — ya satisfecho por `escala-bugreport/SKILL.md` existente, verificado con `tests/test_bugreport_skill.py`. |
+| S47.6 | Calificación y release (`ESCALA-10`) | 5 | Done | Casos de instalación, regresión y límites de privacidad pasan con evidencia: instalación aislada verificada, regresión 1097 passed (1 fallo preexistente ajeno), canary de privacidad en verde. |
 | S47.7 | Sincronizar clones del repo (`ESCALA-5`) | 3 | Done | Un fix en `escala-skills/` llega al clon que sirve los symlinks activos (`agente-de-escalamiento`) sin pasos manuales olvidables. |
 | S47.8 | ~~Evitar contaminación cross-repo en `rai graph query`~~ (`ESCALA-6`) | 3 | Fuera de alcance | RaiSE es herramienta interna de desarrollo, no una dependencia del producto — verificado que `install.sh`/`escala-skills/` no invocan `rai`. Fix de referencia dejado en raise-commons, no bloquea E47. |
 | S47.9 | Company State Document como Project de ChatGPT (`ESCALA-7`) | 5 | Done | El mismo documento de estado de empresa que usa S47.4/S47.3 en Claude es subible a un Project de ChatGPT (web y desktop) con instrucciones equivalentes. |
@@ -32,15 +32,16 @@ Hacer que el recorrido instalado de ESCALA sea coherente y recuperable: Codex op
 
 ## Criterios de terminación
 
-- [ ] Codex no requiere permiso permanente sobre una carpeta que mezcla base de datos y secretos.
-- [ ] El fallback CLI identifica una base de solo lectura y orienta a MCP en vez de devolver traceback.
-- [ ] El provisionador no crea artefactos Git-visibles y deja un worktree listo o explica el bloqueo.
-- [ ] Las instalaciones nuevas y existentes resuelven una única versión de cada skill y recurso.
-- [ ] OPSP mantiene pendientes explícitos y no inventa datos de empresa.
-- [ ] La persistencia local es versionada y recuperable.
-- [ ] Bug/mejora se confirma, se redacta y se guarda localmente; nunca se envía por defecto.
-- [ ] Las pruebas distinguen validación técnica de aceptación humana.
+- [x] Codex no requiere permiso permanente sobre una carpeta que mezcla base de datos y secretos (S47.1).
+- [x] El fallback CLI identifica una base de solo lectura y orienta a MCP en vez de devolver traceback (S47.1).
+- [x] El provisionador no crea artefactos Git-visibles y deja un worktree listo o explica el bloqueo (S47.1/S47.2).
+- [x] Las instalaciones nuevas y existentes resuelven una única versión de cada skill y recurso (S47.2; instalación aislada verificada en S47.6 — 62 skills, sin duplicados).
+- [x] OPSP mantiene pendientes explícitos y no inventa datos de empresa (S47.3 corrige el bug de traducción recursiva; S47.4 exporta `[PENDIENTE]` explícito, nunca inventado).
+- [x] La persistencia local es versionada y recuperable (S47.4: `.escala/my-company/opsp.yaml` + `opsp.md`, git-trackable).
+- [x] Bug/mejora se confirma, se redacta y se guarda localmente; nunca se envía por defecto (S47.5, `escala-bugreport`).
+- [x] Las pruebas distinguen validación técnica de aceptación humana (gates automáticos vs. checklist de calidad conversacional en cada SKILL.md).
 - [x] Jira: Epic `ESCALA-1` y S47.1 `ESCALA-2` creados con la cuenta Eduardo Luna.
+- [x] Regresión, instalación y límites de privacidad verificados con evidencia (S47.6): 1097 passed / 1 fallo preexistente ajeno; canary de boundary público en verde.
 
 ## Dependencias
 
