@@ -25,9 +25,16 @@ Leer las fuentes instaladas que sí existen:
 - `conocimiento/strategy/worksheets/opsp.yaml`
 - evidencia y perfil de empresa disponibles, sólo si el usuario los confirma.
 
-No declares que existe una plantilla, un archivo previo ni un plan guardado si
-no se ha confirmado. S47.4 incorporará persistencia, reanudación y exportación
-local; esta guía sólo construye y revisa el modelo.
+Cargar el estado guardado (si existe) con el core Python:
+
+```bash
+echo '{"action": "load", "base_path": "."}' | python3 -m coaching.strategy_opsp
+```
+
+Si `resuming` es `true`, decirle al usuario qué secciones ya tiene llenas
+(según `missing`) antes de seguir — nunca asumir que empieza de cero si hay
+estado guardado, y nunca afirmar que hay un plan guardado si `resuming` es
+`false`.
 
 ### Step 2: Establish the One-Page Structure
 
@@ -44,12 +51,19 @@ Facilitar ejercicio de descubrimiento:
 2. "¿Qué valores tiene la persona que más admiras en tu equipo?"
 3. "¿Qué no negociarías aunque te costara dinero?"
 
-Llegar a 3-5 Core Values. Guardar.
+Llegar a 3-5 Core Values. Guardar:
+
+```bash
+echo '{"action": "save", "base_path": ".", "section": "core_values", "data": ["valor 1", "valor 2", "..."]}' | python3 -m coaching.strategy_opsp
+```
 
 ### Step 4: Purpose & BHAG
 
 - **Purpose:** "¿Por qué existe tu empresa más allá de hacer dinero?"
 - **BHAG:** "¿Cuál es tu meta audaz a 10-25 años que inspira a todo el equipo?"
+
+Guardar cada campo con su propia llamada (`section: "purpose"` con un
+string; `section: "bhag"` con `{"statement": ..., "target_date": ..., "progress": ...}`).
 
 ### Step 5: Sandbox (3-5 años)
 
@@ -59,15 +73,22 @@ Definir la "arena competitiva":
 - Segmento de clientes
 - Producto/servicio foco
 
+Guardar con `section: "sandbox"` y
+`{"revenue_target", "profit_target", "market_geography", "customer_segment", "product_focus"}`.
+
 ### Step 6: Brand Promise & Profit per X
 
 - **Brand Promise:** "¿Qué promesa medible le haces a tu cliente?"
 - **KPI de la promesa:** "¿Cómo la mides?"
 - **Profit per X:** "¿Cuál es tu motor económico? ¿Profit per qué?"
 
+Guardar `section: "brand_promise"` (`promise`, `kpi`, `guarantee`,
+`catalytic_mechanism`) y `section: "profit_per_x"` (`x`, `amount`) por separado.
+
 ### Step 7: Annual Goals
 
-Metas anuales: revenue, profit, top 5 prioridades del año.
+Metas anuales: revenue, profit, top 5 prioridades del año. Guardar
+`section: "annual_goals"` con `{"year", "revenue_target", "profit_target", "priorities": [{"priority", "owner", "kpi"}]}`.
 
 ### Step 8: Quarterly Plan
 
@@ -75,21 +96,34 @@ Metas anuales: revenue, profit, top 5 prioridades del año.
 - **Top 5 prioridades** con owner y KPI
 - **Theme:** nombre creativo + celebración + deadline + scoreboard
 
-### Step 9: Review Without False Persistence
+Guardar `section: "quarterly_plan"` con
+`{"quarter", "critical_number", "priorities": [{"priority", "owner", "kpi", "status"}], "theme": {"name", "celebration", "deadline", "scoreboard"}}`.
+
+### Step 9: Export — Nunca Afirmar Persistencia Falsa
 
 Revisar completitud: ¿Cabe en una página? ¿Es claro? ¿Lo entendería un empleado nuevo?
-Si falta un dato, declararlo pendiente y pedir una sola aclaración. No afirmar
-que el OPSP se guardó: esa capacidad pertenece a S47.4.
+Exportar el estado guardado a Markdown:
+
+```bash
+echo '{"action": "export", "base_path": ".", "company_name": "...", "date": "..."}' | python3 -m coaching.strategy_opsp
+```
+
+El resultado se escribe en `.escala/my-company/opsp.md` y cualquier campo sin
+guardar aparece como `[PENDIENTE]` — nunca inventado. Si `missing` no está
+vacío, decirle al usuario exactamente qué falta y ofrecer continuar ahora o
+en la próxima sesión (el estado ya quedó guardado en `.escala/my-company/opsp.yaml`,
+así que retomar no pierde nada).
 
 <verification>
-Estructura del Plan Estratégico de Una Página (OPSP) revisada; pendientes explícitos y sin promesa de persistencia.
+`opsp.yaml` y `opsp.md` existen en `.escala/my-company/`; pendientes explícitos, ningún dato inventado.
 </verification>
 
 ## Output
 
 | Item | Destination |
 |------|-------------|
-| Estructura OPSP revisada | Conversación actual; S47.4 añadirá persistencia local |
+| Estado estructurado | `.escala/my-company/opsp.yaml` |
+| Documento exportado | `.escala/my-company/opsp.md` |
 | Next | `/escala-execution` o `/escala-progress` |
 
 ## Quality Checklist
