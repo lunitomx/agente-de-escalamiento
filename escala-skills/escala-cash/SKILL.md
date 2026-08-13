@@ -43,7 +43,7 @@ El motor está en `escala_server/cash/__init__.py` (PowerOfOneEngine).
 - NO usar jerga financiera sin tooltip: "días en cobrar" en vez de "DSO"
 - Benchmarks por industria en `escala-cash-power1`
 - Dar crédito: Alan Miltz (metodología) · Humberto Martínez Barón (implementación)
-- Verne debe opinar después de cada cálculo
+- El asesor debe recomendar después de cada cálculo
 
 ## Output
 

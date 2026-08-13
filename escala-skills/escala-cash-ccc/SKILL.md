@@ -35,7 +35,7 @@ CCC = DSO + DIO - DPO
 1. Preguntar datos en humano: ventas, costo, cuentas x cobrar, inventario, cuentas x pagar
 2. Calcular DSO/DIO/DPO/CCC
 3. Identificar cuál de los 3 aprieta más
-4. Recomendar acción con Verne
+4. Recomendar acción priorizada
 5. Guardar en `work/cash/ccc-analysis.md`
 
 ---
