@@ -4,8 +4,6 @@ serves the live ~/.claude/skills symlinks from silently drifting apart."""
 import subprocess
 from pathlib import Path
 
-import pytest
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = REPO_ROOT / "scripts" / "sync_live_clone.sh"
 
@@ -21,8 +19,12 @@ def run(*args: str) -> subprocess.CompletedProcess:
 
 def _init_repo(path: Path, remote_url: str) -> None:
     subprocess.run(["git", "init", "-q", str(path)], check=True)
-    subprocess.run(["git", "-C", str(path), "remote", "add", "origin", remote_url], check=True)
-    subprocess.run(["git", "-C", str(path), "config", "user.email", "t@example.com"], check=True)
+    subprocess.run(
+        ["git", "-C", str(path), "remote", "add", "origin", remote_url], check=True
+    )
+    subprocess.run(
+        ["git", "-C", str(path), "config", "user.email", "t@example.com"], check=True
+    )
     subprocess.run(["git", "-C", str(path), "config", "user.name", "Test"], check=True)
     (path / "README.md").write_text("x\n")
     subprocess.run(["git", "-C", str(path), "add", "README.md"], check=True)
