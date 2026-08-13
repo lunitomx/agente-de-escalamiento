@@ -43,7 +43,9 @@ def run(context: dict) -> dict:
         return {
             "output": "",
             "artifacts": {},
-            "errors": [f"Acción desconocida: {action!r}. Válidas: {', '.join(ACTIONS)}"],
+            "errors": [
+                f"Acción desconocida: {action!r}. Válidas: {', '.join(ACTIONS)}"
+            ],
         }
 
     if action == "load":

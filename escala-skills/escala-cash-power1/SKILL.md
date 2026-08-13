@@ -14,7 +14,7 @@ financieras. Identificar las de mayor impacto y generar recomendaciones accionab
 
 ## Créditos
 
-- **Metodología:** Alan Miltz (Scaling Up / Gazelles)
+- **Metodología:** Alan Miltz
 - **Implementación original:** Humberto Martínez Barón
 - **Motor backend:** `escala_server/cash/__init__.py`
 
@@ -59,7 +59,7 @@ Usar `POST /api/cash/power-of-one` o las fórmulas de arriba.
 
 Score = Impacto ÷ Dificultad. Incluir: impacto ($), dificultad (1-5), tiempo, principio Rockefeller.
 
-### Step 4: Verne Recommends
+### Step 4: Recomendación priorizada
 
 Decir prioridad #1, por qué, y "¿Qué vas a hacer al respecto?"
 
