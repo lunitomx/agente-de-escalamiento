@@ -67,6 +67,25 @@ python3 .escala/agent/validators/diagnose.py .escala/agent/memory/company-profil
 
 Mostrar el `output` del core module. Si hay routing a sub-agente, preguntar si el usuario quiere ir ahora.
 
+### Contrato E49: resultado explicable
+
+Cuando la evaluación llega desde la bienvenida conversacional, construir el
+intake con evidencia tipada antes de calcular el resultado. Cada respuesta debe
+conservar `evidence_id`, `source_kind`, `source_ref`, `answer_status`,
+`applicability`, `freshness` y `confidence`.
+
+- `not_applicable` y `unknown` nunca se convierten en cero.
+- El denominador y la cobertura se muestran junto al score.
+- El foco debe incluir los IDs de evidencia que lo sostienen y la regla de
+  selección; los empates no se ocultan.
+- La ruta propuesta se limita a dos acciones iniciales, con dueño y métrica por
+  confirmar cuando no existan.
+- El resultado se persiste como artefacto local Markdown + JSON bajo la autoridad
+  existente; no se envía a un servicio hospedado ni activa telemetría.
+
+Si no hay evidencia suficiente, entregar una recomendación provisional y una
+pregunta concreta para completar el dato. No fabricar precisión.
+
 ### Step 6: Partial Re-diagnosis
 
 Para re-evaluar solo una decisión:
