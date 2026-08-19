@@ -4,6 +4,22 @@ Welcome module — company intake, stage detection, profile creation.
 
 from pathlib import Path
 from ..core import detect_stage, write_yaml
+from .conversation import (
+    MaturityProfile,
+    WelcomeState,
+    WelcomeTurn,
+    begin_welcome,
+    respond_to_welcome,
+)
+
+__all__ = [
+    "MaturityProfile",
+    "WelcomeState",
+    "WelcomeTurn",
+    "begin_welcome",
+    "respond_to_welcome",
+    "run",
+]
 
 
 def run(context: dict) -> dict:
