@@ -3,24 +3,30 @@
 from .explainable import score_diagnostic
 from .intake import build_diagnostic_intake
 from .prefill import build_prefill, confirm_prefill
+from .result import build_diagnostic_result
 from .models import (
+    DiagnosticResult,
     DecisionScore,
     DiagnosticEvidence,
     DiagnosticIntake,
     ExplainableDiagnosis,
     FunnelMetrics,
     PrefillResult,
+    RouteAction,
 )
 
 __all__ = [
     "DiagnosticEvidence",
     "DiagnosticIntake",
+    "DiagnosticResult",
     "DecisionScore",
     "ExplainableDiagnosis",
     "FunnelMetrics",
     "PrefillResult",
+    "RouteAction",
     "build_prefill",
     "build_diagnostic_intake",
+    "build_diagnostic_result",
     "confirm_prefill",
     "score_diagnostic",
 ]

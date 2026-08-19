@@ -9,6 +9,9 @@ import datetime
 from pathlib import Path
 
 from ..core import read_yaml, ensure_dir
+from .diagnostic import run_diagnostic
+
+__all__ = ["run", "run_diagnostic"]
 
 # ---------------------------------------------------------------------------
 # Constants
