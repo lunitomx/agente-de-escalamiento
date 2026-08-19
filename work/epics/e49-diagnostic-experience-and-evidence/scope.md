@@ -24,7 +24,7 @@ actionable handoff.
 |----|-------|:----:|:------:|-------------|
 | S49.1 | Canonical diagnostic evidence contract | S | **Done** (2026-08-19) | Define typed evidence, provenance, freshness, confidence, N/A, and answer IDs without changing the four-decision backbone. |
 | S49.2 | Conversational welcome walking skeleton | M | **Done** (2026-08-19) | Route one question at a time from first concern to provisional focus and next step. |
-| S49.3 | Optional evidence pack and source adapters | M | Pending | Deepen only when useful; accept conversation, files, CRM exports, and estimates with explicit source status. |
+| S49.3 | Optional evidence pack and source adapters | M | **Done** (2026-08-19) | Deepen only when useful; accept conversation, files, CRM exports, and estimates with explicit source status. |
 | S49.4 | Explainable scoring and bottleneck evidence | M | Pending | Score four decisions, exclude N/A from denominators, expose uncertainty, and link the focus to supporting answers. |
 | S49.5 | Diagnostic result and 90-day action route | M | Pending | Produce local Markdown/machine-readable output with scorecard, funnel, evidence, owner, metric, and bounded route. |
 | S49.6 | Prefill, freshness, and privacy lifecycle | S | Pending | Reuse eligible profile/OPSP facts with source/freshness confirmation and local retention/export controls. |
@@ -225,7 +225,7 @@ Stream 2 (Parallel):          └────── S49.6 ──────┘
 |-------|:----:|:------:|:------:|:--------:|-------|
 | S49.1 | S | **Done** | 2026-08-19 | — | Contract, tests, AR/QR, and retrospective merged; global closure gate has unrelated baseline failures. |
 | S49.2 | M | **Done** | 2026-08-19 | — | Walking skeleton, AR/QR, and retrospective merged. |
-| S49.3 | M | Pending | — | — | Targeted evidence, not a universal form. |
+| S49.3 | M | **Done** | 2026-08-19 | — | Typed funnel/intake, AR/QR, and retrospective merged. |
 | S49.4 | M | Pending | — | — | Explainability and N/A denominator are acceptance-critical. |
 | S49.5 | M | Pending | — | — | Result artifact and 90-day route. |
 | S49.6 | S | Pending | — | — | Parallel lifecycle/prefill stream. |
