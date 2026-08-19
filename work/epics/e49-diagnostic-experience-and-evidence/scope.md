@@ -1,6 +1,6 @@
 # Epic E49: Experiencia diagnóstica y evidencia accionable para Escala — Scope
 
-> **Status:** DRAFT — awaiting product-owner review
+> **Status:** IN PROGRESS — S49.1 complete
 > **Release:** REL-TBD (diagnostic experience)
 > **Created:** 2026-08-19
 > **Design:** `design.md`
@@ -22,7 +22,7 @@ actionable handoff.
 
 | ID | Story | Size | Status | Description |
 |----|-------|:----:|:------:|-------------|
-| S49.1 | Canonical diagnostic evidence contract | S | Pending | Define typed evidence, provenance, freshness, confidence, N/A, and answer IDs without changing the four-decision backbone. |
+| S49.1 | Canonical diagnostic evidence contract | S | **Done** (2026-08-19) | Define typed evidence, provenance, freshness, confidence, N/A, and answer IDs without changing the four-decision backbone. |
 | S49.2 | Conversational welcome walking skeleton | M | Pending | Route one question at a time from first concern to provisional focus and next step. |
 | S49.3 | Optional evidence pack and source adapters | M | Pending | Deepen only when useful; accept conversation, files, CRM exports, and estimates with explicit source status. |
 | S49.4 | Explainable scoring and bottleneck evidence | M | Pending | Score four decisions, exclude N/A from denominators, expose uncertainty, and link the focus to supporting answers. |
@@ -223,7 +223,7 @@ Stream 2 (Parallel):          └────── S49.6 ──────┘
 
 | Story | Size | Status | Actual | Velocity | Notes |
 |-------|:----:|:------:|:------:|:--------:|-------|
-| S49.1 | S | Pending | — | — | Contract is the first design gate. |
+| S49.1 | S | **Done** | 2026-08-19 | — | Contract, tests, AR/QR, and retrospective merged; global closure gate has unrelated baseline failures. |
 | S49.2 | M | Pending | — | — | Walking skeleton; no deep evidence required. |
 | S49.3 | M | Pending | — | — | Targeted evidence, not a universal form. |
 | S49.4 | M | Pending | — | — | Explainability and N/A denominator are acceptance-critical. |
