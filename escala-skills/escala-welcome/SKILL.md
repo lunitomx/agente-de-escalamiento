@@ -76,6 +76,26 @@ Objetivo: en menos de 10 minutos desde "hola", el usuario debe tener:
 - Un dashboard o documento generado
 - Un siguiente paso concreto
 
+### Contrato E49: dos velocidades
+
+La bienvenida debe producir un valor provisional antes de pedir evidencia
+profunda. El agente mantiene un estado conversacional serializable con:
+
+- preocupación, perfil de madurez, decisión candidata y siguiente acción
+  interna;
+- una sola pregunta visible por turno, sin mostrar nombres de skills ni
+  comandos;
+- una ruta de evidencia opcional sólo cuando el usuario necesita probar o
+  cuantificar el foco.
+
+Cuando se propone información previa del perfil u OPSP, se muestra su fuente y
+frescura. Un dato precargado es una inferencia hasta que el empresario lo
+confirma; un dato viejo o sin fecha genera una pregunta, no una certeza.
+
+La bienvenida no presenta un formulario largo como requisito de entrada. Si el
+usuario tiene un dolor específico, se ataca ese dolor; si la respuesta es vaga,
+se hace una sola pregunta de encuadre.
+
 ### Cierre
 
 "Hemos avanzado. Esto es lo que tenemos:
