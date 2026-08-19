@@ -2,12 +2,14 @@
 
 from .explainable import score_diagnostic
 from .intake import build_diagnostic_intake
+from .prefill import build_prefill, confirm_prefill
 from .models import (
     DecisionScore,
     DiagnosticEvidence,
     DiagnosticIntake,
     ExplainableDiagnosis,
     FunnelMetrics,
+    PrefillResult,
 )
 
 __all__ = [
@@ -16,7 +18,10 @@ __all__ = [
     "DecisionScore",
     "ExplainableDiagnosis",
     "FunnelMetrics",
+    "PrefillResult",
+    "build_prefill",
     "build_diagnostic_intake",
+    "confirm_prefill",
     "score_diagnostic",
 ]
 

@@ -109,3 +109,11 @@ class ExplainableDiagnosis(BaseModel):
     focus: str | None = None
     focus_evidence_ids: list[str] = Field(default_factory=list)
     selection_rule: str = "lowest_score_then_decision_order"
+
+
+class PrefillResult(BaseModel):
+    """Proposed profile/OPSP facts awaiting explicit confirmation."""
+
+    evidence: list[DiagnosticEvidence] = Field(default_factory=list)
+    confirmation_ids: list[str] = Field(default_factory=list)
+    questions: list[str] = Field(default_factory=list)
