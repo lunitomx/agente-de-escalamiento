@@ -26,7 +26,7 @@ actionable handoff.
 | S49.2 | Conversational welcome walking skeleton | M | **Done** (2026-08-19) | Route one question at a time from first concern to provisional focus and next step. |
 | S49.3 | Optional evidence pack and source adapters | M | **Done** (2026-08-19) | Deepen only when useful; accept conversation, files, CRM exports, and estimates with explicit source status. |
 | S49.4 | Explainable scoring and bottleneck evidence | M | **Done** (2026-08-19) | Score four decisions, exclude N/A from denominators, expose uncertainty, and link the focus to supporting answers. |
-| S49.5 | Diagnostic result and 90-day action route | M | Pending | Produce local Markdown/machine-readable output with scorecard, funnel, evidence, owner, metric, and bounded route. |
+| S49.5 | Diagnostic result and 90-day action route | M | **Done** (2026-08-19) | Produce local Markdown/machine-readable output with scorecard, funnel, evidence, owner, metric, and bounded route. |
 | S49.6 | Prefill, freshness, and privacy lifecycle | S | **Done** (2026-08-19) | Reuse eligible profile/OPSP facts with source/freshness confirmation and local retention/export controls. |
 | S49.7 | Dogfood comparison and acceptance evidence | S | Pending | Compare the new flow with the current baseline and observed Accelerator strengths using time, completion, actionability, and trust measures. |
 
@@ -227,7 +227,7 @@ Stream 2 (Parallel):          └────── S49.6 ──────┘
 | S49.2 | M | **Done** | 2026-08-19 | — | Walking skeleton, AR/QR, and retrospective merged. |
 | S49.3 | M | **Done** | 2026-08-19 | — | Typed funnel/intake, AR/QR, and retrospective merged. |
 | S49.4 | M | **Done** | 2026-08-19 | — | Explainable scores, AR/QR, and retrospective merged. |
-| S49.5 | M | Pending | — | — | Result artifact and 90-day route. |
+| S49.5 | M | **Done** | 2026-08-19 | — | Local Markdown/JSON result, AR/QR, and retrospective merged. |
 | S49.6 | S | **Done** | 2026-08-19 | — | Pure prefill/confirmation, AR/QR, and retrospective merged. |
 | S49.7 | S | Pending | — | — | Redacted benchmark and dogfood receipt. |
 
