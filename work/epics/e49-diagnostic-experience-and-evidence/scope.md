@@ -1,6 +1,6 @@
 # Epic E49: Experiencia diagnóstica y evidencia accionable para Escala — Scope
 
-> **Status:** IN PROGRESS — S49.1 complete
+> **Status:** READY FOR EPIC CLOSE — S49.1–S49.7 complete
 > **Release:** REL-TBD (diagnostic experience)
 > **Created:** 2026-08-19
 > **Design:** `design.md`
@@ -28,7 +28,7 @@ actionable handoff.
 | S49.4 | Explainable scoring and bottleneck evidence | M | **Done** (2026-08-19) | Score four decisions, exclude N/A from denominators, expose uncertainty, and link the focus to supporting answers. |
 | S49.5 | Diagnostic result and 90-day action route | M | **Done** (2026-08-19) | Produce local Markdown/machine-readable output with scorecard, funnel, evidence, owner, metric, and bounded route. |
 | S49.6 | Prefill, freshness, and privacy lifecycle | S | **Done** (2026-08-19) | Reuse eligible profile/OPSP facts with source/freshness confirmation and local retention/export controls. |
-| S49.7 | Dogfood comparison and acceptance evidence | S | Pending | Compare the new flow with the current baseline and observed Accelerator strengths using time, completion, actionability, and trust measures. |
+| S49.7 | Dogfood comparison and acceptance evidence | S | **Done** (2026-08-19) | Compare the new flow with the current baseline and observed Accelerator strengths using time, completion, actionability, and trust measures. |
 
 **Total:** 7 stories, 18 SP (S=2, M=3)
 
@@ -75,16 +75,16 @@ actionable handoff.
 
 **Epic complete:**
 
-- [ ] All stories S49.1–S49.7 complete.
-- [ ] A synthetic/dogfood user reaches a provisional insight before deepening.
-- [ ] Optional evidence produces a result with scores, confidence, evidence
+- [x] All stories S49.1–S49.7 complete.
+- [x] A synthetic/dogfood user reaches a provisional insight before deepening.
+- [x] Optional evidence produces a result with scores, confidence, evidence
   links, N/A handling, and a 90-day route.
-- [ ] No seller/no applicable cases do not depress scores through fake zeros.
-- [ ] Prefilled facts display source/freshness and require confirmation when
+- [x] No seller/no applicable cases do not depress scores through fake zeros.
+- [x] Prefilled facts display source/freshness and require confirmation when
   stale or inferred.
-- [ ] Output is locally persisted and exportable without telemetry or hosted
+- [x] Output is locally persisted and exportable without telemetry or hosted
   transmission.
-- [ ] Comparison receipt records completion time, abandonment, evidence
+- [x] Comparison receipt records completion time, abandonment, evidence
   coverage, actionability, and user trust; no raw personal data is committed.
 - [ ] Epic retrospective done and merged to `main`.
 
@@ -229,7 +229,7 @@ Stream 2 (Parallel):          └────── S49.6 ──────┘
 | S49.4 | M | **Done** | 2026-08-19 | — | Explainable scores, AR/QR, and retrospective merged. |
 | S49.5 | M | **Done** | 2026-08-19 | — | Local Markdown/JSON result, AR/QR, and retrospective merged. |
 | S49.6 | S | **Done** | 2026-08-19 | — | Pure prefill/confirmation, AR/QR, and retrospective merged. |
-| S49.7 | S | Pending | — | — | Redacted benchmark and dogfood receipt. |
+| S49.7 | S | **Done** | 2026-08-19 | — | Synthetic E2E path, skill integration, and acceptance receipt merged. |
 
 ### Sequencing Risks
 

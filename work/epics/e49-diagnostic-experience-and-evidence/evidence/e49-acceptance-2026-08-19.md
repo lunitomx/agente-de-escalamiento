@@ -24,7 +24,8 @@ begin_welcome
 
 | Measure | Evidence | Result |
 |---|---|---|
-| First useful route | Synthetic concern is routed after one response | PASS |
+| First useful route | Synthetic concern is routed after one user response (1 turn to route) | PASS |
+| Completion / abandonment | 1/1 synthetic runs completed; 0/1 abandoned | PASS (synthetic proxy) |
 | Evidence coverage | Scorecard includes coverage, confidence, and evidence IDs | PASS |
 | N/A semantics | Contract excludes `not_applicable` from denominator | PASS |
 | Actionability | Result contains no more than two route actions with metric slots | PASS |
