@@ -117,3 +117,27 @@ class PrefillResult(BaseModel):
     evidence: list[DiagnosticEvidence] = Field(default_factory=list)
     confirmation_ids: list[str] = Field(default_factory=list)
     questions: list[str] = Field(default_factory=list)
+
+
+class RouteAction(BaseModel):
+    """One bounded action in the first 90-day route."""
+
+    quarter: str = Field(..., min_length=1)
+    decision: str = Field(..., min_length=1)
+    action: str = Field(..., min_length=1)
+    owner: str | None = None
+    metric: str | None = None
+    rationale: str | None = None
+
+
+class DiagnosticResult(BaseModel):
+    """Stable local result consumed by Markdown and machine-readable exports."""
+
+    diagnosis: ExplainableDiagnosis
+    funnel: FunnelMetrics | None = None
+    route: list[RouteAction] = Field(default_factory=list, max_length=2)
+    company: dict[str, Any] = Field(default_factory=dict)
+    open_context: dict[str, str] = Field(default_factory=dict)
+    owner_context: dict[str, str] = Field(default_factory=dict)
+    generated_at: date | datetime
+    provenance: dict[str, Any] = Field(default_factory=dict)
