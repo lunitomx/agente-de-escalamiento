@@ -30,6 +30,7 @@ class DiagnosticEvidence(BaseModel):
 
     evidence_id: str = Field(..., min_length=1, pattern=r"^[a-z0-9][a-z0-9_.-]*$")
     question_id: str = Field(..., min_length=1)
+    decision: str | None = None
     value: Any = None
     applicability: Applicability = "applicable"
     answer_status: AnswerStatus = "fact"
@@ -85,3 +86,26 @@ class DiagnosticIntake(BaseModel):
     funnel: FunnelMetrics | None = None
     open_context: dict[str, str] = Field(default_factory=dict)
     owner_context: dict[str, str] = Field(default_factory=dict)
+
+
+class DecisionScore(BaseModel):
+    """One explainable decision score and its evidence coverage."""
+
+    decision: str
+    score: float | None = None
+    answered: int = 0
+    applicable: int = 0
+    excluded: int = 0
+    coverage: float = Field(default=0.0, ge=0.0, le=1.0)
+    confidence: Confidence = "low"
+    evidence_ids: list[str] = Field(default_factory=list)
+    excluded_evidence_ids: list[str] = Field(default_factory=list)
+
+
+class ExplainableDiagnosis(BaseModel):
+    """Scorecard with a traceable focus selection."""
+
+    scores: dict[str, DecisionScore] = Field(default_factory=dict)
+    focus: str | None = None
+    focus_evidence_ids: list[str] = Field(default_factory=list)
+    selection_rule: str = "lowest_score_then_decision_order"
