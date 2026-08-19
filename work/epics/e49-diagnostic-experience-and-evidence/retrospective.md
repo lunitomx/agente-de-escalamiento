@@ -27,7 +27,7 @@ being implied by the synthetic receipt.
 | Story Points | 18 SP | 2 S + 5 M stories as scoped |
 | Tests Added | 31 | Contract, conversation, intake, scoring, prefill, result, and acceptance |
 | Scoped E49 Tests | 66 passed | Welcome + diagnose + export + synthetic acceptance |
-| Full Suite | 1126 passed, 3 failed, 2 skipped | Remaining failures are pre-existing server-start and entry-point environment issues, outside E49 changed surfaces |
+| Full Suite | 1127 passed, 2 failed, 2 skipped | Entry-point failure cleared after editable local install; two remaining server-start failures are pre-existing HTTP/DNS behavior outside E49 changed surfaces |
 | Average Velocity | Not measured | RaiSE calibration/pattern writes hit readonly shared DB |
 | Calendar Days | 1 | Same-day implementation and local integration |
 
@@ -62,9 +62,14 @@ being implied by the synthetic receipt.
 - The RaiSE pipeline/backlog database was readonly for this checkout, so
   pattern reinforcement, calibration, and external backlog registration could
   not be persisted; the failures are recorded rather than fabricated as green.
-- The full suite still has three unrelated baseline failures: two server
-  resilience tests cannot observe the server startup, and the gate entry-point
-  discovery test lacks installed package entry points.
+- The checkout initially lacked its ignored local `.raise/manifest.yaml`; it was
+  reconstructed from the existing S48 worktree manifests, which allowed
+  lint/format/type gates and the entry-point check to run locally. It is not a
+  tracked release artifact.
+- The full suite still has two unrelated baseline failures: HTTP server
+  resilience tests cannot observe startup because `HTTPServer.server_bind`
+  blocks in `socket.getfqdn` under this environment. The entry-point failure was
+  environment-only and now passes after installing the editable package.
 - Human dogfood timing, abandonment, and trust feedback should be captured in a
   follow-on approved session before claiming UX superiority.
 - Compatibility dictionary access on `FunnelMetrics` should be removed after
@@ -107,7 +112,7 @@ authority gate.
   abandonment, trust, and usefulness feedback.
 - Remove the temporary `FunnelMetrics.__getitem__` compatibility shim after
   consumer migration.
-- Resolve the unrelated server startup and package entry-point baseline
-  failures in their owning bugfix/epic, not in E49.
+- Resolve the unrelated server startup/DNS behavior in the owning E27
+  bugfix/epic, not in E49.
 - Register/push the epic when a writable backlog and release authority are
   available.
