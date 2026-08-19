@@ -1,6 +1,8 @@
-"""
-Diagnose module — structured assessment across 4 decisions.
-"""
+"""Diagnose module — structured assessment across 4 decisions."""
+
+from .models import DiagnosticEvidence, DiagnosticIntake
+
+__all__ = ["DiagnosticEvidence", "DiagnosticIntake"]
 
 from pathlib import Path
 from ..core import read_yaml, write_yaml
