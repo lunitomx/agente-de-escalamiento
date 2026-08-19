@@ -1,13 +1,23 @@
 """Diagnose module — structured assessment across 4 decisions."""
 
+from .explainable import score_diagnostic
 from .intake import build_diagnostic_intake
-from .models import DiagnosticEvidence, DiagnosticIntake, FunnelMetrics
+from .models import (
+    DecisionScore,
+    DiagnosticEvidence,
+    DiagnosticIntake,
+    ExplainableDiagnosis,
+    FunnelMetrics,
+)
 
 __all__ = [
     "DiagnosticEvidence",
     "DiagnosticIntake",
+    "DecisionScore",
+    "ExplainableDiagnosis",
     "FunnelMetrics",
     "build_diagnostic_intake",
+    "score_diagnostic",
 ]
 
 from pathlib import Path
