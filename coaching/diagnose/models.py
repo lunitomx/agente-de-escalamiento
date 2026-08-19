@@ -58,11 +58,30 @@ class DiagnosticEvidence(BaseModel):
         return self.applicability == "applicable" and self.answer_status != "unanswered"
 
 
+class FunnelMetrics(BaseModel):
+    """Optional commercial funnel counts; absent fields stay absent."""
+
+    prospects: int | None = Field(default=None, ge=0)
+    conversations: int | None = Field(default=None, ge=0)
+    proposals: int | None = Field(default=None, ge=0)
+    wins: int | None = Field(default=None, ge=0)
+    average_sale: float | None = Field(default=None, ge=0)
+
+    @property
+    def total_prospects(self) -> int:
+        """Return the known total for compatibility with funnel consumers."""
+        return self.prospects or 0
+
+    def __getitem__(self, key: str) -> int | float | None:
+        """Allow existing dictionary-style consumers during migration."""
+        return getattr(self, key)
+
+
 class DiagnosticIntake(BaseModel):
     """Evidence-backed intake shared by scoring and result consumers."""
 
     company: dict[str, Any] = Field(default_factory=dict)
     evidence: list[DiagnosticEvidence] = Field(default_factory=list)
-    funnel: dict[str, float] = Field(default_factory=dict)
+    funnel: FunnelMetrics | None = None
     open_context: dict[str, str] = Field(default_factory=dict)
     owner_context: dict[str, str] = Field(default_factory=dict)

@@ -8,7 +8,7 @@ from typing import Any
 import pytest
 from pydantic import ValidationError
 
-from coaching.diagnose.models import DiagnosticEvidence, DiagnosticIntake
+from coaching.diagnose.models import DiagnosticEvidence, DiagnosticIntake, FunnelMetrics
 
 
 def _evidence(**overrides: object) -> DiagnosticEvidence:
@@ -77,9 +77,10 @@ def test_intake_requires_a_local_or_redacted_source_for_answers() -> None:
     intake = DiagnosticIntake(
         company={"name": "Demo", "employees": 6},
         evidence=[_evidence()],
-        funnel={"prospects": 10, "conversations": 4},
+        funnel=FunnelMetrics(prospects=10, conversations=4),
         open_context={"obstacle": "Falta de ritmo"},
     )
 
     assert intake.evidence[0].evidence_id == "execution_q2"
+    assert intake.funnel is not None
     assert intake.funnel["prospects"] == 10
