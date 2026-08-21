@@ -1,25 +1,25 @@
+---
+jira_key: ""
+---
+
 # S51.4: Worksheet Save Hardening
 
-## Problem
-GitHub issue #4 reported that `worksheet save` ignored `base_path` and silently overwrote worksheets, risking data loss across businesses. `base_path` is now honored, but there is still no backup when a completed worksheet is overwritten.
+## User Story
+As a user, I want completed worksheets to be backed up before overwrite, so that I never lose prior work.
 
-## Root Cause
-`coaching/worksheet/__init__.py::run(action="save")` calls `write_yaml(state_path, completed_data)` directly. If a file already exists at `state_path`, it is replaced without a backup or confirmation.
+## Gherkin AC
+Feature: Worksheet save protects completed data
 
-## Goal
-Protect completed worksheets from accidental overwrite by creating a timestamped backup before writing.
+Scenario: Saving over a completed worksheet creates a backup
+  Given a worksheet is already completed
+  When I call worksheet save again
+  Then a timestamped backup exists and the new data is saved
 
-## Acceptance Criteria
-- [ ] When `save` overwrites an existing completed worksheet, a timestamped backup is created alongside it.
-- [ ] The backup path is deterministic and parseable.
-- [ ] A regression test proves the backup is created and the new data is written.
-- [ ] No-op saves do not create unnecessary backups.
-- [ ] All existing tests pass.
+Scenario: Saving an in-progress worksheet does not create unnecessary backups
+  Given a worksheet is in progress
+  When I save a step
+  Then no backup is created
 
-## Tasks
-1. Add backup logic to `coaching/worksheet/__init__.py` save path.
-2. Create `coaching/worksheet/tests/test_worksheet_save.py`.
-3. Run gates.
-
-## Related
-- GitHub issue #4
+## SbE Examples
+- Existing file: `.escala/my-company/worksheets/test-ws.yaml` with status `completed`
+- Backup pattern: `.escala/my-company/worksheets/test-ws-20260821-120000.yaml`
