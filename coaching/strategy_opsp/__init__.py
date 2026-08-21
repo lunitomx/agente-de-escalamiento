@@ -9,7 +9,12 @@ templates/opsp.md's structure via formatter.render_markdown.
 from pathlib import Path
 
 from ..core import read_yaml, write_yaml
-from .engine import merge_section, missing_fields
+from .engine import (
+    completeness_score,
+    merge_section,
+    missing_fields,
+    next_missing_section,
+)
 from .formatter import render_markdown
 
 ACTIONS = ("load", "save", "export")
@@ -50,12 +55,15 @@ def run(context: dict) -> dict:
 
     if action == "load":
         state = read_yaml(yaml_path)
+        comp = completeness_score(state)
         return {
             "output": "",
             "artifacts": {
                 "state": state,
                 "resuming": bool(state),
                 "missing": missing_fields(state),
+                "completeness": comp,
+                "next_section": next_missing_section(state),
             },
             "errors": [],
         }
@@ -68,14 +76,27 @@ def run(context: dict) -> dict:
         except ValueError as exc:
             return {"output": "", "artifacts": {}, "errors": [str(exc)]}
         write_yaml(yaml_path, state)
+        comp = completeness_score(state)
+        next_sec = next_missing_section(state)
+        output = f"Guardado: {section}."
+        if comp["percent"] < 100:
+            output += f" OPSP al {comp['percent']}% — siguiente sección sugerida: {next_sec}."
+        else:
+            output += " ¡OPSP completo! Usa action='export' para generar el markdown."
         return {
-            "output": f"Guardado: {section}",
-            "artifacts": {"state": state, "missing": missing_fields(state)},
+            "output": output,
+            "artifacts": {
+                "state": state,
+                "missing": missing_fields(state),
+                "completeness": comp,
+                "next_section": next_sec,
+            },
             "errors": [],
         }
 
     # action == "export"
     state = read_yaml(yaml_path)
+    comp = completeness_score(state)
     markdown = render_markdown(
         state,
         company_name=context.get("company_name", ""),
@@ -89,6 +110,7 @@ def run(context: dict) -> dict:
         "artifacts": {
             "markdown": markdown,
             "missing": missing_fields(state),
+            "completeness": comp,
             "export_path": str(md_path),
         },
         "errors": [],
