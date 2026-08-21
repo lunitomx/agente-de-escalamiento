@@ -174,7 +174,7 @@
 
       function loadScore(decisionId) {
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', '/api/worksheets/' + decisionId, true);
+        xhr.open('GET', '/api/dashboard/summary', true);
         xhr.onload = function () {
           var scoreEl = document.getElementById('score-' + decisionId);
           var metaEl = document.getElementById('meta-' + decisionId);
@@ -183,12 +183,13 @@
           if (xhr.status === 200) {
             try {
               var resp = JSON.parse(xhr.responseText);
-              if (resp.data && Object.keys(resp.data).length > 0) {
-                scoreEl.textContent = 'Datos OK';
-                scoreEl.className = 'score good';
-                metaEl.textContent = 'Con datos guardados';
+              var decision = resp.data && resp.data.decisions ? resp.data.decisions[decisionId] : null;
+              if (decision && decision.score !== null && decision.score !== undefined) {
+                scoreEl.textContent = decision.score;
+                scoreEl.className = 'score ' + (decision.status || 'na');
+                metaEl.textContent = decision.label || '';
               } else {
-                scoreEl.textContent = 'Sin datos';
+                scoreEl.textContent = '—';
                 scoreEl.className = 'score na';
                 metaEl.textContent = 'Completa un worksheet para ver métricas';
               }

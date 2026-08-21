@@ -233,26 +233,13 @@
       var currentCompanyId = '';
       var currentCompanyName = '';
 
-      // ── Datos demo por empresa ──────────────────────────────────
-      var DEMO = {
-        'Carnicería El Buen Corte': {
-          f: { net_sales: 5400000, cogs: 3840000, opex: 1080000, accounts_receivable: 150000, inventory: 300000, accounts_payable: 200000, net_profit: 480000 },
-          ind: 'Alimentos'
-        },
-        'Estrategia 360 Consultores': {
-          f: { net_sales: 14400000, cogs: 5760000, opex: 4200000, accounts_receivable: 3600000, inventory: 0, accounts_payable: 1200000, net_profit: 1440000 },
-          ind: 'Consultoría'
-        },
-        'CloudScale Technologies': {
-          f: { net_sales: 42000000, cogs: 8400000, opex: 21600000, accounts_receivable: 2000000, inventory: 0, accounts_payable: 3500000, net_profit: 8400000 },
-          ind: 'Tecnología'
-        },
-      };
-
-      var FALLBACK = { net_sales: 12000000, cogs: 7200000, opex: 3600000, accounts_receivable: 1500000, inventory: 600000, accounts_payable: 800000, net_profit: 1200000 };
-
       // ── Init ───────────────────────────────────────────────────
       function init() {
+        loadCompanies();
+        loadWorksheet();
+      }
+
+      function loadCompanies() {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', API_BASE + '/api/companies', true);
         xhr.onload = function() {
@@ -271,23 +258,59 @@
         xhr.send();
       }
 
+      function loadWorksheet() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', API_BASE + '/api/worksheets/cash/power-of-one', true);
+        xhr.onload = function() {
+          if (xhr.status === 200) {
+            try {
+              var resp = JSON.parse(xhr.responseText);
+              var payload = (resp.data && resp.data.data) ? resp.data.data : (resp.data || {});
+              if (payload.financials && Object.keys(payload.financials).length > 0) {
+                financials = JSON.parse(JSON.stringify(payload.financials));
+                adjustments = payload.adjustments ? JSON.parse(JSON.stringify(payload.adjustments)) : {};
+                document.getElementById('save-indicator').textContent = '💾 Guardado';
+                document.getElementById('save-indicator').className = 'saved-badge saved';
+                LEVER_IDS.forEach(function(k) { if (!adjustments[k]) adjustments[k] = 0; });
+                renderLevers();
+                calculate();
+              } else {
+                showNoData();
+              }
+            } catch(e) {
+              showNoData();
+            }
+          } else {
+            showNoData();
+          }
+        };
+        xhr.onerror = function() { showNoData(); };
+        xhr.send();
+      }
+
+      function showNoData() {
+        var container = document.getElementById('levers-container');
+        if (container) {
+          container.innerHTML = '<div class="lever" style="justify-content:center;padding:24px;color:#64748b;">' +
+            'No hay datos financieros guardados. ' +
+            'Usa el worksheet Power of One o guarda una empresa desde el asesor.</div>';
+        }
+        document.getElementById('save-indicator').textContent = 'Sin datos';
+        document.getElementById('save-indicator').className = 'saved-badge modified';
+      }
+
       // ── Company change ─────────────────────────────────────────
       window.onCompanyChange = function() {
         var sel = document.getElementById('company-select');
         currentCompanyName = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].textContent : '';
         currentCompanyId = sel.value;
-        var demo = DEMO[currentCompanyName];
-        document.getElementById('industry-tag').textContent = demo ? '🏭 ' + demo.ind : '';
+        document.getElementById('industry-tag').textContent = currentCompanyName ? '🏭 ' + currentCompanyName : '';
 
-        if (demo) {
-          financials = JSON.parse(JSON.stringify(demo.f));
-        } else {
-          financials = JSON.parse(JSON.stringify(FALLBACK));
+        // Worksheet data is global, not per-company; selecting a company only
+        // identifies the user. If no financials are loaded yet, prompt them.
+        if (!financials) {
+          showNoData();
         }
-
-        LEVER_IDS.forEach(function(k) { adjustments[k] = 0; });
-        renderLevers();
-        calculate();
       };
 
       // ── Render levers ──────────────────────────────────────────
