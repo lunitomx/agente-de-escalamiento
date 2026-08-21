@@ -33,7 +33,7 @@ Una vez recibido el archivo:
 
 ### Step 3: Mapear al FACe
 
-Cargar `.escala/knowledge/people/tools/face.md` para la lista de funciones estándar.
+Cargar `conocimiento/people/tools/face.yaml` para la lista de funciones estándar.
 
 Para cada función del FACe:
 - ¿Quién la ocupa en el organigrama real? → Asignar nombre

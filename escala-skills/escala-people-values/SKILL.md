@@ -14,7 +14,7 @@ Facilitar el ejercicio de descubrimiento de Core Values de la empresa. No se inv
 
 ### Step 1: Load Context
 
-Leer `.escala/knowledge/people/frameworks/core-values-discovery.md`.
+Leer `conocimiento/people/concepts/core-values.yaml`.
 
 ### Step 2: Discovery Exercise
 

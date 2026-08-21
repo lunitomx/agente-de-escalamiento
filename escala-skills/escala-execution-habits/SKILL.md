@@ -14,7 +14,7 @@ Evaluar los 10 Hábitos de Ejecución de la empresa, identificar los más débil
 
 ### Step 1: Load Context
 
-Leer `.escala/knowledge/execution/tools/ejecucion-habits-checklist.md`.
+Leer `conocimiento/execution/tools/execution-habits.yaml`.
 Cargar template `templates/ejecucion-habits-checklist.md`.
 
 ### Step 2: Evaluate Each Habit

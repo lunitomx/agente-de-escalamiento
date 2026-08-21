@@ -14,7 +14,7 @@ Guiar al usuario para crear su FACChart: identificar todas las funciones del neg
 
 ### Step 1: Load Context
 
-Leer `.escala/agent/memory/company-profile.yaml` y `.escala/knowledge/people/tools/function-accountability-chart.md`.
+Leer `.escala/agent/memory/company-profile.yaml` y `conocimiento/people/tools/face.yaml`.
 Cargar template `templates/function-accountability-chart.md`.
 
 ### Step 2: Identify Functions
