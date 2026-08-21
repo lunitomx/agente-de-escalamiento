@@ -9,7 +9,10 @@ from .conversation import (
     WelcomeState,
     WelcomeTurn,
     begin_welcome,
+    is_state_fresh,
+    load_welcome_state,
     respond_to_welcome,
+    save_welcome_state,
 )
 
 __all__ = [
@@ -17,8 +20,11 @@ __all__ = [
     "WelcomeState",
     "WelcomeTurn",
     "begin_welcome",
+    "is_state_fresh",
+    "load_welcome_state",
     "respond_to_welcome",
     "run",
+    "save_welcome_state",
 ]
 
 
