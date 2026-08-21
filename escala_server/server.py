@@ -7,6 +7,7 @@ from typing import Any
 from urllib.parse import urlparse, parse_qs
 
 from .cors import CORSHandler
+from .dashboard import DashboardHandler
 from .handlers import (
     CompaniesHandler,
     WorksheetsHandler,
@@ -26,6 +27,7 @@ class EscalaRequestHandler(BaseHTTPRequestHandler):
     worksheets: WorksheetsHandler = None  # type: ignore
     sessions: SessionsHandler = None  # type: ignore
     memory: MemoryHandler = None  # type: ignore
+    dashboard: DashboardHandler = None  # type: ignore
     knowledge: Any = None  # type: ignore[annotation-unchecked]
     advisor: Any = None  # type: ignore[annotation-unchecked]
 
@@ -195,6 +197,7 @@ def make_server(
     EscalaRequestHandler.worksheets = WorksheetsHandler(db_path)
     EscalaRequestHandler.sessions = SessionsHandler(db_path)
     EscalaRequestHandler.memory = MemoryHandler(db_path)
+    EscalaRequestHandler.dashboard = DashboardHandler(db_path)
     EscalaRequestHandler.knowledge = KnowledgeHandler(GraphEngine(db_path))
     EscalaRequestHandler.advisor = BusinessAdvisorHandler(db_path)
 
@@ -227,6 +230,10 @@ def _build_router() -> Router:
     def update_company(company_id=None, payload=None):
         assert company_id is not None
         return EscalaRequestHandler.companies.update_company(company_id, payload or {})
+
+    @router.get("/api/dashboard/summary")
+    def dashboard_summary():
+        return EscalaRequestHandler.dashboard.summary()
 
     @router.get("/api/worksheets/{category}/{tool}")
     def get_worksheet(category=None, tool=None):
