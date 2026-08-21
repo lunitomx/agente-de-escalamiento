@@ -1,12 +1,17 @@
 # ESCALA
 
-Tu asesor de escalamiento empresarial instalado y ejecutado en tu propia
-computadora. Organiza People, Strategy, Execution y Cash a partir de la
-información real que le compartes, sin exigir formatos rígidos.
+Tu asesor de escalamiento empresarial **local**. Organiza People, Strategy,
+Execution y Cash a partir de la información real que le compartes, sin exigir
+formatos rígidos.
+
+La **experiencia conversacional** se ejecuta a través de un agente de terminal
+compatible (Claude Code, Hermes Agent o Codex CLI) que carga los skills de
+ESCALA. Sin uno de esos agentes, puedes usar el paquete Python, la API REST y
+los dashboards directamente.
 
 Te guía paso a paso a través de las 4 decisiones críticas para escalar: **People, Strategy, Execution y Cash**.
 
-## Quick Start
+## Quick Start (con agente de IA)
 
 1. **Abre una terminal** en la carpeta local del producto.
 
@@ -19,13 +24,35 @@ Te guía paso a paso a través de las 4 decisiones críticas para escalar: **Peo
 3. **Abre** tu agente de terminal compatible en esa carpeta y escribe
    `/escala-welcome` para iniciar tu primera sesión.
 
-El agente te guiará para crear tu perfil de empresa y hacer tu primer diagnóstico.
+El agente te guiará para crear o actualizar tu perfil de empresa y hacer tu
+primer diagnóstico.
 
 ## Requisitos
 
 - Python 3 y Git instalados.
-- Claude Code, Hermes Agent o Codex CLI instalado localmente.
+- **Claude Code, Hermes Agent o Codex CLI** instalado localmente para la
+  experiencia conversacional con `/escala-*`.
 - Acceso de lectura y escritura a la carpeta donde guardarás tu empresa.
+
+## Modo sin agente de IA
+
+Si prefieres no usar Claude, Hermes o Codex, ESCALA también funciona como
+paquete Python y servidor web local:
+
+```bash
+# Perfil de empresa
+python -m coaching.welcome
+
+# Diagnóstico
+python -m coaching.diagnose
+
+# Servidor web con dashboards
+python -m escala_server
+```
+
+Endpoints disponibles: `POST /api/cash/power-of-one`, `POST /api/advisor/ask`,
+`GET/POST /api/worksheets/{decision}/{tool}`, entre otros. Ver
+`escala_server/README.md` para la referencia completa.
 
 ## Operación local
 
@@ -40,7 +67,11 @@ El agente te guiará para crear tu perfil de empresa y hacer tu primer diagnóst
   envío automático; si quieres compartir uno, copia el archivo manualmente a
   una carpeta sincronizada que tú controles.
 
-## Comandos disponibles
+## Comandos disponibles (skills para agente de IA)
+
+Los comandos `/escala-*` son **skills** que el agente de terminal compatible
+carga e interpreta. No son ejecutables por sí solos; el agente los traduce en
+preguntas, cálculos y entregables.
 
 ### Inicio
 
