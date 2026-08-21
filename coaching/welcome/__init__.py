@@ -3,7 +3,7 @@ Welcome module — company intake, stage detection, profile creation.
 """
 
 from pathlib import Path
-from ..core import detect_stage, write_yaml
+from ..core import detect_stage, read_yaml, write_yaml
 from .conversation import (
     MaturityProfile,
     WelcomeState,
@@ -57,26 +57,38 @@ def run(context: dict) -> dict:
 
     stage = detect_stage(employees)
 
-    profile = {
-        "company": {
-            "name": name,
-            "industry": industry,
-            "employees": employees,
-            "growth_stage": stage,
-            "entry_methodology": methodology,
-        },
-        "scores": {},
-        "focus": {"current_decision": None, "last_session": None},
-        "coaching": {"level": "shu", "level_source": "auto"},
-        "created": str(__import__("datetime").datetime.now().date()),
+    existing = read_yaml(profile_path)
+
+    new_company = {
+        "name": name,
+        "industry": industry,
+        "employees": employees,
+        "growth_stage": stage,
+        "entry_methodology": methodology,
     }
+
+    # Preserve the whole existing profile and overwrite only the explicitly
+    # provided company fields. This prevents silent data loss for users who
+    # already have scores, focus, coaching level, or diagnosis history.
+    profile = dict(existing) if existing else {}
+    profile["company"] = {**(existing.get("company") or {}), **new_company}
+    profile.setdefault("scores", {})
+    profile.setdefault("focus", {"current_decision": None, "last_session": None})
+    profile.setdefault("coaching", {"level": "shu", "level_source": "auto"})
+    profile.setdefault(
+        "created", str(__import__("datetime").datetime.now().date())
+    )
 
     write_yaml(profile_path, profile)
 
+    is_update = bool(existing)
+    greeting = "Bienvenido de vuelta" if is_update else "Bienvenido"
+    action = "actualicé" if is_update else "creado"
+
     output_lines = [
-        f"## Bienvenido, {name}!",
+        f"## {greeting}, {name}!",
         "",
-        "He creado tu perfil de empresa:",
+        f"He {action} tu perfil de empresa:",
         "",
         "| Campo | Valor |",
         "|-------|-------|",
@@ -85,6 +97,12 @@ def run(context: dict) -> dict:
         f"| Etapa | {stage} |",
         "",
     ]
+
+    if is_update and existing.get("scores"):
+        output_lines.append(
+            "Tus scores y foco de diagnóstico anteriores se conservaron."
+        )
+        output_lines.append("")
 
     if methodology == "lean-canvas":
         output_lines.append(

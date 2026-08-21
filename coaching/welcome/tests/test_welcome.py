@@ -41,6 +41,55 @@ def test_welcome_rejects_missing_name(tmp_path):
     assert any("company_name" in e for e in result["errors"])
 
 
+def test_welcome_preserves_existing_scores(tmp_path):
+    """Second run must not overwrite previously stored scores or focus."""
+    sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
+    from coaching.welcome import run
+    from coaching.core import read_yaml, write_yaml
+
+    profile_path = tmp_path / ".escala" / "agent" / "memory" / "company-profile.yaml"
+    existing_profile = {
+        "company": {
+            "name": "OldCorp",
+            "industry": "Retail",
+            "employees": 25,
+            "growth_stage": "growth",
+            "entry_methodology": "skip",
+        },
+        "scores": {"people": 4, "strategy": 3, "execution": 5, "cash": 2, "overall": 3.5},
+        "focus": {"current_decision": "cash", "last_session": "2026-08-01"},
+        "coaching": {"level": "ha", "level_source": "diagnosis"},
+        "diagnosis_history": [{"date": "2026-08-01", "overall": 3.5}],
+        "created": "2026-08-01",
+    }
+    write_yaml(profile_path, existing_profile)
+
+    result = run(
+        {
+            "company_name": "NewCorp",
+            "industry": "Tech",
+            "employees": 15,
+            "entry_methodology": "lean-canvas",
+            "base_path": str(tmp_path),
+        }
+    )
+
+    assert len(result["errors"]) == 0, f"Errors: {result['errors']}"
+    stored = read_yaml(profile_path)
+
+    # Explicitly provided fields are updated.
+    assert stored["company"]["name"] == "NewCorp"
+    assert stored["company"]["industry"] == "Tech"
+    assert stored["company"]["employees"] == 15
+
+    # Previously stored fields are preserved.
+    assert stored["scores"] == existing_profile["scores"]
+    assert stored["focus"] == existing_profile["focus"]
+    assert stored["coaching"] == existing_profile["coaching"]
+    assert stored["diagnosis_history"] == existing_profile["diagnosis_history"]
+    assert stored["created"] == existing_profile["created"]
+
+
 def test_stage_detection():
     """Verify stage detection logic."""
     sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
