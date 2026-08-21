@@ -1,26 +1,25 @@
+---
+jira_key: ""
+---
+
 # S52.1: Persistence Contract Design
 
-## Problem
-Issue #8 reports that after a long conversational onboarding, the context memory is empty in a later session. `WelcomeState` is serializable but never saved.
+## User Story
+As a returning user, I want my authorized onboarding context to persist, so that the next session can continue where I left off.
 
-## Root Cause
-There is no contract defining what to persist, where to store it, or when persistence is authorized.
+## Gherkin AC
+Feature: Conversational state persistence contract
 
-## Goal
-Define a minimal, explicit persistence contract for conversational onboarding.
+Scenario: Authorized state is persisted
+  Given the user explicitly authorizes memory
+  When the welcome conversation ends
+  Then WelcomeState and derived facts are written to disk
 
-## Acceptance Criteria
-- [ ] Document the decision on what fields of `WelcomeState` are persisted.
-- [ ] Document the storage path (e.g., `.escala/agent/memory/welcome-state.yaml`).
-- [ ] Document the authorization rule: state is only persisted after explicit user consent.
-- [ ] Document freshness/invalidation behavior.
-- [ ] Design reviewed and approved before implementation.
+Scenario: Unauthorized state is not persisted
+  Given the user does not authorize memory
+  When the welcome conversation ends
+  Then no state file is created
 
-## Tasks
-1. Analyze `WelcomeState` fields and decide what is safe/useful to persist.
-2. Draft the contract in the story scope doc.
-3. Review against local-only and privacy constraints.
-4. Hand off to S52.2.
-
-## Related
-- GitHub issue #8
+## SbE Examples
+- Authorized save produces `.escala/agent/memory/welcome-state.yaml`.
+- Declined save leaves no welcome-state file.
