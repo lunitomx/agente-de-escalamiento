@@ -1,4 +1,4 @@
-"""Pure logic for the 10 Rockefeller Habits assessment.
+"""Pure logic for the 10 Execution Habits assessment.
 
 Scores each habit 1-5, computes a total, and identifies the top 3
 weakest habits to prioritize for action.
@@ -69,7 +69,7 @@ HABITS: tuple[dict[str, str], ...] = (
 
 @dataclass
 class HabitScore:
-    """Score for a single Rockefeller Habit."""
+    """Score for a single Execution Habit."""
 
     habit_id: str
     score: int | None = None
@@ -98,8 +98,8 @@ class HabitScore:
 
 
 @dataclass
-class RockefellerAssessment:
-    """A complete assessment of the 10 Rockefeller Habits."""
+class ExecutionAssessment:
+    """A complete assessment of the 10 Execution Habits."""
 
     scores: list[HabitScore] = field(default_factory=list)
 
@@ -114,7 +114,7 @@ class RockefellerAssessment:
         return {"scores": [s.to_dict() for s in self.scores]}
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "RockefellerAssessment":
+    def from_dict(cls, data: dict[str, Any]) -> "ExecutionAssessment":
         raw_scores = data.get("scores", []) if isinstance(data, dict) else []
         by_id = {
             s["habit_id"]: HabitScore.from_dict(s)
@@ -126,7 +126,7 @@ class RockefellerAssessment:
         return cls(scores=scores)
 
 
-def validate(assessment: RockefellerAssessment) -> list[str]:
+def validate(assessment: ExecutionAssessment) -> list[str]:
     """Return validation errors; empty means valid enough to score."""
     errors: list[str] = []
     for habit, score in zip(HABITS, assessment.scores):
@@ -139,7 +139,7 @@ def validate(assessment: RockefellerAssessment) -> list[str]:
     return errors
 
 
-def score(assessment: RockefellerAssessment) -> dict[str, Any]:
+def score(assessment: ExecutionAssessment) -> dict[str, Any]:
     """Compute total score, average, and top 3 weakest habits."""
     rated = [s for s in assessment.scores if s.score is not None]
     if not rated:

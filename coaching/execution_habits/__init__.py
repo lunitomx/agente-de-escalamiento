@@ -1,7 +1,7 @@
-"""Rockefeller Habits module — persist, resume, score, and export.
+"""Execution Habits module — persist, resume, score, and export.
 
-Storage: `.escala/my-company/rockefeller.yaml`
-Export: `.escala/my-company/rockefeller.md`
+Storage: `.escala/my-company/execution_habits.yaml`
+Export: `.escala/my-company/execution_habits.md`
 """
 
 from __future__ import annotations
@@ -9,22 +9,22 @@ from __future__ import annotations
 from pathlib import Path
 
 from ..core import read_yaml, write_yaml
-from .engine import RockefellerAssessment, score, validate
+from .engine import ExecutionAssessment, score, validate
 from .formatter import render_markdown
 
 ACTIONS = ("load", "save", "export")
 
 
-def _rockefeller_yaml_path(base: Path) -> Path:
-    return base / ".escala" / "my-company" / "rockefeller.yaml"
+def _execution_habits_yaml_path(base: Path) -> Path:
+    return base / ".escala" / "my-company" / "execution_habits.yaml"
 
 
-def _rockefeller_md_path(base: Path) -> Path:
-    return base / ".escala" / "my-company" / "rockefeller.md"
+def _execution_habits_md_path(base: Path) -> Path:
+    return base / ".escala" / "my-company" / "execution_habits.md"
 
 
 def run(context: dict) -> dict:
-    """Execute a Rockefeller Habits action.
+    """Execute a Execution Habits action.
 
     Context keys:
         - action: str ("load" | "save" | "export")
@@ -35,7 +35,7 @@ def run(context: dict) -> dict:
     """
     action = context.get("action", "")
     base = Path(context.get("base_path", "."))
-    yaml_path = _rockefeller_yaml_path(base)
+    yaml_path = _execution_habits_yaml_path(base)
 
     if action not in ACTIONS:
         return {
@@ -48,7 +48,7 @@ def run(context: dict) -> dict:
 
     if action == "load":
         raw = read_yaml(yaml_path)
-        assessment = RockefellerAssessment.from_dict(raw)
+        assessment = ExecutionAssessment.from_dict(raw)
         return {
             "output": "",
             "artifacts": {
@@ -62,7 +62,7 @@ def run(context: dict) -> dict:
 
     if action == "save":
         raw = context.get("data", {})
-        assessment = RockefellerAssessment.from_dict(raw)
+        assessment = ExecutionAssessment.from_dict(raw)
         errors = validate(assessment)
         write_yaml(yaml_path, assessment.to_dict())
         return {
@@ -77,13 +77,13 @@ def run(context: dict) -> dict:
 
     # action == "export"
     raw = read_yaml(yaml_path)
-    assessment = RockefellerAssessment.from_dict(raw)
+    assessment = ExecutionAssessment.from_dict(raw)
     markdown = render_markdown(
         assessment,
         company_name=context.get("company_name", ""),
         action_plan=context.get("action_plan"),
     )
-    md_path = _rockefeller_md_path(base)
+    md_path = _execution_habits_md_path(base)
     md_path.parent.mkdir(parents=True, exist_ok=True)
     md_path.write_text(markdown, encoding="utf-8")
     return {
@@ -99,7 +99,7 @@ def run(context: dict) -> dict:
 
 
 def _main() -> None:
-    """Minimal module entry point for ``python -m coaching.execution_rockefeller``."""
+    """Minimal module entry point for ``python -m coaching.execution_habits``."""
     from ..core import load_context
 
     result = run(load_context())
