@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import datetime
 from enum import StrEnum
+from pathlib import Path
 from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from coaching.core import ensure_dir, read_yaml, write_yaml
 from coaching.decision.engine import classify_area
 
 
@@ -167,3 +170,80 @@ def respond_to_welcome(state: WelcomeState, message: str) -> WelcomeTurn:
             next_action="evidence",
         ),
     )
+
+
+def _state_path(base_path: Path) -> Path:
+    """Return the filesystem location for the persisted welcome state."""
+    return base_path / ".escala" / "agent" / "memory" / "welcome-state.yaml"
+
+
+def save_welcome_state(
+    base_path: Path,
+    state: WelcomeState,
+    *,
+    authorized: bool,
+) -> Path | None:
+    """
+    Persist a WelcomeState to disk.
+
+    State is only written when ``authorized`` is True. The caller must obtain
+    explicit user consent before setting this flag.
+    """
+    if not authorized:
+        return None
+
+    payload = {
+        "schema_version": 1,
+        "authorized_at": datetime.datetime.now(tz=datetime.timezone.utc).isoformat(),
+        "updated_at": datetime.datetime.now(tz=datetime.timezone.utc).isoformat(),
+        **state.model_dump(mode="json"),
+    }
+
+    path = _state_path(base_path)
+    ensure_dir(path.parent)
+    write_yaml(path, payload)
+    return path
+
+
+def load_welcome_state(base_path: Path) -> WelcomeState | None:
+    """Load a previously persisted WelcomeState, or None if absent."""
+    path = _state_path(base_path)
+    data = read_yaml(path)
+    if not data:
+        return None
+
+    # Drop metadata fields that are not part of WelcomeState.
+    state_data = {
+        k: v
+        for k, v in data.items()
+        if k not in {"schema_version", "authorized_at", "updated_at"}
+    }
+    return WelcomeState.model_validate(state_data)
+
+
+def is_state_fresh(base_path: Path, max_age_days: int = 7) -> bool:
+    """
+    Return False if the persisted state is older than ``max_age_days``.
+
+    Freshness is checked against the ``updated_at`` metadata stored alongside
+    the state. If no timestamp is available, the state is treated as stale.
+    """
+    data = read_yaml(_state_path(base_path))
+    if not data:
+        return False
+
+    updated_at = data.get("updated_at")
+    if not updated_at:
+        return False
+
+    try:
+        updated = datetime.datetime.fromisoformat(updated_at)
+    except ValueError:
+        return False
+
+    if updated.tzinfo is None:
+        updated = updated.replace(tzinfo=datetime.timezone.utc)
+
+    return (
+        datetime.datetime.now(tz=datetime.timezone.utc) - updated
+    ).days < max_age_days
