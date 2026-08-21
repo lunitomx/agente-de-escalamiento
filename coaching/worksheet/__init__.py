@@ -397,6 +397,20 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
             "status": "completed",
         }
         ensure_dir(state_path.parent)
+
+        # Back up a previously completed worksheet before overwriting it.
+        backup_path: Path | None = None
+        if state_path.exists():
+            existing = read_yaml(state_path)
+            if existing and existing.get("status") == "completed":
+                timestamp = __import__("datetime").datetime.now().strftime(
+                    "%Y%m%d-%H%M%S"
+                )
+                backup_path = (
+                    state_path.parent / f"{state_path.stem}-{timestamp}{state_path.suffix}"
+                )
+                state_path.rename(backup_path)
+
         write_yaml(state_path, completed_data)
 
         return {
@@ -405,6 +419,7 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
                 "worksheet": worksheet,
                 "completed_data": completed_data,
                 "state_path": str(state_path),
+                "backup_path": str(backup_path) if backup_path else None,
             },
             "errors": [],
         }
