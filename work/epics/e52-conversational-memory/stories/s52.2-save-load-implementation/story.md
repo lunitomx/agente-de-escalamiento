@@ -1,26 +1,31 @@
+---
+jira_key: ""
+---
+
 # S52.2: Save/Load Implementation
 
-## Problem
-No functions exist to persist or restore `WelcomeState` to/from disk.
+## User Story
+As the welcome module, I want save/load functions, so that authorized WelcomeState can be persisted and restored.
 
-## Root Cause
-`coaching/welcome/conversation.py` is pure in-memory logic. Persistence was not part of the original implementation.
+## Gherkin AC
+Feature: WelcomeState persistence functions
 
-## Goal
-Add `save_welcome_state(base_path, state, authorized)` and `load_welcome_state(base_path)` with clear error handling.
+Scenario: Save authorized state
+  Given a WelcomeState and explicit authorization
+  When save_welcome_state is called
+  Then the state is written to `.escala/agent/memory/welcome-state.yaml`
 
-## Acceptance Criteria
-- [ ] `save_welcome_state` writes YAML only when `authorized=True`.
-- [ ] `load_welcome_state` returns `None` when no saved state exists.
-- [ ] Saved state is human-readable YAML.
-- [ ] Tests cover save, load, missing file, and unauthorized save.
-- [ ] All existing tests pass.
+Scenario: Refuse unauthorized save
+  Given a WelcomeState without authorization
+  When save_welcome_state is called
+  Then nothing is written
 
-## Tasks
-1. Add persistence functions to `coaching/welcome/conversation.py` or a new module.
-2. Write unit tests.
-3. Run gates.
+Scenario: Load existing state
+  Given a valid welcome-state.yaml exists
+  When load_welcome_state is called
+  Then the WelcomeState is returned
 
-## Related
-- GitHub issue #8
-- S52.1
+Scenario: Missing state returns None
+  Given no welcome-state.yaml exists
+  When load_welcome_state is called
+  Then None is returned
