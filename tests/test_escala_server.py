@@ -184,8 +184,8 @@ class TestDashboardHandler:
         decisions = result["data"]["decisions"]
         assert decisions["strategy"]["score"] is None
         assert decisions["cash"]["score"] is None
-        assert decisions["people"] is None
-        assert decisions["execution"] is None
+        assert decisions["people"]["score"] is None
+        assert decisions["execution"]["score"] is None
         assert result["data"]["overall"]["score"] is None
         assert "focus" in result["data"]
 
@@ -233,6 +233,41 @@ class TestDashboardHandler:
         overall = result["data"]["overall"]
         assert overall["score"] == 25
         assert overall["status"] == "critical"
+
+    def test_people_score_from_facchart(self):
+        ws = WorksheetsHandler(db_path=self.db_path)
+        chart = {
+            "functions": [
+                {
+                    "name": "Sales",
+                    "accountable": "Ana",
+                    "kpis": ["Revenue"],
+                },
+                {
+                    "name": "Ops",
+                    "accountable": "Luis",
+                    "kpis": ["Cost"],
+                },
+            ]
+        }
+        ws.save_worksheet("people", "facchart", {"data": chart})
+        result = self.handler.summary()
+        people = result["data"]["decisions"]["people"]
+        assert people["score"] == 100
+        assert people["status"] == "good"
+
+    def test_execution_score_from_execution_habits(self):
+        ws = WorksheetsHandler(db_path=self.db_path)
+        from coaching.execution_habits.engine import HABITS
+
+        scores = [{"habit_id": h["id"], "score": 4} for h in HABITS]
+        ws.save_worksheet(
+            "execution", "execution_habits", {"data": {"scores": scores}}
+        )
+        result = self.handler.summary()
+        execution = result["data"]["decisions"]["execution"]
+        assert execution["score"] == 80
+        assert execution["status"] == "good"
 
 
 # ─── Server Integration Tests ─────────────────────────────────
