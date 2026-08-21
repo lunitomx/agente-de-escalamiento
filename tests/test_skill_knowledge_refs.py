@@ -62,3 +62,20 @@ def test_no_descriptive_escala_knowledge_md_references_remain() -> None:
             offenders.append(str(skill_file.relative_to(ROOT)))
 
     assert not offenders, f"Old broken .md references remain in: {offenders}"
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        ROOT / ".escala/agent/sub-agents/strategy.md",
+        ROOT / ".escala/agent/sub-agents/people.md",
+        ROOT / ".escala/agent/sub-agents/execution.md",
+        ROOT / ".escala/agent/sub-agents/cash.md",
+        ROOT / ".escala/knowledge/strategy/overview.md",
+        ROOT / ".escala/knowledge/people/overview.md",
+        ROOT / ".escala/knowledge/execution/overview.md",
+    ],
+)
+def test_decision_subagents_and_overviews_exist(path: Path) -> None:
+    assert path.exists(), f"Missing decision context file: {path.relative_to(ROOT)}"
+    assert path.stat().st_size > 0, f"Decision context file is empty: {path.relative_to(ROOT)}"
