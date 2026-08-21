@@ -1,12 +1,12 @@
-"""Render a Rockefeller Habits assessment into markdown."""
+"""Render a Execution Habits assessment into markdown."""
 
 from __future__ import annotations
 
-from .engine import HABITS, MISSING, RockefellerAssessment
+from .engine import HABITS, MISSING, ExecutionAssessment
 
 
 def render_markdown(
-    assessment: RockefellerAssessment,
+    assessment: ExecutionAssessment,
     company_name: str = "",
     action_plan: list[str] | None = None,
 ) -> str:
@@ -14,7 +14,7 @@ def render_markdown(
     score_by_id = {s.habit_id: s for s in assessment.scores}
 
     lines = [
-        "# 10 Rockefeller Habits — Evaluación",
+        "# 10 Execution Habits — Evaluación",
         "",
     ]
     if company_name:

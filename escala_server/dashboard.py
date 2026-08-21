@@ -17,6 +17,8 @@ _PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
 
+from coaching.execution_habits.engine import ExecutionAssessment  # noqa: E402
+from coaching.people_facchart.engine import FACChart  # noqa: E402
 from coaching.strategy_opsp.engine import SECTIONS, missing_fields  # noqa: E402
 
 from .cash import FinancialInputs, PowerOfOneEngine  # noqa: E402
@@ -121,12 +123,50 @@ class DashboardHandler:
         }
 
     def _people_score(self) -> dict | None:
-        """People engine is not yet implemented (S50.4.2)."""
-        return None
+        """Score based on FACChart worksheet completeness and health."""
+        from coaching.people_facchart.engine import score as facchart_score, validate
+
+        result = self.worksheets.get_worksheets("people", "facchart")
+        data = result.get("data") or {}
+        payload = data.get("data") if isinstance(data.get("data"), dict) else data
+        chart = FACChart.from_dict(payload if isinstance(payload, dict) else {})
+        if not chart.functions:
+            return {"score": None, "status": "missing", "label": "Sin datos"}
+
+        score_result = facchart_score(chart)
+        overall = score_result["overall"]
+        status = "good" if overall >= 70 else "warning" if overall >= 40 else "critical"
+        errors = validate(chart)
+        return {
+            "score": overall,
+            "status": status,
+            "label": f"{score_result['function_count']} funciones",
+            "errors": errors,
+        }
 
     def _execution_score(self) -> dict | None:
-        """Execution engine is not yet implemented (S50.4.3)."""
-        return None
+        """Score based on Execution Habits worksheet."""
+        from coaching.execution_habits.engine import score as execution_habits_score, validate
+
+        result = self.worksheets.get_worksheets("execution", "execution_habits")
+        data = result.get("data") or {}
+        payload = data.get("data") if isinstance(data.get("data"), dict) else data
+        assessment = ExecutionAssessment.from_dict(
+            payload if isinstance(payload, dict) else {}
+        )
+        if not any(s.score is not None for s in assessment.scores):
+            return {"score": None, "status": "missing", "label": "Sin datos"}
+
+        score_result = execution_habits_score(assessment)
+        overall = round((score_result["total"] / score_result["max"]) * 100)
+        status = "good" if overall >= 70 else "warning" if overall >= 40 else "critical"
+        errors = validate(assessment)
+        return {
+            "score": overall,
+            "status": status,
+            "label": f"{score_result['total']}/{score_result['max']} puntos",
+            "errors": errors,
+        }
 
     def _focus(self, decisions: dict) -> dict:
         """Pick the decision that most needs attention."""

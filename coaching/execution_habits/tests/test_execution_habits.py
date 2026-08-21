@@ -1,19 +1,19 @@
-"""Tests for the Rockefeller Habits engine (S50.4.3)."""
+"""Tests for the Execution Habits engine (S50.4.3)."""
 
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent.parent))
 
-from coaching.execution_rockefeller import run  # noqa: E402
-from coaching.execution_rockefeller.engine import (  # noqa: E402
+from coaching.execution_habits import run  # noqa: E402
+from coaching.execution_habits.engine import (  # noqa: E402
     HABITS,
     HabitScore,
-    RockefellerAssessment,
+    ExecutionAssessment,
     score,
     validate,
 )
-from coaching.execution_rockefeller.formatter import render_markdown  # noqa: E402
+from coaching.execution_habits.formatter import render_markdown  # noqa: E402
 
 
 def test_load_on_fresh_company_has_empty_assessment(tmp_path):
@@ -42,20 +42,20 @@ def test_save_and_load_roundtrip(tmp_path):
 
 
 def test_validation_flags_missing_scores():
-    assessment = RockefellerAssessment()
+    assessment = ExecutionAssessment()
     errors = validate(assessment)
     assert len(errors) == len(HABITS)
 
 
 def test_validation_rejects_out_of_range_score():
     scores = [HabitScore(habit_id=h["id"], score=7) for h in HABITS]
-    assessment = RockefellerAssessment(scores=scores)
+    assessment = ExecutionAssessment(scores=scores)
     errors = validate(assessment)
     assert any("entre" in e for e in errors)
 
 
 def test_score_zero_for_empty_assessment():
-    result = score(RockefellerAssessment())
+    result = score(ExecutionAssessment())
     assert result["total"] == 0
     assert result["completeness"] == 0
     assert result["top_weaknesses"] == []
@@ -68,7 +68,7 @@ def test_score_identifies_top_weaknesses():
         HabitScore(habit_id=HABITS[2]["id"], score=2),
         *[HabitScore(habit_id=h["id"], score=4) for h in HABITS[3:]],
     ]
-    assessment = RockefellerAssessment(scores=scores)
+    assessment = ExecutionAssessment(scores=scores)
     result = score(assessment)
     assert result["total"] == 5 + 1 + 2 + 4 * 7
     assert result["top_weaknesses"][0]["habit_id"] == HABITS[1]["id"]
@@ -100,7 +100,7 @@ def test_export_writes_markdown_to_disk(tmp_path):
 
 
 def test_render_markdown_shows_pending_marker():
-    assessment = RockefellerAssessment()
+    assessment = ExecutionAssessment()
     markdown = render_markdown(assessment)
     assert "[PENDIENTE]" in markdown
 
@@ -115,6 +115,6 @@ def test_partial_scores_compute_completeness():
         HabitScore(habit_id=HABITS[0]["id"], score=5),
         HabitScore(habit_id=HABITS[1]["id"], score=4),
     ]
-    assessment = RockefellerAssessment(scores=scores)
+    assessment = ExecutionAssessment(scores=scores)
     result = score(assessment)
     assert result["completeness"] == 20  # 2 of 10 habits scored
