@@ -105,7 +105,30 @@ se hace una sola pregunta de encuadre.
 - [Dashboard/documento generado]
 - [Próximo paso concreto]
 
-¿Quieres profundizar en algo o lo dejamos aquí por hoy? Yo guardo todo. Cuando vuelvas, seguimos donde nos quedamos."
+¿Quieres profundizar en algo o lo dejamos aquí por hoy?"
+
+Si el usuario acepta guardar la sesión, persistir el estado conversacional:
+
+```python
+from coaching.welcome import save_welcome_state
+save_welcome_state(base_path, state, authorized=True)
+```
+
+### Persistencia de sesión
+
+Al inicio de cada bienvenida:
+
+1. Intentar cargar estado previo:
+   ```python
+   from coaching.welcome import load_welcome_state, is_state_fresh
+   saved = load_welcome_state(base_path)
+   ```
+2. Si `saved` existe y `is_state_fresh(base_path)` es True, preguntar:
+   "¿Continuamos donde nos quedamos con [tema/decisión]?"
+3. Si el usuario dice sí, reanudar desde `saved.phase`/`saved.area`.
+4. Si dice no o no hay estado, empezar con `begin_welcome()`.
+
+La memoria se guarda solo con autorización explícita del usuario y nunca sale del directorio local `.escala/`.
 
 ## Notas
 
