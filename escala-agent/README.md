@@ -15,7 +15,10 @@ Cuando los cargas, el LLM se convierte en un estratega que:
 - Guarda cada análisis en markdown para que puedas revisitarlo
 - Se **auto-mejora** detectando patrones de uso
 
-**Cero servidores.** Todo corre dentro del LLM. Tus datos se quedan en tu compu.
+**Cero servidores externos.** Tus datos se quedan en tu compu. La
+experiencia conversacional corre dentro del agente de IA compatible; el motor
+subyacente (perfil, diagnóstico, dashboards) también está disponible como
+paquete Python y servidor local.
 
 Para reportar un bug o una mejora, usa `/escala-bugreport`. El skill sólo toma
 lo que escribas, muestra un preview y, con tu confirmación, crea un JSON local
