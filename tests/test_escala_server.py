@@ -19,6 +19,7 @@ sys.path.insert(0, str(PROJECT_ROOT / "escala_server"))
 # Import after path setup
 from escala_server.router import Router
 from escala_server.handlers import CompaniesHandler, WorksheetsHandler
+from escala_server.dashboard import DashboardHandler
 from escala_server.cors import CORSHandler
 
 
@@ -165,6 +166,73 @@ class TestWorksheetsHandler:
 
         get_result = self.handler.get_worksheets("cash", "power-of-one")
         assert get_result["data"]["palancas"]["precio"] == 5
+
+
+# ─── Dashboard Handler Tests ──────────────────────────────────
+
+
+class TestDashboardHandler:
+    def setup_method(self):
+        import uuid
+
+        self.db_path = f"file:test_dash_{uuid.uuid4().hex[:8]}?mode=memory&cache=shared"
+        self.handler = DashboardHandler(db_path=self.db_path)
+
+    def test_summary_empty_db(self):
+        result = self.handler.summary()
+        assert result["status"] == "ok"
+        decisions = result["data"]["decisions"]
+        assert decisions["strategy"]["score"] is None
+        assert decisions["cash"]["score"] is None
+        assert decisions["people"] is None
+        assert decisions["execution"] is None
+        assert result["data"]["overall"]["score"] is None
+        assert "focus" in result["data"]
+
+    def test_strategy_score_from_opsp(self):
+        ws = WorksheetsHandler(db_path=self.db_path)
+        ws.save_worksheet(
+            "strategy",
+            "opsp",
+            {"core_values": ["Honestidad"], "purpose": "Servir"},
+        )
+        result = self.handler.summary()
+        assert result["data"]["decisions"]["strategy"]["score"] == 25
+        assert result["data"]["decisions"]["strategy"]["status"] == "critical"
+
+    def test_cash_score_from_power_of_one(self):
+        ws = WorksheetsHandler(db_path=self.db_path)
+        financials = {
+            "net_sales": 12000000,
+            "cogs": 7200000,
+            "opex": 3600000,
+            "accounts_receivable": 1500000,
+            "inventory": 600000,
+            "accounts_payable": 800000,
+            "net_profit": 1200000,
+        }
+        ws.save_worksheet(
+            "cash",
+            "power-of-one",
+            {"data": {"financials": financials, "adjustments": {}}},
+        )
+        result = self.handler.summary()
+        cash = result["data"]["decisions"]["cash"]
+        assert cash["score"] is not None
+        assert 0 <= cash["score"] <= 100
+        assert cash["status"] in ("good", "warning", "critical")
+
+    def test_overall_averages_available_scores(self):
+        ws = WorksheetsHandler(db_path=self.db_path)
+        ws.save_worksheet(
+            "strategy",
+            "opsp",
+            {"core_values": ["Honestidad"], "purpose": "Servir"},
+        )
+        result = self.handler.summary()
+        overall = result["data"]["overall"]
+        assert overall["score"] == 25
+        assert overall["status"] == "critical"
 
 
 # ─── Server Integration Tests ─────────────────────────────────
