@@ -136,7 +136,7 @@ RAI_WORKTREE=$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")
 # Harness is always this runtime
 RAI_HARNESS="claude_code"
 
-# Resolve session id from rai context
+# Resolve session id from rai session context
 RAI_SESSION=$(rai session context --sections governance 2>/dev/null \
   | grep -o 'session_id:[[:space:]]*[^[:space:]]*' \
   | awk '{print $2}' \

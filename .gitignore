@@ -2,6 +2,16 @@
 governance/
 work/
 .raise/
+# Preserve the canonical RaiSE identity that feeds the repository cartridge.
+# All other RaiSE runtime state remains local-only.
+!.raise/
+.raise/*
+!.raise/rai/
+.raise/rai/*
+!.raise/rai/identity/
+!.raise/rai/identity/core.yaml
+!.raise/rai/personal/
+!.raise/rai/personal/last-diff.json
 AGENTS.md
 
 # === RaiSE Temp Artifacts ===
