@@ -1,7 +1,8 @@
 # Epic Scope: E21 — Verne Harnish Board Member
 
 **Status:** Draft
-**Dependencies:** E19 (grafo de conocimiento del libro)
+**Dependencies:** E18 (infraestructura) + E19 (grafo de conocimiento)
+**Audited:** 2026-08-24
 **Tamaño:** XL
 
 ## In Scope
@@ -26,6 +27,14 @@
 - E19 (conocimiento estructurado del libro en el grafo)
 - E18 (infraestructura: server, sesiones, SQLite, CLI)
 - El alma debe basarse ESTRICTAMENTE en el libro — no inventar
+
+## Gates Before Implementation
+
+- [ ] La suite actual vuelve a verde
+- [ ] Epic design aprobado
+- [ ] Implementation plan aprobado
+- [ ] Tamaño XL dividido en stories con criterios verificables
+- [ ] Estrategia de trazabilidad al conocimiento E19 definida
 
 ## Done Criteria
 - [ ] `miembro-board/verne-harnish.md` completo con framework, preguntas, lente, sesgos, principios

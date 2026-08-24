@@ -1,5 +1,8 @@
 # Epic Scope: E6 — Knowledge Ontology
 
+**Status:** Complete
+**Audited:** 2026-08-24
+
 ## Objective
 
 Convertir el contenido extraído de Scaling Up (LlamaParse) en una ontología de dominio estructurada — el "cerebro" del agente. Retrieval determinístico, sin vectores, puro archivos.
@@ -11,7 +14,7 @@ Convertir el contenido extraído de Scaling Up (LlamaParse) en una ontología de
 - Población de las 4 decisiones (People, Strategy, Execution, Cash)
 - Relaciones cross-decisión y registro de worksheets
 - Motor de retrieval determinístico (traversal simbólico)
-- Los 34 worksheets con metadata y tracking de completitud
+- Los 15 worksheets reales con metadata y tracking de completitud
 
 ## Out of Scope
 
@@ -35,9 +38,15 @@ Convertir el contenido extraído de Scaling Up (LlamaParse) en una ontología de
 
 ## Done Criteria
 
-- [ ] 68 metodologías representadas como nodos con relaciones
-- [ ] 34 worksheets registrados con metadata (decisión, prerequisitos, outputs)
-- [ ] Grafo almacenado en `.scaleup/knowledge/` como archivos YAML inspeccionables
-- [ ] Retrieval engine retorna nodos relevantes para cualquier (decisión, etapa)
-- [ ] Zero dependencias externas — puro file-based
-- [ ] Todo el contenido viene de LlamaParse (no del OCR viejo)
+- [x] Aproximadamente 70 metodologías representadas como nodos con relaciones
+- [x] 15 worksheets registrados con metadata (decisión, prerequisitos, outputs)
+- [x] Grafo almacenado en `.scaleup/knowledge/` como archivos YAML inspeccionables
+- [x] Retrieval engine retorna nodos relevantes para consultas por decisión y etapa
+- [x] Zero dependencias externas — puro file-based
+- [x] Contenido reconstruido desde LlamaParse
+
+### Audit Note — 2026-08-24
+
+El objetivo original decía 34 worksheets. S6.6 verificó que el inventario real
+es 15 y dejó la corrección solicitada en su retrospectiva. El registro actual
+`.scaleup/knowledge/registry/worksheets.yaml` confirma 15.

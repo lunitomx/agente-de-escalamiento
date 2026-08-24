@@ -1,14 +1,17 @@
 # Epic Scope: E8 — Coaching Engine
 
+**Status:** Complete
+**Audited:** 2026-08-24
+
 ## Objective
 
 Convertir la ontología (E6) y la inteligencia de agente (E7) en una experiencia activa de coaching — guiar empresarios a través de worksheets, trackear progreso metodológico y adaptarse a su nivel de maestría.
 
-**Novedad de E8:** Todos los skills se construyen con arquitectura cross-platform desde el día 1 — núcleo de lógica en Python (.scaleup/coaching/), con adaptadores delgados (SKILL.md) por plataforma (Claude Code primero, Hermes Agent y Codex después).
+**Novedad de E8:** Todos los skills se construyen con arquitectura cross-platform desde el día 1 — núcleo de lógica en Python (`coaching/` después de la consolidación de E13), con adaptadores delgados (SKILL.md) por plataforma.
 
 ## In Scope
 
-- Core coaching engine en Python (.scaleup/coaching/)
+- Core coaching engine en Python (`coaching/`)
 - Sistema de onboarding (/scaleup-welcome) con detección de etapa
 - Motor de diagnóstico (/scaleup-diagnose) con scoring estructurado
 - Motor de guía de worksheets (/scaleup-worksheet) con validación
@@ -50,7 +53,7 @@ Critical path: S8.1 → S8.2 → S8.3, S8.2 → S8.4, S8.2 → S8.5
 
 Cada skill de E8 DEBE construirse con:
 
-1. **Core Python module** en `.scaleup/coaching/{skill_name}/` — lógica de negocio pura, sin dependencia del agente
+1. **Core Python module** en `coaching/{skill_name}/` — lógica de negocio pura, sin dependencia del agente
 2. **CLAUDE.md / SKILL.md adapter** en `.claude/skills/scaleup-{skill_name}/SKILL.md` — invoca el core Python, pasa contexto de usuario
 3. **Quality gate** en `.scaleup/agent/validators/` — validación en código, no LLM
 
@@ -58,12 +61,19 @@ Esto permite que en el futuro se agreguen adapters para Hermes y Codex sin reesc
 
 ## Done Criteria
 
-- [ ] Todos los skills de coaching tienen core Python en `.scaleup/coaching/`
-- [ ] Todos los skills tienen SKILL.md adapter que invoca el core
-- [ ] Onboarding completo guía al usuario en < 10 minutos
-- [ ] Diagnóstico produce priorización actionable entre 4 decisiones
-- [ ] Todos los 34 worksheets son guiables y salvables
-- [ ] Progress muestra avance preciso por decisión
-- [ ] Tono de coaching se adapta visiblemente al nivel de maestría
-- [ ] Sub-agentes se activan correctamente según reglas de routing
-- [ ] Cada story tiene al menos 1 quality gate en Python
+- [x] Los 6 skills del coaching engine tienen core Python en `coaching/`
+- [x] Los skills tienen SKILL.md adapters que invocan el core
+- [x] Onboarding y detección de etapa entregados
+- [x] Diagnóstico produce priorización entre 4 decisiones
+- [x] Los 15 worksheets registrados actualmente son guiables y salvables
+- [x] Progress muestra avance por decisión
+- [x] Tono de coaching se adapta al nivel Shu/Ha/Ri
+- [x] Routing determinístico activa la decisión correspondiente
+- [ ] No se demostró un quality gate Python distinto por cada una de las 6 stories; la retrospectiva registra 4 gates
+
+### Audit Note — 2026-08-24
+
+El scope original heredó la cifra incorrecta de 34 worksheets; el registro real
+de E6 contiene 15. E13 movió la fuente canónica desde `.scaleup/coaching/` a
+`coaching/`. E8 permanece cerrada, con la cobertura de gates individuales
+registrada como desviación histórica aceptada.

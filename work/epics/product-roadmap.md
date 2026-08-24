@@ -1,111 +1,142 @@
 # ScaleUp Agent AI — Product Roadmap
 
-> Master plan for the ScaleUp Coach AI product.
-> A GitHub repo any entrepreneur clones, opens in Claude Code, and gets an expert Scaling Up coaching agent running locally. No servers, no databases, no API keys beyond Claude.
+> Inventario canónico de épicas y dirección del producto.
 
----
+**Última auditoría:** 2026-08-24
+**Estado auditado:** main en 67c3d0c (epic/e20-complete)
+**Siguiente número disponible:** E22
 
-## Vision
+## Visión
 
-Turn the Scaling Up methodology (Verne Harnish) into an interactive, local-first AI coaching agent. The entrepreneur gets persistent memory, structured guidance through 34 worksheets across 4 Decisions (People, Strategy, Execution, Cash), and measurable progress tracking — all inside Claude Code.
+Convertir Scaling Up en un coach AI local-first con memoria, conocimiento
+estructurado, herramientas visuales y acompañamiento accionable en People,
+Strategy, Execution y Cash.
 
-## Architecture Principles
+El producto evolucionó desde skills locales hasta incluir un coaching engine
+portable, 22 dashboards, un servidor HTTP local, persistencia SQLite y un grafo
+de conocimiento derivado del libro.
 
-1. **Ontology over RAG** — A curated domain graph (nodes + relationships + pointers), not chunked text in a vector store.
-2. **Shared belief system** — Agent and user share the Scaling Up methodology as the common framework. This constrains the LLM toward useful, methodology-aligned outputs.
-3. **Skills = processes within the ontology** — Each skill is an observable, measurable, repeatable process grounded in the methodology graph.
-4. **Neuro-symbolic memory** — Deterministic retrieval algorithms over structured data. No embedding search.
-5. **Level-aware coaching** — Shu/Ha/Ri adaptation: beginners get step-by-step, advanced users get strategic nudges.
-6. **Everything local** — Clone repo = get the full brain. Privacy by architecture.
+## Reglas del inventario
 
----
+1. Los identificadores históricos no se renumeran ni se reutilizan.
+2. Un cierre se acredita con retrospectiva y evidencia en Git; un checkbox
+   desactualizado no reabre por sí solo una épica.
+3. Retired / Superseded significa que el borrador dejó de ser la unidad de
+   ejecución. No significa que todos sus criterios se hayan cumplido.
+4. Las deudas residuales se registran por separado. Si se promueven a una nueva
+   épica, deben comenzar en E22.
 
-## Epic Sequence
+## Auditoría de numeración
 
-```
-E3 (Agent Framework) ──► E6 (Knowledge Ontology) ──► E7 (Agent Intelligence)
-       DONE                      DONE                       DONE
+E1–E5 fueron registrados en el backlog inicial del commit a9c93f8:
+
+| ID | Registro original | Resultado de la auditoría |
+|----|-------------------|----------------------------|
+| E1 | OCR Pipeline | Completa antes de E3. Solo conserva evidencia histórica de gobernanza; sus salidas sobreviven en las fuentes parseadas. |
+| E2 | Knowledge Base | Completa antes de E3. Su implementación fue ampliada y parcialmente reemplazada por E6 y E19. |
+| E3 | Agent Framework | Primera épica con directorio propio en work/epics/; completa. |
+| E4 | Validation | Borrador histórico. Nunca tuvo directorio, historias ejecutadas ni cierre propio. Retirada/sustituida por validaciones distribuidas en E13, E19 y E20; quedan deudas E2E. |
+| E5 | Distribution | Borrador histórico. Nunca tuvo directorio, historias ejecutadas ni cierre propio. Retirada/sustituida por E10 y E11; quedan validaciones de instalación/release. |
+
+La ausencia de carpetas E1, E2, E4 y E5 no representa números disponibles.
+Todos forman parte de la historia del producto.
+
+## Inventario canónico
+
+| Epic | Objetivo | Estado canónico | Evidencia / observaciones |
+|------|----------|------------------|--------------------------|
+| E1 — OCR Pipeline | Extraer el libro a texto/markdown | ✅ Complete — legacy | Backlog inicial: done; sin artefacto work/epics/. |
+| E2 — Knowledge Base | Estructurar contenido por las 4 decisiones | ✅ Complete — legacy | Backlog inicial: done; evolucionó hacia E6/E19. |
+| E3 — Agent Framework | Repo instalable y skills invocables | ✅ Complete | 5/5; close 0bbc74d; tag epic/e3-complete. |
+| E4 — Validation | Validación E2E del producto completo | ⏹ Retired / Superseded | Borrador sin ejecución propia. Cobertura parcial en E13/E19/E20. |
+| E5 — Distribution | Publicación y distribución | ⏹ Retired / Superseded | Borrador sin ejecución propia. Sustituida por E10/E11. |
+| E6 — Knowledge Ontology | Ontología y retrieval determinístico | ✅ Complete | 7/7; ~70 nodos, 301 edges y **15** worksheets registrados. |
+| E7 — Agent Intelligence | Memoria, sesiones, tareas y routing | ✅ Complete | 6/6; cierre formal 7630a5a. |
+| E8 — Coaching Engine | Coaching Python portable | ✅ Complete | 6/6; opera sobre los 15 worksheets registrados actualmente. |
+| E9 — Value-Add | Export, pulse, dashboard y summary | ✅ Complete — follow-up | 4/4 al cierre. coaching/summary/ fue retirado en E13 y requiere port si se desea restaurar. |
+| E10 — Cross-Platform Distribution | Engines e instalador Claude/Hermes | ✅ Complete — accepted follow-ups | 9/9; no se verificó el flujo completo desde proyecto limpio ni el remapeo real de Hermes. |
+| E11 — Agente de Escalamiento | Repositorio público anonimizado | ✅ Complete | 6/6; retrospectiva registra clon e instalación verificados. |
+| E12 — Codex & Auto-Update | Compatibilidad y actualización | ❌ Cancelled | Absorbida por E11; cierre 6bfcaac. |
+| E13 — Auditoría y Cierre | Sanear cierres, tests y fuentes duplicadas | ✅ Complete | 9/9; 139 tests en el cierre histórico. |
+| E14 — Cash Dashboards | 4 dashboards Cash | ✅ Complete | 4/4. |
+| E15 — Strategy Dashboards | 5 dashboards Strategy | ✅ Complete | 5/5. |
+| E16 — People Dashboards | 6 dashboards People | ✅ Complete | 6/6. |
+| E17 — Execution Dashboards | 7 dashboards Execution | ✅ Complete | 7/7. |
+| E18 — Escala Server | Servidor, dashboards, SQLite y memoria | ✅ Complete | 12/12; close 2a63e09. |
+| E19 — Book Ingestion | Parser, grafo y API de conocimiento | ✅ Complete | 5/5; S19.3 absorbida por S19.2; 42 entidades, 59 relaciones y 406 capítulos. |
+| E20 — Contextual Skills | Grafo → dashboards y coaching | ✅ Complete | 4/4; close 67c3d0c; tag epic/e20-complete. |
+| E21 — Verne Board Member | Primer miembro del board sintético | 📝 Draft | Única épica pendiente formal; todavía sin diseño, plan ni historias. |
+
+### Resumen
+
+- 17 épicas completas: E1, E2, E3, E6–E11 y E13–E20.
+- 1 épica cancelada: E12.
+- 2 borradores históricos retirados/sustituidos: E4 y E5.
+- 1 épica en borrador: E21.
+- No existe una E22 formalizada.
+
+## Secuencia actual
+
+    E18 Escala Server ──► E19 Book Ingestion ──► E20 Contextual Skills
+           DONE                    DONE                    DONE
                                                               │
                                                               ▼
-                                                    E8 (Coaching Engine) ──► E9 (Value-Add)
-                                                             DONE                    DONE
-                                                              │
-                                                              ▼
-                                                  E10 (Cross-Platform Dist.)
-                                                             DONE
+                                                  E21 Verne Board Member
+                                                            DRAFT
 
-E11 (Agente de Escalamiento — repo público) ── DONE
-E12 (Codex Compat — absorbed into E11) ── CANCELLED
-E13 (Auditoría y Cierre) ── DONE
-E14 (Cash Dashboards) ── DONE
-E15 (Strategy Dashboards) ── DONE
-E16 (People Dashboards) ── DONE
-E17 (Execution Dashboards) ── DONE
-```
+E21 depende funcionalmente de E19 y de la infraestructura de E18. No depende de
+E20 para comenzar; E20 es una integración consumidora paralela del conocimiento.
 
----
+## Próximo trabajo recomendado
 
-## Epic Inventory
+### P0 — Restaurar estado verde antes de abrir E21
 
-| Epic | Objective | Status | Stories | Tests |
-|------|-----------|--------|---------|-------|
-| E3 — Agent Framework | Repo installable, skills invocables | ✅ DONE | 5/5 | — |
-| E6 — Knowledge Ontology | Ontología estructurada + retrieval | ✅ DONE | 7/7 | — |
-| E7 — Agent Intelligence | Memoria persistente, sesiones, tareas | ✅ DONE | 6/6 | 41 |
-| E8 — Coaching Engine | Core Python coaching cross-platform | ✅ DONE | 6/6 | ~100 |
-| E9 — Value-Add | Export, pulse, dashboard, summaries | ✅ DONE | 4/4 | ~34 |
-| E10 — Cross-Platform Dist. | Skills para Claude, Hermes, Codex | ✅ DONE | 9/9 | — |
-| E11 — Agente de Escalamiento | Repo público + anonimización | ✅ DONE | 6/6 | — |
-| E12 — Codex & Auto-Update | Absorbido por E11 | ❌ CANCELLED | — | — |
-| E13 — Auditoría y Cierre | Sanear repo, cerrar epics, fix tests | ✅ DONE | 9/9 | 139 |
-| E14 — Cash Dashboards | Dashboards visuales Cash (CASh, Power of One, Recurring Revenue, Fundability) | ✅ DONE | 4/4 | — |
-| E15 — Strategy Dashboards | Dashboards visuales Strategy (BMC, Core Customer, Brand Promises, Diff Activities, Sandbox) | ✅ DONE | 5/5 | — |
-| E16 — People Dashboards | Dashboards visuales People (Core Values, FACe, Team Growth, DISC, Love/Loathe, Hiring) | ✅ DONE | 6/6 | — |
-| E17 — Execution Dashboards | Dashboards visuales Execution (Rockefeller, WWW, Priorities, KPIs, Meetings, Influencers, Vision) | ✅ DONE | 7/7 | — |
+La auditoría del 2026-08-24 ejecutó la suite con Python 3.12:
 
-## E13 — Auditoría y Cierre
+- 380 passed
+- 2 failed
+- 2 skipped
+- 1 warning
 
-**Status:** ✅ DONE (2026-05-25)
+Fallos actuales:
 
-| Story | Status | Description |
-|-------|--------|-------------|
-| S13.1 | ✅ | Close E12 — absorbed into E11 |
-| S13.2 | ✅ | Fix test_finds_overdue (date drift) |
-| S13.3 | ✅ | Close E6 — Knowledge Ontology |
-| S13.4 | ✅ | Close E7 — Agent Intelligence |
-| S13.5 | ✅ | Close E8 — Coaching Engine |
-| S13.6 | ✅ | Add tests for diagnose, level, router (+34 tests) |
-| S13.7 | ✅ | Sync install.sh to root coaching/ |
-| S13.8 | ✅ | Remove orphaned .scaleup/coaching/ |
-| S13.9 | ✅ | Update product-roadmap.md |
+1. _parse_simple_yaml() no construye listas YAML de nivel raíz.
+2. read_yaml_file() no interpreta correctamente pulses: con elementos de lista
+   en .scaleup/my-company/pulse-history.yaml.
 
-## E14–E17 — Visual Dashboards (22 stories)
+### P1 — Preparar E21
 
-**Status:** ✅ ALL DONE (2026-05-28)
+1. Revisar el brief y scope con las dependencias ya reconciliadas.
+2. Ejecutar diseño y plan formal.
+3. Dividir el tamaño XL en historias verificables.
+4. Definir pruebas de fidelidad al libro sin imitación personal ni citas extensas.
 
-4 épicas completadas en una sesión: Cash (4), Strategy (5), People (6), Execution (7). Framework visual con Chart.js vendored, dashboard-base.css, localStorage persistence. 22 dashboards single-file HTML, sin build step.
+## Deuda técnica y de producto no asignada
 
-## Next
+| Deuda | Origen | Estado | Condición de promoción |
+|-------|--------|--------|------------------------|
+| Suite roja: parser YAML | E18 / auditoría 2026-08-24 | Open — P0 | Corregir antes de iniciar implementación nueva. |
+| Instalación E2E desde proyecto limpio | E4/E10/E13 | Open — P1 | Promover a E22 si requiere más que una historia acotada. |
+| Remapeo y prueba real de Hermes | E10 | Open — P1 | Cuando Hermes sea plataforma soportada, no solo destino de copia. |
+| Restaurar coaching/summary/ | E9/E13 | Open — P2 | Cuando se requiera nuevamente resumen automático de sesión. |
+| Documentar formalmente el esquema E19 | E19 | Open — P2 | Antes de extender el grafo con nuevas fuentes. |
+| Integrar Escala Server con el instalador | E18 | Open — P2 | Antes de distribuir el servidor fuera del repo. |
+| Compatibilidad Python declarada | E18/E20 | Open — P2 | Definir y probar una versión mínima única. |
+| Release verificable del repo fuente | E5 | Open — P2 | Si se publica este repo; .scaleup/VERSION es 1.0.0, pero no existe tag v1.0.0 aquí. |
+| Rama origin/story/s6.1/ontology-schema | Higiene Git | Open — P3 | Eliminar tras confirmar que está fusionada y no se usa. |
 
-| Initiative | Priority | Rationale |
-|------------|----------|-----------|
-| E4 — Validation | HIGH | End-to-end testing before public distribution |
-| E5 — Distribution | HIGH | Public GitHub release v1.0.0 |
-| Port to Hermes Agent | MEDIUM | Reach more users |
-| Port to Codex CLI | MEDIUM | Already started in E11 |
+Las ideas condicionadas que no son deuda comprometida viven en dev/parking-lot.md.
+
+## Riesgos vigentes
+
+| Riesgo | Mitigación |
+|--------|------------|
+| Roadmap y scopes divergen del código | Esta tabla es el inventario canónico; auditar al cerrar cada épica. |
+| Declarar completitud por checkbox sin evidencia | Priorizar retrospectiva, código, pruebas y commits de cierre. |
+| Contexto excesivo del grafo | Carga selectiva por herramienta/decisión; no cargar el libro completo. |
+| Respuestas de E21 no fundamentadas | Recuperación obligatoria desde E19 y pruebas de trazabilidad. |
+| Regresiones de migración | Restaurar suite verde y añadir fixtures YAML de listas anidadas. |
 
 ---
 
-## Risk Register
-
-| Risk | Mitigation |
-|------|-----------|
-| Ontology design too complex | Start with minimal viable graph. Add incrementally. |
-| Context window limits with large ontology | Selective loading per session. Never load full ontology. |
-| Session memory corruption | YAML with schema validation. Backup on session close. |
-| Sync drift between dev and distributable coaching code | Resuelto en E13 — install.sh apunta al mismo directorio fuente |
-
----
-
-*Created: 2026-03-17 | Last updated: 2026-05-28*
-*Status: Active | Owner: Eduardo Muñoz Luna*
+*Creado: 2026-03-17 | Auditado: 2026-08-24 | Estado: Active*

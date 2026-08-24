@@ -1,5 +1,8 @@
 # E10: ScaleUp Cross-Platform Distribution
 
+**Status:** Complete — accepted follow-ups
+**Audited:** 2026-08-24
+
 ## Objective
 
 Construir los core Python coaching engines faltantes y distribuir el sistema ScaleUp completo (skills + knowledge + coaching engine + validators) como un bundle portable que funcione en Claude Code global, Hermes Agent y Codex — sin depender del repo de desarrollo.
@@ -12,7 +15,7 @@ Hoy ScaleUp solo funciona dentro de este repo. Al distribuirlo cross-platform:
 - El coaching engine en Python garantiza **consistencia** entre plataformas
 - Un solo `install` actualiza las 3 plataformas
 
-## Current State (Gemba)
+## State at Epic Start (Historical Gemba)
 
 | Componente | Estado | Ubicación |
 |-----------|--------|-----------|
@@ -30,6 +33,9 @@ Hoy ScaleUp solo funciona dentro de este repo. Al distribuirlo cross-platform:
 | Coaching Engine: router | **No existe** | — |
 
 12 skills ya invocan `python3 -m coaching.*` o referencian validators — pero solo `summary` tiene engine real.
+
+Esta tabla conserva el gemba de 2026-05-07; no describe el árbol actual después
+de la consolidación de fuentes realizada en E13.
 
 ## In Scope (MUST)
 
@@ -142,11 +148,18 @@ Script `scaleup-install` que:
 ## Done Criteria
 
 - [x] Los 6 coaching engines construidos y testeados (welcome, diagnose, worksheet, progress, level, router)
-- [x] `scaleup-install` instala exitosamente en Claude Code global
-- [x] `scaleup-install` instala exitosamente en Hermes
-- [x] Ejecutar `/scaleup-welcome` desde un proyecto vacío (fuera de este repo) funciona
-- [x] Ejecutar `/scaleup-diagnose` en Hermes produce el mismo output que en Claude Code
+- [x] `.scaleup/install.sh` copia el bundle a Claude Code global
+- [x] `.scaleup/install.sh` copia el bundle a Hermes
+- [ ] Invocación completa de `/scaleup-welcome` desde un proyecto vacío no verificada
+- [ ] Equivalencia real de `/scaleup-diagnose` en Hermes no verificada
 - [x] Retrospectiva completada
+
+### Audit Note — 2026-08-24
+
+La retrospectiva de E10 contradice los dos criterios E2E que el scope marcaba
+como completos: solo se probó el engine vía PYTHONPATH y el adapter de Hermes
+copió los SKILL.md sin remapeo real de herramientas. E10 permanece cerrada con
+follow-ups aceptados; estas validaciones no deben presentarse como ejecutadas.
 
 ## Risks
 
@@ -213,39 +226,39 @@ S10.4 (Worksheet) está fuera del critical path — puede retrasarse sin bloquea
 ### M1: Walking Skeleton (S10.1 + S10.2)
 **Stories:** S10.1, S10.2
 **Success criteria:**
-- [ ] Matriz de compatibilidad Claude↔Hermes documentada
-- [ ] `coaching/welcome/` construido con engine+formatter+I/O
-- [ ] `python3 -m coaching.welcome --context '{...}'` produce output correcto
-- [ ] Tests pasan
-- [ ] Patrón PAT-L-24 validado para replicar en otros engines
+- [x] Matriz de compatibilidad Claude↔Hermes documentada
+- [x] `coaching/welcome/` construido
+- [x] `coaching.welcome` invocable como módulo
+- [x] Tests de E10 pasaron al cierre
+- [x] Patrón PAT-L-24 validado para replicar en otros engines
 
 **Demo:** Ejecutar welcome engine desde CLI y verificar que genera profile correcto.
 
 ### M2: Engines Complete (S10.3 + S10.4 + S10.5 + S10.6)
 **Stories:** S10.3, S10.4, S10.5, S10.6
 **Success criteria:**
-- [ ] Los 6 coaching engines construidos (welcome, diagnose, worksheet, progress, level, router)
-- [ ] Todos los tests pasan
-- [ ] `python3 -m coaching.router --context '{...}'` retorna sub-agente correcto
-- [ ] Engines invocan validators existentes (no duplican validación)
+- [x] Los 6 coaching engines construidos (welcome, diagnose, worksheet, progress, level, router)
+- [x] Tests de los engines pasaron al cierre
+- [x] Router determinístico retorna la decisión correspondiente
+- [x] Engines reutilizan validators existentes
 
 **Demo:** Flujo completo CLI: welcome → diagnose → router decide sub-agente → progress muestra dashboard.
 
 ### M3: E2E Cross-Platform (S10.7 + S10.8 + S10.9)
 **Stories:** S10.7, S10.8, S10.9
 **Success criteria:**
-- [ ] `scaleup-install` instala en Claude Code global exitosamente
-- [ ] `scaleup-install` instala en Hermes exitosamente
+- [x] Installer copia el bundle en Claude Code global
+- [x] Installer copia el bundle en Hermes
 - [ ] `/scaleup-welcome` funciona desde un proyecto vacío (fuera de este repo)
 - [ ] `/scaleup-diagnose` en Hermes produce output equivalente
-- [ ] `scaleup-install --status` muestra versión instalada en cada plataforma
+- [x] `install.sh --status` muestra versión instalada en cada plataforma
 
 **Demo:** Abrir un proyecto nuevo, ejecutar `/scaleup-welcome`, completar onboarding, ejecutar `/scaleup-diagnose`.
 
 ### M4: Epic Complete
-- [ ] Done criteria del épico cumplidos
-- [ ] Retrospectiva completada (BASE-009)
-- [ ] Parking lot actualizado
+- [x] Épica cerrada con follow-ups E2E aceptados
+- [x] Retrospectiva completada (BASE-009)
+- [x] Parking lot actualizado
 
 ## Sequencing Risks
 
@@ -266,12 +279,12 @@ S10.4 (Worksheet) está fuera del critical path — puede retrasarse sin bloquea
 | S10.5: Progress + Level | done | 2026-05-07 | 2026-05-07 | 25 tests (11+14) |
 | S10.6: Router Engine | done | 2026-05-07 | 2026-05-07 | 12 tests |
 | S10.7: Claude Global Installer | done | 2026-05-07 | 2026-05-07 | 39 skills installed |
-| S10.8: Hermes Adapter | done | 2026-05-07 | 2026-05-07 | 39 skills installed |
+| S10.8: Hermes Adapter | done | 2026-05-07 | 2026-05-07 | 39 skills copied; tool remapping not verified |
 | S10.9: Unified Installer | done | 2026-05-07 | 2026-05-07 | install.sh --target all works |
 
 | Milestone | Target | Status |
 |-----------|--------|--------|
 | M1: Walking Skeleton | 2026-05-07 | done |
 | M2: Engines Complete | 2026-05-07 | done |
-| M3: E2E Cross-Platform | 2026-05-07 | done |
-| M4: Epic Complete | 2026-05-07 | done |
+| M3: E2E Cross-Platform | 2026-05-07 | partial — accepted follow-ups |
+| M4: Epic Complete | 2026-05-07 | closed |

@@ -49,7 +49,7 @@ La base de conocimiento está en `.scaleup/knowledge/`, organizada por las 4 dec
 
 ## Sub-agentes especializados
 
-Orquesto 4 sub-agentes, cada uno experto en su decisión. El routing es determinístico (core Python en `.scaleup/coaching/router/`):
+Orquesto 4 sub-agentes, cada uno experto en su decisión. El routing es determinístico (core Python en `coaching/router/`):
 
 | Sub-agente | Decisión | Cuándo se activa |
 |------------|----------|-----------------|
@@ -73,12 +73,12 @@ Los skills de coaching usan la **arquitectura cross-platform**: core Python en `
 
 | Componente | Core Python | Adapter SKILL.md |
 |------------|-------------|------------------|
-| Welcome | `.scaleup/coaching/welcome/` | `.claude/skills/scaleup-welcome/` |
-| Diagnóstico | `.scaleup/coaching/diagnose/` | `.claude/skills/scaleup-diagnose/` |
-| Worksheets | `.scaleup/coaching/worksheet/` | `.claude/skills/scaleup-worksheet/` |
-| Progreso | `.scaleup/coaching/progress/` | `.claude/skills/scaleup-progress/` |
-| Nivel coaching | `.scaleup/coaching/level/` | `.claude/skills/scaleup-level/` |
-| Router | `.scaleup/coaching/router/` | Integrado en CLAUDE.md |
+| Welcome | `coaching/welcome/` | `.claude/skills/scaleup-welcome/` |
+| Diagnóstico | `coaching/diagnose/` | `.claude/skills/scaleup-diagnose/` |
+| Worksheets | `coaching/worksheet/` | `.claude/skills/scaleup-worksheet/` |
+| Progreso | `coaching/progress/` | `.claude/skills/scaleup-progress/` |
+| Nivel coaching | `coaching/level/` | `.claude/skills/scaleup-level/` |
+| Router | `coaching/router/` | Integrado en CLAUDE.md |
 
 Los quality gates en `.scaleup/agent/validators/` validan en código Python, no con LLM.
 
@@ -96,7 +96,7 @@ Los quality gates en `.scaleup/agent/validators/` validan en código Python, no 
 | `/scaleup-welcome` | Primera sesión: crea tu perfil (core Python) |
 | `/scaleup-diagnose` | Diagnóstico completo de las 4 decisiones con scoring estructurado (core Python) |
 | `/scaleup-progress` | Dashboard de progreso mostrando scores y work completado (core Python) |
-| `/scaleup-worksheet [nombre]` | Guía paso a paso de cualquier worksheet desde la ontología (core Python) |
+| `/scaleup-worksheet [nombre]` | Guía paso a paso de cualquiera de los 15 worksheets registrados (core Python) |
 | `/scaleup-level [--set shu/ha/ri]` | Muestra o cambia el nivel de coaching adaptativo |
 
 ### People — Personas

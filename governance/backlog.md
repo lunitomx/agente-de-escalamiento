@@ -1,47 +1,69 @@
 # Backlog: ScaleUp Agent AI
 
-> **Status**: Active
-> **Repo**: https://github.com/lunitomx/scaleupagent
+> Vista operativa del inventario canónico de work/epics/product-roadmap.md.
 
-## Epics
+**Status:** Active
+**Repo:** https://github.com/lunitomx/scaleupagent
+**Audited:** 2026-08-24
+**Next available epic ID:** E22
 
-| ID | Epic | Status | Scope | Priority |
-|----|------|--------|-------|----------|
-| E1 | OCR Pipeline — Extraer libro completo a texto/markdown | done | RF-01 | P0 |
-| E2 | Knowledge Base — Estructurar contenido por las 4 decisiones | done | RF-02 | P0 |
-| E3 | Agent Framework — Estructura instalable para GitHub | active | RF-03, RF-07 | P0 |
-| E4 | Validación — Testing end-to-end del flujo completo | draft | RF-04, RF-05, RF-06 | P1 |
-| E5 | Distribución — Publicar en GitHub y documentar instalación | draft | RF-07 | P1 |
+## Epic Inventory
 
-## E3: Agent Framework — Estructura instalable para GitHub
+| ID | Epic | Canonical Status | Notes |
+|----|------|------------------|-------|
+| E1 | OCR Pipeline | complete — legacy | Cerrada antes de E3; evidencia en el backlog inicial. |
+| E2 | Knowledge Base | complete — legacy | Cerrada antes de E3; evolucionó hacia E6 y E19. |
+| E3 | Agent Framework | complete | 5/5. |
+| E4 | Validation | retired / superseded | Draft histórico sin artefactos de ejecución; cobertura parcial E13/E19/E20. |
+| E5 | Distribution | retired / superseded | Draft histórico sustituido por E10/E11. |
+| E6 | Knowledge Ontology | complete | 7/7; 15 worksheets reales. |
+| E7 | Agent Intelligence | complete | 6/6. |
+| E8 | Coaching Engine | complete | 6/6; follow-up histórico de gates individuales. |
+| E9 | Value-Add Features | complete — follow-up | 4/4 al cierre; summary requiere restauración tras E13. |
+| E10 | Cross-Platform Distribution | complete — follow-ups | 9/9; E2E limpio y Hermes real no verificados. |
+| E11 | Agente de Escalamiento | complete | 6/6. |
+| E12 | Codex & Auto-Update | cancelled | Absorbida por E11. |
+| E13 | Auditoría y Cierre | complete | 9/9. |
+| E14 | Cash Dashboards | complete | 4/4. |
+| E15 | Strategy Dashboards | complete | 5/5. |
+| E16 | People Dashboards | complete | 6/6. |
+| E17 | Execution Dashboards | complete | 7/7. |
+| E18 | Escala Server | complete | 12/12. |
+| E19 | Book Ingestion | complete — follow-up | 5/5; falta documentación dedicada del esquema. |
+| E20 | Contextual Skills | complete | 4/4. |
+| E21 | Verne Board Member | draft | Única épica pendiente formal; sin diseño, plan ni stories. |
 
-> Goal: Que un empresario clone el repo, abra Claude Code, y tenga el agente ScaleUp funcionando.
+## Active Queue
 
-| Story | Description | Size | Status |
-|-------|-------------|------|--------|
-| S3.1 | CLAUDE.md del producto — Identidad, instrucciones base, routing a skills | M | draft |
-| S3.2 | .gitignore + limpieza — Excluir archivos de desarrollo RaiSE, PDF, build artifacts | S | done |
-| S3.3 | README.md — Instrucciones de instalación, qué es, cómo usar | M | draft |
-| S3.4 | Estructura de directorios del usuario — `.scaleup/` con company-profile vacío y defaults | S | done |
-| S3.5 | Skill triggers en CLAUDE.md — Mapear slash commands a skills del producto | S | draft |
+### P0 — Restore Green Build
 
-## E4: Validación — Testing end-to-end
+La auditoría actual encontró dos fallos en tests/test_escala_migration.py:
 
-> Goal: Verificar que cada skill funciona correctamente y el flujo es coherente.
+1. El parser YAML simple no construye listas de nivel raíz.
+2. La lectura de pulse-history.yaml no devuelve pulses como lista.
 
-| Story | Description | Size | Status |
-|-------|-------------|------|--------|
-| S4.1 | Test flujo welcome → diagnose → routing | M | draft |
-| S4.2 | Test cada sub-agente (people, strategy, execution, cash) genera artifacts correctos | L | draft |
-| S4.3 | Test templates se rellenan correctamente | S | draft |
-| S4.4 | Fix bugs encontrados en validación | ? | draft |
+No abrir implementación de E21 ni crear un commit de esta auditoría hasta que
+el gate de tests vuelva a verde.
 
-## E5: Distribución — Publicar en GitHub
+### P1 — E21 Design and Planning
 
-> Goal: Repo público funcional con documentación clara.
+Source: work/epics/e21-verne-board-member/scope.md
 
-| Story | Description | Size | Status |
-|-------|-------------|------|--------|
-| S5.1 | Push inicial a GitHub con estructura limpia | S | draft |
-| S5.2 | LICENSE (MIT o similar) | XS | draft |
-| S5.3 | Smoke test: clonar repo fresco y verificar que funciona | M | draft |
+- [ ] Suite verde
+- [ ] Epic design aprobado
+- [ ] Implementation plan aprobado
+- [ ] XL dividido en stories
+- [ ] Trazabilidad obligatoria hacia E19 definida
+
+## Historical Drafts E4/E5
+
+Las stories S4.x y S5.x del backlog original nunca se ejecutaron bajo esos IDs.
+Sus objetivos se distribuyeron entre E10, E11, E13, E19 y E20. Los criterios
+todavía no demostrados viven como deuda en product-roadmap.md.
+
+No reactivar ni reutilizar E4/E5. Si la deuda residual requiere una épica nueva,
+usar E22.
+
+## Conditional Ideas
+
+Las ideas sin compromiso aprobado viven en dev/parking-lot.md.

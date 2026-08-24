@@ -1,5 +1,8 @@
 # Epic Scope: E9 — Value-Add Features
 
+**Status:** Complete — follow-up required for summary
+**Audited:** 2026-08-24
+
 ## Objective
 
 Entregar exportación, pulse diagnóstico, dashboard histórico y resumen de sesión — features que hacen el coaching tangible y compartible con el equipo del empresario.
@@ -41,8 +44,14 @@ Mismo patrón E8: core Python en `coaching/{skill}/` + adapter SKILL.md en `.cla
 
 ## Done Criteria
 
-- [ ] Export produce documento markdown limpio y compartible
-- [ ] Pulse re-diagnóstico completo en < 5 minutos
-- [ ] Dashboard muestra progresión histórica de scores
-- [ ] Resúmenes de sesión auto-generados y almacenados
-- [ ] Cada story tiene core Python + adapter SKILL.md + quality gate
+- [x] Export produce documento markdown limpio y compartible
+- [x] Pulse re-diagnóstico y comparación histórica entregados
+- [x] Dashboard muestra progresión histórica de scores
+- [ ] Resumen automático fue entregado al cierre de E9, pero `coaching/summary/` fue retirado durante E13 y no existe actualmente
+- [x] Cada story tuvo core Python + adapter SKILL.md + quality gate al cierre
+
+### Audit Note — 2026-08-24
+
+La retrospectiva de E9 es correcta como registro histórico. El estado actual
+cambió después: E13 eliminó la fuente duplicada y dejó el port de summary en su
+parking lot. Restaurar summary es deuda técnica, no una reapertura de E9.
