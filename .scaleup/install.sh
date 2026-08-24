@@ -8,6 +8,7 @@ set -euo pipefail
 #   ./install.sh                    # Install to Claude Code global
 #   ./install.sh --target hermes    # Install to Hermes Agent
 #   ./install.sh --target all       # Install to all platforms
+#   ./install.sh --destination-root /tmp/scaleup-e2e
 #   ./install.sh --status           # Show installation status
 #   ./install.sh --uninstall        # Remove from all platforms
 
@@ -22,11 +23,11 @@ COACHING_DIR="$(dirname "$SCRIPT_DIR")/coaching"
 KNOWLEDGE_DIR="$SCRIPT_DIR/knowledge"
 AGENT_DIR="$SCRIPT_DIR/agent"
 
-# Target directories
-CLAUDE_SKILLS="$HOME/.claude/skills"
-CLAUDE_SCALEUP="$HOME/.claude/scaleup"
-HERMES_SKILLS="$HOME/.hermes/skills"
-HERMES_SCALEUP="$HOME/.hermes/scaleup"
+# Target directories (configured after parsing CLI arguments)
+CLAUDE_SKILLS=""
+CLAUDE_SCALEUP=""
+HERMES_SKILLS=""
+HERMES_SCALEUP=""
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -34,8 +35,30 @@ info()  { echo "  [+] $*"; }
 warn()  { echo "  [!] $*" >&2; }
 error() { echo "  [✗] $*" >&2; exit 1; }
 
+configure_targets() {
+    local destination_root="$1"
+    CLAUDE_SKILLS="$destination_root/.claude/skills"
+    CLAUDE_SCALEUP="$destination_root/.claude/scaleup"
+    HERMES_SKILLS="$destination_root/.hermes/skills"
+    HERMES_SCALEUP="$destination_root/.hermes/scaleup"
+}
+
+adapt_skill() {
+    local skill_file="$1" runtime_root="$2" escaped_root
+    escaped_root="${runtime_root//\\/\\\\}"
+    escaped_root="${escaped_root//&/\\&}"
+    escaped_root="${escaped_root//|/\\|}"
+
+    sed -i \
+        -e "s|sys\\.path\\.insert(0, '\\.')|sys.path.insert(0, '$escaped_root')|g" \
+        -e "s|str(pathlib\\.Path('\\.scaleup/agent'))|str(pathlib.Path('$escaped_root/agent'))|g" \
+        -e "s|python3 \\.scaleup/agent/validators/|python3 $escaped_root/agent/validators/|g" \
+        -e "s|python3 -m coaching\\.|PYTHONPATH='$escaped_root' python3 -m coaching.|g" \
+        "$skill_file"
+}
+
 copy_skills() {
-    local src="$1" dst="$2" count=0
+    local src="$1" dst="$2" runtime_root="$3" count=0
     mkdir -p "$dst"
     for skill_dir in "$src"/scaleup-*/; do
         [[ -d "$skill_dir" ]] || continue
@@ -43,7 +66,8 @@ copy_skills() {
         name="$(basename "$skill_dir")"
         mkdir -p "$dst/$name"
         cp "$skill_dir/SKILL.md" "$dst/$name/SKILL.md"
-        ((count++))
+        adapt_skill "$dst/$name/SKILL.md" "$runtime_root"
+        count=$((count + 1))
     done
     info "Copied $count skills to $dst"
 }
@@ -93,8 +117,8 @@ write_version() {
 
 install_claude() {
     echo ""
-    echo "Installing ScaleUp to Claude Code global (~/.claude/)..."
-    copy_skills "$SKILLS_DIR" "$CLAUDE_SKILLS"
+    echo "Installing ScaleUp to Claude Code ($CLAUDE_SCALEUP)..."
+    copy_skills "$SKILLS_DIR" "$CLAUDE_SKILLS" "$CLAUDE_SCALEUP"
     copy_engine "$CLAUDE_SCALEUP"
     copy_knowledge "$CLAUDE_SCALEUP"
     copy_agent "$CLAUDE_SCALEUP"
@@ -114,8 +138,8 @@ install_claude() {
 
 install_hermes() {
     echo ""
-    echo "Installing ScaleUp to Hermes Agent (~/.hermes/)..."
-    copy_skills "$SKILLS_DIR" "$HERMES_SKILLS"
+    echo "Installing ScaleUp to Hermes Agent ($HERMES_SCALEUP)..."
+    copy_skills "$SKILLS_DIR" "$HERMES_SKILLS" "$HERMES_SCALEUP"
     copy_engine "$HERMES_SCALEUP"
     copy_knowledge "$HERMES_SCALEUP"
     copy_agent "$HERMES_SCALEUP"
@@ -206,19 +230,40 @@ uninstall() {
 
 main() {
     local target="claude"
+    local destination_root="$HOME"
+    local action="install"
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
-            --target)   target="$2"; shift 2 ;;
-            --status)   show_status; exit 0 ;;
-            --uninstall) uninstall; exit 0 ;;
+            --target)
+                [[ $# -ge 2 ]] || error "--target requires a value"
+                target="$2"
+                shift 2
+                ;;
+            --destination-root)
+                [[ $# -ge 2 ]] || error "--destination-root requires a path"
+                destination_root="$2"
+                shift 2
+                ;;
+            --status) action="status"; shift ;;
+            --uninstall) action="uninstall"; shift ;;
             --help|-h)
-                echo "Usage: install.sh [--target claude|hermes|all] [--status] [--uninstall]"
+                echo "Usage: install.sh [--target claude|hermes|all] [--destination-root PATH] [--status] [--uninstall]"
                 exit 0
                 ;;
             *) error "Unknown option: $1" ;;
         esac
     done
+
+    [[ -n "$destination_root" ]] || error "--destination-root cannot be empty"
+    [[ "$destination_root" != "/" ]] || error "Refusing to use / as destination root"
+    [[ "$destination_root" != *"'"* ]] || error "Destination root cannot contain a single quote"
+    configure_targets "$destination_root"
+
+    case "$action" in
+        status) show_status; exit 0 ;;
+        uninstall) uninstall; exit 0 ;;
+    esac
 
     echo "ScaleUp Installer v$VERSION"
     echo "=========================="

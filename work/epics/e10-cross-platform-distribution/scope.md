@@ -150,8 +150,10 @@ Script `scaleup-install` que:
 - [x] Los 6 coaching engines construidos y testeados (welcome, diagnose, worksheet, progress, level, router)
 - [x] `.scaleup/install.sh` copia el bundle a Claude Code global
 - [x] `.scaleup/install.sh` copia el bundle a Hermes
-- [ ] Invocación completa de `/scaleup-welcome` desde un proyecto vacío no verificada
-- [ ] Equivalencia real de `/scaleup-diagnose` en Hermes no verificada
+- [x] Instalación aislada Claude/Hermes y flujo determinístico welcome → diagnose → validadores desde proyectos vacíos
+- [x] Equivalencia de outputs y carga del adapter `scaleup-diagnose` mediante el descubridor oficial de Hermes
+- [ ] Invocación conversacional de `/scaleup-welcome` mediante Claude Code no ejecutada
+- [ ] Invocación conversacional de `/scaleup-diagnose` mediante Hermes no ejecutada
 - [x] Retrospectiva completada
 
 ### Audit Note — 2026-08-24
@@ -160,6 +162,21 @@ La retrospectiva de E10 contradice los dos criterios E2E que el scope marcaba
 como completos: solo se probó el engine vía PYTHONPATH y el adapter de Hermes
 copió los SKILL.md sin remapeo real de herramientas. E10 permanece cerrada con
 follow-ups aceptados; estas validaciones no deben presentarse como ejecutadas.
+
+### Follow-up Verification — 2026-08-24
+
+`tests/test_scaleup_installer.py` instala los dos bundles bajo un destino
+temporal sin modificar las configuraciones reales. Desde dos proyectos vacíos
+ejecuta welcome, valida el perfil, ejecuta diagnose, valida el diagnóstico y
+compara los outputs Claude/Hermes. El instalador ahora adapta imports,
+validadores y `PYTHONPATH` al runtime de cada plataforma.
+
+La API oficial local de Hermes descubrió los 39 skills y `skill_view()` cargó
+`scaleup-diagnose` con la ruta Hermes adaptada. El smoke conversacional sigue
+separado: la CLI Hermes v0.20.5 falla durante bootstrap por falta de permiso
+sobre `/usr/local/lib/hermes-agent/.env`, y ejecutar Claude/Hermes con un modelo
+requiere autorización de consumo externo. No se presenta ese último paso como
+ejecutado.
 
 ## Risks
 
@@ -249,8 +266,10 @@ S10.4 (Worksheet) está fuera del critical path — puede retrasarse sin bloquea
 **Success criteria:**
 - [x] Installer copia el bundle en Claude Code global
 - [x] Installer copia el bundle en Hermes
-- [ ] `/scaleup-welcome` funciona desde un proyecto vacío (fuera de este repo)
-- [ ] `/scaleup-diagnose` en Hermes produce output equivalente
+- [x] El adapter instalado ejecuta welcome → diagnose desde un proyecto vacío
+- [x] Los bundles Claude/Hermes producen output equivalente y Hermes descubre el skill
+- [ ] Smoke conversacional de `/scaleup-welcome` mediante Claude Code
+- [ ] Smoke conversacional de `/scaleup-diagnose` mediante Hermes
 - [x] `install.sh --status` muestra versión instalada en cada plataforma
 
 **Demo:** Abrir un proyecto nuevo, ejecutar `/scaleup-welcome`, completar onboarding, ejecutar `/scaleup-diagnose`.

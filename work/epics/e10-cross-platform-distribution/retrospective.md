@@ -65,3 +65,23 @@ Built 6 coaching engine modules and a cross-platform installer that distributes 
 1. Test ScaleUp skills from a clean project (outside this repo)
 2. Test in Hermes with real tool call mapping
 3. Evaluate E11 scope: onboarding/GTM or Hermes adapter refinement
+
+## Follow-up Verification — 2026-08-24
+
+The deterministic part of the first two follow-ups is now covered by
+`tests/test_scaleup_installer.py`:
+
+- `install.sh --destination-root` installs both platforms without touching a
+  user's actual configuration.
+- Installed SKILL.md files resolve engine imports and validators against their
+  Claude or Hermes runtime instead of the current project.
+- Fresh projects complete welcome → diagnose and pass both validators.
+- Claude and Hermes bundles produce equivalent outputs and routing.
+- Hermes v0.20.5's official skill loader discovered all 39 ScaleUp skills and
+  loaded the adapted `scaleup-diagnose` content.
+
+A live slash-command conversation remains unexecuted. Hermes currently fails
+before command dispatch because its installation-level `.env` is unreadable to
+the runtime user; both Hermes and Claude live runs would also invoke an external
+model. This is retained as an explicit smoke-test follow-up, not represented as
+completed evidence.

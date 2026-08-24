@@ -20,7 +20,7 @@
 | E7 | Agent Intelligence | complete | 6/6. |
 | E8 | Coaching Engine | complete | 6/6; follow-up histórico de gates individuales. |
 | E9 | Value-Add Features | complete — follow-up | 4/4 al cierre; summary requiere restauración tras E13. |
-| E10 | Cross-Platform Distribution | complete — follow-ups | 9/9; E2E limpio y Hermes real no verificados. |
+| E10 | Cross-Platform Distribution | complete — follow-up | 9/9; instalación aislada, adapters y equivalencia determinística verificados; falta smoke conversacional. |
 | E11 | Agente de Escalamiento | complete | 6/6. |
 | E12 | Codex & Auto-Update | cancelled | Absorbida por E11. |
 | E13 | Auditoría y Cierre | complete | 9/9. |
@@ -35,21 +35,27 @@
 
 ## Active Queue
 
-### P0 — Restore Green Build
+### P0 — Finish E10 Live Smoke
 
-La auditoría actual encontró dos fallos en tests/test_escala_migration.py:
+- [x] Suite restaurada: 385 passed, 2 skipped.
+- [x] Instalación Claude/Hermes aislada en destino temporal.
+- [x] Flujo welcome → diagnose → validadores desde proyectos vacíos.
+- [x] Outputs equivalentes entre los bundles Claude y Hermes.
+- [x] Hermes descubre los 39 skills y carga el adapter de diagnose.
+- [ ] Ejecutar los slash commands mediante agentes reales. La CLI Hermes local
+  no supera bootstrap por permisos de `/usr/local/lib/hermes-agent/.env`; una
+  ejecución Claude/Hermes también consumiría un proveedor externo.
 
-1. El parser YAML simple no construye listas de nivel raíz.
-2. La lectura de pulse-history.yaml no devuelve pulses como lista.
+### P1 — Close Accepted Documentation Debt
 
-No abrir implementación de E21 ni crear un commit de esta auditoría hasta que
-el gate de tests vuelva a verde.
+- [ ] Resolver el contrato retirado de coaching/summary/.
+- [ ] Documentar formalmente el esquema de E19.
 
-### P1 — E21 Design and Planning
+### P2 — E21 Design and Planning
 
 Source: work/epics/e21-verne-board-member/scope.md
 
-- [ ] Suite verde
+- [x] Suite verde
 - [ ] Epic design aprobado
 - [ ] Implementation plan aprobado
 - [ ] XL dividido en stories

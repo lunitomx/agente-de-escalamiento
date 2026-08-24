@@ -3,7 +3,7 @@
 **Fecha:** 2026-08-24
 **Repo:** github.com/lunitomx/scaleupagent
 **Branch auditada:** main
-**HEAD auditado:** 67c3d0c — epic(e20): close with retrospective
+**Baseline reconciliada:** inventario publicado hasta 4aeac46
 
 ## Resumen ejecutivo
 
@@ -12,11 +12,10 @@ auditada desde el backlog original: E1/E2 son épicas históricas completas y
 E4/E5 fueron borradores posteriormente retirados/sustituidos. E22 es el siguiente
 número disponible.
 
-El baseline auditado estaba limpio y sincronizado con origin/main. Esta auditoría
-deja cambios documentales sin commit porque la suite actual no está verde: 380
-pruebas pasan, 2 fallan y 2 se omiten. Conforme a los gates del proyecto, no se
-debe crear el commit hasta resolver esos fallos. La recomendación es corregirlos
-antes de implementar E21.
+El inventario auditado y el arreglo del parser YAML ya fueron publicados. La
+suite está verde con 385 pruebas aprobadas y 2 omitidas. El follow-up E10 añadió
+instalación aislada, adaptación de rutas por plataforma, flujo determinístico
+desde proyectos vacíos y descubrimiento oficial de los 39 skills por Hermes.
 
 ## Estado canónico
 
@@ -65,23 +64,27 @@ La explicación y evidencia por épica están en work/epics/product-roadmap.md.
 Ejecución auditada:
 
     uv run --python 3.12 --with pytest --with pyyaml pytest -q
-    380 passed, 2 failed, 2 skipped, 1 warning
+    385 passed, 2 skipped, 1 warning
 
-Fallos:
+Aceptación E10:
 
-1. tests/test_escala_migration.py::TestSimpleYamlParser::test_list_with_items
-2. tests/test_escala_migration.py::TestReadYamlFile::test_read_pulse_history_yaml
+1. Instalación Claude/Hermes bajo destino temporal.
+2. Welcome → diagnose → validadores desde dos proyectos vacíos.
+3. Outputs y routing equivalentes entre plataformas.
+4. Los 39 skills fueron descubiertos por el cargador oficial de Hermes.
 
-Ambos apuntan al parser YAML simple de escala_server/migrate.py. El segundo
-afecta la lectura del historial real de pulses.
+La ejecución conversacional mediante proveedor real no se realizó. La CLI
+Hermes v0.20.5 está bloqueada durante bootstrap por permisos de su `.env` de
+instalación; Claude Code está disponible, pero invocarlo consumiría un modelo
+externo.
 
 ## Pendiente inmediato
 
-1. Restaurar la suite a verde.
-2. Abrir formalmente E21 con diseño y plan.
-3. Dividir E21 XL en historias antes de implementar.
-4. Mantener las deudas E2E/distribución como deuda sin número o promoverlas a
-   E22 si ameritan una épica completa.
+1. Ejecutar el smoke conversacional E10 cuando se autorice consumo de modelo y
+   se repare el bootstrap de Hermes.
+2. Resolver el pendiente de coaching/summary/.
+3. Documentar el esquema formal de E19.
+4. Abrir E21 con diseño, plan e historias antes de implementar.
 
 ## Drift corregido por esta auditoría
 

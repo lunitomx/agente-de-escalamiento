@@ -54,7 +54,7 @@ Todos forman parte de la historia del producto.
 | E7 — Agent Intelligence | Memoria, sesiones, tareas y routing | ✅ Complete | 6/6; cierre formal 7630a5a. |
 | E8 — Coaching Engine | Coaching Python portable | ✅ Complete | 6/6; opera sobre los 15 worksheets registrados actualmente. |
 | E9 — Value-Add | Export, pulse, dashboard y summary | ✅ Complete — follow-up | 4/4 al cierre. coaching/summary/ fue retirado en E13 y requiere port si se desea restaurar. |
-| E10 — Cross-Platform Distribution | Engines e instalador Claude/Hermes | ✅ Complete — accepted follow-ups | 9/9; no se verificó el flujo completo desde proyecto limpio ni el remapeo real de Hermes. |
+| E10 — Cross-Platform Distribution | Engines e instalador Claude/Hermes | ✅ Complete — accepted follow-up | 9/9; instalación aislada, adapters, flujo determinístico y descubrimiento Hermes verificados; falta smoke conversacional con proveedor real. |
 | E11 — Agente de Escalamiento | Repositorio público anonimizado | ✅ Complete | 6/6; retrospectiva registra clon e instalación verificados. |
 | E12 — Codex & Auto-Update | Compatibilidad y actualización | ❌ Cancelled | Absorbida por E11; cierre 6bfcaac. |
 | E13 — Auditoría y Cierre | Sanear cierres, tests y fuentes duplicadas | ✅ Complete | 9/9; 139 tests en el cierre histórico. |
@@ -89,22 +89,19 @@ E20 para comenzar; E20 es una integración consumidora paralela del conocimiento
 
 ## Próximo trabajo recomendado
 
-### P0 — Restaurar estado verde antes de abrir E21
+### P0 — Terminar smoke conversacional E10
 
-La auditoría del 2026-08-24 ejecutó la suite con Python 3.12:
+La suite está verde con 385 passed y 2 skipped. La instalación aislada, los
+adapters, el flujo welcome → diagnose y el descubrimiento Hermes ya están
+verificados. Falta el smoke mediante agentes y proveedor real; Hermes además
+requiere corregir el permiso de su `.env` de instalación.
 
-- 380 passed
-- 2 failed
-- 2 skipped
-- 1 warning
+### P1 — Cerrar deuda documental aceptada
 
-Fallos actuales:
+1. Resolver el contrato retirado de coaching/summary/.
+2. Documentar formalmente el esquema E19.
 
-1. _parse_simple_yaml() no construye listas YAML de nivel raíz.
-2. read_yaml_file() no interpreta correctamente pulses: con elementos de lista
-   en .scaleup/my-company/pulse-history.yaml.
-
-### P1 — Preparar E21
+### P2 — Preparar E21
 
 1. Revisar el brief y scope con las dependencias ya reconciliadas.
 2. Ejecutar diseño y plan formal.
@@ -115,11 +112,10 @@ Fallos actuales:
 
 | Deuda | Origen | Estado | Condición de promoción |
 |-------|--------|--------|------------------------|
-| Suite roja: parser YAML | E18 / auditoría 2026-08-24 | Open — P0 | Corregir antes de iniciar implementación nueva. |
-| Instalación E2E desde proyecto limpio | E4/E10/E13 | Open — P1 | Promover a E22 si requiere más que una historia acotada. |
-| Remapeo y prueba real de Hermes | E10 | Open — P1 | Cuando Hermes sea plataforma soportada, no solo destino de copia. |
-| Restaurar coaching/summary/ | E9/E13 | Open — P2 | Cuando se requiera nuevamente resumen automático de sesión. |
-| Documentar formalmente el esquema E19 | E19 | Open — P2 | Antes de extender el grafo con nuevas fuentes. |
+| Smoke conversacional desde proyecto limpio | E4/E10/E13 | Open — P0 | Autorizar consumo de modelo y ejecutar Claude/Hermes; la aceptación determinística ya está automatizada. |
+| Bootstrap de Hermes | E10 / entorno | Open — P0 | Corregir lectura de `/usr/local/lib/hermes-agent/.env` antes del smoke. |
+| Restaurar coaching/summary/ | E9/E13 | Open — P1 | Resolver el contrato todavía referenciado por scaleup-close. |
+| Documentar formalmente el esquema E19 | E19 | Open — P1 | Antes de extender el grafo con nuevas fuentes. |
 | Integrar Escala Server con el instalador | E18 | Open — P2 | Antes de distribuir el servidor fuera del repo. |
 | Compatibilidad Python declarada | E18/E20 | Open — P2 | Definir y probar una versión mínima única. |
 | Release verificable del repo fuente | E5 | Open — P2 | Si se publica este repo; .scaleup/VERSION es 1.0.0, pero no existe tag v1.0.0 aquí. |
@@ -135,7 +131,7 @@ Las ideas condicionadas que no son deuda comprometida viven en dev/parking-lot.m
 | Declarar completitud por checkbox sin evidencia | Priorizar retrospectiva, código, pruebas y commits de cierre. |
 | Contexto excesivo del grafo | Carga selectiva por herramienta/decisión; no cargar el libro completo. |
 | Respuestas de E21 no fundamentadas | Recuperación obligatoria desde E19 y pruebas de trazabilidad. |
-| Regresiones de migración | Restaurar suite verde y añadir fixtures YAML de listas anidadas. |
+| Regresiones de migración | Suite verde y fixtures YAML de listas anidadas; conservarlos en el gate completo. |
 
 ---
 
