@@ -181,6 +181,10 @@ def _parse_yaml_mapping(
         if current_indent < parent_indent:
             break
 
+        # A line shallower than the first key belongs to the parent block.
+        if base_indent is not None and current_indent < base_indent:
+            break
+
         # If we've established a base indent, skip lines that are deeper (sub-blocks)
         if base_indent is not None and current_indent > base_indent:
             idx += 1
@@ -211,17 +215,19 @@ def _parse_yaml_mapping(
                         if next_stripped
                         else 0
                     )
-                    if next_stripped and next_indent > current_indent:
-                        if next_stripped.startswith("- "):
-                            # List follows this key
-                            sub_val, idx = _parse_yaml_value(lines, idx + 1, current_indent)
-                            result[key] = sub_val
-                            continue
-                        else:
-                            # Sub-mapping follows
-                            sub_val, idx = _parse_yaml_value(lines, idx + 1, current_indent)
-                            result[key] = sub_val
-                            continue
+                    has_indented_child = next_indent > current_indent
+                    has_indentless_sequence = (
+                        next_indent == current_indent
+                        and next_stripped.startswith("- ")
+                    )
+                    if next_stripped and (
+                        has_indented_child or has_indentless_sequence
+                    ):
+                        sub_val, idx = _parse_yaml_value(
+                            lines, idx + 1, current_indent
+                        )
+                        result[key] = sub_val
+                        continue
                 result[key] = None
                 idx += 1
                 continue

@@ -47,6 +47,26 @@ class TestSimpleYamlParser:
         result = _parse_simple_yaml(text)
         assert result == {"items": ["apple", "banana", "cherry"]}
 
+    def test_indentless_list_with_nested_mappings_and_list(self):
+        text = (
+            "pulses:\n"
+            "- date: '2026-05-06'\n"
+            "  answers:\n"
+            "    execution: -1\n"
+            "  course_corrections:\n"
+            "  - Run execution review\n"
+        )
+        result = _parse_simple_yaml(text)
+        assert result == {
+            "pulses": [
+                {
+                    "date": "2026-05-06",
+                    "answers": {"execution": -1},
+                    "course_corrections": ["Run execution review"],
+                }
+            ]
+        }
+
     def test_comments(self):
         text = "# This is a comment\nname: value\n# another comment\nkey: 42\n"
         result = _parse_simple_yaml(text)
