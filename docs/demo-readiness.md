@@ -52,6 +52,10 @@ un One Page Strategic Plan (OPSP) persistido.
   tests/test_scaleup_installer.py` → **12 passed**, sin `PYTHONPATH` manual.
   Incluye instalación Codex y confirma que welcome/diagnose son internos y que sólo
   la puerta natural se expone al usuario.
+- Ensayo cronometrado automatizado en instalación Codex limpia, con Lumen Casa:
+  onboarding → diagnóstico (prioridad efectivo) → OPSP completo → continuidad →
+  validador instalado, **PASS en 1 segundo**. Es evidencia de motor y artefactos,
+  no sustituye un ensayo conversacional en cliente.
 - Verificaciones de distribución: sintaxis Bash y `git diff --check` correctos; hay
   una única puerta instalada en `.claude/skills/scaleup`.
 - Smoke real parcial: Codex CLI descubrió `.agents/skills/scaleup`, ejecutó el router
