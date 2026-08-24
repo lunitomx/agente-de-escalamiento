@@ -44,17 +44,18 @@ pequeños hoteles en México.
 | Tiempo | Prompt que se escribe | Respuesta o checkpoint esperado |
 |---|---|---|
 | 0–5 min | `Quiero organizar mi empresa; no sé por dónde empezar.` | El coach inicia sin pedir comandos, explica brevemente el proceso y pregunta nombre y actividad. |
-| 5–15 min | `Se llama Lumen Casa. Vendemos iluminación decorativa en línea y a distribuidores en México. Somos 28 personas.` | Completa el perfil con una pregunta a la vez; confirma el resumen antes de continuar. **Artefacto:** perfil persistido bajo `.scaleup/`. |
-| 15–30 min | Responde las preguntas con: `Personas: 2; estrategia: 3; ejecución: 2; efectivo: 1. El inventario nos deja sin efectivo.` | Realiza o completa el diagnóstico de las cuatro decisiones y explica en lenguaje simple por qué Efectivo es el foco inicial. **Checkpoint:** diagnóstico y prioridad guardados. |
+| 5–15 min | `Se llama Lumen Casa. Vendemos iluminación decorativa en línea y a distribuidores en México. Somos 28 personas.` | Guarda el perfil y empieza el diagnóstico con una pregunta 1–5. **Artefacto:** perfil persistido bajo `.scaleup/`. |
+| 15–30 min | Responde cada pregunta con un número del 1 al 5 (por ejemplo: cinco respuestas `2`, luego cinco `3`, luego cinco `2` y finalmente cinco `1`). | El coach hace una pregunta a la vez, guarda cada respuesta y explica en lenguaje simple por qué Efectivo es el foco inicial. **Checkpoint:** diagnóstico y prioridad guardados. |
 | 30–45 min | `Ahora quiero hacer mi plan estratégico en una hoja.` | El coach reconoce la intención, explica “plan en una hoja” sin depender de la sigla OPSP, y comienza con valores. |
 | 45–65 min | `Nos importan diseño honesto, cumplir lo prometido, resolver rápido y cuidar al cliente.` | Pide propósito, meta ambiciosa, mercado, promesa, metas y prioridades una por una. Datos sugeridos: propósito “hacer que los espacios cotidianos se sientan extraordinarios”; meta a 10 años “ser la marca mexicana de iluminación más confiable”; promesa “entrega completa en 72 horas para productos disponibles”; métrica trimestral “pedidos completos entregados a tiempo”; prioridad “reducir faltantes de inventario”. |
-| 65–75 min | `Sí, guárdalo y dime qué haríamos primero este trimestre.` | Resume decisiones, asigna un siguiente paso concreto y guarda el plan. **Artefacto obligatorio:** `work/strategy/opsp.md` con valores, propósito, meta, mercado, promesa, metas y prioridades. |
+| 65–75 min | Responde la última prioridad trimestral: `Reducir faltantes de inventario; Luis; faltantes`. | El coach guarda el plan, resume decisiones y ofrece el siguiente paso. **Artefacto obligatorio:** `work/strategy/opsp.md` con valores, propósito, meta, mercado, promesa, metas y prioridades. |
 | 75–85 min | Cierra y vuelve a abrir el asistente. Escribe: `¿Cómo vamos y qué sigue?` | Recupera el contexto sin volver a pedir toda la información y muestra el siguiente paso. **Checkpoint:** continuidad demostrada. |
 
 ## Recuperación durante la demo
 
-- Si falta un dato, responde “todavía no lo sé”. El coach debe proponer un
-  borrador, explicar que se puede ajustar y continuar con una pregunta.
+- Si falta un dato del perfil, responde “todavía no lo sé”. El coach no lo guarda
+  como respuesta y vuelve a pedir únicamente ese dato. En diagnóstico responde
+  con un número del 1 al 5; en el plan, pide que reformules sólo el dato faltante.
 - Si el asistente pide un comando o muestra un nombre de skill, vuelve a escribir
   la intención completa en lenguaje natural. Registra el fallo: es una brecha
   del release, no un error del presentador.
