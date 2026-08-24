@@ -36,14 +36,21 @@
 - [x] 59 relaciones creadas (mínimo: 50)
 - [x] API funcional: search, entity lookup y context
 - [x] 406 capítulos parseados y 12 integrity tests cubren las 4 decisiones
-- [ ] No se encontró un documento dedicado del esquema E19; la estructura está expresada en código, JSON y tests
+- [x] Esquema formal documentado en `escala_server/data/SCHEMA.md`
 
 ### Audit Note — 2026-08-24
 
 La redacción original pedía verificar cada capítulo contra entidades. La
 evidencia de cierre demuestra 406 capítulos parseados y cobertura de integridad
 por las cuatro decisiones, no una aserción individual por capítulo. E19
-permanece cerrada; la documentación dedicada del esquema queda como deuda.
+permanece cerrada; la documentación quedó registrada como deuda en ese corte.
+
+### Follow-up Verification — 2026-08-24
+
+`escala_server/data/SCHEMA.md` documenta el artefacto JSON, invariantes,
+enumeraciones, proyección SQLite, side effects de memoria, respuestas HTTP y
+reglas de cambio. También registra explícitamente qué provenance se pierde al
+ingerir para que E21 no dependa de garantías inexistentes.
 
 ## Implementation Plan
 

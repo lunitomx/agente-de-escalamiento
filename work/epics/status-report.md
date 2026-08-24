@@ -82,8 +82,7 @@ externo.
 
 1. Ejecutar el smoke conversacional E10 cuando se autorice consumo de modelo y
    se repare el bootstrap de Hermes.
-2. Documentar el esquema formal de E19.
-3. Abrir E21 con diseño, plan e historias antes de implementar.
+2. Abrir E21 con diseño, plan e historias antes de implementar.
 
 ## Drift corregido por esta auditoría
 
@@ -94,6 +93,7 @@ externo.
 - Las rutas canónicas del coaching engine se reconocen bajo coaching/.
 - coaching/summary/ fue restaurado en la ruta canónica y vuelve a distribuirse
   para que scaleup-close conserve su contrato.
+- El esquema E19 quedó formalizado para JSON, SQLite, memoria y API.
 - La dependencia de E21 se expresa como E18 + E19; E20 no es prerequisito.
 
 ---

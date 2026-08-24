@@ -29,7 +29,7 @@
 | E16 | People Dashboards | complete | 6/6. |
 | E17 | Execution Dashboards | complete | 7/7. |
 | E18 | Escala Server | complete | 12/12. |
-| E19 | Book Ingestion | complete — follow-up | 5/5; falta documentación dedicada del esquema. |
+| E19 | Book Ingestion | complete | 5/5; esquema JSON/SQLite/API documentado. |
 | E20 | Contextual Skills | complete | 4/4. |
 | E21 | Verne Board Member | draft | Única épica pendiente formal; sin diseño, plan ni stories. |
 
@@ -46,11 +46,7 @@
   no supera bootstrap por permisos de `/usr/local/lib/hermes-agent/.env`; una
   ejecución Claude/Hermes también consumiría un proveedor externo.
 
-### P1 — Close Accepted Documentation Debt
-
-- [ ] Documentar formalmente el esquema de E19.
-
-### P2 — E21 Design and Planning
+### P1 — E21 Design and Planning
 
 Source: work/epics/e21-verne-board-member/scope.md
 

@@ -63,7 +63,7 @@ Todos forman parte de la historia del producto.
 | E16 — People Dashboards | 6 dashboards People | ✅ Complete | 6/6. |
 | E17 — Execution Dashboards | 7 dashboards Execution | ✅ Complete | 7/7. |
 | E18 — Escala Server | Servidor, dashboards, SQLite y memoria | ✅ Complete | 12/12; close 2a63e09. |
-| E19 — Book Ingestion | Parser, grafo y API de conocimiento | ✅ Complete | 5/5; S19.3 absorbida por S19.2; 42 entidades, 59 relaciones y 406 capítulos. |
+| E19 — Book Ingestion | Parser, grafo y API de conocimiento | ✅ Complete | 5/5; 42 entidades, 59 relaciones, 406 capítulos y esquema formal documentado. |
 | E20 — Contextual Skills | Grafo → dashboards y coaching | ✅ Complete | 4/4; close 67c3d0c; tag epic/e20-complete. |
 | E21 — Verne Board Member | Primer miembro del board sintético | 📝 Draft | Única épica pendiente formal; todavía sin diseño, plan ni historias. |
 
@@ -96,11 +96,7 @@ adapters, el flujo welcome → diagnose y el descubrimiento Hermes ya están
 verificados. Falta el smoke mediante agentes y proveedor real; Hermes además
 requiere corregir el permiso de su `.env` de instalación.
 
-### P1 — Cerrar deuda documental aceptada
-
-1. Documentar formalmente el esquema E19.
-
-### P2 — Preparar E21
+### P1 — Preparar E21
 
 1. Revisar el brief y scope con las dependencias ya reconciliadas.
 2. Ejecutar diseño y plan formal.
@@ -113,7 +109,6 @@ requiere corregir el permiso de su `.env` de instalación.
 |-------|--------|--------|------------------------|
 | Smoke conversacional desde proyecto limpio | E4/E10/E13 | Open — P0 | Autorizar consumo de modelo y ejecutar Claude/Hermes; la aceptación determinística ya está automatizada. |
 | Bootstrap de Hermes | E10 / entorno | Open — P0 | Corregir lectura de `/usr/local/lib/hermes-agent/.env` antes del smoke. |
-| Documentar formalmente el esquema E19 | E19 | Open — P1 | Antes de extender el grafo con nuevas fuentes. |
 | Integrar Escala Server con el instalador | E18 | Open — P2 | Antes de distribuir el servidor fuera del repo. |
 | Compatibilidad Python declarada | E18/E20 | Open — P2 | Definir y probar una versión mínima única. |
 | Release verificable del repo fuente | E5 | Open — P2 | Si se publica este repo; .scaleup/VERSION es 1.0.0, pero no existe tag v1.0.0 aquí. |
