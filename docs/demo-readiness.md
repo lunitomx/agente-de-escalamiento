@@ -45,11 +45,11 @@ un One Page Strategic Plan (OPSP) persistido.
 
 ## Evidencia de checkpoint
 
-- `python -m pytest -q` → **400 passed, 2 skipped, 1 warning preexistente**
+- `python -m pytest -q` → **403 passed, 2 skipped, 1 warning preexistente**
   (2026-08-24). Incluye regresión Codex limpia: welcome → progreso con
   `next_step=diagnosis` → OPSP completo → validador instalado.
-- `pytest -q tests/test_scaleup_frontdoor.py tests/test_opsp.py
-  tests/test_scaleup_installer.py` → **12 passed**, sin `PYTHONPATH` manual.
+- `pytest -q tests/test_scaleup_conversation.py tests/test_scaleup_frontdoor.py tests/test_opsp.py
+  tests/test_scaleup_installer.py` → **16 passed**, sin `PYTHONPATH` manual.
   Incluye instalación Codex y confirma que welcome/diagnose son internos y que sólo
   la puerta natural se expone al usuario.
 - Ensayo cronometrado automatizado en instalación Codex limpia, con Lumen Casa:
@@ -72,3 +72,11 @@ un One Page Strategic Plan (OPSP) persistido.
 - **Codex, smoke real:** descubrió `.agents/skills/scaleup`, ejecutó el mismo comando y devolvió la misma primera pregunta.
 - El ejecutable ahora cubre los handoffs cerrados de bienvenida, diagnóstico, OPSP, progreso y validación con la misma allowlist. La evidencia de cliente real sigue limitada al primer turno; falta ensayar una conversación completa y su reanudación dentro de ambos clientes.
 - Reproducción registrada: Claude Code se ejecutó con `--allowedTools "Bash(.scaleup/bin/scaleup-frontdoor *)"` y Codex con `codex exec --ephemeral --json --approve-for-me`; ambos descubrieron `scaleup`, llamaron al ejecutable y devolvieron la primera pregunta. No se registran esos comandos como sustituto de la demo completa.
+
+## Checkpoint conversacional — 2026-08-24
+
+- Un ensayo independiente reveló que el cliente tenía que adivinar JSON y claves internas tras la primera pregunta. Se corrigió con `scaleup-frontdoor conversation`: una máquina de estados local que recibe solamente la frase humana, persiste el perfil, las 20 respuestas del diagnóstico y el plan parcial, y devuelve una sola pregunta siguiente.
+- La regresión incluye la frase real de demo `Se llama Lumen Casa. Vendemos iluminación decorativa… Somos 28 personas.`, respuesta `todavía no lo sé`, abandono/reanudación, plan persistido válido e instalación Codex limpia.
+- Claude Code, desde instalación limpia, acreditó discovery de `scaleup`, primer turno, perfil tras esa frase exacta, siguiente pregunta 1–5 y reanudación con petición natural de plan.
+- Codex usa globalmente `$CODEX_HOME/skills` (por defecto `~/.codex/skills`); la instalación normal apunta ahí. Un `--destination-root` temporal no cambia la ruta que consume el cliente, por lo que no es evidencia de discovery. El smoke global confirmó carga de la skill instalada, pero falta acreditar el recorrido natural completo en Codex.
+- Estado honesto de release: motores, instalación y flujo natural determinista verdes; sigue pendiente el ensayo conversacional completo y cronometrado en ambos clientes, especialmente Codex.

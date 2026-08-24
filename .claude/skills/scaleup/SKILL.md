@@ -12,19 +12,15 @@ description: Ayuda a una empresa a organizarse, saber por dónde empezar o crear
 Invoca el núcleo común para cualquier primera petición y presenta su `output`:
 
 ```bash
-.scaleup/bin/scaleup-frontdoor "PETICIÓN_DEL_USUARIO"
+.scaleup/bin/scaleup-frontdoor conversation "PETICIÓN_DEL_USUARIO"
 ```
 
-## Handoffs internos permitidos
+## Conversación
 
-Para cada avance usa exclusivamente el mismo ejecutable fijo; nunca uses `python -c`, `PYTHONPATH` ni ejecutes módulos de `coaching` directamente. El segundo argumento de `run` es un objeto JSON con los datos ya recabados y el comando devuelve JSON con `output`, `artifacts` y `errors`.
+En **cada** turno, pasa la frase más reciente de la persona al único comando fijo y presenta su salida tal cual, sin transformar datos, inventar campos, leer archivos ni ejecutar ningún otro comando:
 
 ```bash
-.scaleup/bin/scaleup-frontdoor run welcome "JSON_DE_PERFIL"
-.scaleup/bin/scaleup-frontdoor run diagnose "JSON_DE_RESPUESTAS"
-.scaleup/bin/scaleup-frontdoor run opsp "JSON_DE_PLAN_PARCIAL_O_COMPLETO"
-.scaleup/bin/scaleup-frontdoor run progress "{}"
-.scaleup/bin/scaleup-frontdoor validate-opsp work/strategy/opsp.md
+.scaleup/bin/scaleup-frontdoor conversation "TEXTO_USUARIO"
 ```
 
-No muestres estos comandos ni los nombres internos. Para el OPSP, guarda cada avance parcial en `work/strategy/opsp.md`; sólo decláralo terminado si `validate-opsp` devuelve `{"valid": true, "errors": []}`.
+El comando recuerda localmente el perfil, las respuestas y el plan; hace una sola pregunta útil, recupera interrupciones y guarda el avance. Nunca pidas JSON, comandos, rutas, siglas ni puntuaciones técnicas fuera de la escala 1–5 que el propio coach explique. Nunca uses `python`, `PYTHONPATH`, `coaching.*`, `run`, `validate-opsp` ni nombres de skills. No muestres esta implementación al usuario.
