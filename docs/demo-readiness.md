@@ -55,7 +55,9 @@ un One Page Strategic Plan (OPSP) persistido.
 - Verificaciones de distribución: sintaxis Bash y `git diff --check` correctos; hay
   una única puerta instalada en `.claude/skills/scaleup`.
 - Smoke real parcial: Codex CLI descubrió `.agents/skills/scaleup`, ejecutó el router
-  para una petición natural y obtuvo la primera pregunta correcta. El host cerró la
-  sesión antes del mensaje final del modelo; el mismo límite ocurrió en Claude.
+  para una petición natural y obtuvo la primera pregunta correcta. Claude Code también
+  descubrió y lanzó el skill `scaleup`; su política local negó el comando Python del
+  router antes de que el modelo pudiera responder. El host no permite autorizar ese
+  comando de forma suficientemente acotada en este smoke.
 - Por tanto, no se acredita todavía un recorrido conversacional completo, continuidad
   real ni paridad Claude/Codex.
