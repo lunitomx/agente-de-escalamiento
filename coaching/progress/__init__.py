@@ -3,17 +3,52 @@ Progress module — completion dashboard per decision.
 """
 from pathlib import Path
 from ..core import read_yaml
+from ..opsp import ARTIFACT_PATH, validate_opsp
 
 DECISIONS = ["people", "strategy", "execution", "cash"]
 
 DECISION_LABELS = {
-    "people": "People — Personas",
-    "strategy": "Strategy — Estrategia",
-    "execution": "Execution — Ejecución",
-    "cash": "Cash — Efectivo",
+    "people": "Personas",
+    "strategy": "Estrategia",
+    "execution": "Ejecución",
+    "cash": "Efectivo",
 }
 
 DECISION_ORDER = ["people", "strategy", "execution", "cash"]
+
+OPSP_WORKSHEET_ID = "worksheet-opsp"
+
+# Registry names are internal; the dashboard stays clear for first-time users.
+WORKSHEET_LABELS = {
+    "worksheet-face": "Claridad de roles y encaje",
+    "worksheet-love-loathe": "Roles que dan y quitan energía",
+    "worksheet-oppp": "Plan de desarrollo individual",
+    "worksheet-team-growth": "Salud y crecimiento del equipo",
+    OPSP_WORKSHEET_ID: "Plan de la empresa en una hoja",
+    "worksheet-swt": "Fortalezas, retos y cambios del mercado",
+    "worksheet-7-strata": "Cómo diferenciarse de la competencia",
+    "worksheet-core-customer": "Cliente principal",
+    "worksheet-rockefeller-habits": "Hábitos de gestión del equipo",
+    "worksheet-quarterly-priorities": "Prioridades del trimestre",
+    "worksheet-kpi-development": "Indicadores para dar seguimiento",
+    "worksheet-meeting-agenda": "Ritmo de reuniones",
+    "worksheet-ccc": "Ciclo de efectivo",
+    "worksheet-power-of-one": "Palancas para mejorar resultados",
+    "worksheet-cash-flow-forecast": "Previsión de efectivo de 13 semanas",
+}
+
+
+def _worksheet_label(worksheet: dict) -> str:
+    return WORKSHEET_LABELS.get(worksheet.get("id"), "Guía de trabajo")
+
+
+def _completed_opsp(base_path: Path) -> bool:
+    """A completed, valid canonical OPSP is the Strategy worksheet artifact."""
+    artifact = base_path / ARTIFACT_PATH
+    if not artifact.is_file() or validate_opsp(artifact):
+        return False
+    text = artifact.read_text(encoding="utf-8")
+    return text.startswith("---\n") and "status: completed" in text.split("\n---\n", 1)[0]
 
 
 def _get_worksheets(base_path: Path) -> tuple[list[dict], dict[str, dict]]:
@@ -38,6 +73,10 @@ def _get_worksheets(base_path: Path) -> tuple[list[dict], dict[str, dict]]:
             wid = data.get("worksheet_id") if data else f.stem
             if data and data.get("status") == "completed":
                 completed[wid] = data
+
+    # OPSP persists as canonical Markdown rather than legacy worksheet YAML.
+    if _completed_opsp(base_path):
+        completed[OPSP_WORKSHEET_ID] = {"status": "completed"}
 
     return all_ws, completed
 
@@ -67,14 +106,14 @@ def run(context: dict) -> dict:
     if not all_ws:
         return {"output": "No puedo cargar las guías de seguimiento en esta instalación. Reinstala ScaleUp y vuelve a intentarlo; tus datos de empresa se conservarán.", "artifacts": {}, "errors": ["Empty worksheet registry"]}
 
-    lines = ["## 📊 Dashboard de Progreso", "", "### Scores por Decisión", "", "| Decisión | Score | Nivel |", "|----------|-------|-------|"]
+    lines = ["## 📊 Dashboard de Progreso", "", "### Estado de las cuatro áreas", "", "| Área | Resultado | Nivel |", "|------|-----------|-------|"]
     level_labels = {1: "🔴 No iniciado", 2: "🟠 Ad hoc", 3: "🟡 Emergente", 4: "🟢 Establecido", 5: "⭐ Optimizado"}
 
     for dec_key in DECISION_ORDER:
         score = scores.get(dec_key, 0)
         lines.append(f"| {DECISION_LABELS.get(dec_key, dec_key)} | {score} | {level_labels.get(score, '—')} |")
 
-    lines.extend(["", "### Worksheets por Decisión", ""])
+    lines.extend(["", "### Plan de trabajo por área", ""])
 
     for dec_key in DECISION_ORDER:
         dec_ws = [w for w in all_ws if w.get("decision") == dec_key]
@@ -84,7 +123,7 @@ def run(context: dict) -> dict:
         lines.append(f"**{DECISION_LABELS.get(dec_key, dec_key)}:** {done}/{total} ({pct}%)")
         lines.append("")
         for w in dec_ws:
-            lines.append(f"- {'✅' if w['id'] in completed else '⬜'} {w['name']}")
+            lines.append(f"- {'✅' if w['id'] in completed else '⬜'} {_worksheet_label(w)}")
         lines.append("")
 
     lowest_decision = min([d for d in DECISION_ORDER if scores.get(d, 0) > 0], key=lambda d: scores.get(d, 0), default=None)
@@ -93,7 +132,7 @@ def run(context: dict) -> dict:
         dec_ws = [w for w in all_ws if w.get("decision") == lowest_decision and w["id"] not in completed]
         if dec_ws:
             next_ws = dec_ws[0]
-            lines.extend(["### Siguiente Sugerido", f"- {next_ws['name']} en {DECISION_LABELS.get(lowest_decision, lowest_decision)}", f"- Dificultad: {next_ws.get('difficulty', '—')} | Tiempo: {next_ws.get('time_estimate', '—')}", "- Podemos empezar con este siguiente paso cuando quieras.", ""])
+            lines.extend(["### Siguiente paso", f"- {_worksheet_label(next_ws)} ({DECISION_LABELS.get(lowest_decision, lowest_decision)})", f"- Tiempo estimado: {next_ws.get('time_estimate', '—')}", "- Podemos empezar con este paso cuando quieras.", ""])
 
     lines.append("> Puedes revisar de nuevo las cuatro áreas cuando cambie tu situación.")
 

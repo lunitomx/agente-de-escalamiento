@@ -64,7 +64,7 @@ def _wants_plan(text: str) -> bool:
 
 
 def _wants_progress(text: str) -> bool:
-    return bool(re.search(r"\b(progreso|avance|tareas|pendiente|continuar|retomar|como vamos)\b", _normalise(text)))
+    return bool(re.search(r"\b(progreso|avance|tareas|pendiente|continuar|retomar|como vamos|que sigue)\b", _normalise(text)))
 
 
 def _question_for_diagnosis(index: int) -> str:
@@ -82,8 +82,11 @@ def _answer_score(text: str) -> int | None:
     return int(match.group(1)) if match else None
 
 
-def _parts(text: str, count: int) -> list[str]:
-    values = [part.strip() for part in re.split(r"\s*[;,]\s*", text) if part.strip()]
+def _parts(text: str, count: int, *, trim_values_intro: bool = False) -> list[str]:
+    prepared = text.strip()
+    if trim_values_intro:
+        prepared = re.sub(r"^\s*(?:nos importan|nuestros valores son|valoramos)\s+", "", prepared, flags=re.I)
+    values = [part.strip(" .") for part in re.split(r"\s*(?:[;,]|\s+\b(?:y|e)\b\s+)\s*", prepared) if part.strip(" .")]
     return values if len(values) >= count else []
 
 
@@ -92,7 +95,7 @@ def _plan_data(state: dict[str, Any], answer: str) -> dict[str, Any]:
     key = PLAN_STEPS[step][0]
     data = dict(state.get("plan", {}))
     if key == "core_values":
-        values = _parts(answer, 3)
+        values = _parts(answer, 3, trim_values_intro=True)
         if not values:
             return {}
         data[key] = values[:5]

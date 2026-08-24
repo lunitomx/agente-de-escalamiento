@@ -1,6 +1,6 @@
 ---
 name: scaleup
-description: Ayuda a una empresa a organizarse, saber por dónde empezar o crear su plan estratégico en una hoja usando lenguaje natural.
+description: Úsala siempre cuando alguien quiera organizar, escalar o planear su empresa, no sepa por dónde empezar, pida un plan en una hoja, pregunte cómo va, qué sigue, tareas, avance, progreso, retomar o continuar. Guía todo en lenguaje natural.
 ---
 
 # ScaleUp

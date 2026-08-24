@@ -35,7 +35,7 @@ def _journey(command: Path, project: Path) -> None:
 
     assert "plan en una hoja" in _say(command, project, "quiero hacer mi plan en una hoja")
     answers = (
-        "Diseño, Servicio, Cumplimiento", "Iluminar hogares", "Ser líder nacional",
+        "Nos importan diseño honesto, cumplir lo prometido y resolver rápido.", "Iluminar hogares", "Ser líder nacional",
         "2036", "México", "Entrega en 72 horas; porcentaje puntual", "Q3 2026",
         "95% puntual", "2026", "$10M", "$1M", "Crecer; Ana; ventas",
         "Inventario; Luis; faltantes",
@@ -44,12 +44,15 @@ def _journey(command: Path, project: Path) -> None:
         _say(command, project, answer)
     artifact = project / "work" / "strategy" / "opsp.md"
     assert artifact.is_file()
+    artifact_text = artifact.read_text(encoding="utf-8")
+    assert "Nos importan diseño honesto" not in artifact_text
+    assert "diseño honesto" in artifact_text
     valid = subprocess.run(
         [str(command), "validate-opsp", str(artifact)], cwd=project,
         check=True, capture_output=True, text=True,
     )
     assert json.loads(valid.stdout) == {"valid": True, "errors": []}
-    assert "Dashboard de Progreso" in _say(command, project, "ver mi progreso")
+    assert "Dashboard de Progreso" in _say(command, project, "¿Qué sigue?")
 
 
 def _combined_demo_intake(command: Path, project: Path) -> None:
