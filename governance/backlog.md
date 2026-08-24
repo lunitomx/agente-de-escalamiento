@@ -31,7 +31,7 @@
 | E18 | Escala Server | complete | 12/12. |
 | E19 | Book Ingestion | complete | 5/5; esquema JSON/SQLite/API documentado. |
 | E20 | Contextual Skills | complete | 4/4. |
-| E21 | Verne Board Member | draft | Única épica pendiente formal; sin diseño, plan ni stories. |
+| E21 | Verne Lens Board Member | planned — approval pending | Diseño, plan y 5 stories verificables; implementación no iniciada. |
 
 ## Active Queue
 
@@ -46,15 +46,17 @@
   no supera bootstrap por permisos de `/usr/local/lib/hermes-agent/.env`; una
   ejecución Claude/Hermes también consumiría un proveedor externo.
 
-### P1 — E21 Design and Planning
+### P1 — E21 Approval and Implementation
 
 Source: work/epics/e21-verne-board-member/scope.md
 
 - [x] Suite verde
-- [ ] Epic design aprobado
-- [ ] Implementation plan aprobado
-- [ ] XL dividido en stories
-- [ ] Trazabilidad obligatoria hacia E19 definida
+- [x] Epic design redactado
+- [x] Implementation plan redactado
+- [x] XL dividido en 5 stories
+- [x] Trazabilidad obligatoria hacia E19 definida
+- [ ] Aprobar nombre, disclosure, hooks opt-in y límite de recomendaciones
+- [ ] Implementar S21.1–S21.5
 
 ## Historical Drafts E4/E5
 

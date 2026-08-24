@@ -3,11 +3,11 @@
 **Fecha:** 2026-08-24
 **Repo:** github.com/lunitomx/scaleupagent
 **Branch auditada:** main
-**Baseline reconciliada:** inventario publicado hasta 4aeac46
+**Baseline reconciliada:** E20 cerrada; E21 planificada
 
 ## Resumen ejecutivo
 
-E20 está cerrado y E21 es la única épica pendiente formal. La numeración quedó
+E20 está cerrado y E21 es la única épica activa formal. La numeración quedó
 auditada desde el backlog original: E1/E2 son épicas históricas completas y
 E4/E5 fueron borradores posteriormente retirados/sustituidos. E22 es el siguiente
 número disponible.
@@ -24,14 +24,14 @@ desde proyectos vacíos y descubrimiento oficial de los 39 skills por Hermes.
     E6–E11      ████████████████████ COMPLETE
     E12         ──────────────────── CANCELLED (absorbed by E11)
     E13–E20     ████████████████████ COMPLETE
-    E21         ░░░░░░░░░░░░░░░░░░░░ DRAFT
+    E21         ▓░░░░░░░░░░░░░░░░░░░ PLANNED / APPROVAL GATE
 
 | Categoría | IDs |
 |-----------|-----|
 | Complete | E1, E2, E3, E6, E7, E8, E9, E10, E11, E13, E14, E15, E16, E17, E18, E19, E20 |
 | Cancelled | E12 |
 | Retired / Superseded | E4, E5 |
-| Draft | E21 |
+| Planned — approval pending | E21 |
 | Siguiente número disponible | E22 |
 
 La explicación y evidencia por épica están en work/epics/product-roadmap.md.
@@ -82,7 +82,9 @@ externo.
 
 1. Ejecutar el smoke conversacional E10 cuando se autorice consumo de modelo y
    se repare el bootstrap de Hermes.
-2. Abrir E21 con diseño, plan e historias antes de implementar.
+2. Aprobar para E21 el nombre/disclosure, hooks start/close opt-in y límite de
+   tres recomendaciones.
+3. Implementar S21.1–S21.5 en secuencia y cerrar con smoke real.
 
 ## Drift corregido por esta auditoría
 
@@ -95,6 +97,8 @@ externo.
   para que scaleup-close conserve su contrato.
 - El esquema E19 quedó formalizado para JSON, SQLite, memoria y API.
 - La dependencia de E21 se expresa como E18 + E19; E20 no es prerequisito.
+- E21 ya tiene diseño, plan, cinco stories y contrato de trazabilidad; permanece
+  sin implementar y pendiente de aprobación de producto.
 
 ---
 

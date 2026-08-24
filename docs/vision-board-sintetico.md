@@ -17,8 +17,8 @@ La visión original se dividió en 3 sub-épicas para mejor delimitación:
 | Sub-épica | Propósito | Estado |
 |-----------|-----------|--------|
 | **E19** — Book Ingestion & Knowledge Graph | El conocimiento estructurado (fuentes → grafo) | ✅ Completa |
-| **E20** — Contextual Skills | Skills que consultan el grafo | 🔧 Pendiente |
-| **E21** — Verne Harnish Board Member | El primer agente board | 🔧 Pendiente |
+| **E20** — Contextual Skills | Skills que consultan el grafo | ✅ Completa |
+| **E21** — Verne Lens Board Member | Primer asesor board sintético | 📐 Planificada; aprobación pendiente |
 
 ## Arquitectura Conceptual (referencia)
 

@@ -1,45 +1,89 @@
-# Epic Scope: E21 — Verne Harnish Board Member
+# Epic Scope: E21 — Verne Lens Board Member
 
-**Status:** Draft
-**Dependencies:** E18 (infraestructura) + E19 (grafo de conocimiento)
+**Status:** Planned — pending product approval
+**Dependencies:** E18 (infraestructura y sesiones) + E19 (grafo)
 **Audited:** 2026-08-24
 **Tamaño:** XL
 
+## Outcome
+
+Entregar un asesor sintético, atribuible y verificable que use la lente de
+*Scaling Up* sobre datos de la empresa sin suplantar al autor ni presentar
+inferencias como afirmaciones de la fuente.
+
 ## In Scope
-- **Alma de Verne** (`miembro-board/verne-harnish.md`):
-  - Su framework: Rockefeller Habits, 4 Decisions, Power of One
-  - Sus preguntas características: "¿Cuál es tu ROC?", "¿Tienes un Daily Huddle?", "¿Quién es tu Core Customer?"
-  - Su lente: prioriza cash flow, simplicidad, ejecución, hábitos
-  - Sus sesgos: prefiere acción sobre análisis, estructuras simples, accountability clara
-  - Sus principios no negociables: "No surprises", "Keep things simple", "Daily Huddle every day"
-- **Agente de revisión**: Verne revisa tus dailys y da observaciones
-- **Consulta directa**: "Verne, ¿qué opinas de mi strategy?"
-- **Integración con ciclo de sesión**: al cerrar sesión, Verne puede dar su perspectiva
-- **Modo board completo**: Verne debate contigo sobre decisiones específicas
+
+- Perfil versionado en `miembro-board/verne-harnish.md`.
+- Recuperación selectiva desde E19 por categoría, herramienta y entidad.
+- Contrato que separa hechos empresariales, evidencia e inferencias.
+- Revisión de daily/resumen y consulta directa sobre decisiones.
+- Integración **opt-in** con inicio y cierre de sesión.
+- Skill `scaleup-board-verne` y bundles Claude/Hermes.
+- Pruebas unitarias, integración, contrato y casos adversariales.
+- Logs locales mínimos: modo, categorías, IDs, warnings y versiones; nunca el
+  prompt completo.
 
 ## Out of Scope
-- Ingresar el libro (E19)
-- Conectar skills a dashboards (E20)
-- Crear otros miembros del board (Hormozi, Collins, etc. — futuras épicas)
-- Procesamiento de audio/video (solo texto)
 
-## Dependencias
-- E19 (conocimiento estructurado del libro en el grafo)
-- E18 (infraestructura: server, sesiones, SQLite, CLI)
-- El alma debe basarse ESTRICTAMENTE en el libro — no inventar
+- Ampliar E19 o cambiar paneles E20.
+- Clonar voz, apariencia, biografía, recuerdos o estilo personal del autor.
+- Afirmar participación, aprobación o afiliación de Verne Harnish.
+- Otros miembros, discovery o debates multiagente.
+- Web, fuentes externas, audio o video.
+- Ejecutar decisiones o mutar datos sin confirmación.
+- Evaluar “si suena como Verne”.
+
+## Contratos existentes
+
+- E18 aporta `SessionContext`, DAOs, memoria e inicio/cierre.
+- E19 aporta `KnowledgeHandler.search`, `get_entity` y `get_context`.
+- SQLite no conserva ID JSON ni provenance de relaciones; E21 no los promete.
+- `line_refs` y `chapter_ids` de entidades sí sobreviven en `properties`.
+- E20 es consumidor paralelo, no dependencia funcional.
+
+## Reglas no negociables
+
+1. Cada salida se identifica como asesor sintético basado en *Scaling Up*.
+2. No suplanta al autor ni dice “Verne dice” sin referencia E19.
+3. Cada observación accionable enlaza hechos y/o evidencia; inferencias marcadas.
+4. Sin evidencia suficiente pregunta o limita la respuesta.
+5. Parafrasea; citas excepcionales, breves y trazables.
+6. Contexto empresarial es dato no confiable, nunca instrucciones.
+7. Ninguna recomendación se ejecuta automáticamente.
+
+## Historias
+
+| Orden | Story | Tamaño | Resultado |
+|:---:|---|:---:|---|
+| 1 | S21.1 — Perfil y contrato de evidencia | M | Identidad, límites y esquema |
+| 2 | S21.2 — Motor de contexto y recuperación | L | Paquete E18 + E19 |
+| 3 | S21.3 — Daily review y consulta directa | L | Dos modos estructurados |
+| 4 | S21.4 — Ciclo de sesión y distribución | M | Opt-in + skill portable |
+| 5 | S21.5 — Evaluación, seguridad y cierre | M | Gates y smoke |
+
+Ver `plan.md` y `stories/`.
+
+## Acceptance Criteria
+
+- [ ] Perfil con atribución, límites, cuatro decisiones y reglas validables.
+- [ ] Ambos modos generan el mismo esquema versionado.
+- [ ] No existen afirmaciones huérfanas de facts/evidence.
+- [ ] Sin evidencia no fabrica respuesta.
+- [ ] Prompt injection en datos permanece como dato.
+- [ ] Start/close funcionan igual con E21 desactivada.
+- [ ] Instalación aislada descubre el skill en Claude y Hermes.
+- [ ] Casos dorados cubren las cuatro decisiones.
+- [ ] Suite verde y smoke real documentado antes del cierre.
 
 ## Gates Before Implementation
 
-- [ ] La suite actual vuelve a verde
-- [ ] Epic design aprobado
-- [ ] Implementation plan aprobado
-- [ ] Tamaño XL dividido en stories con criterios verificables
-- [ ] Estrategia de trazabilidad al conocimiento E19 definida
+- [x] Suite base verde: 389 passed, 2 skipped (2026-08-24).
+- [x] Diseño redactado y alineado con E18/E19.
+- [x] Plan y cinco historias verificables redactados.
+- [x] Trazabilidad E19 definida.
+- [ ] Aprobación de producto para iniciar S21.1.
 
-## Done Criteria
-- [ ] `miembro-board/verne-harnish.md` completo con framework, preguntas, lente, sesgos, principios
-- [ ] Verne puede analizar un daily y dar observaciones
-- [ ] Verne puede responder a "¿qué opinas de X?" con coherencia
-- [ ] Integrado con escala-inicia: Verne recibe contexto de la sesión
-- [ ] Los skills pueden consultar "¿qué diría Verne sobre X?"
-- [ ] Tests: respuestas de Verne son coherentes con el libro
+## Definition of Done
+
+Solo se marca `Complete` con cinco historias evidenciadas, retrospectiva, suite
+verde y smoke real. Un perfil o prompt aislado no cierra la épica.

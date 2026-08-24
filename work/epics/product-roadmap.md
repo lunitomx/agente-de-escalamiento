@@ -3,7 +3,7 @@
 > Inventario canónico de épicas y dirección del producto.
 
 **Última auditoría:** 2026-08-24
-**Estado auditado:** main en 67c3d0c (epic/e20-complete)
+**Estado auditado:** main; E20 cerrada y E21 planificada
 **Siguiente número disponible:** E22
 
 ## Visión
@@ -65,14 +65,14 @@ Todos forman parte de la historia del producto.
 | E18 — Escala Server | Servidor, dashboards, SQLite y memoria | ✅ Complete | 12/12; close 2a63e09. |
 | E19 — Book Ingestion | Parser, grafo y API de conocimiento | ✅ Complete | 5/5; 42 entidades, 59 relaciones, 406 capítulos y esquema formal documentado. |
 | E20 — Contextual Skills | Grafo → dashboards y coaching | ✅ Complete | 4/4; close 67c3d0c; tag epic/e20-complete. |
-| E21 — Verne Board Member | Primer miembro del board sintético | 📝 Draft | Única épica pendiente formal; todavía sin diseño, plan ni historias. |
+| E21 — Verne Lens Board Member | Primer asesor del board sintético | 📐 Planned — approval pending | Diseño, plan, trazabilidad y 5 stories listos; sin implementación. |
 
 ### Resumen
 
 - 17 épicas completas: E1, E2, E3, E6–E11 y E13–E20.
 - 1 épica cancelada: E12.
 - 2 borradores históricos retirados/sustituidos: E4 y E5.
-- 1 épica en borrador: E21.
+- 1 épica planificada y pendiente de aprobación: E21.
 - No existe una E22 formalizada.
 
 ## Secuencia actual
@@ -81,8 +81,8 @@ Todos forman parte de la historia del producto.
            DONE                    DONE                    DONE
                                                               │
                                                               ▼
-                                                  E21 Verne Board Member
-                                                            DRAFT
+                                                  E21 Verne Lens Board Member
+                                                  PLANNED / APPROVAL GATE
 
 E21 depende funcionalmente de E19 y de la infraestructura de E18. No depende de
 E20 para comenzar; E20 es una integración consumidora paralela del conocimiento.
@@ -96,12 +96,12 @@ adapters, el flujo welcome → diagnose y el descubrimiento Hermes ya están
 verificados. Falta el smoke mediante agentes y proveedor real; Hermes además
 requiere corregir el permiso de su `.env` de instalación.
 
-### P1 — Preparar E21
+### P1 — Aprobar e implementar E21
 
-1. Revisar el brief y scope con las dependencias ya reconciliadas.
-2. Ejecutar diseño y plan formal.
-3. Dividir el tamaño XL en historias verificables.
-4. Definir pruebas de fidelidad al libro sin imitación personal ni citas extensas.
+1. Aprobar el nombre visible y disclosure del asesor sintético.
+2. Confirmar hooks start/close opt-in y máximo de tres recomendaciones.
+3. Implementar S21.1–S21.5 en el orden documentado.
+4. Cerrar solo con trazabilidad automática y smoke conversacional real.
 
 ## Deuda técnica y de producto no asignada
 
