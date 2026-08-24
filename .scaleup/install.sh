@@ -7,6 +7,7 @@ set -euo pipefail
 # Usage:
 #   ./install.sh                    # Install to Claude Code global
 #   ./install.sh --target hermes    # Install to Hermes Agent
+#   ./install.sh --target codex     # Install to Codex global
 #   ./install.sh --target all       # Install to all platforms
 #   ./install.sh --destination-root /tmp/scaleup-e2e
 #   ./install.sh --status           # Show installation status
@@ -18,7 +19,8 @@ VERSION="0.0.0"
 [[ -f "$VERSION_FILE" ]] && VERSION="$(cat "$VERSION_FILE")"
 
 # Source directories
-SKILLS_DIR="$(dirname "$SCRIPT_DIR")/.claude/skills"
+SKILLS_DIR="$(dirname "$SCRIPT_DIR")/.scaleup/internal/skills"
+[[ -d "$SKILLS_DIR" ]] || SKILLS_DIR="$(dirname "$SCRIPT_DIR")/.claude/skills"
 COACHING_DIR="$(dirname "$SCRIPT_DIR")/coaching"
 KNOWLEDGE_DIR="$SCRIPT_DIR/knowledge"
 AGENT_DIR="$SCRIPT_DIR/agent"
@@ -28,6 +30,9 @@ CLAUDE_SKILLS=""
 CLAUDE_SCALEUP=""
 HERMES_SKILLS=""
 HERMES_SCALEUP=""
+CODEX_SKILLS=""
+CODEX_SCALEUP=""
+MANAGED_SKILLS_FILE=".scaleup-managed-skills"
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -41,6 +46,8 @@ configure_targets() {
     CLAUDE_SCALEUP="$destination_root/.claude/scaleup"
     HERMES_SKILLS="$destination_root/.hermes/skills"
     HERMES_SCALEUP="$destination_root/.hermes/scaleup"
+    CODEX_SKILLS="$destination_root/.codex/skills"
+    CODEX_SCALEUP="$destination_root/.codex/scaleup"
 }
 
 adapt_skill() {
@@ -51,15 +58,51 @@ adapt_skill() {
 
     sed -i \
         -e "s|sys\\.path\\.insert(0, '\\.')|sys.path.insert(0, '$escaped_root')|g" \
+        -e "s|sys\\.path\\.insert(0,'\\.')|sys.path.insert(0, '$escaped_root')|g" \
         -e "s|str(pathlib\\.Path('\\.scaleup/agent'))|str(pathlib.Path('$escaped_root/agent'))|g" \
         -e "s|python3 \\.scaleup/agent/validators/|python3 $escaped_root/agent/validators/|g" \
         -e "s|python3 -m coaching\\.|PYTHONPATH='$escaped_root' python3 -m coaching.|g" \
         "$skill_file"
 }
 
+is_known_scaleup_skill() {
+    local name="$1"
+    [[ "$name" == "scaleup" ]] || [[ -d "$SKILLS_DIR/$name" && "$name" == scaleup-* ]]
+}
+
+remove_managed_skills() {
+    local skills="$1" runtime_root="$2" name known_dir
+    local manifest="$runtime_root/$MANAGED_SKILLS_FILE"
+
+    # The manifest identifies what this installer wrote. Current source skill
+    # names are included for upgrades from installers predating the manifest.
+    # Every candidate is still checked against the repository's known names,
+    # so a third-party `scaleup-*` directory can never be removed by prefix.
+    while IFS= read -r name; do
+        [[ -n "$name" ]] || continue
+        is_known_scaleup_skill "$name" || continue
+        if [[ -d "$skills/$name" ]]; then
+            rm -rf "$skills/$name"
+        fi
+    done < <(
+        [[ -f "$manifest" ]] && cat "$manifest"
+        printf '%s\n' "scaleup"
+        for known_dir in "$SKILLS_DIR"/scaleup-*/; do
+            [[ -d "$known_dir" ]] && basename "$known_dir"
+        done
+    )
+}
+
+write_managed_skills_manifest() {
+    local runtime_root="$1"
+    mkdir -p "$runtime_root"
+    printf '%s\n' "scaleup" > "$runtime_root/$MANAGED_SKILLS_FILE"
+}
+
 copy_skills() {
     local src="$1" dst="$2" runtime_root="$3" count=0
     mkdir -p "$dst"
+    remove_managed_skills "$dst" "$runtime_root"
     for skill_dir in "$src"/scaleup-*/; do
         [[ -d "$skill_dir" ]] || continue
         local name
@@ -72,13 +115,38 @@ copy_skills() {
     info "Copied $count skills to $dst"
 }
 
+copy_front_door() {
+    local dst="$1" runtime_root="$2" candidate
+    # The Claude copy contains executable paths which adapt_skill rewrites for
+    # global installs. .agents remains the local discovery copy for Codex.
+    for candidate in "$(dirname "$SCRIPT_DIR")/.claude/skills/scaleup" "$(dirname "$SCRIPT_DIR")/.agents/skills/scaleup"; do
+        [[ -f "$candidate/SKILL.md" ]] || continue
+        mkdir -p "$dst/scaleup"
+        cp "$candidate/SKILL.md" "$dst/scaleup/SKILL.md"
+        adapt_skill "$dst/scaleup/SKILL.md" "$runtime_root"
+        info "Copied ScaleUp front door to $dst/scaleup"
+        return
+    done
+}
+
+install_public_front_door() {
+    local skills="$1" runtime_root="$2"
+    mkdir -p "$skills"
+    # Legacy skills remain in the source repository for compatibility, but are
+    # implementation details in every installed product runtime.
+    remove_managed_skills "$skills" "$runtime_root"
+    copy_front_door "$skills" "$runtime_root"
+    [[ -f "$skills/scaleup/SKILL.md" ]] || error "Installation requires the public ScaleUp skill at .claude/skills/scaleup/SKILL.md"
+    write_managed_skills_manifest "$runtime_root"
+}
+
 copy_engine() {
     local dst="$1"
     # Clean slate: remove old coaching engine to avoid orphaned files (engine.py, formatter.py, summary/)
     rm -rf "$dst/coaching"
     mkdir -p "$dst/coaching"
     # Copy Python modules
-    for mod in core dashboard diagnose export level progress pulse router summary welcome worksheet; do
+    for mod in core dashboard diagnose export level opsp progress pulse router summary welcome worksheet; do
         if [[ -d "$COACHING_DIR/$mod" ]]; then
             mkdir -p "$dst/coaching/$mod"
             cp "$COACHING_DIR/$mod/"*.py "$dst/coaching/$mod/" 2>/dev/null || true
@@ -90,21 +158,24 @@ copy_engine() {
         fi
     done
     cp "$COACHING_DIR/__init__.py" "$dst/coaching/" 2>/dev/null || true
+    cp "$COACHING_DIR/opsp.py" "$dst/coaching/" 2>/dev/null || true
     info "Copied coaching engine to $dst/coaching/ (clean install)"
 }
 
 copy_knowledge() {
     local dst="$1"
+    rm -rf "$dst/knowledge"
     mkdir -p "$dst/knowledge"
-    cp -r "$KNOWLEDGE_DIR/"* "$dst/knowledge/"
-    info "Copied knowledge ontology to $dst/knowledge/"
+    cp -a "$KNOWLEDGE_DIR/." "$dst/knowledge/"
+    info "Copied knowledge ontology to $dst/knowledge/ (synchronized)"
 }
 
 copy_agent() {
     local dst="$1"
+    rm -rf "$dst/agent"
     mkdir -p "$dst/agent"
-    cp -r "$AGENT_DIR/"* "$dst/agent/" 2>/dev/null || true
-    info "Copied agent config to $dst/agent/"
+    cp -a "$AGENT_DIR/." "$dst/agent/"
+    info "Copied agent config to $dst/agent/ (synchronized)"
 }
 
 write_version() {
@@ -118,7 +189,7 @@ write_version() {
 install_claude() {
     echo ""
     echo "Installing ScaleUp to Claude Code ($CLAUDE_SCALEUP)..."
-    copy_skills "$SKILLS_DIR" "$CLAUDE_SKILLS" "$CLAUDE_SCALEUP"
+    install_public_front_door "$CLAUDE_SKILLS" "$CLAUDE_SCALEUP"
     copy_engine "$CLAUDE_SCALEUP"
     copy_knowledge "$CLAUDE_SCALEUP"
     copy_agent "$CLAUDE_SCALEUP"
@@ -139,7 +210,7 @@ install_claude() {
 install_hermes() {
     echo ""
     echo "Installing ScaleUp to Hermes Agent ($HERMES_SCALEUP)..."
-    copy_skills "$SKILLS_DIR" "$HERMES_SKILLS" "$HERMES_SCALEUP"
+    install_public_front_door "$HERMES_SKILLS" "$HERMES_SCALEUP"
     copy_engine "$HERMES_SCALEUP"
     copy_knowledge "$HERMES_SCALEUP"
     copy_agent "$HERMES_SCALEUP"
@@ -154,6 +225,25 @@ install_hermes() {
     fi
 
     echo "  Hermes installation complete."
+}
+
+install_codex() {
+    echo ""
+    echo "Installing ScaleUp to Codex ($CODEX_SCALEUP)..."
+    install_public_front_door "$CODEX_SKILLS" "$CODEX_SCALEUP"
+    copy_engine "$CODEX_SCALEUP"
+    copy_knowledge "$CODEX_SCALEUP"
+    copy_agent "$CODEX_SCALEUP"
+    write_version "$CODEX_SCALEUP"
+
+    local company_dir="$CODEX_SCALEUP/my-company"
+    if [[ ! -d "$company_dir" ]]; then
+        mkdir -p "$company_dir/worksheets"
+        info "Created my-company template at $company_dir"
+    else
+        info "my-company directory exists — preserved user data"
+    fi
+    echo "  Codex installation complete."
 }
 
 # ── Status ───────────────────────────────────────────────────────────────────
@@ -195,34 +285,53 @@ show_status() {
     else
         echo "Hermes: not installed"
     fi
+    echo ""
+
+    if [[ -f "$CODEX_SCALEUP/VERSION" ]]; then
+        local xv xskill_count
+        xv="$(cat "$CODEX_SCALEUP/VERSION")"
+        xskill_count="$(find "$CODEX_SKILLS" -maxdepth 2 -name "SKILL.md" \( -path "*/scaleup-*" -o -path "*/scaleup/SKILL.md" \) 2>/dev/null | wc -l | tr -d ' ')"
+        echo "Codex: v$xv ($xskill_count skills)"
+        echo "  Skills: $CODEX_SKILLS"
+        echo "  Engine: $CODEX_SCALEUP"
+    else
+        echo "Codex: not installed"
+    fi
 }
 
 # ── Uninstall ────────────────────────────────────────────────────────────────
 
+uninstall_runtime() {
+    local label="$1" skills="$2" runtime="$3" purge="$4"
+    remove_managed_skills "$skills" "$runtime"
+    if [[ -d "$runtime" ]]; then
+        if [[ "$purge" == "true" ]]; then
+            rm -rf "$runtime"
+            info "Removed $runtime including user company data"
+        else
+            rm -rf "$runtime/coaching" "$runtime/knowledge" "$runtime/agent" "$runtime/VERSION" "$runtime/$MANAGED_SKILLS_FILE"
+            rmdir "$runtime" 2>/dev/null || true
+            info "Removed managed $label files; preserved $runtime/my-company"
+        fi
+    fi
+    info "Removed $label skills"
+}
+
 uninstall() {
+    local target="$1" purge="$2"
     echo ""
     echo "Uninstalling ScaleUp..."
-
-    # Claude Code
-    if [[ -d "$CLAUDE_SCALEUP" ]]; then
-        rm -rf "$CLAUDE_SCALEUP"
-        info "Removed $CLAUDE_SCALEUP"
-    fi
-    for d in "$CLAUDE_SKILLS"/scaleup-*/; do
-        [[ -d "$d" ]] && rm -rf "$d"
-    done
-    info "Removed Claude Code skills"
-
-    # Hermes
-    if [[ -d "$HERMES_SCALEUP" ]]; then
-        rm -rf "$HERMES_SCALEUP"
-        info "Removed $HERMES_SCALEUP"
-    fi
-    for d in "$HERMES_SKILLS"/scaleup-*/; do
-        [[ -d "$d" ]] && rm -rf "$d"
-    done
-    info "Removed Hermes skills"
-
+    case "$target" in
+        claude) uninstall_runtime "Claude Code" "$CLAUDE_SKILLS" "$CLAUDE_SCALEUP" "$purge" ;;
+        hermes) uninstall_runtime "Hermes" "$HERMES_SKILLS" "$HERMES_SCALEUP" "$purge" ;;
+        codex) uninstall_runtime "Codex" "$CODEX_SKILLS" "$CODEX_SCALEUP" "$purge" ;;
+        all)
+            uninstall_runtime "Claude Code" "$CLAUDE_SKILLS" "$CLAUDE_SCALEUP" "$purge"
+            uninstall_runtime "Hermes" "$HERMES_SKILLS" "$HERMES_SCALEUP" "$purge"
+            uninstall_runtime "Codex" "$CODEX_SKILLS" "$CODEX_SCALEUP" "$purge"
+            ;;
+        *) error "Unknown target: $target (use claude, hermes, codex, or all)" ;;
+    esac
     echo "  Uninstall complete."
 }
 
@@ -230,14 +339,17 @@ uninstall() {
 
 main() {
     local target="claude"
+    local target_provided="false"
     local destination_root="$HOME"
     local action="install"
+    local purge="false"
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --target)
                 [[ $# -ge 2 ]] || error "--target requires a value"
                 target="$2"
+                target_provided="true"
                 shift 2
                 ;;
             --destination-root)
@@ -247,8 +359,9 @@ main() {
                 ;;
             --status) action="status"; shift ;;
             --uninstall) action="uninstall"; shift ;;
+            --purge) purge="true"; shift ;;
             --help|-h)
-                echo "Usage: install.sh [--target claude|hermes|all] [--destination-root PATH] [--status] [--uninstall]"
+                echo "Usage: install.sh [--target claude|hermes|codex|all] [--destination-root PATH] [--status] [--uninstall [--purge]] (uninstall defaults to all)"
                 exit 0
                 ;;
             *) error "Unknown option: $1" ;;
@@ -260,9 +373,13 @@ main() {
     [[ "$destination_root" != *"'"* ]] || error "Destination root cannot contain a single quote"
     configure_targets "$destination_root"
 
+    if [[ "$action" == "uninstall" && "$target_provided" == "false" ]]; then
+        target="all"
+    fi
+
     case "$action" in
         status) show_status; exit 0 ;;
-        uninstall) uninstall; exit 0 ;;
+        uninstall) uninstall "$target" "$purge"; exit 0 ;;
     esac
 
     echo "ScaleUp Installer v$VERSION"
@@ -271,12 +388,13 @@ main() {
     case "$target" in
         claude) install_claude ;;
         hermes) install_hermes ;;
-        all)    install_claude; install_hermes ;;
-        *)      error "Unknown target: $target (use claude, hermes, or all)" ;;
+        codex)  install_codex ;;
+        all)    install_claude; install_hermes; install_codex ;;
+        *)      error "Unknown target: $target (use claude, hermes, codex, or all)" ;;
     esac
 
     echo ""
-    echo "Done! Run '/scaleup-welcome' to get started."
+    echo "Done! Open Claude Code or Codex and write: ‘Quiero organizar mi empresa.’"
 }
 
 main "$@"

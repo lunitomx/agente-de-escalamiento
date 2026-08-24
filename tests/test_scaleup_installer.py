@@ -37,6 +37,22 @@ def _install(destination_root: Path) -> None:
     )
 
 
+def _installer(destination_root: Path, *args: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        [
+            "bash",
+            str(INSTALLER),
+            "--destination-root",
+            str(destination_root),
+            *args,
+        ],
+        cwd=REPO_ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+
 def _run_engine(runtime_root: Path, project: Path, module: str, context: dict) -> dict:
     code = (
         f"from coaching.{module} import run; "
@@ -108,24 +124,21 @@ def _run_flow(runtime_root: Path, project: Path) -> tuple[dict, dict]:
 def test_installer_targets_are_isolated_and_adapted(tmp_path):
     _install(tmp_path)
 
-    for platform in (".claude", ".hermes"):
+    for platform in (".claude", ".hermes", ".codex"):
         platform_root = tmp_path / platform
         runtime_root = platform_root / "scaleup"
-        skills = list((platform_root / "skills").glob("scaleup-*/SKILL.md"))
+        skills_root = platform_root / "skills"
 
-        assert len(skills) == 39
+        assert sorted(path.name for path in skills_root.iterdir()) == ["scaleup"]
         assert (runtime_root / "VERSION").read_text().strip() == "1.0.0"
         assert (runtime_root / "coaching" / "welcome" / "__init__.py").is_file()
         assert (runtime_root / "coaching" / "summary" / "__init__.py").is_file()
-
-        for skill_name, validator_name in (
-            ("scaleup-welcome", "welcome.py"),
-            ("scaleup-diagnose", "diagnose.py"),
-        ):
-            skill = (platform_root / "skills" / skill_name / "SKILL.md").read_text()
-            assert "sys.path.insert(0, '.')" not in skill
-            assert f"sys.path.insert(0, '{runtime_root}')" in skill
-            assert str(runtime_root / "agent" / "validators" / validator_name) in skill
+        assert (runtime_root / "coaching" / "opsp.py").is_file()
+        skill = (skills_root / "scaleup" / "SKILL.md").read_text()
+        assert "sys.path.insert(0, '.')" not in skill
+        assert f"sys.path.insert(0, '{runtime_root}')" in skill
+        assert ".scaleup/agent" not in skill
+        assert str(runtime_root / "agent" / "validators" / "opsp.py") in skill
 
 
 def test_clean_project_flow_is_equivalent_for_claude_and_hermes(tmp_path):
@@ -143,3 +156,78 @@ def test_clean_project_flow_is_equivalent_for_claude_and_hermes(tmp_path):
     assert claude_diagnose["output"] == hermes_diagnose["output"]
     assert claude_diagnose["artifacts"]["scores"] == hermes_diagnose["artifacts"]["scores"]
     assert claude_diagnose["artifacts"]["priority"] == "cash"
+
+
+def test_codex_install_update_and_targeted_uninstall_preserve_company_data(tmp_path):
+    _installer(tmp_path, "--target", "codex")
+
+    codex = tmp_path / ".codex"
+    runtime = codex / "scaleup"
+    skills = codex / "skills"
+    company_note = runtime / "my-company" / "worksheets" / "important.txt"
+    company_note.write_text("keep me")
+    legacy_skill = skills / "scaleup-welcome"
+    legacy_skill.mkdir()
+    (legacy_skill / "SKILL.md").write_text("legacy")
+    unrelated_skill = skills / "scaleup-unrelated"
+    unrelated_skill.mkdir()
+    (unrelated_skill / "SKILL.md").write_text("third party")
+    stale_knowledge = runtime / "knowledge" / "obsolete.txt"
+    stale_knowledge.write_text("stale")
+    stale_agent = runtime / "agent" / "obsolete.txt"
+    stale_agent.write_text("stale")
+
+    # A repeat install is an upgrade: managed content is synchronized, company
+    # content is not part of the managed payload and must survive.
+    _installer(tmp_path, "--target", "codex")
+    assert company_note.read_text() == "keep me"
+    assert not legacy_skill.exists()
+    assert unrelated_skill.joinpath("SKILL.md").read_text() == "third party"
+    assert not stale_knowledge.exists()
+    assert not stale_agent.exists()
+    assert sorted(path.name for path in skills.iterdir()) == ["scaleup", "scaleup-unrelated"]
+    assert runtime.joinpath("VERSION").read_text().strip() == "1.0.0"
+
+    _installer(tmp_path, "--target", "codex", "--uninstall")
+    assert company_note.read_text() == "keep me"
+    assert not runtime.joinpath("coaching").exists()
+    assert not skills.joinpath("scaleup").exists()
+    assert unrelated_skill.joinpath("SKILL.md").read_text() == "third party"
+
+    _installer(tmp_path, "--target", "codex", "--uninstall", "--purge")
+    assert not runtime.exists()
+
+
+def test_bare_uninstall_removes_all_managed_targets_and_preserves_company_data(tmp_path):
+    _installer(tmp_path, "--target", "codex")
+
+    runtime = tmp_path / ".codex" / "scaleup"
+    skills = tmp_path / ".codex" / "skills"
+    company_note = runtime / "my-company" / "worksheets" / "important.txt"
+    company_note.write_text("keep me")
+
+    _installer(tmp_path, "--uninstall")
+
+    assert company_note.read_text() == "keep me"
+    assert not runtime.joinpath("coaching").exists()
+    assert not runtime.joinpath("VERSION").exists()
+    assert not skills.joinpath("scaleup").exists()
+
+def test_installed_codex_runtime_recovers_progress_and_validates_opsp(tmp_path):
+    _installer(tmp_path, "--target", "codex")
+    runtime, project = tmp_path / ".codex" / "scaleup", tmp_path / "clean-project"
+    project.mkdir()
+    welcome = _run_engine(runtime, project, "welcome", {"company_name": "Lumen Casa", "industry": "Retail", "employees": 28, "entry_methodology": "bmc", "base_path": "."})
+    assert welcome["errors"] == []
+    progress = _run_engine(runtime, project, "progress", {"base_path": "."})
+    assert progress["errors"] == [] and progress["artifacts"]["next_step"] == "diagnosis"
+    plan = _run_engine(runtime, project, "opsp", {"base_path": ".", "complete": True, "data": {"company_name": "Lumen Casa", "core_values": ["Diseño", "Servicio", "Cumplimiento"], "purpose": "Iluminar hogares", "bhag": "Ser líder nacional", "bhag_date": "2036", "sandbox": {"market": "México"}, "brand_promise": {"promise": "Entrega 72 horas", "kpi": "% puntual"}, "quarter": "Q3 2026", "critical_number": "95% puntual", "year": "2026", "annual_revenue": "$10M", "annual_profit": "$1M", "annual_priorities": [{"priority": "Crecer", "owner": "Ana", "kpi": "Ventas"}], "quarterly_priorities": [{"priority": "Inventario", "owner": "Luis", "kpi": "Faltantes"}]}})
+    assert plan["errors"] == [] and plan["artifacts"]["status"] == "completed"
+    artifact = project / "work" / "strategy" / "opsp.md"
+    validator = subprocess.run([sys.executable, str(runtime / "agent" / "validators" / "opsp.py"), str(artifact)], cwd=project, check=True, capture_output=True, text=True)
+
+def test_installed_public_journey_never_exposes_legacy_commands(tmp_path):
+    _install(tmp_path)
+    welcome, diagnose = _run_flow(tmp_path / ".codex" / "scaleup", tmp_path / "natural-project")
+    assert "/scaleup-" not in welcome["output"]
+    assert "/scaleup-" not in diagnose["output"]

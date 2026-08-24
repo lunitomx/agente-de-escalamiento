@@ -68,11 +68,11 @@ SCORE_LABELS = {
 
 PRIORITY_ORDER = ["people", "strategy", "execution", "cash"]
 
-ROUTING_RULES = {
-    "people": "/scaleup-people",
-    "strategy": "/scaleup-strategy",
-    "execution": "/scaleup-execution",
-    "cash": "/scaleup-cash",
+NEXT_STEP_PROMPTS = {
+    "people": "Empecemos por las personas: ¿qué rol o resultado de tu equipo necesita más claridad hoy?",
+    "strategy": "Empecemos por la estrategia: ¿qué hace distinta a tu empresa para sus clientes?",
+    "execution": "Empecemos por la ejecución: ¿qué prioridad importante se está quedando sin avanzar?",
+    "cash": "Empecemos por el efectivo: ¿en qué momento se queda atorado el dinero entre vender, entregar y cobrar?",
 }
 
 
@@ -171,20 +171,20 @@ def run(context: dict) -> dict:
         "",
         f"{DIAGNOSE_QUESTIONS[priority]['summary']}",
         "",
-        f"Tu score más bajo está en **{DIAGNOSE_QUESTIONS[priority]['label']}**. "
-        f"Te recomiendo empezar por ahí con `{ROUTING_RULES[priority]}`.",
+        f"Tu score más bajo está en **{DIAGNOSE_QUESTIONS[priority]['label']}**. Por eso empezaremos por ahí.",
+        NEXT_STEP_PROMPTS[priority],
         "",
-        "### Próximos pasos sugeridos",
+        "### Después revisaremos",
         "",
     ])
 
     remaining = [(k, v) for k, v in new_scores.items() if k != priority and v and v > 0]
     remaining.sort(key=lambda x: x[1])
     for dec_key, score in remaining:
-        report_lines.append(f"- `{ROUTING_RULES[dec_key]}` — {DIAGNOSE_QUESTIONS[dec_key]['label']} (score: {score})")
+        report_lines.append(f"- {DIAGNOSE_QUESTIONS[dec_key]['label']} (resultado actual: {score}/5)")
 
     report_lines.append("")
-    report_lines.append("> Para re-evaluar: `/scaleup-diagnose`")
+    report_lines.append("> Podemos revisar de nuevo estas cuatro áreas cuando cambie tu situación.")
 
     output = "\n".join(report_lines)
 
@@ -202,6 +202,8 @@ def run(context: dict) -> dict:
             "scores": new_scores,
             "priority": priority,
             "profile_path": str(profile_path),
+            "next_step": priority,
+            "next_question": NEXT_STEP_PROMPTS[priority],
         },
         "errors": [],
     }

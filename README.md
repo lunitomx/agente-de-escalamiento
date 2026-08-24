@@ -1,90 +1,90 @@
 # ScaleUp Agent
 
-Tu coach AI de escalamiento empresarial. Implementa la metodología **Scaling Up** de Verne Harnish directamente en tu terminal con Claude Code.
+ScaleUp es un coach para ordenar y escalar una empresa. Convierte conversaciones
+sencillas en un diagnóstico, prioridades y un **plan estratégico en una hoja**.
+No necesitas conocer Scaling Up, usar comandos ni saber programar.
 
-Te guía paso a paso a través de las 4 decisiones críticas para escalar: **People, Strategy, Execution y Cash**.
+## Empieza aquí
 
-## Quick Start
+### 1. Descarga e instala
 
-1. **Clona** este repositorio
-   ```bash
-   git clone https://github.com/lunitomx/scaleupagent.git
-   cd scaleupagent
-   ```
+```bash
+git clone https://github.com/lunitomx/scaleupagent.git
+cd scaleupagent
+bash .scaleup/install.sh --target claude
+```
 
-2. **Abre** Claude Code en el directorio
-   ```bash
-   claude
-   ```
+Para instalarlo para Codex, cambia el último comando por:
 
-3. **Escribe** `/scaleup-welcome` para iniciar tu primera sesión
+```bash
+bash .scaleup/install.sh --target codex
+```
 
-El agente te guiará para crear tu perfil de empresa y hacer tu primer diagnóstico.
+Puedes comprobar qué quedó instalado con:
+
+```bash
+bash .scaleup/install.sh --target claude --status
+bash .scaleup/install.sh --target codex --status
+```
+
+La instalación se puede ejecutar otra vez para actualizar ScaleUp y conserva el
+trabajo de tu empresa. Para quitar ScaleUp de todos los canales instalados y
+conservar ese trabajo, usa:
+
+```bash
+bash .scaleup/install.sh --uninstall
+```
+
+Para quitarlo de un solo canal, añade `--target claude` o `--target codex`.
+`--purge` elimina el runtime instalado, incluido su directorio `my-company`,
+pero **no** localiza ni borra artefactos creados en otras carpetas de proyecto.
+Si deseas eliminar los datos de una demo, entra primero en la carpeta exacta de
+esa demo, revisa `.scaleup/` y `work/strategy/opsp.md`, y elimínalos
+manualmente. No hagas una limpieza amplia desde tu directorio personal ni desde
+una carpeta que contenga otros proyectos.
+
+### 2. Abre tu asistente y habla normalmente
+
+Abre Claude Code o Codex dentro de la carpeta donde quieres trabajar con tu
+empresa. Después escribe una de estas frases, tal cual o con tus propias
+palabras:
+
+> Quiero organizar mi empresa.
+
+> No sé por dónde empezar para escalar mi negocio.
+
+> Quiero hacer mi plan estratégico en una hoja.
+
+ScaleUp debe hacer una pregunta a la vez, guardar el contexto y sugerir el
+siguiente paso. No tienes que escribir nombres de herramientas, rutas de
+archivos ni siglas.
+
+## Qué obtienes
+
+El recorrido de ScaleUp te ayuda a crear y conservar:
+
+- Un perfil básico de tu empresa.
+- Un diagnóstico de Personas, Estrategia, Ejecución y Efectivo.
+- Prioridades y acciones de seguimiento.
+- Un One Page Strategic Plan (OPSP): tu plan estratégico en una hoja.
+
+Los datos de trabajo se guardan localmente en el directorio `.scaleup/` del
+proyecto. Compártelos sólo si deseas que alguien más vea la información de tu
+empresa.
+
+## Guía de demostración
+
+Para un recorrido completo con empresa de ejemplo, usa
+[el guion de demo](docs/demo-script.md). También puedes consultar
+[el estado de preparación](docs/demo-readiness.md), que distingue lo validado
+de lo que aún está en construcción.
 
 ## Requisitos
 
-- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) instalado
-- Suscripción activa a Claude (Pro, Team, o Enterprise)
+- Claude Code o Codex instalado y con acceso a un modelo.
+- Git y Bash para descargar e instalar este repositorio.
+- Una carpeta de trabajo donde el asistente pueda guardar los archivos de tu
+  empresa.
 
-## Comandos disponibles
-
-### Inicio
-
-| Comando | Qué hace |
-|---------|----------|
-| `/scaleup-welcome` | Primera sesión: crea tu perfil y primer diagnóstico |
-| `/scaleup-diagnose` | Diagnóstico completo de las 4 decisiones |
-| `/scaleup-progress` | Dashboard de progreso y madurez |
-
-### People — Personas
-
-| Comando | Qué hace |
-|---------|----------|
-| `/scaleup-people` | Guía completa: personas correctas, accountability |
-| `/scaleup-people-values` | Descubrimiento de Core Values |
-| `/scaleup-people-fac` | Function Accountability Chart |
-| `/scaleup-people-topgrading` | Proceso de contratación A-players |
-
-### Strategy — Estrategia
-
-| Comando | Qué hace |
-|---------|----------|
-| `/scaleup-strategy` | Guía completa: dirección estratégica clara |
-| `/scaleup-strategy-opsp` | One-Page Strategic Plan |
-| `/scaleup-strategy-7strata` | 7 Strata of Strategy |
-| `/scaleup-strategy-swot` | Análisis SWOT/SWT |
-
-### Execution — Ejecución
-
-| Comando | Qué hace |
-|---------|----------|
-| `/scaleup-execution` | Guía completa: disciplina de ejecución |
-| `/scaleup-execution-rhythms` | Cadencia de reuniones |
-| `/scaleup-execution-priorities` | Prioridades trimestrales y Critical Number |
-| `/scaleup-execution-rockefeller` | Evaluación de los 10 Rockefeller Habits |
-
-### Cash — Efectivo
-
-| Comando | Qué hace |
-|---------|----------|
-| `/scaleup-cash` | Guía completa: flujo de efectivo |
-| `/scaleup-cash-ccc` | Cash Conversion Cycle |
-| `/scaleup-cash-power1` | Power of One |
-| `/scaleup-cash-acceleration` | Estrategias de aceleración de cash |
-
-## Estructura
-
-```
-.scaleup/
-├── my-company/          # Tu información (perfil, metas, foco trimestral)
-├── knowledge/           # Base de conocimiento Scaling Up
-│   ├── people/          # Herramientas de People
-│   ├── strategy/        # Frameworks de Strategy
-│   ├── execution/       # Checklists de Execution
-│   └── cash/            # Herramientas de Cash
-└── agent/               # Configuración del agente (no modificar)
-```
-
-## Basado en
-
-**Scaling Up** de Verne Harnish — el framework usado por más de 80,000 empresas en el mundo para escalar con éxito. Este agente transforma la metodología en guía práctica, paso a paso, adaptada a tu empresa.
+La metodología se inspira en **Scaling Up** de Verne Harnish. ScaleUp ofrece
+guía metodológica; no ofrece asesoría financiera ni legal.

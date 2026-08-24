@@ -76,13 +76,14 @@ def run(context: dict) -> dict:
         )
     elif methodology == "bmc":
         output_lines.append(
-            "Tienes un modelo de negocio establecido. Pasemos directo al diagnóstico "
-            "de las 4 decisiones con `/scaleup-diagnose`."
+            "Tienes un modelo de negocio establecido. Ahora haremos un diagnóstico guiado "
+            "de cuatro áreas: personas, estrategia, ejecución y efectivo. Empecemos por "
+            "personas: ¿qué tan claro tiene cada persona de tu equipo qué resultado debe conseguir?"
         )
     else:
         output_lines.append(
-            "Tu perfil está listo. Siguiente paso: `/scaleup-diagnose` para evaluar "
-            "tu situación actual en las 4 decisiones."
+            "Tu perfil está listo. Para encontrar el mejor punto de partida, revisemos "
+            "cuatro áreas con preguntas sencillas. ¿Te parece si empezamos?"
         )
 
     return {

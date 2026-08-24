@@ -18,7 +18,15 @@ DECISION_ORDER = ["people", "strategy", "execution", "cash"]
 
 def _get_worksheets(base_path: Path) -> tuple[list[dict], dict[str, dict]]:
     """Load all worksheets and completed ones."""
-    registry_path = base_path / ".scaleup" / "knowledge" / "registry" / "worksheets.yaml"
+    runtime_root = Path(__file__).resolve().parents[2]
+    registry_paths = (
+        base_path / ".scaleup" / "knowledge" / "registry" / "worksheets.yaml",
+        runtime_root / ".scaleup" / "knowledge" / "registry" / "worksheets.yaml",
+        runtime_root / "knowledge" / "registry" / "worksheets.yaml",
+    )
+    registry_path = next(
+        (path for path in registry_paths if path.is_file()), registry_paths[0]
+    )
     registry = read_yaml(registry_path)
     all_ws = registry.get("worksheets", [])
 
@@ -52,11 +60,12 @@ def run(context: dict) -> dict:
 
     all_ws, completed = _get_worksheets(base)
 
-    if not all_ws:
-        return {"output": "No hay worksheets registrados en la ontología. Verifica E6.", "artifacts": {}, "errors": ["Empty worksheet registry"]}
-
     if not scores:
-        return {"output": "Aún no tienes diagnóstico. Corre `/scaleup-diagnose` primero para establecer tus scores base.", "artifacts": {}, "errors": ["No diagnosis scores found"]}
+        name = profile.get("company", {}).get("name") or "tu empresa"
+        return {"output": f"Ya tengo el perfil de {name}. Para saber dónde conviene empezar, revisemos cuatro áreas de tu empresa con preguntas sencillas. ¿Te parece si empezamos?", "artifacts": {"company_name": name, "next_step": "diagnosis"}, "errors": []}
+
+    if not all_ws:
+        return {"output": "No puedo cargar las guías de seguimiento en esta instalación. Reinstala ScaleUp y vuelve a intentarlo; tus datos de empresa se conservarán.", "artifacts": {}, "errors": ["Empty worksheet registry"]}
 
     lines = ["## 📊 Dashboard de Progreso", "", "### Scores por Decisión", "", "| Decisión | Score | Nivel |", "|----------|-------|-------|"]
     level_labels = {1: "🔴 No iniciado", 2: "🟠 Ad hoc", 3: "🟡 Emergente", 4: "🟢 Establecido", 5: "⭐ Optimizado"}
@@ -84,9 +93,9 @@ def run(context: dict) -> dict:
         dec_ws = [w for w in all_ws if w.get("decision") == lowest_decision and w["id"] not in completed]
         if dec_ws:
             next_ws = dec_ws[0]
-            lines.extend(["### Siguiente Sugerido", f"- {next_ws['name']} (`{next_ws['id']}`) en {DECISION_LABELS.get(lowest_decision, lowest_decision)}", f"- Dificultad: {next_ws.get('difficulty', '—')} | Tiempo: {next_ws.get('time_estimate', '—')}", f"- Usa `/scaleup-worksheet {next_ws['id']}` para empezar", ""])
+            lines.extend(["### Siguiente Sugerido", f"- {next_ws['name']} en {DECISION_LABELS.get(lowest_decision, lowest_decision)}", f"- Dificultad: {next_ws.get('difficulty', '—')} | Tiempo: {next_ws.get('time_estimate', '—')}", "- Podemos empezar con este siguiente paso cuando quieras.", ""])
 
-    lines.append("> Actualiza tu diagnóstico con `/scaleup-diagnose` para mantener scores al día.")
+    lines.append("> Puedes revisar de nuevo las cuatro áreas cuando cambie tu situación.")
 
     total_all = sum(len([w for w in all_ws if w.get("decision") == d]) for d in DECISION_ORDER)
     done_all = sum(1 for w in all_ws if w["id"] in completed)
