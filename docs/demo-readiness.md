@@ -45,7 +45,7 @@ un One Page Strategic Plan (OPSP) persistido.
 
 ## Evidencia de checkpoint
 
-- `python -m pytest -q` → **399 passed, 2 skipped, 1 warning preexistente**
+- `python -m pytest -q` → **400 passed, 2 skipped, 1 warning preexistente**
   (2026-08-24). Incluye regresión Codex limpia: welcome → progreso con
   `next_step=diagnosis` → OPSP completo → validador instalado.
 - `pytest -q tests/test_scaleup_frontdoor.py tests/test_opsp.py
@@ -65,3 +65,10 @@ un One Page Strategic Plan (OPSP) persistido.
   comando de forma suficientemente acotada en este smoke.
 - Por tanto, no se acredita todavía un recorrido conversacional completo, continuidad
   real ni paridad Claude/Codex.
+## Actualización de desbloqueo — 2026-08-24
+
+- Se reemplazó el router embebido `python3 -c` por el ejecutable fijo y auditable `.scaleup/bin/scaleup-frontdoor`; el instalador lo distribuye en cada runtime y la skill instalada apunta a esa ruta absoluta.
+- **Claude Code, smoke real:** descubrió la única skill `scaleup`, ejecutó exclusivamente ese comando con una allowlist específica, no registró denegaciones y devolvió la primera pregunta de onboarding.
+- **Codex, smoke real:** descubrió `.agents/skills/scaleup`, ejecutó el mismo comando y devolvió la misma primera pregunta.
+- El ejecutable ahora cubre los handoffs cerrados de bienvenida, diagnóstico, OPSP, progreso y validación con la misma allowlist. La evidencia de cliente real sigue limitada al primer turno; falta ensayar una conversación completa y su reanudación dentro de ambos clientes.
+- Reproducción registrada: Claude Code se ejecutó con `--allowedTools "Bash(.scaleup/bin/scaleup-frontdoor *)"` y Codex con `codex exec --ephemeral --json --approve-for-me`; ambos descubrieron `scaleup`, llamaron al ejecutable y devolvieron la primera pregunta. No se registran esos comandos como sustituto de la demo completa.

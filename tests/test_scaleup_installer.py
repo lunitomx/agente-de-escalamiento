@@ -134,11 +134,12 @@ def test_installer_targets_are_isolated_and_adapted(tmp_path):
         assert (runtime_root / "coaching" / "welcome" / "__init__.py").is_file()
         assert (runtime_root / "coaching" / "summary" / "__init__.py").is_file()
         assert (runtime_root / "coaching" / "opsp.py").is_file()
+        assert (runtime_root / "bin" / "scaleup-frontdoor").is_file()
         skill = (skills_root / "scaleup" / "SKILL.md").read_text()
-        assert "sys.path.insert(0, '.')" not in skill
-        assert f"sys.path.insert(0, '{runtime_root}')" in skill
+        assert "python3 -c" not in skill
+        assert str(runtime_root / "bin" / "scaleup-frontdoor") in skill
         assert ".scaleup/agent" not in skill
-        assert str(runtime_root / "agent" / "validators" / "opsp.py") in skill
+        assert "validate-opsp" in skill
 
 
 def test_clean_project_flow_is_equivalent_for_claude_and_hermes(tmp_path):
@@ -231,3 +232,48 @@ def test_installed_public_journey_never_exposes_legacy_commands(tmp_path):
     welcome, diagnose = _run_flow(tmp_path / ".codex" / "scaleup", tmp_path / "natural-project")
     assert "/scaleup-" not in welcome["output"]
     assert "/scaleup-" not in diagnose["output"]
+
+def test_safe_frontdoor_executes_in_checkout_and_installed_runtime(tmp_path):
+    project = tmp_path / "natural-project"
+    project.mkdir()
+    _installer(tmp_path, "--target", "codex")
+    commands = (REPO_ROOT / ".scaleup" / "bin" / "scaleup-frontdoor", tmp_path / ".codex" / "scaleup" / "bin" / "scaleup-frontdoor")
+    for index, command in enumerate(commands):
+        command_project = project / str(index)
+        command_project.mkdir()
+        response = subprocess.run(
+            [str(command), "no sé por dónde empezar"],
+            cwd=command_project,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        assert "¿Cómo se llama y a qué se dedica" in response.stdout
+        welcome = subprocess.run(
+            [str(command), "run", "welcome", json.dumps({"company_name": "Lumen Casa", "industry": "Retail", "employees": 28, "entry_methodology": "bmc"})],
+            cwd=command_project,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        assert json.loads(welcome.stdout)["errors"] == []
+        for action, payload in (("diagnose", {"answers": ANSWERS, "mode": "full"}), ("progress", {}), ("opsp", {"data": {}})):
+            handoff = subprocess.run(
+                [str(command), "run", action, json.dumps(payload)],
+                cwd=command_project,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            result = json.loads(handoff.stdout)
+            assert {"output", "artifacts", "errors"} <= result.keys()
+        validation = subprocess.run(
+            [str(command), "validate-opsp", "work/strategy/opsp.md"],
+            cwd=command_project,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        assert "valid" in json.loads(validation.stdout)
+        invalid = subprocess.run([str(command), "run", "unexpected", "{}"], cwd=command_project, capture_output=True, text=True)
+        assert invalid.returncode == 2

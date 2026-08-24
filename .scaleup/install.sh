@@ -24,6 +24,7 @@ SKILLS_DIR="$(dirname "$SCRIPT_DIR")/.scaleup/internal/skills"
 COACHING_DIR="$(dirname "$SCRIPT_DIR")/coaching"
 KNOWLEDGE_DIR="$SCRIPT_DIR/knowledge"
 AGENT_DIR="$SCRIPT_DIR/agent"
+BIN_DIR="$SCRIPT_DIR/bin"
 
 # Target directories (configured after parsing CLI arguments)
 CLAUDE_SKILLS=""
@@ -62,6 +63,7 @@ adapt_skill() {
         -e "s|str(pathlib\\.Path('\\.scaleup/agent'))|str(pathlib.Path('$escaped_root/agent'))|g" \
         -e "s|python3 \\.scaleup/agent/validators/|python3 $escaped_root/agent/validators/|g" \
         -e "s|python3 -m coaching\\.|PYTHONPATH='$escaped_root' python3 -m coaching.|g" \
+        -e "s|\.scaleup/bin/scaleup-frontdoor|$escaped_root/bin/scaleup-frontdoor|g" \
         "$skill_file"
 }
 
@@ -177,6 +179,15 @@ copy_agent() {
     cp -a "$AGENT_DIR/." "$dst/agent/"
     info "Copied agent config to $dst/agent/ (synchronized)"
 }
+copy_bin() {
+    local dst="$1"
+    rm -rf "$dst/bin"
+    mkdir -p "$dst/bin"
+    cp "$BIN_DIR/scaleup-frontdoor" "$dst/bin/scaleup-frontdoor"
+    chmod 755 "$dst/bin/scaleup-frontdoor"
+    info "Copied ScaleUp commands to $dst/bin/"
+}
+
 
 write_version() {
     local dst="$1"
@@ -193,6 +204,7 @@ install_claude() {
     copy_engine "$CLAUDE_SCALEUP"
     copy_knowledge "$CLAUDE_SCALEUP"
     copy_agent "$CLAUDE_SCALEUP"
+    copy_bin "$CLAUDE_SCALEUP"
     write_version "$CLAUDE_SCALEUP"
 
     # Create my-company template if it doesn't exist
@@ -214,6 +226,7 @@ install_hermes() {
     copy_engine "$HERMES_SCALEUP"
     copy_knowledge "$HERMES_SCALEUP"
     copy_agent "$HERMES_SCALEUP"
+    copy_bin "$HERMES_SCALEUP"
     write_version "$HERMES_SCALEUP"
 
     local company_dir="$HERMES_SCALEUP/my-company"
@@ -234,6 +247,7 @@ install_codex() {
     copy_engine "$CODEX_SCALEUP"
     copy_knowledge "$CODEX_SCALEUP"
     copy_agent "$CODEX_SCALEUP"
+    copy_bin "$CODEX_SCALEUP"
     write_version "$CODEX_SCALEUP"
 
     local company_dir="$CODEX_SCALEUP/my-company"
@@ -309,7 +323,7 @@ uninstall_runtime() {
             rm -rf "$runtime"
             info "Removed $runtime including user company data"
         else
-            rm -rf "$runtime/coaching" "$runtime/knowledge" "$runtime/agent" "$runtime/VERSION" "$runtime/$MANAGED_SKILLS_FILE"
+            rm -rf "$runtime/coaching" "$runtime/knowledge" "$runtime/agent" "$runtime/bin" "$runtime/VERSION" "$runtime/$MANAGED_SKILLS_FILE"
             rmdir "$runtime" 2>/dev/null || true
             info "Removed managed $label files; preserved $runtime/my-company"
         fi

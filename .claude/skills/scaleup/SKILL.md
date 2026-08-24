@@ -12,9 +12,19 @@ description: Ayuda a una empresa a organizarse, saber por dónde empezar o crear
 Invoca el núcleo común para cualquier primera petición y presenta su `output`:
 
 ```bash
-echo '{"action":"frontdoor","message":"PETICIÓN_DEL_USUARIO","base_path":"."}' | python3 -c "import json,sys; sys.path.insert(0,'.'); from coaching.router import run; print(json.dumps(run(json.load(sys.stdin)), ensure_ascii=False))"
+.scaleup/bin/scaleup-frontdoor "PETICIÓN_DEL_USUARIO"
 ```
 
-Sigue internamente el `handoff`: onboarding usa `coaching.welcome`, diagnóstico usa `coaching.diagnose`, plan en una hoja usa `coaching.opsp` y avance usa `coaching.progress`. No muestres esos nombres al usuario.
+## Handoffs internos permitidos
 
-Para un OPSP, recoge datos conversacionalmente y llama a `coaching.opsp.run` tras cada avance. Conserva el artefacto en `work/strategy/opsp.md`; los avances parciales son válidos. Antes de afirmar que está completo, ejecuta `python3 .scaleup/agent/validators/opsp.py work/strategy/opsp.md`.
+Para cada avance usa exclusivamente el mismo ejecutable fijo; nunca uses `python -c`, `PYTHONPATH` ni ejecutes módulos de `coaching` directamente. El segundo argumento de `run` es un objeto JSON con los datos ya recabados y el comando devuelve JSON con `output`, `artifacts` y `errors`.
+
+```bash
+.scaleup/bin/scaleup-frontdoor run welcome "JSON_DE_PERFIL"
+.scaleup/bin/scaleup-frontdoor run diagnose "JSON_DE_RESPUESTAS"
+.scaleup/bin/scaleup-frontdoor run opsp "JSON_DE_PLAN_PARCIAL_O_COMPLETO"
+.scaleup/bin/scaleup-frontdoor run progress "{}"
+.scaleup/bin/scaleup-frontdoor validate-opsp work/strategy/opsp.md
+```
+
+No muestres estos comandos ni los nombres internos. Para el OPSP, guarda cada avance parcial en `work/strategy/opsp.md`; sólo decláralo terminado si `validate-opsp` devuelve `{"valid": true, "errors": []}`.
