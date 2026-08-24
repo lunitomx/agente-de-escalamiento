@@ -69,3 +69,12 @@ No RAISE server available across all 4 stories. No `.raise/rai/learnings/` recor
 - **Quality:** 0 bugs escaped to main; QR caught real issues every story
 - **Test count:** 17 → 21 → 23 → 38 per story; full suite 20 → 41 → 62 → (S9.4 clean)
 - **Pattern debt:** 0 — all retrospective patterns applied forward within the epic
+
+## Follow-up Verification — 2026-08-24
+
+E13 removed the original `.scaleup/coaching/summary/` tree while migrating
+coaching sources to the repository root, but the summary module was not ported
+and `scaleup-close` retained the invocation. The contract is now restored under
+`coaching/summary/`, protected against duplicate appends, tested against the
+existing validator, invocable from outside the repository, and included in the
+Claude/Hermes installer bundle.

@@ -13,7 +13,7 @@ E4/E5 fueron borradores posteriormente retirados/sustituidos. E22 es el siguient
 número disponible.
 
 El inventario auditado y el arreglo del parser YAML ya fueron publicados. La
-suite está verde con 385 pruebas aprobadas y 2 omitidas. El follow-up E10 añadió
+suite está verde con 389 pruebas aprobadas y 2 omitidas. El follow-up E10 añadió
 instalación aislada, adaptación de rutas por plataforma, flujo determinístico
 desde proyectos vacíos y descubrimiento oficial de los 39 skills por Hermes.
 
@@ -64,7 +64,7 @@ La explicación y evidencia por épica están en work/epics/product-roadmap.md.
 Ejecución auditada:
 
     uv run --python 3.12 --with pytest --with pyyaml pytest -q
-    385 passed, 2 skipped, 1 warning
+    389 passed, 2 skipped, 1 warning
 
 Aceptación E10:
 
@@ -82,9 +82,8 @@ externo.
 
 1. Ejecutar el smoke conversacional E10 cuando se autorice consumo de modelo y
    se repare el bootstrap de Hermes.
-2. Resolver el pendiente de coaching/summary/.
-3. Documentar el esquema formal de E19.
-4. Abrir E21 con diseño, plan e historias antes de implementar.
+2. Documentar el esquema formal de E19.
+3. Abrir E21 con diseño, plan e historias antes de implementar.
 
 ## Drift corregido por esta auditoría
 
@@ -93,8 +92,8 @@ externo.
 - El roadmap incluye E18–E21.
 - El total real de worksheets se reconoce como 15, no 34.
 - Las rutas canónicas del coaching engine se reconocen bajo coaching/.
-- coaching/summary/ se registra como capacidad retirada en E13 y pendiente de
-  restauración si se necesita.
+- coaching/summary/ fue restaurado en la ruta canónica y vuelve a distribuirse
+  para que scaleup-close conserve su contrato.
 - La dependencia de E21 se expresa como E18 + E19; E20 no es prerequisito.
 
 ---

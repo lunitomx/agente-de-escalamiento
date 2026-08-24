@@ -19,7 +19,7 @@
 | E6 | Knowledge Ontology | complete | 7/7; 15 worksheets reales. |
 | E7 | Agent Intelligence | complete | 6/6. |
 | E8 | Coaching Engine | complete | 6/6; follow-up histórico de gates individuales. |
-| E9 | Value-Add Features | complete — follow-up | 4/4 al cierre; summary requiere restauración tras E13. |
+| E9 | Value-Add Features | complete | 4/4; summary restaurado en la ruta canónica y en el bundle. |
 | E10 | Cross-Platform Distribution | complete — follow-up | 9/9; instalación aislada, adapters y equivalencia determinística verificados; falta smoke conversacional. |
 | E11 | Agente de Escalamiento | complete | 6/6. |
 | E12 | Codex & Auto-Update | cancelled | Absorbida por E11. |
@@ -37,7 +37,7 @@
 
 ### P0 — Finish E10 Live Smoke
 
-- [x] Suite restaurada: 385 passed, 2 skipped.
+- [x] Suite restaurada: 389 passed, 2 skipped.
 - [x] Instalación Claude/Hermes aislada en destino temporal.
 - [x] Flujo welcome → diagnose → validadores desde proyectos vacíos.
 - [x] Outputs equivalentes entre los bundles Claude y Hermes.
@@ -48,7 +48,6 @@
 
 ### P1 — Close Accepted Documentation Debt
 
-- [ ] Resolver el contrato retirado de coaching/summary/.
 - [ ] Documentar formalmente el esquema de E19.
 
 ### P2 — E21 Design and Planning

@@ -78,7 +78,7 @@ copy_engine() {
     rm -rf "$dst/coaching"
     mkdir -p "$dst/coaching"
     # Copy Python modules
-    for mod in core dashboard diagnose export level progress pulse router welcome worksheet; do
+    for mod in core dashboard diagnose export level progress pulse router summary welcome worksheet; do
         if [[ -d "$COACHING_DIR/$mod" ]]; then
             mkdir -p "$dst/coaching/$mod"
             cp "$COACHING_DIR/$mod/"*.py "$dst/coaching/$mod/" 2>/dev/null || true

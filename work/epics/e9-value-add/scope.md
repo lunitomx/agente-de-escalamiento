@@ -47,7 +47,7 @@ Mismo patrón E8: core Python en `coaching/{skill}/` + adapter SKILL.md en `.cla
 - [x] Export produce documento markdown limpio y compartible
 - [x] Pulse re-diagnóstico y comparación histórica entregados
 - [x] Dashboard muestra progresión histórica de scores
-- [ ] Resumen automático fue entregado al cierre de E9, pero `coaching/summary/` fue retirado durante E13 y no existe actualmente
+- [x] Resumen automático restaurado en `coaching/summary/`, cubierto por pruebas e incluido en la distribución
 - [x] Cada story tuvo core Python + adapter SKILL.md + quality gate al cierre
 
 ### Audit Note — 2026-08-24
@@ -55,3 +55,10 @@ Mismo patrón E8: core Python en `coaching/{skill}/` + adapter SKILL.md en `.cla
 La retrospectiva de E9 es correcta como registro histórico. El estado actual
 cambió después: E13 eliminó la fuente duplicada y dejó el port de summary en su
 parking lot. Restaurar summary es deuda técnica, no una reapertura de E9.
+
+### Follow-up Verification — 2026-08-24
+
+El contrato fue portado a la ruta canónica `coaching/summary/`. Conserva engine,
+formatter, API `run(context)` y CLI `python -m coaching.summary`; una
+re-ejecución ya no duplica la sección. El instalador vuelve a copiar el módulo a
+Claude y Hermes, y las pruebas ejercitan el validador real de E9.

@@ -116,6 +116,7 @@ def test_installer_targets_are_isolated_and_adapted(tmp_path):
         assert len(skills) == 39
         assert (runtime_root / "VERSION").read_text().strip() == "1.0.0"
         assert (runtime_root / "coaching" / "welcome" / "__init__.py").is_file()
+        assert (runtime_root / "coaching" / "summary" / "__init__.py").is_file()
 
         for skill_name, validator_name in (
             ("scaleup-welcome", "welcome.py"),
