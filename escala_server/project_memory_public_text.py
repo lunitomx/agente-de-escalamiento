@@ -36,7 +36,18 @@ _FORBIDDEN_TOKENS = frozenset(
 _FORBIDDEN_COMPACTS = frozenset(
     {"apikey", "apisecret", "dbpassword", "databasepassword", "secretkey", "sessionid"}
 )
-_FORBIDDEN_PHRASES = frozenset({"base de datos"})
+_FORBIDDEN_TOKEN_PHRASES = frozenset(
+    {
+        ("base", "de", "datos"),
+        ("clave", "de", "acceso"),
+        ("access", "key"),
+    }
+)
+_LEGITIMATE_BUSINESS_TOKEN_PHRASES = frozenset(
+    {
+        ("indicador", "clave", "de", "ventas"),
+    }
+)
 _PATH = re.compile(r"(?:^|[\s\"'`=:(\[])(?:/|\\|[A-Za-z]:[\\/])")
 
 
@@ -57,14 +68,30 @@ def public_text(value: object) -> str | None:
         for char in unicodedata.normalize("NFKD", normalized).casefold()
         if unicodedata.category(char) != "Mn"
     )
-    tokens = set(re.split(r"[^a-z0-9]+", normalized))
+    token_sequence = tuple(
+        token for token in re.split(r"[^a-z0-9]+", normalized) if token
+    )
+    tokens = set(token_sequence)
     compact = re.sub(r"[^a-z0-9]+", "", normalized)
+    has_legitimate_business_phrase = any(
+        token_sequence[index : index + len(phrase)] == phrase
+        for phrase in _LEGITIMATE_BUSINESS_TOKEN_PHRASES
+        for index in range(len(token_sequence) - len(phrase) + 1)
+    )
+    forbidden_tokens = tokens & _FORBIDDEN_TOKENS
+    if has_legitimate_business_phrase:
+        forbidden_tokens.discard("clave")
+    has_forbidden_phrase = any(
+        token_sequence[index : index + len(phrase)] == phrase
+        for phrase in _FORBIDDEN_TOKEN_PHRASES
+        for index in range(len(token_sequence) - len(phrase) + 1)
+    )
     if (
         not text
         or len(text) > 240
-        or tokens & _FORBIDDEN_TOKENS
+        or forbidden_tokens
         or any(form in compact for form in _FORBIDDEN_COMPACTS)
-        or any(phrase in normalized for phrase in _FORBIDDEN_PHRASES)
+        or has_forbidden_phrase
         or _PATH.search(text)
     ):
         return None

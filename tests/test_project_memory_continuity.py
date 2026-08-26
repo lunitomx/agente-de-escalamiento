@@ -86,6 +86,13 @@ def test_public_policy_keeps_legitimate_business_data() -> None:
     assert public_text("Los datos de ventas son semanales") == (
         "Los datos de ventas son semanales"
     )
+    assert public_text("El indicador clave de ventas es conversión") == (
+        "El indicador clave de ventas es conversión"
+    )
+    assert public_text("El indicadorClaveDeVentas es conversión") == (
+        "El indicadorClaveDeVentas es conversión"
+    )
+    assert public_text("El indicador clave de ventas requiere contraseña") is None
 
 
 @pytest.mark.parametrize(
@@ -97,6 +104,9 @@ def test_public_policy_keeps_legitimate_business_data() -> None:
         "El identificador es 42",
         "El sessionId es 42",
         "La base de datos está lista",
+        "La base-de-datos está lista",
+        "La base_de_datos está lista",
+        "La baseDeDatos está lista",
         "Ejecuta el comando de ventas",
         "La habilidad de ventas está lista",
         "El log dice que sigamos",
@@ -117,6 +127,46 @@ def test_public_policy_rejects_sensitive_or_technical_capture_before_proposal(
 
     assert response.stage == "normal"
     assert "no voy a guardar nada" in (response.next_question or "").lower()
+    with sqlite3.connect(continuity.close.runtime.db_path) as db:
+        assert (
+            db.execute("SELECT COUNT(*) FROM session_memory_proposals").fetchone()[0]
+            == 0
+        )
+        assert (
+            db.execute("SELECT COUNT(*) FROM confirmed_memory_entries").fetchone()[0]
+            == 0
+        )
+
+
+@pytest.mark.parametrize(
+    "statement",
+    (
+        "La base-de-datos está lista",
+        "La base_de_datos está lista",
+        "La baseDeDatos está lista",
+        "La contraseña del ERP es 1234",
+        "The database password is 1234",
+        "El identificador de sesión es 42",
+        "The session ID is 42",
+    ),
+)
+def test_unsafe_pause_capture_yes_resume_never_persists_or_resumes(
+    tmp_path: Path, statement: str
+) -> None:
+    from escala_server.project_memory_continuity import ProjectMemoryContinuity
+
+    continuity = ProjectMemoryContinuity(tmp_path)
+    pause = continuity.begin_pause()
+    assert pause.session_id
+
+    capture = continuity.capture_statement(pause.session_id, statement)
+
+    assert capture.stage == "normal"
+    assert capture.proposal_id is None
+    # A later affirmative reply cannot turn a rejected capture into memory.
+    yes = continuity.answer_confirmation(pause.session_id, "missing-proposal", "sí")
+    assert yes.stage == "normal"
+    assert continuity.resume().prefix is None
     with sqlite3.connect(continuity.close.runtime.db_path) as db:
         assert (
             db.execute("SELECT COUNT(*) FROM session_memory_proposals").fetchone()[0]
