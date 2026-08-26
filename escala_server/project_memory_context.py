@@ -98,7 +98,8 @@ class ProjectMemorySessionContext:
         facts: list[ContextItem] = []
         rows = db.execute(
             """SELECT facts.key, facts.value, facts.updated_at,
-                      applications.applied_at, provenance.value_sha256
+                      applications.applied_at, provenance.applied_at,
+                      provenance.value_sha256
             FROM memory_facts AS facts
             JOIN migration_fact_applications AS provenance
               ON provenance.fact_key = facts.key
@@ -117,11 +118,19 @@ class ProjectMemorySessionContext:
             ORDER BY facts.key""",
             (_PROFILE_SOURCE, _PROFILE_SOURCE_KIND, _IMPORT_SCHEMA),
         )
-        for key, raw_value, updated_at, applied_at, value_sha256 in rows:
+        for (
+            key,
+            raw_value,
+            updated_at,
+            application_applied_at,
+            provenance_applied_at,
+            value_sha256,
+        ) in rows:
             if (
-                updated_at != applied_at
-                or not isinstance(applied_at, str)
-                or not applied_at
+                updated_at != application_applied_at
+                or provenance_applied_at != application_applied_at
+                or not isinstance(application_applied_at, str)
+                or not application_applied_at
             ):
                 continue
             if not isinstance(raw_value, str) or not isinstance(value_sha256, str):
@@ -137,7 +146,7 @@ class ProjectMemorySessionContext:
                         key=key,
                         value=value,
                         source=_PROFILE_SOURCE,
-                        observed_at=applied_at,
+                        observed_at=application_applied_at,
                         kind="fact",
                     )
                 )

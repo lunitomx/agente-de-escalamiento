@@ -200,7 +200,7 @@ def test_corrupt_database_and_bad_worksheet_row_degrade_safely(tmp_path: Path) -
     assert fallback.user_message is None
 
 
-def test_facts_require_current_application_value_and_real_applied_timestamp(
+def test_facts_require_matching_application_and_provenance_timestamps(
     tmp_path: Path,
 ) -> None:
     root = migrated_project(tmp_path)
@@ -218,10 +218,16 @@ def test_facts_require_current_application_value_and_real_applied_timestamp(
             "UPDATE memory_facts SET updated_at = ? WHERE key = ?",
             ("tampered", "profile.name"),
         )
+        connection.execute(
+            "UPDATE migration_fact_applications SET applied_at = ? WHERE fact_key = ?",
+            ("tampered", "diagnosis.cash"),
+        )
 
     result = ProjectMemorySessionContext(root).load()
 
     assert all(item.key != "profile.name" for item in result.items)
+    assert all(item.key != "diagnosis.cash" for item in result.items)
+    assert "profile.industry" in {item.key for item in result.items}
     assert all(
         item.observed_at == applied_at for item in result.items if item.kind == "fact"
     )
