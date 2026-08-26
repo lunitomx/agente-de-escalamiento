@@ -58,6 +58,71 @@ def test_health_rejects_a_database_with_only_a_subset_of_the_e18_schema(
     assert result.reason == "local database schema is incomplete"
 
 
+@pytest.mark.parametrize(
+    "replacement",
+    [
+        ("name TEXT NOT NULL", "name TEXT"),
+        ("industry TEXT DEFAULT ''", "industry TEXT DEFAULT 'wrong'"),
+        ("id TEXT PRIMARY KEY", "id TEXT"),
+    ],
+)
+def test_health_rejects_matching_columns_with_wrong_constraints(
+    tmp_path: Path, replacement: tuple[str, str]
+) -> None:
+    runtime = ProjectMemoryRuntime(tmp_path)
+    assert runtime.ensure_memory().ready is True
+    with sqlite3.connect(runtime.db_path) as connection:
+        connection.execute("DROP TABLE companies")
+        original, altered = replacement
+        definition = """id TEXT PRIMARY KEY, name TEXT NOT NULL,
+            industry TEXT DEFAULT '', metadata TEXT DEFAULT '{}',
+            created_at TEXT NOT NULL DEFAULT (datetime('now')),
+            updated_at TEXT NOT NULL DEFAULT (datetime('now'))""".replace(
+            original, altered
+        )
+        connection.execute(f"CREATE TABLE companies ({definition})")
+
+    result = runtime.health()
+
+    assert result.ready is False
+    assert result.reason == "local database schema structure is invalid"
+
+
+def test_health_rejects_missing_unique_constraint_with_matching_columns(
+    tmp_path: Path,
+) -> None:
+    runtime = ProjectMemoryRuntime(tmp_path)
+    assert runtime.ensure_memory().ready is True
+    with sqlite3.connect(runtime.db_path) as connection:
+        connection.execute("DROP TABLE memory_facts")
+        connection.execute(
+            """CREATE TABLE memory_facts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                key TEXT NOT NULL,
+                value TEXT NOT NULL DEFAULT '',
+                created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+            )"""
+        )
+
+    result = runtime.health()
+
+    assert result.ready is False
+    assert result.reason == "local database schema structure is invalid"
+
+
+def test_health_rejects_missing_required_index(tmp_path: Path) -> None:
+    runtime = ProjectMemoryRuntime(tmp_path)
+    assert runtime.ensure_memory().ready is True
+    with sqlite3.connect(runtime.db_path) as connection:
+        connection.execute("DROP INDEX idx_sessions_company")
+
+    result = runtime.health()
+
+    assert result.ready is False
+    assert result.reason == "local database schema structure is invalid"
+
+
 def test_unwritable_runtime_path_degrades_safely() -> None:
     result = ProjectMemoryRuntime("/proc/scaleup-no-write").ensure_memory()
 
@@ -150,7 +215,7 @@ def test_restore_rejects_a_database_destination_symlinked_outside_project(
     assert not outside.exists()
 
 
-def test_restore_rejects_wal_pending_data_without_replacing_database(
+def test_restore_checkpoints_wal_data_when_database_has_no_users(
     tmp_path: Path,
 ) -> None:
     runtime = ProjectMemoryRuntime(tmp_path)
@@ -164,11 +229,9 @@ def test_restore_rejects_wal_pending_data_without_replacing_database(
     assert runtime.db_path.with_name("escala.db-wal").exists()
     live.close()
     restored = runtime.restore(backup.backup_path)
-    assert restored.ready is False
+    assert restored.ready is True
     with sqlite3.connect(runtime.db_path) as connection:
-        assert connection.execute("SELECT name FROM companies").fetchall() == [
-            ("New data",)
-        ]
+        assert connection.execute("SELECT name FROM companies").fetchall() == []
 
 
 def test_restore_fails_without_replacing_database_when_wal_reader_is_active(
@@ -205,12 +268,12 @@ def test_restore_blocks_a_writer_after_checkpoint(
     backup = runtime.backup()
     assert backup.ready is True
 
-    original_checkpoint = runtime._checkpoint_wal
     for sidecar in runtime._wal_sidecars():
         sidecar.unlink(missing_ok=True)
 
-    def checkpoint_then_write(connection: sqlite3.Connection | None) -> None:
-        original_checkpoint(connection)
+    original_assert = runtime._assert_database_was_not_modified
+
+    def assert_then_write(expected_fingerprint: bytes) -> None:
         writer = sqlite3.connect(runtime.db_path, timeout=0)
         try:
             with pytest.raises(sqlite3.OperationalError, match="locked"):
@@ -219,8 +282,9 @@ def test_restore_blocks_a_writer_after_checkpoint(
                 )
         finally:
             writer.close()
+        original_assert(expected_fingerprint)
 
-    monkeypatch.setattr(runtime, "_checkpoint_wal", checkpoint_then_write)
+    monkeypatch.setattr(runtime, "_assert_database_was_not_modified", assert_then_write)
     restored = runtime.restore(backup.backup_path)
 
-    assert restored.ready is False
+    assert restored.ready is True

@@ -6,6 +6,7 @@ Tables: companies, worksheets, sessions, changes_log,
 """
 
 import sqlite3
+from functools import lru_cache
 from pathlib import Path
 
 SCHEMA_VERSION = 1
@@ -116,6 +117,72 @@ INDEX_STATEMENTS = [
     "CREATE INDEX IF NOT EXISTS idx_relationships_target ON relationships(target_entity_id)",
     "CREATE INDEX IF NOT EXISTS idx_relationships_type ON relationships(relation_type)",
 ]
+
+
+def _contract_fingerprint(
+    connection: sqlite3.Connection, table_names: frozenset[str]
+) -> tuple:
+    """Return the SQLite-visible structural contract for the managed tables."""
+    tables = []
+    for table in sorted(table_names):
+        columns = tuple(
+            (row[1], row[2].upper(), row[3], row[4], row[5])
+            for row in connection.execute(f"PRAGMA table_info({table})")
+        )
+        indexes = []
+        for index in connection.execute(f"PRAGMA index_list({table})"):
+            name, unique, origin, partial = index[1], index[2], index[3], index[4]
+            columns_in_index = tuple(
+                (row[0], row[1], row[2], row[3], row[5])
+                for row in connection.execute(f"PRAGMA index_xinfo({name})")
+                if row[5]
+            )
+            indexes.append((name, unique, origin, partial, columns_in_index))
+        tables.append((table, columns, tuple(sorted(indexes))))
+    return tuple(tables)
+
+
+@lru_cache(maxsize=1)
+def _expected_schema_contract() -> tuple[frozenset[str], tuple]:
+    """Build the health-check contract from the DDL that creates this schema."""
+    with sqlite3.connect(":memory:") as connection:
+        for statement in DDL_STATEMENTS:
+            connection.execute(statement)
+        for statement in INDEX_STATEMENTS:
+            connection.execute(statement)
+        tables = frozenset(
+            row[0]
+            for row in connection.execute(
+                "SELECT name FROM sqlite_master WHERE type = 'table' "
+                "AND name NOT LIKE 'sqlite_%'"
+            )
+        )
+        return tables, _contract_fingerprint(connection, tables)
+
+
+def schema_contract_is_valid(connection: sqlite3.Connection) -> bool:
+    """Whether *connection* has exactly the DDL-derived managed-table contract.
+
+    The fingerprint covers column type, NOT NULL, defaults, primary keys and all
+    SQLite indexes (including the automatic index created for UNIQUE columns).
+    Keeping it here means creation and validation share one authority: the DDL.
+    """
+    expected_tables, expected = _expected_schema_contract()
+    return schema_contract_tables_are_present(connection) and (
+        _contract_fingerprint(connection, expected_tables) == expected
+    )
+
+
+def schema_contract_tables_are_present(connection: sqlite3.Connection) -> bool:
+    """Whether every table owned by the DDL is present in *connection*."""
+    expected_tables, _ = _expected_schema_contract()
+    present = {
+        row[0]
+        for row in connection.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'table'"
+        )
+    }
+    return expected_tables.issubset(present)
 
 
 def _ensure_dir(db_path: str) -> None:

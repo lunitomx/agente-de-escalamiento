@@ -4,13 +4,18 @@ from __future__ import annotations
 
 import os
 import sqlite3
+from hashlib import sha256
 from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from typing import ClassVar
 
-from .schema import SCHEMA_VERSION, init_db
+from .schema import (
+    SCHEMA_VERSION,
+    init_db,
+    schema_contract_is_valid,
+    schema_contract_tables_are_present,
+)
 
 
 @dataclass(frozen=True)
@@ -25,97 +30,6 @@ class MemoryResult:
 
 class ProjectMemoryRuntime:
     """Own the SQLite database belonging to one project, never a global home path."""
-
-    _required_tables = frozenset(
-        {
-            "_meta",
-            "companies",
-            "worksheets",
-            "sessions",
-            "changes_log",
-            "memory_facts",
-            "entities",
-            "relationships",
-        }
-    )
-
-    _required_columns: ClassVar[dict] = {
-        "_meta": {"key": ("TEXT", 1), "value": ("TEXT", 0)},
-        "companies": {
-            "id": ("TEXT", 1),
-            "name": ("TEXT", 0),
-            "industry": ("TEXT", 0),
-            "metadata": ("TEXT", 0),
-            "created_at": ("TEXT", 0),
-            "updated_at": ("TEXT", 0),
-        },
-        "worksheets": {
-            "id": ("INTEGER", 1),
-            "category": ("TEXT", 0),
-            "tool": ("TEXT", 0),
-            "data": ("TEXT", 0),
-            "session_id": ("TEXT", 0),
-            "version": ("INTEGER", 0),
-            "created_at": ("TEXT", 0),
-            "updated_at": ("TEXT", 0),
-        },
-        "sessions": {
-            "id": ("TEXT", 1),
-            "company_id": ("TEXT", 0),
-            "status": ("TEXT", 0),
-            "metadata": ("TEXT", 0),
-            "created_at": ("TEXT", 0),
-            "updated_at": ("TEXT", 0),
-        },
-        "changes_log": {
-            "id": ("INTEGER", 1),
-            "company_id": ("TEXT", 0),
-            "session_id": ("TEXT", 0),
-            "category": ("TEXT", 0),
-            "tool": ("TEXT", 0),
-            "field": ("TEXT", 0),
-            "old_value": ("TEXT", 0),
-            "new_value": ("TEXT", 0),
-            "diff_type": ("TEXT", 0),
-            "created_at": ("TEXT", 0),
-        },
-        "memory_facts": {
-            "id": ("INTEGER", 1),
-            "key": ("TEXT", 0),
-            "value": ("TEXT", 0),
-            "created_at": ("TEXT", 0),
-            "updated_at": ("TEXT", 0),
-        },
-        "entities": {
-            "id": ("INTEGER", 1),
-            "type": ("TEXT", 0),
-            "name": ("TEXT", 0),
-            "properties": ("TEXT", 0),
-            "created_at": ("TEXT", 0),
-            "updated_at": ("TEXT", 0),
-        },
-        "relationships": {
-            "id": ("INTEGER", 1),
-            "source_entity_id": ("INTEGER", 0),
-            "target_entity_id": ("INTEGER", 0),
-            "relation_type": ("TEXT", 0),
-            "properties": ("TEXT", 0),
-            "created_at": ("TEXT", 0),
-        },
-    }
-    _required_indexes: ClassVar[dict] = {
-        "idx_worksheets_category_tool": ("worksheets", ("category", "tool")),
-        "idx_worksheets_category_version": ("worksheets", ("category", "version")),
-        "idx_worksheets_session": ("worksheets", ("session_id",)),
-        "idx_sessions_company": ("sessions", ("company_id",)),
-        "idx_changes_log_session": ("changes_log", ("session_id",)),
-        "idx_changes_log_company": ("changes_log", ("company_id",)),
-        "idx_memory_facts_key": ("memory_facts", ("key",)),
-        "idx_entities_type": ("entities", ("type",)),
-        "idx_relationships_source": ("relationships", ("source_entity_id",)),
-        "idx_relationships_target": ("relationships", ("target_entity_id",)),
-        "idx_relationships_type": ("relationships", ("relation_type",)),
-    }
 
     def __init__(self, project_root: str | Path) -> None:
         self.project_root = Path(project_root).expanduser().resolve()
@@ -171,7 +85,7 @@ class ProjectMemoryRuntime:
 
         Callers must stop runtime/DAO activity before invoking this method. The
         lock rejects active SQLite transactions and keeps new SQLite writers out
-        through checkpoint and replacement; it is not a coordination mechanism
+        through replacement; it is not a coordination mechanism
         for DAOs that do not participate in SQLite locking.
         """
         try:
@@ -189,8 +103,11 @@ class ProjectMemoryRuntime:
             self._assert_contained(temporary, self.project_root)
             self._assert_wal_sidecars_contained()
             self.db_path.parent.mkdir(parents=True, exist_ok=True)
+            self._checkpoint_wal()
+            live_fingerprint = self._database_fingerprint()
             with self._exclusive_restore_connection() as live:
-                self._checkpoint_wal(live)
+                if live is not None:
+                    self._assert_database_was_not_modified(live_fingerprint)
                 with (
                     sqlite3.connect(source) as backup,
                     sqlite3.connect(temporary) as destination,
@@ -217,17 +134,11 @@ class ProjectMemoryRuntime:
                 integrity = connection.execute("PRAGMA integrity_check").fetchone()
                 if integrity is None or integrity[0] != "ok":
                     return self._failure(ValueError("SQLite integrity check failed"))
-                tables = {
-                    row[0]
-                    for row in connection.execute(
-                        "SELECT name FROM sqlite_master WHERE type='table'"
-                    )
-                }
-                if not self._required_tables.issubset(tables):
+                if not schema_contract_tables_are_present(connection):
                     return self._failure(
                         ValueError("local database schema is incomplete")
                     )
-                if not self._schema_structure_is_valid(connection):
+                if not schema_contract_is_valid(connection):
                     return self._failure(
                         ValueError("local database schema structure is invalid")
                     )
@@ -280,49 +191,40 @@ class ProjectMemoryRuntime:
             connection.execute("BEGIN EXCLUSIVE")
             yield connection
 
-    def _checkpoint_wal(self, connection: sqlite3.Connection | None) -> None:
-        """Flush WAL while restore's exclusion is held, or fail safely if busy."""
-        if connection is None or not any(
+    def _checkpoint_wal(self) -> None:
+        """Flush WAL before exclusion, failing safely when a user is active."""
+        if not self._live_database_is_sqlite() or not any(
             sidecar.exists() for sidecar in self._wal_sidecars()
         ):
             return
-        checkpoint = connection.execute("PRAGMA wal_checkpoint(TRUNCATE)").fetchone()
+        with sqlite3.connect(
+            f"file:{self.db_path}?mode=rw", uri=True, isolation_level=None, timeout=0
+        ) as connection:
+            connection.execute("PRAGMA busy_timeout = 0")
+            checkpoint = connection.execute(
+                "PRAGMA wal_checkpoint(TRUNCATE)"
+            ).fetchone()
         if checkpoint is None or checkpoint[0] != 0:
             raise sqlite3.OperationalError("cannot checkpoint active local database")
 
-    def _schema_structure_is_valid(self, connection: sqlite3.Connection) -> bool:
-        for table, expected_columns in self._required_columns.items():
-            actual_columns = {
-                row[1]: (row[2].upper(), row[5])
-                for row in connection.execute(f"PRAGMA table_info({table})")
-            }
-            if actual_columns != expected_columns:
-                return False
-        for name, (table, expected_columns) in self._required_indexes.items():
-            index = next(
-                (
-                    row
-                    for row in connection.execute(f"PRAGMA index_list({table})")
-                    if row[1] == name and row[2] == 0
-                ),
-                None,
-            )
-            if index is None:
-                return False
-            columns = tuple(
-                row[2] for row in connection.execute(f"PRAGMA index_info({name})")
-            )
-            if columns != expected_columns:
-                return False
-        for index in connection.execute("PRAGMA index_list(memory_facts)"):
-            if index[2] != 1:
-                continue
-            columns = tuple(
-                row[2] for row in connection.execute(f"PRAGMA index_info({index[1]})")
-            )
-            if columns == ("key",):
-                return True
-        return False
+    def _assert_database_was_not_modified(self, expected_fingerprint: bytes) -> None:
+        """Detect a writer that committed after the pre-lock checkpoint."""
+        wal, _ = self._wal_sidecars()
+        if (
+            self._database_fingerprint() != expected_fingerprint
+            or wal.exists()
+            and wal.stat().st_size
+        ):
+            raise sqlite3.OperationalError("local database changed during restore")
+
+    def _database_fingerprint(self) -> bytes:
+        return sha256(self.db_path.read_bytes()).digest()
+
+    def _live_database_is_sqlite(self) -> bool:
+        if not self.db_path.exists():
+            return False
+        with self.db_path.open("rb") as database:
+            return database.read(16) == b"SQLite format 3\x00"
 
     def _wal_sidecars(self) -> tuple[Path, Path]:
         return (
