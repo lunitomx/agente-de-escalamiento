@@ -127,7 +127,7 @@ class SessionCloseOrchestrator:
 
         # Compute duration
         created_at = session.get("created_at", "")
-        now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # noqa: DTZ005 - legacy session format
         duration = _compute_duration(created_at)
 
         facts_created = 0
@@ -440,10 +440,10 @@ def _compute_duration(created_at: str) -> str:
     if not created_at:
         return "desconocida"
     try:
-        start = datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S")
+        start = datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S")  # noqa: DTZ007 - legacy UTC-naive storage
     except ValueError:
         return "desconocida"
-    delta = datetime.now() - start
+    delta = datetime.now() - start  # noqa: DTZ005 - matches legacy timestamp convention
     secs = int(delta.total_seconds())
     h, rem = divmod(secs, 3600)
     m, s = divmod(rem, 60)

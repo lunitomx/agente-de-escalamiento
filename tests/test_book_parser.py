@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Tests for the book parser.
 Validates that the parser:

@@ -153,7 +153,7 @@ class EscalaRequestHandler(BaseHTTPRequestHandler):
         """Override to add timestamp prefix."""
         from datetime import datetime
 
-        timestamp = datetime.now().strftime("%H:%M:%S")
+        timestamp = datetime.now().strftime("%H:%M:%S")  # noqa: DTZ005 - display-only local log
         print(f"[{timestamp}] {args[0]} {args[1]} {args[2]}")
 
 

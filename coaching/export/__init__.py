@@ -134,7 +134,7 @@ def run(context: dict) -> dict:
         dict with output (str), artifacts (dict), errors (list[str])
     """
     base = Path(context.get("base_path", "."))
-    today = datetime.date.today().isoformat()
+    today = datetime.date.today().isoformat()  # noqa: DTZ011 - local business date
     filename = f"{today}-action-plan.md"
 
     company_dir = base / ".scaleup" / "my-company"

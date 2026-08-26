@@ -299,7 +299,7 @@ class MemoryEngine:
                 continue
             try:
                 # SQLite datetime → epoch seconds
-                updated_dt = datetime.strptime(updated_str, "%Y-%m-%d %H:%M:%S")
+                updated_dt = datetime.strptime(updated_str, "%Y-%m-%d %H:%M:%S")  # noqa: DTZ007 - SQLite timestamps are UTC-naive
                 age_seconds = (
                     now_ts - updated_dt.replace(tzinfo=timezone.utc).timestamp()
                 )

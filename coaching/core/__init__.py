@@ -5,7 +5,6 @@ Core shared utilities for ScaleUp coaching modules.
 import json
 import sys
 from pathlib import Path
-from typing import Any
 
 
 def load_context() -> dict:
@@ -39,8 +38,8 @@ def read_yaml(path: Path) -> dict:
 
         if path.exists():
             return yaml.safe_load(path.read_text()) or {}
-    except Exception:
-        pass
+    except (OSError, UnicodeError, yaml.YAMLError):
+        return {}
     return {}
 
 

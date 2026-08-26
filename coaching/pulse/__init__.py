@@ -13,7 +13,6 @@ from pathlib import Path
 from ..core import (
     DECISION_LABELS,
     ROUTING_RULES,
-    load_context,
     read_yaml,
     write_yaml,
 )
@@ -122,7 +121,7 @@ def run(context: dict) -> dict:
     """
     base = Path(context.get("base_path", "."))
     answers = context.get("answers", {})
-    today = datetime.date.today().isoformat()
+    today = datetime.date.today().isoformat()  # noqa: DTZ011 - local business date
 
     # --- Validate answers ---
     errors = _validate_answers(answers)

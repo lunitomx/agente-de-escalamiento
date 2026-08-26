@@ -220,7 +220,9 @@ def update_opsp(context: dict[str, Any]) -> dict[str, Any]:
     data = _merge(
         _merge(defaults, existing if isinstance(existing, dict) else {}), supplied
     )
-    data["updated_at"] = str(context.get("updated_at") or date.today().isoformat())
+    data["updated_at"] = str(
+        context.get("updated_at") or date.today().isoformat()  # noqa: DTZ011 - local business date
+    )
     completion_errors = _completion_errors(data)
     if context.get("complete") and not completion_errors:
         data["status"] = "completed"

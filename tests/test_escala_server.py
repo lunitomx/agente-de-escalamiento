@@ -156,7 +156,7 @@ class TestServerIntegration:
             resp = urllib.request.urlopen(url)
             data = json.loads(resp.read())
             assert data["status"] == "ok"
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - convert integration failure to pytest evidence
             pytest.fail(f"Server integration test failed: {e}")
 
     def test_static_file_serving(self, server_process):
@@ -168,5 +168,5 @@ class TestServerIntegration:
         try:
             resp = urllib.request.urlopen(url)
             assert resp.status == 200
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - convert integration failure to pytest evidence
             pytest.fail(f"Static file test failed: {e}")

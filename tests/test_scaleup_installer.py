@@ -363,6 +363,7 @@ def test_safe_frontdoor_executes_in_checkout_and_installed_runtime(tmp_path):
             cwd=command_project,
             capture_output=True,
             text=True,
+            check=False,
         )
         assert invalid.returncode == 2
 

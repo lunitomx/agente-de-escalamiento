@@ -404,7 +404,7 @@ def migrate_from_yaml(db_path: str, yaml_root: str) -> dict[str, Any]:
     init_db(db_path_str)
 
     log_entries: list[str] = []
-    now = datetime.now().isoformat()
+    now = datetime.now().isoformat()  # noqa: DTZ005 - preserves legacy local log timestamps
     log_entries.append(f"=== Migration started at {now} ===")
     log_entries.append(f"Source: {yaml_path}")
     log_entries.append(f"Target: {db_path_str}")
@@ -453,7 +453,7 @@ def migrate_from_yaml(db_path: str, yaml_root: str) -> dict[str, Any]:
                     else:
                         counts["skipped"] += 1
                         log_entries.append("SKIP: profile.md already exists")
-                except Exception as e:
+                except Exception as e:  # noqa: BLE001 - migration records and continues per artifact
                     counts["errors"] += 1
                     log_entries.append(f"ERROR: profile.md: {e}")
 
@@ -470,7 +470,7 @@ def migrate_from_yaml(db_path: str, yaml_root: str) -> dict[str, Any]:
                     )
                     counts["worksheets"] += 1
                     log_entries.append("OK: Imported pulse-history.yaml")
-                except Exception as e:
+                except Exception as e:  # noqa: BLE001 - migration records and continues per artifact
                     counts["errors"] += 1
                     log_entries.append(f"ERROR: pulse-history.yaml: {e}")
 
@@ -489,7 +489,7 @@ def migrate_from_yaml(db_path: str, yaml_root: str) -> dict[str, Any]:
                         )
                         counts["worksheets"] += 1
                         log_entries.append(f"OK: Imported context/{ctx_file.name}")
-                    except Exception as e:
+                    except Exception as e:  # noqa: BLE001 - migration records and continues per artifact
                         counts["errors"] += 1
                         log_entries.append(f"ERROR: context/{ctx_file.name}: {e}")
 
@@ -511,7 +511,7 @@ def migrate_from_yaml(db_path: str, yaml_root: str) -> dict[str, Any]:
                         )
                         counts["worksheets"] += 1
                         log_entries.append(f"OK: Imported {fname}")
-                    except Exception as e:
+                    except Exception as e:  # noqa: BLE001 - migration records and continues per artifact
                         counts["errors"] += 1
                         log_entries.append(f"ERROR: {fname}: {e}")
 
@@ -529,7 +529,7 @@ def migrate_from_yaml(db_path: str, yaml_root: str) -> dict[str, Any]:
                     )
                     counts["worksheets"] += 1
                     log_entries.append("OK: Imported tasks.md")
-                except Exception as e:
+                except Exception as e:  # noqa: BLE001 - migration records and continues per artifact
                     counts["errors"] += 1
                     log_entries.append(f"ERROR: tasks.md: {e}")
 
@@ -564,7 +564,7 @@ def migrate_from_yaml(db_path: str, yaml_root: str) -> dict[str, Any]:
                             log_entries.append(
                                 f"SKIP: sessions/{session_file.name} already exists"
                             )
-                    except Exception as e:
+                    except Exception as e:  # noqa: BLE001 - migration records and continues per artifact
                         counts["errors"] += 1
                         log_entries.append(f"ERROR: sessions/{session_file.name}: {e}")
 
@@ -588,7 +588,7 @@ def migrate_from_yaml(db_path: str, yaml_root: str) -> dict[str, Any]:
                             log_entries.append(
                                 f"OK: Imported knowledge/{decision}/worksheets/{ws_file.name}"
                             )
-                        except Exception as e:
+                        except Exception as e:  # noqa: BLE001 - migration records and continues per artifact
                             counts["errors"] += 1
                             log_entries.append(
                                 f"ERROR: knowledge/{decision}/worksheets/{ws_file.name}: {e}"
@@ -596,7 +596,7 @@ def migrate_from_yaml(db_path: str, yaml_root: str) -> dict[str, Any]:
 
         conn.commit()
 
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - migration records and continues per artifact
         log_entries.append(f"FATAL: {e}")
         counts["errors"] += 1
     finally:
