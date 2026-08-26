@@ -3,8 +3,8 @@
 > Inventario canónico de épicas y dirección del producto.
 
 **Última auditoría:** 2026-08-26
-**Estado auditado:** main; E21–E30 cerradas
-**Siguiente número disponible:** E31
+**Estado auditado:** main; E21–E30 cerradas; E31 formalizada
+**Siguiente número disponible:** E32
 
 ## Visión
 
@@ -75,6 +75,7 @@ Todos forman parte de la historia del producto.
 | E28 — Instalación Portátil y Runtime Visual | Entregar el runtime HTTP y paneles en macOS, Linux y Codex/Claude/Hermes | ✅ Complete | Issues #1 y #2 cubiertos: portabilidad sin GNU sed, bundle HTTP/estáticos y smoke instalado en tres runtimes. |
 | E29 — Business Pulse Basado en Datos | Mostrar el estado ejecutivo real de la empresa y paneles honestos | ✅ Complete | API agregada, vista ejecutiva con procedencia, Power of One persistente, demo aislada y smoke instalado en tres runtimes. |
 | E30 — Accountability Empresarial Longitudinal | Preparar sesiones, revisar compromisos y aprender de patrones con evidencia | ✅ Complete | Entrevista EO narrativa, compromisos verificables, rúbrica explicable, patrones 2+ y panel privado; smoke instalado en Claude/Codex/Hermes. |
+| E31 — Evidencia Operativa a Metodologías | Convertir foco narrativo en datos reales, consentidos y trazables para cada metodología | 📋 Planned | Archivo/MCP/manual con preview y confirmación por campo; inicia por Cash/Power of One/CCC y evita ingestión silenciosa. |
 
 ### Resumen
 
@@ -82,7 +83,8 @@ Todos forman parte de la historia del producto.
 - 1 épica cancelada: E12.
 - 2 borradores históricos retirados/sustituidos: E4 y E5.
 - 0 épicas en curso.
-- E21–E30 están completas. El siguiente número disponible es E31.
+- 1 épica planificada: E31.
+- E21–E30 están completas. El siguiente número disponible es E32.
 
 ## Secuencia actual
 
@@ -98,8 +100,11 @@ E20 para comenzar; E20 es una integración consumidora paralela del conocimiento
 
 ## Próximo trabajo recomendado
 
-No hay una épica activa. El siguiente trabajo debe promoverse desde deuda o
-parking lot sólo cuando tenga outcome, alcance y aceptación verificable.
+### P0 — E31: Evidencia Operativa a Metodologías
+
+Después del diagnóstico narrativo, pedir el dato real mínimo para la
+metodología elegida: manual, archivo local o contexto que el usuario comparta
+mediante un MCP del host. Previsualizar y confirmar antes de persistir.
 
 ## Deuda técnica y de producto no asignada
 
