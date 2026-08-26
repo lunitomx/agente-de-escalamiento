@@ -254,7 +254,16 @@ def init_db(db_path: str) -> sqlite3.Connection:
     else:
         current = int(row[0])
         if current < SCHEMA_VERSION:
-            # Future: run migration steps here
+            if current < 3:
+                conn.execute(
+                    """INSERT INTO migration_applications (
+                        relative_path, content_sha256, import_schema, source_kind
+                    )
+                    SELECT relative_path, content_sha256, import_schema, source_kind
+                    FROM migration_sources
+                    WHERE NOT EXISTS (SELECT 1 FROM migration_applications)
+                    ORDER BY id ASC"""
+                )
             conn.execute(
                 "UPDATE _meta SET value = ? WHERE key = 'schema_version'",
                 (str(SCHEMA_VERSION),),

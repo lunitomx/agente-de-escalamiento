@@ -167,6 +167,46 @@ def test_runtime_upgrades_v2_database_and_reports_healthy(tmp_path: Path) -> Non
         ).fetchone()
 
 
+def test_runtime_upgrade_v2_seeds_applications_in_source_history_order(
+    tmp_path: Path,
+) -> None:
+    runtime = ProjectMemoryRuntime(tmp_path)
+    assert runtime.ensure_memory().ready
+    path = ".scaleup/my-company/worksheets/focus.yaml"
+    snapshots = (
+        (path, "digest-a-v1", 1, "worksheet"),
+        (path, "digest-b-v1", 1, "worksheet"),
+        (path, "digest-a-v2", 1, "worksheet"),
+    )
+    with sqlite3.connect(runtime.db_path) as connection:
+        connection.execute("DROP TABLE migration_applications")
+        connection.executemany(
+            """INSERT INTO migration_sources (
+                relative_path, content_sha256, import_schema, source_kind
+            ) VALUES (?, ?, ?, ?)""",
+            snapshots,
+        )
+        connection.execute(
+            "UPDATE _meta SET value = ? WHERE key = ?", ("2", "schema_version")
+        )
+
+    assert runtime.ensure_memory().ready
+    assert runtime.ensure_memory().ready
+
+    with sqlite3.connect(runtime.db_path) as connection:
+        applications = connection.execute(
+            """SELECT content_sha256 FROM migration_applications
+            WHERE relative_path = ? ORDER BY id ASC""",
+            (path,),
+        ).fetchall()
+        assert [row[0] for row in applications] == [
+            "digest-a-v1",
+            "digest-b-v1",
+            "digest-a-v2",
+        ]
+        assert applications[-1][0] == "digest-a-v2"
+
+
 def test_migration_hashes_and_does_not_mutate_allowlisted_inputs(
     tmp_path: Path,
 ) -> None:
