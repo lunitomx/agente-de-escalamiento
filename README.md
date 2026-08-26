@@ -69,8 +69,16 @@ El recorrido de ScaleUp te ayuda a crear y conservar:
 - Un One Page Strategic Plan (OPSP): tu plan estratégico en una hoja.
 
 Los datos de trabajo se guardan localmente en el directorio `.scaleup/` del
-proyecto. Compártelos sólo si deseas que alguien más vea la información de tu
-empresa.
+proyecto. La continuidad opcional sólo recuerda una declaración que confirmes
+explícitamente con “sí”; una respuesta ambigua o “no” no la da por cierta. La
+memoria y sus copias de seguridad viven en ese mismo proyecto, nunca en la
+instalación compartida. Compártelos sólo si deseas que alguien más vea la
+información de tu empresa.
+
+Para una demostración, puedes decir “quiero pausar”, dar una decisión concreta y
+responder “sí” cuando te pregunte si quieres recordarla. En una sesión nueva,
+“retomemos” recupera únicamente esa decisión confirmada. No dictes contraseñas,
+tokens, rutas ni comandos: ScaleUp los rechaza para esta continuidad local.
 
 ## Guía de demostración
 
