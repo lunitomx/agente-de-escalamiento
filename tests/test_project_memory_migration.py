@@ -73,3 +73,30 @@ def test_corrupt_and_missing_sources_do_not_block_valid_migration(
     assert result.skipped["work/strategy/opsp.md"] == "missing"
     assert result.imported["company-profile"] == 1
     assert ProjectMemoryRuntime(root).health().ready
+
+
+def test_yaml_whitespace_and_key_order_are_idempotent(tmp_path: Path) -> None:
+    root = project(tmp_path, "complete")
+    profile = root / ".scaleup/agent/memory/company-profile.yaml"
+    ProjectMemoryMigrator(root).migrate()
+    profile.write_text(
+        "focus: {current_decision: people}\nscores: {strategy: 6, people: 5}\ncompany: {employees: 12, industry: Interiores, name: Lumen Casa}\n"
+    )
+    result = ProjectMemoryMigrator(root).migrate()
+    assert result.imported == {}
+    assert result.skipped[".scaleup/agent/memory/company-profile.yaml"] == "unchanged"
+
+
+def test_legacy_markdown_without_frontmatter_is_imported(tmp_path: Path) -> None:
+    root = project(tmp_path, "partial")
+    (root / ".scaleup/my-company/annual-goal.md").write_text("Crecer con foco.\n")
+    assert ProjectMemoryMigrator(root).migrate().imported["legacy-plan"] == 1
+
+
+def test_invalid_profile_type_does_not_create_company_or_ledger(tmp_path: Path) -> None:
+    root = project(tmp_path, "partial")
+    (root / ".scaleup/agent/memory/company-profile.yaml").write_text("- no perfil\n")
+    result = ProjectMemoryMigrator(root).migrate()
+    assert ".scaleup/agent/memory/company-profile.yaml" in result.errors
+    assert count(result.db_path, "companies") == 0
+    assert count(result.db_path, "migration_sources") == 0

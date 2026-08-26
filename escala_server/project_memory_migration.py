@@ -71,7 +71,7 @@ class ProjectMemoryMigrator:
                             snapshot.source_kind,
                         ),
                     )
-                    imported[snapshot.source_kind] += 1
+                imported[snapshot.source_kind] += 1
             except (sqlite3.Error, ValueError, TypeError) as error:
                 errors[snapshot.relative_path] = str(error)
         return MigrationResult(
@@ -105,14 +105,20 @@ class ProjectMemoryMigrator:
             ("worksheets", "worksheet", None),
         ):
             base = self.project_root / ".scaleup/my-company" / directory
-            if base.is_dir():
+            try:
+                self._safe_relative(base)
+            except ValueError as error:
+                errors[self._relative(base)] = str(error)
+                continue
+            if base.exists() and base.is_dir():
                 candidates.extend(
                     (path, kind, category, path.stem if category else None)
                     for path in sorted(base.glob("*.yaml"))
                 )
         opsp = self.project_root / "work/strategy/opsp.md"
+        opsp_relative = self._relative(opsp)
         if not opsp.exists():
-            skipped[self._relative(opsp)] = "missing"
+            skipped[opsp_relative] = "missing"
         if self._valid_opsp(opsp, errors):
             candidates.append((opsp, "opsp", "strategy", "opsp"))
         else:
@@ -130,19 +136,17 @@ class ProjectMemoryMigrator:
             )
         snapshots = []
         for path, kind, category, tool in candidates:
-            relative = self._relative(path)
-            if not path.exists():
-                skipped[relative] = "missing"
-                continue
             try:
-                if path.is_symlink() or not path.resolve().is_relative_to(
-                    self.project_root
+                relative = self._safe_relative(path)
+                if not path.exists():
+                    skipped[relative] = "missing"
+                    continue
+                payload, digest = self._read(path, require_frontmatter=kind == "opsp")
+                if kind in {"company-profile", "worksheet"} and not isinstance(
+                    payload, dict
                 ):
-                    raise ValueError("source path escapes project root")
-                payload, digest = self._read(path)
+                    raise ValueError(f"{kind} must be a YAML mapping")
                 if kind == "worksheet":
-                    if not isinstance(payload, dict):
-                        raise ValueError("worksheet must be a YAML mapping")
                     category = str(payload.get("decision") or "worksheet")
                     tool = str(payload.get("id") or path.stem)
                 snapshots.append(
@@ -155,13 +159,14 @@ class ProjectMemoryMigrator:
                 TypeError,
                 yaml.YAMLError,
             ) as error:
-                errors[relative] = str(error)
+                errors[locals().get("relative", self._relative(path))] = str(error)
         return snapshots
 
     def _valid_opsp(self, path: Path, errors: dict[str, str]) -> bool:
-        if not path.exists():
-            return False
         try:
+            relative = self._safe_relative(path)
+            if not path.exists():
+                return False
             return (
                 self._frontmatter(path.read_text(encoding="utf-8")).get("schema")
                 == "tool-opsp"
@@ -173,19 +178,43 @@ class ProjectMemoryMigrator:
             TypeError,
             yaml.YAMLError,
         ) as error:
-            errors[self._relative(path)] = str(error)
+            errors[locals().get("relative", self._relative(path))] = str(error)
             return False
 
-    def _read(self, path: Path) -> tuple[Any, str]:
+    def _read(
+        self, path: Path, *, require_frontmatter: bool = False
+    ) -> tuple[Any, str]:
         raw = path.read_bytes()
         digest = hashlib.sha256(raw).hexdigest()
         if path.suffix == ".md":
             text = raw.decode("utf-8")
-            return {"frontmatter": self._frontmatter(text), "text": text}, digest
+            return {
+                "frontmatter": (
+                    self._frontmatter(text)
+                    if require_frontmatter
+                    else (self._frontmatter(text) if text.startswith("---\n") else {})
+                ),
+                "text": text,
+            }, digest
         payload = yaml.safe_load(raw) or {}
         if not isinstance(payload, (dict, list)):
             raise TypeError("YAML source must be a mapping or list")
-        return json.loads(json.dumps(payload, sort_keys=True, default=str)), digest
+        canonical = json.dumps(
+            payload, sort_keys=True, separators=(",", ":"), default=str
+        )
+        return json.loads(canonical), hashlib.sha256(
+            canonical.encode("utf-8")
+        ).hexdigest()
+
+    def _safe_relative(self, path: Path) -> str:
+        """Reject symlinked paths before discovery reads or expands them."""
+        relative = path.relative_to(self.project_root)
+        current = self.project_root
+        for part in relative.parts:
+            current = current / part
+            if current.is_symlink():
+                raise ValueError("source path contains a symlink")
+        return relative.as_posix()
 
     @staticmethod
     def _frontmatter(text: str) -> dict[str, Any]:
@@ -198,7 +227,7 @@ class ProjectMemoryMigrator:
         return payload
 
     def _relative(self, path: Path) -> str:
-        return path.resolve().relative_to(self.project_root).as_posix()
+        return path.relative_to(self.project_root).as_posix()
 
     @staticmethod
     def _already_imported(connection: sqlite3.Connection, snapshot: _Snapshot) -> bool:
@@ -236,7 +265,9 @@ class ProjectMemoryMigrator:
     def _apply_profile(
         self, connection: sqlite3.Connection, snapshot: _Snapshot
     ) -> None:
-        payload = snapshot.payload if isinstance(snapshot.payload, dict) else {}
+        if not isinstance(snapshot.payload, dict):
+            raise TypeError("company-profile must be a YAML mapping")
+        payload = snapshot.payload
         company = (
             payload.get("company") if isinstance(payload.get("company"), dict) else {}
         )
@@ -250,6 +281,13 @@ class ProjectMemoryMigrator:
                 str(company.get("name") or "Unnamed company"),
                 str(company.get("industry") or ""),
                 json.dumps(payload, sort_keys=True),
+            ),
+        )
+        connection.executemany(
+            "DELETE FROM memory_facts WHERE key LIKE ?",
+            (
+                (f"{prefix}%",)
+                for prefix in ("profile.", "diagnosis.", "profile.focus.")
             ),
         )
         for prefix, values in (
