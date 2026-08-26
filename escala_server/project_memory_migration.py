@@ -130,7 +130,7 @@ class ProjectMemoryMigrator:
         opsp_relative = self._relative(opsp)
         if not opsp.exists():
             skipped[opsp_relative] = "missing"
-        if self._valid_opsp(opsp, errors):
+        if opsp.exists() and self._valid_opsp(opsp, skipped, errors):
             candidates.append((opsp, "opsp", "strategy", "opsp"))
         else:
             candidates.extend(
@@ -147,6 +147,7 @@ class ProjectMemoryMigrator:
             )
         snapshots = []
         for path, kind, category, tool in candidates:
+            relative = self._relative(path)
             try:
                 relative = self._safe_relative(path)
                 if not path.exists():
@@ -170,18 +171,22 @@ class ProjectMemoryMigrator:
                 TypeError,
                 yaml.YAMLError,
             ) as error:
-                errors[locals().get("relative", self._relative(path))] = str(error)
+                errors[relative] = str(error)
         return snapshots
 
-    def _valid_opsp(self, path: Path, errors: dict[str, str]) -> bool:
+    def _valid_opsp(
+        self, path: Path, skipped: dict[str, str], errors: dict[str, str]
+    ) -> bool:
+        relative = self._relative(path)
         try:
             relative = self._safe_relative(path)
             if not path.exists():
                 return False
-            return (
-                self._frontmatter(path.read_text(encoding="utf-8")).get("schema")
-                == "tool-opsp"
-            )
+            frontmatter = self._frontmatter(path.read_text(encoding="utf-8"))
+            if frontmatter.get("schema") != "tool-opsp":
+                skipped[relative] = "unsupported schema"
+                return False
+            return True
         except (
             OSError,
             UnicodeDecodeError,
@@ -189,7 +194,7 @@ class ProjectMemoryMigrator:
             TypeError,
             yaml.YAMLError,
         ) as error:
-            errors[locals().get("relative", self._relative(path))] = str(error)
+            errors[relative] = str(error)
             return False
 
     def _read(

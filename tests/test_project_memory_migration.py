@@ -2,6 +2,7 @@
 
 import shutil
 import sqlite3
+from hashlib import sha256
 from pathlib import Path
 
 from escala_server.project_memory import ProjectMemoryRuntime
@@ -38,6 +39,40 @@ def test_migrates_complete_project_once_and_preserves_sources(tmp_path: Path) ->
         "conversation" not in source and "knowledge" not in source
         for source in first.sources
     )
+
+
+def test_migration_ignores_conversation_and_knowledge_artifacts(tmp_path: Path) -> None:
+    root = project(tmp_path, "complete")
+    conversation = root / ".scaleup/agent/memory/conversation.yaml"
+    knowledge = root / ".scaleup/my-company/knowledge/insight.yaml"
+    conversation.write_text("turns:\n  - confidential conversation\n")
+    knowledge.parent.mkdir(parents=True)
+    knowledge.write_text("pattern: confidential knowledge\n")
+    originals = {
+        path: (path.read_bytes(), sha256(path.read_bytes()).hexdigest())
+        for path in (conversation, knowledge)
+    }
+
+    first = ProjectMemoryMigrator(root).migrate()
+    second = ProjectMemoryMigrator(root).migrate()
+
+    assert first.ready and second.ready
+    assert all(
+        path.read_bytes() == raw and sha256(path.read_bytes()).hexdigest() == digest
+        for path, (raw, digest) in originals.items()
+    )
+    excluded = {
+        conversation.relative_to(root).as_posix(),
+        knowledge.relative_to(root).as_posix(),
+    }
+    assert excluded.isdisjoint(first.sources)
+    assert excluded.isdisjoint(second.sources)
+    with sqlite3.connect(first.db_path) as connection:
+        recorded = {
+            row[0]
+            for row in connection.execute("SELECT relative_path FROM migration_sources")
+        }
+    assert excluded.isdisjoint(recorded)
 
 
 def test_change_versions_worksheet_once_and_keeps_projects_isolated(
@@ -312,6 +347,7 @@ def test_invalid_opsp_uses_legacy_fallback_and_valid_opsp_suppresses_it(
 
     assert fallback.imported["legacy-plan"] == 2
     assert "work/strategy/opsp.md" not in fallback.sources
+    assert fallback.skipped["work/strategy/opsp.md"] == "unsupported schema"
 
     valid_root = project(tmp_path, "complete")
     legacy = valid_root / ".scaleup/my-company/annual-goal.md"
@@ -321,3 +357,24 @@ def test_invalid_opsp_uses_legacy_fallback_and_valid_opsp_suppresses_it(
     assert preferred.imported["opsp"] == 1
     assert "legacy-plan" not in preferred.imported
     assert legacy.relative_to(valid_root).as_posix() not in preferred.sources
+
+
+def test_migration_backup_restore_preserves_worksheets_and_ledger(
+    tmp_path: Path,
+) -> None:
+    root = project(tmp_path, "complete")
+    migrator = ProjectMemoryMigrator(root)
+    migrated = migrator.migrate()
+    backup = migrator.runtime.backup()
+    assert migrated.ready and backup.ready
+    tables = ("worksheets", "migration_sources", "migration_applications")
+    before = {table: count(migrated.db_path, table) for table in tables}
+    with sqlite3.connect(migrated.db_path) as connection:
+        connection.execute("DELETE FROM worksheets")
+        connection.execute("DELETE FROM migration_sources")
+        connection.execute("DELETE FROM migration_applications")
+
+    restored = migrator.runtime.restore(backup.backup_path)
+
+    assert restored.ready
+    assert {table: count(migrated.db_path, table) for table in tables} == before
