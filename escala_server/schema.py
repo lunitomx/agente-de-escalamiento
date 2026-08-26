@@ -11,7 +11,7 @@ import sqlite3
 from functools import lru_cache
 from pathlib import Path
 
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 5
 
 DDL_STATEMENTS = [
     # ── Meta / version tracking ──────────────────────────────────────
@@ -135,6 +135,51 @@ DDL_STATEMENTS = [
         FOREIGN KEY(migration_application_id) REFERENCES migration_applications(id)
     )
     """,
+    # ── Explicitly confirmed session memory (v5) ─────────────────────
+    """
+    CREATE TABLE IF NOT EXISTS project_memory_sessions (
+        id           TEXT PRIMARY KEY,
+        status       TEXT NOT NULL CHECK(status IN ('open', 'closed')),
+        opened_at    TEXT NOT NULL DEFAULT (datetime('now')),
+        closed_at    TEXT DEFAULT NULL,
+        close_reason TEXT DEFAULT NULL
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS session_memory_proposals (
+        id                TEXT PRIMARY KEY,
+        fingerprint       TEXT NOT NULL UNIQUE,
+        session_id        TEXT NOT NULL,
+        kind              TEXT NOT NULL CHECK(kind IN ('fact', 'decision', 'pattern')),
+        statement         TEXT NOT NULL,
+        origin            TEXT NOT NULL CHECK(origin = 'explicit_user_statement'),
+        observation_ids   TEXT NOT NULL,
+        replaces_entry_id TEXT DEFAULT NULL,
+        response_state    TEXT NOT NULL CHECK(response_state IN ('proposed', 'confirmed', 'rejected')),
+        created_at        TEXT NOT NULL DEFAULT (datetime('now')),
+        responded_at      TEXT DEFAULT NULL,
+        FOREIGN KEY(session_id) REFERENCES project_memory_sessions(id),
+        FOREIGN KEY(replaces_entry_id) REFERENCES confirmed_memory_entries(id)
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS confirmed_memory_entries (
+        id                      TEXT PRIMARY KEY,
+        proposal_id             TEXT NOT NULL UNIQUE,
+        session_id              TEXT NOT NULL,
+        kind                    TEXT NOT NULL CHECK(kind IN ('fact', 'decision', 'pattern')),
+        statement               TEXT NOT NULL,
+        source                  TEXT NOT NULL,
+        confirmation_confidence REAL NOT NULL CHECK(confirmation_confidence = 1.0),
+        confidence_reason       TEXT NOT NULL CHECK(confidence_reason = 'explicit_confirmation'),
+        status                  TEXT NOT NULL CHECK(status IN ('active', 'superseded')),
+        replaces_entry_id       TEXT DEFAULT NULL,
+        confirmed_at            TEXT NOT NULL DEFAULT (datetime('now')),
+        FOREIGN KEY(proposal_id) REFERENCES session_memory_proposals(id),
+        FOREIGN KEY(session_id) REFERENCES project_memory_sessions(id),
+        FOREIGN KEY(replaces_entry_id) REFERENCES confirmed_memory_entries(id)
+    )
+    """,
 ]
 
 # ── Indexes (created separately after tables) ────────────────────────
@@ -153,6 +198,10 @@ INDEX_STATEMENTS = [
     "CREATE INDEX IF NOT EXISTS idx_migration_sources_path ON migration_sources(relative_path)",
     "CREATE INDEX IF NOT EXISTS idx_migration_applications_path ON migration_applications(relative_path, import_schema, id)",
     "CREATE INDEX IF NOT EXISTS idx_migration_fact_applications_fact ON migration_fact_applications(fact_key, migration_application_id)",
+    "CREATE INDEX IF NOT EXISTS idx_project_memory_sessions_status ON project_memory_sessions(status)",
+    "CREATE INDEX IF NOT EXISTS idx_session_memory_proposals_session_state ON session_memory_proposals(session_id, response_state)",
+    "CREATE INDEX IF NOT EXISTS idx_confirmed_memory_entries_session ON confirmed_memory_entries(session_id)",
+    "CREATE INDEX IF NOT EXISTS idx_confirmed_memory_entries_kind_status ON confirmed_memory_entries(kind, status)",
 ]
 
 
