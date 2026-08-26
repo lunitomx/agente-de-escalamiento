@@ -207,6 +207,54 @@ def test_runtime_upgrade_v2_seeds_applications_in_source_history_order(
         assert applications[-1][0] == "digest-a-v2"
 
 
+def test_v2_upgrade_reapplies_reverted_real_worksheet_snapshot(
+    tmp_path: Path,
+) -> None:
+    root = project(tmp_path, "complete")
+    worksheet = root / ".scaleup/my-company/worksheets/focus.yaml"
+    source_a = worksheet.read_text()
+    first = ProjectMemoryMigrator(root).migrate()
+    digest_a = ProjectMemoryMigrator(root)._read(worksheet)[1]
+
+    worksheet.write_text("id: focus\ndecision: people\nroles: Finanzas\n")
+    changed = ProjectMemoryMigrator(root).migrate()
+    digest_b = ProjectMemoryMigrator(root)._read(worksheet)[1]
+    assert digest_a != digest_b
+
+    with sqlite3.connect(first.db_path) as connection:
+        source_history = connection.execute(
+            """SELECT content_sha256 FROM migration_sources
+            WHERE relative_path = ? ORDER BY id ASC""",
+            (".scaleup/my-company/worksheets/focus.yaml",),
+        ).fetchall()
+        connection.execute("DROP TABLE migration_applications")
+        connection.execute(
+            "UPDATE _meta SET value = ? WHERE key = ?", ("2", "schema_version")
+        )
+    assert [row[0] for row in source_history] == [digest_a, digest_b]
+
+    worksheet.write_text(source_a)
+    reverted = ProjectMemoryMigrator(root).migrate()
+
+    assert changed.imported["worksheet"] == 1
+    assert reverted.imported["worksheet"] == 1
+    assert ".scaleup/my-company/worksheets/focus.yaml" not in reverted.skipped
+    with sqlite3.connect(first.db_path) as connection:
+        assert (
+            connection.execute(
+                "SELECT MAX(version) FROM worksheets WHERE category=? AND tool=?",
+                ("people", "focus"),
+            ).fetchone()[0]
+            == 3
+        )
+        applications = connection.execute(
+            """SELECT content_sha256 FROM migration_applications
+            WHERE relative_path = ? ORDER BY id ASC""",
+            (".scaleup/my-company/worksheets/focus.yaml",),
+        ).fetchall()
+    assert [row[0] for row in applications] == [digest_a, digest_b, digest_a]
+
+
 def test_migration_hashes_and_does_not_mutate_allowlisted_inputs(
     tmp_path: Path,
 ) -> None:
