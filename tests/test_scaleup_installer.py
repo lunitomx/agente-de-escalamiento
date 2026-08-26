@@ -555,7 +555,8 @@ first = ProjectMemoryMigrator(project).migrate()
 second = ProjectMemoryMigrator(project).migrate()
 with sqlite3.connect(first.db_path) as connection:
     source = connection.execute(
-        "SELECT relative_path, source_kind FROM migration_sources"
+        "SELECT relative_path, source_kind FROM migration_sources "
+        "ORDER BY relative_path, id"
     ).fetchall()
     applications = connection.execute(
         "SELECT COUNT(*) FROM migration_applications"
@@ -613,7 +614,7 @@ def test_installed_frontdoors_reconcile_legacy_sources_idempotently(tmp_path):
         database = project / ".scaleup" / "memory" / "escala.db"
         with sqlite3.connect(database) as connection:
             first = connection.execute(
-                "SELECT content_sha256 FROM migration_sources"
+                "SELECT content_sha256 FROM migration_sources ORDER BY id DESC LIMIT 1"
             ).fetchone()[0]
             assert (
                 connection.execute(
@@ -626,7 +627,7 @@ def test_installed_frontdoors_reconcile_legacy_sources_idempotently(tmp_path):
         _say(command, project, "retomemos")
         with sqlite3.connect(database) as connection:
             second = connection.execute(
-                "SELECT content_sha256 FROM migration_sources"
+                "SELECT content_sha256 FROM migration_sources ORDER BY id DESC LIMIT 1"
             ).fetchone()[0]
             assert (
                 connection.execute(
@@ -657,7 +658,7 @@ def test_installed_handoff_reconciles_legacy_profile_to_current_facts_idempotent
     database = project / ".scaleup" / "memory" / "escala.db"
     with sqlite3.connect(database) as connection:
         legacy_fingerprint = connection.execute(
-            "SELECT content_sha256 FROM migration_sources"
+            "SELECT content_sha256 FROM migration_sources ORDER BY id DESC LIMIT 1"
         ).fetchone()[0]
         legacy_facts = dict(
             connection.execute("SELECT key, value FROM memory_facts").fetchall()
@@ -686,7 +687,7 @@ def test_installed_handoff_reconciles_legacy_profile_to_current_facts_idempotent
     assert json.loads(result.stdout)["errors"] == []
     with sqlite3.connect(database) as connection:
         current_fingerprint = connection.execute(
-            "SELECT content_sha256 FROM migration_sources"
+            "SELECT content_sha256 FROM migration_sources ORDER BY id DESC LIMIT 1"
         ).fetchone()[0]
         current_facts = dict(
             connection.execute("SELECT key, value FROM memory_facts").fetchall()
@@ -717,7 +718,7 @@ def test_installed_handoff_reconciles_legacy_profile_to_current_facts_idempotent
     with sqlite3.connect(database) as connection:
         assert (
             connection.execute(
-                "SELECT content_sha256 FROM migration_sources"
+                "SELECT content_sha256 FROM migration_sources ORDER BY id DESC LIMIT 1"
             ).fetchone()[0]
             == current_fingerprint
         )
