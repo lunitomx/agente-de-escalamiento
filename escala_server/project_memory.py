@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import os
 import sqlite3
-from hashlib import sha256
 from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
+from hashlib import sha256
 from pathlib import Path
 
 from .schema import (
