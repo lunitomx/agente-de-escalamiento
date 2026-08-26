@@ -27,6 +27,26 @@ def test_ensure_memory_initializes_the_existing_schema(tmp_path: Path) -> None:
     assert ProjectMemoryRuntime(tmp_path).health().ready is True
 
 
+@pytest.mark.parametrize("project_name", ["question?mark", "hash#mark"])
+def test_sqlite_uri_operations_keep_special_project_paths_exact(
+    tmp_path: Path, project_name: str
+) -> None:
+    runtime = ProjectMemoryRuntime(tmp_path / project_name)
+
+    created = runtime.ensure_memory()
+    backup = runtime.backup()
+    restored = runtime.restore(backup.backup_path)
+
+    assert created.ready is True
+    assert runtime.health().ready is True
+    assert backup.ready is True
+    assert restored.ready is True
+    assert (
+        runtime.db_path == tmp_path / project_name / ".scaleup" / "memory" / "escala.db"
+    )
+    assert runtime.db_path.is_file()
+
+
 def test_health_reports_a_corrupt_database_without_raising(tmp_path: Path) -> None:
     db_path = tmp_path / ".scaleup" / "memory" / "escala.db"
     db_path.parent.mkdir(parents=True)
@@ -190,6 +210,36 @@ def test_invalid_backup_never_replaces_a_healthy_database(tmp_path: Path) -> Non
     result = runtime.restore(invalid_backup)
 
     assert result.ready is False
+
+
+def test_backup_returns_failure_when_its_temporary_path_is_a_directory(
+    tmp_path: Path,
+) -> None:
+    runtime = ProjectMemoryRuntime(tmp_path)
+    assert runtime.ensure_memory().ready is True
+    temporary = runtime._backup_path(None).with_suffix(".tmp")
+    temporary.mkdir(parents=True)
+
+    result = runtime.backup()
+
+    assert result.ready is False
+    assert temporary.is_dir()
+
+
+def test_restore_returns_failure_when_its_temporary_path_is_a_directory(
+    tmp_path: Path,
+) -> None:
+    runtime = ProjectMemoryRuntime(tmp_path)
+    assert runtime.ensure_memory().ready is True
+    backup = runtime.backup()
+    assert backup.ready is True
+    temporary = runtime.db_path.with_suffix(".restore.tmp")
+    temporary.mkdir()
+
+    result = runtime.restore(backup.backup_path)
+
+    assert result.ready is False
+    assert temporary.is_dir()
 
 
 @pytest.mark.parametrize("linked_part", [".scaleup", "memory"])

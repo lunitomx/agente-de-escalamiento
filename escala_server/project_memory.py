@@ -64,6 +64,7 @@ class ProjectMemoryRuntime:
         temporary = target.with_suffix(".tmp")
         try:
             self._assert_contained(temporary, self.project_root)
+            self._prepare_temporary(temporary)
             target.parent.mkdir(parents=True, exist_ok=True)
             with (
                 sqlite3.connect(self.db_path) as source,
@@ -78,7 +79,7 @@ class ProjectMemoryRuntime:
         except (OSError, sqlite3.Error, ValueError) as error:
             return self._failure(error)
         finally:
-            temporary.unlink(missing_ok=True)
+            self._cleanup_temporary(temporary)
 
     def restore(self, backup_path: str | Path | None = None) -> MemoryResult:
         """Restore an offline database while holding SQLite's exclusive lock.
@@ -101,6 +102,7 @@ class ProjectMemoryRuntime:
         temporary = self.db_path.with_suffix(".restore.tmp")
         try:
             self._assert_contained(temporary, self.project_root)
+            self._prepare_temporary(temporary)
             self._assert_wal_sidecars_contained()
             self.db_path.parent.mkdir(parents=True, exist_ok=True)
             has_live_database = self._live_database_is_sqlite()
@@ -125,7 +127,7 @@ class ProjectMemoryRuntime:
         except (OSError, sqlite3.Error, ValueError) as error:
             return self._failure(error)
         finally:
-            temporary.unlink(missing_ok=True)
+            self._cleanup_temporary(temporary)
 
     def _health_path(self, path: Path) -> MemoryResult:
         try:
@@ -133,7 +135,7 @@ class ProjectMemoryRuntime:
             self._assert_contained(path, self.project_root)
             if not path.is_file():
                 return self._failure(ValueError("local database does not exist"))
-            with sqlite3.connect(f"file:{path}?mode=rw", uri=True) as connection:
+            with sqlite3.connect(self._sqlite_uri(path), uri=True) as connection:
                 integrity = connection.execute("PRAGMA integrity_check").fetchone()
                 if integrity is None or integrity[0] != "ok":
                     return self._failure(ValueError("SQLite integrity check failed"))
@@ -188,7 +190,7 @@ class ProjectMemoryRuntime:
                 yield None
                 return
         with sqlite3.connect(
-            f"file:{self.db_path}?mode=rw", uri=True, isolation_level=None, timeout=0
+            self._sqlite_uri(self.db_path), uri=True, isolation_level=None, timeout=0
         ) as connection:
             connection.execute("PRAGMA busy_timeout = 0")
             connection.execute("BEGIN EXCLUSIVE")
@@ -201,7 +203,7 @@ class ProjectMemoryRuntime:
         ):
             return
         with sqlite3.connect(
-            f"file:{self.db_path}?mode=rw", uri=True, isolation_level=None, timeout=0
+            self._sqlite_uri(self.db_path), uri=True, isolation_level=None, timeout=0
         ) as connection:
             connection.execute("PRAGMA busy_timeout = 0")
             checkpoint = connection.execute(
@@ -243,6 +245,29 @@ class ProjectMemoryRuntime:
         self._assert_wal_sidecars_contained()
         for sidecar in self._wal_sidecars():
             sidecar.unlink(missing_ok=True)
+
+    @staticmethod
+    def _sqlite_uri(path: Path) -> str:
+        """Build a SQLite URI without interpreting path characters as query syntax."""
+        return f"{path.resolve().as_uri()}?mode=rw"
+
+    @staticmethod
+    def _prepare_temporary(path: Path) -> None:
+        """Clear an old temporary file, refusing a path that is a directory."""
+        if not path.exists():
+            return
+        if path.is_dir():
+            raise ValueError("temporary database path must be a file")
+        path.unlink()
+
+    @staticmethod
+    def _cleanup_temporary(path: Path) -> None:
+        """Best-effort cleanup that cannot mask the operation's MemoryResult."""
+        try:
+            if path.exists() and not path.is_dir():
+                path.unlink()
+        except OSError:
+            pass
 
     @staticmethod
     def _assert_contained(path: Path, root: Path) -> None:
