@@ -1,44 +1,15 @@
 ---
 name: scaleup-start-load-tasks
-description: 'Load open tasks from task board. Sub-skill of /scaleup-start.'
+description: Alias temporal de compatibilidad. Redirige al contrato canónico escala-start-load-tasks.
 ---
 
-# Load Open Tasks
+# Alias legado: scaleup-start-load-tasks
 
-## Purpose
+Este alias no contiene lógica ni metodología propia. Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
 
-Read the task board and extract counts and in-progress items. Sub-skill of `/scaleup-start`.
-
-## Steps
-
-### Step 1: Read Task Board
-
-```bash
-cat .scaleup/my-company/tasks.md
-```
-
-### Step 2: Parse Sections
-
-The file has 3 sections marked by `## ` headers:
-- `## En Progreso` — tasks the user committed to
-- `## Próximo` — identified but not started
-- `## Completado` — done tasks
-
-For each section, count list items (`- [ ]` or `- [x]` or `- `).
-
-### Step 3: Extract In-Progress Details
-
-For items under "En Progreso", extract:
-- Task description (the text after `- [ ]`)
-- Metadata from HTML comments if present: `<!-- decision:X node:Y due:YYYY-MM-DD -->`
-
-### Step 4: Produce Summary
-
-| Condition | Output |
-|-----------|--------|
-| Tasks found | Counts per section + list of in-progress items with metadata |
-| All sections empty | Output: "No tasks registered" |
-
-## Output
-
-Task counts and in-progress item details.
+1. Consulta `../../../escala-skills/catalog.yaml` y confirma que `scaleup-start-load-tasks` sigue
+   autorizado durante su ventana de migración.
+2. Continúa con el contrato canónico en
+   `../../../escala-skills/escala-start-load-tasks/SKILL.md`.
+3. No muestres el catálogo técnico al empresario; sigue la experiencia
+   conversacional definida por `escala`.

@@ -1,40 +1,15 @@
 ---
 name: scaleup-task-add
-description: 'Add a task to the ScaleUp task board with decision and ontology links.'
+description: Alias temporal de compatibilidad. Redirige al contrato canónico escala-task-add.
 ---
 
-# Add Task
+# Alias legado: scaleup-task-add
 
-## Purpose
+Este alias no contiene lógica ni metodología propia. Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
 
-Create a new task in the task board linked to a Scaling Up decision and optionally to an ontology node.
-
-## Steps
-
-### Step 1: Collect Task Info
-
-Ask or infer:
-- **Description:** What needs to be done
-- **Decision:** people / strategy / execution / cash
-- **Due date:** YYYY-MM-DD (optional)
-- **Ontology node:** worksheet or tool ID (optional, e.g. `core-values-worksheet`)
-
-### Step 2: Format Task Entry
-
-```markdown
-- [ ] {description} <!-- decision:{decision} node:{node} due:{date} -->
-```
-
-If no node or date, omit those fields from the comment.
-
-### Step 3: Append to Task Board
-
-Read `.scaleup/my-company/tasks.md`. Append the new task under `## En Progreso` section.
-
-### Step 4: Confirm
-
-Report: "Tarea agregada: {description} (decision: {decision})"
-
-## Output
-
-Updated `.scaleup/my-company/tasks.md` with new task.
+1. Consulta `../../../escala-skills/catalog.yaml` y confirma que `scaleup-task-add` sigue
+   autorizado durante su ventana de migración.
+2. Continúa con el contrato canónico en
+   `../../../escala-skills/escala-task-add/SKILL.md`.
+3. No muestres el catálogo técnico al empresario; sigue la experiencia
+   conversacional definida por `escala`.

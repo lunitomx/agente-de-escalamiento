@@ -1,44 +1,15 @@
 ---
-description: 'Dashboard de progreso mostrando scores, worksheets completados y próxima acción sugerida. Core Python cross-platform.'
 name: scaleup-progress
+description: Alias temporal de compatibilidad. Redirige al contrato canónico escala-progress.
 ---
 
-# ScaleUp Progress
+# Alias legado: scaleup-progress
 
-## Purpose
+Este alias no contiene lógica ni metodología propia. Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
 
-Mostrar el progreso del usuario en las 4 decisiones: scores actuales, worksheets completados vs pendientes, y sugerencia del siguiente paso.
-
-## Architecture
-
-Adapter delgado. Core logic en `coaching.progress`.
-
-## Steps
-
-### Step 1: Invoke Core Module
-
-```bash
-echo '{"base_path": "."}' | python3 -c "
-import sys, json; sys.path.insert(0, '.')
-from coaching.progress import run
-print(json.dumps(run(json.loads(sys.stdin.read())), indent=2, ensure_ascii=False))
-"
-```
-
-### Step 2: Quality Gate
-
-```bash
-python3 .scaleup/agent/validators/progress.py
-```
-
-### Step 3: Present Dashboard
-
-Mostrar el `output` del core module al usuario. Si hay un siguiente worksheet sugerido, ofrecer `/scaleup-worksheet {id}`.
-
-## Output
-
-| Item | Description |
-|------|-------------|
-| Scores table | Scores actuales por decisión con nivel |
-| Worksheet progress | Completados vs pendientes por decisión |
-| Next suggestion | Siguiente worksheet recomendado |
+1. Consulta `../../../escala-skills/catalog.yaml` y confirma que `scaleup-progress` sigue
+   autorizado durante su ventana de migración.
+2. Continúa con el contrato canónico en
+   `../../../escala-skills/escala-progress/SKILL.md`.
+3. No muestres el catálogo técnico al empresario; sigue la experiencia
+   conversacional definida por `escala`.

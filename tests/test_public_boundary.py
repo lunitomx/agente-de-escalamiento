@@ -709,7 +709,8 @@ def test_public_entrypoint_states_local_only_and_safe_folder_sharing() -> None:
     assert "Google Drive" in readme
     assert "OneDrive" in readme
     assert "No coloques la base SQLite" in readme
-    assert "/escala-welcome" in readme
+    assert "Un solo agente, muchas capacidades internas" in readme
+    assert "No necesitas conocer\ncomandos ni carpetas" in readme
 
 
 def test_public_knowledge_yaml_has_no_private_root_provenance() -> None:

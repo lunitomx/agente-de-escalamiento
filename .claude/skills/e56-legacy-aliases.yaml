@@ -1,0 +1,159 @@
+schema_version: 1
+aliases:
+- alias: scaleup-cash
+  target: escala-cash
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-cash-acceleration
+  target: escala-cash-acceleration
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-cash-ccc
+  target: escala-cash-ccc
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-cash-power1
+  target: escala-cash-power1
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-close
+  target: escala-close
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-close-capture
+  target: escala-close-capture
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-close-log
+  target: escala-close-log
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-close-sync
+  target: escala-close-sync
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-context-add
+  target: escala-context-add
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-context-query
+  target: escala-context-query
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-dashboard
+  target: escala-dashboard
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-diagnose
+  target: escala-diagnose
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-execution
+  target: escala-execution
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-execution-priorities
+  target: escala-execution-priorities
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-execution-rhythms
+  target: escala-execution-rhythms
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-execution-rockefeller
+  target: escala-execution-habits
+  sunset: '2027-01-01'
+  notice: El checklist Rockefeller anterior se consolidó en Hábitos de Ejecución de
+    ESCALA; conservamos tus resultados y seguimos desde ahí.
+- alias: scaleup-export
+  target: escala-export
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-goal
+  target: escala-goal
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-level
+  target: escala-level
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-people
+  target: escala-people
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-people-fac
+  target: escala-people-fac
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-people-topgrading
+  target: escala-people-topgrading
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-people-values
+  target: escala-people-values
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-progress
+  target: escala-progress
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-pulse
+  target: escala-pulse
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-start
+  target: escala-start
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-start-load-profile
+  target: escala-start-load-profile
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-start-load-sessions
+  target: escala-start-load-sessions
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-start-load-tasks
+  target: escala-start-load-tasks
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-start-present
+  target: escala-start-present
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-strategy
+  target: escala-strategy
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-strategy-7strata
+  target: escala-strategy-7strata
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-strategy-opsp
+  target: escala-strategy-opsp
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-strategy-swot
+  target: escala-strategy-swot
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-task-add
+  target: escala-task-add
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-task-list
+  target: escala-task-list
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-task-update
+  target: escala-task-update
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-welcome
+  target: escala-welcome
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
+- alias: scaleup-worksheet
+  target: escala-worksheet
+  sunset: '2027-01-01'
+  notice: Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.

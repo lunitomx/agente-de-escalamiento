@@ -1,40 +1,15 @@
 ---
 name: scaleup-context-query
-description: 'Query company facts by category from the knowledge graph.'
+description: Alias temporal de compatibilidad. Redirige al contrato canónico escala-context-query.
 ---
 
-# Query Company Context
+# Alias legado: scaleup-context-query
 
-## Purpose
+Este alias no contiene lógica ni metodología propia. Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
 
-Retrieve stored facts about the company by category.
-
-## Steps
-
-### Step 1: Determine Query
-
-Accept a category filter: org, metrics, competitive, custom, or "all".
-
-### Step 2: Read Files
-
-Read the appropriate YAML file(s) from `.scaleup/my-company/context/`.
-
-### Step 3: Present
-
-Display facts grouped by category:
-
-```
-Company Context:
-
-  Org ({count}):
-  - {fact} (added: {date})
-
-  Metrics ({count}):
-  - {fact} (added: {date})
-```
-
-If no facts exist, report: "No hay hechos registrados. Usa /scaleup-context-add para agregar."
-
-## Output
-
-Formatted list of company facts.
+1. Consulta `../../../escala-skills/catalog.yaml` y confirma que `scaleup-context-query` sigue
+   autorizado durante su ventana de migración.
+2. Continúa con el contrato canónico en
+   `../../../escala-skills/escala-context-query/SKILL.md`.
+3. No muestres el catálogo técnico al empresario; sigue la experiencia
+   conversacional definida por `escala`.

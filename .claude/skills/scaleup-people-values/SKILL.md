@@ -1,44 +1,15 @@
 ---
-description: 'Facilita ejercicio de descubrimiento de Core Values. Identifica los
-  valores no negociables que definen la cultura.'
 name: scaleup-people-values
+description: Alias temporal de compatibilidad. Redirige al contrato canónico escala-people-values.
 ---
 
-# ScaleUp People — Core Values Discovery
+# Alias legado: scaleup-people-values
 
-## Purpose
+Este alias no contiene lógica ni metodología propia. Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
 
-Facilitar el ejercicio de descubrimiento de Core Values de la empresa. No se inventan — se descubren observando qué ya valora la organización.
-
-## Steps
-
-### Step 1: Load Context
-
-Leer `.scaleup/knowledge/people/frameworks/core-values-discovery.md`.
-
-### Step 2: Discovery Exercise
-
-Guiar con preguntas de Patrick Lencioni / Jim Collins adaptadas por Harnish:
-
-1. "Piensa en tu mejor empleado de la historia. ¿Qué 3 valores representaba?"
-2. "¿Qué comportamientos premiarías incluso si el resultado no fue bueno?"
-3. "¿Qué comportamientos castigarías incluso si el resultado fue excelente?"
-4. "Si tuvieras que reducir tu equipo a 3 personas, ¿quiénes serían y por qué?"
-5. "¿Qué no sacrificarías aunque te costara dinero?"
-
-### Step 3: Consolidate
-
-De las respuestas, identificar 3-5 temas recurrentes. Nombrar cada valor con una frase memorable.
-
-### Step 4: Test & Save
-
-Test de cada valor: "¿Podría alguien razonablemente tener el valor opuesto?" Si no → es muy genérico, refinar.
-
-Guardar en `work/people/core-values.md`.
-
-## Output
-
-| Item | Destination |
-|------|-------------|
-| Core Values | `work/people/core-values.md` |
-| Next | `/scaleup-strategy` (los values alimentan al OPSP) |
+1. Consulta `../../../escala-skills/catalog.yaml` y confirma que `scaleup-people-values` sigue
+   autorizado durante su ventana de migración.
+2. Continúa con el contrato canónico en
+   `../../../escala-skills/escala-people-values/SKILL.md`.
+3. No muestres el catálogo técnico al empresario; sigue la experiencia
+   conversacional definida por `escala`.

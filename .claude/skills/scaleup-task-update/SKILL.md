@@ -1,38 +1,15 @@
 ---
 name: scaleup-task-update
-description: 'Move a task between states on the ScaleUp task board.'
+description: Alias temporal de compatibilidad. Redirige al contrato canónico escala-task-update.
 ---
 
-# Update Task
+# Alias legado: scaleup-task-update
 
-## Purpose
+Este alias no contiene lógica ni metodología propia. Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
 
-Move a task between board states: En Progreso → Completado, or Próximo → En Progreso.
-
-## Steps
-
-### Step 1: Identify Task
-
-Ask which task to update, or identify by description match.
-
-### Step 2: Determine New State
-
-| Current | Target | Action |
-|---------|--------|--------|
-| En Progreso | Completado | Move to `## Completado`, mark `[x]` |
-| Próximo | En Progreso | Move to `## En Progreso` |
-| En Progreso | Próximo | Move back to `## Próximo` (deprioritize) |
-
-### Step 3: Update Task Board
-
-Read `.scaleup/my-company/tasks.md`. Remove the task from its current section. Add it to the target section.
-
-If moving to Completado, change `- [ ]` to `- [x]` and append completion date: `<!-- completed:YYYY-MM-DD -->`.
-
-### Step 4: Confirm
-
-Report the move: "{task} moved from {old} to {new}"
-
-## Output
-
-Updated `.scaleup/my-company/tasks.md` with task in new state.
+1. Consulta `../../../escala-skills/catalog.yaml` y confirma que `scaleup-task-update` sigue
+   autorizado durante su ventana de migración.
+2. Continúa con el contrato canónico en
+   `../../../escala-skills/escala-task-update/SKILL.md`.
+3. No muestres el catálogo técnico al empresario; sigue la experiencia
+   conversacional definida por `escala`.

@@ -1,42 +1,15 @@
 ---
-description: 'Diseña estrategias de aceleración de cash: reducir CCC, mejorar modelo
-  de pricing, optimizar cobro.'
 name: scaleup-cash-acceleration
+description: Alias temporal de compatibilidad. Redirige al contrato canónico escala-cash-acceleration.
 ---
 
-# ScaleUp Cash — Cash Acceleration Strategies
+# Alias legado: scaleup-cash-acceleration
 
-## Purpose
+Este alias no contiene lógica ni metodología propia. Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
 
-Diseñar estrategias concretas para acelerar el flujo de efectivo basándose en el CCC y Power of One analysis.
-
-## Steps
-
-### Step 1: Load Previous Work
-
-Leer `work/cash/ccc-analysis.md` y `work/cash/power-of-one.md`.
-Si no existen → sugerir hacer CCC y Power of One primero.
-
-### Step 2: Explore Strategies
-
-Categorías de estrategias del libro:
-1. **Cycle time** — Reducir tiempo en cada etapa del CCC
-2. **Pricing model** — Cobrar antes (subscriptions, deposits, prepago)
-3. **Collection** — Acelerar cobro (incentivos, automatización)
-4. **Payment terms** — Negociar mejores términos con proveedores
-5. **Inventory/WIP** — Reducir inventario o trabajo en proceso
-
-### Step 3: Select & Design
-
-Seleccionar 3-5 estrategias con mayor impacto para esta empresa específica.
-
-### Step 4: Implementation Plan & Save
-
-Crear plan con timeline y responsable. Guardar en `work/cash/acceleration-strategies.md`.
-
-## Output
-
-| Item | Destination |
-|------|-------------|
-| Acceleration strategies | `work/cash/acceleration-strategies.md` |
-| Next | `/scaleup-progress` |
+1. Consulta `../../../escala-skills/catalog.yaml` y confirma que `scaleup-cash-acceleration` sigue
+   autorizado durante su ventana de migración.
+2. Continúa con el contrato canónico en
+   `../../../escala-skills/escala-cash-acceleration/SKILL.md`.
+3. No muestres el catálogo técnico al empresario; sigue la experiencia
+   conversacional definida por `escala`.

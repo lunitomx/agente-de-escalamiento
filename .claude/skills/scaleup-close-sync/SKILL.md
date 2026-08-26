@@ -1,46 +1,15 @@
 ---
 name: scaleup-close-sync
-description: 'Sync YAML to markdown views on session close. Sub-skill of /scaleup-close.'
+description: Alias temporal de compatibilidad. Redirige al contrato canónico escala-close-sync.
 ---
 
-# Sync State to Markdown Views
+# Alias legado: scaleup-close-sync
 
-## Purpose
+Este alias no contiene lógica ni metodología propia. Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
 
-Generate human-readable markdown files from YAML source of truth. Sub-skill of `/scaleup-close`.
-
-## Steps
-
-### Step 1: Render Company Profile
-
-Run the Python renderer:
-
-```bash
-python3 -c "
-import sys, pathlib
-sys.path.insert(0, str(pathlib.Path('.scaleup/agent')))
-from validators.memory import render_profile_markdown
-md = render_profile_markdown(pathlib.Path('.scaleup/agent/memory/company-profile.yaml'))
-pathlib.Path('.scaleup/my-company/profile.md').write_text(md)
-print('Profile rendered')
-"
-```
-
-This overwrites `.scaleup/my-company/profile.md` with a clean render from the YAML.
-
-### Step 2: Verify Files
-
-Confirm that the following files exist and are non-empty:
-- `.scaleup/my-company/profile.md` — rendered from YAML
-- `.scaleup/my-company/sessions/` — contains at least today's session log
-
-### Step 3: Report
-
-Report which files were synced.
-
-## Output
-
-| Item | Destination |
-|------|-------------|
-| Company profile markdown | `.scaleup/my-company/profile.md` |
-| Verification | Files exist and are non-empty |
+1. Consulta `../../../escala-skills/catalog.yaml` y confirma que `scaleup-close-sync` sigue
+   autorizado durante su ventana de migración.
+2. Continúa con el contrato canónico en
+   `../../../escala-skills/escala-close-sync/SKILL.md`.
+3. No muestres el catálogo técnico al empresario; sigue la experiencia
+   conversacional definida por `escala`.

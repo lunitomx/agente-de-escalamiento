@@ -16,6 +16,18 @@ Caminar por los 7 Estratos de Estrategia de Escalamiento de Negocios para constr
 
 Leer `conocimiento/strategy/tools/7-strata.yaml`.
 
+### Gate de evidencia de clientes
+
+Antes de definir Words you own, Brand Promise, One-Phrase Strategy o
+Diferenciación:
+
+- Revisar evidencia de clientes con identificadores, fuente, fecha, confianza y
+  contradicciones.
+- Words you own, Brand Promise y One-Phrase Strategy requieren identificadores
+  de evidencia citados.
+- Si falta evidencia o hay contradicciones, hacer una sola pregunta y no
+  inventar una afirmación de diferenciación.
+
 ### Step 2: Walk Through Each Stratum
 
 1. **Words you own** — ¿Qué palabra/frase posees en la mente de tu mercado?

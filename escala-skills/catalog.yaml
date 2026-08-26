@@ -1,0 +1,374 @@
+schema_version: 1
+baseline:
+  canonical_procedures: 62
+  legacy_aliases: 39
+public_entrypoint: escala
+capabilities:
+- id: escala
+  visibility: public
+  owner: orchestration
+  disposition: keep
+  reason: Única puerta conversacional para el empresario.
+- id: escala-board
+  visibility: internal
+  owner: board
+  disposition: keep
+  reason: Opinión ejecutiva con contrato propio.
+- id: escala-board-acta
+  visibility: internal
+  owner: board
+  disposition: internalize
+  reason: Ayudante de acta invocado por board.
+- id: escala-bugreport
+  visibility: internal
+  owner: product
+  disposition: keep
+  reason: Salida local y consentida de feedback.
+- id: escala-cash
+  visibility: internal
+  owner: cash
+  disposition: keep
+  reason: Entrada estable de Cash.
+- id: escala-cash-acceleration
+  visibility: internal
+  owner: cash
+  disposition: keep
+  reason: Proceso de decisiones de caja.
+- id: escala-cash-ccc
+  visibility: internal
+  owner: cash
+  disposition: keep
+  reason: Cálculo con contrato financiero.
+- id: escala-cash-finanzas
+  visibility: internal
+  owner: cash
+  disposition: keep
+  reason: Lectura financiera especializada.
+- id: escala-cash-power1
+  visibility: internal
+  owner: cash
+  disposition: keep
+  reason: Método Power of One verificable.
+- id: escala-close
+  visibility: internal
+  owner: session
+  disposition: keep
+  reason: Cierre con persistencia y validación.
+- id: escala-close-capture
+  visibility: internal
+  owner: session
+  disposition: internalize
+  reason: Paso de cierre del orquestador.
+- id: escala-close-log
+  visibility: internal
+  owner: session
+  disposition: internalize
+  reason: Paso de cierre del orquestador.
+- id: escala-close-sync
+  visibility: internal
+  owner: session
+  disposition: internalize
+  reason: Paso de cierre del orquestador.
+- id: escala-context-add
+  visibility: internal
+  owner: memory
+  disposition: internalize
+  reason: Operación de memoria, no decisión empresarial.
+- id: escala-context-query
+  visibility: internal
+  owner: memory
+  disposition: internalize
+  reason: Operación de memoria, no decisión empresarial.
+- id: escala-dashboard
+  visibility: internal
+  owner: presentation
+  disposition: keep
+  reason: Entrega visual bajo demanda.
+- id: escala-decision
+  visibility: internal
+  owner: coaching
+  disposition: internalize
+  reason: Selector de siguiente paso.
+- id: escala-diagnose
+  visibility: internal
+  owner: coaching
+  disposition: keep
+  reason: Diagnóstico con evidencia y límites.
+- id: escala-discover
+  visibility: internal
+  owner: workspace
+  disposition: keep
+  reason: Descubre fuentes locales permitidas.
+- id: escala-evidence
+  visibility: internal
+  owner: evidence
+  disposition: keep
+  reason: Protege procedencia y confianza.
+- id: escala-execution
+  visibility: internal
+  owner: execution
+  disposition: keep
+  reason: Entrada estable de Ejecución.
+- id: escala-execution-habits
+  visibility: internal
+  owner: execution
+  disposition: keep
+  reason: Reemplazo canónico de la evaluación histórica de hábitos.
+- id: escala-execution-pipeline
+  visibility: internal
+  owner: execution
+  disposition: internalize
+  reason: Detalle de pipeline interno.
+- id: escala-execution-pizarron
+  visibility: internal
+  owner: execution
+  disposition: keep
+  reason: Tablero de ejecución con salida propia.
+- id: escala-execution-prioridad
+  visibility: internal
+  owner: execution
+  disposition: merge
+  reason: Variante de prioridades a consolidar con escala-execution-priorities.
+- id: escala-execution-priorities
+  visibility: internal
+  owner: execution
+  disposition: keep
+  reason: Contrato de prioridades trimestrales.
+- id: escala-execution-rhythms
+  visibility: internal
+  owner: execution
+  disposition: keep
+  reason: Contrato de ritmos de reunión.
+- id: escala-export
+  visibility: internal
+  owner: presentation
+  disposition: keep
+  reason: Exportación explícita del usuario.
+- id: escala-goal
+  visibility: internal
+  owner: coaching
+  disposition: keep
+  reason: Objetivos con estado y evidencia.
+- id: escala-health
+  visibility: internal
+  owner: lifecycle
+  disposition: keep
+  reason: Diagnóstico de instalación local.
+- id: escala-level
+  visibility: internal
+  owner: coaching
+  disposition: keep
+  reason: Modelo de madurez reutilizable.
+- id: escala-memory
+  visibility: internal
+  owner: memory
+  disposition: keep
+  reason: Memoria bajo consentimiento.
+- id: escala-memory-alerts
+  visibility: internal
+  owner: memory
+  disposition: internalize
+  reason: Avisos derivados de memoria.
+- id: escala-people
+  visibility: internal
+  owner: people
+  disposition: keep
+  reason: Entrada estable de People.
+- id: escala-people-fac
+  visibility: internal
+  owner: people
+  disposition: keep
+  reason: FAC con entregable reconocido.
+- id: escala-people-organigrama
+  visibility: internal
+  owner: people
+  disposition: keep
+  reason: Organigrama con salida propia.
+- id: escala-people-topgrading
+  visibility: internal
+  owner: people
+  disposition: keep
+  reason: Proceso de talento especializado.
+- id: escala-people-values
+  visibility: internal
+  owner: people
+  disposition: keep
+  reason: Valores desde evidencia observada.
+- id: escala-progress
+  visibility: internal
+  owner: coaching
+  disposition: keep
+  reason: Seguimiento de avance.
+- id: escala-pulse
+  visibility: internal
+  owner: coaching
+  disposition: keep
+  reason: Pulso semanal con estado.
+- id: escala-qualifier
+  visibility: internal
+  owner: product
+  disposition: internalize
+  reason: Calificación de producto, no interfaz empresarial.
+- id: escala-responder
+  visibility: internal
+  owner: coaching
+  disposition: internalize
+  reason: Adaptador conversacional interno.
+- id: escala-reviewer
+  visibility: internal
+  owner: product
+  disposition: internalize
+  reason: Control de calidad interno.
+- id: escala-rhythm-quarterly
+  visibility: internal
+  owner: execution
+  disposition: keep
+  reason: Ritmo trimestral con contrato.
+- id: escala-rhythm-setup
+  visibility: internal
+  owner: execution
+  disposition: internalize
+  reason: Configuración del ritmo interno.
+- id: escala-rhythm-weekly
+  visibility: internal
+  owner: execution
+  disposition: keep
+  reason: Ritmo semanal con contrato.
+- id: escala-selector
+  visibility: internal
+  owner: coaching
+  disposition: internalize
+  reason: Selector interno del orquestador.
+- id: escala-start
+  visibility: internal
+  owner: coaching
+  disposition: merge
+  reason: Su recorrido se absorbe por escala y welcome.
+- id: escala-start-load-profile
+  visibility: internal
+  owner: session
+  disposition: internalize
+  reason: Paso de carga interno.
+- id: escala-start-load-sessions
+  visibility: internal
+  owner: session
+  disposition: internalize
+  reason: Paso de carga interno.
+- id: escala-start-load-tasks
+  visibility: internal
+  owner: session
+  disposition: internalize
+  reason: Paso de carga interno.
+- id: escala-start-present
+  visibility: internal
+  owner: session
+  disposition: internalize
+  reason: Paso de presentación interno.
+- id: escala-strategy
+  visibility: internal
+  owner: strategy
+  disposition: keep
+  reason: Entrada estable de Strategy.
+- id: escala-strategy-7strata
+  visibility: internal
+  owner: strategy
+  disposition: keep
+  reason: Método estratégico especializado.
+- id: escala-strategy-opsp
+  visibility: internal
+  owner: strategy
+  disposition: keep
+  reason: OPSP con contrato reconocible.
+- id: escala-strategy-swot
+  visibility: internal
+  owner: strategy
+  disposition: merge
+  reason: Se consolida con SWT para evitar duplicidad de nomenclatura.
+- id: escala-strategy-swt
+  visibility: internal
+  owner: strategy
+  disposition: keep
+  reason: SWT canónico.
+- id: escala-task-add
+  visibility: internal
+  owner: execution
+  disposition: internalize
+  reason: Operación de tareas interna.
+- id: escala-task-list
+  visibility: internal
+  owner: execution
+  disposition: internalize
+  reason: Operación de tareas interna.
+- id: escala-task-update
+  visibility: internal
+  owner: execution
+  disposition: internalize
+  reason: Operación de tareas interna.
+- id: escala-update
+  visibility: internal
+  owner: lifecycle
+  disposition: keep
+  reason: Actualización local explícita.
+- id: escala-welcome
+  visibility: internal
+  owner: coaching
+  disposition: keep
+  reason: Onboarding conversacional y continuidad.
+- id: escala-worksheet
+  visibility: internal
+  owner: workspace
+  disposition: keep
+  reason: Plantillas de trabajo con contrato.
+routes:
+- id: cash
+  keywords:
+  - cash
+  - efectivo
+  - dinero
+  - cobrar
+  - flujo de caja
+  - ventas
+  target: escala-cash
+  message: Empecemos por entender tus números disponibles y qué parte del efectivo te preocupa.
+- id: people
+  keywords:
+  - equipo
+  - personas
+  - delegar
+  - contratar
+  - talento
+  target: escala-people
+  message: Empecemos por las personas y responsabilidades que más están frenando a tu empresa.
+- id: strategy
+  keywords:
+  - estrategia
+  - opsp
+  - cliente
+  - competencia
+  - rumbo
+  target: escala-strategy
+  message: Empecemos por aclarar tu rumbo y la evidencia que ya tienes sobre tu mercado.
+- id: execution
+  keywords:
+  - ejecucion
+  - operacion
+  - prioridad
+  - meta
+  - reuniones
+  - incendios
+  target: escala-execution
+  message: Empecemos por la prioridad y el ritmo operativo que más impacto puede tener esta semana.
+- id: diagnose
+  keywords:
+  - diagnostico
+  - como vamos
+  - salud de mi empresa
+  target: escala-diagnose
+  message: Haré un diagnóstico con lo que ya sabemos y te diré claramente qué falta para hacerlo más preciso.
+- id: resume
+  keywords:
+  - continuar
+  - retomar
+  - donde nos quedamos
+  target: escala-welcome
+  message: Primero revisemos el último contexto que autorizaste guardar y confirmemos si sigue vigente.

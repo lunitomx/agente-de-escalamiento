@@ -32,6 +32,15 @@ ls work/people/ 2>/dev/null
 
 Verificar que People tiene base mínima (score >= 2). Si no, sugerir volver a People primero.
 
+### Gate de evidencia de clientes
+
+Antes de definir cliente central, promesa de marca, posicionamiento o plan:
+
+- Revisar evidencia de clientes con fuente, fecha, confianza y contradicciones.
+- Citar los identificadores de evidencia que sostienen cada recomendación.
+- Si falta evidencia, hacer una sola pregunta de evidencia faltante por turno.
+- No inventar diferenciación, promesa o posicionamiento cuando haya huecos.
+
 ### Step 3: Recommend Next Tool
 
 | Estado | Recomendación |

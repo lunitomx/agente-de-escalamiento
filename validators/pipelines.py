@@ -5,6 +5,12 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from escala_server.capabilities import (
+    CatalogError,
+    load_capability_catalog,
+    load_legacy_aliases,
+)
+
 try:
     import yaml
 except ImportError as exc:  # pragma: no cover - project dependency
@@ -209,5 +215,23 @@ def _validate_skill_exists(
         return
 
     skill_path = skills_root / skill_name / "SKILL.md"
-    if not skill_path.exists():
-        errors.append(f"{owner}: skill not found: {skill_path}")
+    if skill_path.exists():
+        return
+    try:
+        catalog = load_capability_catalog()
+        alias = next(
+            (item for item in load_legacy_aliases(catalog) if item.alias == skill_name),
+            None,
+        )
+    except CatalogError:
+        alias = None
+    if alias is not None:
+        canonical_path = (
+            Path(__file__).resolve().parents[1]
+            / "escala-skills"
+            / alias.target
+            / "SKILL.md"
+        )
+        if canonical_path.exists():
+            return
+    errors.append(f"{owner}: skill not found: {skill_path}")

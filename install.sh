@@ -9,6 +9,15 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_NAME="agente-de-escalamiento"
 VERSION="1.0.0"
 
+# E56: por defecto se instala una sola puerta conversacional.
+SKILLS_ONLY=false
+if [[ "${1:-}" == "--skills-only" ]]; then
+    SKILLS_ONLY=true
+elif [[ $# -gt 0 ]]; then
+    echo "Uso: ./install.sh [--skills-only]" >&2
+    exit 2
+fi
+
 # Colores
 VERDE='\033[0;32m'
 AMARILLO='\033[1;33m'
@@ -70,14 +79,14 @@ instalar_en() {
         fi
     done
 
-    # Crear symlinks en lugar de copiar
-    local count=0
-    for skill_dir in "$SCRIPT_DIR/escala-skills"/escala-*/; do
-        local skill_name
-        skill_name=$(basename "$skill_dir")
-        ln -sfn "$skill_dir" "$destino/$skill_name"
-        count=$((count + 1))
-    done
+    # E56: una puerta pública; las capacidades se cargan desde su catálogo.
+    local skill_dir="$SCRIPT_DIR/escala-skills/escala"
+    if [[ ! -f "$skill_dir/SKILL.md" ]]; then
+        echo "Skill público ESCALA no encontrado: $skill_dir" >&2
+        return 1
+    fi
+    ln -sfn "$skill_dir" "$destino/escala"
+    local count=1
 
     echo -e "    ${VERDE}✓${NC} $count skills instalados (symlinks) en ${destino}"
 }
@@ -96,6 +105,11 @@ for p in "${PLATAFORMAS[@]}"; do
 done
 
 # ----------------------
+if [[ "$SKILLS_ONLY" == true ]]; then
+    echo "  Instalación de skill completada: habla con ESCALA en lenguaje natural."
+    exit 0
+fi
+
 # Configurar RaiSE MCP para Codex (sin tocar el estado global del usuario)
 # ----------------------
 if [[ " ${PLATAFORMAS[*]} " == *" codex "* ]]; then
@@ -163,19 +177,17 @@ echo -e "${VERDE}║   Instalación completada exitosamente        ║${NC}"
 echo -e "${VERDE}╚══════════════════════════════════════════════╝${NC}"
 echo ""
 echo "  Plataformas configuradas: ${PLATAFORMAS[*]}"
-echo "  Skills instalados: $(ls -d "$SCRIPT_DIR/escala-skills"/escala-* 2>/dev/null | wc -l)"
+echo "  Skill público instalado: escala (las capacidades internas se cargan bajo demanda)"
 echo "  Paquete Python: escala-coaching v$VERSION"
 echo ""
-echo "  Próximo paso: Abre tu terminal de IA y ejecuta /escala-welcome"
-echo "  para crear o actualizar tu perfil de empresa."
+echo "  Próximo paso: Abre tu agente de IA y cuéntale a ESCALA qué te preocupa hoy."
+echo "  No necesitas aprender comandos: ESCALA elegirá el siguiente paso contigo."
 echo "  Si ya tienes datos previos, se conservarán (scores, foco e historial)."
 echo ""
 echo "  Para actualizar más tarde:"
-echo "    ./update.sh          (terminal)"
-echo "    /escala-update       (desde tu terminal de IA)"
+echo "    ./update.sh            (terminal)"
 echo ""
-echo "  Para verificar instalación:"
-echo "    /escala-health       (desde tu terminal de IA)"
+echo "  Para verificar instalación: revisa que tu agente detecte ESCALA y háblale en lenguaje natural."
 echo ""
 echo "  Para desinstalar:"
 echo "    ./uninstall.sh       (terminal)"

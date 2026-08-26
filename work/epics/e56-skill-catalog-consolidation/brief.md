@@ -1,6 +1,6 @@
 ---
 epic_id: "E56"
-status: "planned"
+status: "completed"
 title: "Un solo orquestador y catálogo canónico de capacidades"
 depends_on:
   - "E42 — catálogo funcional calificado"

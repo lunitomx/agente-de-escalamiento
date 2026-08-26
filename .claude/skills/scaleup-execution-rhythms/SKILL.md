@@ -1,46 +1,15 @@
 ---
-description: 'Diseña la cadencia de reuniones: daily huddle, weekly, monthly, quarterly
-  y annual planning.'
 name: scaleup-execution-rhythms
+description: Alias temporal de compatibilidad. Redirige al contrato canónico escala-execution-rhythms.
 ---
 
-# ScaleUp Execution — Meeting Rhythms
+# Alias legado: scaleup-execution-rhythms
 
-## Purpose
+Este alias no contiene lógica ni metodología propia. Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
 
-Diseñar la cadencia completa de reuniones de la empresa siguiendo el modelo Scaling Up.
-
-## Steps
-
-### Step 1: Load Context
-
-Leer `.scaleup/knowledge/execution/tools/meeting-rhythms.md`.
-Cargar template `templates/meeting-rhythm-planner.md`.
-
-### Step 2: Current State
-
-Preguntar qué reuniones tienen actualmente y cómo funcionan.
-
-### Step 3: Design Each Rhythm
-
-Guiar el diseño de cada nivel:
-1. Daily Huddle (15 min)
-2. Weekly Meeting (60-90 min)
-3. Monthly Review (2-4 hrs)
-4. Quarterly Planning (1-2 días)
-5. Annual Planning (2-3 días)
-
-### Step 4: Implementation Plan
-
-Priorizar: empezar con Daily Huddle (mayor impacto inmediato), luego Weekly.
-
-### Step 5: Save
-
-Guardar en `work/execution/meeting-rhythms.md`.
-
-## Output
-
-| Item | Destination |
-|------|-------------|
-| Meeting Rhythm plan | `work/execution/meeting-rhythms.md` |
-| Next | `/scaleup-execution-priorities` |
+1. Consulta `../../../escala-skills/catalog.yaml` y confirma que `scaleup-execution-rhythms` sigue
+   autorizado durante su ventana de migración.
+2. Continúa con el contrato canónico en
+   `../../../escala-skills/escala-execution-rhythms/SKILL.md`.
+3. No muestres el catálogo técnico al empresario; sigue la experiencia
+   conversacional definida por `escala`.

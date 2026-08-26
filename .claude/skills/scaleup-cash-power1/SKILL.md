@@ -1,40 +1,15 @@
 ---
-description: 'Análisis Power of One: impacto de mejorar 1% cada palanca de cash flow.'
 name: scaleup-cash-power1
+description: Alias temporal de compatibilidad. Redirige al contrato canónico escala-cash-power1.
 ---
 
-# ScaleUp Cash — Power of One
+# Alias legado: scaleup-cash-power1
 
-## Purpose
+Este alias no contiene lógica ni metodología propia. Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
 
-Calcular el impacto en cash flow de mejorar 1% (o 1 día) cada una de las 7 palancas. Identificar las de mayor impacto.
-
-## Steps
-
-### Step 1: Load Context
-
-Leer `.scaleup/knowledge/cash/tools/power-of-one.md`.
-Cargar template `templates/power-of-one.md`.
-
-### Step 2: Gather Current Numbers
-
-Pedir datos actuales: precio promedio, volumen, COGS, OpEx, días de cobro, inventario, días de pago.
-
-### Step 3: Calculate Impact
-
-Para cada palanca, calcular impacto anual en cash de mejorar 1%/1 día.
-
-### Step 4: Prioritize
-
-Ordenar por impacto vs dificultad. Seleccionar top 3 palancas a accionar.
-
-### Step 5: Action Plan & Save
-
-Crear plan de acción para las 3 palancas prioritarias. Guardar en `work/cash/power-of-one.md`.
-
-## Output
-
-| Item | Destination |
-|------|-------------|
-| Power of One analysis | `work/cash/power-of-one.md` |
-| Next | `/scaleup-cash-acceleration` |
+1. Consulta `../../../escala-skills/catalog.yaml` y confirma que `scaleup-cash-power1` sigue
+   autorizado durante su ventana de migración.
+2. Continúa con el contrato canónico en
+   `../../../escala-skills/escala-cash-power1/SKILL.md`.
+3. No muestres el catálogo técnico al empresario; sigue la experiencia
+   conversacional definida por `escala`.

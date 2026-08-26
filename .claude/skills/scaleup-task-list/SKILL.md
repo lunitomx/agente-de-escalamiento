@@ -1,47 +1,15 @@
 ---
 name: scaleup-task-list
-description: 'Display the current ScaleUp task board with counts and metadata.'
+description: Alias temporal de compatibilidad. Redirige al contrato canónico escala-task-list.
 ---
 
-# List Tasks
+# Alias legado: scaleup-task-list
 
-## Purpose
+Este alias no contiene lógica ni metodología propia. Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
 
-Show the current state of the task board with counts per section and metadata.
-
-## Steps
-
-### Step 1: Read Board
-
-Read `.scaleup/my-company/tasks.md`.
-
-### Step 2: Parse and Count
-
-For each section (En Progreso, Próximo, Completado):
-- Count tasks
-- Extract metadata from HTML comments (decision, node, due date)
-- Flag overdue tasks (due date < today)
-
-### Step 3: Present
-
-```
-═══════════════════════════════════════
-  Task Board
-═══════════════════════════════════════
-
-  En Progreso ({count}):
-  - {task} [decision] {due date or ""}
-  - {task} [decision] ⚠️ OVERDUE
-
-  Próximo ({count}):
-  - {task} [decision]
-
-  Completado ({count}):
-  - {task} ✓
-
-═══════════════════════════════════════
-```
-
-## Output
-
-Formatted task board displayed to user.
+1. Consulta `../../../escala-skills/catalog.yaml` y confirma que `scaleup-task-list` sigue
+   autorizado durante su ventana de migración.
+2. Continúa con el contrato canónico en
+   `../../../escala-skills/escala-task-list/SKILL.md`.
+3. No muestres el catálogo técnico al empresario; sigue la experiencia
+   conversacional definida por `escala`.

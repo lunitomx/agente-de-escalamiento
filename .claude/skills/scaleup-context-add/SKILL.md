@@ -1,43 +1,15 @@
 ---
 name: scaleup-context-add
-description: 'Add a structured fact to the company knowledge graph.'
+description: Alias temporal de compatibilidad. Redirige al contrato canónico escala-context-add.
 ---
 
-# Add Company Context
+# Alias legado: scaleup-context-add
 
-## Purpose
+Este alias no contiene lógica ni metodología propia. Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
 
-Store a structured fact about the company for use in personalized coaching.
-
-## Steps
-
-### Step 1: Determine Category
-
-| Category | File | When |
-|----------|------|------|
-| org | `context/org.yaml` | Team structure, roles, reporting |
-| metrics | `context/metrics.yaml` | Revenue, margins, KPIs |
-| competitive | `context/competitive.yaml` | Competitors, market position |
-| custom | `context/custom.yaml` | Anything else |
-
-### Step 2: Collect Fact
-
-Ask or infer: "What fact should I remember about your company?"
-
-### Step 3: Append to File
-
-Read the appropriate YAML file in `.scaleup/my-company/context/`. Append to the `facts` list:
-
-```yaml
-- description: "{the fact}"
-  added: "{today's date}"
-  source: "session"
-```
-
-### Step 4: Confirm
-
-Report: "Registrado: {fact} (categoría: {category})"
-
-## Output
-
-Updated context file in `.scaleup/my-company/context/`.
+1. Consulta `../../../escala-skills/catalog.yaml` y confirma que `scaleup-context-add` sigue
+   autorizado durante su ventana de migración.
+2. Continúa con el contrato canónico en
+   `../../../escala-skills/escala-context-add/SKILL.md`.
+3. No muestres el catálogo técnico al empresario; sigue la experiencia
+   conversacional definida por `escala`.

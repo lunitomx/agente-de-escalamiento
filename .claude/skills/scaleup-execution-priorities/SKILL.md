@@ -1,42 +1,15 @@
 ---
-description: 'Define prioridades trimestrales, Critical Number y Theme del trimestre.'
 name: scaleup-execution-priorities
+description: Alias temporal de compatibilidad. Redirige al contrato canónico escala-execution-priorities.
 ---
 
-# ScaleUp Execution — Quarterly Priorities
+# Alias legado: scaleup-execution-priorities
 
-## Purpose
+Este alias no contiene lógica ni metodología propia. Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
 
-Definir las prioridades del trimestre actual: Critical Number (#1), Top 5 prioridades de empresa, y Theme motivacional.
-
-## Steps
-
-### Step 1: Load Context
-
-Leer company profile y `work/strategy/opsp.md` si existe (para alinear con estrategia).
-
-### Step 2: Critical Number
-
-"¿Cuál es LA métrica más importante para este trimestre?" Solo UNA.
-
-### Step 3: Top 5 Priorities
-
-Definir 5 prioridades de empresa con Owner, KPI y deadline.
-
-### Step 4: Theme
-
-Crear un tema motivacional: nombre creativo, scoreboard visible, celebración al lograr la meta.
-
-### Step 5: Individual Priorities
-
-Cada líder define sus Top 5 individuales alineadas a las de la empresa.
-
-### Step 6: Save
-
-Guardar en `work/execution/q{N}-priorities.md`.
-
-## Output
-
-| Item | Destination |
-|------|-------------|
-| Quarterly priorities | `work/execution/q{N}-priorities.md` |
+1. Consulta `../../../escala-skills/catalog.yaml` y confirma que `scaleup-execution-priorities` sigue
+   autorizado durante su ventana de migración.
+2. Continúa con el contrato canónico en
+   `../../../escala-skills/escala-execution-priorities/SKILL.md`.
+3. No muestres el catálogo técnico al empresario; sigue la experiencia
+   conversacional definida por `escala`.

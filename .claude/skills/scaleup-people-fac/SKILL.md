@@ -1,44 +1,15 @@
 ---
-description: 'Guía para crear el Function Accountability Chart (FACChart). Clarifica
-  estructura organizacional, roles y accountability.'
 name: scaleup-people-fac
+description: Alias temporal de compatibilidad. Redirige al contrato canónico escala-people-fac.
 ---
 
-# ScaleUp People — Function Accountability Chart
+# Alias legado: scaleup-people-fac
 
-## Purpose
+Este alias no contiene lógica ni metodología propia. Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
 
-Guiar al usuario para crear su FACChart: identificar todas las funciones del negocio, asignar UN accountable por función, y definir KPIs.
-
-## Steps
-
-### Step 1: Load Context
-
-Leer `.scaleup/agent/memory/company-profile.yaml` y `.scaleup/knowledge/people/tools/function-accountability-chart.md`.
-Cargar template `templates/function-accountability-chart.md`.
-
-### Step 2: Identify Functions
-
-Preguntar: "¿Cuáles son las funciones principales de tu empresa?" Guiar con las funciones estándar como base y adaptar a su industria.
-
-### Step 3: Assign Accountability
-
-Para cada función, preguntar quién es accountable. Reglas:
-- Exactamente 1 persona por función
-- Máximo 2-3 funciones por persona
-- El CEO no puede ser accountable de todo
-
-### Step 4: Define KPIs
-
-Para cada función, definir 1-2 KPIs medibles semanalmente.
-
-### Step 5: Validate & Save
-
-Correr checklist de validación. Guardar en `work/people/fac-chart.md`.
-
-## Output
-
-| Item | Destination |
-|------|-------------|
-| FACChart | `work/people/fac-chart.md` |
-| Next | `/scaleup-people-values` o `/scaleup-people` |
+1. Consulta `../../../escala-skills/catalog.yaml` y confirma que `scaleup-people-fac` sigue
+   autorizado durante su ventana de migración.
+2. Continúa con el contrato canónico en
+   `../../../escala-skills/escala-people-fac/SKILL.md`.
+3. No muestres el catálogo técnico al empresario; sigue la experiencia
+   conversacional definida por `escala`.

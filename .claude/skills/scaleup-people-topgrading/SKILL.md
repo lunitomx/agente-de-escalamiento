@@ -1,41 +1,15 @@
 ---
-description: 'Guía el proceso de Topgrading para contratar A-players. Diseña proceso
-  de entrevista riguroso.'
 name: scaleup-people-topgrading
+description: Alias temporal de compatibilidad. Redirige al contrato canónico escala-people-topgrading.
 ---
 
-# ScaleUp People — Topgrading
+# Alias legado: scaleup-people-topgrading
 
-## Purpose
+Este alias no contiene lógica ni metodología propia. Este acceso anterior ahora continúa en ESCALA sin cambiar tu trabajo.
 
-Guiar al usuario para implementar el proceso de Topgrading: contratar A-players de forma consistente mediante un proceso de entrevista riguroso y estructurado.
-
-## Steps
-
-### Step 1: Load Context
-
-Leer `.scaleup/knowledge/people/tools/topgrading.md` y company profile.
-
-### Step 2: Assess Current Hiring
-
-Preguntar sobre proceso actual de contratación. Evaluar gaps.
-
-### Step 3: Design Topgrading Process
-
-Guiar diseño de:
-1. Job Scorecard (no job description — resultados esperados)
-2. Screening interview (phone, 30 min)
-3. Topgrading interview (cronológica, 2-3 hrs)
-4. Reference check (TORC — Threat of Reference Check)
-5. 90-day onboarding plan
-
-### Step 4: Create Job Scorecard Template
-
-Crear scorecard para el próximo puesto a contratar. Guardar en `work/people/`.
-
-## Output
-
-| Item | Destination |
-|------|-------------|
-| Topgrading process | `work/people/topgrading-process.md` |
-| Job Scorecard | `work/people/job-scorecard-{role}.md` |
+1. Consulta `../../../escala-skills/catalog.yaml` y confirma que `scaleup-people-topgrading` sigue
+   autorizado durante su ventana de migración.
+2. Continúa con el contrato canónico en
+   `../../../escala-skills/escala-people-topgrading/SKILL.md`.
+3. No muestres el catálogo técnico al empresario; sigue la experiencia
+   conversacional definida por `escala`.

@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from copy import deepcopy
 import importlib.util
+from copy import deepcopy
 from pathlib import Path
 
 import yaml
-
 
 ROOT = Path(__file__).resolve().parents[1]
 REGISTRY = ROOT / ".raise/pipelines/scaleup.yaml"
@@ -59,19 +58,21 @@ def test_gate_without_name_is_reported(tmp_path: Path) -> None:
     assert any("missing non-empty name" in error for error in errors)
 
 
-def test_entrypoint_skills_reference_canonical_pipeline_ids() -> None:
+def test_legacy_pipeline_entrypoints_resolve_to_canonical_skills() -> None:
     expected = {
-        "scaleup-start": "scaleup-session-start",
-        "scaleup-close": "scaleup-session-close",
-        "scaleup-cash": "scaleup-cash-acceleration-system",
-        "scaleup-strategy": "scaleup-strategy-development",
-        "scaleup-people": "scaleup-people-development",
-        "scaleup-execution": "scaleup-execution-system",
+        "scaleup-start": "escala-start",
+        "scaleup-close": "escala-close",
+        "scaleup-cash": "escala-cash",
+        "scaleup-strategy": "escala-strategy",
+        "scaleup-people": "escala-people",
+        "scaleup-execution": "escala-execution",
     }
+    from escala_server.capabilities import load_capability_catalog, load_legacy_aliases
 
-    for skill, pipeline_id in expected.items():
-        text = (ROOT / ".claude/skills" / skill / "SKILL.md").read_text(
-            encoding="utf-8"
-        )
-        assert pipeline_id in text
-        assert ".raise/pipelines/scaleup.yaml" in text
+    aliases = {
+        item.alias: item.target
+        for item in load_legacy_aliases(load_capability_catalog())
+    }
+    for legacy, canonical in expected.items():
+        assert aliases[legacy] == canonical
+        assert (ROOT / "escala-skills" / canonical / "SKILL.md").is_file()

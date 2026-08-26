@@ -44,6 +44,17 @@ estado guardado, y nunca afirmar que hay un plan guardado si `resuming` es
 - Cada celda de ejecución debe nombrar Your Accountability.
 - Column 2 incluye Key Capabilities para el horizonte de 3-5 años.
 
+### Gate de evidencia de clientes
+
+Antes de completar Sandbox, Brand Promise o posicionamiento:
+
+- Revisar evidencia de clientes con su identificador, fuente, fecha, confianza
+  y contradicciones.
+- Sandbox/Core Customer y Brand Promise requieren identificadores de evidencia
+  citados.
+- Si faltan datos, hacer una sola pregunta de evidencia faltante; no inventar
+  promesas, segmentos ni posicionamiento.
+
 ### Step 3: Core Values (si no existen)
 
 Facilitar ejercicio de descubrimiento:

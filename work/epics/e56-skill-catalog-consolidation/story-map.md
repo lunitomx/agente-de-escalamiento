@@ -1,4 +1,5 @@
 # Mapa de historias E56
+**Estado:** completada localmente; publicación pendiente.
 
 ## Secuencia
 
