@@ -23,7 +23,18 @@ class MemoryResult:
 class ProjectMemoryRuntime:
     """Own the SQLite database belonging to one project, never a global home path."""
 
-    _required_tables = frozenset({"_meta", "companies", "memory_facts", "entities"})
+    _required_tables = frozenset(
+        {
+            "_meta",
+            "companies",
+            "worksheets",
+            "sessions",
+            "changes_log",
+            "memory_facts",
+            "entities",
+            "relationships",
+        }
+    )
 
     def __init__(self, project_root: str | Path) -> None:
         self.project_root = Path(project_root).expanduser().resolve()
@@ -34,7 +45,7 @@ class ProjectMemoryRuntime:
     def ensure_memory(self) -> MemoryResult:
         """Create or validate this project's database without raising to a coach."""
         try:
-            self._assert_contained(self.db_path, self.memory_root)
+            self._assert_memory_layout()
             connection = init_db(str(self.db_path))
             connection.close()
             return self.health()
@@ -57,6 +68,7 @@ class ProjectMemoryRuntime:
             )
         temporary = target.with_suffix(".tmp")
         try:
+            self._assert_contained(temporary, self.project_root)
             target.parent.mkdir(parents=True, exist_ok=True)
             with (
                 sqlite3.connect(self.db_path) as source,
@@ -74,7 +86,11 @@ class ProjectMemoryRuntime:
             temporary.unlink(missing_ok=True)
 
     def restore(self, backup_path: str | Path | None = None) -> MemoryResult:
-        """Atomically replace the live DB only after a healthy backup is available."""
+        """Restore after checkpointing WAL; active SQLite users cause a safe failure."""
+        try:
+            self._assert_memory_layout()
+        except (OSError, ValueError) as error:
+            return self._failure(error)
         source = self._backup_path(backup_path)
         if source is None or not source.is_file():
             return self._failure(ValueError("valid local backup not found"))
@@ -83,7 +99,10 @@ class ProjectMemoryRuntime:
             return candidate
         temporary = self.db_path.with_suffix(".restore.tmp")
         try:
+            self._assert_contained(temporary, self.project_root)
+            self._assert_wal_sidecars_contained()
             self.db_path.parent.mkdir(parents=True, exist_ok=True)
+            self._checkpoint_wal()
             with (
                 sqlite3.connect(source) as backup,
                 sqlite3.connect(temporary) as destination,
@@ -93,7 +112,8 @@ class ProjectMemoryRuntime:
             if not restored.ready:
                 return restored
             os.replace(temporary, self.db_path)
-            return self.health()
+            self._remove_wal_sidecars()
+            return MemoryResult(True, self.db_path)
         except (OSError, sqlite3.Error, ValueError) as error:
             return self._failure(error)
         finally:
@@ -101,7 +121,8 @@ class ProjectMemoryRuntime:
 
     def _health_path(self, path: Path) -> MemoryResult:
         try:
-            self._assert_contained(path, self.memory_root)
+            self._assert_memory_layout()
+            self._assert_contained(path, self.project_root)
             if not path.is_file():
                 return self._failure(ValueError("local database does not exist"))
             with sqlite3.connect(f"file:{path}?mode=rw", uri=True) as connection:
@@ -136,11 +157,48 @@ class ProjectMemoryRuntime:
             else Path(supplied)
         )
         try:
+            self._assert_memory_layout()
             path = path.resolve()
+            self._assert_contained(path, self.project_root)
             self._assert_contained(path, self.backups_root)
-        except ValueError:
+        except (OSError, ValueError):
             return None
         return path
+
+    def _assert_memory_layout(self) -> None:
+        """Reject symlinked memory paths that would escape this project."""
+        self._assert_contained(self.memory_root, self.project_root)
+        self._assert_contained(self.db_path, self.project_root)
+        self._assert_contained(self.backups_root, self.project_root)
+
+    def _checkpoint_wal(self) -> None:
+        """Flush WAL before replacement; a busy checkpoint means restore is unsafe."""
+        if not self.db_path.exists() or not any(
+            sidecar.exists() for sidecar in self._wal_sidecars()
+        ):
+            return
+        with self.db_path.open("rb") as database:
+            if database.read(16) != b"SQLite format 3\x00":
+                return
+        with sqlite3.connect(f"file:{self.db_path}?mode=rw", uri=True) as connection:
+            checkpoint = connection.execute("PRAGMA wal_checkpoint(TRUNCATE)").fetchone()
+        if checkpoint is None or checkpoint[0] != 0:
+            raise sqlite3.OperationalError("cannot checkpoint active local database")
+
+    def _wal_sidecars(self) -> tuple[Path, Path]:
+        return (
+            self.db_path.with_name(f"{self.db_path.name}-wal"),
+            self.db_path.with_name(f"{self.db_path.name}-shm"),
+        )
+
+    def _assert_wal_sidecars_contained(self) -> None:
+        for sidecar in self._wal_sidecars():
+            self._assert_contained(sidecar, self.project_root)
+
+    def _remove_wal_sidecars(self) -> None:
+        self._assert_wal_sidecars_contained()
+        for sidecar in self._wal_sidecars():
+            sidecar.unlink(missing_ok=True)
 
     @staticmethod
     def _assert_contained(path: Path, root: Path) -> None:
