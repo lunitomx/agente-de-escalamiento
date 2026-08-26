@@ -9,7 +9,7 @@ import sqlite3
 from functools import lru_cache
 from pathlib import Path
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 
 DDL_STATEMENTS = [
     # ── Meta / version tracking ──────────────────────────────────────
@@ -112,6 +112,16 @@ DDL_STATEMENTS = [
         UNIQUE(relative_path, content_sha256, import_schema)
     )
     """,
+    """
+    CREATE TABLE IF NOT EXISTS migration_applications (
+        id             INTEGER PRIMARY KEY AUTOINCREMENT,
+        relative_path  TEXT NOT NULL,
+        content_sha256 TEXT NOT NULL,
+        import_schema  INTEGER NOT NULL,
+        source_kind    TEXT NOT NULL,
+        applied_at     TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+    """,
 ]
 
 # ── Indexes (created separately after tables) ────────────────────────
@@ -128,6 +138,7 @@ INDEX_STATEMENTS = [
     "CREATE INDEX IF NOT EXISTS idx_relationships_target ON relationships(target_entity_id)",
     "CREATE INDEX IF NOT EXISTS idx_relationships_type ON relationships(relation_type)",
     "CREATE INDEX IF NOT EXISTS idx_migration_sources_path ON migration_sources(relative_path)",
+    "CREATE INDEX IF NOT EXISTS idx_migration_applications_path ON migration_applications(relative_path, import_schema, id)",
 ]
 
 

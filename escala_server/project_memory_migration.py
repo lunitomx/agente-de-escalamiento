@@ -57,12 +57,23 @@ class ProjectMemoryMigrator:
             try:
                 with sqlite3.connect(runtime.db_path) as connection:
                     connection.execute("BEGIN")
+                    self._ensure_application_ledger(connection)
                     if self._already_imported(connection, snapshot):
                         skipped[snapshot.relative_path] = "unchanged"
                         continue
                     self._apply(connection, snapshot)
                     connection.execute(
-                        "INSERT INTO migration_sources (relative_path, content_sha256, "
+                        "INSERT OR IGNORE INTO migration_sources (relative_path, content_sha256, "
+                        "import_schema, source_kind) VALUES (?, ?, ?, ?)",
+                        (
+                            snapshot.relative_path,
+                            snapshot.digest,
+                            IMPORT_SCHEMA,
+                            snapshot.source_kind,
+                        ),
+                    )
+                    connection.execute(
+                        "INSERT INTO migration_applications (relative_path, content_sha256, "
                         "import_schema, source_kind) VALUES (?, ?, ?, ?)",
                         (
                             snapshot.relative_path,
@@ -230,14 +241,26 @@ class ProjectMemoryMigrator:
         return path.relative_to(self.project_root).as_posix()
 
     @staticmethod
-    def _already_imported(connection: sqlite3.Connection, snapshot: _Snapshot) -> bool:
-        return (
-            connection.execute(
-                "SELECT 1 FROM migration_sources WHERE relative_path=? AND content_sha256=? AND import_schema=?",
-                (snapshot.relative_path, snapshot.digest, IMPORT_SCHEMA),
-            ).fetchone()
-            is not None
+    def _ensure_application_ledger(connection: sqlite3.Connection) -> None:
+        """Seed the application history when upgrading an existing database."""
+        connection.execute(
+            """INSERT INTO migration_applications (
+                relative_path, content_sha256, import_schema, source_kind
+            )
+            SELECT relative_path, content_sha256, import_schema, source_kind
+            FROM migration_sources
+            WHERE NOT EXISTS (SELECT 1 FROM migration_applications)"""
         )
+
+    @staticmethod
+    def _already_imported(connection: sqlite3.Connection, snapshot: _Snapshot) -> bool:
+        latest = connection.execute(
+            """SELECT content_sha256 FROM migration_applications
+            WHERE relative_path=? AND import_schema=?
+            ORDER BY id DESC LIMIT 1""",
+            (snapshot.relative_path, IMPORT_SCHEMA),
+        ).fetchone()
+        return latest is not None and latest[0] == snapshot.digest
 
     def _apply(self, connection: sqlite3.Connection, snapshot: _Snapshot) -> None:
         if snapshot.source_kind == "company-profile":
