@@ -80,6 +80,14 @@ def test_explicit_capture_requires_confirmation_and_keeps_ambiguous_pending(
     assert "próxima vez" in (confirmed.next_question or "").lower()
 
 
+def test_public_policy_keeps_legitimate_business_data() -> None:
+    from escala_server.project_memory_public_text import public_text
+
+    assert public_text("Los datos de ventas son semanales") == (
+        "Los datos de ventas son semanales"
+    )
+
+
 @pytest.mark.parametrize(
     "statement",
     (

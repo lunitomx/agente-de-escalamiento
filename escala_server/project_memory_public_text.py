@@ -9,7 +9,6 @@ _FORBIDDEN_TOKENS = frozenset(
     {
         "api",
         "apikey",
-        "base",
         "clave",
         "comando",
         "command",
@@ -17,7 +16,6 @@ _FORBIDDEN_TOKENS = frozenset(
         "credential",
         "credentials",
         "database",
-        "datos",
         "db",
         "habilidad",
         "id",
@@ -38,6 +36,7 @@ _FORBIDDEN_TOKENS = frozenset(
 _FORBIDDEN_COMPACTS = frozenset(
     {"apikey", "apisecret", "dbpassword", "databasepassword", "secretkey", "sessionid"}
 )
+_FORBIDDEN_PHRASES = frozenset({"base de datos"})
 _PATH = re.compile(r"(?:^|[\s\"'`=:(\[])(?:/|\\|[A-Za-z]:[\\/])")
 
 
@@ -65,6 +64,7 @@ def public_text(value: object) -> str | None:
         or len(text) > 240
         or tokens & _FORBIDDEN_TOKENS
         or any(form in compact for form in _FORBIDDEN_COMPACTS)
+        or any(phrase in normalized for phrase in _FORBIDDEN_PHRASES)
         or _PATH.search(text)
     ):
         return None
