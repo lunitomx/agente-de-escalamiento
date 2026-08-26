@@ -4,6 +4,8 @@ import sqlite3
 import threading
 from pathlib import Path
 
+import pytest
+
 from escala_server.project_memory import ProjectMemoryRuntime
 from escala_server.project_memory_session_close import (
     CandidateSource,
@@ -395,3 +397,159 @@ def test_threaded_proposal_never_appears_after_a_forced_close(tmp_path: Path) ->
     assert not proposal_thread.is_alive()
     assert result["close"].closed  # type: ignore[union-attr]
     assert result["proposal"].reason == "session_not_open"  # type: ignore[union-attr]
+
+
+def test_close_cannot_pass_a_proposal_already_inside_its_transaction(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A close waits for an in-flight proposal before deciding it has no pending work."""
+    close = ProjectMemorySessionClose(tmp_path)
+    assert close.open_session("s-1").ready
+    proposal_read = threading.Event()
+    close_attempted_begin = threading.Event()
+    release_proposal = threading.Event()
+    result: dict[str, object] = {}
+
+    original_begin = ProjectMemorySessionClose._begin_immediate
+
+    class ProposalConnection(sqlite3.Connection):
+        def execute(self, statement: str, parameters: object = ()) -> sqlite3.Cursor:
+            cursor = super().execute(statement, parameters)
+            if (
+                "SELECT status FROM project_memory_sessions" in statement
+                and not proposal_read.is_set()
+            ):
+                proposal_read.set()
+                release_proposal.wait(timeout=5)
+            return cursor
+
+    def proposal_connection() -> sqlite3.Connection:
+        db = sqlite3.connect(
+            close.runtime.db_path, isolation_level=None, factory=ProposalConnection
+        )
+        db.execute("PRAGMA foreign_keys=ON")
+        return db
+
+    def observe_close_begin(db: sqlite3.Connection) -> None:
+        if threading.current_thread().name == "competing-close":
+            close_attempted_begin.set()
+        original_begin(db)
+
+    monkeypatch.setattr(close, "_connection", proposal_connection)
+    monkeypatch.setattr(
+        ProjectMemorySessionClose,
+        "_begin_immediate",
+        staticmethod(observe_close_begin),
+    )
+
+    def propose() -> None:
+        result["proposal"] = close.propose("s-1", candidate())
+
+    def close_session() -> None:
+        result["close"] = ProjectMemorySessionClose(tmp_path).close("s-1")
+
+    proposal_thread = threading.Thread(target=propose, name="in-flight-proposal")
+    close_thread = threading.Thread(target=close_session, name="competing-close")
+    proposal_thread.start()
+    assert proposal_read.wait(timeout=2)
+    close_thread.start()
+    assert close_attempted_begin.wait(timeout=2)
+    release_proposal.set()
+    proposal_thread.join(timeout=5)
+    close_thread.join(timeout=5)
+
+    assert not proposal_thread.is_alive()
+    assert not close_thread.is_alive()
+    assert result["proposal"].status == "proposed"  # type: ignore[union-attr]
+    assert result["close"].reason == "confirmation_pending"  # type: ignore[union-attr]
+    with sqlite3.connect(ProjectMemoryRuntime(tmp_path).db_path) as db:
+        assert (
+            db.execute(
+                "SELECT status FROM project_memory_sessions WHERE id = 's-1'"
+            ).fetchone()[0]
+            == "open"
+        )
+        assert (
+            db.execute(
+                "SELECT response_state FROM session_memory_proposals"
+            ).fetchone()[0]
+            == "proposed"
+        )
+
+
+def test_proposal_cannot_pass_a_close_already_inside_its_transaction(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A proposal waits for an in-flight close before accepting an open session."""
+    close = ProjectMemorySessionClose(tmp_path)
+    assert close.open_session("s-1").ready
+    close_read = threading.Event()
+    proposal_attempted_begin = threading.Event()
+    release_close = threading.Event()
+    result: dict[str, object] = {}
+
+    original_begin = ProjectMemorySessionClose._begin_immediate
+
+    class CloseConnection(sqlite3.Connection):
+        def execute(self, statement: str, parameters: object = ()) -> sqlite3.Cursor:
+            cursor = super().execute(statement, parameters)
+            if (
+                "SELECT 1 FROM session_memory_proposals" in statement
+                and not close_read.is_set()
+            ):
+                close_read.set()
+                release_close.wait(timeout=5)
+            return cursor
+
+    def close_connection() -> sqlite3.Connection:
+        db = sqlite3.connect(
+            close.runtime.db_path, isolation_level=None, factory=CloseConnection
+        )
+        db.execute("PRAGMA foreign_keys=ON")
+        return db
+
+    def observe_proposal_begin(db: sqlite3.Connection) -> None:
+        if threading.current_thread().name == "competing-proposal":
+            proposal_attempted_begin.set()
+        original_begin(db)
+
+    monkeypatch.setattr(close, "_connection", close_connection)
+    monkeypatch.setattr(
+        ProjectMemorySessionClose,
+        "_begin_immediate",
+        staticmethod(observe_proposal_begin),
+    )
+
+    def close_session() -> None:
+        result["close"] = close.close("s-1")
+
+    def propose() -> None:
+        result["proposal"] = ProjectMemorySessionClose(tmp_path).propose(
+            "s-1", candidate()
+        )
+
+    close_thread = threading.Thread(target=close_session, name="in-flight-close")
+    proposal_thread = threading.Thread(target=propose, name="competing-proposal")
+    close_thread.start()
+    assert close_read.wait(timeout=2)
+    proposal_thread.start()
+    assert proposal_attempted_begin.wait(timeout=2)
+    release_close.set()
+    close_thread.join(timeout=5)
+    proposal_thread.join(timeout=5)
+
+    assert not close_thread.is_alive()
+    assert not proposal_thread.is_alive()
+    assert result["close"].closed  # type: ignore[union-attr]
+    assert result["proposal"].reason == "session_not_open"  # type: ignore[union-attr]
+    with sqlite3.connect(ProjectMemoryRuntime(tmp_path).db_path) as db:
+        assert (
+            db.execute(
+                "SELECT status FROM project_memory_sessions WHERE id = 's-1'"
+            ).fetchone()[0]
+            == "closed"
+        )
+        assert (
+            db.execute("SELECT COUNT(*) FROM session_memory_proposals").fetchone()[0]
+            == 0
+        )
