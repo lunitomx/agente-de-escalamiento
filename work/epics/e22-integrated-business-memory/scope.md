@@ -1,6 +1,6 @@
 # Epic Scope: E22 — Memoria Empresarial Integrada
 
-**Status:** In progress — S22.6 complete
+**Status:** Ready for epic close — S22.7 complete
 **Dependencies:** E10 (distribución), E18 (SQLite, memoria, grafo y sesiones)
 **Audited:** 2026-08-26
 **Tamaño:** L
@@ -63,7 +63,7 @@ skills, rutas ni la arquitectura al empresario.
 | 4 | S22.4 — Inicio y recuperación contextual ✓ | M | Sesión nueva recupera facts, cambios y foco relevante. |
 | 5 | S22.5 — Cierre, hechos y patrones confirmados ✓ | L | Decisiones/aprendizajes con fuente, confianza y confirmación. |
 | 6 | S22.6 — Front door y continuidad natural ✓ | M | ScaleUp orquesta memoria sin exponer infraestructura. |
-| 7 | S22.7 — Validación E2E, privacidad y release | M | Matriz cliente, backup/restore, regresiones y docs verdes. |
+| 7 | S22.7 — Validación E2E, privacidad y release ✓ | M | Matriz cliente, backup/restore, regresiones y docs verdes. |
 
 ## Acceptance Criteria
 
@@ -104,7 +104,7 @@ runtime puede vivir, migrar y aislarse dentro de un proyecto real.
 | 4 | S22.4 — Inicio y recuperación contextual | S22.2, S22.3 | Recupera sólo datos confirmados y muestra degradación segura; valida el valor entre sesiones. | Done | 2026-08-26 |
 | 5 | S22.5 — Cierre, hechos y patrones confirmados | S22.2, S22.3 | Añade propuesta, sí/no, fuente y confianza. Puede desarrollarse en paralelo con S22.4 una vez migración esté estable. | Done | 2026-08-26 |
 | 6 | S22.6 — Front door y continuidad natural | S22.4, S22.5 | Conecta inicio/cierre sin exponer infraestructura y conserva onboarding, diagnóstico, plan y progreso. | Done | 2026-08-26 |
-| 7 | S22.7 — Validación E2E, privacidad y release | S22.6 | Prueba instalación limpia → conversar → confirmar/cerrar → nueva sesión → recuperar en los clientes soportados. | Ready | — |
+| 7 | S22.7 — Validación E2E, privacidad y release | S22.6 | Prueba instalación limpia → conversar → confirmar/cerrar → nueva sesión → recuperar en los clientes soportados. | Done | 2026-08-26 |
 
 No hay una oportunidad de paralelismo segura antes de S22.3: el contrato de
 rutas y la migración definen los datos que consumirán inicio y cierre. Después

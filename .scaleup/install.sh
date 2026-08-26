@@ -188,7 +188,13 @@ copy_agent() {
     local dst="$1"
     rm -rf "$dst/agent"
     mkdir -p "$dst/agent"
-    cp -a "$AGENT_DIR/." "$dst/agent/"
+    # Agent memory and profiles are company data, never distributable runtime
+    # payload. Keep this list explicit so new source directories are private by
+    # default until their runtime need is reviewed.
+    for entry in identity sub-agents validators; do
+        [[ -d "$AGENT_DIR/$entry" ]] || continue
+        cp -a "$AGENT_DIR/$entry" "$dst/agent/$entry"
+    done
     info "Copied agent config to $dst/agent/ (synchronized)"
 }
 copy_bin() {

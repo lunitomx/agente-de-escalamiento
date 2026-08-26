@@ -1,6 +1,9 @@
 """End-to-end acceptance tests for the E10 cross-platform installer."""
 
+import hashlib
 import json
+import shutil
+import sqlite3
 import subprocess
 import sys
 from pathlib import Path
@@ -50,6 +53,83 @@ def _installer(destination_root: Path, *args: str) -> subprocess.CompletedProces
         capture_output=True,
         text=True,
     )
+
+
+def _say(command: Path, project: Path, message: str) -> str:
+    return subprocess.run(
+        [str(command), "conversation", message],
+        cwd=project,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout
+
+
+def _memory_rows(project: Path) -> list[tuple[str, str, str, float]]:
+    database = project / ".scaleup" / "memory" / "escala.db"
+    if not database.is_file():
+        return []
+    with sqlite3.connect(database) as connection:
+        return connection.execute(
+            """SELECT statement, source, status, confirmation_confidence
+               FROM confirmed_memory_entries ORDER BY id"""
+        ).fetchall()
+
+
+def _stable_memory_state(project: Path) -> list[tuple[str, str, str, float]]:
+    return [
+        (statement, json.loads(source)["origin"], status, confidence)
+        for statement, source, status, confidence in _memory_rows(project)
+    ]
+
+
+def _memory_digest_and_counts(project: Path) -> tuple[str | None, tuple[int, int, int]]:
+    database = project / ".scaleup" / "memory" / "escala.db"
+    if not database.is_file():
+        return None, (0, 0, 0)
+    tables = (
+        "project_memory_sessions",
+        "session_memory_proposals",
+        "confirmed_memory_entries",
+    )
+    with sqlite3.connect(database) as connection:
+        rows = tuple(
+            (table, tuple(connection.execute(f"SELECT * FROM {table} ORDER BY id")))
+            for table in tables
+        )
+    counts = tuple(len(table_rows) for _, table_rows in rows)
+    return hashlib.sha256(repr(rows).encode()).hexdigest(), counts
+
+
+def _installed_memory(
+    runtime: Path, project: Path, action: str, backup: Path | None = None
+) -> dict:
+    code = """
+import json
+import sys
+from escala_server import ProjectMemoryRuntime
+
+runtime = ProjectMemoryRuntime(sys.argv[1])
+if sys.argv[2] == "backup":
+    result = runtime.backup()
+elif sys.argv[2] == "restore":
+    result = runtime.restore(sys.argv[3])
+else:
+    result = runtime.ensure_memory()
+print(json.dumps({"ready": result.ready, "reason": result.reason,
+                  "backup_path": str(result.backup_path) if result.backup_path else None}))
+"""
+    arguments = [sys.executable, "-c", code, str(project), action]
+    if backup is not None:
+        arguments.append(str(backup))
+    result = subprocess.run(
+        arguments,
+        env={"PYTHONPATH": str(runtime)},
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return json.loads(result.stdout)
 
 
 def _run_engine(runtime_root: Path, project: Path, module: str, context: dict) -> dict:
@@ -139,6 +219,53 @@ def test_installer_targets_are_isolated_and_adapted(tmp_path):
         assert str(runtime_root / "bin" / "scaleup-frontdoor") in skill
         assert ".scaleup/agent" not in skill
         assert "validate-opsp" in skill
+
+
+def test_installer_never_distributes_source_company_memory_or_backups(tmp_path):
+    """Source-company data is never part of the distributed runtime payload."""
+    source = tmp_path / "source"
+    shutil.copytree(
+        REPO_ROOT,
+        source,
+        ignore=shutil.ignore_patterns(".git", "__pycache__"),
+    )
+    agent_memory = source / ".scaleup" / "agent" / "memory"
+    scaleup_memory = source / ".scaleup" / "memory"
+    for path in (
+        agent_memory / "company-profile.yaml",
+        agent_memory / "conversation.yaml",
+        agent_memory / "escala.db",
+        agent_memory / "backups" / "snapshot.db",
+        scaleup_memory / "escala.db",
+        scaleup_memory / "backups" / "snapshot.db",
+    ):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(b"source-company-data")
+
+    destination = tmp_path / "destination"
+    subprocess.run(
+        [
+            "bash",
+            str(source / ".scaleup" / "install.sh"),
+            "--target",
+            "all",
+            "--destination-root",
+            str(destination),
+        ],
+        cwd=source,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    for platform in (".claude", ".hermes", ".codex"):
+        runtime = destination / platform / "scaleup"
+        assert not (runtime / "agent" / "memory").exists()
+        assert not any(
+            path.name in {"company-profile.yaml", "conversation.yaml", "escala.db"}
+            or "backups" in path.parts
+            for path in runtime.rglob("*")
+        )
 
 
 def test_clean_project_flow_is_equivalent_for_claude_and_hermes(tmp_path):
@@ -442,3 +569,204 @@ def test_installed_frontdoor_pauses_confirms_and_resumes_naturally(tmp_path):
             "ruta",
         )
     )
+
+
+def test_installed_frontdoor_rejection_and_ambiguity_only_write_expected_state(
+    tmp_path,
+):
+    _installer(tmp_path, "--target", "codex")
+    command = tmp_path / ".codex" / "scaleup" / "bin" / "scaleup-frontdoor"
+
+    rejected = tmp_path / "rejected"
+    rejected.mkdir()
+    assert _memory_digest_and_counts(rejected) == (None, (0, 0, 0))
+    assert "qué decisión o dato" in _say(command, rejected, "quiero pausar").lower()
+    assert (
+        "quieres que lo recuerde"
+        in _say(command, rejected, "Abriremos una oficina en Querétaro").lower()
+    )
+    proposed_digest, proposed_counts = _memory_digest_and_counts(rejected)
+    assert proposed_digest is not None and proposed_counts == (1, 1, 0)
+    assert "no lo voy a guardar" in _say(command, rejected, "no").lower()
+    rejected_digest, rejected_counts = _memory_digest_and_counts(rejected)
+    assert rejected_digest != proposed_digest and rejected_counts == (1, 1, 0)
+    assert _memory_rows(rejected) == []
+
+    ambiguous = tmp_path / "ambiguous"
+    ambiguous.mkdir()
+    assert _memory_digest_and_counts(ambiguous) == (None, (0, 0, 0))
+    _say(command, ambiguous, "quiero pausar")
+    _say(command, ambiguous, "Abriremos una oficina en Querétaro")
+    before_digest, before_counts = _memory_digest_and_counts(ambiguous)
+    assert before_digest is not None and before_counts == (1, 1, 0)
+    assert "no lo voy a dar por hecho" in _say(command, ambiguous, "tal vez").lower()
+    assert _memory_digest_and_counts(ambiguous) == (before_digest, before_counts)
+    assert _memory_rows(ambiguous) == []
+
+
+def test_release_installed_frontdoors_preserve_local_memory_and_isolation(tmp_path):
+    _install(tmp_path)
+    statement = "Contrataremos una líder de ventas en septiembre"
+    journeys = {}
+    persisted_state = {}
+    for target in ("claude", "codex", "hermes"):
+        runtime = tmp_path / f".{target}" / "scaleup"
+        command = runtime / "bin" / "scaleup-frontdoor"
+        project = tmp_path / f"{target}-company"
+        project.mkdir()
+
+        assert sorted(
+            path.name for path in (tmp_path / f".{target}" / "skills").iterdir()
+        ) == ["scaleup"]
+        assert command.is_file()
+        assert not (runtime / ".scaleup").exists()
+        assert not (runtime / "memory").exists()
+        pause = _say(command, project, "quiero pausar")
+        proposal = _say(command, project, statement)
+        confirmed = _say(command, project, "sí")
+        resumed = _say(command, project, "retomemos")
+        assert "qué decisión o dato" in pause.lower()
+        assert "quieres que lo recuerde" in proposal.lower()
+        assert "próxima vez" in confirmed.lower()
+        resumed = resumed.lower()
+        assert statement.lower() in resumed
+        assert all(
+            token not in resumed
+            for token in (
+                ".scaleup",
+                "sqlite",
+                "database",
+                "base de datos",
+                "skill",
+                "comando",
+                "ruta",
+            )
+        )
+        rows = _memory_rows(project)
+        assert len(rows) == 1
+        assert rows[0][0] == statement
+        assert json.loads(rows[0][1])["origin"] == "explicit_user_statement"
+        assert rows[0][2:] == ("active", 1.0)
+        journeys[target] = (pause, proposal, confirmed, resumed)
+        persisted_state[target] = _stable_memory_state(project)
+
+    assert journeys["claude"] == journeys["codex"] == journeys["hermes"]
+    assert (
+        persisted_state["claude"]
+        == persisted_state["codex"]
+        == persisted_state["hermes"]
+    )
+    isolated = tmp_path / "isolated-company"
+    isolated.mkdir()
+    assert statement not in _say(
+        tmp_path / ".codex" / "scaleup" / "bin" / "scaleup-frontdoor",
+        isolated,
+        "retomemos",
+    )
+    assert (tmp_path / "claude-company" / ".scaleup" / "memory" / "escala.db").is_file()
+    assert (tmp_path / "codex-company" / ".scaleup" / "memory" / "escala.db").is_file()
+    assert not any(
+        (tmp_path / f".{target}" / "scaleup" / "memory").exists() for target in journeys
+    )
+
+
+def test_release_installed_frontdoor_rejects_sensitive_text_and_falls_back_without_writes(
+    tmp_path,
+):
+    _installer(tmp_path, "--target", "codex")
+    runtime = tmp_path / ".codex" / "scaleup"
+    command = runtime / "bin" / "scaleup-frontdoor"
+    sensitive = "La contraseña del ERP es 1234"
+    project = tmp_path / "sensitive-company"
+    project.mkdir()
+
+    assert "qué decisión o dato" in _say(command, project, "quiero pausar").lower()
+    reply = _say(command, project, sensitive).lower()
+    assert "no voy a guardar nada" in reply
+    assert sensitive.lower() not in reply
+    assert _memory_rows(project) == []
+    assert (
+        sensitive.lower()
+        not in (project / ".scaleup" / "memory" / "escala.db")
+        .read_bytes()
+        .decode("latin1")
+        .lower()
+    )
+
+    for fixture in ("absent", "empty", "corrupt"):
+        baseline, candidate = (
+            tmp_path / f"baseline-{fixture}",
+            tmp_path / f"candidate-{fixture}",
+        )
+        baseline.mkdir()
+        candidate.mkdir()
+        if fixture == "empty":
+            assert _installed_memory(runtime, candidate, "ensure")["ready"] is True
+        elif fixture == "corrupt":
+            database = candidate / ".scaleup" / "memory" / "escala.db"
+            database.parent.mkdir(parents=True)
+            database.write_bytes(b"not a sqlite database")
+        before = (
+            (candidate / ".scaleup" / "memory" / "escala.db").read_bytes()
+            if fixture == "corrupt"
+            else None
+        )
+        assert _say(command, candidate, "retomemos") == _say(
+            command, baseline, "retomemos"
+        )
+        database = candidate / ".scaleup" / "memory" / "escala.db"
+        if fixture == "absent":
+            assert not database.exists()
+        elif fixture == "corrupt":
+            assert database.read_bytes() == before
+        else:
+            assert _memory_rows(candidate) == []
+
+
+def test_release_backup_restore_and_targeted_removal_are_conservative(tmp_path):
+    _installer(tmp_path, "--target", "codex")
+    runtime = tmp_path / ".codex" / "scaleup"
+    command = runtime / "bin" / "scaleup-frontdoor"
+    project, other = tmp_path / "company", tmp_path / "other-company"
+    project.mkdir()
+    other.mkdir()
+    _say(command, project, "quiero pausar")
+    _say(command, project, "Abriremos una tienda en Monterrey")
+    _say(command, project, "sí")
+    expected = _memory_rows(project)
+    backup = _installed_memory(runtime, project, "backup")
+    assert backup["ready"] is True
+    backup_path = Path(backup["backup_path"])
+    assert backup_path.is_file() and backup_path.is_relative_to(
+        project / ".scaleup" / "memory" / "backups"
+    )
+    database = project / ".scaleup" / "memory" / "escala.db"
+    database.unlink()
+    assert _installed_memory(runtime, project, "restore", backup_path)["ready"] is True
+    assert _memory_rows(project) == expected
+    assert "abriremos una tienda" in _say(command, project, "retomemos").lower()
+
+    _say(command, other, "quiero pausar")
+    _say(command, other, "Mantendremos el almacén actual")
+    _say(command, other, "sí")
+    other_before = _memory_digest_and_counts(other)
+    cross_company = _installed_memory(runtime, other, "restore", backup_path)
+    assert cross_company["ready"] is False
+    assert _memory_digest_and_counts(other) == other_before
+
+    invalid = project / ".scaleup" / "memory" / "backups" / "invalid.db"
+    invalid.write_bytes(b"not a sqlite database")
+    preserved = _memory_rows(project)
+    assert _installed_memory(runtime, project, "restore", invalid)["ready"] is False
+    assert _memory_rows(project) == preserved
+    assert "abriremos una tienda" not in _say(command, other, "retomemos").lower()
+
+    company_note = runtime / "my-company" / "worksheets" / "keep.txt"
+    company_note.write_text("keep")
+    _installer(tmp_path, "--target", "codex")
+    _installer(tmp_path, "--target", "codex", "--uninstall")
+    assert company_note.read_text() == "keep"
+    assert _memory_rows(project) == expected and backup_path.is_file()
+    _installer(tmp_path, "--target", "codex", "--uninstall", "--purge")
+    assert not runtime.exists()
+    assert _memory_rows(project) == expected and backup_path.is_file()
