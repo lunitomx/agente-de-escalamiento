@@ -76,6 +76,7 @@ _MAX_IDENTIFIER = 160
 _IDENTIFIER_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{0,159}\Z")
 _ABSOLUTE_PATH_RE = re.compile(r"(?:^|[\s\"'`=:(\[])(?:/|\\\\|[A-Za-z]:[\\/])")
 _TRAVERSAL_PATH_RE = re.compile(r"(?:^|[\\/])\.\.(?:[\\/]|$)")
+_TILDE_HOME_PATH_RE = re.compile(r"(?:^|[\s\"'`=:(\[])~[\\/]")
 
 
 class ProjectMemorySessionClose:
@@ -327,7 +328,9 @@ class ProjectMemorySessionClose:
     def _has_external_path_form(statement: str) -> bool:
         """Reject path-bearing proposals without treating ordinary prose as paths."""
         return bool(
-            _ABSOLUTE_PATH_RE.search(statement) or _TRAVERSAL_PATH_RE.search(statement)
+            _ABSOLUTE_PATH_RE.search(statement)
+            or _TRAVERSAL_PATH_RE.search(statement)
+            or _TILDE_HOME_PATH_RE.search(statement)
         )
 
     @staticmethod

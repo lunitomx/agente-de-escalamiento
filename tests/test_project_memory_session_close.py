@@ -300,6 +300,10 @@ def test_path_bearing_statements_are_rejected_before_any_proposal_persists(
         "Revisar ../../private/plan.yaml",
         r"Abrir C:\\Users\\owner\\secrets.txt",
         r"Consultar \\server\\share\\strategy.md",
+        "~/private/plan.yaml",
+        r"~\private\plan.yaml",
+        "Guardar ~/private/plan.yaml como decisión",
+        r"Guardar ~\private\plan.yaml como decisión",
     ):
         result = close.propose("s-1", candidate(statement=statement))
         assert result.status == "invalid"
