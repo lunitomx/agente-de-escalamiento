@@ -6,6 +6,7 @@ from hashlib import sha256
 from pathlib import Path
 
 from escala_server.project_memory import ProjectMemoryRuntime
+from escala_server.project_memory_context import ProjectMemorySessionContext
 from escala_server.project_memory_migration import ProjectMemoryMigrator
 
 FIXTURES = Path(__file__).parent / "fixtures" / "project_memory_migration"
@@ -403,3 +404,61 @@ def test_profile_facts_are_linked_to_the_application_transaction(
         updated_at == linked_at == application_at
         for _, updated_at, linked_at, application_at in rows
     )
+
+
+def test_v3_upgrade_backfills_current_profile_facts_without_remigration(
+    tmp_path: Path,
+) -> None:
+    root = project(tmp_path, "complete")
+    profile = root / ".scaleup/agent/memory/company-profile.yaml"
+    source_a = profile.read_text(encoding="utf-8")
+    source_b = source_a.replace("Lumen Casa", "Lumen Norte").replace(
+        "people: 5", "people: 8"
+    )
+    migrator = ProjectMemoryMigrator(root)
+    first = migrator.migrate()
+    profile.write_text(source_b, encoding="utf-8")
+    assert migrator.migrate().ready
+    profile.write_text(source_a, encoding="utf-8")
+    assert migrator.migrate().ready
+
+    with sqlite3.connect(first.db_path) as connection:
+        connection.execute("DROP TABLE migration_fact_applications")
+        connection.execute(
+            "INSERT INTO memory_facts (key, value) VALUES (?, ?)",
+            ("profile.injected", '"unverified"'),
+        )
+        connection.execute(
+            "UPDATE _meta SET value = ? WHERE key = ?", ("3", "schema_version")
+        )
+
+    upgraded = migrator.runtime.ensure_memory()
+    context = ProjectMemorySessionContext(root).load()
+
+    assert upgraded.ready
+    assert migrator.runtime.health().ready
+    assert context.ready
+    assert any(
+        item.key == "profile.focus.current_decision" and item.value == "people"
+        for item in context.items
+    )
+    assert all(item.key != "profile.injected" for item in context.items)
+    with sqlite3.connect(first.db_path) as connection:
+        version = connection.execute(
+            "SELECT value FROM _meta WHERE key = ?", ("schema_version",)
+        ).fetchone()[0]
+        latest_application = connection.execute(
+            """SELECT id FROM migration_applications
+            WHERE relative_path = ? AND source_kind = ?
+            ORDER BY id DESC LIMIT 1""",
+            (".scaleup/agent/memory/company-profile.yaml", "company-profile"),
+        ).fetchone()[0]
+        linked = connection.execute(
+            """SELECT fact_key FROM migration_fact_applications
+            WHERE migration_application_id = ? ORDER BY fact_key""",
+            (latest_application,),
+        ).fetchall()
+
+    assert version == "4"
+    assert linked
+    assert "profile.injected" not in {row[0] for row in linked}

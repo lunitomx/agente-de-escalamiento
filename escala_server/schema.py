@@ -5,6 +5,8 @@ Tables: companies, worksheets, sessions, changes_log,
         memory_facts, entities, relationships.
 """
 
+import hashlib
+import json
 import sqlite3
 from functools import lru_cache
 from pathlib import Path
@@ -220,6 +222,82 @@ def schema_contract_tables_are_present(connection: sqlite3.Connection) -> bool:
     return expected_tables.issubset(present)
 
 
+def _profile_fact_values(metadata: object) -> dict[str, str]:
+    """Return the exact profile facts a S22.3 migration would have stored.
+
+    The v3 -> v4 upgrade derives provenance from the persisted profile payload
+    rather than trusting arbitrary ``memory_facts`` rows.
+    """
+    if not isinstance(metadata, str):
+        return {}
+    try:
+        payload = json.loads(metadata)
+    except json.JSONDecodeError:
+        return {}
+    if not isinstance(payload, dict):
+        return {}
+
+    company = payload.get("company")
+    groups = (
+        ("profile", company if isinstance(company, dict) else {}),
+        ("diagnosis", payload.get("scores", {})),
+        ("profile.focus", payload.get("focus", {})),
+    )
+    facts: dict[str, str] = {}
+    for prefix, values in groups:
+        if not isinstance(values, dict):
+            continue
+        for key, value in values.items():
+            if value not in (None, "", [], {}, 0):
+                facts[f"{prefix}.{key}"] = json.dumps(value, sort_keys=True)
+    return facts
+
+
+def _backfill_fact_applications(connection: sqlite3.Connection) -> None:
+    """Link only current, source-derived profile facts during the v4 upgrade."""
+    application = connection.execute(
+        """SELECT applications.id, applications.applied_at
+        FROM migration_applications AS applications
+        JOIN migration_sources AS sources
+          ON sources.relative_path = applications.relative_path
+         AND sources.content_sha256 = applications.content_sha256
+         AND sources.import_schema = applications.import_schema
+         AND sources.source_kind = applications.source_kind
+        WHERE applications.relative_path = ?
+          AND applications.source_kind = ?
+          AND applications.import_schema = ?
+        ORDER BY applications.id DESC LIMIT 1""",
+        (".scaleup/agent/memory/company-profile.yaml", "company-profile", 1),
+    ).fetchone()
+    if application is None:
+        return
+
+    expected: dict[str, str] = {}
+    for (metadata,) in connection.execute("SELECT metadata FROM companies"):
+        expected.update(_profile_fact_values(metadata))
+    if not expected:
+        return
+
+    application_id, applied_at = application
+    for fact_key, fact_value in expected.items():
+        row = connection.execute(
+            "SELECT value FROM memory_facts WHERE key = ?", (fact_key,)
+        ).fetchone()
+        if row is None or row[0] != fact_value:
+            continue
+        connection.execute(
+            """INSERT OR IGNORE INTO migration_fact_applications (
+                fact_key, value_sha256, migration_application_id, applied_at
+            ) VALUES (?, ?, ?, ?)""",
+            (
+                fact_key,
+                hashlib.sha256(fact_value.encode()).hexdigest(),
+                application_id,
+                applied_at,
+            ),
+        )
+
+
 def _ensure_dir(db_path: str) -> None:
     """Create parent directories for the database file if needed."""
     parent = Path(db_path).parent
@@ -248,42 +326,50 @@ def init_db(db_path: str) -> sqlite3.Connection:
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA journal_mode=WAL")
     conn.execute("PRAGMA foreign_keys=ON")
+    try:
+        conn.execute("BEGIN")
 
-    # ── Run DDL ──────────────────────────────────────────────────────
-    for stmt in DDL_STATEMENTS:
-        conn.execute(stmt)
+        # ── Run DDL ──────────────────────────────────────────────────────
+        for stmt in DDL_STATEMENTS:
+            conn.execute(stmt)
 
-    # ── Schema version check / upgrade ───────────────────────────────
-    row = conn.execute(
-        "SELECT value FROM _meta WHERE key = 'schema_version'"
-    ).fetchone()
+        # ── Schema version check / upgrade ───────────────────────────────
+        row = conn.execute(
+            "SELECT value FROM _meta WHERE key = 'schema_version'"
+        ).fetchone()
 
-    if row is None:
-        conn.execute(
-            "INSERT INTO _meta (key, value) VALUES ('schema_version', ?)",
-            (str(SCHEMA_VERSION),),
-        )
-    else:
-        current = int(row[0])
-        if current < SCHEMA_VERSION:
-            if current < 3:
-                conn.execute(
-                    """INSERT INTO migration_applications (
-                        relative_path, content_sha256, import_schema, source_kind
-                    )
-                    SELECT relative_path, content_sha256, import_schema, source_kind
-                    FROM migration_sources
-                    WHERE NOT EXISTS (SELECT 1 FROM migration_applications)
-                    ORDER BY id ASC"""
-                )
+        if row is None:
             conn.execute(
-                "UPDATE _meta SET value = ? WHERE key = 'schema_version'",
+                "INSERT INTO _meta (key, value) VALUES ('schema_version', ?)",
                 (str(SCHEMA_VERSION),),
             )
+        else:
+            current = int(row[0])
+            if current < SCHEMA_VERSION:
+                if current < 3:
+                    conn.execute(
+                        """INSERT INTO migration_applications (
+                            relative_path, content_sha256, import_schema, source_kind
+                        )
+                        SELECT relative_path, content_sha256, import_schema, source_kind
+                        FROM migration_sources
+                        WHERE NOT EXISTS (SELECT 1 FROM migration_applications)
+                        ORDER BY id ASC"""
+                    )
+                if current < 4:
+                    _backfill_fact_applications(conn)
+                conn.execute(
+                    "UPDATE _meta SET value = ? WHERE key = 'schema_version'",
+                    (str(SCHEMA_VERSION),),
+                )
 
-    # ── Create indexes ───────────────────────────────────────────────
-    for stmt in INDEX_STATEMENTS:
-        conn.execute(stmt)
+        # ── Create indexes ───────────────────────────────────────────────
+        for stmt in INDEX_STATEMENTS:
+            conn.execute(stmt)
 
-    conn.commit()
+        conn.commit()
+    except sqlite3.Error:
+        conn.rollback()
+        conn.close()
+        raise
     return conn

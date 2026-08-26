@@ -133,7 +133,8 @@ class ProjectMemorySessionContext:
     def _allowed_fact_key(key: object) -> bool:
         if not isinstance(key, str) or not key.startswith(_FACT_PREFIXES):
             return False
-        normalized = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", " ", key).lower()
+        normalized = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", " ", key)
+        normalized = re.sub(r"(?<=[A-Z])(?=[A-Z][a-z])", " ", normalized).lower()
         tokens = set(re.split(r"[^a-z0-9]+", normalized))
         return not bool(tokens & _SENSITIVE_KEY_PARTS)
 
