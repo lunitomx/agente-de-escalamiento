@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Literal
 
 from .project_memory import ProjectMemoryRuntime
+from .schema import context_read_schema_is_valid
 
 _PROFILE_SOURCE = ".scaleup/agent/memory/company-profile.yaml"
 _PROFILE_SOURCE_KIND = "company-profile"
@@ -74,7 +75,7 @@ class ProjectMemorySessionContext:
     def load(self) -> SessionRecoveryResult:
         """Return a bounded context without creating, changing, or repairing data."""
         health = self.runtime.health()
-        if not health.ready:
+        if not health.ready and not self._legacy_v4_read_ready():
             return self._fallback(health.reason)
         try:
             with sqlite3.connect(self._read_only_uri(health.db_path), uri=True) as db:
@@ -85,6 +86,33 @@ class ProjectMemorySessionContext:
                 return SessionRecoveryResult(True, tuple(self._rank(items)[:5]))
         except (OSError, sqlite3.Error, TypeError, ValueError) as error:
             return self._fallback(str(error))
+
+    def _legacy_v4_read_ready(self) -> bool:
+        """Allow only a validated v4 database through the read-only bridge.
+
+        ``ProjectMemoryRuntime.health`` remains authoritative for v6. This
+        compatibility branch exists solely so S22.4 can recover verified
+        context before an explicit writer upgrades the database.
+        """
+        try:
+            self.runtime._assert_memory_layout()
+            if not self.runtime.db_path.is_file():
+                return False
+            with sqlite3.connect(
+                self._read_only_uri(self.runtime.db_path), uri=True
+            ) as db:
+                integrity = db.execute("PRAGMA integrity_check").fetchone()
+                return (
+                    integrity is not None
+                    and integrity[0] == "ok"
+                    and context_read_schema_is_valid(db)
+                    and db.execute(
+                        "SELECT value FROM _meta WHERE key = 'schema_version'"
+                    ).fetchone()[0]
+                    == "4"
+                )
+        except (OSError, sqlite3.Error, TypeError, ValueError):
+            return False
 
     @staticmethod
     def _read_only_uri(path: Path) -> str:

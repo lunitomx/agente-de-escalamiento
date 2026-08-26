@@ -73,6 +73,7 @@ _SENSITIVE_COMPACT = frozenset(
 )
 _MAX_STATEMENT = 500
 _MAX_IDENTIFIER = 160
+_IDENTIFIER_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{0,159}\Z")
 
 
 class ProjectMemorySessionClose:
@@ -127,8 +128,8 @@ class ProjectMemorySessionClose:
                 db.execute(
                     """INSERT INTO session_memory_proposals
                     (id, fingerprint, session_id, kind, statement, origin, observation_ids,
-                     replaces_entry_id, response_state)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'proposed')""",
+                     provenance_format_version, replaces_entry_id, response_state)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, 'proposed')""",
                     (
                         proposal_id,
                         fingerprint,
@@ -196,14 +197,16 @@ class ProjectMemorySessionClose:
                         "session_id": row[1],
                         "origin": row[4],
                         "observation_ids": json.loads(row[5]),
+                        "format_version": 1,
                     },
                     sort_keys=True,
                 )
                 db.execute(
                     """INSERT INTO confirmed_memory_entries
                     (id, proposal_id, session_id, kind, statement, source,
-                     confirmation_confidence, confidence_reason, status, replaces_entry_id)
-                    VALUES (?, ?, ?, ?, ?, ?, 1.0, 'explicit_confirmation', 'active', ?)""",
+                     entry_format_version, provenance_format_version, confirmation_confidence,
+                     confidence_reason, status, replaces_entry_id)
+                    VALUES (?, ?, ?, ?, ?, ?, 1, 1, 1.0, 'explicit_confirmation', 'active', ?)""",
                     (
                         entry_id,
                         proposal_id,
@@ -275,9 +278,8 @@ class ProjectMemorySessionClose:
     def _valid_identifier(value: object) -> bool:
         return (
             isinstance(value, str)
-            and bool(value.strip())
-            and len(value) <= _MAX_IDENTIFIER
-            and "\x00" not in value
+            and bool(_IDENTIFIER_RE.fullmatch(value))
+            and not ProjectMemorySessionClose._sensitive(value)
         )
 
     def _candidate_reason(self, session_id: str, candidate: object) -> str | None:

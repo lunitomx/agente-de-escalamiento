@@ -166,3 +166,124 @@ def test_isolation_conflicts_and_explicit_replacement(tmp_path: Path) -> None:
             == 3
         )
     assert second.close("s-1").closed
+
+
+def test_identifiers_must_be_opaque_and_never_persist_adversarial_input(
+    tmp_path: Path,
+) -> None:
+    close = ProjectMemorySessionClose(tmp_path)
+    assert (
+        close.open_session("session transcript with words").reason == "invalid_session"
+    )
+    assert close.open_session("APIKey").reason == "invalid_session"
+    assert close.open_session("s-1").ready
+    for observations, replacement in (
+        (("../../private",), None),
+        (("I said the secret",), None),
+        (("APIKey",), None),
+        (("obs-1",), "../entry"),
+    ):
+        assert (
+            close.propose(
+                "s-1",
+                candidate(observations=observations, replaces_entry_id=replacement),
+            ).status
+            == "invalid"
+        )
+    with sqlite3.connect(ProjectMemoryRuntime(tmp_path).db_path) as db:
+        assert (
+            db.execute("SELECT COUNT(*) FROM session_memory_proposals").fetchone()[0]
+            == 0
+        )
+        assert (
+            db.execute("SELECT COUNT(*) FROM confirmed_memory_entries").fetchone()[0]
+            == 0
+        )
+
+
+def test_entries_record_immutable_entry_and_provenance_format_versions(
+    tmp_path: Path,
+) -> None:
+    close = ProjectMemorySessionClose(tmp_path)
+    assert close.open_session("s-1").ready
+    proposal = close.propose("s-1", candidate())
+    assert close.confirm(proposal.id or "", "yes").status == "confirmed"
+    with sqlite3.connect(ProjectMemoryRuntime(tmp_path).db_path) as db:
+        proposal_version = db.execute(
+            "SELECT provenance_format_version FROM session_memory_proposals"
+        ).fetchone()[0]
+        entry = db.execute(
+            "SELECT entry_format_version, provenance_format_version, source "
+            "FROM confirmed_memory_entries"
+        ).fetchone()
+    assert proposal_version == 1
+    assert entry[:2] == (1, 1)
+    assert '"format_version": 1' in entry[2]
+
+
+def test_v5_consent_tables_upgrade_format_columns_idempotently(tmp_path: Path) -> None:
+    runtime = ProjectMemoryRuntime(tmp_path)
+    assert runtime.ensure_memory().ready
+    with sqlite3.connect(runtime.db_path) as db:
+        db.execute("PRAGMA foreign_keys=OFF")
+        db.execute("DROP TABLE session_memory_proposals")
+        db.execute("DROP TABLE confirmed_memory_entries")
+        db.execute("DROP TABLE project_memory_sessions")
+        db.executescript(
+            """
+            CREATE TABLE project_memory_sessions (
+                id TEXT PRIMARY KEY,
+                status TEXT NOT NULL CHECK(status IN ('open', 'closed')),
+                opened_at TEXT NOT NULL DEFAULT (datetime('now')),
+                closed_at TEXT DEFAULT NULL,
+                close_reason TEXT DEFAULT NULL
+            );
+            CREATE TABLE session_memory_proposals (
+                id TEXT PRIMARY KEY,
+                fingerprint TEXT NOT NULL UNIQUE,
+                session_id TEXT NOT NULL,
+                kind TEXT NOT NULL CHECK(kind IN ('fact', 'decision', 'pattern')),
+                statement TEXT NOT NULL,
+                origin TEXT NOT NULL CHECK(origin = 'explicit_user_statement'),
+                observation_ids TEXT NOT NULL,
+                replaces_entry_id TEXT DEFAULT NULL,
+                response_state TEXT NOT NULL CHECK(response_state IN ('proposed', 'confirmed', 'rejected')),
+                created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                responded_at TEXT DEFAULT NULL,
+                FOREIGN KEY(session_id) REFERENCES project_memory_sessions(id),
+                FOREIGN KEY(replaces_entry_id) REFERENCES confirmed_memory_entries(id)
+            );
+            CREATE TABLE confirmed_memory_entries (
+                id TEXT PRIMARY KEY,
+                proposal_id TEXT NOT NULL UNIQUE,
+                session_id TEXT NOT NULL,
+                kind TEXT NOT NULL CHECK(kind IN ('fact', 'decision', 'pattern')),
+                statement TEXT NOT NULL,
+                source TEXT NOT NULL,
+                confirmation_confidence REAL NOT NULL CHECK(confirmation_confidence = 1.0),
+                confidence_reason TEXT NOT NULL CHECK(confidence_reason = 'explicit_confirmation'),
+                status TEXT NOT NULL CHECK(status IN ('active', 'superseded')),
+                replaces_entry_id TEXT DEFAULT NULL,
+                confirmed_at TEXT NOT NULL DEFAULT (datetime('now')),
+                FOREIGN KEY(proposal_id) REFERENCES session_memory_proposals(id),
+                FOREIGN KEY(session_id) REFERENCES project_memory_sessions(id),
+                FOREIGN KEY(replaces_entry_id) REFERENCES confirmed_memory_entries(id)
+            );
+            """
+        )
+        db.execute("UPDATE _meta SET value = ? WHERE key = ?", ("5", "schema_version"))
+
+    assert runtime.ensure_memory().ready
+    assert runtime.ensure_memory().ready
+    with sqlite3.connect(runtime.db_path) as db:
+        assert db.execute(
+            "SELECT value FROM _meta WHERE key = ?", ("schema_version",)
+        ).fetchone()[0] == str(SCHEMA_VERSION)
+        proposal_columns = {
+            row[1] for row in db.execute("PRAGMA table_info(session_memory_proposals)")
+        }
+        entry_columns = {
+            row[1] for row in db.execute("PRAGMA table_info(confirmed_memory_entries)")
+        }
+    assert "provenance_format_version" in proposal_columns
+    assert {"entry_format_version", "provenance_format_version"} <= entry_columns

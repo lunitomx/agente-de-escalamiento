@@ -11,7 +11,7 @@ import sqlite3
 from functools import lru_cache
 from pathlib import Path
 
-SCHEMA_VERSION = 5
+SCHEMA_VERSION = 6
 
 DDL_STATEMENTS = [
     # ── Meta / version tracking ──────────────────────────────────────
@@ -158,6 +158,7 @@ DDL_STATEMENTS = [
         response_state    TEXT NOT NULL CHECK(response_state IN ('proposed', 'confirmed', 'rejected')),
         created_at        TEXT NOT NULL DEFAULT (datetime('now')),
         responded_at      TEXT DEFAULT NULL,
+        provenance_format_version INTEGER NOT NULL DEFAULT 1 CHECK(provenance_format_version = 1),
         FOREIGN KEY(session_id) REFERENCES project_memory_sessions(id),
         FOREIGN KEY(replaces_entry_id) REFERENCES confirmed_memory_entries(id)
     )
@@ -175,12 +176,43 @@ DDL_STATEMENTS = [
         status                  TEXT NOT NULL CHECK(status IN ('active', 'superseded')),
         replaces_entry_id       TEXT DEFAULT NULL,
         confirmed_at            TEXT NOT NULL DEFAULT (datetime('now')),
+        entry_format_version    INTEGER NOT NULL DEFAULT 1 CHECK(entry_format_version = 1),
+        provenance_format_version INTEGER NOT NULL DEFAULT 1 CHECK(provenance_format_version = 1),
         FOREIGN KEY(proposal_id) REFERENCES session_memory_proposals(id),
         FOREIGN KEY(session_id) REFERENCES project_memory_sessions(id),
         FOREIGN KEY(replaces_entry_id) REFERENCES confirmed_memory_entries(id)
     )
     """,
 ]
+
+# S22.4 may safely read these columns from an already-migrated v4 database.
+# This deliberately is a smaller, read-only contract than the v6 write schema:
+# the context bridge never creates, repairs, or upgrades a legacy database.
+_CONTEXT_READ_COLUMNS = {
+    "_meta": {"key", "value"},
+    "memory_facts": {"key", "value", "updated_at"},
+    "migration_sources": {
+        "relative_path",
+        "content_sha256",
+        "import_schema",
+        "source_kind",
+    },
+    "migration_applications": {
+        "id",
+        "relative_path",
+        "content_sha256",
+        "import_schema",
+        "source_kind",
+        "applied_at",
+    },
+    "migration_fact_applications": {
+        "fact_key",
+        "value_sha256",
+        "migration_application_id",
+        "applied_at",
+    },
+    "worksheets": {"id", "category", "tool", "data"},
+}
 
 # ── Indexes (created separately after tables) ────────────────────────
 INDEX_STATEMENTS = [
@@ -269,6 +301,59 @@ def schema_contract_tables_are_present(connection: sqlite3.Connection) -> bool:
         )
     }
     return expected_tables.issubset(present)
+
+
+def context_read_schema_is_valid(connection: sqlite3.Connection) -> bool:
+    """Validate the narrow, read-only v4 context contract without upgrading it."""
+    try:
+        version = connection.execute(
+            "SELECT value FROM _meta WHERE key = 'schema_version'"
+        ).fetchone()
+        if version is None or int(version[0]) not in {4, SCHEMA_VERSION}:
+            return False
+        for table, required in _CONTEXT_READ_COLUMNS.items():
+            actual = {
+                row[1] for row in connection.execute(f"PRAGMA table_info({table})")
+            }
+            if not required.issubset(actual):
+                return False
+    except (sqlite3.Error, TypeError, ValueError):
+        return False
+    return True
+
+
+def _ensure_v6_format_columns(connection: sqlite3.Connection) -> None:
+    """Add immutable format markers to pre-v6 consent tables once."""
+    required = (
+        (
+            "session_memory_proposals",
+            "provenance_format_version",
+            (
+                "ALTER TABLE session_memory_proposals ADD COLUMN provenance_format_version "
+                "INTEGER NOT NULL DEFAULT 1 CHECK(provenance_format_version = 1)"
+            ),
+        ),
+        (
+            "confirmed_memory_entries",
+            "entry_format_version",
+            (
+                "ALTER TABLE confirmed_memory_entries ADD COLUMN entry_format_version "
+                "INTEGER NOT NULL DEFAULT 1 CHECK(entry_format_version = 1)"
+            ),
+        ),
+        (
+            "confirmed_memory_entries",
+            "provenance_format_version",
+            (
+                "ALTER TABLE confirmed_memory_entries ADD COLUMN provenance_format_version "
+                "INTEGER NOT NULL DEFAULT 1 CHECK(provenance_format_version = 1)"
+            ),
+        ),
+    )
+    for table, column, statement in required:
+        columns = {row[1] for row in connection.execute(f"PRAGMA table_info({table})")}
+        if column not in columns:
+            connection.execute(statement)
 
 
 def _profile_fact_values(metadata: object) -> dict[str, str]:
@@ -407,6 +492,8 @@ def init_db(db_path: str) -> sqlite3.Connection:
                     )
                 if current < 4:
                     _backfill_fact_applications(conn)
+                if current < 6:
+                    _ensure_v6_format_columns(conn)
                 conn.execute(
                     "UPDATE _meta SET value = ? WHERE key = 'schema_version'",
                     (str(SCHEMA_VERSION),),
