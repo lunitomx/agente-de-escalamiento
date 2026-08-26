@@ -73,7 +73,11 @@ def _conversation(message: str) -> int:
     from coaching.router.conversation import run
 
     _reconcile_memory()
-    print(run(message, base_path="."))
+    try:
+        response = run(message, base_path=".")
+    finally:
+        _reconcile_memory()
+    print(response)
     return 0
 
 

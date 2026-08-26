@@ -730,6 +730,100 @@ def test_installed_handoff_reconciles_legacy_profile_to_current_facts_idempotent
         )
 
 
+def test_installed_natural_onboarding_reconciles_profile_in_the_same_return(tmp_path):
+    """Natural onboarding must not leave its new YAML profile ahead of SQLite."""
+    _install(tmp_path)
+    profile_path = ".scaleup/agent/memory/company-profile.yaml"
+    for platform in ("claude", "codex"):
+        runtime = tmp_path / f".{platform}" / "scaleup"
+        command = runtime / "bin" / "scaleup-frontdoor"
+        project = tmp_path / f"{platform}-natural-onboarding"
+        project.mkdir()
+
+        assert _memory_digest_and_counts(project) == (None, (0, 0, 0))
+        assert (
+            "¿cómo se llama y a qué se dedica"
+            in _say(command, project, "no sé por dónde empezar").lower()
+        )
+        assert (
+            "¿a qué se dedica lumen casa"
+            in _say(command, project, "Lumen Casa").lower()
+        )
+        assert (
+            "¿cuántas personas"
+            in _say(command, project, "Vendemos iluminación decorativa").lower()
+        )
+
+        same_return = _say(command, project, "28")
+        assert "ahora revisaremos cuatro áreas" in same_return.lower()
+        profile = project / profile_path
+        database = project / ".scaleup" / "memory" / "escala.db"
+        assert profile.is_file() and database.is_file()
+        with sqlite3.connect(database) as connection:
+            fingerprint = connection.execute(
+                "SELECT content_sha256 FROM migration_sources "
+                "WHERE relative_path = ? ORDER BY id DESC LIMIT 1",
+                (profile_path,),
+            ).fetchone()[0]
+            application_fingerprint = connection.execute(
+                "SELECT content_sha256 FROM migration_applications "
+                "WHERE relative_path = ? ORDER BY id DESC LIMIT 1",
+                (profile_path,),
+            ).fetchone()[0]
+            facts = dict(connection.execute("SELECT key, value FROM memory_facts"))
+            assert (
+                connection.execute("SELECT name FROM companies").fetchone()[0]
+                == "Lumen Casa"
+            )
+        assert fingerprint == application_fingerprint
+        assert len(fingerprint) == 64
+        assert json.loads(facts["profile.name"]) == "Lumen Casa"
+        assert (
+            json.loads(facts["profile.industry"]) == "Vendemos iluminación decorativa"
+        )
+        assert json.loads(facts["profile.employees"]) == 28
+
+        _say(command, project, "retomemos")
+        with sqlite3.connect(database) as connection:
+            assert (
+                connection.execute(
+                    "SELECT COUNT(*) FROM migration_applications "
+                    "WHERE relative_path = ?",
+                    (profile_path,),
+                ).fetchone()[0]
+                == 1
+            )
+            assert (
+                connection.execute(
+                    "SELECT content_sha256 FROM migration_sources "
+                    "WHERE relative_path = ? ORDER BY id DESC LIMIT 1",
+                    (profile_path,),
+                ).fetchone()[0]
+                == fingerprint
+            )
+
+        no_source = tmp_path / f"{platform}-no-source"
+        no_source.mkdir()
+        assert _say(command, no_source, "retomemos")
+        assert _memory_digest_and_counts(no_source) == (None, (0, 0, 0))
+
+        corrupt = tmp_path / f"{platform}-corrupt"
+        corrupt_database = corrupt / ".scaleup" / "memory" / "escala.db"
+        corrupt_profile = corrupt / profile_path
+        corrupt_database.parent.mkdir(parents=True)
+        corrupt_profile.parent.mkdir(parents=True)
+        corrupt_database.write_bytes(b"not a sqlite database")
+        corrupt_profile.write_text("company:\n  name: Lumen Casa\n", encoding="utf-8")
+        database_before = corrupt_database.read_bytes()
+        profile_before = corrupt_profile.read_bytes()
+        assert (
+            "ahora revisaremos cuatro áreas"
+            in _say(command, corrupt, "retomemos").lower()
+        )
+        assert corrupt_database.read_bytes() == database_before
+        assert corrupt_profile.read_bytes() == profile_before
+
+
 def test_installed_frontdoor_pauses_confirms_and_resumes_naturally(tmp_path):
     _installer(tmp_path, "--target", "codex")
     runtime = tmp_path / ".codex" / "scaleup"
