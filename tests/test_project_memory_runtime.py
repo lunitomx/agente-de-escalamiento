@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from escala_server.project_memory import ProjectMemoryRuntime
+from escala_server.schema import DDL_STATEMENTS, INDEX_STATEMENTS
 
 
 def test_ensure_memory_creates_only_the_project_database(tmp_path: Path) -> None:
@@ -366,3 +367,41 @@ def test_restore_blocks_a_writer_after_checkpoint(
     restored = runtime.restore(backup.backup_path)
 
     assert restored.ready is True
+
+
+@pytest.mark.parametrize(
+    "removed_constraint",
+    (
+        "CHECK(origin = 'explicit_user_statement')",
+        "FOREIGN KEY(replaces_entry_id) REFERENCES confirmed_memory_entries(id)",
+    ),
+)
+def test_health_rejects_recreated_consent_table_missing_check_or_foreign_key(
+    tmp_path: Path, removed_constraint: str
+) -> None:
+    runtime = ProjectMemoryRuntime(tmp_path)
+    assert runtime.ensure_memory().ready is True
+    proposal_ddl = next(
+        statement
+        for statement in DDL_STATEMENTS
+        if "CREATE TABLE IF NOT EXISTS session_memory_proposals" in statement
+    ).replace("IF NOT EXISTS ", "")
+    if removed_constraint.startswith("FOREIGN KEY"):
+        proposal_ddl = proposal_ddl.replace(f",\n        {removed_constraint}", "")
+    else:
+        proposal_ddl = proposal_ddl.replace(removed_constraint, "")
+    proposal_index = next(
+        statement
+        for statement in INDEX_STATEMENTS
+        if "idx_session_memory_proposals_session_state" in statement
+    ).replace("IF NOT EXISTS ", "")
+    with sqlite3.connect(runtime.db_path) as connection:
+        connection.execute("PRAGMA foreign_keys=OFF")
+        connection.execute("DROP TABLE session_memory_proposals")
+        connection.execute(proposal_ddl)
+        connection.execute(proposal_index)
+
+    result = runtime.health()
+
+    assert result.ready is False
+    assert result.reason == "local database schema structure is invalid"

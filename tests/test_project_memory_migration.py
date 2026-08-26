@@ -8,6 +8,7 @@ from pathlib import Path
 from escala_server.project_memory import ProjectMemoryRuntime
 from escala_server.project_memory_context import ProjectMemorySessionContext
 from escala_server.project_memory_migration import ProjectMemoryMigrator
+from escala_server.schema import SCHEMA_VERSION
 
 FIXTURES = Path(__file__).parent / "fixtures" / "project_memory_migration"
 
@@ -191,12 +192,9 @@ def test_runtime_upgrades_v2_database_and_reports_healthy(tmp_path: Path) -> Non
     assert upgraded.ready
     assert runtime.health().ready
     with sqlite3.connect(runtime.db_path) as connection:
-        assert (
-            connection.execute(
-                "SELECT value FROM _meta WHERE key = ?", ("schema_version",)
-            ).fetchone()[0]
-            == "4"
-        )
+        assert connection.execute(
+            "SELECT value FROM _meta WHERE key = ?", ("schema_version",)
+        ).fetchone()[0] == str(SCHEMA_VERSION)
         assert connection.execute(
             "SELECT 1 FROM sqlite_master WHERE type = ? AND name = ?",
             ("table", "migration_applications"),
@@ -459,6 +457,6 @@ def test_v3_upgrade_backfills_current_profile_facts_without_remigration(
             (latest_application,),
         ).fetchall()
 
-    assert version == "4"
+    assert version == str(SCHEMA_VERSION)
     assert linked
     assert "profile.injected" not in {row[0] for row in linked}
