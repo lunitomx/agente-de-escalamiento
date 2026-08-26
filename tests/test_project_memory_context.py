@@ -13,6 +13,11 @@ import pytest
 from escala_server.project_memory import ProjectMemoryRuntime
 from escala_server.project_memory_context import ProjectMemorySessionContext
 from escala_server.project_memory_migration import ProjectMemoryMigrator
+from escala_server.project_memory_session_close import (
+    CandidateSource,
+    MemoryCandidate,
+    ProjectMemorySessionClose,
+)
 
 FIXTURES = Path(__file__).parent / "fixtures" / "project_memory_migration"
 
@@ -388,3 +393,29 @@ def test_v4_context_falls_back_without_writing_for_altered_schema_or_index(
         assert not result.ready
         assert result.items == ()
         assert runtime.db_path.read_bytes() == before
+
+
+def test_projects_only_valid_active_explicitly_confirmed_entries(
+    tmp_path: Path,
+) -> None:
+    close = ProjectMemorySessionClose(tmp_path)
+    assert close.open_session("s-1").ready
+    proposal = close.propose(
+        "s-1",
+        MemoryCandidate(
+            "decision",
+            "Contrataremos una líder de ventas en septiembre",
+            CandidateSource("s-1", ("obs-1",), "explicit_user_statement"),
+        ),
+    )
+    assert close.confirm(proposal.id or "", "sí").status == "confirmed"
+
+    result = ProjectMemorySessionContext(tmp_path).load()
+
+    assert [(item.kind, item.value) for item in result.items] == [
+        ("entry", "Contrataremos una líder de ventas en septiembre")
+    ]
+    runtime = ProjectMemoryRuntime(tmp_path)
+    with sqlite3.connect(runtime.db_path) as db:
+        db.execute("UPDATE confirmed_memory_entries SET status = 'superseded'")
+    assert ProjectMemorySessionContext(tmp_path).load().items == ()

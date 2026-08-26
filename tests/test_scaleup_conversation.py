@@ -6,6 +6,8 @@ import json
 import subprocess
 from pathlib import Path
 
+from escala_server.project_memory_session_close import ProjectMemorySessionClose
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 INSTALLER = REPO_ROOT / ".scaleup" / "install.sh"
 
@@ -143,3 +145,44 @@ def test_conversation_persists_natural_journey_after_clean_install(tmp_path):
     combined = tmp_path / "installed-combined"
     combined.mkdir()
     _combined_demo_intake(command, combined)
+
+
+def test_pause_confirmation_and_resume_use_only_natural_language(
+    tmp_path: Path,
+) -> None:
+    from coaching.router.conversation import run
+
+    root = tmp_path / "continuity"
+    root.mkdir()
+    question = run("quiero pausar", base_path=root)
+    assert "qué decisión o dato" in question.lower()
+    proposal = run("Contrataremos una líder de ventas en septiembre", base_path=root)
+    assert "quieres que lo recuerde" in proposal.lower()
+    confirmed = run("sí", base_path=root)
+    assert "próxima vez" in confirmed.lower()
+    resumed = run("retomemos", base_path=root)
+    assert "líder de ventas" in resumed.lower()
+    assert all(
+        token not in resumed.lower() for token in (".scaleup", "sqlite", "skill")
+    )
+
+
+def test_pause_no_and_ambiguous_never_confirm_an_entry(tmp_path: Path) -> None:
+    from coaching.router.conversation import run
+
+    root = tmp_path / "consent"
+    root.mkdir()
+    run("quiero pausar", base_path=root)
+    run("La meta de septiembre es 1.2 M MXN", base_path=root)
+    ambiguous = run("tal vez", base_path=root)
+    assert "no lo voy a dar por hecho" in ambiguous.lower()
+    assert run("no", base_path=root).lower().startswith("de acuerdo")
+    close = ProjectMemorySessionClose(root)
+    assert close.runtime.health().ready
+    import sqlite3
+
+    with sqlite3.connect(close.runtime.db_path) as db:
+        assert (
+            db.execute("SELECT COUNT(*) FROM confirmed_memory_entries").fetchone()[0]
+            == 0
+        )
