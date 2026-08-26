@@ -183,6 +183,7 @@ def test_pause_no_and_ambiguous_never_confirm_an_entry(tmp_path: Path) -> None:
     ambiguous = run("tal vez", base_path=root)
     assert "no lo voy a dar por hecho" in ambiguous.lower()
     close = ProjectMemorySessionClose(root)
+    proposed_state_digest = _memory_state_digest(root)
     assert close.runtime.health().ready
     with sqlite3.connect(close.runtime.db_path) as db:
         assert (
@@ -232,6 +233,7 @@ def test_pause_no_and_ambiguous_never_confirm_an_entry(tmp_path: Path) -> None:
             db.execute("SELECT status FROM project_memory_sessions").fetchone()[0]
             == "closed"
         )
+    assert _memory_state_digest(root) != proposed_state_digest
 
 
 def test_ambiguous_confirmation_can_continue_without_persisting(tmp_path: Path) -> None:
@@ -242,12 +244,18 @@ def test_ambiguous_confirmation_can_continue_without_persisting(tmp_path: Path) 
     run("quiero pausar", base_path=root)
     run("Contrataremos una líder de ventas en septiembre", base_path=root)
     assert "no lo voy a dar por hecho" in run("tal vez", base_path=root).lower()
+    before = _memory_digest(root)
+    before_state = _memory_state_digest(root)
+    before_counts = _memory_counts(root)
 
     continued = run("sigamos", base_path=root)
 
     assert "¿cómo se llama" in continued.lower()
     assert "recuerde para la próxima vez" not in continued.lower()
     close = ProjectMemorySessionClose(root)
+    assert _memory_digest(root) == before
+    assert _memory_state_digest(root) == before_state
+    assert _memory_counts(root) == before_counts == (1, 1, 0)
 
     with sqlite3.connect(close.runtime.db_path) as db:
         assert (
@@ -266,11 +274,11 @@ def test_ambiguous_confirmation_can_continue_without_persisting(tmp_path: Path) 
             db.execute(
                 "SELECT response_state FROM session_memory_proposals"
             ).fetchone()[0]
-            == "rejected"
+            == "proposed"
         )
         assert (
             db.execute("SELECT status FROM project_memory_sessions").fetchone()[0]
-            == "closed"
+            == "open"
         )
 
 
@@ -289,6 +297,29 @@ def test_business_goal_with_cerrar_does_not_start_memory(tmp_path: Path) -> None
 def _memory_digest(root: Path) -> str | None:
     path = root / ".scaleup" / "memory" / "escala.db"
     return hashlib.sha256(path.read_bytes()).hexdigest() if path.is_file() else None
+
+
+def _memory_state_digest(root: Path) -> str | None:
+    """Digest the observable memory state; SQLite may put writes in its WAL."""
+    path = root / ".scaleup" / "memory" / "escala.db"
+    if not path.is_file():
+        return None
+    try:
+        with sqlite3.connect(path) as db:
+            state = {
+                "sessions": db.execute(
+                    "SELECT status FROM project_memory_sessions ORDER BY id"
+                ).fetchall(),
+                "proposals": db.execute(
+                    "SELECT response_state FROM session_memory_proposals ORDER BY id"
+                ).fetchall(),
+                "entries": db.execute(
+                    "SELECT COUNT(*) FROM confirmed_memory_entries"
+                ).fetchone(),
+            }
+    except sqlite3.DatabaseError:
+        return None
+    return hashlib.sha256(json.dumps(state, sort_keys=True).encode("utf-8")).hexdigest()
 
 
 def _memory_counts(root: Path) -> tuple[int, int, int] | None:

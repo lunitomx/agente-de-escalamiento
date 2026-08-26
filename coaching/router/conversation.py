@@ -442,7 +442,6 @@ def run(message: str, base_path: str | Path = ".") -> str:
             _restore_after_memory(base, state)
             return _run_existing(text, base)
         if _wants_continue_without_memory(text):
-            continuity.answer_confirmation(session_id, proposal_id, "no")
             _restore_after_memory(base, state)
             return _run_existing(text, base)
         turn = continuity.answer_confirmation(session_id, proposal_id, text)
