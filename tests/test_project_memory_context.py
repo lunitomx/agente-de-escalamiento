@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import shutil
 import sqlite3
 from hashlib import sha256
@@ -108,19 +109,35 @@ def test_ranks_facts_before_verified_changes_and_limits_globally(
     root = migrated_project(tmp_path)
     runtime = ProjectMemoryRuntime(root)
     with sqlite3.connect(runtime.db_path) as connection:
-        connection.execute("DELETE FROM memory_facts")
-        connection.executemany(
-            "INSERT INTO memory_facts (key, value, updated_at) VALUES (?, ?, ?)",
-            (
-                ("profile.name", '"Lumen Casa"', "2026-08-01 00:00:00"),
-                ("diagnosis.cash", "4", "2026-08-02 00:00:00"),
-                (
-                    "profile.focus.current_decision",
-                    '"people"',
-                    "2026-08-03 00:00:00",
-                ),
-            ),
+        application_id, applied_at = connection.execute(
+            """SELECT id, applied_at FROM migration_applications
+            WHERE relative_path = ? ORDER BY id DESC LIMIT 1""",
+            (".scaleup/agent/memory/company-profile.yaml",),
+        ).fetchone()
+        facts = (
+            ("profile.name", "Lumen Casa"),
+            ("diagnosis.cash", 4),
+            ("profile.focus.current_decision", "people"),
         )
+        connection.execute("DELETE FROM migration_fact_applications")
+        connection.execute("DELETE FROM memory_facts")
+        for key, value in facts:
+            raw_value = json.dumps(value)
+            connection.execute(
+                "INSERT INTO memory_facts (key, value, updated_at) VALUES (?, ?, ?)",
+                (key, raw_value, applied_at),
+            )
+            connection.execute(
+                """INSERT INTO migration_fact_applications (
+                    fact_key, value_sha256, migration_application_id, applied_at
+                ) VALUES (?, ?, ?, ?)""",
+                (
+                    key,
+                    sha256(raw_value.encode()).hexdigest(),
+                    application_id,
+                    applied_at,
+                ),
+            )
 
     result = ProjectMemorySessionContext(root).load()
 
@@ -181,3 +198,95 @@ def test_corrupt_database_and_bad_worksheet_row_degrade_safely(tmp_path: Path) -
     assert fallback.ready is False
     assert fallback.items == ()
     assert fallback.user_message is None
+
+
+def test_facts_require_current_application_value_and_real_applied_timestamp(
+    tmp_path: Path,
+) -> None:
+    root = migrated_project(tmp_path)
+    runtime = ProjectMemoryRuntime(root)
+    with sqlite3.connect(runtime.db_path) as connection:
+        row = connection.execute(
+            """SELECT applications.id, applications.applied_at
+            FROM migration_applications AS applications
+            WHERE applications.relative_path = ?
+            ORDER BY applications.id DESC LIMIT 1""",
+            (".scaleup/agent/memory/company-profile.yaml",),
+        ).fetchone()
+        application_id, applied_at = row
+        connection.execute(
+            "UPDATE memory_facts SET updated_at = ? WHERE key = ?",
+            ("tampered", "profile.name"),
+        )
+
+    result = ProjectMemorySessionContext(root).load()
+
+    assert all(item.key != "profile.name" for item in result.items)
+    assert all(
+        item.observed_at == applied_at for item in result.items if item.kind == "fact"
+    )
+    assert application_id
+
+
+def test_sensitive_and_oversized_fact_values_are_not_recovered(tmp_path: Path) -> None:
+    root = migrated_project(tmp_path)
+    profile = root / ".scaleup/agent/memory/company-profile.yaml"
+    profile.write_text(
+        "company:\n"
+        "  name: Lumen Casa\n"
+        "  apiKey: never-show\n"
+        "  db_password: never-show\n"
+        "  accessToken: never-show\n"
+        "  description: " + ("x" * 241) + "\n",
+        encoding="utf-8",
+    )
+    assert ProjectMemoryMigrator(root).migrate().ready
+
+    result = ProjectMemorySessionContext(root).load()
+
+    assert result.ready
+    assert all(
+        token not in item.key.lower()
+        for item in result.items
+        for token in ("apikey", "password", "token", "description")
+    )
+
+
+def test_changes_are_independent_from_company_and_profile_ledger(
+    tmp_path: Path,
+) -> None:
+    root = migrated_project(tmp_path)
+    runtime = ProjectMemoryRuntime(root)
+    with sqlite3.connect(runtime.db_path) as connection:
+        connection.execute("DELETE FROM companies")
+        connection.execute(
+            "DELETE FROM migration_applications WHERE relative_path = ?",
+            (".scaleup/agent/memory/company-profile.yaml",),
+        )
+
+    result = ProjectMemorySessionContext(root).load()
+
+    assert result.ready
+    assert result.items
+    assert all(item.kind == "change" for item in result.items)
+
+
+def test_sensitive_or_oversized_worksheet_metadata_is_not_recovered(
+    tmp_path: Path,
+) -> None:
+    root = migrated_project(tmp_path)
+    runtime = ProjectMemoryRuntime(root)
+    with sqlite3.connect(runtime.db_path) as connection:
+        connection.execute(
+            "UPDATE worksheets SET category = ? WHERE category = ?",
+            ("apiKey", "context"),
+        )
+        connection.execute(
+            "UPDATE worksheets SET tool = ? WHERE tool = ?",
+            ("x" * 97, "focus"),
+        )
+
+    result = ProjectMemorySessionContext(root).load()
+
+    assert all("apiKey" not in item.key for item in result.items)
+    assert all("x" * 97 not in item.key for item in result.items)
