@@ -637,41 +637,96 @@ def test_installed_frontdoors_reconcile_legacy_sources_idempotently(tmp_path):
         assert second == first
 
 
-def test_installed_handoff_reconciles_new_profile_idempotently(tmp_path):
+def test_installed_handoff_reconciles_legacy_profile_to_current_facts_idempotently(
+    tmp_path,
+):
     _installer(tmp_path, "--target", "codex")
     runtime = tmp_path / ".codex" / "scaleup"
     command = runtime / "bin" / "scaleup-frontdoor"
     project = tmp_path / "welcome-project"
     project.mkdir()
-    payload = json.dumps(
-        {
-            "company_name": "Lumen Casa",
-            "industry": "Interiores",
-            "employees": 12,
-            "entry_methodology": "bmc",
-        }
+    profile = project / ".scaleup" / "agent" / "memory" / "company-profile.yaml"
+    profile.parent.mkdir(parents=True)
+    profile.write_text(
+        "company:\n  name: Lumen Casa\n  industry: Interiores\n"
+        "scores:\n  strategy: 6\n",
+        encoding="utf-8",
     )
-
-    for _ in range(2):
-        result = subprocess.run(
-            [str(command), "run", "welcome", payload],
-            cwd=project,
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-        assert json.loads(result.stdout)["errors"] == []
+    assert "6" in _say(command, project, "retomemos")
 
     database = project / ".scaleup" / "memory" / "escala.db"
     with sqlite3.connect(database) as connection:
-        source = connection.execute(
-            "SELECT relative_path, content_sha256 FROM migration_sources"
-        ).fetchall()
-        applications = connection.execute(
-            "SELECT COUNT(*) FROM migration_applications"
+        legacy_fingerprint = connection.execute(
+            "SELECT content_sha256 FROM migration_sources"
         ).fetchone()[0]
-    assert source == [(".scaleup/agent/memory/company-profile.yaml", source[0][1])]
-    assert applications == 1
+        legacy_facts = dict(
+            connection.execute("SELECT key, value FROM memory_facts").fetchall()
+        )
+        legacy_snapshot = tuple(
+            connection.execute("SELECT * FROM migration_applications ORDER BY id")
+        )
+        assert json.loads(legacy_facts["profile.name"]) == "Lumen Casa"
+        assert json.loads(legacy_facts["diagnosis.strategy"]) == 6
+
+    payload = json.dumps(
+        {
+            "company_name": "Norte Verde",
+            "industry": "Manufactura",
+            "employees": 44,
+            "entry_methodology": "bmc",
+        }
+    )
+    result = subprocess.run(
+        [str(command), "run", "welcome", payload],
+        cwd=project,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    assert json.loads(result.stdout)["errors"] == []
+    with sqlite3.connect(database) as connection:
+        current_fingerprint = connection.execute(
+            "SELECT content_sha256 FROM migration_sources"
+        ).fetchone()[0]
+        current_facts = dict(
+            connection.execute("SELECT key, value FROM memory_facts").fetchall()
+        )
+        current_snapshot = tuple(
+            connection.execute("SELECT * FROM migration_applications ORDER BY id")
+        )
+        assert (
+            connection.execute("SELECT name FROM companies").fetchone()[0]
+            == "Norte Verde"
+        )
+    assert current_fingerprint != legacy_fingerprint
+    assert json.loads(current_facts["profile.name"]) == "Norte Verde"
+    assert current_snapshot != legacy_snapshot
+    assert len(current_snapshot) == len(legacy_snapshot) + 1
+    assert json.loads(current_facts["profile.industry"]) == "Manufactura"
+    assert json.loads(current_facts["profile.employees"]) == 44
+    assert "diagnosis.strategy" not in current_facts
+
+    result = subprocess.run(
+        [str(command), "run", "welcome", payload],
+        cwd=project,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    assert json.loads(result.stdout)["errors"] == []
+    with sqlite3.connect(database) as connection:
+        assert (
+            connection.execute(
+                "SELECT content_sha256 FROM migration_sources"
+            ).fetchone()[0]
+            == current_fingerprint
+        )
+        assert (
+            tuple(
+                connection.execute("SELECT * FROM migration_applications ORDER BY id")
+            )
+            == current_snapshot
+        )
 
 
 def test_installed_frontdoor_pauses_confirms_and_resumes_naturally(tmp_path):
