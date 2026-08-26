@@ -1,6 +1,8 @@
 """End-to-end acceptance tests for the E10 cross-platform installer."""
 
+import hashlib
 import json
+import shutil
 import sqlite3
 import subprocess
 import sys
@@ -72,6 +74,24 @@ def _memory_rows(project: Path) -> list[tuple[str, str, str, float]]:
             """SELECT statement, source, status, confirmation_confidence
                FROM confirmed_memory_entries ORDER BY id"""
         ).fetchall()
+
+
+def _memory_digest_and_counts(project: Path) -> tuple[str | None, tuple[int, int, int]]:
+    database = project / ".scaleup" / "memory" / "escala.db"
+    if not database.is_file():
+        return None, (0, 0, 0)
+    tables = (
+        "project_memory_sessions",
+        "session_memory_proposals",
+        "confirmed_memory_entries",
+    )
+    with sqlite3.connect(database) as connection:
+        rows = tuple(
+            (table, tuple(connection.execute(f"SELECT * FROM {table} ORDER BY id")))
+            for table in tables
+        )
+    counts = tuple(len(table_rows) for _, table_rows in rows)
+    return hashlib.sha256(repr(rows).encode()).hexdigest(), counts
 
 
 def _installed_memory(
@@ -192,6 +212,53 @@ def test_installer_targets_are_isolated_and_adapted(tmp_path):
         assert str(runtime_root / "bin" / "scaleup-frontdoor") in skill
         assert ".scaleup/agent" not in skill
         assert "validate-opsp" in skill
+
+
+def test_installer_never_distributes_source_company_memory_or_backups(tmp_path):
+    """Source-company data is never part of the distributed runtime payload."""
+    source = tmp_path / "source"
+    shutil.copytree(
+        REPO_ROOT,
+        source,
+        ignore=shutil.ignore_patterns(".git", "__pycache__"),
+    )
+    agent_memory = source / ".scaleup" / "agent" / "memory"
+    scaleup_memory = source / ".scaleup" / "memory"
+    for path in (
+        agent_memory / "company-profile.yaml",
+        agent_memory / "conversation.yaml",
+        agent_memory / "escala.db",
+        agent_memory / "backups" / "snapshot.db",
+        scaleup_memory / "escala.db",
+        scaleup_memory / "backups" / "snapshot.db",
+    ):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(b"source-company-data")
+
+    destination = tmp_path / "destination"
+    subprocess.run(
+        [
+            "bash",
+            str(source / ".scaleup" / "install.sh"),
+            "--target",
+            "all",
+            "--destination-root",
+            str(destination),
+        ],
+        cwd=source,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    for platform in (".claude", ".hermes", ".codex"):
+        runtime = destination / platform / "scaleup"
+        assert not (runtime / "agent" / "memory").exists()
+        assert not any(
+            path.name in {"company-profile.yaml", "conversation.yaml", "escala.db"}
+            or "backups" in path.parts
+            for path in runtime.rglob("*")
+        )
 
 
 def test_clean_project_flow_is_equivalent_for_claude_and_hermes(tmp_path):
@@ -495,6 +562,39 @@ def test_installed_frontdoor_pauses_confirms_and_resumes_naturally(tmp_path):
             "ruta",
         )
     )
+
+
+def test_installed_frontdoor_rejection_and_ambiguity_only_write_expected_state(
+    tmp_path,
+):
+    _installer(tmp_path, "--target", "codex")
+    command = tmp_path / ".codex" / "scaleup" / "bin" / "scaleup-frontdoor"
+
+    rejected = tmp_path / "rejected"
+    rejected.mkdir()
+    assert _memory_digest_and_counts(rejected) == (None, (0, 0, 0))
+    assert "qué decisión o dato" in _say(command, rejected, "quiero pausar").lower()
+    assert (
+        "quieres que lo recuerde"
+        in _say(command, rejected, "Abriremos una oficina en Querétaro").lower()
+    )
+    proposed_digest, proposed_counts = _memory_digest_and_counts(rejected)
+    assert proposed_digest is not None and proposed_counts == (1, 1, 0)
+    assert "no lo voy a guardar" in _say(command, rejected, "no").lower()
+    rejected_digest, rejected_counts = _memory_digest_and_counts(rejected)
+    assert rejected_digest != proposed_digest and rejected_counts == (1, 1, 0)
+    assert _memory_rows(rejected) == []
+
+    ambiguous = tmp_path / "ambiguous"
+    ambiguous.mkdir()
+    assert _memory_digest_and_counts(ambiguous) == (None, (0, 0, 0))
+    _say(command, ambiguous, "quiero pausar")
+    _say(command, ambiguous, "Abriremos una oficina en Querétaro")
+    before_digest, before_counts = _memory_digest_and_counts(ambiguous)
+    assert before_digest is not None and before_counts == (1, 1, 0)
+    assert "no lo voy a dar por hecho" in _say(command, ambiguous, "tal vez").lower()
+    assert _memory_digest_and_counts(ambiguous) == (before_digest, before_counts)
+    assert _memory_rows(ambiguous) == []
 
 
 def test_release_installed_frontdoors_preserve_local_memory_and_isolation(tmp_path):
