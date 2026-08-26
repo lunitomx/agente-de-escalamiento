@@ -59,7 +59,7 @@ var DashboardInteractive = (function () {
             state.hasData = true;
             applySavedData(resp.data.variables);
           }
-          state.onLoad(resp.meta || null, state.hasData);
+          state.onLoad(resp.meta || null, state.hasData, resp.data || {});
         } catch (e) { /* ignore parse errors */ }
       }
       renderSliders();

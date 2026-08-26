@@ -1,5 +1,7 @@
 # Epic Brief: E31 — Evidencia Operativa a Metodologías
 
+**Estado:** Complete — verified 2026-08-26
+
 ScaleUp debe saber cuándo dejar de diagnosticar de forma abierta y pedir el
 dato operativo mínimo que vuelve útil una metodología. Después de una señal
 narrativa o cuando la persona lo solicite, ofrece una ruta no técnica para

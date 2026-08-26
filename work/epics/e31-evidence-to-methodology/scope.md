@@ -1,6 +1,6 @@
 # Epic Scope: E31 — Evidencia Operativa a Metodologías
 
-**Status:** Planned
+**Status:** Complete — verified 2026-08-26
 **Dependencies:** E22 (memoria local), E25 (guía de conectores), E26 (workspace), E27 (diagnóstico narrativo), E29 (Business Pulse)
 **Tamaño:** XL
 
@@ -82,20 +82,34 @@ campos que la persona confirma, con fuente y fecha visibles.
 
 ## Acceptance criteria
 
-- [ ] Una respuesta narrativa detallada no se reduce obligatoriamente a 1–5; la
+- [x] Una respuesta narrativa detallada no se reduce obligatoriamente a 1–5; la
   persona puede mantenerla cualitativa o pedir cuantificación.
-- [ ] Para Cash, el agente explica qué siete variables necesita antes de pedir
+- [x] Para Cash, el agente explica qué siete variables necesita antes de pedir
   un archivo o valores: precio, volumen, COGS, gastos, A/R, inventario y A/P.
-- [ ] Un CSV/XLSX se previsualiza y propone columnas; ningún dato se persiste
+- [x] Un CSV/XLSX se previsualiza y propone columnas; ningún dato se persiste
   hasta que la persona confirme los campos.
-- [ ] Un dato proporcionado mediante MCP conserva que vino del host, cuándo fue
+- [x] Un dato proporcionado mediante MCP conserva que vino del host, cuándo fue
   observado y qué campo de metodología alimenta; un host sin MCP sigue teniendo
   una ruta manual completa.
-- [ ] Secretos, identificadores y contenido delicado detienen o minimizan la
+- [x] Secretos, identificadores y contenido delicado detienen o minimizan la
   captura antes de memoria, índice, dashboard o workspace compartido.
-- [ ] Power of One/CCC y al menos una metodología por las otras tres decisiones
+- [x] Power of One/CCC y al menos una metodología por las otras tres decisiones
   muestran datos reales confirmados o un estado pendiente accionable.
-- [ ] La corrección o sustitución de fuente actualiza el panel sin destruir el
+- [x] La corrección o sustitución de fuente actualiza el panel sin destruir el
   historial ni ocultar su procedencia.
-- [ ] El flujo se instala y funciona desde el único skill público en Claude,
+- [x] El flujo se instala y funciona desde el único skill público en Claude,
   Codex y Hermes, sin pedir rutas, JSON ni jerga técnica.
+
+## Evidencia de cierre
+
+- `escala_server/evidence.py`: preview local CSV/XLSX, contenido explícito del
+  host, clasificación de sensibilidad, consentimiento por campo, procedencia,
+  vigencia y versiones de cada valor. Los archivos originales no se guardan.
+- `coaching/router/conversation.py`: tras cada relato ofrece cualitativo o
+  cuantificación; Cash explica sus siete variables y las cuatro decisiones
+  tienen una captura progresiva.
+- `escala_server/handlers.py` y el panel Power of One muestran procedencia y
+  dejan el impacto pendiente cuando faltan campos o la evidencia está vencida.
+- Pruebas: `tests/test_evidence.py`, flujo de conversación e instalador limpio;
+  suite completa y `rai gate check gate-tests --scope tests/test_evidence.py`
+  completados el 2026-08-26.

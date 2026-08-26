@@ -55,15 +55,7 @@ class WorksheetsHandler:
     def get_worksheets(self, category: str, tool: str) -> dict:
         row = self.worksheet_dao.get(category, tool)
         data = json.loads(row["data"]) if row else {}
-        meta = (
-            {
-                "version": row["version"],
-                "observed_at": row["updated_at"],
-                "source": f"Datos locales · {category}/{tool}",
-            }
-            if row
-            else None
-        )
+        meta = self._worksheet_meta(row, data, category, tool) if row else None
         return {"data": data, "meta": meta, "status": "ok"}
 
     def save_worksheet(
@@ -98,13 +90,54 @@ class WorksheetsHandler:
         response_data = json.loads(saved["data"])
         return {
             "data": response_data,
-            "meta": {
-                "version": saved["version"],
-                "observed_at": saved["updated_at"],
-                "source": f"Datos locales · {category}/{tool}",
-            },
+            "meta": self._worksheet_meta(saved, response_data, category, tool),
             "status": "ok",
         }
+
+    @staticmethod
+    def _worksheet_meta(
+        row: dict[str, Any], data: dict[str, Any], category: str, tool: str
+    ) -> dict[str, Any]:
+        """Expose confirmed E31 provenance when a panel has it, never raw content."""
+        meta = {
+            "version": row["version"],
+            "observed_at": row["updated_at"],
+            "source": f"Datos locales · {category}/{tool}",
+        }
+        evidence = data.get("evidence") if isinstance(data, dict) else None
+        fields = evidence.get("fields") if isinstance(evidence, dict) else None
+        confirmed = (
+            [
+                item
+                for item in fields.values()
+                if isinstance(item, dict) and item.get("state") == "confirmed"
+            ]
+            if isinstance(fields, dict)
+            else []
+        )
+        if confirmed:
+            source = (
+                confirmed[0].get("source")
+                if isinstance(confirmed[0].get("source"), dict)
+                else {}
+            )
+            if source:
+                meta["source"] = (
+                    f"Evidencia confirmada · {source.get('type', 'local')} · {source.get('label', 'fuente local')}"
+                )
+            dates = [
+                str(item.get("observed_at"))
+                for item in confirmed
+                if item.get("observed_at")
+            ]
+            if dates:
+                meta["observed_at"] = max(dates)
+            meta["pending_fields"] = [
+                item.get("label")
+                for item in fields.values()
+                if isinstance(item, dict) and item.get("state") != "confirmed"
+            ]
+        return meta
 
     def get_changes(self, category: str, tool: str) -> list[dict[str, Any]]:
         """Return raw change-log rows for a (category, tool) pair."""

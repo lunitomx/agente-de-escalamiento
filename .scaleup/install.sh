@@ -179,7 +179,7 @@ copy_memory_runtime() {
     local dst="$1"
     rm -rf "$dst/escala_server"
     mkdir -p "$dst/escala_server"
-    for module in __init__.py __main__.py cli.py server.py handlers.py router.py cors.py diff.py knowledge_handler.py business_pulse.py accountability.py schema.py workspace.py human_context.py weekly_cadence.py connected_guidance.py project_memory.py project_memory_migration.py project_memory_context.py project_memory_public_text.py project_memory_session_close.py project_memory_continuity.py memory_engine.py graph_engine.py; do
+    for module in __init__.py __main__.py cli.py server.py handlers.py router.py cors.py diff.py knowledge_handler.py business_pulse.py accountability.py evidence.py schema.py workspace.py human_context.py weekly_cadence.py connected_guidance.py project_memory.py project_memory_migration.py project_memory_context.py project_memory_public_text.py project_memory_session_close.py project_memory_continuity.py memory_engine.py graph_engine.py; do
         cp "$MEMORY_RUNTIME_DIR/$module" "$dst/escala_server/$module"
     done
     cp -a "$MEMORY_RUNTIME_DIR/daos" "$dst/escala_server/daos"

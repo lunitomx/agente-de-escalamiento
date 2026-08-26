@@ -12,8 +12,19 @@ from pathlib import Path
 from typing import Any
 
 from escala_server.accountability import AccountabilityStore
-from escala_server.board import BoardContextBuilder, PortableKnowledgeHandler, VerneLensAdvisor
-from escala_server.connected_guidance import anonymize_preview, capabilities, recommend, record_decision, swt_recipe
+from escala_server.board import (
+    BoardContextBuilder,
+    PortableKnowledgeHandler,
+    VerneLensAdvisor,
+)
+from escala_server.connected_guidance import (
+    anonymize_preview,
+    capabilities,
+    recommend,
+    record_decision,
+    swt_recipe,
+)
+from escala_server.evidence import EvidenceStore, field_specs, sensitivity_of
 from escala_server.human_context import HumanContextStore
 from escala_server.project_memory import ProjectMemoryRuntime
 from escala_server.project_memory_continuity import ProjectMemoryContinuity
@@ -782,6 +793,207 @@ def _cadence_turn(base: Path, state: dict[str, Any], text: str) -> str | None:
         return "Puedo sugerirte cómo configurar un recordatorio nativo en el host que uses, pero no puedo crearlo ni afirmar que se ejecutará. Antes te diré propósito, frecuencia, datos mínimos, alternativa manual y cómo detenerlo."
     return None
 
+
+def _advance_after_evidence(base: Path, state: dict[str, Any]) -> str:
+    """Resume the narrative diagnosis without forcing a score."""
+    index = int(state.pop("evidence_narrative_index", state.get("narrative_index", 0))) + 1
+    for key in tuple(state):
+        if key.startswith(("evidence_", "draft_evidence_")):
+            state.pop(key, None)
+    state.update({"narrative_index": index, "stage": "diagnosis_narrative"})
+    _save(base, state)
+    return _narrative_question(index) if index < len(DECISIONS) else _finish_narrative_diagnosis(base, state)
+
+
+def _offer_evidence(base: Path, state: dict[str, Any], decision: str, text: str) -> str:
+    state.update({
+        "stage": "evidence_offer",
+        "evidence_decision": decision,
+        "evidence_narrative_index": int(state.get("narrative_index", 0)),
+    })
+    _save(base, state)
+    label = DIAGNOSE_QUESTIONS[decision]["label"]
+    return (
+        f"Entendí esto sobre {label}: “{text.strip().replace(chr(10), ' ')[:220]}”. "
+        f"¿Quieres mantenerlo como diagnóstico cualitativo o cuantificar {label} ahora con datos reales? "
+        "No guardaré ni convertiré nada en una calificación sin que tú lo decidas."
+    )
+
+
+def _cash_data_explanation() -> str:
+    return (
+        "Para Cash necesito siete variables antes de construir Power of One y el ciclo de efectivo: "
+        "precio, volumen, COGS, gastos operativos, días de cobranza (A/R), días de inventario y días de pago (A/P)."
+    )
+
+
+def _start_evidence_capture(base: Path, state: dict[str, Any]) -> str:
+    decision = str(state.get("evidence_decision", ""))
+    label = DIAGNOSE_QUESTIONS.get(decision, {}).get("label", decision.title())
+    state.update({"stage": "evidence_choice", "draft_evidence_values": {}})
+    _save(base, state)
+    introduction = _cash_data_explanation() + " " if decision == "cash" else ""
+    return (
+        f"{introduction}Para cuantificar {label}, elige una ruta: captura manual, archivo CSV/XLSX o contenido que ya autorizaste en un conector del host. "
+        "Sólo conservaré los campos que confirmes uno por uno; el archivo o contenido original no se guarda. ¿Cuál prefieres?"
+    )
+
+
+def _preview_to_confirmation(base: Path, state: dict[str, Any], preview: Any, source_type: str) -> str:
+    decision = str(state.get("evidence_decision", ""))
+    if not preview.ready:
+        return (preview.reason or "No pude preparar una vista previa.") + " Puedes continuar manualmente o mantener el diagnóstico cualitativo."
+    proposed = dict(preview.proposed or {})
+    if not proposed:
+        return "Vi el archivo, pero no pude asociar columnas con los datos mínimos sin adivinar. Puedes capturarlos manualmente; no guardé ni indexé el archivo."
+    state.update({
+        "stage": "evidence_confirm_field",
+        "draft_evidence_values": proposed,
+        "draft_evidence_keys": list(proposed),
+        "draft_evidence_field_index": 0,
+        "draft_evidence_source_type": source_type,
+        "draft_evidence_source_ref": preview.source_ref or "fuente local",
+        "draft_evidence_sha256": preview.content_sha256,
+    })
+    _save(base, state)
+    mapped = ", ".join(next(spec.label for spec in field_specs(decision) if spec.key == key) for key in proposed)
+    ambiguous = ""
+    if preview.ambiguous:
+        ambiguous = " No asocié campos ambiguos: " + ", ".join(preview.ambiguous) + "."
+    return f"Vista previa lista. Propuse estos campos: {mapped}.{ambiguous} Revisemos uno por uno antes de guardarlos. " + _evidence_field_question(state)
+
+
+def _evidence_field_question(state: dict[str, Any]) -> str:
+    decision = str(state.get("evidence_decision", ""))
+    keys = state.get("draft_evidence_keys", [])
+    index = int(state.get("draft_evidence_field_index", 0))
+    if not isinstance(keys, list) or index >= len(keys):
+        return ""
+    key = str(keys[index])
+    spec = next(item for item in field_specs(decision) if item.key == key)
+    value = dict(state.get("draft_evidence_values", {})).get(key)
+    return f"{spec.label.capitalize()}: “{value}”. ¿Lo confirmas para {spec.methodology}?"
+
+
+def _finish_evidence_capture(base: Path, state: dict[str, Any]) -> str:
+    decision = str(state.get("evidence_decision", ""))
+    snapshot = EvidenceStore(base).snapshot(decision)
+    fields = snapshot.get("fields", {}) if isinstance(snapshot, dict) else {}
+    confirmed = [item["label"] for item in fields.values() if item.get("state") == "confirmed"]
+    pending = [item["label"] for item in fields.values() if item.get("state") != "confirmed"]
+    summary = "Guardé localmente los campos confirmados con su fuente y fecha."
+    if confirmed:
+        summary += " Confirmados: " + ", ".join(confirmed) + "."
+    if pending:
+        summary += " Pendiente: " + ", ".join(pending) + "."
+    return summary + " " + _advance_after_evidence(base, state)
+
+
+def _wants_evidence(text: str) -> str | None:
+    normal = _normalise(text)
+    for decision in DECISIONS:
+        if re.search(rf"\b(?:trabajar|profundizar|cuantificar|ver)\b.*\b{decision}\b", normal):
+            return decision
+    if re.search(r"\b(?:caja|efectivo|power of one|ciclo de efectivo)\b", normal):
+        return "cash"
+    if re.search(r"\b(?:excel|xlsx|csv|archivo|reporte)\b", normal):
+        return "cash"
+    return None
+
+
+def _evidence_turn(base: Path, state: dict[str, Any], text: str) -> str | None:
+    stage = state.get("stage")
+    normal = _normalise(text).strip(" .!¡?¿")
+    if stage == "evidence_offer":
+        score = _answer_score(text)
+        if score is not None:
+            decision = str(state.get("evidence_decision", ""))
+            answers = dict(state.get("answers", {}))
+            answers.update(_score_answers(decision, score))
+            state["answers"] = answers
+            return _advance_after_evidence(base, state)
+        if normal in {"cualitativo", "mantener cualitativo", "sin calificacion", "sin calificación", "omitir", "ahora no", "no"}:
+            return _advance_after_evidence(base, state)
+        if re.search(r"\b(?:si|sí|cuantificar|datos|real|manual|archivo|excel|conector)\b", normal):
+            return _start_evidence_capture(base, state)
+        return "Puedes decir “mantener cualitativo”, “cuantificar”, o elegir un número del 1 al 5 si quieres registrar una calificación puntual."
+    if stage == "evidence_choice":
+        if normal in {"cualitativo", "mantener cualitativo", "cancelar", "ahora no", "no"}:
+            return _advance_after_evidence(base, state)
+        if re.search(r"\b(?:manual|capturar|escribir)\b", normal):
+            state.update({"stage": "evidence_manual", "draft_evidence_field_index": 0, "draft_evidence_values": {}, "draft_evidence_source_type": "manual", "draft_evidence_source_ref": "captura manual"})
+            _save(base, state)
+            first = field_specs(str(state.get("evidence_decision", "")))[0]
+            return "Empecemos con el dato mínimo. " + first.question
+        if re.search(r"\b(?:archivo|excel|xlsx|csv|reporte)\b", normal):
+            state["stage"] = "evidence_file"
+            _save(base, state)
+            return "Comparte un archivo CSV o XLSX con las columnas necesarias. Lo previsualizaré localmente y te mostraré el mapeo antes de conservar cualquier campo."
+        if re.search(r"\b(?:conector|drive|calendar|calendario|crm|host)\b", normal):
+            state["stage"] = "evidence_host"
+            _save(base, state)
+            return "Autoriza el acceso dentro de tu host y comparte sólo una tabla con los campos necesarios. No abriré cuentas, no instalaré conectores ni asumiré acceso continuo."
+        return "Elige captura manual, archivo CSV/XLSX, contenido autorizado por conector, o mantenerlo cualitativo."
+    if stage == "evidence_manual":
+        decision = str(state.get("evidence_decision", ""))
+        specs = field_specs(decision)
+        index = int(state.get("draft_evidence_field_index", 0))
+        if index >= len(specs):
+            return "No pude recuperar el dato pendiente. Empecemos de nuevo con la captura manual."
+        if sensitivity_of(text):
+            return "Eso parece un dato delicado. No lo guardaré ni indexaré; comparte sólo el valor agregado necesario para la metodología. " + specs[index].question
+        preview = EvidenceStore(base).preview_values(decision, {specs[index].key: text})
+        if not preview.ready:
+            return (preview.reason or "No pude interpretar ese dato.") + " " + specs[index].question
+        values = dict(state.get("draft_evidence_values", {}))
+        values[specs[index].key] = preview.proposed[specs[index].key]
+        index += 1
+        if index < len(specs):
+            state.update({"draft_evidence_values": values, "draft_evidence_field_index": index})
+            _save(base, state)
+            return specs[index].question
+        final_preview = EvidenceStore(base).preview_values(decision, values)
+        return _preview_to_confirmation(base, state, final_preview, "manual")
+    if stage == "evidence_file":
+        match = re.search(r"(?:archivo|file)\s*[:：]\s*(.+)", text, re.IGNORECASE)
+        if not match:
+            return "Cuando el archivo esté disponible en esta conversación, lo previsualizaré localmente antes de usarlo. También puedes elegir captura manual."
+        return _preview_to_confirmation(base, state, EvidenceStore(base).preview_file(match.group(1).strip(), str(state.get("evidence_decision", ""))), "file_preview")
+    if stage == "evidence_host":
+        match = re.search(r"(?:contenido|datos)\s*[:：]\s*(.+)", text, re.IGNORECASE | re.DOTALL)
+        if not match:
+            return "Después de autorizarlo en tu host, comparte sólo una tabla con las columnas necesarias. También puedes elegir captura manual."
+        return _preview_to_confirmation(base, state, EvidenceStore(base).preview_host_content(match.group(1).strip(), str(state.get("evidence_decision", ""))), "host_connector")
+    if stage == "evidence_confirm_field":
+        keys = state.get("draft_evidence_keys", [])
+        index = int(state.get("draft_evidence_field_index", 0))
+        if not isinstance(keys, list) or index >= len(keys):
+            return _finish_evidence_capture(base, state)
+        key = str(keys[index])
+        decision = str(state.get("evidence_decision", ""))
+        source_type = str(state.get("draft_evidence_source_type", "manual"))
+        source_ref = str(state.get("draft_evidence_source_ref", "captura manual"))
+        if _answers_yes(text):
+            saved = EvidenceStore(base).confirm_value(decision=decision, field=key, value=dict(state.get("draft_evidence_values", {})).get(key), source_type=source_type, source_ref=source_ref, content_sha256=state.get("draft_evidence_sha256"), source_id=state.get("draft_evidence_source_id"))
+            if not saved.ready:
+                return "No pude guardar ese campo confirmado: " + (saved.reason or "inténtalo de nuevo")
+            state["draft_evidence_source_id"] = saved.source_id
+        elif _answers_no(text) or normal in {"omitir", "rechazar"}:
+            EvidenceStore(base).reject_value(decision=decision, field=key, source_type=source_type, source_ref=source_ref)
+        else:
+            return "No lo guardaré sin una decisión clara. Responde “sí” para confirmar o “no” para rechazar este campo."
+        state["draft_evidence_field_index"] = index + 1
+        _save(base, state)
+        return _evidence_field_question(state) if index + 1 < len(keys) else _finish_evidence_capture(base, state)
+    if stage not in {"company_name", "company_industry", "company_employees", "diagnosis_narrative", "narrative_score_confirmation", "plan", "diagnosis"}:
+        decision = _wants_evidence(text)
+        if decision:
+            state.update({"stage": "evidence_offer", "evidence_decision": decision, "evidence_narrative_index": len(DECISIONS)})
+            _save(base, state)
+            return _start_evidence_capture(base, state)
+    return None
+
+
 def _connected_context_turn(base: Path, state: dict[str, Any], text: str) -> str | None:
     normal = _normalise(text)
     pending_need = state.get("connected_guidance_need")
@@ -900,10 +1112,8 @@ def _continue_narrative_diagnosis(base: Path, state: dict[str, Any], text: str) 
         return _narrative_question(index + 1) if index + 1 < len(DECISIONS) else _finish_narrative_diagnosis(base, state)
     notes = dict(state.get("diagnostic_notes", {}))
     notes[decision] = text.strip()
-    state.update({"diagnostic_notes": notes, "stage": "narrative_score_confirmation", "pending_decision": decision, "pending_score": _provisional_score(text)})
-    _save(base, state)
-    preview = text.strip().replace("\n", " ")[:220]
-    return f"Entendí esto sobre {DIAGNOSE_QUESTIONS[decision]['label']}: “{preview}”. Con esa evidencia propondría provisionalmente {state['pending_score']}/5. ¿La aceptas, prefieres otro número del 1 al 5, o quieres dejarla sin calificación?"
+    state["diagnostic_notes"] = notes
+    return _offer_evidence(base, state, decision, text)
 
 
 def _confirm_narrative_score(base: Path, state: dict[str, Any], text: str) -> str:
@@ -1291,6 +1501,9 @@ def run(message: str, base_path: str | Path = ".") -> str:
     cadence_reply = _cadence_turn(base, state, text)
     if cadence_reply is not None:
         return cadence_reply
+    evidence_reply = _evidence_turn(base, state, text)
+    if evidence_reply is not None:
+        return evidence_reply
     connected_reply = _connected_context_turn(base, state, text)
     if connected_reply is not None:
         return connected_reply

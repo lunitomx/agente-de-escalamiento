@@ -292,9 +292,16 @@
         variableKeys: VARIABLE_KEYS,
         variableMeta: variableMeta,
         onRecalc: onRecalc,
-        onLoad: function (meta, hasData) {
-          scenarioActive = hasData;
-          setSource(hasData ? sourceLabel(meta) : 'Aún no hay un escenario guardado. Captura una línea base real y un escenario para comenzar.');
+        onLoad: function (meta, hasData, data) {
+          var pending = meta && Array.isArray(meta.pending_fields) ? meta.pending_fields : [];
+          scenarioActive = hasData && pending.length === 0;
+          if (!hasData) {
+            setSource('Aún no hay un escenario guardado. Captura una línea base real y un escenario para comenzar.');
+          } else if (pending.length) {
+            setSource(sourceLabel(meta) + ' · Pendiente: ' + pending.join(', ') + '. No mostraré impactos hasta completar estos datos.');
+          } else {
+            setSource(sourceLabel(meta));
+          }
         },
         onModified: function () {
           scenarioActive = true;

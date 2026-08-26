@@ -12,7 +12,7 @@ import sqlite3
 from functools import lru_cache
 from pathlib import Path
 
-SCHEMA_VERSION = 10
+SCHEMA_VERSION = 11
 
 DDL_STATEMENTS = [
     # ── Meta / version tracking ──────────────────────────────────────
@@ -340,6 +340,47 @@ DDL_STATEMENTS = [
         FOREIGN KEY(session_id) REFERENCES accountability_sessions(id)
     )
     """,
+    # ── Methodology evidence (v11, local/confirmed fields only) ───────
+    """
+    CREATE TABLE IF NOT EXISTS evidence_sources (
+        id             TEXT PRIMARY KEY,
+        source_type    TEXT NOT NULL CHECK(source_type IN ('manual', 'file_preview', 'host_connector')),
+        source_ref     TEXT NOT NULL,
+        observed_at    TEXT NOT NULL,
+        allowed_scope  TEXT NOT NULL CHECK(allowed_scope IN ('people', 'strategy', 'execution', 'cash')),
+        content_sha256 TEXT DEFAULT NULL,
+        created_at     TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS evidence_proposals (
+        id          TEXT PRIMARY KEY,
+        source_id   TEXT NOT NULL,
+        methodology TEXT NOT NULL,
+        field       TEXT NOT NULL,
+        value_json  TEXT DEFAULT NULL,
+        sensitivity TEXT NOT NULL CHECK(sensitivity IN ('none', 'secret', 'personal_data')),
+        state       TEXT NOT NULL CHECK(state IN ('accepted', 'rejected', 'superseded')),
+        decided_at  TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(source_id) REFERENCES evidence_sources(id)
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS methodology_values (
+        id          TEXT PRIMARY KEY,
+        methodology TEXT NOT NULL,
+        field       TEXT NOT NULL,
+        value_json  TEXT NOT NULL,
+        source_id   TEXT NOT NULL,
+        observed_at TEXT NOT NULL,
+        confidence  REAL NOT NULL DEFAULT 1.0 CHECK(confidence >= 0.0 AND confidence <= 1.0),
+        version     INTEGER NOT NULL,
+        status      TEXT NOT NULL CHECK(status IN ('active', 'superseded')),
+        created_at  TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(source_id) REFERENCES evidence_sources(id),
+        UNIQUE(methodology, field, version)
+    )
+    """,
 ]
 
 # The v4 read-only bridge accepts only the exact historical v4 contract. The
@@ -381,6 +422,9 @@ INDEX_STATEMENTS = [
     "CREATE INDEX IF NOT EXISTS idx_accountability_commitments_session_status ON accountability_commitments(session_id, status)",
     "CREATE INDEX IF NOT EXISTS idx_accountability_commitments_due ON accountability_commitments(status, due_on)",
     "CREATE INDEX IF NOT EXISTS idx_accountability_exclusions_session ON accountability_exclusions(session_id, changed_at)",
+    "CREATE INDEX IF NOT EXISTS idx_evidence_sources_scope_observed ON evidence_sources(allowed_scope, observed_at)",
+    "CREATE INDEX IF NOT EXISTS idx_evidence_proposals_source_state ON evidence_proposals(source_id, state)",
+    "CREATE INDEX IF NOT EXISTS idx_methodology_values_active ON methodology_values(methodology, field, status)",
 ]
 
 _V4_INDEX_STATEMENTS = tuple(INDEX_STATEMENTS[:14])
@@ -513,7 +557,7 @@ def context_read_schema_is_valid(connection: sqlite3.Connection) -> bool:
         # at v4 by the read-only bridge may retain those known tables after a
         # later runtime was opened; they are not consulted by context recovery.
         # Keep every v4-owned table/index exact and reject any other extra.
-        allowed_local_index_tables = {"workspace_documents", "workspace_facts", "human_context_entries", "human_context_accesses", "weekly_cadences", "weekly_commitments", "weekly_reviews", "cadence_automation_preferences", "accountability_sessions", "accountability_commitments", "accountability_exclusions"}
+        allowed_local_index_tables = {"workspace_documents", "workspace_facts", "human_context_entries", "human_context_accesses", "weekly_cadences", "weekly_commitments", "weekly_reviews", "cadence_automation_preferences", "accountability_sessions", "accountability_commitments", "accountability_exclusions", "evidence_sources", "evidence_proposals", "methodology_values"}
         if not expected_tables.issubset(actual_tables) or (
             actual_tables - expected_tables - allowed_local_index_tables
         ):

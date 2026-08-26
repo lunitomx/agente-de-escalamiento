@@ -391,7 +391,7 @@ def test_resume_fallback_preserves_each_public_flow_without_memory_writes(
     assert _memory_counts(project) == before_counts
 
 
-def test_narrative_diagnosis_accepts_detail_then_offers_an_explainable_optional_score(tmp_path):
+def test_narrative_diagnosis_keeps_detail_qualitative_before_any_optional_score(tmp_path):
     from coaching.router.conversation import run
 
     root = tmp_path / "narrative-diagnosis"
@@ -406,7 +406,7 @@ def test_narrative_diagnosis_accepts_detail_then_offers_an_explainable_optional_
         "Tenemos dos líderes fuertes, pero ventas no tiene responsable claro y eso retrasó dos contratos este mes.",
         base_path=root,
     )
-    assert "Entendí esto" in summary and "provisionalmente" in summary
+    assert "Entendí esto" in summary and "diagnóstico cualitativo" in summary
     next_question = run("sin calificación", base_path=root)
     assert "Strategy" in next_question
     assert "Respóndeme sólo con un número" not in summary
@@ -429,3 +429,39 @@ def test_intake_keeps_logo_and_url_as_references_not_company_description(tmp_pat
     assert profile["company"]["name"] == "RAISE"
     assert "docs.raiseframework.ai" not in profile["company"]["industry"]
     assert profile["company"]["declared_references"][0]["kind"] == "attachment_reference"
+
+
+
+def test_narrative_can_flow_into_cash_evidence_with_per_field_consent(tmp_path: Path) -> None:
+    from coaching.router.conversation import run
+    from escala_server.evidence import EvidenceStore
+
+    root = tmp_path / "cash-evidence"
+    root.mkdir()
+    run("quiero organizar mi empresa", base_path=root)
+    run("Lumen Casa", base_path=root)
+    run("Vendemos iluminación", base_path=root)
+    run("12", base_path=root)
+    run("ahora no", base_path=root)
+    offer = run("Tenemos dos líderes, pero no hay dueño claro de ventas.", base_path=root)
+    assert "diagnóstico cualitativo" in offer
+    run("mantener cualitativo", base_path=root)
+    run("Atendemos hogares y queremos aclarar por qué nos eligen.", base_path=root)
+    run("mantener cualitativo", base_path=root)
+    run("La prioridad se atasca porque no la seguimos semanalmente.", base_path=root)
+    run("mantener cualitativo", base_path=root)
+    cash_offer = run("La cobranza se atrasa y no sabemos qué parte del efectivo queda atrapada.", base_path=root)
+    assert "diagnóstico cualitativo" in cash_offer
+    choice = run("cuantificar", base_path=root)
+    assert "siete variables" in choice
+    assert "precio" in choice and "días de pago" in choice
+    assert "dato mínimo" in run("manual", base_path=root)
+    for value in ("100", "50", "40", "1200", "30", "20", "15"):
+        response = run(value, base_path=root)
+    assert "Revisemos uno por uno" in response
+    for _ in range(7):
+        response = run("sí", base_path=root)
+    assert "campos confirmados" in response
+    snapshot = EvidenceStore(root).snapshot("cash")
+    assert all(item["state"] == "confirmed" for item in snapshot["fields"].values())
+    assert snapshot["fields"]["price"]["value"] == 100.0
