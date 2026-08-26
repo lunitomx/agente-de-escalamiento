@@ -1,0 +1,8 @@
+{
+  "clients": {
+    "claude": {"status": "pass", "evidence_file": "claude.jsonl", "discovery": "one public scaleup skill", "continuity": "pause, fictitious statement, yes, new-session resume"},
+    "codex": {"status": "pass", "evidence_file": "codex.jsonl", "discovery": "one public scaleup skill", "continuity": "pause, fictitious statement, yes, new-session resume"}
+  },
+  "response_policy": {"no_paths": true, "no_sqlite": true, "no_skill_internals": true},
+  "evidence_contract": {"data": "fictitious", "raw_transcripts": "not retained", "verification": "offline semantic verifier plus redacted-artifact hashes"}
+}

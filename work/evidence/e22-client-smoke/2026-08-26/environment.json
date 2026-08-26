@@ -1,0 +1,7 @@
+{
+  "date_utc": "2026-08-26",
+  "clients": {"claude_code": "2.1.241", "codex_cli": "0.149.0"},
+  "bundle_version": "1.0.0",
+  "isolation": "Each run used a new /tmp root, fictitious data, and an installed runtime. No global client directory was modified.",
+  "permissions": {"claude": "Only Bash(<installed frontdoor> conversation *) was allowed.", "codex": "--approve-for-me with default workspace-write sandbox; no bypass flag."}
+}

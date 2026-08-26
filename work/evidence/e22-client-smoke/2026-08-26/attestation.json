@@ -1,0 +1,28 @@
+{
+  "format": "e22-client-smoke-attestation/v1",
+  "scope": {
+    "date_utc": "2026-08-26",
+    "clients": ["claude", "codex"],
+    "scenario": "one installed public scaleup skill; pause, fictitious statement, explicit yes, new-session resume"
+  },
+  "provenance": {
+    "source": "recorded disposable client runs",
+    "collection_command": "commands.sh <claude|codex>",
+    "verification": "verify.sh runs offline against this redacted evidence"
+  },
+  "redaction": {
+    "runtime_placeholder": "<RUNTIME>",
+    "removed": ["temporary paths", "session identifiers", "signatures", "tool lists"],
+    "raw_transcripts_retained": false,
+    "fictitious_business_data_only": true
+  },
+  "sha256": {
+    "assertions.json": "43e2060709d6ee83bab0de8590057080e46c59bc5775e3052c281054b2fbe86a",
+    "environment.json": "c1374281f8f9738ea2bc2a43d3d7649cb191fed8419748864f8c6612f9e7a5ee",
+    "claude.jsonl": "3befa45ff2399424d2023402b38b5514b0a893abe4a6fc1cd563c64274070105",
+    "codex.jsonl": "fbdb0797b03108683ce5a6731324a574fcdb5ec54704218b2b4ecfe8018c6981",
+    "README.md": "3dd40bec5ba5f85c612880088d71f1b6bf31d6779c4d18d0eefd89154363953f",
+    "commands.sh": "61a167c76c74eed08776fbc4212566147a2ad590112898edce9ee535f717cc3d",
+    "verify.sh": "e9bccf21fc89766cef54cdaf43d5d6c6a20ea5cd7511c691f3cdada75684a25b"
+  }
+}
