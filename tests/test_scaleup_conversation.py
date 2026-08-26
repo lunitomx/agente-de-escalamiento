@@ -2,10 +2,15 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import subprocess
 from pathlib import Path
 
+import pytest
+
+from coaching.core import write_yaml
+from escala_server.project_memory import ProjectMemoryRuntime
 from escala_server.project_memory_session_close import ProjectMemorySessionClose
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -186,3 +191,55 @@ def test_pause_no_and_ambiguous_never_confirm_an_entry(tmp_path: Path) -> None:
             db.execute("SELECT COUNT(*) FROM confirmed_memory_entries").fetchone()[0]
             == 0
         )
+
+
+def _memory_digest(root: Path) -> str | None:
+    path = root / ".scaleup" / "memory" / "escala.db"
+    return hashlib.sha256(path.read_bytes()).hexdigest() if path.is_file() else None
+
+
+def _prepare_public_flow(root: Path, flow: str) -> None:
+    root.mkdir()
+    if flow == "onboarding":
+        return
+    write_yaml(
+        root / ".scaleup" / "agent" / "memory" / "company-profile.yaml",
+        {"company": {"name": "Lumen Casa", "industry": "Retail", "employees": 28}},
+    )
+    states = {
+        "diagnosis": {"stage": "diagnosis", "diagnosis_index": 0, "answers": {}},
+        "plan": {"stage": "plan", "plan_step": 0, "plan": {}},
+        "progress": {"stage": "post_plan"},
+    }
+    write_yaml(
+        root / ".scaleup" / "agent" / "memory" / "conversation.yaml", states[flow]
+    )
+
+
+def _prepare_memory_fixture(root: Path, fixture: str) -> None:
+    path = root / ".scaleup" / "memory" / "escala.db"
+    if fixture == "empty":
+        assert ProjectMemoryRuntime(root).ensure_memory().ready
+    elif fixture == "corrupt":
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(b"not a sqlite database")
+
+
+@pytest.mark.parametrize("fixture", ("absent", "empty", "corrupt"))
+@pytest.mark.parametrize("flow", ("onboarding", "diagnosis", "plan", "progress"))
+def test_resume_fallback_preserves_each_public_flow_without_memory_writes(
+    tmp_path: Path, fixture: str, flow: str
+) -> None:
+    from coaching.router.conversation import run
+
+    baseline, project = tmp_path / "baseline", tmp_path / fixture
+    _prepare_public_flow(baseline, flow)
+    _prepare_public_flow(project, flow)
+    _prepare_memory_fixture(project, fixture)
+    before = _memory_digest(project)
+
+    expected = run("retomemos", base_path=baseline)
+    actual = run("retomemos", base_path=project)
+
+    assert actual == expected
+    assert _memory_digest(project) == before
