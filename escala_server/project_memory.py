@@ -181,7 +181,9 @@ class ProjectMemoryRuntime:
             if database.read(16) != b"SQLite format 3\x00":
                 return
         with sqlite3.connect(f"file:{self.db_path}?mode=rw", uri=True) as connection:
-            checkpoint = connection.execute("PRAGMA wal_checkpoint(TRUNCATE)").fetchone()
+            checkpoint = connection.execute(
+                "PRAGMA wal_checkpoint(TRUNCATE)"
+            ).fetchone()
         if checkpoint is None or checkpoint[0] != 0:
             raise sqlite3.OperationalError("cannot checkpoint active local database")
 
