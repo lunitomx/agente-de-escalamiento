@@ -26,6 +26,20 @@ _FACT_PREFIXES = ("profile.focus.", "diagnosis.", "profile.")
 _SENSITIVE_KEY_PARTS = frozenset(
     {"api", "credential", "key", "password", "secret", "token"}
 )
+_SENSITIVE_COMPACT_FORMS = frozenset(
+    {
+        "apikey",
+        "accesskey",
+        "authkey",
+        "clientkey",
+        "privatekey",
+        "secretkey",
+        "password",
+        "secret",
+        "token",
+        "credential",
+    }
+)
 
 
 @dataclass(frozen=True)
@@ -136,7 +150,11 @@ class ProjectMemorySessionContext:
         normalized = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", " ", key)
         normalized = re.sub(r"(?<=[A-Z])(?=[A-Z][a-z])", " ", normalized).lower()
         tokens = set(re.split(r"[^a-z0-9]+", normalized))
-        return not bool(tokens & _SENSITIVE_KEY_PARTS)
+        compact = re.sub(r"[^a-z0-9]+", "", normalized)
+        return not bool(
+            tokens & _SENSITIVE_KEY_PARTS
+            or any(form in compact for form in _SENSITIVE_COMPACT_FORMS)
+        )
 
     @staticmethod
     def _brief_scalar(raw_value: object) -> str | None:

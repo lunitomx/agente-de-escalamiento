@@ -292,9 +292,19 @@ def test_sensitive_or_oversized_worksheet_metadata_is_not_recovered(
     assert all("x" * 97 not in item.key for item in result.items)
 
 
-@pytest.mark.parametrize("sensitive_name", ("APIKey", "DBPassword"))
-def test_acronym_sensitive_fact_and_metadata_are_not_recovered(
-    tmp_path: Path, sensitive_name: str
+@pytest.mark.parametrize(
+    ("sensitive_name", "metadata_field"),
+    (
+        ("APIKey", "category"),
+        ("DBPassword", "tool"),
+        ("apikey", "category"),
+        ("dbpassword", "tool"),
+        ("clientsecret", "category"),
+        ("ClientSecret", "tool"),
+    ),
+)
+def test_sensitive_fact_and_worksheet_metadata_are_not_recovered(
+    tmp_path: Path, sensitive_name: str, metadata_field: str
 ) -> None:
     root = migrated_project(tmp_path)
     profile = root / ".scaleup/agent/memory/company-profile.yaml"
@@ -305,10 +315,16 @@ def test_acronym_sensitive_fact_and_metadata_are_not_recovered(
     assert ProjectMemoryMigrator(root).migrate().ready
     runtime = ProjectMemoryRuntime(root)
     with sqlite3.connect(runtime.db_path) as connection:
-        connection.execute(
-            "UPDATE worksheets SET category = ? WHERE category = ?",
-            (sensitive_name, "context"),
-        )
+        if metadata_field == "category":
+            connection.execute(
+                "UPDATE worksheets SET category = ? WHERE category = ?",
+                (sensitive_name, "context"),
+            )
+        else:
+            connection.execute(
+                "UPDATE worksheets SET tool = ? WHERE tool = ?",
+                (sensitive_name, "focus"),
+            )
 
     result = ProjectMemorySessionContext(root).load()
 
