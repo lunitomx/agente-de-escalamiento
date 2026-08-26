@@ -57,7 +57,7 @@ skills, rutas ni la arquitectura al empresario.
 
 | Orden | Story | Tamaño | Resultado |
 |:---:|---|:---:|---|
-| 1 | S22.1 — Contrato y ADR de memoria | M | Esquemas, privacidad, confirmación y fuente única definidos. |
+| 1 | S22.1 — Contrato y ADR de memoria ✓ | M | Esquemas, privacidad, confirmación y fuente única definidos. |
 | 2 | S22.2 — Runtime, instalación y ciclo SQLite ✓ | L | E18 se distribuye, crea/valida base por proyecto y permite rollback. |
 | 3 | S22.3 — Migración YAML idempotente ✓ | L | Perfil, diagnóstico, plan y worksheets migran sin pérdida ni duplicados. |
 | 4 | S22.4 — Inicio y recuperación contextual ✓ | M | Sesión nueva recupera facts, cambios y foco relevante. |
@@ -67,28 +67,43 @@ skills, rutas ni la arquitectura al empresario.
 
 ## Acceptance Criteria
 
-- [ ] Una instalación limpia contiene el runtime de memoria esperado en cada
+- [x] Una instalación limpia contiene el runtime de memoria esperado en cada
   plataforma soportada y no instala datos de empresa compartidos globalmente.
-- [ ] La migración se puede repetir y conserva todos los artefactos actuales.
-- [ ] La conversación nueva recupera información relevante verificable desde la
+- [x] La migración se puede repetir y conserva todos los artefactos actuales.
+- [x] La conversación nueva recupera información relevante verificable desde la
   base, aun sin historial de chat.
-- [ ] Hechos y decisiones muestran su fuente; las inferencias no confirmadas se
+- [x] Hechos y decisiones muestran su fuente; las inferencias no confirmadas se
   distinguen o se descartan.
-- [ ] Cambios, contradicciones y confianza siguen una política documentada.
-- [ ] Fallo o ausencia de SQLite degrada con seguridad al flujo actual.
-- [ ] Instalar → conversar → cerrar → abrir sesión nueva → recuperar pasa en
+- [x] Cambios, contradicciones y confianza siguen una política documentada.
+- [x] Fallo o ausencia de SQLite degrada con seguridad al flujo actual.
+- [x] Instalar → conversar → cerrar → abrir sesión nueva → recuperar pasa en
   Claude Code y Codex; Hermes obtiene cobertura equivalente o un límite explícito.
-- [ ] Suite completa, smoke real, backup/restore y desinstalación pasan antes del
+  Hermes: sólo hay cobertura determinista del bundle; en este host el cliente
+  real no inicializa porque no puede leer `/usr/local/lib/hermes-agent/.env`
+  (`PermissionError`), por lo que la paridad de discovery/conversación queda
+  explícitamente fuera de esta afirmación hasta disponer de esa configuración.
+- [x] Suite completa, smoke real, backup/restore y desinstalación pasan antes del
   cierre.
 
 ## Gates Before Implementation
 
-- [ ] ADR aprobado: ubicación de base, esquema, confirmación y retención.
-- [ ] Política de migración/rollback aprobada con fixture de empresa existente.
-- [ ] Contrato de memoria y casos adversariales escritos antes de tocar el front
+- [x] ADR aprobado: ubicación de base, esquema, confirmación y retención.
+- [x] Política de migración/rollback aprobada con fixture de empresa existente.
+- [x] Contrato de memoria y casos adversariales escritos antes de tocar el front
   door.
 - [x] Diagnóstico RaiSE M documentado localmente el 2026-08-26.
 - [x] Base actual: 404 passed, 2 skipped (2026-08-24).
+
+## Evidencia de cierre
+
+- Smoke de clientes registrado y verificable offline:
+  `work/evidence/e22-client-smoke/2026-08-26/` y su `verify.sh`. Conserva
+  hashes, aserciones y transcripciones redactadas; no pretende conservar la
+  proveniencia cruda de los procesos desechables.
+- `RAISE_TEST_WORKER_BUDGET=0 rai gate check gate-tests` finalizó
+  correctamente el 2026-08-26 sin inyectar paralelismo. Emitió el aviso
+  `RAISE-5391` de que la gate no tiene `--scope` dentro del workflow; el aviso
+  no cambió el resultado de la ejecución completa.
 
 ## Implementation Plan
 

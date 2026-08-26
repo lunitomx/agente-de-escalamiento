@@ -92,6 +92,18 @@ un One Page Strategic Plan (OPSP) persistido.
 
 ## Checkpoint de release E22 — 2026-08-26
 
+- La evidencia reproducible del smoke de clientes vive en
+  [`work/evidence/e22-client-smoke/2026-08-26/`](../work/evidence/e22-client-smoke/2026-08-26/).
+  Ejecutar `bash work/evidence/e22-client-smoke/2026-08-26/verify.sh` valida
+  hashes, aserciones y semántica de las transcripciones redactadas. Es un
+  verificador offline: no vuelve a ejecutar clientes, instalador, modelo ni
+  runtime, y no se presenta como proveniencia cruda de aquellas ejecuciones
+  desechables.
+- Gate completa final de pruebas:
+  `RAISE_TEST_WORKER_BUDGET=0 rai gate check gate-tests` finalizó correctamente
+  el 2026-08-26 sin inyección de workers. La CLI emitió sólo el aviso
+  `RAISE-5391` para preferir `--scope` en ese contexto de workflow.
+
 - `rai gate check gate-tests --scope tests/test_scaleup_installer.py` instala Claude, Codex y Hermes en raíces temporales limpias y conversa sólo mediante el `scaleup-frontdoor` copiado: pausar → declaración → `sí` → nueva sesión → retomar. Verifica proveniencia, aislamiento y ausencia de datos empresariales en el runtime.
 - El smoke acredita rechazo de texto sensible, fallback con DB ausente/vacía/corrupta sin alterar memoria, backup/restore offline, rechazo de backup inválido, actualización y uninstall conservadores. `--purge` elimina sólo el runtime del target solicitado.
 - **Hermes:** el bundle y su front door pasaron el smoke determinista. No se declara paridad del cliente Hermes: en este host `/usr/local/bin/hermes --help` no inicializa porque no puede leer `/usr/local/lib/hermes-agent/.env` (`PermissionError`). Para cerrar la brecha hace falta un cliente Hermes con permisos de lectura de su configuración, en raíz temporal, que descubra `.hermes/skills/scaleup` y ejecute una conversación real contra el front door.
