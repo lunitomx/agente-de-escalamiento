@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from .contracts import AdviceItem, BoardResponse, EvidencePacket, SCHEMA_VERSION
+from .contracts import SCHEMA_VERSION, AdviceItem, BoardResponse, EvidencePacket
 
 DISCLOSURE = (
     "Esta es una lente sintética basada en Scaling Up; no es Verne Harnish, "
@@ -13,7 +13,8 @@ DISCLOSURE = (
 def validate_profile(path: str) -> list[str]:
     """Validate the versioned, non-impersonating board profile."""
     try:
-        value = open(path, encoding="utf-8").read()
+        with open(path, encoding="utf-8") as handle:
+            value = handle.read()
     except OSError as error:
         return [f"profile unreadable: {error}"]
     required = (
@@ -26,7 +27,11 @@ def validate_profile(path: str) -> list[str]:
         "Cash",
         "Línea fuente",
     )
-    return [f"missing profile requirement: {item}" for item in required if item.casefold() not in value.casefold()]
+    return [
+        f"missing profile requirement: {item}"
+        for item in required
+        if item.casefold() not in value.casefold()
+    ]
 
 
 class VerneLensAdvisor:
@@ -55,7 +60,7 @@ class VerneLensAdvisor:
                 evidence=packet.source_evidence,
             )
         observation = AdviceItem(
-            text=f"El contexto empresarial reporta un tema a validar en {packet.category}.",
+            text=packet.company_facts[0].text[:360],
             kind="company_observation",
             company_fact_ids=fact_ids,
             confidence="low",
@@ -67,7 +72,9 @@ class VerneLensAdvisor:
             evidence_ids=evidence_ids,
             confidence="medium",
         )
-        question = f"¿Qué resultado observable confirmará el avance en {packet.category}?"
+        question = (
+            f"¿Qué resultado observable confirmará el avance en {packet.category}?"
+        )
         summary = "Revisión breve con evidencia local y una inferencia marcada para decisión humana."
         if mode == "decision_consult":
             summary = "Consulta estructurada: la decisión sigue siendo humana y se muestra la evidencia disponible."
@@ -85,15 +92,31 @@ class VerneLensAdvisor:
 
     @staticmethod
     def render_markdown(response: BoardResponse) -> str:
-        lines = ["## Lente de Board de ScaleUp", "", response.disclosure, "", f"**Resumen:** {response.summary}"]
+        lines = [
+            "## Lente de Board de ScaleUp",
+            "",
+            response.disclosure,
+            "",
+            f"**Resumen:** {response.summary}",
+        ]
         if response.observations:
-            lines += ["", "### Observación"] + [f"- {item.text} *(inferencia/dato de empresa)*" for item in response.observations]
+            lines += ["", "### Observación"] + [
+                f"- {item.text} *(inferencia/dato de empresa)*"
+                for item in response.observations
+            ]
         if response.questions:
             lines += ["", "### Pregunta"] + [f"- {item}" for item in response.questions]
         if response.recommended_actions:
-            lines += ["", "### Siguiente paso propuesto"] + [f"- {item.text}" for item in response.recommended_actions]
+            lines += ["", "### Siguiente paso propuesto"] + [
+                f"- {item.text}" for item in response.recommended_actions
+            ]
         if response.evidence:
-            lines += ["", "### Evidencia local"] + [f"- {item.entity_name} (líneas {', '.join(map(str, item.line_refs))})" for item in response.evidence]
+            lines += ["", "### Evidencia local"] + [
+                f"- {item.entity_name} (líneas {', '.join(map(str, item.line_refs))})"
+                for item in response.evidence
+            ]
         if response.limitations:
-            lines += ["", "### Límites"] + [f"- {item}" for item in response.limitations]
+            lines += ["", "### Límites"] + [
+                f"- {item}" for item in response.limitations
+            ]
         return "\n".join(lines)

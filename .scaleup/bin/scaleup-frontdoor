@@ -215,6 +215,25 @@ def _open_panel() -> int:
     print(f"No pude abrir el panel. Puedes revisar el registro local en {log_path}.")
     return 1
 
+def _host_attachment() -> object | None:
+    """Read a one-shot host envelope; the user never supplies a file path."""
+    raw = os.environ.pop("SCALEUP_ATTACHMENT_ENVELOPE", "")
+    if not raw:
+        return None
+    try:
+        from escala_server.evidence import AttachmentEnvelope
+        value = json.loads(raw)
+        if not isinstance(value, dict):
+            return None
+        return AttachmentEnvelope(
+            name=str(value.get("name", "")), media_type=str(value.get("media_type", "")),
+            temporary_path=str(value.get("temporary_path", "")), observed_at=str(value.get("observed_at", "")),
+            authorized=value.get("authorized") is True,
+        )
+    except (TypeError, ValueError):
+        return None
+
+
 def _conversation(message: str) -> int:
     """Run the fixed stateful public conversation; no caller supplied JSON."""
     if _wants_close_panel(message):
@@ -226,7 +245,7 @@ def _conversation(message: str) -> int:
 
     _reconcile_memory()
     try:
-        response = run(message, base_path=".")
+        response = run(message, base_path=".", attachment=_host_attachment())
     finally:
         _reconcile_memory()
     print(response)

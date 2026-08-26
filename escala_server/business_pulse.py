@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import sqlite3
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -85,7 +84,9 @@ class BusinessPulseHandler:
         pulse, pulse_source = self._worksheet(db, "diagnosis", "pulse-history")
         power, power_source = self._worksheet(db, "cash", "power-of-one")
 
-        scores = profile.get("scores") if isinstance(profile.get("scores"), dict) else {}
+        scores = (
+            profile.get("scores") if isinstance(profile.get("scores"), dict) else {}
+        )
         focus = profile.get("focus") if isinstance(profile.get("focus"), dict) else {}
         latest_pulse = self._latest_pulse(pulse)
         decisions = self._decisions(scores, latest_pulse, profile_source, pulse_source)
@@ -99,7 +100,12 @@ class BusinessPulseHandler:
             if source and source.get("observed_at")
         ]
         has_data = any(
-            [company.get("name"), any(d["score"] is not None for d in decisions), plan, power]
+            [
+                company.get("name"),
+                any(d["score"] is not None for d in decisions),
+                plan,
+                power,
+            ]
         )
         complete_sections = sum(
             [
@@ -108,10 +114,21 @@ class BusinessPulseHandler:
                 bool(power),
             ]
         )
+        context = None
+        if self.project_root is not None:
+            from .company_context import CompanyContextReader
+
+            context = (
+                CompanyContextReader(self.project_root).read(consumer="pulse").to_dict()
+            )
         return {
             "mode": "company",
             "synthetic": False,
-            "state": "empty" if not has_data else "ready" if complete_sections == 3 else "partial",
+            "state": "empty"
+            if not has_data
+            else "ready"
+            if complete_sections == 3
+            else "partial",
             "company": company,
             "as_of": max(source_dates) if source_dates else None,
             "decisions": decisions,
@@ -124,14 +141,23 @@ class BusinessPulseHandler:
             },
             "timeline": timeline,
             "actions": self._actions(decisions, plan_view, power),
+            "executive_context": context
+            or {
+                "items": [],
+                "gaps": ["Abre el proyecto local para leer contexto ejecutivo."],
+            },
         }
 
     @staticmethod
-    def _profile(db: sqlite3.Connection) -> tuple[dict[str, Any], dict[str, Any] | None]:
+    def _profile(
+        db: sqlite3.Connection,
+    ) -> tuple[dict[str, Any], dict[str, Any] | None]:
         row = db.execute(
             "SELECT metadata, updated_at FROM companies ORDER BY updated_at DESC, id DESC LIMIT 1"
         ).fetchone()
-        source = BusinessPulseHandler._latest_source(db, "company-profile", PROFILE_PATH)
+        source = BusinessPulseHandler._latest_source(
+            db, "company-profile", PROFILE_PATH
+        )
         if row is None:
             return {}, source
         try:
@@ -164,7 +190,9 @@ class BusinessPulseHandler:
             "observed_at": row["updated_at"] or row["created_at"],
             "type": "local_worksheet",
         }
-        if all(raw.get(key) for key in ("source_kind", "relative_path", "content_sha256")):
+        if all(
+            raw.get(key) for key in ("source_kind", "relative_path", "content_sha256")
+        ):
             nested = raw.get("payload")
             payload = nested if isinstance(nested, dict) else {}
             source = {
@@ -174,11 +202,17 @@ class BusinessPulseHandler:
                 "type": str(raw["source_kind"]),
             }
         if category == "strategy" and tool == "opsp":
-            frontmatter = payload.get("frontmatter") if isinstance(payload, dict) else None
-            if isinstance(frontmatter, dict) and isinstance(frontmatter.get("data"), dict):
+            frontmatter = (
+                payload.get("frontmatter") if isinstance(payload, dict) else None
+            )
+            if isinstance(frontmatter, dict) and isinstance(
+                frontmatter.get("data"), dict
+            ):
                 payload = dict(frontmatter["data"])
                 payload.setdefault("status", frontmatter.get("status"))
-                source["observed_at"] = frontmatter.get("updated_at") or source["observed_at"]
+                source["observed_at"] = (
+                    frontmatter.get("updated_at") or source["observed_at"]
+                )
         return payload, source
 
     @staticmethod
@@ -216,13 +250,19 @@ class BusinessPulseHandler:
         profile_source: dict[str, Any] | None,
         plan_source: dict[str, Any] | None,
     ) -> dict[str, Any]:
-        company = profile.get("company") if isinstance(profile.get("company"), dict) else {}
+        company = (
+            profile.get("company") if isinstance(profile.get("company"), dict) else {}
+        )
         name = company.get("name") or plan.get("company_name")
         industry = company.get("industry")
         return {
             "name": str(name).strip() if name else None,
             "industry": str(industry).strip() if industry else None,
-            "source": profile_source if company.get("name") else plan_source if name else None,
+            "source": profile_source
+            if company.get("name")
+            else plan_source
+            if name
+            else None,
         }
 
     @staticmethod
@@ -243,8 +283,16 @@ class BusinessPulseHandler:
         output = []
         for key, config in DECISIONS.items():
             raw_score = scores.get(key)
-            score = raw_score if isinstance(raw_score, (int, float)) and 1 <= raw_score <= 5 else None
-            trend = trends.get(key) if trends.get(key) in {"improving", "stalling", "regressing"} else None
+            score = (
+                raw_score
+                if isinstance(raw_score, (int, float)) and 1 <= raw_score <= 5
+                else None
+            )
+            trend = (
+                trends.get(key)
+                if trends.get(key) in {"improving", "stalling", "regressing"}
+                else None
+            )
             output.append(
                 {
                     "id": key,
@@ -254,7 +302,9 @@ class BusinessPulseHandler:
                     "state": "available" if score is not None else "pending",
                     "source": profile_source if score is not None else None,
                     "trend_source": pulse_source if trend else None,
-                    "cta": "Cuéntame cómo funciona hoy esta área" if score is None else "Abrir herramientas",
+                    "cta": "Cuéntame cómo funciona hoy esta área"
+                    if score is None
+                    else "Abrir herramientas",
                 }
             )
         return output
@@ -276,7 +326,10 @@ class BusinessPulseHandler:
             }
         scored = [item for item in decisions if item["score"] is not None]
         if scored:
-            lowest = min(scored, key=lambda item: (item["score"], list(DECISIONS).index(item["id"])))
+            lowest = min(
+                scored,
+                key=lambda item: (item["score"], list(DECISIONS).index(item["id"])),
+            )
             return {
                 "decision": lowest["id"],
                 "label": lowest["label"],
@@ -284,40 +337,60 @@ class BusinessPulseHandler:
                 "derived": True,
                 "source": source,
             }
-        return {"decision": None, "label": None, "reason": "Completa el diagnóstico para definir el foco", "derived": False, "source": None}
+        return {
+            "decision": None,
+            "label": None,
+            "reason": "Completa el diagnóstico para definir el foco",
+            "derived": False,
+            "source": None,
+        }
 
     @staticmethod
     def _plan(plan: dict[str, Any], source: dict[str, Any] | None) -> dict[str, Any]:
         fields = {
             "purpose": bool(plan.get("purpose")),
             "bhag": bool(plan.get("bhag")),
-            "market": bool((plan.get("sandbox") or {}).get("market")) if isinstance(plan.get("sandbox"), dict) else False,
-            "brand_promise": bool((plan.get("brand_promise") or {}).get("promise")) if isinstance(plan.get("brand_promise"), dict) else False,
+            "market": bool((plan.get("sandbox") or {}).get("market"))
+            if isinstance(plan.get("sandbox"), dict)
+            else False,
+            "brand_promise": bool((plan.get("brand_promise") or {}).get("promise"))
+            if isinstance(plan.get("brand_promise"), dict)
+            else False,
             "critical_number": bool(plan.get("critical_number")),
             "annual_priorities": bool(plan.get("annual_priorities")),
             "quarterly_priorities": bool(plan.get("quarterly_priorities")),
         }
         complete = sum(fields.values())
         total = len(fields)
-        priorities = [
-            {key: item.get(key) for key in ("priority", "owner", "kpi", "status")}
-            for item in plan.get("quarterly_priorities", [])
-            if isinstance(item, dict) and item.get("priority")
-        ] if isinstance(plan.get("quarterly_priorities"), list) else []
+        priorities = (
+            [
+                {key: item.get(key) for key in ("priority", "owner", "kpi", "status")}
+                for item in plan.get("quarterly_priorities", [])
+                if isinstance(item, dict) and item.get("priority")
+            ]
+            if isinstance(plan.get("quarterly_priorities"), list)
+            else []
+        )
         return {
             "available": bool(plan),
             "status": plan.get("status") if plan else None,
             "quarter": plan.get("quarter") if plan else None,
             "critical_number": plan.get("critical_number") if plan else None,
             "priorities": priorities,
-            "completion": {"complete": complete, "total": total, "percent": round(complete * 100 / total)},
+            "completion": {
+                "complete": complete,
+                "total": total,
+                "percent": round(complete * 100 / total),
+            },
             "missing": [key for key, present in fields.items() if not present],
             "source": source,
             "route": "/dashboards/execution/vision-summary.html",
         }
 
     @staticmethod
-    def _timeline(db: sqlite3.Connection, power_source: dict[str, Any] | None) -> list[dict[str, Any]]:
+    def _timeline(
+        db: sqlite3.Connection, power_source: dict[str, Any] | None
+    ) -> list[dict[str, Any]]:
         rows = db.execute(
             """SELECT source_kind, relative_path, applied_at FROM migration_applications
                ORDER BY id DESC LIMIT 8"""
@@ -340,7 +413,9 @@ class BusinessPulseHandler:
                     "type": "local_worksheet",
                 }
             )
-        return sorted(items, key=lambda item: item["observed_at"] or "", reverse=True)[:8]
+        return sorted(items, key=lambda item: item["observed_at"] or "", reverse=True)[
+            :8
+        ]
 
     @staticmethod
     def _actions(
@@ -348,30 +423,105 @@ class BusinessPulseHandler:
     ) -> list[dict[str, str]]:
         actions = []
         if not any(item["score"] is not None for item in decisions):
-            actions.append({"label": "Iniciar diagnóstico", "say": "Quiero entender cómo está mi empresa"})
+            actions.append(
+                {
+                    "label": "Iniciar diagnóstico",
+                    "say": "Quiero entender cómo está mi empresa",
+                }
+            )
         if not plan["available"]:
-            actions.append({"label": "Crear plan en una hoja", "say": "Ayúdame a crear mi plan en una hoja"})
+            actions.append(
+                {
+                    "label": "Crear plan en una hoja",
+                    "say": "Ayúdame a crear mi plan en una hoja",
+                }
+            )
         if not (power and isinstance(power.get("variables"), dict)):
-            actions.append({"label": "Modelar efectivo", "route": "/dashboards/cash/power-of-one.html"})
-        actions.append({"label": "Ver Accountability", "route": "/dashboards/execution/accountability.html"})
+            actions.append(
+                {
+                    "label": "Modelar efectivo",
+                    "route": "/dashboards/cash/power-of-one.html",
+                }
+            )
+        actions.append(
+            {
+                "label": "Ver Accountability",
+                "route": "/dashboards/execution/accountability.html",
+            }
+        )
         return actions
 
     @staticmethod
     def _demo() -> dict[str, Any]:
         observed = "2026-08-26"
-        source = {"label": "Demo sintética", "path": None, "observed_at": observed, "type": "synthetic_demo"}
+        source = {
+            "label": "Demo sintética",
+            "path": None,
+            "observed_at": observed,
+            "type": "synthetic_demo",
+        }
         scores = {"people": 4, "strategy": 3, "execution": 2, "cash": 3}
-        decisions = BusinessPulseHandler._decisions(scores, {"trends": {"people": "improving", "strategy": "stalling", "execution": "regressing", "cash": "improving"}}, source, source)
+        decisions = BusinessPulseHandler._decisions(
+            scores,
+            {
+                "trends": {
+                    "people": "improving",
+                    "strategy": "stalling",
+                    "execution": "regressing",
+                    "cash": "improving",
+                }
+            },
+            source,
+            source,
+        )
         return {
             "mode": "synthetic_demo",
             "synthetic": True,
             "state": "ready",
-            "company": {"name": "Empresa Ejemplo", "industry": "Demo", "source": source},
+            "company": {
+                "name": "Empresa Ejemplo",
+                "industry": "Demo",
+                "source": source,
+            },
             "as_of": observed,
             "decisions": decisions,
-            "priority": {"decision": "execution", "label": "Execution", "reason": "Ejemplo: calificación más baja", "derived": True, "source": source},
-            "plan": {"available": True, "status": "completed", "quarter": "Trimestre de ejemplo", "critical_number": "Ejemplo: 90% de entregas a tiempo", "priorities": [{"priority": "Reducir retrasos", "owner": "Responsable ejemplo", "kpi": "90% puntual", "status": "En curso"}], "completion": {"complete": 7, "total": 7, "percent": 100}, "missing": [], "source": source, "route": "/dashboards/execution/vision-summary.html"},
-            "power_of_one": {"available": True, "route": "/dashboards/cash/power-of-one.html", "source": source},
-            "timeline": [{"label": "Diagnóstico de demostración", "source": "Demo sintética", "observed_at": observed, "type": "synthetic_demo"}],
+            "priority": {
+                "decision": "execution",
+                "label": "Execution",
+                "reason": "Ejemplo: calificación más baja",
+                "derived": True,
+                "source": source,
+            },
+            "plan": {
+                "available": True,
+                "status": "completed",
+                "quarter": "Trimestre de ejemplo",
+                "critical_number": "Ejemplo: 90% de entregas a tiempo",
+                "priorities": [
+                    {
+                        "priority": "Reducir retrasos",
+                        "owner": "Responsable ejemplo",
+                        "kpi": "90% puntual",
+                        "status": "En curso",
+                    }
+                ],
+                "completion": {"complete": 7, "total": 7, "percent": 100},
+                "missing": [],
+                "source": source,
+                "route": "/dashboards/execution/vision-summary.html",
+            },
+            "power_of_one": {
+                "available": True,
+                "route": "/dashboards/cash/power-of-one.html",
+                "source": source,
+            },
+            "timeline": [
+                {
+                    "label": "Diagnóstico de demostración",
+                    "source": "Demo sintética",
+                    "observed_at": observed,
+                    "type": "synthetic_demo",
+                }
+            ],
             "actions": [],
         }

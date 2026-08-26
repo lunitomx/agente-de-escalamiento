@@ -197,6 +197,31 @@ class CaptureResult:
     reason: str | None = None
 
 
+@dataclass(frozen=True)
+class AttachmentEnvelope:
+    """One-shot attachment supplied and authorized by a host integration."""
+
+    name: str
+    media_type: str
+    temporary_path: str | Path
+    observed_at: str
+    authorized: bool
+
+    def valid(self) -> bool:
+        suffix = Path(self.name).suffix.casefold()
+        return (
+            self.authorized
+            and bool(self.name.strip())
+            and suffix in {".csv", ".xlsx"}
+            and self.media_type.casefold()
+            in {
+                "text/csv",
+                "application/vnd.ms-excel",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            }
+        )
+
+
 def field_specs(decision: str) -> tuple[FieldSpec, ...]:
     return FIELDS.get(decision, ())
 
@@ -268,8 +293,12 @@ def _as_number(value: object) -> float | None:
 class EvidenceStore:
     """Store accepted methodology facts in local SQLite with full provenance."""
 
-    def __init__(self, project_root: str | Path) -> None:
-        self.runtime = ProjectMemoryRuntime(project_root)
+    def __init__(
+        self, project_root: str | Path, *, local_state_root: str | Path | None = None
+    ) -> None:
+        self.runtime = ProjectMemoryRuntime(
+            project_root, local_state_root=local_state_root
+        )
 
     def preview_file(self, path: str | Path, decision: str) -> Preview:
         candidate = Path(path).expanduser()
@@ -311,6 +340,30 @@ class EvidenceStore:
             decision,
             _safe_source_ref(str(resolved)),
             hashlib.sha256(resolved.read_bytes()).hexdigest(),
+        )
+
+    def preview_attachment(
+        self, attachment: AttachmentEnvelope, decision: str
+    ) -> Preview:
+        """Preview a host-authorized attachment without retaining its path or bytes."""
+        if not attachment.valid():
+            return Preview(
+                False,
+                reason="El adjunto necesita autorización explícita del host y debe ser CSV o XLSX.",
+            )
+        preview = self.preview_file(attachment.temporary_path, decision)
+        if not preview.ready:
+            return preview
+        return Preview(
+            True,
+            preview.headers,
+            preview.rows,
+            preview.proposed,
+            preview.ambiguous,
+            preview.sensitivity,
+            preview.reason,
+            _safe_source_ref(attachment.name),
+            preview.content_sha256,
         )
 
     def preview_host_content(
@@ -584,7 +637,7 @@ class EvidenceStore:
         with sqlite3.connect(ready.db_path) as db:
             db.row_factory = sqlite3.Row
             rows = db.execute(
-                f"SELECT values_.field, values_.value_json, values_.observed_at, values_.confidence, sources.source_type, sources.source_ref FROM methodology_values AS values_ JOIN evidence_sources AS sources ON sources.id=values_.source_id WHERE values_.methodology IN ({placeholders}) AND values_.status='active'",
+                f"SELECT values_.field, values_.value_json, values_.observed_at, values_.confidence, values_.version, sources.source_type, sources.source_ref FROM methodology_values AS values_ JOIN evidence_sources AS sources ON sources.id=values_.source_id WHERE values_.methodology IN ({placeholders}) AND values_.status='active'",
                 methodologies,
             ).fetchall()
         for row in rows:
@@ -606,6 +659,7 @@ class EvidenceStore:
                         },
                         "observed_at": row["observed_at"],
                         "confidence": row["confidence"],
+                        "version": row["version"],
                     }
                 )
         return {"decision": decision, "fields": result, "ready": True}
@@ -635,6 +689,188 @@ class EvidenceStore:
                 (category, tool, json.dumps(payload, ensure_ascii=False), version),
             )
             db.commit()
+
+    def export_confirmed(
+        self,
+        workspace_root: str | Path,
+        *,
+        decision: str,
+        author: str,
+        role: str,
+        explicit_confirmation: bool,
+    ) -> Any:
+        """Append scrubbed confirmed facts; raw inputs and SQLite never leave the machine."""
+        from .workspace import ContributionResult, create_contribution
+
+        if not explicit_confirmation:
+            return ContributionResult(
+                False, reason="explicit confirmation is required to share evidence"
+            )
+        snapshot = self.snapshot(decision)
+        records: list[dict[str, Any]] = []
+        for field, item in snapshot.get("fields", {}).items():
+            if item.get("state") != "confirmed":
+                continue
+            source = item.get("source") if isinstance(item.get("source"), dict) else {}
+            records.append(
+                {
+                    "record_id": hashlib.sha256(
+                        json.dumps(
+                            [
+                                decision,
+                                field,
+                                item.get("value"),
+                                item.get("observed_at"),
+                            ],
+                            ensure_ascii=False,
+                        ).encode()
+                    ).hexdigest()[:24],
+                    "field": field,
+                    "methodology": item["methodology"],
+                    "value": item["value"],
+                    "source": {
+                        "type": source.get("type", "manual"),
+                        "label": source.get("label", "captura confirmada"),
+                    },
+                    "observed_at": item.get("observed_at"),
+                    "confidence": item.get("confidence", 1.0),
+                    "status": "confirmed",
+                }
+            )
+        if not records:
+            return ContributionResult(
+                False, reason="no confirmed evidence is available"
+            )
+        return create_contribution(
+            workspace_root,
+            area=decision,
+            author=author,
+            role=role,
+            source="evidencia confirmada por ScaleUp",
+            status="confirmed",
+            target=f"areas/{decision}/evidence.yaml",
+            content={
+                "kind": "scaleup-portable-evidence-v1",
+                "decision": decision,
+                "records": records,
+            },
+        )
+
+    def import_portable_workspace(self, workspace_root: str | Path) -> tuple[str, ...]:
+        """Idempotently rebuild local evidence from reconciled canonical documents only."""
+        root = Path(workspace_root).expanduser().resolve()
+        ready = self.runtime.ensure_memory()
+        if not ready.ready:
+            return ()
+        imported: list[str] = []
+        for decision in DECISIONS:
+            path = root / "areas" / decision / "evidence.yaml"
+            if not path.is_file():
+                continue
+            try:
+                import yaml
+
+                payload = yaml.safe_load(path.read_text(encoding="utf-8"))
+                content = (
+                    payload.get("content", payload) if isinstance(payload, dict) else {}
+                )
+                if (
+                    not isinstance(payload, dict)
+                    or payload.get("status") != "confirmed"
+                    or content.get("kind") != "scaleup-portable-evidence-v1"
+                ):
+                    continue
+                digest = hashlib.sha256(path.read_bytes()).hexdigest()
+                document_id = str(payload.get("revision_id") or digest)
+                with sqlite3.connect(ready.db_path) as db:
+                    prior = db.execute(
+                        "SELECT content_sha256 FROM portable_evidence_imports WHERE document_id=?",
+                        (document_id,),
+                    ).fetchone()
+                    if prior and prior[0] == digest:
+                        continue
+                    for record in content.get("records", []):
+                        if (
+                            not isinstance(record, dict)
+                            or record.get("status") != "confirmed"
+                        ):
+                            continue
+                        field, methodology, value = (
+                            record.get("field"),
+                            record.get("methodology"),
+                            record.get("value"),
+                        )
+                        spec = next(
+                            (
+                                x
+                                for x in field_specs(decision)
+                                if x.key == field and x.methodology == methodology
+                            ),
+                            None,
+                        )
+                        if spec is None or sensitivity_of(value):
+                            continue
+                        source = (
+                            record.get("source")
+                            if isinstance(record.get("source"), dict)
+                            else {}
+                        )
+                        source_type = str(source.get("type", "manual"))
+                        if source_type not in {
+                            "manual",
+                            "file_preview",
+                            "host_connector",
+                        }:
+                            source_type = "manual"
+                        source_id = str(uuid4())
+                        observed = str(
+                            record.get("observed_at")
+                            or datetime.now(timezone.utc).date().isoformat()
+                        )
+                        db.execute(
+                            "INSERT INTO evidence_sources (id, source_type, source_ref, observed_at, allowed_scope, content_sha256) VALUES (?, ?, ?, ?, ?, ?)",
+                            (
+                                source_id,
+                                source_type,
+                                _safe_source_ref(
+                                    str(source.get("label", "documento portable"))
+                                ),
+                                observed,
+                                decision,
+                                digest,
+                            ),
+                        )
+                        db.execute(
+                            "UPDATE methodology_values SET status='superseded' WHERE methodology=? AND field=? AND status='active'",
+                            (methodology, field),
+                        )
+                        version = db.execute(
+                            "SELECT COALESCE(MAX(version), 0) + 1 FROM methodology_values WHERE methodology=? AND field=?",
+                            (methodology, field),
+                        ).fetchone()[0]
+                        db.execute(
+                            "INSERT INTO methodology_values (id, methodology, field, value_json, source_id, observed_at, confidence, version, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active')",
+                            (
+                                str(uuid4()),
+                                methodology,
+                                field,
+                                json.dumps(value, ensure_ascii=False),
+                                source_id,
+                                observed,
+                                float(record.get("confidence", 1.0)),
+                                version,
+                            ),
+                        )
+                    db.execute(
+                        "INSERT INTO portable_evidence_imports (document_id, relative_path, content_sha256) VALUES (?, ?, ?) ON CONFLICT(document_id) DO UPDATE SET relative_path=excluded.relative_path, content_sha256=excluded.content_sha256, imported_at=CURRENT_TIMESTAMP",
+                        (document_id, path.relative_to(root).as_posix(), digest),
+                    )
+                    db.commit()
+                self._write_methodology_snapshot(ready.db_path, decision)
+                imported.append(path.relative_to(root).as_posix())
+            except (OSError, ValueError, TypeError, sqlite3.Error):
+                continue
+        return tuple(imported)
 
 
 def _read_csv(path: Path) -> tuple[tuple[str, ...], tuple[dict[str, str], ...]]:

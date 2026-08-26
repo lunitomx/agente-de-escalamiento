@@ -12,7 +12,7 @@ import sqlite3
 from functools import lru_cache
 from pathlib import Path
 
-SCHEMA_VERSION = 11
+SCHEMA_VERSION = 12
 
 DDL_STATEMENTS = [
     # ── Meta / version tracking ──────────────────────────────────────
@@ -381,6 +381,14 @@ DDL_STATEMENTS = [
         UNIQUE(methodology, field, version)
     )
     """,
+    """
+    CREATE TABLE IF NOT EXISTS portable_evidence_imports (
+        document_id     TEXT PRIMARY KEY,
+        relative_path   TEXT NOT NULL,
+        content_sha256  TEXT NOT NULL,
+        imported_at     TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )
+    """,
 ]
 
 # The v4 read-only bridge accepts only the exact historical v4 contract. The
@@ -425,6 +433,7 @@ INDEX_STATEMENTS = [
     "CREATE INDEX IF NOT EXISTS idx_evidence_sources_scope_observed ON evidence_sources(allowed_scope, observed_at)",
     "CREATE INDEX IF NOT EXISTS idx_evidence_proposals_source_state ON evidence_proposals(source_id, state)",
     "CREATE INDEX IF NOT EXISTS idx_methodology_values_active ON methodology_values(methodology, field, status)",
+    "CREATE INDEX IF NOT EXISTS idx_portable_evidence_imports_path ON portable_evidence_imports(relative_path)",
 ]
 
 _V4_INDEX_STATEMENTS = tuple(INDEX_STATEMENTS[:14])
@@ -557,7 +566,23 @@ def context_read_schema_is_valid(connection: sqlite3.Connection) -> bool:
         # at v4 by the read-only bridge may retain those known tables after a
         # later runtime was opened; they are not consulted by context recovery.
         # Keep every v4-owned table/index exact and reject any other extra.
-        allowed_local_index_tables = {"workspace_documents", "workspace_facts", "human_context_entries", "human_context_accesses", "weekly_cadences", "weekly_commitments", "weekly_reviews", "cadence_automation_preferences", "accountability_sessions", "accountability_commitments", "accountability_exclusions", "evidence_sources", "evidence_proposals", "methodology_values"}
+        allowed_local_index_tables = {
+            "workspace_documents",
+            "workspace_facts",
+            "human_context_entries",
+            "human_context_accesses",
+            "weekly_cadences",
+            "weekly_commitments",
+            "weekly_reviews",
+            "cadence_automation_preferences",
+            "accountability_sessions",
+            "accountability_commitments",
+            "accountability_exclusions",
+            "evidence_sources",
+            "evidence_proposals",
+            "methodology_values",
+            "portable_evidence_imports",
+        }
         if not expected_tables.issubset(actual_tables) or (
             actual_tables - expected_tables - allowed_local_index_tables
         ):

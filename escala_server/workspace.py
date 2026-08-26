@@ -19,7 +19,6 @@ from uuid import UUID, uuid4
 
 import yaml
 
-
 MANIFEST_NAME = "scaleup-workspace.yaml"
 WORKSPACE_SCHEMA = 1
 AREAS = frozenset(("cash", "people", "strategy", "execution"))
@@ -112,10 +111,13 @@ def load_workspace(root: str | Path) -> WorkspaceResult:
         unknown = set(payload) - allowed
         if unknown:
             raise WorkspaceValidationError(
-                "workspace manifest has unsupported fields: " + ", ".join(sorted(unknown))
+                "workspace manifest has unsupported fields: "
+                + ", ".join(sorted(unknown))
             )
         if set(payload) != allowed:
-            raise WorkspaceValidationError("workspace manifest is missing required fields")
+            raise WorkspaceValidationError(
+                "workspace manifest is missing required fields"
+            )
         schema_version = payload["schema_version"]
         if schema_version != WORKSPACE_SCHEMA:
             raise WorkspaceValidationError("unsupported workspace schema version")
@@ -166,7 +168,9 @@ def _validate_name(value: Any) -> str:
         raise WorkspaceValidationError("workspace name must be text")
     name = value.strip()
     if not 1 <= len(name) <= 120:
-        raise WorkspaceValidationError("workspace name must contain 1 to 120 characters")
+        raise WorkspaceValidationError(
+            "workspace name must contain 1 to 120 characters"
+        )
     if any(character in name for character in ("\n", "\r", "\x00")):
         raise WorkspaceValidationError("workspace name contains unsafe characters")
     return name
@@ -177,7 +181,8 @@ def _write_yaml_atomically(path: Path, payload: dict[str, Any]) -> None:
     _assert_contained(temporary, path.parent)
     try:
         temporary.write_text(
-            yaml.safe_dump(payload, allow_unicode=True, sort_keys=True), encoding="utf-8"
+            yaml.safe_dump(payload, allow_unicode=True, sort_keys=True),
+            encoding="utf-8",
         )
         temporary.replace(path)
     finally:
@@ -189,9 +194,15 @@ def _assert_contained(path: Path, root: Path) -> None:
 
 
 _DOCUMENT_SUFFIXES = frozenset((".yaml", ".yml", ".md"))
-_SECRET_NAME = re.compile(r"(?:api[_-]?key|password|secret|token|private[_-]?key)", re.I)
-_SECRET_VALUE = re.compile(r"(?:api[_-]?key|password|secret|token)\s*[:=]", re.I)
-_CONFLICT_COPY = re.compile(r"(?:conflict|conflicted copy|copia en conflicto)", re.I)
+_SECRET_NAME = re.compile(
+    r"(?:api[_-]?key|password|secret|token|private[_-]?key)", re.IGNORECASE
+)
+_SECRET_VALUE = re.compile(
+    r"(?:api[_-]?key|password|secret|token)\s*[:=]", re.IGNORECASE
+)
+_CONFLICT_COPY = re.compile(
+    r"(?:conflict|conflicted copy|copia en conflicto)", re.IGNORECASE
+)
 _ALLOWED_CANONICAL_ROOTS = frozenset(
     ("company", "areas", "plans", "cadence", "decisions", "contributions")
 )
@@ -274,7 +285,9 @@ def create_contribution(
         normalized_role = _validate_short_text(role, "role")
         normalized_source = _validate_short_text(source, "source")
         if status not in {"proposed", "confirmed"}:
-            raise WorkspaceValidationError("contribution status must be proposed or confirmed")
+            raise WorkspaceValidationError(
+                "contribution status must be proposed or confirmed"
+            )
         normalized_target = _validate_target(target, workspace.root)
         normalized_base = _validate_digest(base_sha256, "base_sha256")
         if normalized_target is None and normalized_base is not None:
@@ -294,10 +307,14 @@ def create_contribution(
             "content": content,
         }
         _assert_no_sensitive_data(payload)
-        target_path = workspace.root / "contributions" / normalized_area / f"{identifier}.yaml"
+        target_path = (
+            workspace.root / "contributions" / normalized_area / f"{identifier}.yaml"
+        )
         _assert_contained(target_path, workspace.root)
         if target_path.exists():
-            raise WorkspaceValidationError("contribution id already exists; contributions are append-only")
+            raise WorkspaceValidationError(
+                "contribution id already exists; contributions are append-only"
+            )
         target_path.parent.mkdir(parents=True, exist_ok=True)
         _write_yaml_atomically(target_path, payload)
         return ContributionResult(True, target_path, identifier)
@@ -335,30 +352,47 @@ def reconcile_canonical_document(
         return ReconciliationResult(False, reason=workspace.reason)
     try:
         if not confirm:
-            raise WorkspaceValidationError("explicit confirmation is required to reconcile a canonical document")
+            raise WorkspaceValidationError(
+                "explicit confirmation is required to reconcile a canonical document"
+            )
         assert workspace.manifest is not None
         relative_target = _validate_target(target, workspace.root)
         assert relative_target is not None
         if not relative_target.endswith((".yaml", ".yml")):
-            raise WorkspaceValidationError("reconciliation currently requires a YAML canonical document")
+            raise WorkspaceValidationError(
+                "reconciliation currently requires a YAML canonical document"
+            )
         target_path = workspace.root / relative_target
         _assert_contained(target_path, workspace.root)
         previous = _read_document_payload(target_path) if target_path.is_file() else {}
         if previous:
             existing_owner = previous.get("owner")
-            if isinstance(existing_owner, str) and existing_owner.strip() != owner.strip():
-                raise WorkspaceValidationError("only the declared owner can confirm this canonical revision")
+            if (
+                isinstance(existing_owner, str)
+                and existing_owner.strip() != owner.strip()
+            ):
+                raise WorkspaceValidationError(
+                    "only the declared owner can confirm this canonical revision"
+                )
         normalized_owner = _validate_short_text(owner, "owner")
         if not isinstance(content, dict):
             raise WorkspaceValidationError("canonical content must be a mapping")
-        if {"owner", "status", "schema_version", "resolved_contribution_ids"} & set(content):
-            raise WorkspaceValidationError("canonical content cannot replace protected reconciliation fields")
-        resolved = tuple(_validate_workspace_id(item) for item in resolved_contribution_ids)
+        if {"owner", "status", "schema_version", "resolved_contribution_ids"} & set(
+            content
+        ):
+            raise WorkspaceValidationError(
+                "canonical content cannot replace protected reconciliation fields"
+            )
+        resolved = tuple(
+            _validate_workspace_id(item) for item in resolved_contribution_ids
+        )
         if len(set(resolved)) != len(resolved):
             raise WorkspaceValidationError("resolved contribution IDs must be unique")
         revision_id = str(uuid4())
         previous_sha = _sha256_file(target_path) if target_path.is_file() else None
-        record_path = workspace.root / "decisions" / "reconciliations" / f"{revision_id}.yaml"
+        record_path = (
+            workspace.root / "decisions" / "reconciliations" / f"{revision_id}.yaml"
+        )
         _assert_contained(record_path, workspace.root)
         revision = {
             "schema_version": WORKSPACE_SCHEMA,
@@ -376,7 +410,9 @@ def reconcile_canonical_document(
             "owner": normalized_owner,
             "status": "confirmed",
             "revision_id": revision_id,
-            "based_on_reconciliation": record_path.relative_to(workspace.root).as_posix(),
+            "based_on_reconciliation": record_path.relative_to(
+                workspace.root
+            ).as_posix(),
             **content,
         }
         _assert_no_sensitive_data(revision)
@@ -483,6 +519,14 @@ class WorkspaceIndexer:
                 connection.commit()
         except (sqlite3.Error, ValueError, TypeError) as error:
             return WorkspaceIndexResult(False, memory.db_path, reason=str(error))
+        try:
+            from .evidence import EvidenceStore
+
+            EvidenceStore(
+                self.workspace_root, local_state_root=self.local_state_root
+            ).import_portable_workspace(self.workspace_root)
+        except (OSError, ValueError, sqlite3.Error):
+            pass
         digest = self._digest(snapshots)
         return WorkspaceIndexResult(
             True,
@@ -549,14 +593,25 @@ class WorkspaceIndexer:
         snapshots: list[_DocumentSnapshot] = []
         errors: dict[str, str] = {}
         for path in sorted(self.workspace_root.rglob("*")):
-            if not path.is_file() or path.name == MANIFEST_NAME or path.suffix.lower() not in _DOCUMENT_SUFFIXES:
+            if (
+                not path.is_file()
+                or path.name == MANIFEST_NAME
+                or path.suffix.lower() not in _DOCUMENT_SUFFIXES
+            ):
                 continue
             try:
-                relative = path.resolve().relative_to(self.workspace_root.resolve()).as_posix()
+                relative = (
+                    path.resolve().relative_to(self.workspace_root.resolve()).as_posix()
+                )
                 if relative.split("/", 1)[0] not in _ALLOWED_CANONICAL_ROOTS:
                     continue
                 snapshots.append(self._read_document(path, relative))
-            except (OSError, TypeError, WorkspaceValidationError, yaml.YAMLError) as error:
+            except (
+                OSError,
+                TypeError,
+                WorkspaceValidationError,
+                yaml.YAMLError,
+            ) as error:
                 relative = _safe_relative_for_error(path, self.workspace_root)
                 errors[relative] = str(error)
                 snapshots.append(
@@ -585,7 +640,9 @@ class WorkspaceIndexer:
             ):
                 continue
             value = item.payload.get("resolved_contribution_ids", [])
-            if isinstance(value, list) and all(isinstance(entry, str) for entry in value):
+            if isinstance(value, list) and all(
+                isinstance(entry, str) for entry in value
+            ):
                 resolved_ids.update(value)
 
         conflicts: set[str] = set()
@@ -631,13 +688,18 @@ class WorkspaceIndexer:
         _assert_no_sensitive_data(payload)
         digest = _sha256_file(path)
         if _CONFLICT_COPY.search(path.name):
-            return _DocumentSnapshot(relative, digest, "unknown", "conflict", None, None, payload, False)
+            return _DocumentSnapshot(
+                relative, digest, "unknown", "conflict", None, None, payload, False
+            )
         if relative.startswith("contributions/"):
             return _contribution_snapshot(relative, digest, payload)
         return _canonical_snapshot(relative, digest, payload)
 
     def _replace_facts(
-        self, connection: sqlite3.Connection, workspace_id: str, snapshot: _DocumentSnapshot
+        self,
+        connection: sqlite3.Connection,
+        workspace_id: str,
+        snapshot: _DocumentSnapshot,
     ) -> None:
         self._delete_facts(connection, workspace_id, snapshot.relative_path)
         if snapshot.lifecycle != "active" or not snapshot.confirmed:
@@ -655,7 +717,9 @@ class WorkspaceIndexer:
                 (prefix + key, value),
             )
 
-    def _delete_facts(self, connection: sqlite3.Connection, workspace_id: str, relative_path: str) -> None:
+    def _delete_facts(
+        self, connection: sqlite3.Connection, workspace_id: str, relative_path: str
+    ) -> None:
         connection.execute(
             "DELETE FROM workspace_facts WHERE workspace_id=? AND relative_path=?",
             (workspace_id, relative_path),
@@ -680,20 +744,28 @@ class WorkspaceIndexer:
             if not path.is_file():
                 continue
             name = path.name.lower()
-            if name.endswith((".db", ".db-wal", ".db-shm", ".sqlite", ".sqlite-wal", ".sqlite-shm")):
+            if name.endswith(
+                (".db", ".db-wal", ".db-shm", ".sqlite", ".sqlite-wal", ".sqlite-shm")
+            ):
                 artifacts.append(path.relative_to(self.workspace_root).as_posix())
         return artifacts
 
 
-def _canonical_snapshot(relative: str, digest: str, payload: dict[str, Any]) -> _DocumentSnapshot:
+def _canonical_snapshot(
+    relative: str, digest: str, payload: dict[str, Any]
+) -> _DocumentSnapshot:
     if not isinstance(payload, dict):
-        raise WorkspaceValidationError("canonical document must be a YAML mapping or Markdown frontmatter")
+        raise WorkspaceValidationError(
+            "canonical document must be a YAML mapping or Markdown frontmatter"
+        )
     owner = payload.get("owner")
     status = payload.get("status")
     if not isinstance(owner, str) or not owner.strip():
         raise WorkspaceValidationError("canonical document needs a responsible owner")
     if status != "confirmed":
-        raise WorkspaceValidationError("canonical document must be explicitly confirmed")
+        raise WorkspaceValidationError(
+            "canonical document must be explicitly confirmed"
+        )
     return _DocumentSnapshot(
         relative,
         digest,
@@ -706,13 +778,27 @@ def _canonical_snapshot(relative: str, digest: str, payload: dict[str, Any]) -> 
     )
 
 
-def _contribution_snapshot(relative: str, digest: str, payload: dict[str, Any]) -> _DocumentSnapshot:
+def _contribution_snapshot(
+    relative: str, digest: str, payload: dict[str, Any]
+) -> _DocumentSnapshot:
     if not isinstance(payload, dict):
         raise WorkspaceValidationError("contribution must be a YAML mapping")
-    required = {"schema_version", "id", "area", "author", "role", "source", "created_at", "status", "content"}
+    required = {
+        "schema_version",
+        "id",
+        "area",
+        "author",
+        "role",
+        "source",
+        "created_at",
+        "status",
+        "content",
+    }
     missing = required - set(payload)
     if missing:
-        raise WorkspaceValidationError("contribution is missing: " + ", ".join(sorted(missing)))
+        raise WorkspaceValidationError(
+            "contribution is missing: " + ", ".join(sorted(missing))
+        )
     if payload["schema_version"] != WORKSPACE_SCHEMA:
         raise WorkspaceValidationError("unsupported contribution schema version")
     _validate_workspace_id(payload["id"])
@@ -721,7 +807,9 @@ def _contribution_snapshot(relative: str, digest: str, payload: dict[str, Any]) 
     _validate_short_text(payload["role"], "role")
     _validate_short_text(payload["source"], "source")
     if payload["status"] not in {"proposed", "confirmed"}:
-        raise WorkspaceValidationError("contribution status must be proposed or confirmed")
+        raise WorkspaceValidationError(
+            "contribution status must be proposed or confirmed"
+        )
     target = payload.get("target")
     base = _validate_digest(payload.get("base_sha256"), "base_sha256")
     if target is None and base is not None:
@@ -765,7 +853,9 @@ def _markdown_frontmatter(raw: str) -> tuple[dict[str, Any], str]:
 
 def _validate_area(value: Any) -> str:
     if not isinstance(value, str) or value not in AREAS:
-        raise WorkspaceValidationError("area must be cash, people, strategy or execution")
+        raise WorkspaceValidationError(
+            "area must be cash, people, strategy or execution"
+        )
     return value
 
 
@@ -773,7 +863,9 @@ def _validate_short_text(value: Any, label: str) -> str:
     if not isinstance(value, str):
         raise WorkspaceValidationError(f"{label} must be text")
     cleaned = value.strip()
-    if not 1 <= len(cleaned) <= 160 or any(char in cleaned for char in ("\n", "\r", "\x00")):
+    if not 1 <= len(cleaned) <= 160 or any(
+        char in cleaned for char in ("\n", "\r", "\x00")
+    ):
         raise WorkspaceValidationError(f"{label} is invalid")
     return cleaned
 
@@ -782,7 +874,9 @@ def _validate_target(value: str | None, root: Path) -> str | None:
     if value is None:
         return None
     if not isinstance(value, str) or not value.strip():
-        raise WorkspaceValidationError("target must be a relative canonical document path")
+        raise WorkspaceValidationError(
+            "target must be a relative canonical document path"
+        )
     candidate = (root / value).resolve()
     if not path_is_inside(candidate, root):
         raise WorkspaceValidationError("target must stay inside the workspace")
@@ -805,17 +899,32 @@ def _assert_no_sensitive_data(value: Any, path: str = "") -> None:
         for key, child in value.items():
             key_text = str(key)
             if _SECRET_NAME.search(key_text):
-                raise WorkspaceValidationError("sensitive data must stay local and is not indexed")
+                raise WorkspaceValidationError(
+                    "sensitive data must stay local and is not indexed"
+                )
             _assert_no_sensitive_data(child, f"{path}.{key_text}" if path else key_text)
     elif isinstance(value, list):
         for index, child in enumerate(value):
             _assert_no_sensitive_data(child, f"{path}[{index}]")
     elif isinstance(value, str) and _SECRET_VALUE.search(value):
-        raise WorkspaceValidationError("sensitive data must stay local and is not indexed")
+        raise WorkspaceValidationError(
+            "sensitive data must stay local and is not indexed"
+        )
 
 
 def _flatten_payload(value: Any, prefix: str = "") -> list[tuple[str, str]]:
-    ignored = {"schema_version", "id", "author", "role", "source", "created_at", "status", "target", "base_sha256", "owner"}
+    ignored = {
+        "schema_version",
+        "id",
+        "author",
+        "role",
+        "source",
+        "created_at",
+        "status",
+        "target",
+        "base_sha256",
+        "owner",
+    }
     if isinstance(value, dict):
         values: list[tuple[str, str]] = []
         for key in sorted(value):
@@ -832,7 +941,9 @@ def _flatten_payload(value: Any, prefix: str = "") -> list[tuple[str, str]]:
 
 
 def _canonical_json(value: Any) -> str:
-    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), default=str)
+    return json.dumps(
+        value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), default=str
+    )
 
 
 def _fact_prefix(workspace_id: str, relative_path: str) -> str:

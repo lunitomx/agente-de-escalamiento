@@ -24,6 +24,6 @@
 
 - Un elemento del parking lot no recibe número de épica hasta tener objetivo,
   alcance, dependencias y criterio de éxito aprobados.
-- El siguiente número disponible es E32.
+- El siguiente número disponible es E33.
 - La deuda técnica ya comprometida se mantiene en
   work/epics/product-roadmap.md, no se duplica aquí.

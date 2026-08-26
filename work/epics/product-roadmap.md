@@ -3,8 +3,8 @@
 > Inventario canónico de épicas y dirección del producto.
 
 **Última auditoría:** 2026-08-26
-**Estado auditado:** main; E21–E31 cerradas
-**Siguiente número disponible:** E32
+**Estado auditado:** main; E21–E32 cerradas; E32 implementada y validada bajo RaiSE
+**Siguiente número disponible:** E33
 
 ## Visión
 
@@ -76,15 +76,16 @@ Todos forman parte de la historia del producto.
 | E29 — Business Pulse Basado en Datos | Mostrar el estado ejecutivo real de la empresa y paneles honestos | ✅ Complete | API agregada, vista ejecutiva con procedencia, Power of One persistente, demo aislada y smoke instalado en tres runtimes. |
 | E30 — Accountability Empresarial Longitudinal | Preparar sesiones, revisar compromisos y aprender de patrones con evidencia | ✅ Complete | Entrevista EO narrativa, compromisos verificables, rúbrica explicable, patrones 2+ y panel privado; smoke instalado en Claude/Codex/Hermes. |
 | E31 — Evidencia Operativa a Metodologías | Convertir foco narrativo en datos reales, consentidos y trazables para cada metodología | ✅ Complete | Narrativa → cualitativo/evidencia, CSV/XLSX/host explícito, consentimiento por campo, datos de Cash y mapeadores de las cuatro decisiones; procedencia, vigencia y panel honesto. |
+| E32 — Contexto Ejecutivo Portátil | Llevar sólo evidencia confirmada desde adjuntos/manual a workspace, paneles y Board | ✅ Complete | AttachmentEnvelope, contribuciones reconciliables, rebuild local por máquina y CompanyContext para Pulse/Board; sin OAuth ni compartir SQLite. |
 
 ### Resumen
 
-- 28 épicas completas: E1, E2, E3, E6–E11, E13–E31.
+- 29 épicas completas: E1, E2, E3, E6–E11, E13–E32.
 - 1 épica cancelada: E12.
 - 2 borradores históricos retirados/sustituidos: E4 y E5.
 - 0 épicas en curso.
 - 0 épicas planificadas.
-- E21–E31 están completas. El siguiente número disponible es E32.
+- E21–E32 están completas. El siguiente número disponible es E33.
 
 ## Secuencia actual
 
@@ -100,8 +101,11 @@ E20 para comenzar; E20 es una integración consumidora paralela del conocimiento
 
 ## Próximo trabajo recomendado
 
-No hay una épica activa. El siguiente trabajo debe formalizarse como E32 a
-partir del parking lot o de la deuda técnica priorizada.
+### Siguiente candidato — E33: Activación y seguimiento de negocio
+
+Convertir el contexto ya seguro de E32 en un recorrido no técnico de compartir,
+reconciliar y revisar compromisos semanales. Mantener conectores como guía del
+host: no agrega OAuth, sincronización propia ni un servicio multiusuario.
 
 ## Deuda técnica y de producto no asignada
 

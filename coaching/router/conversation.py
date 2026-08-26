@@ -14,9 +14,12 @@ from typing import Any
 from escala_server.accountability import AccountabilityStore
 from escala_server.board import (
     BoardContextBuilder,
+    CompanyFact,
+    EvidencePacket,
     PortableKnowledgeHandler,
     VerneLensAdvisor,
 )
+from escala_server.company_context import CompanyContextReader
 from escala_server.connected_guidance import (
     anonymize_preview,
     capabilities,
@@ -24,7 +27,12 @@ from escala_server.connected_guidance import (
     record_decision,
     swt_recipe,
 )
-from escala_server.evidence import EvidenceStore, field_specs, sensitivity_of
+from escala_server.evidence import (
+    AttachmentEnvelope,
+    EvidenceStore,
+    field_specs,
+    sensitivity_of,
+)
 from escala_server.human_context import HumanContextStore
 from escala_server.project_memory import ProjectMemoryRuntime
 from escala_server.project_memory_continuity import ProjectMemoryContinuity
@@ -119,7 +127,6 @@ def _wants_progress(text: str) -> bool:
     )
 
 
-
 def _wants_workspace(text: str) -> bool:
     normal = _normalise(text)
     return bool(
@@ -183,7 +190,9 @@ def _workspace_turn(base: Path, state: dict[str, Any], text: str) -> str | None:
         state.pop("workspace_stage", None)
         _save(base, state)
         if not created.ready:
-            return "No pude preparar la carpeta compartida: " + (created.reason or "inténtalo de nuevo")
+            return "No pude preparar la carpeta compartida: " + (
+                created.reason or "inténtalo de nuevo"
+            )
         return (
             "Listo. Esta carpeta ya tiene una estructura empresarial que puedes sincronizar con Drive Desktop, Dropbox u OneDrive. "
             "La base local de este equipo queda fuera de la carpeta compartida. "
@@ -195,7 +204,9 @@ def _workspace_turn(base: Path, state: dict[str, Any], text: str) -> str | None:
         if _wants_workspace_rebuild(text):
             rebuilt = WorkspaceIndexer(base).rebuild()
             if not rebuilt.ready:
-                return "No pude reconstruir la memoria local: " + (rebuilt.reason or "inténtalo de nuevo")
+                return "No pude reconstruir la memoria local: " + (
+                    rebuilt.reason or "inténtalo de nuevo"
+                )
             if rebuilt.conflicts:
                 return "Reconstruí la memoria local y conservé cambios que necesitan conciliación. Di “revisa la carpeta compartida” para ver el siguiente paso."
             return "Listo: reconstruí la memoria local de este equipo desde la carpeta compartida."
@@ -218,12 +229,19 @@ def _workspace_turn(base: Path, state: dict[str, Any], text: str) -> str | None:
         )
     return None
 
+
 _HUMAN_CONTEXT_STEPS = ("role", "communication_style", "detail_level", "availability")
 _HUMAN_FIELD_ALIASES = {
-    "rol": "role", "responsabilidad": "responsibilities",
-    "estilo": "communication_style", "idioma": "language",
-    "detalle": "detail_level", "ritmo": "pace", "disponibilidad": "availability",
-    "horario": "availability", "horizonte": "horizon", "capacidad": "capacity",
+    "rol": "role",
+    "responsabilidad": "responsibilities",
+    "estilo": "communication_style",
+    "idioma": "language",
+    "detalle": "detail_level",
+    "ritmo": "pace",
+    "disponibilidad": "availability",
+    "horario": "availability",
+    "horizonte": "horizon",
+    "capacidad": "capacity",
     "objetivo profesional": "professional_goal",
 }
 
@@ -268,23 +286,38 @@ def _human_context_turn(base: Path, state: dict[str, Any], text: str) -> str | N
         field = _HUMAN_CONTEXT_STEPS[int(state.get("human_context_step", 0))]
         valid = store.validate(field, text)
         if not valid.ready:
-            return "Eso parece un dato delicado, así que no lo guardaré. " + (valid.suggested_generalization or _human_context_question(field))
+            return "Eso parece un dato delicado, así que no lo guardaré. " + (
+                valid.suggested_generalization or _human_context_question(field)
+            )
         label, purpose = HumanContextStore.describe(field)
-        state.update({"stage": "human_context_confirm", "human_context_pending": {"field": field, "value": text.strip()}})
+        state.update(
+            {
+                "stage": "human_context_confirm",
+                "human_context_pending": {"field": field, "value": text.strip()},
+            }
+        )
         _save(base, state)
         return f"Entendí tu {label}: “{text.strip()}”. Esto sirve para {purpose}. ¿Quieres guardarlo sólo en la memoria local de este equipo?"
     if stage == "human_context_confirm":
         pending = state.get("human_context_pending")
-        if not isinstance(pending, dict) or not isinstance(pending.get("field"), str) or not isinstance(pending.get("value"), str):
+        if (
+            not isinstance(pending, dict)
+            or not isinstance(pending.get("field"), str)
+            or not isinstance(pending.get("value"), str)
+        ):
             state.pop("human_context_pending", None)
             return _advance_human_context(base, state)
         if _answers_yes(text):
-            result = store.confirm(pending["field"], pending["value"], explicit_confirmation=True)
+            result = store.confirm(
+                pending["field"], pending["value"], explicit_confirmation=True
+            )
             state.pop("human_context_pending", None)
             if not result.ready:
                 state["stage"] = "human_context_capture"
                 _save(base, state)
-                return "No pude guardar esa preferencia. " + _human_context_question(pending["field"])
+                return "No pude guardar esa preferencia. " + _human_context_question(
+                    pending["field"]
+                )
             return _advance_human_context(base, state)
         if _answers_no(text) or normal in {"saltar", "omitir"}:
             state.pop("human_context_pending", None)
@@ -298,19 +331,34 @@ def _human_context_turn(base: Path, state: dict[str, Any], text: str) -> str | N
             return None
         valid = store.validate(field, text)
         if not valid.ready:
-            return "Eso parece delicado y no lo guardaré. " + (valid.suggested_generalization or _human_context_question(field))
-        state.update({"stage": "human_context_confirm_change", "human_context_pending": {"field": field, "value": text.strip()}})
+            return "Eso parece delicado y no lo guardaré. " + (
+                valid.suggested_generalization or _human_context_question(field)
+            )
+        state.update(
+            {
+                "stage": "human_context_confirm_change",
+                "human_context_pending": {"field": field, "value": text.strip()},
+            }
+        )
         _save(base, state)
         return "¿Quieres guardar este cambio sólo en la memoria local de este equipo?"
     if stage == "human_context_confirm_change":
         pending = state.get("human_context_pending")
         if isinstance(pending, dict) and _answers_yes(text):
-            result = store.confirm(str(pending.get("field")), pending.get("value"), explicit_confirmation=True)
+            result = store.confirm(
+                str(pending.get("field")),
+                pending.get("value"),
+                explicit_confirmation=True,
+            )
             state.pop("human_context_pending", None)
             state.pop("human_context_field", None)
             state.pop("stage", None)
             _save(base, state)
-            return "Listo, actualicé esa preferencia local." if result.ready else "No pude actualizar esa preferencia."
+            return (
+                "Listo, actualicé esa preferencia local."
+                if result.ready
+                else "No pude actualizar esa preferencia."
+            )
         if _answers_no(text):
             state.pop("human_context_pending", None)
             state.pop("human_context_field", None)
@@ -318,7 +366,10 @@ def _human_context_turn(base: Path, state: dict[str, Any], text: str) -> str | N
             _save(base, state)
             return "De acuerdo, no cambié nada."
         return "No lo guardaré sin confirmación. ¿Quieres guardar el cambio sólo en este equipo?"
-    if re.search(r"\b(?:ver|mostrar|que recuerdas|que sabes)\b.*\b(?:perfil|contexto|preferenc|como trabajo)\b", normal):
+    if re.search(
+        r"\b(?:ver|mostrar|que recuerdas|que sabes)\b.*\b(?:perfil|contexto|preferenc|como trabajo)\b",
+        normal,
+    ):
         result = store.list()
         if not result.ready:
             return "No pude abrir tu contexto personal local."
@@ -329,51 +380,139 @@ def _human_context_turn(base: Path, state: dict[str, Any], text: str) -> str | N
             label, _ = HumanContextStore.describe(entry.field)
             lines.append(f"- {label.capitalize()}: {entry.value}")
         return "\n".join(lines)
-    if re.search(r"\b(?:borra|elimina|olvida)\b.*\b(?:perfil|contexto|preferenc|como trabajo)\b", normal):
-        return "Listo, borré tu contexto personal local." if store.delete().ready else "No pude borrar ese contexto."
+    if re.search(
+        r"\b(?:borra|elimina|olvida)\b.*\b(?:perfil|contexto|preferenc|como trabajo)\b",
+        normal,
+    ):
+        return (
+            "Listo, borré tu contexto personal local."
+            if store.delete().ready
+            else "No pude borrar ese contexto."
+        )
     if re.search(r"\b(?:cambia|modifica|actualiza)\b", normal):
-        field = next((value for phrase, value in _HUMAN_FIELD_ALIASES.items() if phrase in normal), None)
+        field = next(
+            (
+                value
+                for phrase, value in _HUMAN_FIELD_ALIASES.items()
+                if phrase in normal
+            ),
+            None,
+        )
         if field:
-            state.update({"stage": "human_context_change", "human_context_field": field})
+            state.update(
+                {"stage": "human_context_change", "human_context_field": field}
+            )
             _save(base, state)
             return _human_context_question(field)
-    if re.search(r"\b(?:personaliza(?:r)?|perfil personal|mi perfil|como trabajo|preferencias|conocerme)\b", normal):
+    if re.search(
+        r"\b(?:personaliza(?:r)?|perfil personal|mi perfil|como trabajo|preferencias|conocerme)\b",
+        normal,
+    ):
         state.update({"stage": "human_context_capture", "human_context_step": 0})
         _save(base, state)
         return _human_context_question("role")
     return None
 
-_CADENCE_STEPS = ("weekday", "timezone", "duration", "owner", "priority", "project", "desired_outcome", "next_action")
+
+_CADENCE_STEPS = (
+    "weekday",
+    "timezone",
+    "duration",
+    "owner",
+    "priority",
+    "project",
+    "desired_outcome",
+    "next_action",
+)
 _WEEKDAYS = {
-    "lunes": 0, "martes": 1, "miercoles": 2, "miércoles": 2, "jueves": 3,
-    "viernes": 4, "sabado": 5, "sábado": 5, "domingo": 6,
+    "lunes": 0,
+    "martes": 1,
+    "miercoles": 2,
+    "miércoles": 2,
+    "jueves": 3,
+    "viernes": 4,
+    "sabado": 5,
+    "sábado": 5,
+    "domingo": 6,
 }
 
 
 def _wants_cadence(text: str) -> bool:
-    return bool(re.search(r"\b(?:revision semanal|revisión semanal|cadencia semanal|activar.*semanal|check.?in semanal)\b", _normalise(text)))
+    return bool(
+        re.search(
+            r"\b(?:revision semanal|revisión semanal|cadencia semanal|activar.*semanal|check.?in semanal)\b",
+            _normalise(text),
+        )
+    )
 
 
 _ACCOUNTABILITY_STEPS = (
-    ("held_on", "¿De qué fecha es esta sesión de Accountability? Puedes decir “hoy”.", False),
-    ("personal_update", "¿Qué pasó en lo personal desde la sesión anterior? Puedes decir “saltar”; no usaré esto para inferencias psicológicas.", True),
-    ("business_update", "¿Qué cambió en el negocio desde la sesión anterior? Cuéntame hechos y resultados.", False),
+    (
+        "held_on",
+        "¿De qué fecha es esta sesión de Accountability? Puedes decir “hoy”.",
+        False,
+    ),
+    (
+        "personal_update",
+        "¿Qué pasó en lo personal desde la sesión anterior? Puedes decir “saltar”; no usaré esto para inferencias psicológicas.",
+        True,
+    ),
+    (
+        "business_update",
+        "¿Qué cambió en el negocio desde la sesión anterior? Cuéntame hechos y resultados.",
+        False,
+    ),
     ("issue_statement", "¿Qué situación concreta quieres llevar al grupo?", False),
-    ("pillar_and_tool", "¿Se relaciona principalmente con People, Strategy, Execution o Cash? ¿Qué herramienta has intentado usar?", False),
-    ("background", "¿Qué contexto necesita el grupo para entender la situación?", False),
-    ("current_situation", "¿Cuál es la situación actual, sin interpretar ni resolverla todavía?", False),
+    (
+        "pillar_and_tool",
+        "¿Se relaciona principalmente con People, Strategy, Execution o Cash? ¿Qué herramienta has intentado usar?",
+        False,
+    ),
+    (
+        "background",
+        "¿Qué contexto necesita el grupo para entender la situación?",
+        False,
+    ),
+    (
+        "current_situation",
+        "¿Cuál es la situación actual, sin interpretar ni resolverla todavía?",
+        False,
+    ),
     ("future_options", "¿Qué opciones reales estás considerando?", False),
     ("uncertainty", "¿Dónde te sientes más incierto, confundido o preocupado?", False),
-    ("own_contribution", "¿Cómo podrían tus propias acciones estar contribuyendo a esta situación?", False),
-    ("failure_impact", "¿Qué significaría no resolverla para ti, el equipo o la empresa?", False),
+    (
+        "own_contribution",
+        "¿Cómo podrían tus propias acciones estar contribuyendo a esta situación?",
+        False,
+    ),
+    (
+        "failure_impact",
+        "¿Qué significaría no resolverla para ti, el equipo o la empresa?",
+        False,
+    ),
     ("personal_challenge", "¿Cuál es tu reto personal al enfrentarla?", False),
     ("desired_outcome", "¿Qué resultado esperas obtener de esta sesión?", False),
-    ("confidence", "¿Qué nivel de confianza tienes hoy, de 0 a 100, para lograr ese resultado?", False),
-    ("notes", "¿Hay alguna nota u opción que quieras llevar preparada? Puedes decir “saltar”.", True),
-    ("tags", "¿Qué temas quieres usar para encontrar patrones después? Escríbelos separados por comas; deben ser temas que tú confirmas.", False),
+    (
+        "confidence",
+        "¿Qué nivel de confianza tienes hoy, de 0 a 100, para lograr ese resultado?",
+        False,
+    ),
+    (
+        "notes",
+        "¿Hay alguna nota u opción que quieras llevar preparada? Puedes decir “saltar”.",
+        True,
+    ),
+    (
+        "tags",
+        "¿Qué temas quieres usar para encontrar patrones después? Escríbelos separados por comas; deben ser temas que tú confirmas.",
+        False,
+    ),
 )
 _ACCOUNTABILITY_COMMITMENT_STEPS = (
-    ("statement", "¿Qué acción o resultado te comprometes a completar antes de la siguiente sesión?"),
+    (
+        "statement",
+        "¿Qué acción o resultado te comprometes a completar antes de la siguiente sesión?",
+    ),
     ("owner", "¿Quién es la única persona dueña de este compromiso?"),
     ("due_on", "¿Para qué fecha debe estar listo?"),
     ("success_measure", "¿Qué evidencia concreta demostrará que se cumplió?"),
@@ -381,21 +520,31 @@ _ACCOUNTABILITY_COMMITMENT_STEPS = (
 
 
 def _accountability_date(text: str) -> str | None:
-    from datetime import date, datetime
+    from datetime import datetime, timezone
 
     normal = _normalise(text).strip(" .!¡?¿")
     if normal == "hoy":
-        return date.today().isoformat()
+        return datetime.now(timezone.utc).date().isoformat()
     match = re.search(r"\b(\d{4}-\d{2}-\d{2})\b", text)
     if match:
         try:
-            return date.fromisoformat(match.group(1)).isoformat()
+            return (
+                datetime.fromisoformat(match.group(1))
+                .replace(tzinfo=timezone.utc)
+                .date()
+                .isoformat()
+            )
         except ValueError:
             return None
     match = re.search(r"\b(\d{1,2})/(\d{1,2})/(\d{4})\b", text)
     if match:
         try:
-            return datetime.strptime(match.group(0), "%d/%m/%Y").date().isoformat()
+            return (
+                datetime.strptime(match.group(0), "%d/%m/%Y")
+                .replace(tzinfo=timezone.utc)
+                .date()
+                .isoformat()
+            )
         except ValueError:
             return None
     return None
@@ -416,11 +565,19 @@ def _accountability_pattern_reply(store: AccountabilityStore) -> str:
     if not data["session_count"]:
         return "Todavía no hay sesiones de Accountability guardadas. Puedo ayudarte a preparar la primera."
     sessions_result = store.list_sessions()
-    sessions = sessions_result.data["sessions"] if sessions_result.ready and sessions_result.data else []
+    sessions = (
+        sessions_result.data["sessions"]
+        if sessions_result.ready and sessions_result.data
+        else []
+    )
     dates = {item["id"]: item["held_on"] for item in sessions}
-    lines = [f"Analicé {data['session_count']} sesiones incluidas con una regla clara: algo sólo es patrón si aparece en dos o más sesiones."]
+    lines = [
+        f"Analicé {data['session_count']} sesiones incluidas con una regla clara: algo sólo es patrón si aparece en dos o más sesiones."
+    ]
     if data["average_follow_through_percent"] is not None:
-        lines.append(f"Seguimiento promedio de compromisos revisados: {data['average_follow_through_percent']}% según resultado, evidencia, plazo y aprendizaje.")
+        lines.append(
+            f"Seguimiento promedio de compromisos revisados: {data['average_follow_through_percent']}% según resultado, evidencia, plazo y aprendizaje."
+        )
     labels = {
         "decision_frequency": "Área recurrente",
         "confirmed_theme": "Tema confirmado recurrente",
@@ -429,7 +586,9 @@ def _accountability_pattern_reply(store: AccountabilityStore) -> str:
     }
     for item in data["patterns"][:5]:
         support = ", ".join(dates.get(value, value) for value in item["session_ids"])
-        lines.append(f"- {labels.get(item['kind'], 'Patrón')}: {item['label']} ({support}).")
+        lines.append(
+            f"- {labels.get(item['kind'], 'Patrón')}: {item['label']} ({support})."
+        )
     if not data["patterns"]:
         lines.append("Aún no hay patrones con dos sesiones de evidencia.")
     if data["observations"]:
@@ -444,7 +603,7 @@ def _accountability_turn(base: Path, state: dict[str, Any], text: str) -> str | 
 
     if "accountability group sharing worksheet" in normal:
         confirmed = normal.startswith("confirmo guardar")
-        document = re.sub(r"^\s*confirmo guardar\s*:\s*", "", text, flags=re.I)
+        document = re.sub(r"^\s*confirmo guardar\s*:\s*", "", text, flags=re.IGNORECASE)
         preview = store.preview_import(
             document,
             title="Documento de Accountability pegado por la persona",
@@ -452,13 +611,22 @@ def _accountability_turn(base: Path, state: dict[str, Any], text: str) -> str | 
             source_type="imported_document",
         )
         if not confirmed:
-            warning = ", ".join(preview.warnings) if preview.warnings else "sin marcadores delicados detectados"
+            warning = (
+                ", ".join(preview.warnings)
+                if preview.warnings
+                else "sin marcadores delicados detectados"
+            )
             return (
                 f"Reconocí {len(preview.recognized_fields)} secciones y detecté: {warning}. "
                 "No guardé ni indexé el texto. Si quieres conservarlo, vuelve a pegarlo empezando con “Confirmo guardar:”."
             )
         saved = store.confirm_import(preview, explicit_confirmation=True)
-        return "Guardé localmente esa sesión con su fuente y consentimiento." if saved.ready else "No pude guardar esa sesión: " + (saved.reason or "revisa el documento")
+        return (
+            "Guardé localmente esa sesión con su fuente y consentimiento."
+            if saved.ready
+            else "No pude guardar esa sesión: "
+            + (saved.reason or "revisa el documento")
+        )
 
     if stage == "accountability_prepare_offer":
         if _answers_no(text):
@@ -467,7 +635,13 @@ def _accountability_turn(base: Path, state: dict[str, Any], text: str) -> str | 
             return "De acuerdo. No guardé un borrador. Puedes retomarlo cuando quieras."
         if not _answers_yes(text):
             return "No conservaré respuestas sin tu permiso. ¿Quieres iniciar y guardar el borrador sólo en la memoria local de este equipo?"
-        state.update({"stage": "accountability_prepare", "accountability_step": 0, "accountability_data": {}})
+        state.update(
+            {
+                "stage": "accountability_prepare",
+                "accountability_step": 0,
+                "accountability_data": {},
+            }
+        )
         _save(base, state)
         return _ACCOUNTABILITY_STEPS[0][1]
 
@@ -501,7 +675,9 @@ def _accountability_turn(base: Path, state: dict[str, Any], text: str) -> str | 
             state.update({"accountability_step": step, "accountability_data": data})
             _save(base, state)
             return _ACCOUNTABILITY_STEPS[step][1]
-        state.update({"stage": "accountability_prepare_confirm", "accountability_data": data})
+        state.update(
+            {"stage": "accountability_prepare_confirm", "accountability_data": data}
+        )
         _save(base, state)
         return (
             f"Preparé la sesión del {data['held_on']}. Asunto: “{data['issue_statement']}”. "
@@ -515,14 +691,25 @@ def _accountability_turn(base: Path, state: dict[str, Any], text: str) -> str | 
             _save(base, state)
             return "De acuerdo. Borré el borrador y no creé la sesión."
         if not _answers_yes(text):
-            return "No crearé la sesión sin una confirmación clara. ¿La guardo localmente?"
+            return (
+                "No crearé la sesión sin una confirmación clara. ¿La guardo localmente?"
+            )
         data = dict(state.get("accountability_data", {}))
         held_on = data.pop("held_on", None)
         tags = data.pop("tags", [])
-        result = store.create_session(data, held_on=str(held_on), tags=tags, explicit_confirmation=True)
+        result = store.create_session(
+            data, held_on=str(held_on), tags=tags, explicit_confirmation=True
+        )
         if not result.ready or not result.data:
-            return "No pude guardar la sesión: " + (result.reason or "revisa las respuestas")
-        state.update({"stage": "accountability_commitment_offer", "accountability_session_id": result.data["id"]})
+            return "No pude guardar la sesión: " + (
+                result.reason or "revisa las respuestas"
+            )
+        state.update(
+            {
+                "stage": "accountability_commitment_offer",
+                "accountability_session_id": result.data["id"],
+            }
+        )
         state.pop("accountability_data", None)
         state.pop("accountability_step", None)
         _save(base, state)
@@ -535,7 +722,13 @@ def _accountability_turn(base: Path, state: dict[str, Any], text: str) -> str | 
             return "Listo. Conservé la sesión sin inventar un compromiso."
         if not _answers_yes(text):
             return "¿Quieres definir ahora quién hará qué, para cuándo y cómo sabremos que se cumplió?"
-        state.update({"stage": "accountability_commitment", "accountability_commitment_step": 0, "accountability_commitment": {}})
+        state.update(
+            {
+                "stage": "accountability_commitment",
+                "accountability_commitment_step": 0,
+                "accountability_commitment": {},
+            }
+        )
         _save(base, state)
         return _ACCOUNTABILITY_COMMITMENT_STEPS[0][1]
 
@@ -554,10 +747,20 @@ def _accountability_turn(base: Path, state: dict[str, Any], text: str) -> str | 
         data[key] = value
         step += 1
         if step < len(_ACCOUNTABILITY_COMMITMENT_STEPS):
-            state.update({"accountability_commitment_step": step, "accountability_commitment": data})
+            state.update(
+                {
+                    "accountability_commitment_step": step,
+                    "accountability_commitment": data,
+                }
+            )
             _save(base, state)
             return _ACCOUNTABILITY_COMMITMENT_STEPS[step][1]
-        state.update({"stage": "accountability_commitment_confirm", "accountability_commitment": data})
+        state.update(
+            {
+                "stage": "accountability_commitment_confirm",
+                "accountability_commitment": data,
+            }
+        )
         _save(base, state)
         return f"Compromiso: “{data['statement']}”; responsable: {data['owner']}; fecha: {data['due_on']}; evidencia: {data['success_measure']}. ¿Lo confirmas?"
 
@@ -569,71 +772,143 @@ def _accountability_turn(base: Path, state: dict[str, Any], text: str) -> str | 
         if not _answers_yes(text):
             return "No guardaré el compromiso sin tu confirmación. ¿Lo confirmas?"
         data = state.get("accountability_commitment", {})
-        result = store.add_commitment(str(state.get("accountability_session_id")), **data, explicit_confirmation=True) if isinstance(data, dict) else None
+        result = (
+            store.add_commitment(
+                str(state.get("accountability_session_id")),
+                **data,
+                explicit_confirmation=True,
+            )
+            if isinstance(data, dict)
+            else None
+        )
         _clear_accountability_state(state)
         _save(base, state)
-        return "Guardé el compromiso. En la siguiente sesión podrás revisar resultado, evidencia, plazo y aprendizaje." if result and result.ready else "No pude guardar el compromiso."
+        return (
+            "Guardé el compromiso. En la siguiente sesión podrás revisar resultado, evidencia, plazo y aprendizaje."
+            if result and result.ready
+            else "No pude guardar el compromiso."
+        )
 
     if stage == "accountability_review_status":
-        status = {"hecho": "done", "cumplido": "done", "parcial": "partial", "no hecho": "not_done", "incumplido": "not_done", "renegociado": "renegotiated"}.get(normal)
+        status = {
+            "hecho": "done",
+            "cumplido": "done",
+            "parcial": "partial",
+            "no hecho": "not_done",
+            "incumplido": "not_done",
+            "renegociado": "renegotiated",
+        }.get(normal)
         if status is None:
             return "¿El compromiso quedó hecho, parcial, no hecho o renegociado?"
-        review = dict(state.get("accountability_review", {})); review["status"] = status
-        state.update({"stage": "accountability_review_result", "accountability_review": review}); _save(base, state)
+        review = dict(state.get("accountability_review", {}))
+        review["status"] = status
+        state.update(
+            {"stage": "accountability_review_result", "accountability_review": review}
+        )
+        _save(base, state)
         return "¿Qué resultado observable obtuviste?"
     if stage == "accountability_review_result":
-        review = dict(state.get("accountability_review", {})); review["result"] = text.strip()
-        state.update({"stage": "accountability_review_evidence", "accountability_review": review}); _save(base, state)
+        review = dict(state.get("accountability_review", {}))
+        review["result"] = text.strip()
+        state.update(
+            {"stage": "accountability_review_evidence", "accountability_review": review}
+        )
+        _save(base, state)
         return "¿Qué evidencia tienes? Si no existe, di “sin evidencia”."
     if stage == "accountability_review_evidence":
         review = dict(state.get("accountability_review", {}))
-        evidence = None if normal in {"sin evidencia", "ninguna", "ninguno"} else text.strip()
+        evidence = (
+            None if normal in {"sin evidencia", "ninguna", "ninguno"} else text.strip()
+        )
         if review.get("status") in {"done", "partial"} and not evidence:
             return "Para marcarlo hecho o parcial necesito una evidencia concreta, no una impresión. ¿Cuál es?"
         review["evidence"] = evidence
-        state.update({"stage": "accountability_review_blocker", "accountability_review": review}); _save(base, state)
+        state.update(
+            {"stage": "accountability_review_blocker", "accountability_review": review}
+        )
+        _save(base, state)
         return "¿Qué bloqueo apareció? Puedes decir “ninguno”."
     if stage == "accountability_review_blocker":
-        review = dict(state.get("accountability_review", {})); review["blocker"] = None if normal in {"ninguno", "ninguna", "no hubo"} else text.strip()
-        state.update({"stage": "accountability_review_learning", "accountability_review": review}); _save(base, state)
+        review = dict(state.get("accountability_review", {}))
+        review["blocker"] = (
+            None if normal in {"ninguno", "ninguna", "no hubo"} else text.strip()
+        )
+        state.update(
+            {"stage": "accountability_review_learning", "accountability_review": review}
+        )
+        _save(base, state)
         return "¿Qué aprendizaje quieres conservar para el siguiente ciclo? Puedes decir “ninguno”."
     if stage == "accountability_review_learning":
-        review = dict(state.get("accountability_review", {})); review["learning"] = None if normal in {"ninguno", "ninguna"} else text.strip()
-        if review.get("status") in {"not_done", "renegotiated"} and not (review.get("blocker") or review.get("learning")):
+        review = dict(state.get("accountability_review", {}))
+        review["learning"] = None if normal in {"ninguno", "ninguna"} else text.strip()
+        if review.get("status") in {"not_done", "renegotiated"} and not (
+            review.get("blocker") or review.get("learning")
+        ):
             return "Para un compromiso incompleto necesito al menos el bloqueo o el aprendizaje; no asignaré una calificación vacía. ¿Qué aprendiste?"
         review["reviewed_on"] = str(__import__("datetime").date.today())
-        state.update({"stage": "accountability_review_confirm", "accountability_review": review}); _save(base, state)
+        state.update(
+            {"stage": "accountability_review_confirm", "accountability_review": review}
+        )
+        _save(base, state)
         return "Calcularé el seguimiento sólo con resultado, evidencia, plazo y aprendizaje, mostrando cada razón. ¿Confirmas guardar esta revisión?"
     if stage == "accountability_review_confirm":
         if _answers_no(text):
-            _clear_accountability_state(state); _save(base, state)
+            _clear_accountability_state(state)
+            _save(base, state)
             return "De acuerdo. No guardé la revisión."
         if not _answers_yes(text):
             return "No guardaré la revisión sin confirmación. ¿La confirmas?"
         review = state.get("accountability_review", {})
-        result = store.review_commitment(str(state.get("accountability_commitment_id")), **review, explicit_confirmation=True) if isinstance(review, dict) else None
-        _clear_accountability_state(state); _save(base, state)
+        result = (
+            store.review_commitment(
+                str(state.get("accountability_commitment_id")),
+                **review,
+                explicit_confirmation=True,
+            )
+            if isinstance(review, dict)
+            else None
+        )
+        _clear_accountability_state(state)
+        _save(base, state)
         if not result or not result.ready or not result.data:
-            return "No pude guardar la revisión: " + ((result.reason if result else None) or "revisa las respuestas")
+            return "No pude guardar la revisión: " + (
+                (result.reason if result else None) or "revisa las respuestas"
+            )
         rubric = result.data["rubric"]
-        reasons = ", ".join(f"{key} {item['points']}/{item['max']}" for key, item in rubric["criteria"].items())
+        reasons = ", ".join(
+            f"{key} {item['points']}/{item['max']}"
+            for key, item in rubric["criteria"].items()
+        )
         return f"Guardé la revisión. Seguimiento derivado: {rubric['percent']}% ({reasons}). No es una opinión 1–5; puedes corregir la evidencia y recalcular."
 
-    if re.search(r"\b(?:patrones?|tendencias?|aprendizajes?)\b.*\baccountabil", normal) or re.search(r"\baccountabil.*\b(?:patrones?|tendencias?)\b", normal):
+    if re.search(
+        r"\b(?:patrones?|tendencias?|aprendizajes?)\b.*\baccountabil", normal
+    ) or re.search(r"\baccountabil.*\b(?:patrones?|tendencias?)\b", normal):
         return _accountability_pattern_reply(store)
     if re.search(r"\b(?:revisar|revisa|calificar|evaluar)\b.*\baccountabil", normal):
         pending = store.latest_pending_commitment()
         if not pending.ready or not pending.data:
             return "No encontré un compromiso pendiente de Accountability. Primero prepara una sesión y confirma quién hará qué, para cuándo y con qué evidencia."
-        state.update({"stage": "accountability_review_status", "accountability_commitment_id": pending.data["id"], "accountability_review": {}})
+        state.update(
+            {
+                "stage": "accountability_review_status",
+                "accountability_commitment_id": pending.data["id"],
+                "accountability_review": {},
+            }
+        )
         _save(base, state)
         return f"Revisemos: “{pending.data['statement']}”, con fecha {pending.data['due_on']}. ¿Quedó hecho, parcial, no hecho o renegociado?"
     if re.search(r"\b(?:que|qué)\s+(?:puedes|puede)\s+hacer\b.*\baccountabil", normal):
         return "Sí: puedo ayudarte a preparar una sesión, convertirla en un compromiso verificable, revisar el resultado con evidencia y encontrar patrones entre sesiones. ¿Quieres preparar, revisar o ver patrones?"
-    if re.search(r"\b(?:preparar|crear|hacer|iniciar|nuevo|nueva)\b.*\baccountabil", normal):
-        state["stage"] = "accountability_prepare_offer"; _save(base, state)
+    if re.search(
+        r"\b(?:preparar|crear|hacer|iniciar|nuevo|nueva)\b.*\baccountabil", normal
+    ):
+        state["stage"] = "accountability_prepare_offer"
+        _save(base, state)
         return "Puedo guiarte una pregunta a la vez con la estructura real de EO y guardar un borrador sólo local. La parte personal no se usará para inferencias. ¿Quieres iniciar?"
-    if "accountabil" in normal and ("drive" in normal or "import" in normal or "document" in normal):
+    if "accountabil" in normal and (
+        "drive" in normal or "import" in normal or "document" in normal
+    ):
         return "Puedo revisar documentos mediante el conector nativo de tu host, pero no importo una carpeta en silencio. Primero mostraré qué se reconoció y qué parece delicado; sólo guardaré cada sesión si tú lo confirmas."
     if "accountabil" in normal:
         return "Sí: puedo ayudarte a preparar una sesión, convertirla en un compromiso verificable, revisar el resultado con evidencia y encontrar patrones entre sesiones. ¿Quieres preparar, revisar o ver patrones?"
@@ -657,9 +932,13 @@ def _cadence_question(step: str) -> str:
 def _parse_cadence_value(step: str, text: str) -> object | None:
     normal = _normalise(text).strip(" .!¡?¿")
     if step == "weekday":
-        return next((number for name, number in _WEEKDAYS.items() if name in normal), None)
+        return next(
+            (number for name, number in _WEEKDAYS.items() if name in normal), None
+        )
     if step == "timezone":
-        if any(city in normal for city in ("mexico", "cdmx", "monterrey", "guadalajara")):
+        if any(
+            city in normal for city in ("mexico", "cdmx", "monterrey", "guadalajara")
+        ):
             return "America/Mexico_City"
         match = re.search(r"\b(?:america|europe|asia|pacific)/[a-z_]+", normal)
         return match.group(0).title().replace("_", "_") if match else None
@@ -705,19 +984,33 @@ def _cadence_turn(base: Path, state: dict[str, Any], text: str) -> str | None:
             state["stage"] = "post_plan"
             _save(base, state)
             if not result.ready:
-                return "No pude activar la revisión semanal: " + (result.reason or "inténtalo de nuevo")
+                return "No pude activar la revisión semanal: " + (
+                    result.reason or "inténtalo de nuevo"
+                )
             return "Listo. La revisión se hará al abrir ScaleUp cuando corresponda; no enviaré notificaciones por mi cuenta."
         if _answers_no(text):
             state.pop("cadence_data", None)
             state.pop("cadence_step", None)
             state["stage"] = "post_plan"
             _save(base, state)
-            return "De acuerdo, no activé ninguna cadencia. Puedes hacerlo cuando quieras."
+            return (
+                "De acuerdo, no activé ninguna cadencia. Puedes hacerlo cuando quieras."
+            )
         return "No la activaré sin confirmación. ¿Quieres guardar esta cadencia local? Responde “sí” o “no”."
     if stage == "cadence_review_outcome":
-        outcome = {"hecho": "done", "done": "done", "bloqueado": "blocked", "bloqueada": "blocked", "diferido": "deferred", "renegociar": "renegotiated", "renegociado": "renegotiated"}.get(normal)
+        outcome = {
+            "hecho": "done",
+            "done": "done",
+            "bloqueado": "blocked",
+            "bloqueada": "blocked",
+            "diferido": "deferred",
+            "renegociar": "renegotiated",
+            "renegociado": "renegotiated",
+        }.get(normal)
         if outcome is None:
-            return "¿Cómo terminó el compromiso: hecho, bloqueado, diferido o renegociado?"
+            return (
+                "¿Cómo terminó el compromiso: hecho, bloqueado, diferido o renegociado?"
+            )
         review = dict(state.get("cadence_review", {}))
         review["outcome"] = outcome
         state.update({"stage": "cadence_review_result", "cadence_review": review})
@@ -749,36 +1042,65 @@ def _cadence_turn(base: Path, state: dict[str, Any], text: str) -> str | None:
         review = state.get("cadence_review", {})
         if _answers_yes(text) and isinstance(review, dict):
             result = store.review(
-                outcome=review["outcome"], result=review["result"], blocker=review.get("blocker"),
-                priority=review["priority"], project=review["project"],
-                desired_outcome=review["desired_outcome"], next_action=review["next_action"],
-                owner=review["owner"], explicit_confirmation=True,
+                outcome=review["outcome"],
+                result=review["result"],
+                blocker=review.get("blocker"),
+                priority=review["priority"],
+                project=review["project"],
+                desired_outcome=review["desired_outcome"],
+                next_action=review["next_action"],
+                owner=review["owner"],
+                explicit_confirmation=True,
             )
             state.pop("cadence_review", None)
             state["stage"] = "post_plan"
             _save(base, state)
-            return "Cerramos la revisión y guardé la siguiente acción local." if result.ready else "No pude cerrar la revisión: " + (result.reason or "inténtalo de nuevo")
+            return (
+                "Cerramos la revisión y guardé la siguiente acción local."
+                if result.ready
+                else "No pude cerrar la revisión: "
+                + (result.reason or "inténtalo de nuevo")
+            )
         if _answers_no(text):
             state.pop("cadence_review", None)
             state["stage"] = "post_plan"
             _save(base, state)
             return "De acuerdo, no guardé esta revisión."
         return "No guardaré la revisión sin tu confirmación. ¿La confirmas?"
-    if re.search(r"\b(?:hacer|iniciar|comenzar)\b.*\b(?:revision|revisión) semanal\b", normal):
+    if re.search(
+        r"\b(?:hacer|iniciar|comenzar)\b.*\b(?:revision|revisión) semanal\b", normal
+    ):
         current = store.status()
         commitment = current.commitment
         if not current.ready or commitment is None:
             return "Primero necesitas activar una revisión semanal con un compromiso."
-        state.update({"stage": "cadence_review_outcome", "cadence_review": {
-            "priority": commitment.priority, "project": commitment.project,
-            "desired_outcome": commitment.desired_outcome, "owner": commitment.owner,
-        }})
+        state.update(
+            {
+                "stage": "cadence_review_outcome",
+                "cadence_review": {
+                    "priority": commitment.priority,
+                    "project": commitment.project,
+                    "desired_outcome": commitment.desired_outcome,
+                    "owner": commitment.owner,
+                },
+            }
+        )
         _save(base, state)
         return f"Revisemos tu compromiso: {commitment.next_action}. ¿Cómo terminó: hecho, bloqueado, diferido o renegociado?"
     if re.search(r"\b(?:pausa|pausar)\b.*\b(?:revision|revisión|cadencia)\b", normal):
-        return "Pausé la revisión semanal. La historia queda local y puedes reanudarla cuando quieras." if store.pause().ready else "No encontré una revisión semanal activa."
-    if re.search(r"\b(?:reanuda|reanudar|reactiva)\b.*\b(?:revision|revisión|cadencia)\b", normal):
-        return "Reanudé la revisión semanal. Te la propondré al abrir ScaleUp cuando corresponda." if store.resume().ready else "No encontré una revisión semanal para reanudar."
+        return (
+            "Pausé la revisión semanal. La historia queda local y puedes reanudarla cuando quieras."
+            if store.pause().ready
+            else "No encontré una revisión semanal activa."
+        )
+    if re.search(
+        r"\b(?:reanuda|reanudar|reactiva)\b.*\b(?:revision|revisión|cadencia)\b", normal
+    ):
+        return (
+            "Reanudé la revisión semanal. Te la propondré al abrir ScaleUp cuando corresponda."
+            if store.resume().ready
+            else "No encontré una revisión semanal para reanudar."
+        )
     if _wants_cadence(text) and "automat" not in normal:
         status = store.status()
         if status.ready and status.cadence_id:
@@ -788,29 +1110,43 @@ def _cadence_turn(base: Path, state: dict[str, Any], text: str) -> str | None:
                 return f"Tu próxima revisión local será el {status.next_review_on}. Puedes decir “pausa mi revisión semanal” cuando quieras."
         state.update({"stage": "cadence_setup", "cadence_step": 0, "cadence_data": {}})
         _save(base, state)
-        return "La revisión es opcional y sólo aparecerá al abrir ScaleUp; no enviaré mensajes ni crearé eventos. " + _cadence_question("weekday")
-    if re.search(r"\b(?:recordatorio|automatiza|automatizar)\b.*\b(?:revision|revisión|swt|semanal)\b", normal):
+        return (
+            "La revisión es opcional y sólo aparecerá al abrir ScaleUp; no enviaré mensajes ni crearé eventos. "
+            + _cadence_question("weekday")
+        )
+    if re.search(
+        r"\b(?:recordatorio|automatiza|automatizar)\b.*\b(?:revision|revisión|swt|semanal)\b",
+        normal,
+    ):
         return "Puedo sugerirte cómo configurar un recordatorio nativo en el host que uses, pero no puedo crearlo ni afirmar que se ejecutará. Antes te diré propósito, frecuencia, datos mínimos, alternativa manual y cómo detenerlo."
     return None
 
 
 def _advance_after_evidence(base: Path, state: dict[str, Any]) -> str:
     """Resume the narrative diagnosis without forcing a score."""
-    index = int(state.pop("evidence_narrative_index", state.get("narrative_index", 0))) + 1
+    index = (
+        int(state.pop("evidence_narrative_index", state.get("narrative_index", 0))) + 1
+    )
     for key in tuple(state):
         if key.startswith(("evidence_", "draft_evidence_")):
             state.pop(key, None)
     state.update({"narrative_index": index, "stage": "diagnosis_narrative"})
     _save(base, state)
-    return _narrative_question(index) if index < len(DECISIONS) else _finish_narrative_diagnosis(base, state)
+    return (
+        _narrative_question(index)
+        if index < len(DECISIONS)
+        else _finish_narrative_diagnosis(base, state)
+    )
 
 
 def _offer_evidence(base: Path, state: dict[str, Any], decision: str, text: str) -> str:
-    state.update({
-        "stage": "evidence_offer",
-        "evidence_decision": decision,
-        "evidence_narrative_index": int(state.get("narrative_index", 0)),
-    })
+    state.update(
+        {
+            "stage": "evidence_offer",
+            "evidence_decision": decision,
+            "evidence_narrative_index": int(state.get("narrative_index", 0)),
+        }
+    )
     _save(base, state)
     label = DIAGNOSE_QUESTIONS[decision]["label"]
     return (
@@ -839,28 +1175,40 @@ def _start_evidence_capture(base: Path, state: dict[str, Any]) -> str:
     )
 
 
-def _preview_to_confirmation(base: Path, state: dict[str, Any], preview: Any, source_type: str) -> str:
+def _preview_to_confirmation(
+    base: Path, state: dict[str, Any], preview: Any, source_type: str
+) -> str:
     decision = str(state.get("evidence_decision", ""))
     if not preview.ready:
-        return (preview.reason or "No pude preparar una vista previa.") + " Puedes continuar manualmente o mantener el diagnóstico cualitativo."
+        return (
+            preview.reason or "No pude preparar una vista previa."
+        ) + " Puedes continuar manualmente o mantener el diagnóstico cualitativo."
     proposed = dict(preview.proposed or {})
     if not proposed:
         return "Vi el archivo, pero no pude asociar columnas con los datos mínimos sin adivinar. Puedes capturarlos manualmente; no guardé ni indexé el archivo."
-    state.update({
-        "stage": "evidence_confirm_field",
-        "draft_evidence_values": proposed,
-        "draft_evidence_keys": list(proposed),
-        "draft_evidence_field_index": 0,
-        "draft_evidence_source_type": source_type,
-        "draft_evidence_source_ref": preview.source_ref or "fuente local",
-        "draft_evidence_sha256": preview.content_sha256,
-    })
+    state.update(
+        {
+            "stage": "evidence_confirm_field",
+            "draft_evidence_values": proposed,
+            "draft_evidence_keys": list(proposed),
+            "draft_evidence_field_index": 0,
+            "draft_evidence_source_type": source_type,
+            "draft_evidence_source_ref": preview.source_ref or "fuente local",
+            "draft_evidence_sha256": preview.content_sha256,
+        }
+    )
     _save(base, state)
-    mapped = ", ".join(next(spec.label for spec in field_specs(decision) if spec.key == key) for key in proposed)
+    mapped = ", ".join(
+        next(spec.label for spec in field_specs(decision) if spec.key == key)
+        for key in proposed
+    )
     ambiguous = ""
     if preview.ambiguous:
         ambiguous = " No asocié campos ambiguos: " + ", ".join(preview.ambiguous) + "."
-    return f"Vista previa lista. Propuse estos campos: {mapped}.{ambiguous} Revisemos uno por uno antes de guardarlos. " + _evidence_field_question(state)
+    return (
+        f"Vista previa lista. Propuse estos campos: {mapped}.{ambiguous} Revisemos uno por uno antes de guardarlos. "
+        + _evidence_field_question(state)
+    )
 
 
 def _evidence_field_question(state: dict[str, Any]) -> str:
@@ -872,15 +1220,21 @@ def _evidence_field_question(state: dict[str, Any]) -> str:
     key = str(keys[index])
     spec = next(item for item in field_specs(decision) if item.key == key)
     value = dict(state.get("draft_evidence_values", {})).get(key)
-    return f"{spec.label.capitalize()}: “{value}”. ¿Lo confirmas para {spec.methodology}?"
+    return (
+        f"{spec.label.capitalize()}: “{value}”. ¿Lo confirmas para {spec.methodology}?"
+    )
 
 
 def _finish_evidence_capture(base: Path, state: dict[str, Any]) -> str:
     decision = str(state.get("evidence_decision", ""))
     snapshot = EvidenceStore(base).snapshot(decision)
     fields = snapshot.get("fields", {}) if isinstance(snapshot, dict) else {}
-    confirmed = [item["label"] for item in fields.values() if item.get("state") == "confirmed"]
-    pending = [item["label"] for item in fields.values() if item.get("state") != "confirmed"]
+    confirmed = [
+        item["label"] for item in fields.values() if item.get("state") == "confirmed"
+    ]
+    pending = [
+        item["label"] for item in fields.values() if item.get("state") != "confirmed"
+    ]
     summary = "Guardé localmente los campos confirmados con su fuente y fecha."
     if confirmed:
         summary += " Confirmados: " + ", ".join(confirmed) + "."
@@ -892,7 +1246,9 @@ def _finish_evidence_capture(base: Path, state: dict[str, Any]) -> str:
 def _wants_evidence(text: str) -> str | None:
     normal = _normalise(text)
     for decision in DECISIONS:
-        if re.search(rf"\b(?:trabajar|profundizar|cuantificar|ver)\b.*\b{decision}\b", normal):
+        if re.search(
+            rf"\b(?:trabajar|profundizar|cuantificar|ver)\b.*\b{decision}\b", normal
+        ):
             return decision
     if re.search(r"\b(?:caja|efectivo|power of one|ciclo de efectivo)\b", normal):
         return "cash"
@@ -901,7 +1257,12 @@ def _wants_evidence(text: str) -> str | None:
     return None
 
 
-def _evidence_turn(base: Path, state: dict[str, Any], text: str) -> str | None:
+def _evidence_turn(
+    base: Path,
+    state: dict[str, Any],
+    text: str,
+    attachment: AttachmentEnvelope | None = None,
+) -> str | None:
     stage = state.get("stage")
     normal = _normalise(text).strip(" .!¡?¿")
     if stage == "evidence_offer":
@@ -912,16 +1273,41 @@ def _evidence_turn(base: Path, state: dict[str, Any], text: str) -> str | None:
             answers.update(_score_answers(decision, score))
             state["answers"] = answers
             return _advance_after_evidence(base, state)
-        if normal in {"cualitativo", "mantener cualitativo", "sin calificacion", "sin calificación", "omitir", "ahora no", "no"}:
+        if normal in {
+            "cualitativo",
+            "mantener cualitativo",
+            "sin calificacion",
+            "sin calificación",
+            "omitir",
+            "ahora no",
+            "no",
+        }:
             return _advance_after_evidence(base, state)
-        if re.search(r"\b(?:si|sí|cuantificar|datos|real|manual|archivo|excel|conector)\b", normal):
+        if re.search(
+            r"\b(?:si|sí|cuantificar|datos|real|manual|archivo|excel|conector)\b",
+            normal,
+        ):
             return _start_evidence_capture(base, state)
         return "Puedes decir “mantener cualitativo”, “cuantificar”, o elegir un número del 1 al 5 si quieres registrar una calificación puntual."
     if stage == "evidence_choice":
-        if normal in {"cualitativo", "mantener cualitativo", "cancelar", "ahora no", "no"}:
+        if normal in {
+            "cualitativo",
+            "mantener cualitativo",
+            "cancelar",
+            "ahora no",
+            "no",
+        }:
             return _advance_after_evidence(base, state)
         if re.search(r"\b(?:manual|capturar|escribir)\b", normal):
-            state.update({"stage": "evidence_manual", "draft_evidence_field_index": 0, "draft_evidence_values": {}, "draft_evidence_source_type": "manual", "draft_evidence_source_ref": "captura manual"})
+            state.update(
+                {
+                    "stage": "evidence_manual",
+                    "draft_evidence_field_index": 0,
+                    "draft_evidence_values": {},
+                    "draft_evidence_source_type": "manual",
+                    "draft_evidence_source_ref": "captura manual",
+                }
+            )
             _save(base, state)
             first = field_specs(str(state.get("evidence_decision", "")))[0]
             return "Empecemos con el dato mínimo. " + first.question
@@ -941,29 +1327,53 @@ def _evidence_turn(base: Path, state: dict[str, Any], text: str) -> str | None:
         if index >= len(specs):
             return "No pude recuperar el dato pendiente. Empecemos de nuevo con la captura manual."
         if sensitivity_of(text):
-            return "Eso parece un dato delicado. No lo guardaré ni indexaré; comparte sólo el valor agregado necesario para la metodología. " + specs[index].question
+            return (
+                "Eso parece un dato delicado. No lo guardaré ni indexaré; comparte sólo el valor agregado necesario para la metodología. "
+                + specs[index].question
+            )
         preview = EvidenceStore(base).preview_values(decision, {specs[index].key: text})
         if not preview.ready:
-            return (preview.reason or "No pude interpretar ese dato.") + " " + specs[index].question
+            return (
+                (preview.reason or "No pude interpretar ese dato.")
+                + " "
+                + specs[index].question
+            )
         values = dict(state.get("draft_evidence_values", {}))
         values[specs[index].key] = preview.proposed[specs[index].key]
         index += 1
         if index < len(specs):
-            state.update({"draft_evidence_values": values, "draft_evidence_field_index": index})
+            state.update(
+                {"draft_evidence_values": values, "draft_evidence_field_index": index}
+            )
             _save(base, state)
             return specs[index].question
         final_preview = EvidenceStore(base).preview_values(decision, values)
         return _preview_to_confirmation(base, state, final_preview, "manual")
     if stage == "evidence_file":
-        match = re.search(r"(?:archivo|file)\s*[:：]\s*(.+)", text, re.IGNORECASE)
-        if not match:
-            return "Cuando el archivo esté disponible en esta conversación, lo previsualizaré localmente antes de usarlo. También puedes elegir captura manual."
-        return _preview_to_confirmation(base, state, EvidenceStore(base).preview_file(match.group(1).strip(), str(state.get("evidence_decision", ""))), "file_preview")
+        if attachment is not None:
+            return _preview_to_confirmation(
+                base,
+                state,
+                EvidenceStore(base).preview_attachment(
+                    attachment, str(state.get("evidence_decision", ""))
+                ),
+                "file_preview",
+            )
+        return "Adjunta aquí un CSV o XLSX. Te mostraré la vista previa antes de conservar cualquier campo; no necesitas darme una ruta de archivo."
     if stage == "evidence_host":
-        match = re.search(r"(?:contenido|datos)\s*[:：]\s*(.+)", text, re.IGNORECASE | re.DOTALL)
+        match = re.search(
+            r"(?:contenido|datos)\s*[:：]\s*(.+)", text, re.IGNORECASE | re.DOTALL
+        )
         if not match:
             return "Después de autorizarlo en tu host, comparte sólo una tabla con las columnas necesarias. También puedes elegir captura manual."
-        return _preview_to_confirmation(base, state, EvidenceStore(base).preview_host_content(match.group(1).strip(), str(state.get("evidence_decision", ""))), "host_connector")
+        return _preview_to_confirmation(
+            base,
+            state,
+            EvidenceStore(base).preview_host_content(
+                match.group(1).strip(), str(state.get("evidence_decision", ""))
+            ),
+            "host_connector",
+        )
     if stage == "evidence_confirm_field":
         keys = state.get("draft_evidence_keys", [])
         index = int(state.get("draft_evidence_field_index", 0))
@@ -974,21 +1384,54 @@ def _evidence_turn(base: Path, state: dict[str, Any], text: str) -> str | None:
         source_type = str(state.get("draft_evidence_source_type", "manual"))
         source_ref = str(state.get("draft_evidence_source_ref", "captura manual"))
         if _answers_yes(text):
-            saved = EvidenceStore(base).confirm_value(decision=decision, field=key, value=dict(state.get("draft_evidence_values", {})).get(key), source_type=source_type, source_ref=source_ref, content_sha256=state.get("draft_evidence_sha256"), source_id=state.get("draft_evidence_source_id"))
+            saved = EvidenceStore(base).confirm_value(
+                decision=decision,
+                field=key,
+                value=dict(state.get("draft_evidence_values", {})).get(key),
+                source_type=source_type,
+                source_ref=source_ref,
+                content_sha256=state.get("draft_evidence_sha256"),
+                source_id=state.get("draft_evidence_source_id"),
+            )
             if not saved.ready:
-                return "No pude guardar ese campo confirmado: " + (saved.reason or "inténtalo de nuevo")
+                return "No pude guardar ese campo confirmado: " + (
+                    saved.reason or "inténtalo de nuevo"
+                )
             state["draft_evidence_source_id"] = saved.source_id
         elif _answers_no(text) or normal in {"omitir", "rechazar"}:
-            EvidenceStore(base).reject_value(decision=decision, field=key, source_type=source_type, source_ref=source_ref)
+            EvidenceStore(base).reject_value(
+                decision=decision,
+                field=key,
+                source_type=source_type,
+                source_ref=source_ref,
+            )
         else:
             return "No lo guardaré sin una decisión clara. Responde “sí” para confirmar o “no” para rechazar este campo."
         state["draft_evidence_field_index"] = index + 1
         _save(base, state)
-        return _evidence_field_question(state) if index + 1 < len(keys) else _finish_evidence_capture(base, state)
-    if stage not in {"company_name", "company_industry", "company_employees", "diagnosis_narrative", "narrative_score_confirmation", "plan", "diagnosis"}:
+        return (
+            _evidence_field_question(state)
+            if index + 1 < len(keys)
+            else _finish_evidence_capture(base, state)
+        )
+    if stage not in {
+        "company_name",
+        "company_industry",
+        "company_employees",
+        "diagnosis_narrative",
+        "narrative_score_confirmation",
+        "plan",
+        "diagnosis",
+    }:
         decision = _wants_evidence(text)
         if decision:
-            state.update({"stage": "evidence_offer", "evidence_decision": decision, "evidence_narrative_index": len(DECISIONS)})
+            state.update(
+                {
+                    "stage": "evidence_offer",
+                    "evidence_decision": decision,
+                    "evidence_narrative_index": len(DECISIONS),
+                }
+            )
             _save(base, state)
             return _start_evidence_capture(base, state)
     return None
@@ -999,12 +1442,22 @@ def _connected_context_turn(base: Path, state: dict[str, Any], text: str) -> str
     pending_need = state.get("connected_guidance_need")
     if pending_need in {"documents", "calendar", "market_research"}:
         if re.search(r"\b(?:acepto|aceptar|si,? acepto|sí,? acepto)\b", normal):
-            record_decision(str(base), need=pending_need, state="accepted", explicit_confirmation=True)
+            record_decision(
+                str(base),
+                need=pending_need,
+                state="accepted",
+                explicit_confirmation=True,
+            )
             state.pop("connected_guidance_need", None)
             _save(base, state)
             return "Dejé registrada localmente tu decisión. No conecté ninguna cuenta, no instalé nada y no guardé contenido externo."
         if re.search(r"\b(?:rechazo|rechazar|no acepto|ahora no)\b", normal):
-            record_decision(str(base), need=pending_need, state="rejected", explicit_confirmation=True)
+            record_decision(
+                str(base),
+                need=pending_need,
+                state="rejected",
+                explicit_confirmation=True,
+            )
             state.pop("connected_guidance_need", None)
             _save(base, state)
             return "Dejé registrada localmente tu decisión de no usar esa sugerencia. Puedes retomarla cuando quieras; no conecté ni guardé datos externos."
@@ -1017,12 +1470,18 @@ def _connected_context_turn(base: Path, state: dict[str, Any], text: str) -> str
         need = "market_research"
     if need is None:
         return None
-    preview_match = re.search(r"(?:compartir|texto|datos)\s*[:：]\s*(.+)", text, re.I)
+    preview_match = re.search(
+        r"(?:compartir|texto|datos)\s*[:：]\s*(.+)", text, re.IGNORECASE
+    )
     if preview_match:
         preview = anonymize_preview(preview_match.group(1))
         if preview is None:
             return "Ese contenido parece incluir un secreto o dato de acceso. No lo guardaré, indexaré ni sugeriré compartirlo."
-        return "Vista anonimizada para que la revises antes de compartir fuera de ScaleUp:\n\n" + preview + "\n\nConectarte al host no autoriza guardar ni indexar ese contenido aquí."
+        return (
+            "Vista anonimizada para que la revises antes de compartir fuera de ScaleUp:\n\n"
+            + preview
+            + "\n\nConectarte al host no autoriza guardar ni indexar ese contenido aquí."
+        )
     guide = recommend(need, capabilities("none"))
     if need == "market_research":
         guide = swt_recipe(capabilities("none"))
@@ -1035,14 +1494,41 @@ def _connected_context_turn(base: Path, state: dict[str, Any], text: str) -> str
     )
 
 
-def _board_turn(text: str) -> str | None:
+def _board_turn(base: Path, text: str) -> str | None:
     normal = _normalise(text)
-    if not re.search(r"\b(?:board|consejo directivo|lente verne|opinion del asesor|opinión del asesor|revisa (?:mi |este )?daily)\b", normal):
+    if not re.search(
+        r"\b(?:board|consejo directivo|lente verne|opinion del asesor|opinión del asesor|revisa (?:mi |este )?daily)\b",
+        normal,
+    ):
         return None
     payload = text.split(":", 1)[1].strip() if ":" in text else text
-    packet = BoardContextBuilder(PortableKnowledgeHandler()).build(payload)
+    context = CompanyContextReader(base).read(
+        consumer="board", include_board_human=True
+    )
+    category = BoardContextBuilder(PortableKnowledgeHandler()).classify(payload)
+    facts = list(context.for_board(category))
+    if not facts:
+        facts = [
+            CompanyFact("company:input:0", payload or "Sin dato empresarial.", category)
+        ]
+    packet = BoardContextBuilder(PortableKnowledgeHandler()).build(
+        payload, category=category, company_facts=facts
+    )
+    if context.gaps:
+        packet = EvidencePacket(
+            packet.schema_version,
+            packet.category,
+            packet.company_facts,
+            packet.source_evidence,
+            tuple(dict.fromkeys((*packet.gaps, *context.gaps))),
+            packet.warnings,
+        )
     advisor = VerneLensAdvisor()
-    response = advisor.daily_review(packet) if "daily" in normal else advisor.decision_consult(packet)
+    response = (
+        advisor.daily_review(packet)
+        if "daily" in normal
+        else advisor.decision_consult(packet)
+    )
     return advisor.render_markdown(response)
 
 
@@ -1081,23 +1567,36 @@ def _provisional_score(text: str) -> int:
 
 
 def _score_answers(decision: str, score: int) -> dict[str, int]:
-    return {question["id"]: score for question in DIAGNOSE_QUESTIONS[decision]["questions"]}
+    return {
+        question["id"]: score for question in DIAGNOSE_QUESTIONS[decision]["questions"]
+    }
 
 
 def _finish_narrative_diagnosis(base: Path, state: dict[str, Any]) -> str:
     answers = dict(state.get("answers", {}))
-    scored = [decision for decision in DECISIONS if any(key.startswith(decision + "_") for key in answers)]
+    scored = [
+        decision
+        for decision in DECISIONS
+        if any(key.startswith(decision + "_") for key in answers)
+    ]
     notes = dict(state.get("diagnostic_notes", {}))
     profile = _profile(base)
     if profile:
         profile["diagnostic_notes"] = notes
-        write_yaml(base / ".scaleup" / "agent" / "memory" / "company-profile.yaml", profile)
+        write_yaml(
+            base / ".scaleup" / "agent" / "memory" / "company-profile.yaml", profile
+        )
     state["stage"] = "post_diagnosis"
     _save(base, state)
     if not scored:
         return "Guardé tu diagnóstico narrativo sin calificaciones. Ya tenemos contexto suficiente para elegir la primera prioridad juntos. ¿Quieres hacer tu plan en una hoja o profundizar en una de las cuatro áreas?"
-    result = run_diagnose({"base_path": base, "answers": answers, "decisions": scored, "mode": "partial"})
-    return result["output"] + "\n\nLas calificaciones son provisionales y se basan en lo que me contaste. Puedes revisarlas cuando quieras o pasar a tu plan en una hoja."
+    result = run_diagnose(
+        {"base_path": base, "answers": answers, "decisions": scored, "mode": "partial"}
+    )
+    return (
+        result["output"]
+        + "\n\nLas calificaciones son provisionales y se basan en lo que me contaste. Puedes revisarlas cuando quieras o pasar a tu plan en una hoja."
+    )
 
 
 def _continue_narrative_diagnosis(base: Path, state: dict[str, Any], text: str) -> str:
@@ -1109,7 +1608,11 @@ def _continue_narrative_diagnosis(base: Path, state: dict[str, Any], text: str) 
         answers.update(_score_answers(decision, score))
         state.update({"answers": answers, "narrative_index": index + 1})
         _save(base, state)
-        return _narrative_question(index + 1) if index + 1 < len(DECISIONS) else _finish_narrative_diagnosis(base, state)
+        return (
+            _narrative_question(index + 1)
+            if index + 1 < len(DECISIONS)
+            else _finish_narrative_diagnosis(base, state)
+        )
     notes = dict(state.get("diagnostic_notes", {}))
     notes[decision] = text.strip()
     state["diagnostic_notes"] = notes
@@ -1123,18 +1626,40 @@ def _confirm_narrative_score(base: Path, state: dict[str, Any], text: str) -> st
     score = _answer_score(text)
     if _answers_yes(text):
         score = int(state.get("pending_score", 0))
-    if normal in {"sin calificacion", "sin calificación", "omitir", "sin numero", "sin número"}:
+    if normal in {
+        "sin calificacion",
+        "sin calificación",
+        "omitir",
+        "sin numero",
+        "sin número",
+    }:
         score = None
-    if score is None and normal not in {"sin calificacion", "sin calificación", "omitir", "sin numero", "sin número"}:
+    if score is None and normal not in {
+        "sin calificacion",
+        "sin calificación",
+        "omitir",
+        "sin numero",
+        "sin número",
+    }:
         return "Puedes responder “sí”, otro número del 1 al 5, o “sin calificación”."
     answers = dict(state.get("answers", {}))
     if score is not None:
         answers.update(_score_answers(decision, score))
-    state.update({"answers": answers, "narrative_index": index + 1, "stage": "diagnosis_narrative"})
+    state.update(
+        {
+            "answers": answers,
+            "narrative_index": index + 1,
+            "stage": "diagnosis_narrative",
+        }
+    )
     state.pop("pending_decision", None)
     state.pop("pending_score", None)
     _save(base, state)
-    return _narrative_question(index + 1) if index + 1 < len(DECISIONS) else _finish_narrative_diagnosis(base, state)
+    return (
+        _narrative_question(index + 1)
+        if index + 1 < len(DECISIONS)
+        else _finish_narrative_diagnosis(base, state)
+    )
 
 
 def _plan_question(step: int) -> str:
@@ -1231,7 +1756,14 @@ def _continue_plan(base: Path, state: dict[str, Any], text: str) -> str:
 
 
 def _begin_diagnosis(base: Path, state: dict[str, Any]) -> str:
-    state.update({"stage": "diagnosis_narrative", "narrative_index": 0, "answers": {}, "diagnostic_notes": {}})
+    state.update(
+        {
+            "stage": "diagnosis_narrative",
+            "narrative_index": 0,
+            "answers": {},
+            "diagnostic_notes": {},
+        }
+    )
     _save(base, state)
     return "Ahora voy a escucharte antes de poner números. " + _narrative_question(0)
 
@@ -1261,15 +1793,19 @@ def _continue_diagnosis(base: Path, state: dict[str, Any], text: str) -> str:
     )
 
 
-
 def _record_intake_sources(state: dict[str, Any], text: str) -> None:
     sources = list(state.get("intake_sources", []))
     for url in re.findall(r"https?://[^\s)>]+", text):
         entry = {"kind": "url", "value": url.rstrip(".,")}
         if entry not in sources:
             sources.append(entry)
-    if re.search(r"\b(?:logo|archivo|adjunto|\.svg|\.png|\.jpg|\.pdf)\b", _normalise(text)):
-        entry = {"kind": "attachment_reference", "value": "archivo o logo declarado por la persona"}
+    if re.search(
+        r"\b(?:logo|archivo|adjunto|\.svg|\.png|\.jpg|\.pdf)\b", _normalise(text)
+    ):
+        entry = {
+            "kind": "attachment_reference",
+            "value": "archivo o logo declarado por la persona",
+        }
         if entry not in sources:
             sources.append(entry)
     if sources:
@@ -1284,8 +1820,9 @@ def _attach_intake_sources(base: Path, state: dict[str, Any]) -> None:
     company = profile.get("company") if isinstance(profile, dict) else None
     if isinstance(company, dict):
         company["declared_references"] = sources
-        write_yaml(base / ".scaleup" / "agent" / "memory" / "company-profile.yaml", profile)
-
+        write_yaml(
+            base / ".scaleup" / "agent" / "memory" / "company-profile.yaml", profile
+        )
 
 
 def _intake(base: Path, state: dict[str, Any], text: str) -> str:
@@ -1320,7 +1857,12 @@ def _intake(base: Path, state: dict[str, Any], text: str) -> str:
         if name:
             state["company_name"] = name.group(1).strip(" ,")
         elif not (industry or employees):
-            candidate = re.split(r"\s+(?:te dejo|logo|adjunto|archivo|https?://)", text, maxsplit=1, flags=re.IGNORECASE)[0]
+            candidate = re.split(
+                r"\s+(?:te dejo|logo|adjunto|archivo|https?://)",
+                text,
+                maxsplit=1,
+                flags=re.IGNORECASE,
+            )[0]
             state["company_name"] = candidate.strip(" ,.")
         if industry:
             state["industry"] = industry.group(1).strip(" ,")
@@ -1484,7 +2026,11 @@ def _restore_after_memory(base: Path, state: dict[str, Any]) -> None:
     _save(base, state)
 
 
-def run(message: str, base_path: str | Path = ".") -> str:
+def run(
+    message: str,
+    base_path: str | Path = ".",
+    attachment: AttachmentEnvelope | None = None,
+) -> str:
     """Consume one public turn, adding local continuity only when requested."""
     base = Path(base_path)
     text = str(message or "").strip()
@@ -1492,7 +2038,7 @@ def run(message: str, base_path: str | Path = ".") -> str:
     accountability_reply = _accountability_turn(base, state, text)
     if accountability_reply is not None:
         return accountability_reply
-    board_reply = _board_turn(text)
+    board_reply = _board_turn(base, text)
     if board_reply is not None:
         return board_reply
     human_context_reply = _human_context_turn(base, state, text)
@@ -1501,7 +2047,7 @@ def run(message: str, base_path: str | Path = ".") -> str:
     cadence_reply = _cadence_turn(base, state, text)
     if cadence_reply is not None:
         return cadence_reply
-    evidence_reply = _evidence_turn(base, state, text)
+    evidence_reply = _evidence_turn(base, state, text, attachment)
     if evidence_reply is not None:
         return evidence_reply
     connected_reply = _connected_context_turn(base, state, text)
