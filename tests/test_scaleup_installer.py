@@ -277,3 +277,36 @@ def test_safe_frontdoor_executes_in_checkout_and_installed_runtime(tmp_path):
         assert "valid" in json.loads(validation.stdout)
         invalid = subprocess.run([str(command), "run", "unexpected", "{}"], cwd=command_project, capture_output=True, text=True)
         assert invalid.returncode == 2
+
+
+def test_installer_copies_local_memory_runtime_and_preserves_memory_data(tmp_path):
+    _install(tmp_path)
+
+    for platform in (".claude", ".hermes", ".codex"):
+        runtime = tmp_path / platform / "scaleup"
+        memory_runtime = runtime / "escala_server"
+        assert (memory_runtime / "project_memory.py").is_file()
+        assert (memory_runtime / "schema.py").is_file()
+        assert not (memory_runtime / "server.py").exists()
+        project = tmp_path / f"{platform}-project"
+        completed = subprocess.run(
+            [
+                sys.executable,
+                "-c",
+                "from escala_server import ProjectMemoryRuntime; "
+                "assert ProjectMemoryRuntime('" + str(project) + "').ensure_memory().ready",
+            ],
+            env={"PYTHONPATH": str(runtime)},
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        assert completed.returncode == 0
+
+    runtime = tmp_path / ".codex" / "scaleup"
+    memory_note = runtime / "memory" / "keep.txt"
+    memory_note.parent.mkdir(parents=True)
+    memory_note.write_text("keep me")
+    _installer(tmp_path, "--target", "codex")
+    _installer(tmp_path, "--target", "codex", "--uninstall")
+    assert memory_note.read_text() == "keep me"

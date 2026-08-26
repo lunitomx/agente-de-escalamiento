@@ -25,6 +25,7 @@ COACHING_DIR="$(dirname "$SCRIPT_DIR")/coaching"
 KNOWLEDGE_DIR="$SCRIPT_DIR/knowledge"
 AGENT_DIR="$SCRIPT_DIR/agent"
 BIN_DIR="$SCRIPT_DIR/bin"
+MEMORY_RUNTIME_DIR="$(dirname "$SCRIPT_DIR")/escala_server"
 
 # Target directories (configured after parsing CLI arguments)
 CLAUDE_SKILLS=""
@@ -164,6 +165,17 @@ copy_engine() {
     info "Copied coaching engine to $dst/coaching/ (clean install)"
 }
 
+copy_memory_runtime() {
+    local dst="$1"
+    rm -rf "$dst/escala_server"
+    mkdir -p "$dst/escala_server"
+    for module in __init__.py schema.py project_memory.py memory_engine.py graph_engine.py; do
+        cp "$MEMORY_RUNTIME_DIR/$module" "$dst/escala_server/$module"
+    done
+    cp -a "$MEMORY_RUNTIME_DIR/daos" "$dst/escala_server/daos"
+    info "Copied local SQLite memory runtime to $dst/escala_server/"
+}
+
 copy_knowledge() {
     local dst="$1"
     rm -rf "$dst/knowledge"
@@ -202,6 +214,7 @@ install_claude() {
     echo "Installing ScaleUp to Claude Code ($CLAUDE_SCALEUP)..."
     install_public_front_door "$CLAUDE_SKILLS" "$CLAUDE_SCALEUP"
     copy_engine "$CLAUDE_SCALEUP"
+    copy_memory_runtime "$CLAUDE_SCALEUP"
     copy_knowledge "$CLAUDE_SCALEUP"
     copy_agent "$CLAUDE_SCALEUP"
     copy_bin "$CLAUDE_SCALEUP"
@@ -224,6 +237,7 @@ install_hermes() {
     echo "Installing ScaleUp to Hermes Agent ($HERMES_SCALEUP)..."
     install_public_front_door "$HERMES_SKILLS" "$HERMES_SCALEUP"
     copy_engine "$HERMES_SCALEUP"
+    copy_memory_runtime "$HERMES_SCALEUP"
     copy_knowledge "$HERMES_SCALEUP"
     copy_agent "$HERMES_SCALEUP"
     copy_bin "$HERMES_SCALEUP"
@@ -245,6 +259,7 @@ install_codex() {
     echo "Installing ScaleUp to Codex ($CODEX_SCALEUP)..."
     install_public_front_door "$CODEX_SKILLS" "$CODEX_SCALEUP"
     copy_engine "$CODEX_SCALEUP"
+    copy_memory_runtime "$CODEX_SCALEUP"
     copy_knowledge "$CODEX_SCALEUP"
     copy_agent "$CODEX_SCALEUP"
     copy_bin "$CODEX_SCALEUP"
@@ -323,9 +338,9 @@ uninstall_runtime() {
             rm -rf "$runtime"
             info "Removed $runtime including user company data"
         else
-            rm -rf "$runtime/coaching" "$runtime/knowledge" "$runtime/agent" "$runtime/bin" "$runtime/VERSION" "$runtime/$MANAGED_SKILLS_FILE"
+            rm -rf "$runtime/coaching" "$runtime/knowledge" "$runtime/agent" "$runtime/bin" "$runtime/escala_server" "$runtime/VERSION" "$runtime/$MANAGED_SKILLS_FILE"
             rmdir "$runtime" 2>/dev/null || true
-            info "Removed managed $label files; preserved $runtime/my-company"
+            info "Removed managed $label files; preserved $runtime/my-company and $runtime/memory"
         fi
     fi
     info "Removed $label skills"
