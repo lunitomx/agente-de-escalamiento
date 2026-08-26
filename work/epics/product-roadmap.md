@@ -2,9 +2,9 @@
 
 > Inventario canónico de épicas y dirección del producto.
 
-**Última auditoría:** 2026-08-24
-**Estado auditado:** main; E20 cerrada y E21 planificada
-**Siguiente número disponible:** E22
+**Última auditoría:** 2026-08-26
+**Estado auditado:** main; E20 cerrada y E21/E22 planificadas
+**Siguiente número disponible:** E23
 
 ## Visión
 
@@ -66,14 +66,15 @@ Todos forman parte de la historia del producto.
 | E19 — Book Ingestion | Parser, grafo y API de conocimiento | ✅ Complete | 5/5; 42 entidades, 59 relaciones, 406 capítulos y esquema formal documentado. |
 | E20 — Contextual Skills | Grafo → dashboards y coaching | ✅ Complete | 4/4; close 67c3d0c; tag epic/e20-complete. |
 | E21 — Verne Lens Board Member | Primer asesor del board sintético | 📐 Planned — approval pending | Diseño, plan, trazabilidad y 5 stories listos; sin implementación. |
+| E22 — Memoria Empresarial Integrada | Conectar SQLite, hechos, grafo y sesiones de E18 al producto instalado | 📐 Planned — design gate | Brief/scope creados tras diagnóstico RaiSE 2026-08-26; no implementación sin ADR de fuente única, migración y privacidad. |
 
 ### Resumen
 
 - 17 épicas completas: E1, E2, E3, E6–E11 y E13–E20.
 - 1 épica cancelada: E12.
 - 2 borradores históricos retirados/sustituidos: E4 y E5.
-- 1 épica planificada y pendiente de aprobación: E21.
-- No existe una E22 formalizada.
+- 2 épicas planificadas: E21 (board sintético) y E22 (memoria empresarial integrada).
+- No existe una E23 formalizada.
 
 ## Secuencia actual
 
@@ -89,12 +90,12 @@ E20 para comenzar; E20 es una integración consumidora paralela del conocimiento
 
 ## Próximo trabajo recomendado
 
-### P0 — Terminar smoke conversacional E10
+### P0 — E22: Integrar memoria empresarial al producto instalado
 
-La suite está verde con 389 passed y 2 skipped. La instalación aislada, los
-adapters, el flujo welcome → diagnose y el descubrimiento Hermes ya están
-verificados. Falta el smoke mediante agentes y proveedor real; Hermes además
-requiere corregir el permiso de su `.env` de instalación.
+La RC actual acreditó recorridos naturales completos en Claude Code y Codex
+(404 passed, 2 skipped). El diagnóstico de 2026-08-26 confirmó que el runtime
+SQLite/memoria de E18 no se instala ni se invoca desde la puerta pública. E22
+debe resolver esa separación antes de presentar ScaleUp como memoria empresarial neurosimbólica.
 
 ### P1 — Aprobar e implementar E21
 
@@ -109,7 +110,7 @@ requiere corregir el permiso de su `.env` de instalación.
 |-------|--------|--------|------------------------|
 | Smoke conversacional desde proyecto limpio | E4/E10/E13 | Open — P0 | Autorizar consumo de modelo y ejecutar Claude/Hermes; la aceptación determinística ya está automatizada. |
 | Bootstrap de Hermes | E10 / entorno | Open — P0 | Corregir lectura de `/usr/local/lib/hermes-agent/.env` antes del smoke. |
-| Integrar Escala Server con el instalador | E18 | Open — P2 | Antes de distribuir el servidor fuera del repo. |
+| Integrar Escala Server con el instalador | E18 | Promovida a E22 | E22 define fuente única, migración y E2E antes de distribuirla. |
 | Compatibilidad Python declarada | E18/E20 | Open — P2 | Definir y probar una versión mínima única. |
 | Release verificable del repo fuente | E5 | Open — P2 | Si se publica este repo; .scaleup/VERSION es 1.0.0, pero no existe tag v1.0.0 aquí. |
 | Rama origin/story/s6.1/ontology-schema | Higiene Git | Open — P3 | Eliminar tras confirmar que está fusionada y no se usa. |
