@@ -194,7 +194,7 @@ def test_runtime_upgrades_v2_database_and_reports_healthy(tmp_path: Path) -> Non
             connection.execute(
                 "SELECT value FROM _meta WHERE key = ?", ("schema_version",)
             ).fetchone()[0]
-            == "3"
+            == "4"
         )
         assert connection.execute(
             "SELECT 1 FROM sqlite_master WHERE type = ? AND name = ?",
@@ -378,3 +378,28 @@ def test_migration_backup_restore_preserves_worksheets_and_ledger(
 
     assert restored.ready
     assert {table: count(migrated.db_path, table) for table in tables} == before
+
+
+def test_profile_facts_are_linked_to_the_application_transaction(
+    tmp_path: Path,
+) -> None:
+    root = project(tmp_path, "complete")
+    migrated = ProjectMemoryMigrator(root).migrate()
+
+    with sqlite3.connect(migrated.db_path) as connection:
+        rows = connection.execute(
+            """SELECT facts.key, facts.updated_at, links.applied_at, applications.applied_at
+            FROM memory_facts AS facts
+            JOIN migration_fact_applications AS links ON links.fact_key = facts.key
+            JOIN migration_applications AS applications
+              ON applications.id = links.migration_application_id
+            WHERE applications.relative_path = ?
+            ORDER BY facts.key""",
+            (".scaleup/agent/memory/company-profile.yaml",),
+        ).fetchall()
+
+    assert rows
+    assert all(
+        updated_at == linked_at == application_at
+        for _, updated_at, linked_at, application_at in rows
+    )

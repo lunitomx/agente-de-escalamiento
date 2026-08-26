@@ -61,7 +61,6 @@ class ProjectMemoryMigrator:
                     if self._already_imported(connection, snapshot):
                         skipped[snapshot.relative_path] = "unchanged"
                         continue
-                    self._apply(connection, snapshot)
                     connection.execute(
                         "INSERT OR IGNORE INTO migration_sources (relative_path, content_sha256, "
                         "import_schema, source_kind) VALUES (?, ?, ?, ?)",
@@ -72,7 +71,7 @@ class ProjectMemoryMigrator:
                             snapshot.source_kind,
                         ),
                     )
-                    connection.execute(
+                    application = connection.execute(
                         "INSERT INTO migration_applications (relative_path, content_sha256, "
                         "import_schema, source_kind) VALUES (?, ?, ?, ?)",
                         (
@@ -82,6 +81,12 @@ class ProjectMemoryMigrator:
                             snapshot.source_kind,
                         ),
                     )
+                    application_id = application.lastrowid
+                    applied_at = connection.execute(
+                        "SELECT applied_at FROM migration_applications WHERE id = ?",
+                        (application_id,),
+                    ).fetchone()[0]
+                    self._apply(connection, snapshot, application_id, applied_at)
                 imported[snapshot.source_kind] += 1
             except (sqlite3.Error, ValueError, TypeError) as error:
                 errors[snapshot.relative_path] = str(error)
@@ -265,11 +270,45 @@ class ProjectMemoryMigrator:
             ORDER BY id DESC LIMIT 1""",
             (snapshot.relative_path, IMPORT_SCHEMA),
         ).fetchone()
-        return latest is not None and latest[0] == snapshot.digest
+        if latest is None or latest[0] != snapshot.digest:
+            return False
+        if snapshot.source_kind != "company-profile":
+            return True
+        application = connection.execute(
+            """SELECT id FROM migration_applications
+            WHERE relative_path=? AND content_sha256=? AND import_schema=?
+              AND source_kind=? ORDER BY id DESC LIMIT 1""",
+            (
+                snapshot.relative_path,
+                snapshot.digest,
+                IMPORT_SCHEMA,
+                snapshot.source_kind,
+            ),
+        ).fetchone()
+        if application is None:
+            return False
+        fact_count = connection.execute(
+            """SELECT COUNT(*) FROM memory_facts
+            WHERE key LIKE 'profile.%' OR key LIKE 'diagnosis.%'"""
+        ).fetchone()[0]
+        if fact_count == 0:
+            return True
+        linked_count = connection.execute(
+            """SELECT COUNT(*) FROM migration_fact_applications
+            WHERE migration_application_id = ?""",
+            (application[0],),
+        ).fetchone()[0]
+        return linked_count == fact_count
 
-    def _apply(self, connection: sqlite3.Connection, snapshot: _Snapshot) -> None:
+    def _apply(
+        self,
+        connection: sqlite3.Connection,
+        snapshot: _Snapshot,
+        application_id: int,
+        applied_at: str,
+    ) -> None:
         if snapshot.source_kind == "company-profile":
-            self._apply_profile(connection, snapshot)
+            self._apply_profile(connection, snapshot, application_id, applied_at)
             return
         assert snapshot.category is not None and snapshot.tool is not None
         version = connection.execute(
@@ -291,7 +330,11 @@ class ProjectMemoryMigrator:
         )
 
     def _apply_profile(
-        self, connection: sqlite3.Connection, snapshot: _Snapshot
+        self,
+        connection: sqlite3.Connection,
+        snapshot: _Snapshot,
+        application_id: int,
+        applied_at: str,
     ) -> None:
         if not isinstance(snapshot.payload, dict):
             raise TypeError("company-profile must be a YAML mapping")
@@ -318,6 +361,10 @@ class ProjectMemoryMigrator:
                 for prefix in ("profile.", "diagnosis.", "profile.focus.")
             ),
         )
+        connection.execute(
+            "DELETE FROM migration_fact_applications WHERE fact_key LIKE 'profile.%' "
+            "OR fact_key LIKE 'diagnosis.%'"
+        )
         for prefix, values in (
             ("profile", company),
             ("diagnosis", payload.get("scores", {})),
@@ -326,7 +373,23 @@ class ProjectMemoryMigrator:
             if isinstance(values, dict):
                 for key, value in values.items():
                     if value not in (None, "", [], {}, 0):
+                        fact_key = f"{prefix}.{key}"
+                        fact_value = json.dumps(value, sort_keys=True)
                         connection.execute(
-                            "INSERT INTO memory_facts (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_at=datetime('now')",
-                            (f"{prefix}.{key}", json.dumps(value, sort_keys=True)),
+                            """INSERT INTO memory_facts (key, value, created_at, updated_at)
+                            VALUES (?, ?, ?, ?)
+                            ON CONFLICT(key) DO UPDATE SET value=excluded.value,
+                            updated_at=excluded.updated_at""",
+                            (fact_key, fact_value, applied_at, applied_at),
+                        )
+                        connection.execute(
+                            """INSERT INTO migration_fact_applications (
+                                fact_key, value_sha256, migration_application_id, applied_at
+                            ) VALUES (?, ?, ?, ?)""",
+                            (
+                                fact_key,
+                                hashlib.sha256(fact_value.encode()).hexdigest(),
+                                application_id,
+                                applied_at,
+                            ),
                         )
