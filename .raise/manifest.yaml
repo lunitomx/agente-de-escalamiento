@@ -2,7 +2,7 @@
 project:
   name: scaleupagent
   language: python
-  project_type: python
+  project_type: brownfield
   test_command: "uv run --with pytest pytest"
   lint_command: "uv run --with ruff ruff check coaching escala_server tests"
   format_command: "uv run --with ruff ruff format --check coaching escala_server tests"
