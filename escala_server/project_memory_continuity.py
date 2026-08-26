@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 import re
-import unicodedata
 import uuid
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
 
 from .project_memory_context import ProjectMemorySessionContext
+from .project_memory_public_text import public_text
 from .project_memory_session_close import (
     CandidateSource,
     MemoryCandidate,
@@ -17,21 +17,6 @@ from .project_memory_session_close import (
 )
 
 Stage = Literal["normal", "capture", "confirm"]
-_FORBIDDEN = frozenset(
-    {
-        "sqlite",
-        "database",
-        "db",
-        "skill",
-        "command",
-        "log",
-        "token",
-        "password",
-        "secret",
-        "apikey",
-    }
-)
-_PATH = re.compile(r"(?:^|[\s\"'`=:(\[])(?:/|\\|[A-Za-z]:[\\/])")
 
 
 @dataclass(frozen=True)
@@ -103,7 +88,7 @@ class ProjectMemoryContinuity:
                 next_question="No voy a guardar nada. Podemos seguir cuando quieras."
             )
         return NaturalTurn(
-            next_question=f"Entendí: {statement}. ¿Quieres que lo recuerde para la próxima sesión? (sí/no)",
+            next_question=f"Entendí: {statement}. ¿Quieres que lo recuerde para la próxima vez? (sí/no)",
             stage="confirm",
             session_id=session_id,
             proposal_id=proposed.id,
@@ -139,11 +124,4 @@ class ProjectMemoryContinuity:
 
     @staticmethod
     def _public_text(value: object) -> str | None:
-        if not isinstance(value, str):
-            return None
-        text = " ".join(value.strip().split())
-        normalized = unicodedata.normalize("NFKD", text).casefold()
-        tokens = set(re.split(r"[^a-z0-9]+", normalized))
-        if not text or len(text) > 240 or tokens & _FORBIDDEN or _PATH.search(text):
-            return None
-        return text
+        return public_text(value)

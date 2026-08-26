@@ -1,6 +1,9 @@
 """Public-language contract for the local memory continuity adapter."""
 
+import sqlite3
 from pathlib import Path
+
+import pytest
 
 from escala_server.project_memory_session_close import (
     CandidateSource,
@@ -75,3 +78,70 @@ def test_explicit_capture_requires_confirmation_and_keeps_ambiguous_pending(
     )
     assert confirmed.stage == "normal"
     assert "próxima vez" in (confirmed.next_question or "").lower()
+
+
+@pytest.mark.parametrize(
+    "statement",
+    (
+        "La APIKey es abc",
+        "La contraseña es abc",
+        "La clave de acceso es abc",
+        "El identificador es 42",
+        "El sessionId es 42",
+        "La base de datos está lista",
+        "Ejecuta el comando de ventas",
+        "La habilidad de ventas está lista",
+        "El log dice que sigamos",
+        "La ruta es /tmp/secreto",
+        "DBPassword=abc",
+    ),
+)
+def test_public_policy_rejects_sensitive_or_technical_capture_before_proposal(
+    tmp_path: Path, statement: str
+) -> None:
+    from escala_server.project_memory_continuity import ProjectMemoryContinuity
+
+    continuity = ProjectMemoryContinuity(tmp_path)
+    pause = continuity.begin_pause()
+    assert pause.session_id
+
+    response = continuity.capture_statement(pause.session_id, statement)
+
+    assert response.stage == "normal"
+    assert "no voy a guardar nada" in (response.next_question or "").lower()
+    with sqlite3.connect(continuity.close.runtime.db_path) as db:
+        assert (
+            db.execute("SELECT COUNT(*) FROM session_memory_proposals").fetchone()[0]
+            == 0
+        )
+        assert (
+            db.execute("SELECT COUNT(*) FROM confirmed_memory_entries").fetchone()[0]
+            == 0
+        )
+
+
+def test_context_projection_omits_legacy_sensitive_values_before_rendering(
+    tmp_path: Path,
+) -> None:
+    from escala_server.project_memory_continuity import ProjectMemoryContinuity
+
+    close = ProjectMemorySessionClose(tmp_path)
+    assert close.open_session("s-safe").ready
+    proposal = close.propose(
+        "s-safe",
+        MemoryCandidate(
+            "fact",
+            "El foco es puntualidad de entrega",
+            CandidateSource("s-safe", ("obs-safe",), "explicit_user_statement"),
+        ),
+    )
+    assert close.confirm(proposal.id or "", "sí").status == "confirmed"
+    with sqlite3.connect(close.runtime.db_path) as db:
+        db.execute(
+            "UPDATE confirmed_memory_entries SET statement = 'La habilidad de ventas'"
+        )
+        db.execute(
+            "UPDATE session_memory_proposals SET statement = 'La habilidad de ventas'"
+        )
+
+    assert ProjectMemoryContinuity(tmp_path).resume().prefix is None

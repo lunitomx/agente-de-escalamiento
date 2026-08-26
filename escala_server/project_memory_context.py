@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Literal
 
 from .project_memory import ProjectMemoryRuntime
+from .project_memory_public_text import public_text
 from .schema import context_read_schema_is_valid
 
 _PROFILE_SOURCE = ".scaleup/agent/memory/company-profile.yaml"
@@ -168,7 +169,7 @@ class ProjectMemorySessionContext:
                 continue
             if not self._allowed_fact_key(key):
                 continue
-            value = self._brief_scalar(raw_value)
+            value = public_text(self._brief_scalar(raw_value))
             if value is not None:
                 facts.append(
                     ContextItem(
@@ -203,10 +204,13 @@ class ProjectMemorySessionContext:
             if not self._valid_confirmed_entry(row):
                 continue
             entry_id, _, kind, statement, _, confirmed_at, *_ = row
+            value = public_text(statement)
+            if value is None:
+                continue
             items.append(
                 ContextItem(
                     key=f"confirmed:{kind}:{entry_id}",
-                    value=statement.strip(),
+                    value=value,
                     source="confirmed",
                     observed_at=confirmed_at,
                     kind="entry",
@@ -344,10 +348,13 @@ class ProjectMemorySessionContext:
             applied_at = self._verified_worksheet_application(db, envelope)
             if applied_at is None:
                 continue
+            value = public_text(f"{source_kind}: {category}/{tool}")
+            if value is None:
+                continue
             changes.append(
                 ContextItem(
                     key=f"{source_kind}:{category}/{tool}",
-                    value=f"{source_kind}: {category}/{tool}",
+                    value=value,
                     source=relative_path,
                     observed_at=applied_at,
                     kind="change",
