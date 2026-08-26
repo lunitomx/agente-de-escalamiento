@@ -7,7 +7,7 @@ the same API contract as the original in-memory handlers.
 import json
 from typing import Any
 
-from .daos import CompanyDAO, WorksheetDAO, ChangeDAO, SessionDAO
+from .daos import ChangeDAO, CompanyDAO, SessionDAO, WorksheetDAO
 from .diff import dict_diff
 
 
@@ -128,8 +128,8 @@ class MemoryHandler:
     """Handle memory & knowledge graph API (SQLite-backed)."""
 
     def __init__(self, db_path: str = ":memory:"):
-        from .memory_engine import MemoryEngine
         from .graph_engine import GraphEngine
+        from .memory_engine import MemoryEngine
 
         self.memory = MemoryEngine(db_path)
         self.graph = GraphEngine(db_path)
@@ -237,6 +237,7 @@ class MemoryHandler:
 
 
 # ── helpers ──────────────────────────────────────────────────────────
+
 
 def _serialise(value: Any) -> str | None:
     """Stringify a value for storage in changes_log."""

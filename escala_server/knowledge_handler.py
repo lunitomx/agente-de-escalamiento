@@ -34,28 +34,81 @@ from .graph_engine import GraphEngine
 # Entities whose keywords or name signal membership in each category
 _CATEGORY_SIGNALS: dict[str, list[str]] = {
     "cash": [
-        "cash", "cash flow", "ccc", "working capital", "revenue",
-        "gross margin", "profit", "power of one", "financial",
-        "operating cash", "receivables", "inventory", "payables",
-        "capex", "capital", "balance sheet", "income statement",
+        "cash",
+        "cash flow",
+        "ccc",
+        "working capital",
+        "revenue",
+        "gross margin",
+        "profit",
+        "power of one",
+        "financial",
+        "operating cash",
+        "receivables",
+        "inventory",
+        "payables",
+        "capex",
+        "capital",
+        "balance sheet",
+        "income statement",
     ],
     "strategy": [
-        "strategy", "strategic", "swot", "swt", "bhag", "brand promise",
-        "core purpose", "core values", "core customer", "sandbox",
-        "x factor", "profit per x", "7 strata", "one-page",
-        "opsp", "differentiation", "promise", "mission",
+        "strategy",
+        "strategic",
+        "swot",
+        "swt",
+        "bhag",
+        "brand promise",
+        "core purpose",
+        "core values",
+        "core customer",
+        "sandbox",
+        "x factor",
+        "profit per x",
+        "7 strata",
+        "one-page",
+        "opsp",
+        "differentiation",
+        "promise",
+        "mission",
     ],
     "people": [
-        "people", "topgrading", "fac", "functions", "accountability",
-        "responsibility", "talent", "hiring", "culture", "values",
-        "engagement", "net promoter", "nps", "quarterly conversation",
-        "feedback", "coaching", "a-player",
+        "people",
+        "topgrading",
+        "fac",
+        "functions",
+        "accountability",
+        "responsibility",
+        "talent",
+        "hiring",
+        "culture",
+        "values",
+        "engagement",
+        "net promoter",
+        "nps",
+        "quarterly conversation",
+        "feedback",
+        "coaching",
+        "a-player",
     ],
     "execution": [
-        "execution", "priority", "critical number", "theme",
-        "quarterly", "rhythm", "huddle", "weekly meeting",
-        "pace", "process", "routine", "habit", "scoreboard",
-        "kpi", "no surprises", "same page", "alignment",
+        "execution",
+        "priority",
+        "critical number",
+        "theme",
+        "quarterly",
+        "rhythm",
+        "huddle",
+        "weekly meeting",
+        "pace",
+        "process",
+        "routine",
+        "habit",
+        "scoreboard",
+        "kpi",
+        "no surprises",
+        "same page",
+        "alignment",
     ],
 }
 
@@ -194,9 +247,7 @@ class KnowledgeHandler:
         outgoing: list[dict[str, Any]] = []
         incoming: list[dict[str, Any]] = []
         for rel in rel_rows:
-            rel_props = (
-                json.loads(rel["properties"]) if rel["properties"] else {}
-            )
+            rel_props = json.loads(rel["properties"]) if rel["properties"] else {}
             rel_dict = {
                 "id": rel["id"],
                 "type": rel["relation_type"],
@@ -228,9 +279,7 @@ class KnowledgeHandler:
 
     # ── get_context ───────────────────────────────────────────────────
 
-    def get_context(
-        self, tool: str | None = None, category: str | None = None
-    ) -> dict:
+    def get_context(self, tool: str | None = None, category: str | None = None) -> dict:
         """Return relevant context for a session.
 
         Args:
@@ -242,7 +291,10 @@ class KnowledgeHandler:
             and ``status``.
         """
         if not tool and not category:
-            return {"status": "error", "message": "requires 'tool' or 'category' parameter"}
+            return {
+                "status": "error",
+                "message": "requires 'tool' or 'category' parameter",
+            }
         conn = self.graph._conn()
 
         # Determine the set of relevant entity names via category signals
@@ -259,9 +311,11 @@ class KnowledgeHandler:
                 keywords: list[str] = props.get("keywords", [])
                 desc = props.get("description", "").lower()
 
-                if any(s in name_lower for s in signals) or any(
-                    any(s in kw.lower() for s in signals) for kw in keywords
-                ) or any(s in desc for s in signals):
+                if (
+                    any(s in name_lower for s in signals)
+                    or any(any(s in kw.lower() for s in signals) for kw in keywords)
+                    or any(s in desc for s in signals)
+                ):
                     category_names.add(row["name"])
 
         # If tool is provided, find its entity
@@ -275,7 +329,7 @@ class KnowledgeHandler:
         if tool and category and tool_result:
             tool_entity = tool_result.get("entity", {})
             tool_related = tool_result.get("related", [])
-            tool_related_names = tool_result.get("related_names", [])
+            tool_result.get("related_names", [])
 
             # Entities in both tool's scope and category
             ctx_entities: list[dict[str, Any]] = []
@@ -287,12 +341,8 @@ class KnowledgeHandler:
                     ctx_entities.append(rel["entity"])
 
             # Principles and habits from the intersection
-            principles = [
-                e for e in ctx_entities if e["type"] == "principle"
-            ]
-            habits = [
-                e for e in ctx_entities if e["type"] == "habit"
-            ]
+            principles = [e for e in ctx_entities if e["type"] == "principle"]
+            habits = [e for e in ctx_entities if e["type"] == "habit"]
 
             return {
                 "tool": tool_entity,
@@ -309,14 +359,12 @@ class KnowledgeHandler:
 
             # Extract principles and habits from related
             all_entities = [tool_entity] + [
-                r["entity"] for r in related_list if r["entity"]["id"] != tool_entity.get("id")
+                r["entity"]
+                for r in related_list
+                if r["entity"]["id"] != tool_entity.get("id")
             ]
-            principles = [
-                e for e in all_entities if e.get("type") == "principle"
-            ]
-            habits = [
-                e for e in all_entities if e.get("type") == "habit"
-            ]
+            principles = [e for e in all_entities if e.get("type") == "principle"]
+            habits = [e for e in all_entities if e.get("type") == "habit"]
 
             return {
                 "tool": tool_entity,
@@ -336,19 +384,17 @@ class KnowledgeHandler:
             for row in all_rows:
                 if row["name"] in category_names:
                     props = json.loads(row["properties"]) if row["properties"] else {}
-                    ctx_entities.append({
-                        "id": row["id"],
-                        "type": row["type"],
-                        "name": row["name"],
-                        "properties": props,
-                    })
+                    ctx_entities.append(
+                        {
+                            "id": row["id"],
+                            "type": row["type"],
+                            "name": row["name"],
+                            "properties": props,
+                        }
+                    )
 
-            principles = [
-                e for e in ctx_entities if e["type"] == "principle"
-            ]
-            habits = [
-                e for e in ctx_entities if e["type"] == "habit"
-            ]
+            principles = [e for e in ctx_entities if e["type"] == "principle"]
+            habits = [e for e in ctx_entities if e["type"] == "habit"]
 
             return {
                 "entities": ctx_entities,
@@ -369,9 +415,7 @@ class KnowledgeHandler:
 # ── helpers ──────────────────────────────────────────────────────────
 
 
-def _entity_to_search_dict(
-    row: Any, props: dict[str, Any]
-) -> dict[str, Any]:
+def _entity_to_search_dict(row: Any, props: dict[str, Any]) -> dict[str, Any]:
     """Convert an entity row + parsed properties into a search result dict."""
     return {
         "id": row["id"],

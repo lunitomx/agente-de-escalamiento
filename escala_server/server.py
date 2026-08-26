@@ -1,14 +1,18 @@
 """Escala HTTP Server — serves static files and API endpoints."""
 
 import json
-import os
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from typing import Any
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import parse_qs, urlparse
 
 from .cors import CORSHandler
-from .handlers import CompaniesHandler, WorksheetsHandler, SessionsHandler, MemoryHandler
+from .handlers import (
+    CompaniesHandler,
+    MemoryHandler,
+    SessionsHandler,
+    WorksheetsHandler,
+)
 from .router import Router
 
 
@@ -149,7 +153,7 @@ class EscalaRequestHandler(BaseHTTPRequestHandler):
         """Override to add timestamp prefix."""
         from datetime import datetime
 
-        timestamp = datetime.now().strftime("%H:%M:%S")
+        timestamp = datetime.now().strftime("%H:%M:%S")  # noqa: DTZ005 - display-only local log
         print(f"[{timestamp}] {args[0]} {args[1]} {args[2]}")
 
 
@@ -170,9 +174,8 @@ def make_server(
     if db_path is None:
         db_path = str(Path.home() / ".escala" / "escala.db")
 
-    from .daos import CompanyDAO
     from .graph_engine import GraphEngine
-    from .handlers import WorksheetsHandler, SessionsHandler
+    from .handlers import SessionsHandler, WorksheetsHandler
     from .knowledge_handler import KnowledgeHandler
 
     EscalaRequestHandler.static_root = str(Path(static_root).resolve())
@@ -277,7 +280,9 @@ def _build_router() -> Router:
     @router.post("/api/knowledge/ingest")
     def knowledge_ingest(payload=None):
         ingester = EscalaRequestHandler.knowledge_ingester
-        json_path = (payload or {}).get("json_path", "escala_server/data/book-knowledge.json")
+        json_path = (payload or {}).get(
+            "json_path", "escala_server/data/book-knowledge.json"
+        )
         result = ingester.ingest_all(json_path=json_path)
         return {"data": result, "status": "ok"}
 

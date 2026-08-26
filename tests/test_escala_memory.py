@@ -10,16 +10,13 @@ import pytest
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "escala_server"))
 
-from escala_server.memory_engine import MemoryEngine
 from escala_server.graph_engine import GraphEngine
+from escala_server.graph_engine import _conn_cache as _graph_cache
 from escala_server.handlers import MemoryHandler
-from escala_server.router import Router
-from escala_server.server import EscalaRequestHandler
+from escala_server.memory_engine import MemoryEngine
 
 # Import cache modules so we can reset them between tests
 from escala_server.memory_engine import _conn_cache as _mem_cache
-from escala_server.graph_engine import _conn_cache as _graph_cache
-
 
 # ─── MemoryEngine Tests ────────────────────────────────────────────
 
@@ -260,23 +257,33 @@ class TestGraphEngine:
         conn = engine._conn()
         conn.execute(
             "INSERT INTO memory_facts (key, value) VALUES (?, ?)",
-            ("fact:1", json.dumps({
-                "content": "Acme Corp grew 20%",
-                "category": "finance",
-                "tags": [],
-                "source": "",
-                "trust_score": 1.0,
-            })),
+            (
+                "fact:1",
+                json.dumps(
+                    {
+                        "content": "Acme Corp grew 20%",
+                        "category": "finance",
+                        "tags": [],
+                        "source": "",
+                        "trust_score": 1.0,
+                    }
+                ),
+            ),
         )
         conn.execute(
             "INSERT INTO memory_facts (key, value) VALUES (?, ?)",
-            ("fact:2", json.dumps({
-                "content": "Unrelated fact about other company",
-                "category": "general",
-                "tags": [],
-                "source": "",
-                "trust_score": 1.0,
-            })),
+            (
+                "fact:2",
+                json.dumps(
+                    {
+                        "content": "Unrelated fact about other company",
+                        "category": "general",
+                        "tags": [],
+                        "source": "",
+                        "trust_score": 1.0,
+                    }
+                ),
+            ),
         )
         conn.commit()
 
@@ -323,12 +330,14 @@ class TestMemoryHandler:
         _graph_cache.pop(h.graph._db_path, None)
 
     def test_create_and_list_facts(self, handler):
-        result = handler.create_fact({
-            "content": "Revenue grew 20%",
-            "category": "finance",
-            "tags": ["revenue"],
-            "source": "test",
-        })
+        result = handler.create_fact(
+            {
+                "content": "Revenue grew 20%",
+                "category": "finance",
+                "tags": ["revenue"],
+                "source": "test",
+            }
+        )
         assert result["status"] == "ok"
         fid = result["data"]["id"]
         assert isinstance(fid, int)
@@ -359,11 +368,13 @@ class TestMemoryHandler:
         assert len(result["data"]) >= 1
 
     def test_create_entity(self, handler):
-        result = handler.create_entity({
-            "name": "Acme Corp",
-            "type": "company",
-            "properties": {"industry": "Tech"},
-        })
+        result = handler.create_entity(
+            {
+                "name": "Acme Corp",
+                "type": "company",
+                "properties": {"industry": "Tech"},
+            }
+        )
         assert result["status"] == "ok"
         assert result["data"]["id"] > 0
 
@@ -375,12 +386,14 @@ class TestMemoryHandler:
         e1 = handler.create_entity({"name": "A", "type": "node"})
         e2 = handler.create_entity({"name": "B", "type": "node"})
 
-        result = handler.create_relationship({
-            "source_id": e1["data"]["id"],
-            "target_id": e2["data"]["id"],
-            "type": "connects",
-            "weight": 0.5,
-        })
+        result = handler.create_relationship(
+            {
+                "source_id": e1["data"]["id"],
+                "target_id": e2["data"]["id"],
+                "type": "connects",
+                "weight": 0.5,
+            }
+        )
         assert result["status"] == "ok"
         assert result["data"]["id"] > 0
 
@@ -395,11 +408,13 @@ class TestMemoryHandler:
         result_john = handler.create_entity({"name": "John", "type": "person"})
         john_id = result_john["data"]["id"]
 
-        handler.create_relationship({
-            "source_id": eid,
-            "target_id": john_id,
-            "type": "employee_of",
-        })
+        handler.create_relationship(
+            {
+                "source_id": eid,
+                "target_id": john_id,
+                "type": "employee_of",
+            }
+        )
 
         result = handler.get_entity(eid)
         assert result["status"] == "ok"
@@ -421,21 +436,21 @@ class TestMemoryRoutes:
         from escala_server.server import _build_router
 
         router = _build_router()
-        handler, params = router.dispatch("GET", "/api/memory/context")
+        handler, _params = router.dispatch("GET", "/api/memory/context")
         assert handler is not None
 
     def test_facts_list_route_registered(self):
         from escala_server.server import _build_router
 
         router = _build_router()
-        handler, params = router.dispatch("GET", "/api/memory/facts")
+        handler, _params = router.dispatch("GET", "/api/memory/facts")
         assert handler is not None
 
     def test_facts_create_route_registered(self):
         from escala_server.server import _build_router
 
         router = _build_router()
-        handler, params = router.dispatch("POST", "/api/memory/facts")
+        handler, _params = router.dispatch("POST", "/api/memory/facts")
         assert handler is not None
 
     def test_entity_route_registered(self):
@@ -450,12 +465,12 @@ class TestMemoryRoutes:
         from escala_server.server import _build_router
 
         router = _build_router()
-        handler, params = router.dispatch("POST", "/api/memory/entities")
+        handler, _params = router.dispatch("POST", "/api/memory/entities")
         assert handler is not None
 
     def test_relationship_create_route_registered(self):
         from escala_server.server import _build_router
 
         router = _build_router()
-        handler, params = router.dispatch("POST", "/api/memory/relationships")
+        handler, _params = router.dispatch("POST", "/api/memory/relationships")
         assert handler is not None

@@ -1,7 +1,9 @@
 """
 Welcome module — company intake, stage detection, profile creation.
 """
+
 from pathlib import Path
+
 from ..core import detect_stage, write_yaml
 
 
@@ -59,14 +61,14 @@ def run(context: dict) -> dict:
     output_lines = [
         f"## Bienvenido, {name}!",
         "",
-        f"He creado tu perfil de empresa:",
-        f"",
-        f"| Campo | Valor |",
-        f"|-------|-------|",
+        "He creado tu perfil de empresa:",
+        "",
+        "| Campo | Valor |",
+        "|-------|-------|",
         f"| Industria | {industry} |",
         f"| Empleados | {employees} |",
         f"| Etapa | {stage} |",
-        f"",
+        "",
     ]
 
     if methodology == "lean-canvas":

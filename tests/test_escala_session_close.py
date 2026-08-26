@@ -6,7 +6,6 @@ and engines share the same database instance.
 
 from __future__ import annotations
 
-import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -57,9 +56,7 @@ class TestSessionCloseOrchestrator(unittest.TestCase):
 
     # ── helpers ──────────────────────────────────────────────────
 
-    def _seed_company(
-        self, name: str = "TestCorp", industry: str = "Tech"
-    ) -> dict:
+    def _seed_company(self, name: str = "TestCorp", industry: str = "Tech") -> dict:
         return self.company_dao.create({"name": name, "industry": industry})
 
     def _seed_session(
@@ -68,11 +65,13 @@ class TestSessionCloseOrchestrator(unittest.TestCase):
         status: str = "active",
         metadata: dict | None = None,
     ) -> dict:
-        return self.session_dao.create({
-            "company_id": company_id,
-            "status": status,
-            "metadata": metadata or {},
-        })
+        return self.session_dao.create(
+            {
+                "company_id": company_id,
+                "status": status,
+                "metadata": metadata or {},
+            }
+        )
 
     def _seed_worksheet(
         self,
@@ -150,9 +149,7 @@ class TestSessionCloseOrchestrator(unittest.TestCase):
         # Create a first version of a worksheet (not linked to session)
         self._seed_worksheet("cash", "power-of-one", {"value": 100})
         # Now save an update linked to this session
-        self._seed_worksheet(
-            "cash", "power-of-one", {"value": 200}, session["id"]
-        )
+        self._seed_worksheet("cash", "power-of-one", {"value": 200}, session["id"])
 
         with patch.object(Path, "home", return_value=Path(tempfile.mkdtemp())):
             result = self.orchestrator.close_session(session_id=session["id"])
@@ -187,7 +184,8 @@ class TestSessionCloseOrchestrator(unittest.TestCase):
         self._seed_worksheet("cash", "power-of-one", {"value": 100, "unit": "MXN"})
         # Update both fields in session
         self._seed_worksheet(
-            "cash", "power-of-one",
+            "cash",
+            "power-of-one",
             {"value": 200, "unit": "USD"},
             session["id"],
         )
@@ -205,7 +203,8 @@ class TestSessionCloseOrchestrator(unittest.TestCase):
 
         # Save a brand new worksheet directly linked to session
         self._seed_worksheet(
-            "strategy", "swot",
+            "strategy",
+            "swot",
             {"strengths": "brand", "weaknesses": "cashflow"},
             session["id"],
         )
@@ -258,9 +257,7 @@ class TestSessionCloseOrchestrator(unittest.TestCase):
         session = self._seed_session(company["id"])
 
         self._seed_worksheet("cash", "power-of-one", {"value": 100})
-        self._seed_worksheet(
-            "cash", "power-of-one", {"value": 200}, session["id"]
-        )
+        self._seed_worksheet("cash", "power-of-one", {"value": 200}, session["id"])
 
         with patch.object(Path, "home", return_value=Path(tempfile.mkdtemp())):
             result = self.orchestrator.close_session(session_id=session["id"])
@@ -281,7 +278,9 @@ class TestSessionCloseOrchestrator(unittest.TestCase):
         company = self._seed_company()
         session = self._seed_session(company["id"])
 
-        self._seed_worksheet("strategy", "swot", {"nueva_metrica": "abc"}, session["id"])
+        self._seed_worksheet(
+            "strategy", "swot", {"nueva_metrica": "abc"}, session["id"]
+        )
 
         with patch.object(Path, "home", return_value=Path(tempfile.mkdtemp())):
             result = self.orchestrator.close_session(session_id=session["id"])
@@ -312,9 +311,7 @@ class TestSessionCloseOrchestrator(unittest.TestCase):
         session = self._seed_session(company["id"])
 
         self._seed_worksheet("cash", "power-of-one", {"value": 100})
-        self._seed_worksheet(
-            "cash", "power-of-one", {"value": 200}, session["id"]
-        )
+        self._seed_worksheet("cash", "power-of-one", {"value": 200}, session["id"])
 
         with patch.object(Path, "home", return_value=Path(tempfile.mkdtemp())):
             result = self.orchestrator.close_session(
@@ -340,9 +337,7 @@ class TestSessionCloseOrchestrator(unittest.TestCase):
         session = self._seed_session(company["id"])
 
         self._seed_worksheet("cash", "power-of-one", {"value": 100})
-        self._seed_worksheet(
-            "cash", "power-of-one", {"value": 200}, session["id"]
-        )
+        self._seed_worksheet("cash", "power-of-one", {"value": 200}, session["id"])
 
         tmp_home = tempfile.mkdtemp()
 
@@ -433,18 +428,14 @@ class TestSessionCloseOrchestrator(unittest.TestCase):
         session = self._seed_session(company["id"])
 
         self._seed_worksheet("cash", "power-of-one", {"value": 100})
-        self._seed_worksheet(
-            "cash", "power-of-one", {"value": 200}, session["id"]
-        )
+        self._seed_worksheet("cash", "power-of-one", {"value": 200}, session["id"])
 
         with patch.object(Path, "home", return_value=Path(tempfile.mkdtemp())):
             self.orchestrator.close_session(session_id=session["id"])
 
         # Check that entities were created
         conn = self.company_dao.get_connection()
-        entities = conn.execute(
-            "SELECT name, type FROM entities"
-        ).fetchall()
+        entities = conn.execute("SELECT name, type FROM entities").fetchall()
         names = [e["name"] for e in entities]
 
         self.assertIn(f"session:{session['id']}", names)
@@ -452,9 +443,7 @@ class TestSessionCloseOrchestrator(unittest.TestCase):
         self.assertIn("field:cash.power-of-one.value", names)
 
         # Check relationships exist
-        rels = conn.execute(
-            "SELECT relation_type FROM relationships"
-        ).fetchall()
+        rels = conn.execute("SELECT relation_type FROM relationships").fetchall()
         rel_types = [r["relation_type"] for r in rels]
         self.assertIn("modified_tool", rel_types)
         self.assertIn("has_field", rel_types)

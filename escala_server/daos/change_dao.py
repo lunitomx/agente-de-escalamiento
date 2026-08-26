@@ -1,6 +1,6 @@
 """ChangeDAO — audit log for field-level changes in worksheets."""
 
-from typing import Any, Optional
+from typing import Any
 
 from .base import BaseDAO
 
@@ -12,13 +12,13 @@ class ChangeDAO(BaseDAO):
 
     def log(
         self,
-        company_id: Optional[str],
-        session_id: Optional[str],
-        category: Optional[str],
-        tool: Optional[str],
+        company_id: str | None,
+        session_id: str | None,
+        category: str | None,
+        tool: str | None,
         field: str,
-        old_value: Optional[str],
-        new_value: Optional[str],
+        old_value: str | None,
+        new_value: str | None,
         diff_type: str = "update",
     ) -> dict[str, Any]:
         """Record a field-level change.
@@ -63,7 +63,7 @@ class ChangeDAO(BaseDAO):
 
     # ── list_by_session ─────────────────────────────────────────────
 
-    def list_by_session(self, session_id: Optional[str]) -> list[dict[str, Any]]:
+    def list_by_session(self, session_id: str | None) -> list[dict[str, Any]]:
         """Return all changes recorded for a given session.
 
         Args:

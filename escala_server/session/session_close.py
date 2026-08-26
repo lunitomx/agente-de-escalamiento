@@ -127,7 +127,7 @@ class SessionCloseOrchestrator:
 
         # Compute duration
         created_at = session.get("created_at", "")
-        now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # noqa: DTZ005 - legacy session format
         duration = _compute_duration(created_at)
 
         facts_created = 0
@@ -179,12 +179,10 @@ class SessionCloseOrchestrator:
             "changes_count": len(changes),
             "facts_count": facts_created,
         }
-        self._session_dao.update(
-            session_id, {"status": "closed", "metadata": metadata}
-        )
+        self._session_dao.update(session_id, {"status": "closed", "metadata": metadata})
 
         # 7. Write markdown log
-        log_path = self._write_markdown_log(
+        self._write_markdown_log(
             session_id=session_id,
             company_id=company_id,
             company_name=company_name,
@@ -395,7 +393,7 @@ class SessionCloseOrchestrator:
             f"- **Inicio:** {created_at}",
             f"- **Cierre:** {closed_at}",
             f"- **Duración:** {duration}",
-            f"- **Estado:** closed",
+            "- **Estado:** closed",
             "",
             "## Aprendizajes",
             "",
@@ -413,10 +411,12 @@ class SessionCloseOrchestrator:
         ]
 
         if changes:
-            lines.extend([
-                "| Categoría | Herramienta | Campo | Anterior | Nuevo | Tipo |",
-                "|-----------|-------------|-------|----------|-------|------|",
-            ])
+            lines.extend(
+                [
+                    "| Categoría | Herramienta | Campo | Anterior | Nuevo | Tipo |",
+                    "|-----------|-------------|-------|----------|-------|------|",
+                ]
+            )
             for c in changes:
                 old = str(c.get("old_value", "-") or "-")
                 new = str(c.get("new_value", "-") or "-")
@@ -440,10 +440,10 @@ def _compute_duration(created_at: str) -> str:
     if not created_at:
         return "desconocida"
     try:
-        start = datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S")
+        start = datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S")  # noqa: DTZ007 - legacy UTC-naive storage
     except ValueError:
         return "desconocida"
-    delta = datetime.now() - start
+    delta = datetime.now() - start  # noqa: DTZ005 - matches legacy timestamp convention
     secs = int(delta.total_seconds())
     h, rem = divmod(secs, 3600)
     m, s = divmod(rem, 60)
@@ -482,16 +482,7 @@ def _change_to_fact_text(change: dict[str, Any]) -> str:
     new_val = change.get("new_value")
 
     if old_val is not None and new_val is not None:
-        return (
-            f"Cambio en {cat}/{tool}: "
-            f"'{field}' pasó de '{old_val}' a '{new_val}'"
-        )
+        return f"Cambio en {cat}/{tool}: '{field}' pasó de '{old_val}' a '{new_val}'"
     if old_val is None:
-        return (
-            f"Nuevo campo en {cat}/{tool}: "
-            f"'{field}' = '{new_val}'"
-        )
-    return (
-        f"Campo eliminado en {cat}/{tool}: "
-        f"'{field}' (era '{old_val}')"
-    )
+        return f"Nuevo campo en {cat}/{tool}: '{field}' = '{new_val}'"
+    return f"Campo eliminado en {cat}/{tool}: '{field}' (era '{old_val}')"

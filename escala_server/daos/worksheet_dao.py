@@ -6,7 +6,7 @@ Each ``save()`` call creates a new row with an auto-incremented version.
 """
 
 import json
-from typing import Any, Optional
+from typing import Any
 
 from .base import BaseDAO
 
@@ -16,7 +16,7 @@ class WorksheetDAO(BaseDAO):
 
     # ── get (latest version) ────────────────────────────────────────
 
-    def get(self, category: str, tool: str) -> Optional[dict[str, Any]]:
+    def get(self, category: str, tool: str) -> dict[str, Any] | None:
         """Return the latest version of a worksheet.
 
         Args:
@@ -44,7 +44,7 @@ class WorksheetDAO(BaseDAO):
         category: str,
         tool: str,
         data: dict[str, Any],
-        session_id: Optional[str] = None,
+        session_id: str | None = None,
     ) -> dict[str, Any]:
         """Save a new version of a worksheet.
 

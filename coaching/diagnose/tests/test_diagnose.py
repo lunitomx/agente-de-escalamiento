@@ -1,13 +1,17 @@
 """Tests for diagnose module."""
+
 from __future__ import annotations
 
 import pathlib
 import sys
 
-import pytest
-
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent.parent.parent))
-from coaching.diagnose import DIAGNOSE_QUESTIONS, SCORE_LABELS, calculate_score, detect_priority
+from coaching.diagnose import (
+    DIAGNOSE_QUESTIONS,
+    SCORE_LABELS,
+    calculate_score,
+    detect_priority,
+)
 
 
 class TestCalculateScore:
@@ -39,7 +43,10 @@ class TestDetectPriority:
         assert detect_priority(scores) == "people"
 
     def test_all_zero(self):
-        assert detect_priority({"people": 0, "strategy": 0, "execution": 0, "cash": 0}) == "people"
+        assert (
+            detect_priority({"people": 0, "strategy": 0, "execution": 0, "cash": 0})
+            == "people"
+        )
 
     def test_partial_scores(self):
         # Filter: exclude scores < 1 (strategy=0 excluded, valid: people=3, execution=4, cash=2 → min=2 → cash)
@@ -52,18 +59,31 @@ class TestDetectPriority:
 
 class TestDiagnoseQuestions:
     def test_four_decisions(self):
-        assert set(DIAGNOSE_QUESTIONS.keys()) == {"people", "strategy", "execution", "cash"}
+        assert set(DIAGNOSE_QUESTIONS.keys()) == {
+            "people",
+            "strategy",
+            "execution",
+            "cash",
+        }
 
     def test_five_questions_per_decision(self):
         for decision, data in DIAGNOSE_QUESTIONS.items():
-            assert len(data["questions"]) == 5, f"{decision} has {len(data['questions'])} questions"
+            assert len(data["questions"]) == 5, (
+                f"{decision} has {len(data['questions'])} questions"
+            )
 
     def test_all_questions_have_ids(self):
         for decision, data in DIAGNOSE_QUESTIONS.items():
             for q in data["questions"]:
-                assert q["id"].startswith(decision), f"Question {q['id']} doesn't start with {decision}"
+                assert q["id"].startswith(decision), (
+                    f"Question {q['id']} doesn't start with {decision}"
+                )
                 assert 1 <= len(q["text"]) <= 200
-                assert q["concept"].startswith("concept-") or q["concept"].startswith("tool-") or q["concept"].startswith("metric-")
+                assert (
+                    q["concept"].startswith("concept-")
+                    or q["concept"].startswith("tool-")
+                    or q["concept"].startswith("metric-")
+                )
 
 
 class TestScoreLabels:

@@ -1,6 +1,6 @@
 # Epic Scope: E22 — Memoria Empresarial Integrada
 
-**Status:** Planned — ready for story execution
+**Status:** In progress — S22.2 complete
 **Dependencies:** E10 (distribución), E18 (SQLite, memoria, grafo y sesiones)
 **Audited:** 2026-08-26
 **Tamaño:** L
@@ -58,7 +58,7 @@ skills, rutas ni la arquitectura al empresario.
 | Orden | Story | Tamaño | Resultado |
 |:---:|---|:---:|---|
 | 1 | S22.1 — Contrato y ADR de memoria | M | Esquemas, privacidad, confirmación y fuente única definidos. |
-| 2 | S22.2 — Runtime, instalación y ciclo SQLite | L | E18 se distribuye, crea/valida base por proyecto y permite rollback. |
+| 2 | S22.2 — Runtime, instalación y ciclo SQLite ✓ | L | E18 se distribuye, crea/valida base por proyecto y permite rollback. |
 | 3 | S22.3 — Migración YAML idempotente | L | Perfil, diagnóstico, plan y worksheets migran sin pérdida ni duplicados. |
 | 4 | S22.4 — Inicio y recuperación contextual | M | Sesión nueva recupera facts, cambios y foco relevante. |
 | 5 | S22.5 — Cierre, hechos y patrones confirmados | L | Decisiones/aprendizajes con fuente, confianza y confirmación. |
@@ -99,7 +99,7 @@ runtime puede vivir, migrar y aislarse dentro de un proyecto real.
 | Pos. | Story | Dependencias | Razonamiento y habilita | Estado | Real |
 |:---:|---|---|---|:---:|:---:|
 | 1 | S22.1 — Contrato y ADR | Ninguna | Fija fuente única, consentimiento y fixture adversarial; evita migrar datos ambiguos. | Done | — |
-| 2 | S22.2 — Runtime, instalación y ciclo SQLite | S22.1 | Walking skeleton: prueba DB local, health, backup y rollback sin servidor ni defaults globales. Habilita todo lo demás. | Ready | — |
+| 2 | S22.2 — Runtime, instalación y ciclo SQLite | S22.1 | Walking skeleton: prueba DB local, health, backup y rollback sin servidor ni defaults globales. Habilita todo lo demás. | Done | 2026-08-26 |
 | 3 | S22.3 — Migración YAML idempotente | S22.2 | Lleva el estado existente a la fuente única y prueba repetición/recuperación antes de leerlo en conversación. | Blocked by S22.2 | — |
 | 4 | S22.4 — Inicio y recuperación contextual | S22.2, S22.3 | Recupera sólo datos confirmados y muestra degradación segura; valida el valor entre sesiones. | Blocked by S22.3 | — |
 | 5 | S22.5 — Cierre, hechos y patrones confirmados | S22.2, S22.3 | Añade propuesta, sí/no, fuente y confianza. Puede desarrollarse en paralelo con S22.4 una vez migración esté estable. | Blocked by S22.3 | — |

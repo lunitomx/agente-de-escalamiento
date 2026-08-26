@@ -10,13 +10,14 @@ pulse-history.yaml. Produces a 4-section markdown dashboard:
 
 Read-only — no file writes.
 """
+
 from pathlib import Path
 
 from ..core import (
-    read_yaml,
     DECISION_LABELS,
-    ROUTING_RULES,
     PRIORITY_ORDER,
+    ROUTING_RULES,
+    read_yaml,
 )
 
 # ---------------------------------------------------------------------------
@@ -37,6 +38,7 @@ HISTORY_REL_PATH = ".scaleup/my-company/pulse-history.yaml"
 # ---------------------------------------------------------------------------
 # Helpers — Scores
 # ---------------------------------------------------------------------------
+
 
 def _read_scores(base: Path) -> dict:
     """Return diagnosis scores from company-profile.yaml, or empty dict."""
@@ -74,6 +76,7 @@ def _build_scores_section(base: Path) -> tuple[str, dict]:
 # ---------------------------------------------------------------------------
 # Helpers — Pulse History
 # ---------------------------------------------------------------------------
+
 
 def _read_pulse_history(base: Path) -> list[dict]:
     """Read pulse history from pulse-history.yaml. Returns list of pulses."""
@@ -149,6 +152,7 @@ def _build_attention(pulses: list[dict]) -> list[tuple[str, str, str]]:
 # Section builders
 # ---------------------------------------------------------------------------
 
+
 def _section_pulse_history(pulses: list[dict]) -> str:
     if not pulses:
         return "No pulse data yet. Run /scaleup-pulse to start tracking."
@@ -182,6 +186,7 @@ def _section_attention(pulses: list[dict]) -> str:
 # ---------------------------------------------------------------------------
 # Core run function
 # ---------------------------------------------------------------------------
+
 
 def run(context: dict) -> dict:
     """
