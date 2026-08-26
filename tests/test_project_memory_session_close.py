@@ -103,6 +103,31 @@ def test_invalid_inference_secrets_and_pattern_evidence_never_persist(
         )
 
 
+def test_confirmation_failure_rolls_back_the_state_transition(tmp_path: Path) -> None:
+    close = ProjectMemorySessionClose(tmp_path)
+    close.open_session("s-1")
+    proposal = close.propose("s-1", candidate())
+    db_path = ProjectMemoryRuntime(tmp_path).db_path
+    with sqlite3.connect(db_path) as db:
+        db.execute(
+            """CREATE TRIGGER reject_entry BEFORE INSERT ON confirmed_memory_entries
+            BEGIN SELECT RAISE(ABORT, 'injected'); END"""
+        )
+    assert close.confirm(proposal.id or "", "yes").status == "fallback"
+    with sqlite3.connect(db_path) as db:
+        assert (
+            db.execute(
+                "SELECT response_state FROM session_memory_proposals WHERE id = ?",
+                (proposal.id,),
+            ).fetchone()[0]
+            == "proposed"
+        )
+        assert (
+            db.execute("SELECT COUNT(*) FROM confirmed_memory_entries").fetchone()[0]
+            == 0
+        )
+
+
 def test_isolation_conflicts_and_explicit_replacement(tmp_path: Path) -> None:
     first = ProjectMemorySessionClose(tmp_path / "a")
     second = ProjectMemorySessionClose(tmp_path / "b")
