@@ -150,26 +150,25 @@ def test_restore_rejects_a_database_destination_symlinked_outside_project(
     assert not outside.exists()
 
 
-def test_restore_checkpoints_wal_and_removes_stale_sidecars(tmp_path: Path) -> None:
+def test_restore_rejects_wal_pending_data_without_replacing_database(
+    tmp_path: Path,
+) -> None:
     runtime = ProjectMemoryRuntime(tmp_path)
     assert runtime.ensure_memory().ready is True
     backup = runtime.backup()
     assert backup.ready is True
-
     live = sqlite3.connect(runtime.db_path)
     live.execute("PRAGMA journal_mode=WAL")
     live.execute("INSERT INTO companies (id, name) VALUES ('new', 'New data')")
     live.commit()
     assert runtime.db_path.with_name("escala.db-wal").exists()
     live.close()
-
     restored = runtime.restore(backup.backup_path)
-
-    assert restored.ready is True
-    assert not runtime.db_path.with_name("escala.db-wal").exists()
-    assert not runtime.db_path.with_name("escala.db-shm").exists()
+    assert restored.ready is False
     with sqlite3.connect(runtime.db_path) as connection:
-        assert connection.execute("SELECT name FROM companies").fetchall() == []
+        assert connection.execute("SELECT name FROM companies").fetchall() == [
+            ("New data",)
+        ]
 
 
 def test_restore_fails_without_replacing_database_when_wal_reader_is_active(
@@ -196,3 +195,32 @@ def test_restore_fails_without_replacing_database_when_wal_reader_is_active(
         assert connection.execute("SELECT name FROM companies").fetchall() == [
             ("Live data",)
         ]
+
+
+def test_restore_blocks_a_writer_after_checkpoint(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    runtime = ProjectMemoryRuntime(tmp_path)
+    assert runtime.ensure_memory().ready is True
+    backup = runtime.backup()
+    assert backup.ready is True
+
+    original_checkpoint = runtime._checkpoint_wal
+    for sidecar in runtime._wal_sidecars():
+        sidecar.unlink(missing_ok=True)
+
+    def checkpoint_then_write(connection: sqlite3.Connection | None) -> None:
+        original_checkpoint(connection)
+        writer = sqlite3.connect(runtime.db_path, timeout=0)
+        try:
+            with pytest.raises(sqlite3.OperationalError, match="locked"):
+                writer.execute(
+                    "INSERT INTO companies (id, name) VALUES ('late', 'Late writer')"
+                )
+        finally:
+            writer.close()
+
+    monkeypatch.setattr(runtime, "_checkpoint_wal", checkpoint_then_write)
+    restored = runtime.restore(backup.backup_path)
+
+    assert restored.ready is False
