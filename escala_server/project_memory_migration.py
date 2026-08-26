@@ -45,6 +45,32 @@ class ProjectMemoryMigrator:
         self.project_root = Path(project_root).expanduser().resolve()
         self.runtime = ProjectMemoryRuntime(self.project_root)
 
+    def has_migratable_sources(self) -> bool:
+        """Report whether an allowlisted local source exists without creating SQLite."""
+        candidates = [
+            self.project_root / ".scaleup/agent/memory/company-profile.yaml",
+            self.project_root / ".scaleup/my-company/pulse-history.yaml",
+            self.project_root / "work/strategy/opsp.md",
+            self.project_root / ".scaleup/my-company/annual-goal.md",
+            self.project_root / ".scaleup/my-company/quarterly-focus.md",
+        ]
+        for directory in ("context", "worksheets"):
+            base = self.project_root / ".scaleup/my-company" / directory
+            try:
+                self._safe_relative(base)
+            except ValueError:
+                continue
+            if base.is_dir():
+                candidates.extend(base.glob("*.yaml"))
+        for path in candidates:
+            try:
+                self._safe_relative(path)
+            except ValueError:
+                continue
+            if path.is_file():
+                return True
+        return False
+
     def migrate(self) -> MigrationResult:
         runtime = self.runtime.ensure_memory()
         if not runtime.ready:

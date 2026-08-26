@@ -502,6 +502,7 @@ def test_installer_copies_local_memory_runtime_and_preserves_memory_data(tmp_pat
         runtime = tmp_path / platform / "scaleup"
         memory_runtime = runtime / "escala_server"
         assert (memory_runtime / "project_memory.py").is_file()
+        assert (memory_runtime / "project_memory_migration.py").is_file()
         assert (memory_runtime / "schema.py").is_file()
         assert not (memory_runtime / "server.py").exists()
         project = tmp_path / f"{platform}-project"
@@ -528,6 +529,149 @@ def test_installer_copies_local_memory_runtime_and_preserves_memory_data(tmp_pat
     _installer(tmp_path, "--target", "codex")
     _installer(tmp_path, "--target", "codex", "--uninstall")
     assert memory_note.read_text() == "keep me"
+
+
+def test_installed_runtime_migrates_legacy_project_without_checkout(tmp_path):
+    """The installed module owns the real, idempotent legacy migration."""
+    _installer(tmp_path, "--target", "codex")
+    runtime = tmp_path / ".codex" / "scaleup"
+    project = tmp_path / "legacy-project"
+    profile = project / ".scaleup" / "agent" / "memory" / "company-profile.yaml"
+    profile.parent.mkdir(parents=True)
+    profile.write_text(
+        "company:\n  name: Lumen Casa\n  industry: Interiores\n"
+        "scores:\n  strategy: 6\n",
+        encoding="utf-8",
+    )
+
+    code = """
+import json
+import sqlite3
+import sys
+from escala_server.project_memory_migration import ProjectMemoryMigrator
+
+project = sys.argv[1]
+first = ProjectMemoryMigrator(project).migrate()
+second = ProjectMemoryMigrator(project).migrate()
+with sqlite3.connect(first.db_path) as connection:
+    source = connection.execute(
+        "SELECT relative_path, source_kind FROM migration_sources"
+    ).fetchall()
+    applications = connection.execute(
+        "SELECT COUNT(*) FROM migration_applications"
+    ).fetchone()[0]
+    company = connection.execute("SELECT name FROM companies").fetchone()[0]
+print(json.dumps({
+    "first_ready": first.ready,
+    "first_imported": first.imported,
+    "second_imported": second.imported,
+    "second_skipped": second.skipped,
+    "source": source,
+    "applications": applications,
+    "company": company,
+}))
+"""
+    completed = subprocess.run(
+        [sys.executable, "-c", code, str(project)],
+        cwd=project,
+        env={"PYTHONPATH": str(runtime)},
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    result = json.loads(completed.stdout)
+
+    assert result["first_ready"] is True
+    assert result["first_imported"] == {"company-profile": 1}
+    assert result["second_imported"] == {}
+    assert (
+        result["second_skipped"][".scaleup/agent/memory/company-profile.yaml"]
+        == "unchanged"
+    )
+    assert result["source"] == [
+        [".scaleup/agent/memory/company-profile.yaml", "company-profile"]
+    ]
+    assert result["applications"] == 1
+    assert result["company"] == "Lumen Casa"
+
+
+def test_installed_frontdoors_reconcile_legacy_sources_idempotently(tmp_path):
+    _install(tmp_path)
+    for platform in ("claude", "codex"):
+        runtime = tmp_path / f".{platform}" / "scaleup"
+        command = runtime / "bin" / "scaleup-frontdoor"
+        project = tmp_path / f"{platform}-legacy"
+        profile = project / ".scaleup" / "agent" / "memory" / "company-profile.yaml"
+        profile.parent.mkdir(parents=True)
+        profile.write_text(
+            "company:\n  name: Lumen Casa\n  industry: Interiores\n"
+            "scores:\n  strategy: 6\n",
+            encoding="utf-8",
+        )
+
+        resumed = _say(command, project, "retomemos")
+        database = project / ".scaleup" / "memory" / "escala.db"
+        with sqlite3.connect(database) as connection:
+            first = connection.execute(
+                "SELECT content_sha256 FROM migration_sources"
+            ).fetchone()[0]
+            assert (
+                connection.execute(
+                    "SELECT COUNT(*) FROM migration_applications"
+                ).fetchone()[0]
+                == 1
+            )
+        assert "6" in resumed
+
+        _say(command, project, "retomemos")
+        with sqlite3.connect(database) as connection:
+            second = connection.execute(
+                "SELECT content_sha256 FROM migration_sources"
+            ).fetchone()[0]
+            assert (
+                connection.execute(
+                    "SELECT COUNT(*) FROM migration_applications"
+                ).fetchone()[0]
+                == 1
+            )
+        assert second == first
+
+
+def test_installed_handoff_reconciles_new_profile_idempotently(tmp_path):
+    _installer(tmp_path, "--target", "codex")
+    runtime = tmp_path / ".codex" / "scaleup"
+    command = runtime / "bin" / "scaleup-frontdoor"
+    project = tmp_path / "welcome-project"
+    project.mkdir()
+    payload = json.dumps(
+        {
+            "company_name": "Lumen Casa",
+            "industry": "Interiores",
+            "employees": 12,
+            "entry_methodology": "bmc",
+        }
+    )
+
+    for _ in range(2):
+        result = subprocess.run(
+            [str(command), "run", "welcome", payload],
+            cwd=project,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        assert json.loads(result.stdout)["errors"] == []
+
+    database = project / ".scaleup" / "memory" / "escala.db"
+    with sqlite3.connect(database) as connection:
+        source = connection.execute(
+            "SELECT relative_path, content_sha256 FROM migration_sources"
+        ).fetchall()
+        applications = connection.execute(
+            "SELECT COUNT(*) FROM migration_applications"
+        ).fetchone()[0]
+    assert source == [(".scaleup/agent/memory/company-profile.yaml", source[0][1])]
+    assert applications == 1
 
 
 def test_installed_frontdoor_pauses_confirms_and_resumes_naturally(tmp_path):
@@ -706,19 +850,33 @@ def test_release_installed_frontdoor_rejects_sensitive_text_and_falls_back_witho
             database = candidate / ".scaleup" / "memory" / "escala.db"
             database.parent.mkdir(parents=True)
             database.write_bytes(b"not a sqlite database")
+            profile = (
+                candidate / ".scaleup" / "agent" / "memory" / "company-profile.yaml"
+            )
+            profile.parent.mkdir(parents=True)
+            profile.write_text("company:\n  name: Lumen Casa\n", encoding="utf-8")
+            baseline_profile = (
+                baseline / ".scaleup" / "agent" / "memory" / "company-profile.yaml"
+            )
+            baseline_profile.parent.mkdir(parents=True)
+            baseline_profile.write_bytes(profile.read_bytes())
         before = (
             (candidate / ".scaleup" / "memory" / "escala.db").read_bytes()
             if fixture == "corrupt"
             else None
         )
-        assert _say(command, candidate, "retomemos") == _say(
-            command, baseline, "retomemos"
-        )
+        profile_before = profile.read_bytes() if fixture == "corrupt" else None
+        actual = _say(command, candidate, "retomemos")
+        if fixture == "corrupt":
+            assert "ahora revisaremos cuatro áreas" in actual.lower()
+        else:
+            assert actual == _say(command, baseline, "retomemos")
         database = candidate / ".scaleup" / "memory" / "escala.db"
         if fixture == "absent":
             assert not database.exists()
         elif fixture == "corrupt":
             assert database.read_bytes() == before
+            assert profile.read_bytes() == profile_before
         else:
             assert _memory_rows(candidate) == []
 

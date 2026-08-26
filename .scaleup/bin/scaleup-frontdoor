@@ -16,6 +16,7 @@ def runtime_root() -> Path:
             return candidate
     raise RuntimeError("No se encontró el runtime de ScaleUp")
 
+
 HANDOFFS = {
     "welcome": "coaching.welcome",
     "diagnose": "coaching.diagnose",
@@ -30,15 +31,31 @@ def _context(payload: str) -> dict:
     except json.JSONDecodeError as error:
         raise ValueError("El contexto debe ser JSON válido") from error
     if not isinstance(value, dict):
-        raise ValueError("El contexto debe ser un objeto JSON")
+        raise TypeError("El contexto debe ser un objeto JSON")
     value["base_path"] = "."
     return value
+
+
+def _reconcile_memory() -> None:
+    """Silently import allowlisted legacy business sources when they exist."""
+    try:
+        from escala_server.project_memory_migration import ProjectMemoryMigrator
+
+        migrator = ProjectMemoryMigrator(Path.cwd())
+        if migrator.has_migratable_sources():
+            migrator.migrate()
+    except (OSError, ValueError):
+        pass
 
 
 def _run_handoff(action: str, payload: str) -> int:
     from importlib import import_module
 
-    result = import_module(HANDOFFS[action]).run(_context(payload))
+    _reconcile_memory()
+    try:
+        result = import_module(HANDOFFS[action]).run(_context(payload))
+    finally:
+        _reconcile_memory()
     print(json.dumps(result, ensure_ascii=False))
     return 0
 
@@ -55,6 +72,7 @@ def _conversation(message: str) -> int:
     """Run the fixed stateful public conversation; no caller supplied JSON."""
     from coaching.router.conversation import run
 
+    _reconcile_memory()
     print(run(message, base_path="."))
     return 0
 
@@ -72,7 +90,10 @@ def main() -> int:
     if len(sys.argv) == 3 and sys.argv[1] == "validate-opsp":
         return _validate_opsp(sys.argv[2])
 
-    print("Uso interno: scaleup-frontdoor MENSAJE | conversation MENSAJE | run {welcome|diagnose|opsp|progress} JSON | validate-opsp RUTA", file=sys.stderr)
+    print(
+        "Uso interno: scaleup-frontdoor MENSAJE | conversation MENSAJE | run {welcome|diagnose|opsp|progress} JSON | validate-opsp RUTA",
+        file=sys.stderr,
+    )
     return 2
 
 
