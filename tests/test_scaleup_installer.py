@@ -76,6 +76,13 @@ def _memory_rows(project: Path) -> list[tuple[str, str, str, float]]:
         ).fetchall()
 
 
+def _stable_memory_state(project: Path) -> list[tuple[str, str, str, float]]:
+    return [
+        (statement, json.loads(source)["origin"], status, confidence)
+        for statement, source, status, confidence in _memory_rows(project)
+    ]
+
+
 def _memory_digest_and_counts(project: Path) -> tuple[str | None, tuple[int, int, int]]:
     database = project / ".scaleup" / "memory" / "escala.db"
     if not database.is_file():
@@ -599,7 +606,9 @@ def test_installed_frontdoor_rejection_and_ambiguity_only_write_expected_state(
 
 def test_release_installed_frontdoors_preserve_local_memory_and_isolation(tmp_path):
     _install(tmp_path)
-    statements = {}
+    statement = "Contrataremos una líder de ventas en septiembre"
+    journeys = {}
+    persisted_state = {}
     for target in ("claude", "codex", "hermes"):
         runtime = tmp_path / f".{target}" / "scaleup"
         command = runtime / "bin" / "scaleup-frontdoor"
@@ -612,11 +621,14 @@ def test_release_installed_frontdoors_preserve_local_memory_and_isolation(tmp_pa
         assert command.is_file()
         assert not (runtime / ".scaleup").exists()
         assert not (runtime / "memory").exists()
-        assert "qué decisión o dato" in _say(command, project, "quiero pausar").lower()
-        statement = f"Contrataremos una líder de ventas en septiembre para {target}"
-        assert "quieres que lo recuerde" in _say(command, project, statement).lower()
-        assert "próxima vez" in _say(command, project, "sí").lower()
-        resumed = _say(command, project, "retomemos").lower()
+        pause = _say(command, project, "quiero pausar")
+        proposal = _say(command, project, statement)
+        confirmed = _say(command, project, "sí")
+        resumed = _say(command, project, "retomemos")
+        assert "qué decisión o dato" in pause.lower()
+        assert "quieres que lo recuerde" in proposal.lower()
+        assert "próxima vez" in confirmed.lower()
+        resumed = resumed.lower()
         assert statement.lower() in resumed
         assert all(
             token not in resumed
@@ -635,18 +647,26 @@ def test_release_installed_frontdoors_preserve_local_memory_and_isolation(tmp_pa
         assert rows[0][0] == statement
         assert json.loads(rows[0][1])["origin"] == "explicit_user_statement"
         assert rows[0][2:] == ("active", 1.0)
-        statements[target] = statement
+        journeys[target] = (pause, proposal, confirmed, resumed)
+        persisted_state[target] = _stable_memory_state(project)
 
-    assert statements["claude"] not in _say(
+    assert journeys["claude"] == journeys["codex"] == journeys["hermes"]
+    assert (
+        persisted_state["claude"]
+        == persisted_state["codex"]
+        == persisted_state["hermes"]
+    )
+    isolated = tmp_path / "isolated-company"
+    isolated.mkdir()
+    assert statement not in _say(
         tmp_path / ".codex" / "scaleup" / "bin" / "scaleup-frontdoor",
-        tmp_path / "codex-company",
+        isolated,
         "retomemos",
     )
     assert (tmp_path / "claude-company" / ".scaleup" / "memory" / "escala.db").is_file()
     assert (tmp_path / "codex-company" / ".scaleup" / "memory" / "escala.db").is_file()
     assert not any(
-        (tmp_path / f".{target}" / "scaleup" / "memory").exists()
-        for target in statements
+        (tmp_path / f".{target}" / "scaleup" / "memory").exists() for target in journeys
     )
 
 
@@ -725,6 +745,14 @@ def test_release_backup_restore_and_targeted_removal_are_conservative(tmp_path):
     assert _installed_memory(runtime, project, "restore", backup_path)["ready"] is True
     assert _memory_rows(project) == expected
     assert "abriremos una tienda" in _say(command, project, "retomemos").lower()
+
+    _say(command, other, "quiero pausar")
+    _say(command, other, "Mantendremos el almacén actual")
+    _say(command, other, "sí")
+    other_before = _memory_digest_and_counts(other)
+    cross_company = _installed_memory(runtime, other, "restore", backup_path)
+    assert cross_company["ready"] is False
+    assert _memory_digest_and_counts(other) == other_before
 
     invalid = project / ".scaleup" / "memory" / "backups" / "invalid.db"
     invalid.write_bytes(b"not a sqlite database")
