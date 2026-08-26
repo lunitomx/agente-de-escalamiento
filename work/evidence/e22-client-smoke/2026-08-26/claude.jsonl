@@ -3,4 +3,4 @@
 {"event":"tool_call","command":"<RUNTIME>/bin/scaleup-frontdoor conversation \"Abriremos ventas en Mérida en octubre\"","output":"Entendí: Abriremos ventas en Mérida en octubre. ¿Quieres que lo recuerde para la próxima vez? (sí/no)"}
 {"event":"tool_call","command":"<RUNTIME>/bin/scaleup-frontdoor conversation \"sí\"","output":"Listo. La próxima vez podremos retomar esa decisión."}
 {"event":"new_session_tool_call","command":"<RUNTIME>/bin/scaleup-frontdoor conversation \"retomemos\"","output":"La última vez dejamos como foco: Abriremos ventas en Mérida en octubre. Para orientarte bien, empecemos por tu empresa. ¿Cómo se llama y a qué se dedica? Primero dime el nombre."}
-{"event":"result","status":"pass","permission_denials":0,"total_cost_usd":0.2102215,"raw_transcript_sha256":"6bfcec97d4790f0a33a4d6c3ef08325a6a4da501083ae4b25a52f3930e90cd9f"}
+{"event":"result","status":"pass","permission_denials":0,"total_cost_usd":0.2102215}

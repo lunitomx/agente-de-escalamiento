@@ -1,16 +1,8 @@
 {
-  "sha256": {
-    "environment.json": "c1374281f8f9738ea2bc2a43d3d7649cb191fed8419748864f8c6612f9e7a5ee",
-    "claude.jsonl": "001dded9d3096f26deb3afc89d3696cfeb7f3b42d19d4c4d377002c31311a206",
-    "codex.jsonl": "fbdb0797b03108683ce5a6731324a574fcdb5ec54704218b2b4ecfe8018c6981",
-    "README.md": "dbe511de631bc46b8c86bd05bafdeab46347de2508c2e23f3b4cce2edfdd5812",
-    "commands.sh": "dc9c9cd7750d3e6edd08681d1bfaa640a75a498d2944fedcbf942f5779e1f226",
-    "verify.sh": "f5b4ca710e81b2ab0cdc3deadc698baa5f4b9568ce25430b5bd4e21c804ba336"
-  },
   "clients": {
-    "claude": {"status": "pass", "evidence_file": "claude.jsonl", "discovery": "one public scaleup skill", "continuity": "pause, statement, yes, resume"},
-    "codex": {"status": "pass", "evidence_file": "codex.jsonl", "discovery": "one public scaleup skill", "continuity": "pause, statement, yes, resume"}
+    "claude": {"status": "pass", "evidence_file": "claude.jsonl", "discovery": "one public scaleup skill", "continuity": "pause, fictitious statement, yes, new-session resume"},
+    "codex": {"status": "pass", "evidence_file": "codex.jsonl", "discovery": "one public scaleup skill", "continuity": "pause, fictitious statement, yes, new-session resume"}
   },
   "response_policy": {"no_paths": true, "no_sqlite": true, "no_skill_internals": true},
-  "database_observation": {"claude_sha256": "321e835e578b7cd2d4ea4e4886366da39e80f0ba2011dba660519b1d85d9eace", "codex": "created in disposable project; content not retained"}
+  "evidence_contract": {"data": "fictitious", "raw_transcripts": "not retained", "verification": "offline semantic verifier plus redacted-artifact hashes"}
 }

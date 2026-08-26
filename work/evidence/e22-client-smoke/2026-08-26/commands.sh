@@ -6,6 +6,13 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../.." && pwd)"
 run_root="${RUN_ROOT:?Set RUN_ROOT to a writable temporary directory}"
 client="${1:?claude or codex}"
+case "$client" in
+  claude|codex) ;;
+  *)
+    echo "unsupported target: $client (expected claude or codex)" >&2
+    exit 64
+    ;;
+esac
 project="${run_root}/${client}-project"
 install_root="${run_root}/${client}-home"
 
