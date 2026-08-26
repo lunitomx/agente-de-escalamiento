@@ -373,10 +373,25 @@ def _run_existing(message: str, base_path: str | Path = ".") -> str:
 
 
 def _wants_pause(text: str) -> bool:
+    normal = _normalise(text).strip(" .!¡?¿")
     return bool(
-        re.search(
-            r"\b(pausar|pausa|cerrar|terminar por hoy|dejemos aqui)\b",
-            _normalise(text),
+        re.fullmatch(
+            r"(?:quiero |vamos a |podemos |necesito )?(?:pausar|pausa)", normal
+        )
+        or re.search(
+            r"\b(?:cerrar(?: la)? (?:sesion|conversacion)|terminar por hoy|dejemos (?:aqui|por hoy))\b",
+            normal,
+        )
+    )
+
+
+def _wants_continue_without_memory(text: str) -> bool:
+    """Recognise an explicit choice to leave an unresolved proposal behind."""
+    normal = _normalise(text).strip(" .!¡?¿")
+    return bool(
+        re.fullmatch(
+            r"(?:mejor )?(?:sigamos|seguimos|seguir|continuemos|continuar|retomemos)(?: con lo que estabamos trabajando)?",
+            normal,
         )
     )
 
@@ -424,6 +439,10 @@ def run(message: str, base_path: str | Path = ".") -> str:
         session_id = state.get("memory_session_id")
         proposal_id = state.get("memory_proposal_id")
         if not isinstance(session_id, str) or not isinstance(proposal_id, str):
+            _restore_after_memory(base, state)
+            return _run_existing(text, base)
+        if _wants_continue_without_memory(text):
+            continuity.answer_confirmation(session_id, proposal_id, "no")
             _restore_after_memory(base, state)
             return _run_existing(text, base)
         turn = continuity.answer_confirmation(session_id, proposal_id, text)
