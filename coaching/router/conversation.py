@@ -11,6 +11,8 @@ import re
 from pathlib import Path
 from typing import Any
 
+from escala_server.project_memory_continuity import ProjectMemoryContinuity
+
 from ..core import read_yaml, write_yaml
 from ..diagnose import DIAGNOSE_QUESTIONS
 from ..diagnose import run as run_diagnose
@@ -317,7 +319,7 @@ def _intake(base: Path, state: dict[str, Any], text: str) -> str:
     return _begin_diagnosis(base, state)
 
 
-def run(message: str, base_path: str | Path = ".") -> str:
+def _run_existing(message: str, base_path: str | Path = ".") -> str:
     """Consume one user turn and return exactly one human-friendly next message."""
     base = Path(base_path)
     text = str(message or "").strip()
@@ -368,3 +370,100 @@ def run(message: str, base_path: str | Path = ".") -> str:
     state["stage"] = "company_name"
     _save(base, state)
     return "¿Cómo se llama tu empresa?"
+
+
+def _wants_pause(text: str) -> bool:
+    normal = _normalise(text).strip(" .!¡?¿")
+    return bool(
+        re.fullmatch(
+            r"(?:quiero |vamos a |podemos |necesito )?(?:pausar|pausa)", normal
+        )
+        or re.search(
+            r"\b(?:cerrar(?: la)? (?:sesion|conversacion)|terminar por hoy|dejemos (?:aqui|por hoy))\b",
+            normal,
+        )
+    )
+
+
+def _wants_continue_without_memory(text: str) -> bool:
+    """Recognise an explicit choice to leave an unresolved proposal behind."""
+    normal = _normalise(text).strip(" .!¡?¿")
+    return bool(
+        re.fullmatch(
+            r"(?:mejor )?(?:sigamos|seguimos|seguir|continuemos|continuar|retomemos)(?: con lo que estabamos trabajando)?",
+            normal,
+        )
+    )
+
+
+def _wants_resume(text: str) -> bool:
+    return bool(
+        re.search(
+            r"\b(retomar|retomemos|donde nos quedamos|continuemos)\b", _normalise(text)
+        )
+    )
+
+
+def _restore_after_memory(base: Path, state: dict[str, Any]) -> None:
+    previous = state.pop("memory_return_stage", None)
+    state.pop("memory_session_id", None)
+    state.pop("memory_proposal_id", None)
+    if previous is None:
+        state.pop("stage", None)
+    else:
+        state["stage"] = previous
+    _save(base, state)
+
+
+def run(message: str, base_path: str | Path = ".") -> str:
+    """Consume one public turn, adding local continuity only when requested."""
+    base = Path(base_path)
+    text = str(message or "").strip()
+    state = _load(base)
+    continuity = ProjectMemoryContinuity(base)
+    if state.get("stage") == "memory_capture":
+        session_id = state.get("memory_session_id")
+        if not isinstance(session_id, str):
+            _restore_after_memory(base, state)
+            return _run_existing(text, base)
+        turn = continuity.capture_statement(session_id, text)
+        if turn.stage == "confirm" and turn.proposal_id:
+            state.update(
+                {"stage": "memory_confirm", "memory_proposal_id": turn.proposal_id}
+            )
+            _save(base, state)
+        else:
+            _restore_after_memory(base, state)
+        return turn.next_question or _run_existing(text, base)
+    if state.get("stage") == "memory_confirm":
+        session_id = state.get("memory_session_id")
+        proposal_id = state.get("memory_proposal_id")
+        if not isinstance(session_id, str) or not isinstance(proposal_id, str):
+            _restore_after_memory(base, state)
+            return _run_existing(text, base)
+        if _wants_continue_without_memory(text):
+            _restore_after_memory(base, state)
+            return _run_existing(text, base)
+        turn = continuity.answer_confirmation(session_id, proposal_id, text)
+        if turn.stage == "confirm":
+            _save(base, state)
+        else:
+            _restore_after_memory(base, state)
+        return turn.next_question or _run_existing(text, base)
+    if text and _wants_pause(text):
+        turn = continuity.begin_pause()
+        if turn.stage == "capture" and turn.session_id:
+            state.update(
+                {
+                    "memory_return_stage": state.get("stage"),
+                    "memory_session_id": turn.session_id,
+                    "stage": "memory_capture",
+                }
+            )
+            _save(base, state)
+            return turn.next_question or _run_existing(text, base)
+    if text and _wants_resume(text):
+        turn = continuity.resume()
+        reply = _run_existing(text, base)
+        return f"{turn.prefix}\n\n{reply}" if turn.prefix else reply
+    return _run_existing(text, base)

@@ -2,9 +2,17 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
+import sqlite3
 import subprocess
 from pathlib import Path
+
+import pytest
+
+from coaching.core import write_yaml
+from escala_server.project_memory import ProjectMemoryRuntime
+from escala_server.project_memory_session_close import ProjectMemorySessionClose
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 INSTALLER = REPO_ROOT / ".scaleup" / "install.sh"
@@ -143,3 +151,239 @@ def test_conversation_persists_natural_journey_after_clean_install(tmp_path):
     combined = tmp_path / "installed-combined"
     combined.mkdir()
     _combined_demo_intake(command, combined)
+
+
+def test_pause_confirmation_and_resume_use_only_natural_language(
+    tmp_path: Path,
+) -> None:
+    from coaching.router.conversation import run
+
+    root = tmp_path / "continuity"
+    root.mkdir()
+    question = run("quiero pausar", base_path=root)
+    assert "qué decisión o dato" in question.lower()
+    proposal = run("Contrataremos una líder de ventas en septiembre", base_path=root)
+    assert "quieres que lo recuerde" in proposal.lower()
+    confirmed = run("sí", base_path=root)
+    assert "próxima vez" in confirmed.lower()
+    resumed = run("retomemos", base_path=root)
+    assert "líder de ventas" in resumed.lower()
+    assert all(
+        token not in resumed.lower() for token in (".scaleup", "sqlite", "skill")
+    )
+
+
+def test_pause_no_and_ambiguous_never_confirm_an_entry(tmp_path: Path) -> None:
+    from coaching.router.conversation import run
+
+    root = tmp_path / "consent"
+    root.mkdir()
+    run("quiero pausar", base_path=root)
+    run("La meta de septiembre es 1.2 M MXN", base_path=root)
+    ambiguous = run("tal vez", base_path=root)
+    assert "no lo voy a dar por hecho" in ambiguous.lower()
+    close = ProjectMemorySessionClose(root)
+    proposed_state_digest = _memory_state_digest(root)
+    assert close.runtime.health().ready
+    with sqlite3.connect(close.runtime.db_path) as db:
+        assert (
+            db.execute("SELECT COUNT(*) FROM project_memory_sessions").fetchone()[0]
+            == 1
+        )
+        assert (
+            db.execute("SELECT COUNT(*) FROM session_memory_proposals").fetchone()[0]
+            == 1
+        )
+        assert (
+            db.execute("SELECT COUNT(*) FROM confirmed_memory_entries").fetchone()[0]
+            == 0
+        )
+        assert (
+            db.execute(
+                "SELECT response_state FROM session_memory_proposals"
+            ).fetchone()[0]
+            == "proposed"
+        )
+        assert (
+            db.execute("SELECT status FROM project_memory_sessions").fetchone()[0]
+            == "open"
+        )
+
+    assert run("no", base_path=root).lower().startswith("de acuerdo")
+    with sqlite3.connect(close.runtime.db_path) as db:
+        assert (
+            db.execute("SELECT COUNT(*) FROM project_memory_sessions").fetchone()[0]
+            == 1
+        )
+        assert (
+            db.execute("SELECT COUNT(*) FROM session_memory_proposals").fetchone()[0]
+            == 1
+        )
+        assert (
+            db.execute("SELECT COUNT(*) FROM confirmed_memory_entries").fetchone()[0]
+            == 0
+        )
+        assert (
+            db.execute(
+                "SELECT response_state FROM session_memory_proposals"
+            ).fetchone()[0]
+            == "rejected"
+        )
+        assert (
+            db.execute("SELECT status FROM project_memory_sessions").fetchone()[0]
+            == "closed"
+        )
+    assert _memory_state_digest(root) != proposed_state_digest
+
+
+def test_ambiguous_confirmation_can_continue_without_persisting(tmp_path: Path) -> None:
+    from coaching.router.conversation import run
+
+    root = tmp_path / "continue-after-ambiguous"
+    root.mkdir()
+    run("quiero pausar", base_path=root)
+    run("Contrataremos una líder de ventas en septiembre", base_path=root)
+    assert "no lo voy a dar por hecho" in run("tal vez", base_path=root).lower()
+    before = _memory_digest(root)
+    before_state = _memory_state_digest(root)
+    before_counts = _memory_counts(root)
+
+    continued = run("sigamos", base_path=root)
+
+    assert "¿cómo se llama" in continued.lower()
+    assert "recuerde para la próxima vez" not in continued.lower()
+    close = ProjectMemorySessionClose(root)
+    assert _memory_digest(root) == before
+    assert _memory_state_digest(root) == before_state
+    assert _memory_counts(root) == before_counts == (1, 1, 0)
+
+    with sqlite3.connect(close.runtime.db_path) as db:
+        assert (
+            db.execute("SELECT COUNT(*) FROM project_memory_sessions").fetchone()[0]
+            == 1
+        )
+        assert (
+            db.execute("SELECT COUNT(*) FROM session_memory_proposals").fetchone()[0]
+            == 1
+        )
+        assert (
+            db.execute("SELECT COUNT(*) FROM confirmed_memory_entries").fetchone()[0]
+            == 0
+        )
+        assert (
+            db.execute(
+                "SELECT response_state FROM session_memory_proposals"
+            ).fetchone()[0]
+            == "proposed"
+        )
+        assert (
+            db.execute("SELECT status FROM project_memory_sessions").fetchone()[0]
+            == "open"
+        )
+
+
+def test_business_goal_with_cerrar_does_not_start_memory(tmp_path: Path) -> None:
+    from coaching.router.conversation import run
+
+    root = tmp_path / "close-more-sales"
+    root.mkdir()
+
+    response = run("quiero cerrar más ventas", base_path=root)
+
+    assert "¿cómo se llama" in response.lower()
+    assert not (root / ".scaleup" / "memory" / "escala.db").exists()
+
+
+def _memory_digest(root: Path) -> str | None:
+    path = root / ".scaleup" / "memory" / "escala.db"
+    return hashlib.sha256(path.read_bytes()).hexdigest() if path.is_file() else None
+
+
+def _memory_state_digest(root: Path) -> str | None:
+    """Digest the observable memory state; SQLite may put writes in its WAL."""
+    path = root / ".scaleup" / "memory" / "escala.db"
+    if not path.is_file():
+        return None
+    try:
+        with sqlite3.connect(path) as db:
+            state = {
+                "sessions": db.execute(
+                    "SELECT status FROM project_memory_sessions ORDER BY id"
+                ).fetchall(),
+                "proposals": db.execute(
+                    "SELECT response_state FROM session_memory_proposals ORDER BY id"
+                ).fetchall(),
+                "entries": db.execute(
+                    "SELECT COUNT(*) FROM confirmed_memory_entries"
+                ).fetchone(),
+            }
+    except sqlite3.DatabaseError:
+        return None
+    return hashlib.sha256(json.dumps(state, sort_keys=True).encode("utf-8")).hexdigest()
+
+
+def _memory_counts(root: Path) -> tuple[int, int, int] | None:
+    path = root / ".scaleup" / "memory" / "escala.db"
+    if not path.is_file():
+        return None
+    try:
+        with sqlite3.connect(path) as db:
+            return tuple(
+                db.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
+                for table in (
+                    "project_memory_sessions",
+                    "session_memory_proposals",
+                    "confirmed_memory_entries",
+                )
+            )
+    except sqlite3.DatabaseError:
+        return None
+
+
+def _prepare_public_flow(root: Path, flow: str) -> None:
+    root.mkdir()
+    if flow == "onboarding":
+        return
+    write_yaml(
+        root / ".scaleup" / "agent" / "memory" / "company-profile.yaml",
+        {"company": {"name": "Lumen Casa", "industry": "Retail", "employees": 28}},
+    )
+    states = {
+        "diagnosis": {"stage": "diagnosis", "diagnosis_index": 0, "answers": {}},
+        "plan": {"stage": "plan", "plan_step": 0, "plan": {}},
+        "progress": {"stage": "post_plan"},
+    }
+    write_yaml(
+        root / ".scaleup" / "agent" / "memory" / "conversation.yaml", states[flow]
+    )
+
+
+def _prepare_memory_fixture(root: Path, fixture: str) -> None:
+    path = root / ".scaleup" / "memory" / "escala.db"
+    if fixture == "empty":
+        assert ProjectMemoryRuntime(root).ensure_memory().ready
+    elif fixture == "corrupt":
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(b"not a sqlite database")
+
+
+@pytest.mark.parametrize("fixture", ("absent", "empty", "corrupt"))
+@pytest.mark.parametrize("flow", ("onboarding", "diagnosis", "plan", "progress"))
+def test_resume_fallback_preserves_each_public_flow_without_memory_writes(
+    tmp_path: Path, fixture: str, flow: str
+) -> None:
+    from coaching.router.conversation import run
+
+    baseline, project = tmp_path / "baseline", tmp_path / fixture
+    _prepare_public_flow(baseline, flow)
+    _prepare_public_flow(project, flow)
+    _prepare_memory_fixture(project, fixture)
+    before = _memory_digest(project)
+    before_counts = _memory_counts(project)
+
+    expected = run("retomemos", base_path=baseline)
+    actual = run("retomemos", base_path=project)
+
+    assert actual == expected
+    assert _memory_digest(project) == before
+    assert _memory_counts(project) == before_counts

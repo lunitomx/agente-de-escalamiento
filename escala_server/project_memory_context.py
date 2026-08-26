@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Literal
 
 from .project_memory import ProjectMemoryRuntime
+from .project_memory_public_text import public_text
 from .schema import context_read_schema_is_valid
 
 _PROFILE_SOURCE = ".scaleup/agent/memory/company-profile.yaml"
@@ -51,7 +52,7 @@ class ContextItem:
     value: str
     source: str
     observed_at: str
-    kind: Literal["fact", "change"]
+    kind: Literal["fact", "change", "entry"]
     confirmed: bool = True
 
 
@@ -80,6 +81,7 @@ class ProjectMemorySessionContext:
         try:
             with sqlite3.connect(self._read_only_uri(health.db_path), uri=True) as db:
                 items = [
+                    *self._verified_confirmed_entries(db),
                     *self._verified_facts(db),
                     *self._verified_changes(db),
                 ]
@@ -167,7 +169,7 @@ class ProjectMemorySessionContext:
                 continue
             if not self._allowed_fact_key(key):
                 continue
-            value = self._brief_scalar(raw_value)
+            value = public_text(self._brief_scalar(raw_value))
             if value is not None:
                 facts.append(
                     ContextItem(
@@ -179,6 +181,119 @@ class ProjectMemorySessionContext:
                     )
                 )
         return facts
+
+    def _verified_confirmed_entries(self, db: sqlite3.Connection) -> list[ContextItem]:
+        """Project only active entries with matching explicit-consent provenance."""
+        if not self._has_table(db, "confirmed_memory_entries"):
+            return []
+        rows = db.execute(
+            """SELECT entries.id, entries.session_id, entries.kind, entries.statement,
+                      entries.source, entries.confirmed_at,
+                      entries.entry_format_version, entries.provenance_format_version,
+                      proposals.session_id, proposals.kind, proposals.statement,
+                      proposals.origin, proposals.observation_ids,
+                      proposals.response_state, proposals.provenance_format_version
+               FROM confirmed_memory_entries AS entries
+               JOIN session_memory_proposals AS proposals
+                 ON proposals.id = entries.proposal_id
+               WHERE entries.status = 'active'
+               ORDER BY entries.confirmed_at DESC, entries.id"""
+        )
+        items: list[ContextItem] = []
+        for row in rows:
+            if not self._valid_confirmed_entry(row):
+                continue
+            entry_id, _, kind, statement, _, confirmed_at, *_ = row
+            value = public_text(statement)
+            if value is None:
+                continue
+            items.append(
+                ContextItem(
+                    key=f"confirmed:{kind}:{entry_id}",
+                    value=value,
+                    source="confirmed",
+                    observed_at=confirmed_at,
+                    kind="entry",
+                )
+            )
+        return items
+
+    @staticmethod
+    def _has_table(db: sqlite3.Connection, name: str) -> bool:
+        return (
+            db.execute(
+                "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?", (name,)
+            ).fetchone()
+            is not None
+        )
+
+    @staticmethod
+    def _valid_confirmed_entry(row: tuple[object, ...]) -> bool:
+        (
+            entry_id,
+            entry_session_id,
+            entry_kind,
+            entry_statement,
+            raw_source,
+            confirmed_at,
+            entry_format,
+            provenance_format,
+            proposal_session_id,
+            proposal_kind,
+            proposal_statement,
+            proposal_origin,
+            raw_observations,
+            proposal_state,
+            proposal_format,
+        ) = row
+        if not (
+            all(
+                isinstance(value, str) and value
+                for value in (entry_id, entry_session_id, entry_statement, confirmed_at)
+            )
+            and entry_kind in {"fact", "decision", "pattern"}
+            and entry_kind == proposal_kind
+            and entry_session_id == proposal_session_id
+            and entry_statement == proposal_statement
+            and proposal_origin == "explicit_user_statement"
+            and proposal_state == "confirmed"
+            and entry_format == provenance_format == proposal_format == 1
+        ):
+            return False
+        try:
+            source = json.loads(raw_source)
+            observations = json.loads(raw_observations)
+        except (TypeError, json.JSONDecodeError):
+            return False
+        return (
+            isinstance(source, dict)
+            and source
+            == {
+                "session_id": entry_session_id,
+                "origin": "explicit_user_statement",
+                "observation_ids": observations,
+                "format_version": 1,
+            }
+            and isinstance(observations, list)
+            and bool(observations)
+            and all(isinstance(value, str) and value for value in observations)
+            and len(entry_statement.strip()) <= _MAX_FACT_VALUE_LENGTH
+            and not ProjectMemorySessionContext._contains_sensitive_or_technical_text(
+                entry_statement
+            )
+        )
+
+    @staticmethod
+    def _contains_sensitive_or_technical_text(value: str) -> bool:
+        normalized = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", " ", value).casefold()
+        compact = re.sub(r"[^a-z0-9]+", "", normalized)
+        tokens = set(re.split(r"[^a-z0-9]+", normalized))
+        return bool(
+            tokens & _SENSITIVE_KEY_PARTS
+            or any(form in compact for form in _SENSITIVE_COMPACT_FORMS)
+            or tokens & {"sqlite", "database", "db", "skill", "command", "log"}
+            or re.search(r"(?:^|[\s\"'`=:(\[])(?:/|\\|[A-Za-z]:[\\/])", value)
+        )
 
     @staticmethod
     def _allowed_fact_key(key: object) -> bool:
@@ -233,10 +348,13 @@ class ProjectMemorySessionContext:
             applied_at = self._verified_worksheet_application(db, envelope)
             if applied_at is None:
                 continue
+            value = public_text(f"{source_kind}: {category}/{tool}")
+            if value is None:
+                continue
             changes.append(
                 ContextItem(
                     key=f"{source_kind}:{category}/{tool}",
-                    value=f"{source_kind}: {category}/{tool}",
+                    value=value,
                     source=relative_path,
                     observed_at=applied_at,
                     kind="change",
@@ -324,6 +442,8 @@ class ProjectMemorySessionContext:
 
     @staticmethod
     def _priority(item: ContextItem) -> int:
+        if item.kind == "entry":
+            return -1
         if item.kind == "change":
             return 3
         if item.key.startswith("profile.focus."):

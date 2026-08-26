@@ -401,3 +401,44 @@ def test_installer_copies_local_memory_runtime_and_preserves_memory_data(tmp_pat
     _installer(tmp_path, "--target", "codex")
     _installer(tmp_path, "--target", "codex", "--uninstall")
     assert memory_note.read_text() == "keep me"
+
+
+def test_installed_frontdoor_pauses_confirms_and_resumes_naturally(tmp_path):
+    _installer(tmp_path, "--target", "codex")
+    runtime = tmp_path / ".codex" / "scaleup"
+    command = runtime / "bin" / "scaleup-frontdoor"
+    project = tmp_path / "continuity-project"
+    project.mkdir()
+
+    def say(message: str) -> str:
+        return subprocess.run(
+            [str(command), "conversation", message],
+            cwd=project,
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout
+
+    assert (runtime / "escala_server" / "project_memory_public_text.py").is_file()
+    pause = say("quiero pausar")
+    assert "qué decisión o dato" in pause.lower()
+    proposal = say("Contrataremos una líder de ventas en septiembre")
+    assert "quieres que lo recuerde" in proposal.lower()
+    confirmed = say("sí")
+    assert "próxima vez" in confirmed.lower()
+    resumed = say("retomemos")
+    assert "líder de ventas" in resumed.lower()
+    assert all(
+        forbidden not in resumed.lower()
+        for forbidden in (
+            ".scaleup",
+            "sqlite",
+            "database",
+            "base de datos",
+            "session",
+            "sesión",
+            "skill",
+            "comando",
+            "ruta",
+        )
+    )
