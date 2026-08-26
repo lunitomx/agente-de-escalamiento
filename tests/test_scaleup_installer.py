@@ -2,10 +2,14 @@
 
 import hashlib
 import json
+import os
+import signal
 import shutil
 import sqlite3
 import subprocess
 import sys
+import time
+import urllib.request
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -132,6 +136,59 @@ print(json.dumps({"ready": result.ready, "reason": result.reason,
     return json.loads(result.stdout)
 
 
+
+def _installed_visual_smoke(runtime: Path, project: Path) -> dict:
+    code = """
+import json
+import sys
+import threading
+import urllib.request
+from pathlib import Path
+from escala_server.server import EscalaRequestHandler, make_server
+
+runtime = Path(sys.argv[1])
+project = Path(sys.argv[2])
+EscalaRequestHandler.log_message = lambda *args: None
+server = make_server(
+    host="127.0.0.1",
+    port=0,
+    static_root=str(runtime / "escala_server" / "static"),
+    db_path=str(project / "visual-smoke.db"),
+    project_root=str(project),
+)
+thread = threading.Thread(target=server.serve_forever, daemon=True)
+thread.start()
+try:
+    port = server.server_address[1]
+    health = json.loads(urllib.request.urlopen(f"http://127.0.0.1:{port}/api/health").read())
+    pulse = json.loads(urllib.request.urlopen(f"http://127.0.0.1:{port}/api/business-pulse").read())
+    accountability = json.loads(urllib.request.urlopen(f"http://127.0.0.1:{port}/api/accountability").read())
+    index = urllib.request.urlopen(f"http://127.0.0.1:{port}/").read().decode("utf-8")
+    accountability_html = urllib.request.urlopen(f"http://127.0.0.1:{port}/dashboards/execution/accountability.html").read().decode("utf-8")
+finally:
+    server.shutdown()
+    thread.join(timeout=5)
+    server.server_close()
+print(json.dumps({
+    "health": health,
+    "pulse": pulse,
+    "accountability": accountability,
+    "index_has_scaleup": "ScaleUp" in index,
+    "index_has_business_pulse": "Business Pulse" in index,
+    "accountability_has_title": "Accountability" in accountability_html,
+}))
+"""
+    environment = os.environ.copy()
+    environment["PYTHONPATH"] = str(runtime)
+    completed = subprocess.run(
+        [sys.executable, "-c", code, str(runtime), str(project)],
+        env=environment,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return json.loads(completed.stdout)
+
 def _run_engine(runtime_root: Path, project: Path, module: str, context: dict) -> dict:
     code = (
         f"from coaching.{module} import run; "
@@ -214,12 +271,119 @@ def test_installer_targets_are_isolated_and_adapted(tmp_path):
         assert (runtime_root / "coaching" / "summary" / "__init__.py").is_file()
         assert (runtime_root / "coaching" / "opsp.py").is_file()
         assert (runtime_root / "bin" / "scaleup-frontdoor").is_file()
+        assert (runtime_root / "escala_server" / "board" / "verne.py").is_file()
+        assert (runtime_root / "miembro-board" / "verne-harnish.md").is_file()
+        for relative in (
+            "escala_server/__main__.py",
+            "escala_server/server.py",
+            "escala_server/handlers.py",
+            "escala_server/router.py",
+            "escala_server/cors.py",
+            "escala_server/knowledge_handler.py",
+            "escala_server/business_pulse.py",
+            "escala_server/accountability.py",
+            "escala_server/static/index.html",
+            "escala_server/static/dashboards/cash/power-of-one.html",
+            "escala_server/static/dashboards/execution/accountability.html",
+        ):
+            assert (runtime_root / relative).is_file(), relative
         skill = (skills_root / "scaleup" / "SKILL.md").read_text()
         assert "python3 -c" not in skill
         assert str(runtime_root / "bin" / "scaleup-frontdoor") in skill
         assert ".scaleup/agent" not in skill
         assert "validate-opsp" in skill
+        board_project = tmp_path / f"{platform}-board-project"
+        board_project.mkdir()
+        board_reply = _say(
+            runtime_root / "bin" / "scaleup-frontdoor",
+            board_project,
+            "opinión del board: el daily está bloqueado",
+        )
+        assert "lente sintética" in board_reply.lower()
+        assert "no es verne harnish" in board_reply.lower()
+        accountability_project = tmp_path / f"{platform}-accountability-project"
+        accountability_project.mkdir()
+        accountability_reply = _say(
+            runtime_root / "bin" / "scaleup-frontdoor",
+            accountability_project,
+            "¿Qué puedes hacer con mis accountability?",
+        )
+        assert "preparar" in accountability_reply.lower()
+        assert "evidencia" in accountability_reply.lower()
+        assert "patrones" in accountability_reply.lower()
+        visual_project = tmp_path / f"{platform}-visual-project"
+        visual_project.mkdir()
+        visual = _installed_visual_smoke(runtime_root, visual_project)
+        assert visual["health"]["status"] == "ok"
+        assert visual["pulse"]["status"] == "ok"
+        assert visual["pulse"]["data"]["state"] == "empty"
+        assert visual["accountability"]["status"] == "ok"
+        assert visual["accountability"]["data"]["state"] == "empty"
+        assert visual["index_has_scaleup"] is True
+        assert visual["index_has_business_pulse"] is True
+        assert visual["accountability_has_title"] is True
 
+
+def test_installer_adaptation_does_not_depend_on_sed_in_place(tmp_path):
+    fake_bin = tmp_path / "fake-bin"
+    fake_bin.mkdir()
+    fake_sed = fake_bin / "sed"
+    fake_sed.write_text("#!/bin/sh\nexit 97\n")
+    fake_sed.chmod(0o755)
+    environment = os.environ.copy()
+    environment["PATH"] = f"{fake_bin}:{environment['PATH']}"
+    destination = tmp_path / "destination"
+    subprocess.run(
+        [
+            "bash",
+            str(INSTALLER),
+            "--target",
+            "codex",
+            "--destination-root",
+            str(destination),
+        ],
+        cwd=REPO_ROOT,
+        env=environment,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    assert (destination / ".codex" / "skills" / "scaleup" / "SKILL.md").is_file()
+    assert (destination / ".codex" / "scaleup" / "VERSION").is_file()
+
+
+
+def test_installed_natural_panel_request_returns_live_local_url(tmp_path):
+    _installer(tmp_path, "--target", "codex")
+    runtime = tmp_path / ".codex" / "scaleup"
+    command = runtime / "bin" / "scaleup-frontdoor"
+    project = tmp_path / "panel-company"
+    project.mkdir()
+    response = _say(command, project, "abre mi panel de ScaleUp")
+    state_path = project / ".scaleup" / "runtime" / "visual-panel.json"
+    assert "http://127.0.0.1:" in response
+    assert state_path.is_file()
+    state = json.loads(state_path.read_text())
+    try:
+        with urllib.request.urlopen(state["url"] + "/api/health", timeout=2) as health:
+            payload = json.loads(health.read())
+        assert payload["status"] == "ok"
+        with urllib.request.urlopen(state["url"] + "/api/business-pulse", timeout=2) as response:
+            pulse = json.loads(response.read())
+        assert pulse["status"] == "ok"
+        assert pulse["data"]["synthetic"] is False
+        second = _say(command, project, "quiero ver mi dashboard")
+        assert "ya está disponible" in second
+        assert state["url"] in second
+        closed = _say(command, project, "cierra mi panel")
+        assert "Cerré el panel" in closed
+        assert not state_path.exists()
+    finally:
+        if state_path.exists():
+            try:
+                os.kill(int(state["pid"]), signal.SIGTERM)
+            except ProcessLookupError:
+                pass
 
 def test_installer_never_distributes_source_company_memory_or_backups(tmp_path):
     """Source-company data is never part of the distributed runtime payload."""
@@ -504,7 +668,8 @@ def test_installer_copies_local_memory_runtime_and_preserves_memory_data(tmp_pat
         assert (memory_runtime / "project_memory.py").is_file()
         assert (memory_runtime / "project_memory_migration.py").is_file()
         assert (memory_runtime / "schema.py").is_file()
-        assert not (memory_runtime / "server.py").exists()
+        assert (memory_runtime / "server.py").is_file()
+        assert (memory_runtime / "static" / "index.html").is_file()
         project = tmp_path / f"{platform}-project"
         completed = subprocess.run(
             [
@@ -754,8 +919,10 @@ def test_installed_natural_onboarding_reconciles_profile_in_the_same_return(tmp_
             in _say(command, project, "Vendemos iluminación decorativa").lower()
         )
 
-        same_return = _say(command, project, "28")
-        assert "ahora revisaremos cuatro áreas" in same_return.lower()
+        offer = _say(command, project, "28")
+        assert "personalizar" in offer.lower()
+        same_return = _say(command, project, "ahora no")
+        assert "ahora voy a escucharte antes de poner números" in same_return.lower()
         profile = project / profile_path
         database = project / ".scaleup" / "memory" / "escala.db"
         assert profile.is_file() and database.is_file()
@@ -817,7 +984,7 @@ def test_installed_natural_onboarding_reconciles_profile_in_the_same_return(tmp_
         database_before = corrupt_database.read_bytes()
         profile_before = corrupt_profile.read_bytes()
         assert (
-            "ahora revisaremos cuatro áreas"
+            "ahora voy a escucharte antes de poner números"
             in _say(command, corrupt, "retomemos").lower()
         )
         assert corrupt_database.read_bytes() == database_before
@@ -1018,7 +1185,7 @@ def test_release_installed_frontdoor_rejects_sensitive_text_and_falls_back_witho
         profile_before = profile.read_bytes() if fixture == "corrupt" else None
         actual = _say(command, candidate, "retomemos")
         if fixture == "corrupt":
-            assert "ahora revisaremos cuatro áreas" in actual.lower()
+            assert "ahora voy a escucharte antes de poner números" in actual.lower()
         else:
             assert actual == _say(command, baseline, "retomemos")
         database = candidate / ".scaleup" / "memory" / "escala.db"

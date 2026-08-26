@@ -53,19 +53,29 @@ configure_targets() {
 }
 
 adapt_skill() {
-    local skill_file="$1" runtime_root="$2" escaped_root
-    escaped_root="${runtime_root//\\/\\\\}"
-    escaped_root="${escaped_root//&/\\&}"
-    escaped_root="${escaped_root//|/\\|}"
+    local skill_file="$1" runtime_root="$2"
+    python3 - "$skill_file" "$runtime_root" <<'PY'
+import shlex
+import sys
+from pathlib import Path
 
-    sed -i \
-        -e "s|sys\\.path\\.insert(0, '\\.')|sys.path.insert(0, '$escaped_root')|g" \
-        -e "s|sys\\.path\\.insert(0,'\\.')|sys.path.insert(0, '$escaped_root')|g" \
-        -e "s|str(pathlib\\.Path('\\.scaleup/agent'))|str(pathlib.Path('$escaped_root/agent'))|g" \
-        -e "s|python3 \\.scaleup/agent/validators/|python3 $escaped_root/agent/validators/|g" \
-        -e "s|python3 -m coaching\\.|PYTHONPATH='$escaped_root' python3 -m coaching.|g" \
-        -e "s|\.scaleup/bin/scaleup-frontdoor|$escaped_root/bin/scaleup-frontdoor|g" \
-        "$skill_file"
+skill_path = Path(sys.argv[1])
+runtime_root = sys.argv[2]
+runtime_literal = repr(runtime_root)
+runtime_shell = shlex.quote(runtime_root)
+text = skill_path.read_text(encoding="utf-8")
+replacements = (
+    ("sys.path.insert(0, '.')", f"sys.path.insert(0, {runtime_literal})"),
+    ("sys.path.insert(0,'.')", f"sys.path.insert(0,{runtime_literal})"),
+    ("str(pathlib.Path('.scaleup/agent'))", f"str(pathlib.Path({repr(runtime_root + '/agent')}))"),
+    ("python3 .scaleup/agent/validators/", f"python3 {runtime_root}/agent/validators/"),
+    ("python3 -m coaching.", f"PYTHONPATH={runtime_shell} python3 -m coaching."),
+    (".scaleup/bin/scaleup-frontdoor", f"{runtime_root}/bin/scaleup-frontdoor"),
+)
+for source, target in replacements:
+    text = text.replace(source, target)
+skill_path.write_text(text, encoding="utf-8")
+PY
 }
 
 is_known_scaleup_skill() {
@@ -169,11 +179,17 @@ copy_memory_runtime() {
     local dst="$1"
     rm -rf "$dst/escala_server"
     mkdir -p "$dst/escala_server"
-    for module in __init__.py schema.py project_memory.py project_memory_migration.py project_memory_context.py project_memory_public_text.py project_memory_session_close.py project_memory_continuity.py memory_engine.py graph_engine.py; do
+    for module in __init__.py __main__.py cli.py server.py handlers.py router.py cors.py diff.py knowledge_handler.py business_pulse.py accountability.py schema.py workspace.py human_context.py weekly_cadence.py connected_guidance.py project_memory.py project_memory_migration.py project_memory_context.py project_memory_public_text.py project_memory_session_close.py project_memory_continuity.py memory_engine.py graph_engine.py; do
         cp "$MEMORY_RUNTIME_DIR/$module" "$dst/escala_server/$module"
     done
     cp -a "$MEMORY_RUNTIME_DIR/daos" "$dst/escala_server/daos"
-    info "Copied local SQLite memory runtime to $dst/escala_server/"
+    cp -a "$MEMORY_RUNTIME_DIR/board" "$dst/escala_server/board"
+    mkdir -p "$dst/escala_server/data"
+    for data_file in __init__.py knowledge_ingester.py book-knowledge.json SCHEMA.md; do
+        cp "$MEMORY_RUNTIME_DIR/data/$data_file" "$dst/escala_server/data/$data_file"
+    done
+    cp -a "$MEMORY_RUNTIME_DIR/static" "$dst/escala_server/static"
+    info "Copied local SQLite memory and visual runtime to $dst/escala_server/"
 }
 
 copy_knowledge() {
@@ -181,6 +197,10 @@ copy_knowledge() {
     rm -rf "$dst/knowledge"
     mkdir -p "$dst/knowledge"
     cp -a "$KNOWLEDGE_DIR/." "$dst/knowledge/"
+    local board_profile="$(dirname "$SCRIPT_DIR")/miembro-board"
+    if [[ -d "$board_profile" ]]; then
+        cp -a "$board_profile" "$dst/miembro-board"
+    fi
     info "Copied knowledge ontology to $dst/knowledge/ (synchronized)"
 }
 

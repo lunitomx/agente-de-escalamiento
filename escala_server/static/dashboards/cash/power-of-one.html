@@ -108,6 +108,25 @@
       text-align: right;
     }
 
+    .baseline-input {
+      width: 118px;
+      padding: 7px 8px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font: inherit;
+      text-align: right;
+    }
+    .baseline-input:focus { outline: 2px solid #93c5fd; border-color: #2563eb; }
+    .provenance {
+      margin: 12px 16px 0;
+      padding: 10px 13px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background: #f8fafc;
+      color: #64748b;
+      font-size: .8rem;
+    }
+
     .impact-summary {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -152,20 +171,21 @@
     <div class="interactive-bar">
       <h2>🔄 Power of One — Interactivo</h2>
       <div style="display:flex;align-items:center;gap:12px;">
-        <span id="save-indicator" class="save-indicator saved">💾 Guardado</span>
+        <span id="save-indicator" class="save-indicator modified">Pendiente de capturar</span>
         <button id="save-btn" class="save-btn" onclick="DashboardInteractive.save()">💾 Guardar</button>
       </div>
     </div>
+    <p class="provenance" id="scenario-source">Aún no hay un escenario guardado. Captura una línea base real y un escenario para comenzar.</p>
 
     <!-- Impact Summary Cards -->
     <div class="impact-summary" id="impact-summary">
       <div class="impact-card">
         <h3>Impacto CF</h3>
-        <div id="total-cf" class="value neutral">$0</div>
+        <div id="total-cf" class="value neutral">Pendiente</div>
       </div>
       <div class="impact-card">
         <h3>Impacto EBIT</h3>
-        <div id="total-ebit" class="value neutral">$0</div>
+        <div id="total-ebit" class="value neutral">Pendiente</div>
       </div>
       <div class="impact-card">
         <h3>Estado</h3>
@@ -214,6 +234,21 @@
       };
 
       // ── Recalc handler ──────────────────────────────────────────────────
+      var scenarioActive = false;
+
+      function sourceLabel(meta) {
+        if (!meta) return 'Fuente pendiente';
+        var date = meta.observed_at ? new Date(meta.observed_at) : null;
+        var formatted = date && !Number.isNaN(date.getTime())
+          ? new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium' }).format(date)
+          : 'fecha pendiente';
+        return 'Fuente: ' + (meta.source || 'Datos locales') + ' · ' + formatted + ' · versión ' + meta.version;
+      }
+
+      function setSource(text) {
+        document.getElementById('scenario-source').textContent = text;
+      }
+
       function onRecalc(vars, impacts) {
         var totalCF = 0;
         var totalEBIT = 0;
@@ -229,6 +264,12 @@
         var ebitEl = document.getElementById('total-ebit');
         var statusEl = document.getElementById('aggregate-status');
 
+        if (!scenarioActive) {
+          if (cfEl) { cfEl.textContent = 'Pendiente'; cfEl.className = 'value neutral'; }
+          if (ebitEl) { ebitEl.textContent = 'Pendiente'; ebitEl.className = 'value neutral'; }
+          if (statusEl) { statusEl.textContent = 'Sin datos'; statusEl.className = 'value neutral'; }
+          return;
+        }
         if (cfEl) {
           cfEl.textContent = PowerOfOneEngine.formatCurrency(totalCF, true);
           cfEl.className = 'value ' + (totalCF > 0 ? 'positive' : (totalCF < 0 ? 'negative' : 'neutral'));
@@ -251,6 +292,18 @@
         variableKeys: VARIABLE_KEYS,
         variableMeta: variableMeta,
         onRecalc: onRecalc,
+        onLoad: function (meta, hasData) {
+          scenarioActive = hasData;
+          setSource(hasData ? sourceLabel(meta) : 'Aún no hay un escenario guardado. Captura una línea base real y un escenario para comenzar.');
+        },
+        onModified: function () {
+          scenarioActive = true;
+          setSource('Cambios sin guardar · la fuente seguirá siendo local cuando confirmes Guardar.');
+        },
+        onSaved: function (meta) {
+          scenarioActive = true;
+          setSource(sourceLabel(meta));
+        },
         containerId: 'sliders-container'
       });
     })();

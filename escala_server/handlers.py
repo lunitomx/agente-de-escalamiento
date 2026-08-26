@@ -55,7 +55,16 @@ class WorksheetsHandler:
     def get_worksheets(self, category: str, tool: str) -> dict:
         row = self.worksheet_dao.get(category, tool)
         data = json.loads(row["data"]) if row else {}
-        return {"data": data, "status": "ok"}
+        meta = (
+            {
+                "version": row["version"],
+                "observed_at": row["updated_at"],
+                "source": f"Datos locales · {category}/{tool}",
+            }
+            if row
+            else None
+        )
+        return {"data": data, "meta": meta, "status": "ok"}
 
     def save_worksheet(
         self,
@@ -87,7 +96,15 @@ class WorksheetsHandler:
                 )
 
         response_data = json.loads(saved["data"])
-        return {"data": response_data, "status": "ok"}
+        return {
+            "data": response_data,
+            "meta": {
+                "version": saved["version"],
+                "observed_at": saved["updated_at"],
+                "source": f"Datos locales · {category}/{tool}",
+            },
+            "status": "ok",
+        }
 
     def get_changes(self, category: str, tool: str) -> list[dict[str, Any]]:
         """Return raw change-log rows for a (category, tool) pair."""

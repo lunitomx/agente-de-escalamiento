@@ -6,6 +6,8 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qs, urlparse
 
+from .accountability import AccountabilityStore
+from .business_pulse import BusinessPulseHandler
 from .cors import CORSHandler
 from .handlers import (
     CompaniesHandler,
@@ -28,6 +30,8 @@ class EscalaRequestHandler(BaseHTTPRequestHandler):
     memory: MemoryHandler = None  # type: ignore
     knowledge_ingester: Any = None  # type: ignore
     knowledge: Any = None  # type: ignore
+    business_pulse: BusinessPulseHandler = None  # type: ignore
+    accountability: AccountabilityStore = None  # type: ignore
 
     def do_GET(self):
         path = self.path
@@ -162,6 +166,7 @@ def make_server(
     port: int = 8080,
     static_root: str = ".",
     db_path: str | None = None,
+    project_root: str | None = None,
 ) -> HTTPServer:
     """Create and configure an Escala server instance.
 
@@ -170,6 +175,7 @@ def make_server(
         port: Port to bind to
         static_root: Root directory for static files
         db_path: Path to SQLite database (default: ~/.escala/escala.db)
+        project_root: Company project whose allowlisted sources feed the pulse.
     """
     if db_path is None:
         db_path = str(Path.home() / ".escala" / "escala.db")
@@ -186,6 +192,12 @@ def make_server(
     EscalaRequestHandler.memory = MemoryHandler(db_path)
     EscalaRequestHandler.knowledge_ingester = _build_knowledge_ingester(db_path)
     EscalaRequestHandler.knowledge = KnowledgeHandler(GraphEngine(db_path))
+    EscalaRequestHandler.business_pulse = BusinessPulseHandler(
+        db_path, project_root=project_root
+    )
+    EscalaRequestHandler.accountability = AccountabilityStore(
+        project_root or str(Path(db_path).parent)
+    )
 
     server = HTTPServer((host, port), EscalaRequestHandler)
     return server
@@ -198,6 +210,17 @@ def _build_router() -> Router:
     @router.get("/api/health")
     def health_check():
         return {"status": "ok", "service": "escala-server", "version": "0.1.0"}
+
+    @router.get("/api/business-pulse")
+    def business_pulse(demo: str = "false"):
+        return EscalaRequestHandler.business_pulse.get(demo=demo)
+
+    @router.get("/api/accountability")
+    def accountability_summary():
+        result = EscalaRequestHandler.accountability.public_summary()
+        if result.ready:
+            return {"status": "ok", "data": result.data}
+        return {"status": "error", "message": result.reason}
 
     @router.get("/api/companies")
     def list_companies():

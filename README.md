@@ -68,6 +68,16 @@ El recorrido de ScaleUp te ayuda a crear y conservar:
 - Prioridades y acciones de seguimiento.
 - Un One Page Strategic Plan (OPSP): tu plan estratégico en una hoja.
 
+## Abre tu panel local
+
+Dentro de la carpeta de tu empresa, dile a ScaleUp: **“Abre mi panel.”** El
+asistente inicia el servidor incluido y te devuelve un enlace local. No tienes
+que escribir comandos, puertos ni rutas. El panel sólo escucha en tu propia
+computadora y usa la memoria de esa carpeta.
+
+Cuando termines, di **“Cierra mi panel.”** ScaleUp detiene únicamente el panel
+de esa carpeta.
+
 Los datos de trabajo se guardan localmente en el directorio `.scaleup/` del
 proyecto. La continuidad opcional sólo recuerda una declaración que confirmes
 explícitamente con “sí”; una respuesta ambigua o “no” no la da por cierta. La
@@ -79,6 +89,24 @@ Para una demostración, puedes decir “quiero pausar”, dar una decisión conc
 responder “sí” cuando te pregunte si quieres recordarla. En una sesión nueva,
 “retomemos” recupera únicamente esa decisión confirmada. No dictes contraseñas,
 tokens, rutas ni comandos: ScaleUp los rechaza para esta continuidad local.
+
+## Trabajar con tu equipo
+
+Cuando quieras que tu empresa colabore desde una carpeta compartida, abre Claude
+Code o Codex en esa carpeta y di: **“Quiero compartir esta carpeta con mi
+equipo.”** ScaleUp pedirá una sola confirmación y dejará una estructura de
+documentos empresariales legibles. Después puedes sincronizar esa carpeta con
+Drive Desktop, Dropbox, OneDrive u otro proveedor que ya uses.
+
+Cada colaborador abre la misma carpeta en su propia computadora. Los documentos
+confirmados y las contribuciones viajan por el proveedor de archivos; la base
+SQLite, sus copias y sus locks se quedan exclusivamente en cada computadora.
+No necesitas instalar un servidor, conectar OAuth ni administrar una base de
+datos. Para revisarla, di: **“Revisa la carpeta compartida.”**
+
+No copies contraseñas, tokens o secretos a la carpeta: ScaleUp los rechaza antes
+de indexarlos. Si existe un conflicto, conserva las versiones y pide una
+conciliación explícita en vez de sobrescribir información.
 
 ## Guía de demostración
 

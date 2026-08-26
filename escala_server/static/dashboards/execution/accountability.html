@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Seguimiento local y explicable de Accountability Groups.">
+  <title>Accountability | ScaleUp</title>
+  <link rel="stylesheet" href="../../shared/styles/context-panel.css">
+  <style>
+    :root{--navy:#08052f;--blue:#2442d7;--pink:#e91e63;--gold:#f4c531;--ink:#17162b;--muted:#6b7280;--line:#e6e6ef;--bg:#f7f7fb}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.top{background:linear-gradient(135deg,var(--navy),#241a75);color:#fff;padding:22px clamp(18px,5vw,68px) 92px}.nav,.hero,.main{max-width:1180px;margin:auto}.nav{display:flex;justify-content:space-between;align-items:center}.brand{font-weight:850}.back{color:#dedcf0;text-decoration:none;font-size:13px}.hero{padding-top:62px}.eyebrow{color:var(--gold);font-size:11px;font-weight:850;letter-spacing:.14em;text-transform:uppercase}.hero h1{font-size:clamp(38px,7vw,68px);line-height:1;margin:8px 0 15px;letter-spacing:-.055em}.hero p{max-width:720px;color:#dad9e8}.main{padding:0 clamp(18px,4vw,44px) 60px;margin-top:-54px}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.card,.panel{background:#fff;border:1px solid var(--line);border-radius:17px;box-shadow:0 5px 18px #1512430d}.card{padding:23px}.metric{font-size:34px;font-weight:850;letter-spacing:-.05em}.label,.muted{color:var(--muted);font-size:12px}.section{margin-top:34px}.section h2{font-size:25px;letter-spacing:-.035em}.grid{display:grid;grid-template-columns:1.15fr .85fr;gap:17px}.panel{padding:24px}.list{display:grid;gap:12px}.session,.pattern{padding:16px;border:1px solid var(--line);border-radius:12px}.session-top{display:flex;justify-content:space-between;gap:12px}.date{font-weight:800}.pill{display:inline-block;padding:3px 8px;border-radius:999px;background:#eceeff;color:#263bb1;font-size:11px;font-weight:800}.commitment{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}.commitment strong{display:block}.meta{color:var(--muted);font-size:12px;margin-top:5px}.score{color:#166534;font-weight:850}.pattern{border-left:4px solid var(--pink)}.empty{padding:28px;text-align:center;color:var(--muted)}.privacy{margin-top:28px;padding:15px;border:1px solid #d8d6e8;background:#fff;border-radius:12px;color:var(--muted);font-size:12px}.error{color:#991b1b;background:#fff1f2;border:1px solid #fecaca;padding:18px;border-radius:12px}@media(max-width:760px){.summary,.grid{grid-template-columns:1fr}.top{padding-bottom:82px}.hero{padding-top:42px}}
+  </style>
+</head>
+<body>
+  <header class="top"><nav class="nav"><span class="brand">ScaleUp</span><a class="back" href="/">← Business Pulse</a></nav><div class="hero"><div class="eyebrow">Execution · Memoria longitudinal</div><h1>Accountability</h1><p>Prepara la conversación, convierte acuerdos en compromisos verificables y aprende de patrones sustentados por sesiones reales.</p></div></header>
+  <main class="main" id="main" aria-live="polite">
+    <section class="summary"><article class="card"><div class="metric" id="sessions">—</div><div class="label">sesiones incluidas</div></article><article class="card"><div class="metric" id="follow">—</div><div class="label">seguimiento promedio revisado</div></article><article class="card"><div class="metric" id="patterns">—</div><div class="label">patrones con 2+ evidencias</div></article></section>
+    <section class="section grid"><article class="panel"><h2>Historial y compromisos</h2><div class="list" id="history"></div></article><aside class="panel"><h2>Patrones explicables</h2><div class="list" id="pattern-list"></div></aside></section>
+    <p class="privacy" id="privacy">Este panel nunca muestra la actualización personal ni la narrativa delicada del worksheet.</p>
+  </main>
+  <script>
+  (function(){'use strict';
+    var el=function(id){return document.getElementById(id)};
+    var text=function(tag,value,klass){var n=document.createElement(tag);n.textContent=value||'';if(klass)n.className=klass;return n};
+    function empty(node,message){var n=text('div',message,'empty');node.appendChild(n)}
+    function render(data){
+      var sessions=data.sessions||[],analysis=data.analysis||{},patterns=analysis.patterns||[];
+      el('sessions').textContent=String(sessions.length);el('patterns').textContent=String(patterns.length);el('follow').textContent=analysis.average_follow_through_percent===null||analysis.average_follow_through_percent===undefined?'Pendiente':analysis.average_follow_through_percent+'%';el('privacy').textContent=data.privacy||el('privacy').textContent;
+      var history=el('history');history.textContent='';
+      if(!sessions.length){empty(history,'Aún no hay sesiones. Dile al agente: “Quiero preparar mi Accountability”.')}
+      sessions.slice().reverse().forEach(function(session){var box=document.createElement('article');box.className='session';var top=document.createElement('div');top.className='session-top';top.appendChild(text('span',session.held_on,'date'));top.appendChild(text('span',session.decision_area||'sin pilar','pill'));box.appendChild(top);var tags=(session.tags||[]).join(' · ');if(tags)box.appendChild(text('div',tags,'meta'));(session.commitments||[]).forEach(function(item){var c=document.createElement('div');c.className='commitment';c.appendChild(text('strong',item.statement));c.appendChild(text('div','Dueño: '+item.owner+' · Fecha: '+item.due_on+' · Estado: '+item.status,'meta'));c.appendChild(text('div','Evidencia esperada: '+item.success_measure,'meta'));if(item.follow_through_percent!==null&&item.follow_through_percent!==undefined)c.appendChild(text('div','Seguimiento derivado: '+item.follow_through_percent+'%','score'));box.appendChild(c)});history.appendChild(box)});
+      var list=el('pattern-list');list.textContent='';if(!patterns.length)empty(list,'Todavía no hay dos sesiones que sustenten un patrón. Las apariciones únicas se conservan como observaciones.');patterns.forEach(function(item){var box=document.createElement('article');box.className='pattern';box.appendChild(text('strong',item.label));box.appendChild(text('div','Evidencia: '+(item.evidence_dates||[]).join(', '),'meta'));list.appendChild(box)});
+    }
+    fetch('/api/accountability',{headers:{Accept:'application/json'}}).then(function(response){if(!response.ok)throw new Error('No se pudo cargar');return response.json()}).then(function(payload){if(payload.status!=='ok')throw new Error(payload.message||'No disponible');render(payload.data)}).catch(function(error){el('main').textContent='';var node=text('div','No pude cargar el seguimiento local: '+String(error.message),'error');el('main').appendChild(node)});
+  }());
+  </script>
+  <script src="../../shared/js/context-panel.js"></script>
+</body>
+</html>

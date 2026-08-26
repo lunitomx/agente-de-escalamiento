@@ -35,15 +35,16 @@ def _journey(command: Path, project: Path) -> None:
     assert "Cuántas personas" in _say(
         command, project, "Vendemos iluminación para hogares"
     )
-    first_question = _say(command, project, "28")
-    assert "Del 1 al 5" in first_question
+    offer = _say(command, project, "28")
+    assert "personalizar" in offer.lower()
+    first_question = _say(command, project, "ahora no")
+    assert "escucharte antes de poner números" in first_question
 
-    # A fresh process keeps the same question/answer state: the public command
-    # receives only natural text, never onboarding or diagnosis keys.
-    assert "core values" in _say(command, project, "3").lower()
+    # A fresh process keeps narrative state, while a number remains an optional shortcut.
+    assert "strategy" in _say(command, project, "3").lower()
     state = project / ".scaleup" / "agent" / "memory" / "conversation.yaml"
     assert state.is_file() and "people_q1: 3" in state.read_text(encoding="utf-8")
-    for _ in range(19):
+    for _ in range(3):
         _say(command, project, "3")
 
     assert "plan en una hoja" in _say(
@@ -93,7 +94,8 @@ def _combined_demo_intake(command: Path, project: Path) -> None:
         project,
         "Se llama Lumen Casa. Vendemos iluminación decorativa… Somos 28 personas.",
     )
-    assert "Del 1 al 5" in response
+    assert "personalizar" in response.lower()
+    assert "escucharte antes de poner números" in _say(command, project, "ahora no")
     profile = (
         project / ".scaleup" / "agent" / "memory" / "company-profile.yaml"
     ).read_text(encoding="utf-8")
@@ -387,3 +389,43 @@ def test_resume_fallback_preserves_each_public_flow_without_memory_writes(
     assert actual == expected
     assert _memory_digest(project) == before
     assert _memory_counts(project) == before_counts
+
+
+def test_narrative_diagnosis_accepts_detail_then_offers_an_explainable_optional_score(tmp_path):
+    from coaching.router.conversation import run
+
+    root = tmp_path / "narrative-diagnosis"
+    root.mkdir()
+    run("quiero organizar mi empresa", base_path=root)
+    run("Lumen Casa", base_path=root)
+    run("Vendemos iluminación para hogares", base_path=root)
+    run("12", base_path=root)
+    first = run("ahora no", base_path=root)
+    assert "escucharte antes de poner números" in first
+    summary = run(
+        "Tenemos dos líderes fuertes, pero ventas no tiene responsable claro y eso retrasó dos contratos este mes.",
+        base_path=root,
+    )
+    assert "Entendí esto" in summary and "provisionalmente" in summary
+    next_question = run("sin calificación", base_path=root)
+    assert "Strategy" in next_question
+    assert "Respóndeme sólo con un número" not in summary
+
+
+def test_intake_keeps_logo_and_url_as_references_not_company_description(tmp_path):
+    from coaching.core import read_yaml
+    from coaching.router.conversation import run
+
+    root = tmp_path / "raise-intake"
+    root.mkdir()
+    run("quiero organizar mi empresa", base_path=root)
+    question = run("RAISE te dejo el logo", base_path=root)
+    assert "RAISE" in question and "logo" not in question.lower()
+    url_reply = run("https://docs.raiseframework.ai/3.1/", base_path=root)
+    assert "enlace como referencia" in url_reply
+    run("Ayudamos a equipos a construir y mejorar agentes de IA.", base_path=root)
+    run("5", base_path=root)
+    profile = read_yaml(root / ".scaleup" / "agent" / "memory" / "company-profile.yaml")
+    assert profile["company"]["name"] == "RAISE"
+    assert "docs.raiseframework.ai" not in profile["company"]["industry"]
+    assert profile["company"]["declared_references"][0]["kind"] == "attachment_reference"

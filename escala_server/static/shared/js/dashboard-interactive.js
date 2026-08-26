@@ -26,6 +26,10 @@ var DashboardInteractive = (function () {
     variableKeys: [],
     variableMeta: {},
     onRecalc: null,
+    onLoad: null,
+    onModified: null,
+    onSaved: null,
+    hasData: false,
     modified: false,
     savedVersion: null
   };
@@ -36,6 +40,9 @@ var DashboardInteractive = (function () {
     state.variableKeys = config.variableKeys;
     state.variableMeta = config.variableMeta;
     state.onRecalc = config.onRecalc || function () {};
+    state.onLoad = config.onLoad || function () {};
+    state.onModified = config.onModified || function () {};
+    state.onSaved = config.onSaved || function () {};
     state.containerId = config.containerId || 'sliders-container';
 
     loadFromServer();
@@ -49,13 +56,15 @@ var DashboardInteractive = (function () {
         try {
           var resp = JSON.parse(xhr.responseText);
           if (resp.data && resp.data.variables) {
+            state.hasData = true;
             applySavedData(resp.data.variables);
           }
+          state.onLoad(resp.meta || null, state.hasData);
         } catch (e) { /* ignore parse errors */ }
       }
       renderSliders();
       runRecalc();
-      setSavedIndicator('saved');
+      setSavedIndicator(state.hasData ? 'saved' : 'empty');
     };
     xhr.send();
   }
@@ -99,7 +108,20 @@ var DashboardInteractive = (function () {
       valueDisplay.textContent = formatAdjusted(v.adjusted, meta);
       row.appendChild(valueDisplay);
 
-      // Range input
+      // Editable baseline
+      var currentInput = document.createElement('input');
+      currentInput.type = 'number';
+      currentInput.className = 'baseline-input';
+      currentInput.min = meta.min || 0;
+      currentInput.max = meta.max || 100;
+      currentInput.step = meta.step || 1;
+      currentInput.value = v.current;
+      currentInput.setAttribute('data-key', key);
+      currentInput.setAttribute('aria-label', 'Línea base de ' + meta.label);
+      currentInput.addEventListener('input', onCurrentChange);
+      row.appendChild(currentInput);
+
+      // Adjusted scenario range
       var slider = document.createElement('input');
       slider.type = 'range';
       slider.className = 'slider-input';
@@ -108,24 +130,37 @@ var DashboardInteractive = (function () {
       slider.step = meta.step || 1;
       slider.value = v.adjusted;
       slider.setAttribute('data-key', key);
+      slider.setAttribute('aria-label', 'Escenario de ' + meta.label);
 
       slider.addEventListener('input', onSliderChange);
       row.appendChild(slider);
 
-      // Current value (baseline)
+      // Baseline label
       var currentDisplay = document.createElement('span');
       currentDisplay.className = 'slider-current';
-      currentDisplay.textContent = 'Base: ' + PowerOfOneEngine.formatValue(v.current, meta.unit);
+      currentDisplay.textContent = 'Línea base';
       row.appendChild(currentDisplay);
 
       container.appendChild(row);
     }
   }
 
+  function onCurrentChange(e) {
+    var key = e.target.getAttribute('data-key');
+    var val = parseFloat(e.target.value);
+    if (!Number.isFinite(val)) return;
+    state.variables[key].current = val;
+    state.hasData = true;
+    setModified(true);
+    state.onModified();
+    runRecalc();
+  }
+
   function onSliderChange(e) {
     var key = e.target.getAttribute('data-key');
     var val = parseFloat(e.target.value);
     state.variables[key].adjusted = val;
+    state.hasData = true;
 
     // Update value display
     var valueDisplay = document.getElementById('sv-' + key);
@@ -134,6 +169,7 @@ var DashboardInteractive = (function () {
     }
 
     setModified(true);
+    state.onModified();
     runRecalc();
   }
 
@@ -150,9 +186,12 @@ var DashboardInteractive = (function () {
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.onload = function () {
       if (xhr.status === 200) {
+        var response = {};
+        try { response = JSON.parse(xhr.responseText); } catch (e) { /* metadata is optional */ }
         state.savedVersion = JSON.parse(JSON.stringify(state.variables));
         setModified(false);
         setSavedIndicator('saved');
+        state.onSaved(response.meta || null);
       }
     };
     var payload = JSON.stringify({
@@ -170,7 +209,10 @@ var DashboardInteractive = (function () {
   function setSavedIndicator(status) {
     var indicator = document.getElementById('save-indicator');
     if (!indicator) return;
-    if (status === 'modified') {
+    if (status === 'empty') {
+      indicator.textContent = 'Pendiente de capturar';
+      indicator.className = 'save-indicator modified';
+    } else if (status === 'modified') {
       indicator.textContent = '✏️ Modificado';
       indicator.className = 'save-indicator modified';
     } else {

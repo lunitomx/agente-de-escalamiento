@@ -1,5 +1,8 @@
 # ScaleUp Agent AI — Status Report
 
+> Snapshot histórico del 2026-08-24. Fue sustituido por
+> `work/epics/product-roadmap.md`; no usar este archivo como estado actual.
+
 **Fecha:** 2026-08-24
 **Repo:** github.com/lunitomx/scaleupagent
 **Branch auditada:** main

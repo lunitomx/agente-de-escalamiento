@@ -3,249 +3,358 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Escala — Home | ScaleUp</title>
+  <meta name="description" content="Business Pulse local de ScaleUp: foco, decisiones, plan y próximos pasos con fuente y fecha.">
+  <title>Business Pulse | ScaleUp</title>
   <link rel="stylesheet" href="shared/styles/dashboard-base.css">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f1f5f9; color: #1e293b; }
-
-    /* Breadcrumbs */
-    .breadcrumbs {
-      display: flex; align-items: center; gap: 8px;
-      padding: 12px 24px; background: white;
-      border-bottom: 1px solid #e2e8f0;
-      font-size: 0.85rem;
+    :root {
+      --pulse-navy: #08052f;
+      --pulse-blue: #2442d7;
+      --pulse-pink: #e91e63;
+      --pulse-gold: #f4c531;
+      --pulse-ink: #17162b;
+      --pulse-muted: #6b7280;
+      --pulse-bg: #f7f7fb;
+      --pulse-card: #fff;
+      --pulse-border: #e6e6ef;
     }
-    .breadcrumbs a { color: #64748b; text-decoration: none; cursor: pointer; }
-    .breadcrumbs a:hover { color: #2563eb; }
-    .breadcrumbs .sep { color: #94a3b8; }
-    .breadcrumbs .current { color: #1e293b; font-weight: 600; }
-
-    /* Header */
-    .page-header {
-      padding: 24px 24px 0;
+    body { background: var(--pulse-bg); color: var(--pulse-ink); }
+    a { color: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    .topbar {
+      min-height: 72px; padding: 14px clamp(18px, 4vw, 64px);
+      display: flex; align-items: center; justify-content: space-between; gap: 20px;
+      background: var(--pulse-navy); color: white;
     }
-    .page-header h1 { font-size: 1.5rem; color: #0f172a; }
-    .page-header p { color: #64748b; font-size: 0.9rem; margin-top: 4px; }
-
-    /* Decision Cards */
-    .decisions-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 16px;
-      padding: 24px;
+    .brand { display: flex; align-items: center; gap: 13px; font-weight: 800; letter-spacing: -.02em; }
+    .brand-mark { position: relative; width: 34px; height: 34px; }
+    .brand-mark::before, .brand-mark::after { content: ""; position: absolute; transform: skew(-20deg); }
+    .brand-mark::before { inset: 2px 16px 2px 5px; background: var(--pulse-blue); }
+    .brand-mark::after { inset: 2px 4px 2px 17px; background: var(--pulse-pink); }
+    .brand-mark span { position: absolute; width: 11px; height: 19px; left: 13px; top: 9px; background: var(--pulse-gold); clip-path: polygon(50% 0, 100% 100%, 0 100%); z-index: 2; }
+    .privacy { font-size: 12px; color: #d7d6e8; display: flex; gap: 8px; align-items: center; }
+    .privacy-dot { width: 8px; height: 8px; border-radius: 50%; background: #42d392; box-shadow: 0 0 0 4px rgb(66 211 146 / .16); }
+    .hero {
+      background: linear-gradient(135deg, var(--pulse-navy) 0%, #17115d 64%, #241a75 100%);
+      color: white; padding: clamp(34px, 7vw, 78px) clamp(18px, 4vw, 64px) 104px;
     }
+    .hero-inner, .main { max-width: 1240px; margin: 0 auto; }
+    .eyebrow { color: var(--pulse-gold); text-transform: uppercase; font-size: 12px; font-weight: 800; letter-spacing: .14em; }
+    .hero h1 { margin-top: 10px; font-size: clamp(36px, 6vw, 68px); line-height: .98; letter-spacing: -.055em; }
+    .hero-copy { margin-top: 16px; color: #dad9e8; font-size: clamp(15px, 2vw, 19px); max-width: 740px; }
+    .hero-meta { display: flex; flex-wrap: wrap; gap: 10px 24px; margin-top: 25px; color: #c4c2dc; font-size: 13px; }
+    .mode-banner { display: none; margin-top: 24px; padding: 12px 16px; border-radius: 10px; background: #fff3c4; color: #5e4600; font-weight: 700; max-width: 760px; }
+    .mode-banner.visible { display: block; }
+    .main { margin-top: -70px; padding: 0 clamp(18px, 4vw, 42px) 70px; }
+    .focus-card {
+      position: relative; overflow: hidden; padding: clamp(23px, 4vw, 38px);
+      background: white; border: 1px solid var(--pulse-border); border-radius: 20px;
+      box-shadow: 0 18px 48px rgb(24 20 74 / .16); display: grid; grid-template-columns: 1.35fr 1fr; gap: 34px;
+    }
+    .focus-card::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 6px; background: linear-gradient(var(--pulse-pink), var(--pulse-gold)); }
+    .section-kicker { color: var(--pulse-pink); font-size: 11px; font-weight: 850; text-transform: uppercase; letter-spacing: .13em; }
+    .focus-name { font-size: clamp(28px, 4vw, 43px); line-height: 1.05; margin-top: 7px; letter-spacing: -.04em; }
+    .focus-reason { color: var(--pulse-muted); margin-top: 10px; max-width: 640px; }
+    .source { color: var(--pulse-muted); font-size: 11px; margin-top: 14px; line-height: 1.45; }
+    .source strong { color: #46455d; }
+    .critical { border-left: 1px solid var(--pulse-border); padding-left: 34px; }
+    .critical-label { color: var(--pulse-muted); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+    .critical-value { font-size: clamp(19px, 3vw, 28px); font-weight: 800; margin-top: 7px; letter-spacing: -.025em; }
+    .critical-value.pending { color: #9190a1; font-weight: 650; }
+    .section { margin-top: 40px; }
+    .section-header { display: flex; justify-content: space-between; gap: 18px; align-items: end; margin-bottom: 16px; }
+    .section-title { font-size: clamp(22px, 3vw, 30px); letter-spacing: -.035em; }
+    .section-help { color: var(--pulse-muted); font-size: 13px; max-width: 470px; text-align: right; }
+    .decision-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
     .decision-card {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      cursor: pointer;
-      transition: transform 0.15s, box-shadow 0.15s;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-      border-left: 4px solid #94a3b8;
+      min-height: 258px; display: flex; flex-direction: column; padding: 21px;
+      text-decoration: none; background: var(--pulse-card); border: 1px solid var(--pulse-border); border-radius: 16px;
+      box-shadow: 0 3px 12px rgb(18 15 55 / .04); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
     }
-    .decision-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
-    .decision-card .icon { font-size: 1.8rem; margin-bottom: 8px; }
-    .decision-card h2 { font-size: 1.1rem; margin-bottom: 4px; }
-    .decision-card .subtitle { font-size: 0.8rem; color: #64748b; margin-bottom: 12px; }
-    .decision-card .score {
-      font-size: 1.6rem; font-weight: 700;
+    .decision-card:hover, .decision-card:focus-visible { transform: translateY(-3px); box-shadow: 0 12px 26px rgb(18 15 55 / .1); border-color: #c9c7dc; outline: none; }
+    .decision-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .decision-name { font-weight: 820; font-size: 18px; }
+    .score { display: flex; align-items: baseline; gap: 3px; margin-top: 23px; }
+    .score-value { font-size: 46px; line-height: 1; font-weight: 850; letter-spacing: -.06em; }
+    .score-max { color: var(--pulse-muted); font-weight: 650; }
+    .score.pending .score-value { font-size: 23px; color: #8c8a9c; letter-spacing: -.02em; }
+    .trend { font-size: 11px; font-weight: 780; border-radius: 999px; padding: 4px 8px; background: #f1f1f6; color: #626075; }
+    .trend.improving { background: #dcfce7; color: #166534; }
+    .trend.regressing { background: #fee2e2; color: #991b1b; }
+    .trend.stalling { background: #fef3c7; color: #92400e; }
+    .decision-question { color: var(--pulse-muted); font-size: 12px; line-height: 1.5; margin-top: 12px; }
+    .decision-card .source { margin-top: auto; padding-top: 16px; }
+    .open-label { display: block; margin-top: 10px; font-size: 12px; font-weight: 800; color: var(--pulse-blue); }
+    .two-col { display: grid; grid-template-columns: 1.25fr .75fr; gap: 18px; }
+    .panel { background: white; border: 1px solid var(--pulse-border); border-radius: 16px; padding: clamp(20px, 3vw, 28px); }
+    .panel-head { display: flex; justify-content: space-between; gap: 16px; align-items: start; }
+    .panel h3 { font-size: 19px; letter-spacing: -.025em; }
+    .plan-status { color: var(--pulse-muted); font-size: 12px; }
+    .progress-track { margin-top: 18px; height: 9px; background: #ededf4; border-radius: 999px; overflow: hidden; }
+    .progress-fill { width: 0; height: 100%; background: linear-gradient(90deg, var(--pulse-blue), var(--pulse-pink)); border-radius: inherit; transition: width .35s ease; }
+    .progress-copy { display: flex; justify-content: space-between; color: var(--pulse-muted); font-size: 12px; margin-top: 8px; }
+    .priority-list { list-style: none; margin-top: 20px; display: grid; gap: 11px; }
+    .priority-item { padding: 14px; background: #f8f8fc; border-radius: 11px; border-left: 3px solid var(--pulse-blue); }
+    .priority-title { font-weight: 760; }
+    .priority-meta { color: var(--pulse-muted); font-size: 12px; margin-top: 4px; }
+    .empty-copy { color: var(--pulse-muted); padding: 19px 0 5px; }
+    .pulse-link { display: inline-flex; margin-top: 17px; padding: 10px 14px; border-radius: 9px; background: var(--pulse-navy); color: white; text-decoration: none; font-weight: 760; font-size: 13px; }
+    .timeline { list-style: none; display: grid; gap: 0; margin-top: 14px; }
+    .timeline li { position: relative; padding: 0 0 17px 21px; border-left: 1px solid #d9d8e5; }
+    .timeline li:last-child { border-left-color: transparent; padding-bottom: 0; }
+    .timeline li::before { content: ""; position: absolute; width: 9px; height: 9px; border-radius: 50%; left: -5px; top: 5px; background: var(--pulse-pink); box-shadow: 0 0 0 4px #fde7ef; }
+    .timeline-label { font-weight: 730; font-size: 13px; }
+    .timeline-meta { color: var(--pulse-muted); font-size: 11px; margin-top: 2px; overflow-wrap: anywhere; }
+    .actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .action {
+      min-height: 124px; padding: 18px; border-radius: 14px; border: 1px solid var(--pulse-border); background: white;
+      display: flex; flex-direction: column; justify-content: space-between; text-align: left; text-decoration: none; cursor: pointer; font: inherit;
     }
-    .decision-card .score.good { color: #16a34a; }
-    .decision-card .score.warning { color: #ca8a04; }
-    .decision-card .score.critical { color: #dc2626; }
-    .decision-card .score.na { color: #94a3b8; }
-    .decision-card .meta {
-      font-size: 0.75rem; color: #94a3b8; margin-top: 8px;
+    .action:hover, .action:focus-visible { border-color: var(--pulse-blue); outline: none; }
+    .action-title { font-weight: 800; }
+    .action-say { color: var(--pulse-muted); font-size: 12px; margin-top: 9px; line-height: 1.45; }
+    .action-go { color: var(--pulse-blue); font-size: 12px; font-weight: 800; margin-top: 13px; }
+    .demo-link { color: var(--pulse-blue); font-size: 12px; font-weight: 750; }
+    .error { margin: 32px auto; max-width: 720px; padding: 22px; border: 1px solid #fecaca; background: #fff1f2; color: #881337; border-radius: 14px; }
+    .hidden { display: none !important; }
+    .footer { color: var(--pulse-muted); text-align: center; font-size: 11px; padding-top: 42px; }
+    @media (max-width: 980px) {
+      .decision-grid { grid-template-columns: repeat(2, 1fr); }
+      .focus-card, .two-col { grid-template-columns: 1fr; }
+      .critical { border-left: none; border-top: 1px solid var(--pulse-border); padding: 24px 0 0; }
     }
-
-    .card-cash { border-left-color: #16a34a; }
-    .card-strategy { border-left-color: #2563eb; }
-    .card-people { border-left-color: #d946ef; }
-    .card-execution { border-left-color: #ea580c; }
-
-    /* Tool List */
-    .tools-list {
-      padding: 24px;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 12px;
-    }
-    .tool-item {
-      background: white;
-      border-radius: 8px;
-      padding: 16px;
-      cursor: pointer;
-      transition: background 0.15s;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
-      border: 1px solid #e2e8f0;
-    }
-    .tool-item:hover { background: #f8fafc; border-color: #2563eb; }
-    .tool-item h3 { font-size: 0.9rem; margin-bottom: 4px; }
-    .tool-item .status {
-      font-size: 0.8rem;
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 10px;
-    }
-    .tool-item .status.ok { background: #dcfce7; color: #166534; }
-    .tool-item .status.pending { background: #fef9c3; color: #854d0e; }
-
-    .back-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 8px 16px; margin: 0 24px;
-      background: white; border: 1px solid #e2e8f0;
-      border-radius: 6px; cursor: pointer; font-size: 0.85rem;
-      transition: background 0.15s;
-    }
-    .back-btn:hover { background: #f1f5f9; }
-
     @media (max-width: 640px) {
-      .decisions-grid { grid-template-columns: 1fr; padding: 16px; }
-      .tools-list { grid-template-columns: 1fr; padding: 16px; }
+      .privacy { display: none; }
+      .hero { padding-bottom: 94px; }
+      .decision-grid, .actions { grid-template-columns: 1fr; }
+      .decision-card { min-height: 225px; }
+      .section-header { display: block; }
+      .section-help { text-align: left; margin-top: 6px; }
     }
   </style>
 </head>
 <body>
-  <div id="breadcrumbs" class="breadcrumbs"></div>
-  <div id="content"></div>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true"><span></span></span><span>ScaleUp</span></div>
+    <div class="privacy"><span class="privacy-dot" aria-hidden="true"></span><span>Memoria local de esta empresa</span></div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow">Vista ejecutiva</p>
+      <h1>Business Pulse</h1>
+      <p class="hero-copy" id="company-title">Cargando el estado real de tu empresa…</p>
+      <div class="hero-meta"><span id="company-industry"></span><span id="as-of"></span></div>
+      <div id="mode-banner" class="mode-banner" role="status"></div>
+    </div>
+  </section>
+
+  <main class="main" id="main-content" aria-live="polite">
+    <section class="focus-card" aria-labelledby="focus-title">
+      <div>
+        <p class="section-kicker">El foco que merece atención ahora</p>
+        <h2 class="focus-name" id="focus-title">Pendiente de diagnóstico</h2>
+        <p class="focus-reason" id="focus-reason">Completa el diagnóstico para convertir información en una prioridad clara.</p>
+        <p class="source" id="focus-source"></p>
+      </div>
+      <div class="critical">
+        <p class="critical-label">Número crítico del trimestre</p>
+        <p class="critical-value pending" id="critical-number">Pendiente de definir en tu plan</p>
+        <p class="source" id="critical-source"></p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="decisions-title">
+      <div class="section-header">
+        <h2 class="section-title" id="decisions-title">Las cuatro decisiones</h2>
+        <p class="section-help">Cada dato muestra de dónde salió y cuándo se observó. Abre una tarjeta para trabajar esa área.</p>
+      </div>
+      <div class="decision-grid" id="decision-grid"></div>
+    </section>
+
+    <section class="section two-col" aria-label="Plan y actividad reciente">
+      <article class="panel">
+        <div class="panel-head">
+          <div><p class="section-kicker">Dirección compartida</p><h3>Plan en una hoja</h3></div>
+          <span class="plan-status" id="plan-status">Pendiente</span>
+        </div>
+        <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="plan-progress"></div></div>
+        <div class="progress-copy"><span id="plan-progress-copy">0 de 7 elementos clave</span><span id="plan-percent">0%</span></div>
+        <ul class="priority-list" id="priority-list"></ul>
+        <p class="empty-copy" id="plan-empty">Todavía no hay un plan en una hoja. Pídele al agente que lo construyan juntos.</p>
+        <p class="source" id="plan-source"></p>
+      </article>
+
+      <aside class="panel">
+        <p class="section-kicker">Trazabilidad</p>
+        <h3>Qué cambió recientemente</h3>
+        <ul class="timeline" id="timeline"></ul>
+        <p class="empty-copy" id="timeline-empty">Aún no hay cambios empresariales registrados.</p>
+      </aside>
+    </section>
+
+    <section class="section" id="actions-section" aria-labelledby="actions-title">
+      <div class="section-header">
+        <h2 class="section-title" id="actions-title">Qué hacer después</h2>
+        <a class="demo-link" id="demo-link" href="?demo=1">Ver una demostración sintética</a>
+      </div>
+      <div class="actions" id="actions"></div>
+    </section>
+
+    <p class="footer">Datos locales · Sin cifras inventadas · Nada se sincroniza sin tu decisión</p>
+  </main>
 
   <script>
     (function () {
       'use strict';
+      var params = new URLSearchParams(window.location.search);
+      var demo = params.get('demo') === '1';
+      var endpoint = '/api/business-pulse' + (demo ? '?demo=true' : '');
+      var trendLabels = { improving: 'Mejorando', stalling: 'Sin cambio', regressing: 'Retrocediendo' };
 
-      var DECISIONS = [
-        { id: 'cash',     icon: '\u{1F4B0}', label: 'Cash',     subtitle: 'Flujo de caja y rentabilidad', color: 'card-cash' },
-        { id: 'strategy', icon: '\u{1F3AF}', label: 'Strategy', subtitle: 'Dirección y ventaja competitiva', color: 'card-strategy' },
-        { id: 'people',   icon: '\u{1F465}', label: 'People',   subtitle: 'Equipo y cultura', color: 'card-people' },
-        { id: 'execution',icon: '\u{2699}\u{FE0F}', label: 'Execution', subtitle: 'Ejecución y hábitos', color: 'card-execution' },
-      ];
-
-      var TOOLS = {
-        cash:     ['Power of One', 'Cash Board', 'Fundability', 'Recurring Revenue', 'CCC'],
-        strategy: ['BMC Board', 'Core Customer', 'Brand Promises', 'Diff Activities', 'Sandbox'],
-        people:   ['Core Values', 'FACe', 'Team Growth', 'DISC', 'Love/Loathe', 'Hiring Pipeline'],
-        execution:['Rockefeller Habits', 'WWW', 'Priorities', 'Balanced KPIs', 'Meeting Rhythms', 'Influencers', 'Vision Summary'],
-      };
-
-      var state = { view: 'home', decision: null };
-
-      function render() {
-        renderBreadcrumbs();
-        if (state.view === 'home') renderHome();
-        else if (state.view === 'tools') renderTools();
+      function byId(id) { return document.getElementById(id); }
+      function setText(id, value) { var node = byId(id); if (node) node.textContent = value || ''; }
+      function safeRoute(value, fallback) { return typeof value === 'string' && value.indexOf('/dashboards/') === 0 ? value : fallback; }
+      function dateLabel(value) {
+        if (!value) return 'fecha pendiente';
+        var date = new Date(value.length === 10 ? value + 'T00:00:00' : value);
+        if (Number.isNaN(date.getTime())) return String(value);
+        return new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium' }).format(date);
+      }
+      function sourceText(source) {
+        if (!source) return 'Fuente pendiente';
+        var parts = [source.label || 'Fuente local'];
+        if (source.observed_at) parts.push(dateLabel(source.observed_at));
+        return parts.join(' · ');
+      }
+      function sourceNode(source) {
+        var node = document.createElement('p');
+        node.className = 'source';
+        var strong = document.createElement('strong');
+        strong.textContent = 'Fuente: ';
+        node.appendChild(strong);
+        node.appendChild(document.createTextNode(sourceText(source)));
+        return node;
+      }
+      function scoreClass(score) {
+        if (score === null || score === undefined) return 'pending';
+        if (score >= 4) return 'good';
+        if (score >= 3) return 'warning';
+        return 'critical';
       }
 
-      function renderBreadcrumbs() {
-        var el = document.getElementById('breadcrumbs');
-        if (state.view === 'home') {
-          el.innerHTML = '<span class="current">\u{1F3E0} Home</span>';
-        } else {
-          var decision = DECISIONS.find(function(d) { return d.id === state.decision; });
-          el.innerHTML = '<a onclick="navigateHome()">\u{1F3E0} Home</a>' +
-            '<span class="sep">\u203A</span>' +
-            '<span class="current">' + (decision ? decision.label : state.decision) + '</span>';
-        }
-      }
-
-      function renderHome() {
-        var el = document.getElementById('content');
-        var html = '<div class="page-header"><h1>Escala — Panel de Control</h1><p>Selecciona un área para ver sus herramientas</p></div>';
-        html += '<div class="decisions-grid">';
-
-        for (var i = 0; i < DECISIONS.length; i++) {
-          var d = DECISIONS[i];
-          html += '<div class="decision-card ' + d.color + '" onclick="navigateTools(\'' + d.id + '\')">' +
-            '<div class="icon">' + d.icon + '</div>' +
-            '<h2>' + d.label + '</h2>' +
-            '<div class="subtitle">' + d.subtitle + '</div>' +
-            '<div class="score na" id="score-' + d.id + '">--</div>' +
-            '<div class="meta" id="meta-' + d.id + '">Cargando...</div>' +
-            '</div>';
-        }
-        html += '</div>';
-        el.innerHTML = html;
-
-        // Load scores from API
-        for (var j = 0; j < DECISIONS.length; j++) {
-          loadScore(DECISIONS[j].id);
-        }
-      }
-
-      function loadScore(decisionId) {
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', '/api/worksheets/' + decisionId, true);
-        xhr.onload = function () {
-          var scoreEl = document.getElementById('score-' + decisionId);
-          var metaEl = document.getElementById('meta-' + decisionId);
-          if (!scoreEl || !metaEl) return;
-
-          if (xhr.status === 200) {
-            try {
-              var resp = JSON.parse(xhr.responseText);
-              if (resp.data && Object.keys(resp.data).length > 0) {
-                scoreEl.textContent = 'Datos OK';
-                scoreEl.className = 'score good';
-                metaEl.textContent = 'Con datos guardados';
-              } else {
-                scoreEl.textContent = 'Sin datos';
-                scoreEl.className = 'score na';
-                metaEl.textContent = 'Completa un worksheet para ver métricas';
-              }
-            } catch (e) {
-              scoreEl.textContent = '--';
-              metaEl.textContent = 'Error al cargar';
-            }
-          } else {
-            scoreEl.textContent = '--';
-            metaEl.textContent = 'Servidor no disponible';
+      function renderDecisions(decisions) {
+        var grid = byId('decision-grid');
+        grid.textContent = '';
+        decisions.forEach(function (decision) {
+          var card = document.createElement('a');
+          card.className = 'decision-card';
+          card.href = safeRoute(decision.route, '#');
+          var top = document.createElement('div'); top.className = 'decision-top';
+          var name = document.createElement('span'); name.className = 'decision-name'; name.textContent = decision.label;
+          top.appendChild(name);
+          if (decision.trend) {
+            var trend = document.createElement('span'); trend.className = 'trend ' + decision.trend; trend.textContent = trendLabels[decision.trend] || decision.trend;
+            top.appendChild(trend);
           }
-        };
-        xhr.onerror = function () {
-          var scoreEl = document.getElementById('score-' + decisionId);
-          var metaEl = document.getElementById('meta-' + decisionId);
-          if (scoreEl) scoreEl.textContent = '--';
-          if (metaEl) metaEl.textContent = 'Error de conexión';
-        };
-        xhr.send();
+          card.appendChild(top);
+          var score = document.createElement('div'); score.className = 'score ' + scoreClass(decision.score);
+          var value = document.createElement('span'); value.className = 'score-value'; value.textContent = decision.score === null ? 'Pendiente' : String(decision.score);
+          score.appendChild(value);
+          if (decision.score !== null) { var max = document.createElement('span'); max.className = 'score-max'; max.textContent = '/5'; score.appendChild(max); }
+          card.appendChild(score);
+          var question = document.createElement('p'); question.className = 'decision-question'; question.textContent = decision.question; card.appendChild(question);
+          card.appendChild(sourceNode(decision.source));
+          var open = document.createElement('span'); open.className = 'open-label'; open.textContent = decision.cta + ' →'; card.appendChild(open);
+          grid.appendChild(card);
+        });
       }
 
-      function renderTools() {
-        var el = document.getElementById('content');
-        var tools = TOOLS[state.decision] || [];
-        var decision = DECISIONS.find(function(d) { return d.id === state.decision; });
-        var label = decision ? decision.label : state.decision;
+      function renderPlan(plan) {
+        var completion = plan.completion || { complete: 0, total: 7, percent: 0 };
+        var percent = Math.max(0, Math.min(100, Number(completion.percent) || 0));
+        byId('plan-progress').style.width = percent + '%';
+        setText('plan-progress-copy', completion.complete + ' de ' + completion.total + ' elementos clave');
+        setText('plan-percent', percent + '%');
+        setText('plan-status', plan.available ? (plan.status === 'completed' ? 'Completo' : 'En construcción') : 'Pendiente');
+        var list = byId('priority-list'); list.textContent = '';
+        (plan.priorities || []).forEach(function (priority) {
+          var item = document.createElement('li'); item.className = 'priority-item';
+          var title = document.createElement('p'); title.className = 'priority-title'; title.textContent = priority.priority; item.appendChild(title);
+          var meta = document.createElement('p'); meta.className = 'priority-meta';
+          var pieces = [];
+          if (priority.owner) pieces.push('Responsable: ' + priority.owner);
+          if (priority.kpi) pieces.push('Medida: ' + priority.kpi);
+          if (priority.status) pieces.push(priority.status);
+          meta.textContent = pieces.join(' · '); item.appendChild(meta); list.appendChild(item);
+        });
+        byId('plan-empty').classList.toggle('hidden', plan.available);
+        setText('plan-source', plan.source ? 'Fuente: ' + sourceText(plan.source) : 'Fuente pendiente');
+      }
 
-        var html = '<div class="page-header"><h1>' + (decision ? decision.icon : '') + ' ' + label + '</h1><p>Selecciona una herramienta</p></div>';
-        html += '<div class="tools-list">';
+      function renderTimeline(items) {
+        var list = byId('timeline'); list.textContent = '';
+        (items || []).forEach(function (event) {
+          var item = document.createElement('li');
+          var label = document.createElement('p'); label.className = 'timeline-label'; label.textContent = event.label; item.appendChild(label);
+          var meta = document.createElement('p'); meta.className = 'timeline-meta'; meta.textContent = dateLabel(event.observed_at) + (event.source ? ' · ' + event.source : ''); item.appendChild(meta);
+          list.appendChild(item);
+        });
+        byId('timeline-empty').classList.toggle('hidden', Boolean(items && items.length));
+      }
 
-        for (var i = 0; i < tools.length; i++) {
-          var toolSlug = tools[i].toLowerCase().replace(/[\/\s]+/g, '-');
-          var toolUrl = '/dashboards/' + state.decision + '/' + toolSlug + '.html';
-          html += '<div class="tool-item" onclick="window.location.href=\'' + toolUrl + '\'">' +
-            '<h3>' + tools[i] + '</h3>' +
-            '<span class="status pending">Listo</span>' +
-            '</div>';
+      function renderActions(actions, power) {
+        var container = byId('actions'); container.textContent = '';
+        var list = (actions || []).slice();
+        if (power && power.available) list.push({ label: 'Revisar Power of One', route: power.route });
+        list.forEach(function (action) {
+          var node = document.createElement(action.route ? 'a' : 'button');
+          node.className = 'action';
+          if (action.route) node.href = safeRoute(action.route, '#'); else node.type = 'button';
+          var title = document.createElement('span'); title.className = 'action-title'; title.textContent = action.label; node.appendChild(title);
+          if (action.say) {
+            var say = document.createElement('span'); say.className = 'action-say'; say.textContent = 'Dile al agente: “' + action.say + '”'; node.appendChild(say);
+            node.addEventListener('click', function () {
+              if (navigator.clipboard) navigator.clipboard.writeText(action.say);
+              say.textContent = 'Frase copiada: “' + action.say + '”';
+            });
+          }
+          var go = document.createElement('span'); go.className = 'action-go'; go.textContent = action.route ? 'Abrir →' : 'Copiar frase →'; node.appendChild(go);
+          container.appendChild(node);
+        });
+        byId('actions-section').classList.toggle('hidden', list.length === 0 && !demo);
+      }
+
+      function render(data) {
+        setText('company-title', data.company.name ? data.company.name : 'Tu empresa aún no tiene información suficiente');
+        setText('company-industry', data.company.industry || 'Contexto empresarial pendiente');
+        setText('as-of', data.as_of ? 'Actualizado: ' + dateLabel(data.as_of) : 'Sin actualizaciones todavía');
+        if (data.synthetic) {
+          var banner = byId('mode-banner'); banner.classList.add('visible'); banner.textContent = 'DEMO SINTÉTICA · Estos valores son ilustrativos y no pertenecen a tu empresa.';
+          byId('demo-link').textContent = 'Volver a mis datos'; byId('demo-link').href = '/';
         }
-        html += '</div>';
-        el.innerHTML = html;
+        setText('focus-title', data.priority.label || 'Pendiente de diagnóstico');
+        setText('focus-reason', data.priority.reason);
+        setText('focus-source', data.priority.source ? 'Fuente: ' + sourceText(data.priority.source) + (data.priority.derived ? ' · cálculo explicado' : '') : 'Fuente pendiente');
+        var critical = data.plan.critical_number;
+        setText('critical-number', critical || 'Pendiente de definir en tu plan');
+        byId('critical-number').classList.toggle('pending', !critical);
+        setText('critical-source', data.plan.source ? 'Fuente: ' + sourceText(data.plan.source) : 'Fuente pendiente');
+        renderDecisions(data.decisions || []);
+        renderPlan(data.plan || {});
+        renderTimeline(data.timeline || []);
+        renderActions(data.actions || [], data.power_of_one || {});
       }
 
-      // Global nav functions (called from onclick)
-      window.navigateHome = function () {
-        state.view = 'home';
-        state.decision = null;
-        render();
-      };
-
-      window.navigateTools = function (decisionId) {
-        state.view = 'tools';
-        state.decision = decisionId;
-        render();
-      };
-
-      // Init
-      render();
+      fetch(endpoint, { headers: { Accept: 'application/json' } })
+        .then(function (response) { if (!response.ok) throw new Error('HTTP ' + response.status); return response.json(); })
+        .then(function (payload) { if (!payload.data) throw new Error('Respuesta incompleta'); render(payload.data); })
+        .catch(function () {
+          var main = byId('main-content'); main.textContent = '';
+          var error = document.createElement('p'); error.className = 'error';
+          error.textContent = 'No pude cargar Business Pulse. Tus datos no se modificaron; cierra y vuelve a abrir el panel para intentarlo otra vez.';
+          main.appendChild(error);
+        });
     })();
   </script>
 </body>

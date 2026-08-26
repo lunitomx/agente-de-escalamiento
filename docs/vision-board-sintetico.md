@@ -18,7 +18,7 @@ La visión original se dividió en 3 sub-épicas para mejor delimitación:
 |-----------|-----------|--------|
 | **E19** — Book Ingestion & Knowledge Graph | El conocimiento estructurado (fuentes → grafo) | ✅ Completa |
 | **E20** — Contextual Skills | Skills que consultan el grafo | ✅ Completa |
-| **E21** — Verne Lens Board Member | Primer asesor board sintético | 📐 Planificada; aprobación pendiente |
+| **E21** — Verne Lens Board Member | Primer asesor board sintético | ✅ Completa; lente sintética trazable y local |
 
 ## Arquitectura Conceptual (referencia)
 

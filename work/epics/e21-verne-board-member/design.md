@@ -1,6 +1,6 @@
 # Design: E21 — Verne Lens Board Member
 
-**Status:** Ready for approval
+**Status:** Implemented — 2026-08-26
 **Date:** 2026-08-24
 
 ## Decisión de producto

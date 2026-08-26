@@ -12,7 +12,7 @@ import sqlite3
 from functools import lru_cache
 from pathlib import Path
 
-SCHEMA_VERSION = 6
+SCHEMA_VERSION = 10
 
 DDL_STATEMENTS = [
     # ── Meta / version tracking ──────────────────────────────────────
@@ -184,6 +184,162 @@ DDL_STATEMENTS = [
         FOREIGN KEY(replaces_entry_id) REFERENCES confirmed_memory_entries(id)
     )
     """,
+    # ── Shared workspace index (v7, always local) ───────────────────
+    """
+    CREATE TABLE IF NOT EXISTS workspace_documents (
+        workspace_id   TEXT NOT NULL,
+        relative_path  TEXT NOT NULL,
+        content_sha256 TEXT NOT NULL,
+        document_kind  TEXT NOT NULL,
+        lifecycle      TEXT NOT NULL CHECK(lifecycle IN ('active', 'removed', 'invalid', 'conflict')),
+        owner          TEXT DEFAULT NULL,
+        base_sha256    TEXT DEFAULT NULL,
+        content_json   TEXT NOT NULL DEFAULT '{}',
+        indexed_at     TEXT NOT NULL DEFAULT (datetime('now')),
+        removed_at     TEXT DEFAULT NULL,
+        PRIMARY KEY(workspace_id, relative_path)
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS workspace_facts (
+        workspace_id  TEXT NOT NULL,
+        relative_path TEXT NOT NULL,
+        fact_key      TEXT NOT NULL,
+        value         TEXT NOT NULL,
+        confirmed     INTEGER NOT NULL CHECK(confirmed IN (0, 1)),
+        PRIMARY KEY(workspace_id, relative_path, fact_key)
+    )
+    """,
+    # ── Human context (v8, local and explicit-consent only) ───────
+    """
+    CREATE TABLE IF NOT EXISTS human_context_entries (
+        id          TEXT PRIMARY KEY,
+        field       TEXT NOT NULL,
+        value       TEXT NOT NULL,
+        purpose     TEXT NOT NULL,
+        source      TEXT NOT NULL CHECK(source = 'explicit_user_statement'),
+        status      TEXT NOT NULL CHECK(status IN ('active', 'superseded', 'deleted')),
+        consented_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        deleted_at  TEXT DEFAULT NULL,
+        replaces_entry_id TEXT DEFAULT NULL,
+        format_version INTEGER NOT NULL DEFAULT 1 CHECK(format_version = 1),
+        FOREIGN KEY(replaces_entry_id) REFERENCES human_context_entries(id)
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS human_context_accesses (
+        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+        entry_id    TEXT NOT NULL,
+        consumer    TEXT NOT NULL CHECK(consumer IN ('coaching', 'cadence', 'board')),
+        purpose     TEXT NOT NULL,
+        accessed_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(entry_id) REFERENCES human_context_entries(id)
+    )
+    """,
+    # ── Weekly GTD cadence (v9, local and opt-in only) ─────────────
+    """
+    CREATE TABLE IF NOT EXISTS weekly_cadences (
+        id              TEXT PRIMARY KEY,
+        status          TEXT NOT NULL CHECK(status IN ('active', 'paused')),
+        weekday         INTEGER NOT NULL CHECK(weekday BETWEEN 0 AND 6),
+        timezone        TEXT NOT NULL,
+        duration_minutes INTEGER NOT NULL CHECK(duration_minutes BETWEEN 10 AND 180),
+        owner           TEXT NOT NULL,
+        next_review_on  TEXT NOT NULL,
+        created_at      TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at      TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS weekly_commitments (
+        id              TEXT PRIMARY KEY,
+        cadence_id      TEXT NOT NULL,
+        priority        TEXT NOT NULL,
+        project         TEXT NOT NULL,
+        desired_outcome TEXT NOT NULL,
+        next_action     TEXT NOT NULL,
+        owner           TEXT NOT NULL,
+        status          TEXT NOT NULL CHECK(status IN ('active', 'done', 'blocked', 'deferred', 'renegotiated')),
+        created_at      TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at      TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(cadence_id) REFERENCES weekly_cadences(id)
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS weekly_reviews (
+        id              TEXT PRIMARY KEY,
+        commitment_id   TEXT NOT NULL,
+        outcome         TEXT NOT NULL CHECK(outcome IN ('done', 'blocked', 'deferred', 'renegotiated')),
+        result          TEXT NOT NULL,
+        blocker         TEXT DEFAULT NULL,
+        reviewed_at     TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(commitment_id) REFERENCES weekly_commitments(id)
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS cadence_automation_preferences (
+        id              TEXT PRIMARY KEY,
+        kind            TEXT NOT NULL,
+        purpose         TEXT NOT NULL,
+        frequency_months INTEGER NOT NULL CHECK(frequency_months BETWEEN 1 AND 12),
+        data_minimum    TEXT NOT NULL,
+        host_capability TEXT NOT NULL,
+        manual_alternative TEXT NOT NULL,
+        state           TEXT NOT NULL CHECK(state IN ('accepted', 'rejected', 'paused', 'removed')),
+        host_state      TEXT NOT NULL CHECK(host_state IN ('not_configured', 'configured_by_user')),
+        created_at      TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at      TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )
+    """,
+    # ── Accountability Group longitudinal record (v10) ───────────
+    """
+    CREATE TABLE IF NOT EXISTS accountability_sessions (
+        id             TEXT PRIMARY KEY,
+        held_on        TEXT NOT NULL,
+        source_type    TEXT NOT NULL CHECK(source_type IN ('manual', 'imported_document', 'drive_connector')),
+        source_ref     TEXT NOT NULL,
+        worksheet_json TEXT NOT NULL,
+        decision_area  TEXT DEFAULT NULL CHECK(decision_area IS NULL OR decision_area IN ('people', 'strategy', 'execution', 'cash')),
+        confidence     INTEGER DEFAULT NULL CHECK(confidence IS NULL OR confidence BETWEEN 0 AND 100),
+        tags_json      TEXT NOT NULL DEFAULT '[]',
+        status         TEXT NOT NULL CHECK(status IN ('draft', 'ready', 'reviewed')),
+        included       INTEGER NOT NULL DEFAULT 1 CHECK(included IN (0, 1)),
+        consented_at   TEXT NOT NULL,
+        created_at     TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at     TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS accountability_commitments (
+        id                     TEXT PRIMARY KEY,
+        session_id             TEXT NOT NULL,
+        statement              TEXT NOT NULL,
+        owner                  TEXT NOT NULL,
+        due_on                 TEXT NOT NULL,
+        success_measure        TEXT NOT NULL,
+        status                 TEXT NOT NULL CHECK(status IN ('planned', 'done', 'partial', 'not_done', 'renegotiated')),
+        evidence               TEXT DEFAULT NULL,
+        result                 TEXT DEFAULT NULL,
+        blocker                TEXT DEFAULT NULL,
+        learning               TEXT DEFAULT NULL,
+        reviewed_on            TEXT DEFAULT NULL,
+        rubric_json            TEXT DEFAULT NULL,
+        follow_through_percent INTEGER DEFAULT NULL CHECK(follow_through_percent IS NULL OR follow_through_percent BETWEEN 0 AND 100),
+        created_at             TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at             TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(session_id) REFERENCES accountability_sessions(id)
+    )
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS accountability_exclusions (
+        id         TEXT PRIMARY KEY,
+        session_id TEXT NOT NULL,
+        state      TEXT NOT NULL CHECK(state IN ('excluded', 'included')),
+        reason     TEXT NOT NULL,
+        changed_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(session_id) REFERENCES accountability_sessions(id)
+    )
+    """,
 ]
 
 # The v4 read-only bridge accepts only the exact historical v4 contract. The
@@ -212,6 +368,19 @@ INDEX_STATEMENTS = [
     "CREATE INDEX IF NOT EXISTS idx_session_memory_proposals_session_state ON session_memory_proposals(session_id, response_state)",
     "CREATE INDEX IF NOT EXISTS idx_confirmed_memory_entries_session ON confirmed_memory_entries(session_id)",
     "CREATE INDEX IF NOT EXISTS idx_confirmed_memory_entries_kind_status ON confirmed_memory_entries(kind, status)",
+    "CREATE INDEX IF NOT EXISTS idx_workspace_documents_lifecycle ON workspace_documents(workspace_id, lifecycle)",
+    "CREATE INDEX IF NOT EXISTS idx_workspace_facts_path ON workspace_facts(workspace_id, relative_path)",
+    "CREATE INDEX IF NOT EXISTS idx_human_context_entries_field_status ON human_context_entries(field, status, consented_at)",
+    "CREATE INDEX IF NOT EXISTS idx_human_context_accesses_entry ON human_context_accesses(entry_id, accessed_at)",
+    "CREATE INDEX IF NOT EXISTS idx_weekly_cadences_status_due ON weekly_cadences(status, next_review_on)",
+    "CREATE INDEX IF NOT EXISTS idx_weekly_commitments_cadence_status ON weekly_commitments(cadence_id, status)",
+    "CREATE INDEX IF NOT EXISTS idx_weekly_reviews_commitment ON weekly_reviews(commitment_id, reviewed_at)",
+    "CREATE INDEX IF NOT EXISTS idx_cadence_automation_state ON cadence_automation_preferences(state, kind)",
+    "CREATE INDEX IF NOT EXISTS idx_accountability_sessions_date ON accountability_sessions(included, held_on)",
+    "CREATE INDEX IF NOT EXISTS idx_accountability_sessions_decision ON accountability_sessions(included, decision_area)",
+    "CREATE INDEX IF NOT EXISTS idx_accountability_commitments_session_status ON accountability_commitments(session_id, status)",
+    "CREATE INDEX IF NOT EXISTS idx_accountability_commitments_due ON accountability_commitments(status, due_on)",
+    "CREATE INDEX IF NOT EXISTS idx_accountability_exclusions_session ON accountability_exclusions(session_id, changed_at)",
 ]
 
 _V4_INDEX_STATEMENTS = tuple(INDEX_STATEMENTS[:14])
@@ -340,7 +509,14 @@ def context_read_schema_is_valid(connection: sqlite3.Connection) -> bool:
                 "AND name NOT LIKE 'sqlite_%'"
             )
         }
-        if actual_tables != expected_tables:
+        # E26 adds two local-only index tables. A database deliberately held
+        # at v4 by the read-only bridge may retain those known tables after a
+        # later runtime was opened; they are not consulted by context recovery.
+        # Keep every v4-owned table/index exact and reject any other extra.
+        allowed_local_index_tables = {"workspace_documents", "workspace_facts", "human_context_entries", "human_context_accesses", "weekly_cadences", "weekly_commitments", "weekly_reviews", "cadence_automation_preferences", "accountability_sessions", "accountability_commitments", "accountability_exclusions"}
+        if not expected_tables.issubset(actual_tables) or (
+            actual_tables - expected_tables - allowed_local_index_tables
+        ):
             return False
         if _contract_fingerprint(connection, expected_tables) != expected:
             return False

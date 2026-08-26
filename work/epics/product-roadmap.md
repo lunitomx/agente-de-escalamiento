@@ -3,8 +3,8 @@
 > Inventario canónico de épicas y dirección del producto.
 
 **Última auditoría:** 2026-08-26
-**Estado auditado:** main; E20 cerrada y E21/E22 planificadas
-**Siguiente número disponible:** E23
+**Estado auditado:** main; E21–E30 cerradas
+**Siguiente número disponible:** E31
 
 ## Visión
 
@@ -24,7 +24,7 @@ de conocimiento derivado del libro.
 3. Retired / Superseded significa que el borrador dejó de ser la unidad de
    ejecución. No significa que todos sus criterios se hayan cumplido.
 4. Las deudas residuales se registran por separado. Si se promueven a una nueva
-   épica, deben comenzar en E22.
+   épica, deben usar el siguiente ID disponible.
 
 ## Auditoría de numeración
 
@@ -65,16 +65,24 @@ Todos forman parte de la historia del producto.
 | E18 — Escala Server | Servidor, dashboards, SQLite y memoria | ✅ Complete | 12/12; close 2a63e09. |
 | E19 — Book Ingestion | Parser, grafo y API de conocimiento | ✅ Complete | 5/5; 42 entidades, 59 relaciones, 406 capítulos y esquema formal documentado. |
 | E20 — Contextual Skills | Grafo → dashboards y coaching | ✅ Complete | 4/4; close 67c3d0c; tag epic/e20-complete. |
-| E21 — Verne Lens Board Member | Primer asesor del board sintético | 📐 Planned — approval pending | Diseño, plan, trazabilidad y 5 stories listos; sin implementación. |
-| E22 — Memoria Empresarial Integrada | Conectar SQLite, hechos, grafo y sesiones de E18 al producto instalado | 📐 Planned — design gate | Brief/scope creados tras diagnóstico RaiSE 2026-08-26; no implementación sin ADR de fuente única, migración y privacidad. |
+| E21 — Verne Lens Board Member | Primer asesor del board sintético | ✅ Complete | Lente sintética trazable, perfil no suplantador, consulta/daily local, hook opt-in y smoke de instalación en tres runtimes. |
+| E22 — Memoria Empresarial Integrada | Conectar SQLite, hechos, grafo y sesiones de E18 al producto instalado | ✅ Complete | Cierre 50c70af; smoke real Claude/Codex, continuidad y memoria local confirmada. |
+| E23 — Contexto Humano Consentido | Conocer preferencias y restricciones de colaboración del líder, sin convertirlo en expediente | ✅ Complete | Perfil local opcional, consentimiento por campo, edición/borrado y proyección selectiva trazable. |
+| E24 — Cadencia Semanal GTD | Convertir el plan en una revisión semanal útil y consentida | ✅ Complete | Cadencia local opt-in, revisión GTD, pausa y automatizaciones sólo propuestas/aceptadas. |
+| E25 — Guía de Contexto Conectado | Sugerir conectores nativos del host con propósito y límites claros | ✅ Complete | Guía conservadora, anonimización, decisión local explícita y recetas SWT opt-in; no OAuth ni sincronización. |
+| E26 — Workspace Empresarial Compartido Local-First | Colaborar mediante documentos sincronizables con un SQLite local y reconstruible por equipo | ✅ Complete | Documentos compartidos, SQLite local reconstruible, migración E22, conflictos recuperables y smokes de instalación Claude/Codex verificados. |
+| E27 — Diagnóstico Narrativo con Evidencia | Escuchar detalles y evidencias antes de una puntuación opcional | ✅ Complete | Intake de referencias, entrevista adaptativa, síntesis confirmable y score opcional explicable. |
+| E28 — Instalación Portátil y Runtime Visual | Entregar el runtime HTTP y paneles en macOS, Linux y Codex/Claude/Hermes | ✅ Complete | Issues #1 y #2 cubiertos: portabilidad sin GNU sed, bundle HTTP/estáticos y smoke instalado en tres runtimes. |
+| E29 — Business Pulse Basado en Datos | Mostrar el estado ejecutivo real de la empresa y paneles honestos | ✅ Complete | API agregada, vista ejecutiva con procedencia, Power of One persistente, demo aislada y smoke instalado en tres runtimes. |
+| E30 — Accountability Empresarial Longitudinal | Preparar sesiones, revisar compromisos y aprender de patrones con evidencia | ✅ Complete | Entrevista EO narrativa, compromisos verificables, rúbrica explicable, patrones 2+ y panel privado; smoke instalado en Claude/Codex/Hermes. |
 
 ### Resumen
 
-- 17 épicas completas: E1, E2, E3, E6–E11 y E13–E20.
+- 27 épicas completas: E1, E2, E3, E6–E11, E13–E30.
 - 1 épica cancelada: E12.
 - 2 borradores históricos retirados/sustituidos: E4 y E5.
-- 2 épicas planificadas: E21 (board sintético) y E22 (memoria empresarial integrada).
-- No existe una E23 formalizada.
+- 0 épicas en curso.
+- E21–E30 están completas. El siguiente número disponible es E31.
 
 ## Secuencia actual
 
@@ -83,26 +91,15 @@ Todos forman parte de la historia del producto.
                                                               │
                                                               ▼
                                                   E21 Verne Lens Board Member
-                                                  PLANNED / APPROVAL GATE
+                                                  DONE
 
 E21 depende funcionalmente de E19 y de la infraestructura de E18. No depende de
 E20 para comenzar; E20 es una integración consumidora paralela del conocimiento.
 
 ## Próximo trabajo recomendado
 
-### P0 — E22: Integrar memoria empresarial al producto instalado
-
-La RC actual acreditó recorridos naturales completos en Claude Code y Codex
-(404 passed, 2 skipped). El diagnóstico de 2026-08-26 confirmó que el runtime
-SQLite/memoria de E18 no se instala ni se invoca desde la puerta pública. E22
-debe resolver esa separación antes de presentar ScaleUp como memoria empresarial neurosimbólica.
-
-### P1 — Aprobar e implementar E21
-
-1. Aprobar el nombre visible y disclosure del asesor sintético.
-2. Confirmar hooks start/close opt-in y máximo de tres recomendaciones.
-3. Implementar S21.1–S21.5 en el orden documentado.
-4. Cerrar solo con trazabilidad automática y smoke conversacional real.
+No hay una épica activa. El siguiente trabajo debe promoverse desde deuda o
+parking lot sólo cuando tenga outcome, alcance y aceptación verificable.
 
 ## Deuda técnica y de producto no asignada
 
@@ -110,7 +107,7 @@ debe resolver esa separación antes de presentar ScaleUp como memoria empresaria
 |-------|--------|--------|------------------------|
 | Smoke conversacional desde proyecto limpio | E4/E10/E13 | Open — P0 | Autorizar consumo de modelo y ejecutar Claude/Hermes; la aceptación determinística ya está automatizada. |
 | Bootstrap de Hermes | E10 / entorno | Open — P0 | Corregir lectura de `/usr/local/lib/hermes-agent/.env` antes del smoke. |
-| Integrar Escala Server con el instalador | E18 | Promovida a E22 | E22 define fuente única, migración y E2E antes de distribuirla. |
+| Integrar Escala Server con el instalador | E18 | ✅ Resuelta en E22 | E22 distribuyó, migró y validó la memoria empresarial integrada. |
 | Compatibilidad Python declarada | E18/E20 | Open — P2 | Definir y probar una versión mínima única. |
 | Release verificable del repo fuente | E5 | Open — P2 | Si se publica este repo; .scaleup/VERSION es 1.0.0, pero no existe tag v1.0.0 aquí. |
 | Rama origin/story/s6.1/ontology-schema | Higiene Git | Open — P3 | Eliminar tras confirmar que está fusionada y no se usa. |
@@ -126,6 +123,8 @@ Las ideas condicionadas que no son deuda comprometida viven en dev/parking-lot.m
 | Contexto excesivo del grafo | Carga selectiva por herramienta/decisión; no cargar el libro completo. |
 | Respuestas de E21 no fundamentadas | Recuperación obligatoria desde E19 y pruebas de trazabilidad. |
 | Regresiones de migración | Suite verde y fixtures YAML de listas anidadas; conservarlos en el gate completo. |
+| SQLite dentro de una carpeta sincronizada | Invariante E26: DB, WAL, SHM, locks y backups siempre fuera del workspace compartido. |
+| Conflictos del proveedor de archivos | IDs append-only, hashes base, conservación de ambas versiones y conciliación explícita. |
 
 ---
 

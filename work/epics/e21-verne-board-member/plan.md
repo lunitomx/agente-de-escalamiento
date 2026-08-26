@@ -1,6 +1,6 @@
 # Implementation Plan: E21 — Verne Lens Board Member
 
-**Status:** Ready for approval
+**Status:** Implemented — 2026-08-26
 **Baseline:** main; suite verde el 2026-08-24
 
 ## Secuencia
@@ -37,28 +37,28 @@ tienen propietarios de archivos distintos.
 
 ### Gate 0 — Product approval
 
-- [ ] Nombre/disclosure.
-- [ ] Start/close opt-in.
-- [ ] Máximo de recomendaciones.
+- [x] Nombre/disclosure.
+- [x] Start/close opt-in.
+- [x] Máximo de recomendaciones.
 
 ### Gate 1 — Grounding
 
-- [ ] Perfil y contratos versionados.
-- [ ] Referencias E19 resolubles.
-- [ ] Sin evidence degrada seguro.
+- [x] Perfil y contratos versionados.
+- [x] Referencias E19 resolubles.
+- [x] Sin evidence degrada seguro.
 
 ### Gate 2 — Product
 
-- [ ] Ambos modos comparten `BoardResponse v1`.
-- [ ] Entrada maliciosa permanece dato.
-- [ ] E18 funciona sin E21 y tolera fallos.
-- [ ] Skill instalado/descubierto en ambas plataformas.
+- [x] Ambos modos comparten `BoardResponse v1`.
+- [x] Entrada maliciosa permanece dato.
+- [x] E18 funciona sin E21 y tolera fallos.
+- [x] Skill instalado/descubierto en ambas plataformas.
 
 ### Gate 3 — Close
 
-- [ ] Casos dorados/adversariales y suite verdes.
-- [ ] Smoke real registrado.
-- [ ] Retrospectiva e inventario actualizados.
+- [x] Casos dorados/adversariales y suite verdes.
+- [x] Smoke real registrado.
+- [x] Retrospectiva e inventario actualizados.
 
 ## Riesgos
 

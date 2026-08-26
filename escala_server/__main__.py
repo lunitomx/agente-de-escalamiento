@@ -28,6 +28,11 @@ def main():
         default=default_db,
         help=f"SQLite database path (default: {default_db})",
     )
+    parser.add_argument(
+        "--project-root",
+        default=None,
+        help="Company project root used to refresh allowlisted local sources",
+    )
     args = parser.parse_args()
 
     server = make_server(
@@ -35,6 +40,7 @@ def main():
         port=args.port,
         static_root=args.static_root,
         db_path=args.db_path,
+        project_root=args.project_root,
     )
 
     print(f"Escala Server running on http://{args.host}:{args.port}")

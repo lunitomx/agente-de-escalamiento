@@ -1,6 +1,6 @@
 # Epic Scope: E21 — Verne Lens Board Member
 
-**Status:** Planned — pending product approval
+**Status:** Complete — 2026-08-26
 **Dependencies:** E18 (infraestructura y sesiones) + E19 (grafo)
 **Audited:** 2026-08-24
 **Tamaño:** XL
@@ -65,15 +65,15 @@ Ver `plan.md` y `stories/`.
 
 ## Acceptance Criteria
 
-- [ ] Perfil con atribución, límites, cuatro decisiones y reglas validables.
-- [ ] Ambos modos generan el mismo esquema versionado.
-- [ ] No existen afirmaciones huérfanas de facts/evidence.
-- [ ] Sin evidencia no fabrica respuesta.
-- [ ] Prompt injection en datos permanece como dato.
-- [ ] Start/close funcionan igual con E21 desactivada.
-- [ ] Instalación aislada descubre el skill en Claude y Hermes.
-- [ ] Casos dorados cubren las cuatro decisiones.
-- [ ] Suite verde y smoke real documentado antes del cierre.
+- [x] Perfil con atribución, límites, cuatro decisiones y reglas validables.
+- [x] Ambos modos generan el mismo esquema versionado.
+- [x] No existen afirmaciones huérfanas de facts/evidence.
+- [x] Sin evidencia no fabrica respuesta.
+- [x] Prompt injection en datos permanece como dato.
+- [x] Start/close funcionan igual con E21 desactivada.
+- [x] Instalación aislada descubre el skill en Claude y Hermes.
+- [x] Casos dorados cubren las cuatro decisiones.
+- [x] Suite verde y smoke real documentado antes del cierre.
 
 ## Gates Before Implementation
 
@@ -81,7 +81,7 @@ Ver `plan.md` y `stories/`.
 - [x] Diseño redactado y alineado con E18/E19.
 - [x] Plan y cinco historias verificables redactados.
 - [x] Trazabilidad E19 definida.
-- [ ] Aprobación de producto para iniciar S21.1.
+- [x] Aprobación de producto para iniciar S21.1.
 
 ## Definition of Done
 

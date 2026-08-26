@@ -4,7 +4,14 @@
 from __future__ import annotations
 
 import json
+import os
+import signal
+import socket
+import subprocess
 import sys
+import time
+import unicodedata
+import urllib.request
 from pathlib import Path
 
 
@@ -37,11 +44,17 @@ def _context(payload: str) -> dict:
 
 
 def _reconcile_memory() -> None:
-    """Silently import allowlisted legacy business sources when they exist."""
+    """Rebuild a portable workspace or import allowlisted legacy sources."""
     try:
+        from escala_server.workspace import WorkspaceIndexer, load_workspace
+
+        root = Path.cwd()
+        if load_workspace(root).ready:
+            WorkspaceIndexer(root).rebuild()
+            return
         from escala_server.project_memory_migration import ProjectMemoryMigrator
 
-        migrator = ProjectMemoryMigrator(Path.cwd())
+        migrator = ProjectMemoryMigrator(root)
         if migrator.has_migratable_sources():
             migrator.migrate()
     except (OSError, ValueError):
@@ -68,8 +81,147 @@ def _validate_opsp(path: str) -> int:
     return 0
 
 
+
+def _normalise(message: str) -> str:
+    return "".join(
+        character
+        for character in unicodedata.normalize("NFD", message.casefold())
+        if unicodedata.category(character) != "Mn"
+    )
+
+
+def _wants_panel(message: str) -> bool:
+    normal = _normalise(message)
+    visual = any(term in normal for term in ("panel", "dashboard", "business pulse"))
+    action = any(term in normal for term in ("abre", "abrir", "muestra", "mostrar", "quiero ver", "ver mi"))
+    return visual and action
+
+
+def _wants_close_panel(message: str) -> bool:
+    normal = _normalise(message)
+    visual = any(term in normal for term in ("panel", "dashboard", "business pulse"))
+    action = any(term in normal for term in ("cierra", "cerrar", "deten", "apaga"))
+    return visual and action
+
+
+def _close_panel() -> int:
+    state_path = Path.cwd().resolve() / ".scaleup" / "runtime" / "visual-panel.json"
+    if not state_path.is_file():
+        print("No hay un panel local abierto en esta carpeta.")
+        return 0
+    try:
+        state = json.loads(state_path.read_text(encoding="utf-8"))
+        pid = int(state["pid"])
+        os.kill(pid, signal.SIGTERM)
+        for _ in range(30):
+            try:
+                os.kill(pid, 0)
+            except ProcessLookupError:
+                break
+            time.sleep(0.1)
+    except (OSError, ValueError, KeyError, TypeError):
+        pass
+    state_path.unlink(missing_ok=True)
+    print("Cerré el panel local de esta carpeta.")
+    return 0
+
+
+def _panel_health(url: str) -> bool:
+    try:
+        with urllib.request.urlopen(url + "/api/health", timeout=0.5) as response:
+            payload = json.loads(response.read())
+        return response.status == 200 and payload.get("status") == "ok"
+    except (OSError, ValueError):
+        return False
+
+
+def _available_port() -> int:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listener:
+        listener.bind(("127.0.0.1", 0))
+        return int(listener.getsockname()[1])
+
+
+def _open_panel() -> int:
+    """Start one project-local visual server and return its clickable URL."""
+    project = Path.cwd().resolve()
+    runtime = runtime_root()
+    state_dir = project / ".scaleup" / "runtime"
+    state_path = state_dir / "visual-panel.json"
+    if state_path.is_file():
+        try:
+            existing = json.loads(state_path.read_text(encoding="utf-8"))
+            existing_url = str(existing.get("url", ""))
+            if existing_url and _panel_health(existing_url):
+                print(f"Tu panel local ya está disponible: {existing_url}")
+                return 0
+        except (OSError, ValueError, TypeError):
+            pass
+
+    from escala_server.project_memory import ProjectMemoryRuntime
+
+    memory = ProjectMemoryRuntime(project).ensure_memory()
+    if not memory.ready or memory.db_path is None:
+        print("No pude preparar la memoria local necesaria para abrir el panel.")
+        return 1
+
+    state_dir.mkdir(parents=True, exist_ok=True)
+    port = _available_port()
+    url = f"http://127.0.0.1:{port}"
+    log_path = state_dir / "visual-panel.log"
+    environment = os.environ.copy()
+    current_path = environment.get("PYTHONPATH", "")
+    environment["PYTHONPATH"] = str(runtime) + (os.pathsep + current_path if current_path else "")
+    command = [
+        sys.executable,
+        "-m",
+        "escala_server",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        str(port),
+        "--static-root",
+        str(runtime / "escala_server" / "static"),
+        "--db-path",
+        str(memory.db_path),
+        "--project-root",
+        str(project),
+    ]
+    with log_path.open("ab") as log:
+        process = subprocess.Popen(
+            command,
+            cwd=project,
+            env=environment,
+            stdout=log,
+            stderr=subprocess.STDOUT,
+            start_new_session=True,
+        )
+    for _ in range(30):
+        if _panel_health(url):
+            state_path.write_text(
+                json.dumps({"pid": process.pid, "url": url}, sort_keys=True),
+                encoding="utf-8",
+            )
+            print(f"Tu panel local está listo: {url}")
+            return 0
+        if process.poll() is not None:
+            break
+        time.sleep(0.1)
+    if process.poll() is None:
+        process.terminate()
+        try:
+            process.wait(timeout=3)
+        except subprocess.TimeoutExpired:
+            process.kill()
+    print(f"No pude abrir el panel. Puedes revisar el registro local en {log_path}.")
+    return 1
+
 def _conversation(message: str) -> int:
     """Run the fixed stateful public conversation; no caller supplied JSON."""
+    if _wants_close_panel(message):
+        return _close_panel()
+    if _wants_panel(message):
+        return _open_panel()
+
     from coaching.router.conversation import run
 
     _reconcile_memory()

@@ -83,6 +83,7 @@ class ProjectMemorySessionContext:
                 items = [
                     *self._verified_confirmed_entries(db),
                     *self._verified_facts(db),
+                    *self._verified_workspace_facts(db),
                     *self._verified_changes(db),
                 ]
                 return SessionRecoveryResult(True, tuple(self._rank(items)[:5]))
@@ -181,6 +182,56 @@ class ProjectMemorySessionContext:
                     )
                 )
         return facts
+
+
+    def _verified_workspace_facts(self, db: sqlite3.Connection) -> list[ContextItem]:
+        """Project confirmed E26 documents after their local deterministic rebuild."""
+        workspace = self.runtime.workspace
+        if workspace is None or not self._has_table(db, "workspace_facts"):
+            return []
+        rows = db.execute(
+            """SELECT facts.relative_path, facts.fact_key, facts.value, documents.indexed_at
+               FROM workspace_facts AS facts
+               JOIN workspace_documents AS documents
+                 ON documents.workspace_id = facts.workspace_id
+                AND documents.relative_path = facts.relative_path
+              WHERE facts.workspace_id = ?
+                AND facts.confirmed = 1
+                AND documents.lifecycle = 'active'
+              ORDER BY facts.relative_path, facts.fact_key""",
+            (workspace.workspace_id,),
+        )
+        items: list[ContextItem] = []
+        for relative_path, key, raw_value, indexed_at in rows:
+            if not isinstance(relative_path, str) or not isinstance(key, str):
+                continue
+            value = public_text(self._brief_scalar(raw_value))
+            if value is None or not self._allowed_workspace_fact_key(key):
+                continue
+            items.append(
+                ContextItem(
+                    key=f"workspace:{relative_path}:{key}",
+                    value=value,
+                    source=f"workspace:{relative_path}",
+                    observed_at=indexed_at,
+                    kind="fact",
+                )
+            )
+        return items
+
+    @staticmethod
+    def _allowed_workspace_fact_key(key: str) -> bool:
+        """Workspace payloads are structured, but retain the context privacy gate."""
+        if not key or len(key) > _MAX_SOURCE_PATH_LENGTH:
+            return False
+        normalized = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", " ", key)
+        normalized = re.sub(r"(?<=[A-Z])(?=[A-Z][a-z])", " ", normalized).lower()
+        tokens = set(re.split(r"[^a-z0-9]+", normalized))
+        compact = re.sub(r"[^a-z0-9]+", "", normalized)
+        return not bool(
+            tokens & _SENSITIVE_KEY_PARTS
+            or any(form in compact for form in _SENSITIVE_COMPACT_FORMS)
+        )
 
     def _verified_confirmed_entries(self, db: sqlite3.Connection) -> list[ContextItem]:
         """Project only active entries with matching explicit-consent provenance."""

@@ -122,6 +122,8 @@ class TestWorksheetsHandler:
 
         get_result = self.handler.get_worksheets("cash", "power-of-one")
         assert get_result["data"]["palancas"]["precio"] == 5
+        assert get_result["meta"]["source"] == "Datos locales · cash/power-of-one"
+        assert get_result["meta"]["observed_at"]
 
 
 # ─── Server Integration Tests ─────────────────────────────────
