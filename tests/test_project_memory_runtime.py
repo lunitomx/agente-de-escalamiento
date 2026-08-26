@@ -152,6 +152,34 @@ def test_backup_and_restore_preserve_companies(tmp_path: Path) -> None:
         )
 
 
+def test_restore_recreates_a_missing_database_from_a_valid_backup(
+    tmp_path: Path,
+) -> None:
+    runtime = ProjectMemoryRuntime(tmp_path)
+    assert runtime.ensure_memory().ready is True
+    with sqlite3.connect(runtime.db_path) as connection:
+        connection.execute(
+            "INSERT INTO companies (id, name) VALUES ('lumen', 'Lumen Casa')"
+        )
+
+    backup = runtime.backup()
+    assert backup.ready is True
+    runtime.db_path.unlink()
+    for sidecar in runtime._wal_sidecars():
+        sidecar.unlink(missing_ok=True)
+
+    restored = runtime.restore(backup.backup_path)
+
+    assert restored.ready is True
+    with sqlite3.connect(runtime.db_path) as connection:
+        assert (
+            connection.execute(
+                "SELECT name FROM companies WHERE id = 'lumen'"
+            ).fetchone()[0]
+            == "Lumen Casa"
+        )
+
+
 def test_invalid_backup_never_replaces_a_healthy_database(tmp_path: Path) -> None:
     runtime = ProjectMemoryRuntime(tmp_path)
     assert runtime.ensure_memory().ready is True

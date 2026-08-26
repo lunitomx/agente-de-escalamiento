@@ -103,10 +103,13 @@ class ProjectMemoryRuntime:
             self._assert_contained(temporary, self.project_root)
             self._assert_wal_sidecars_contained()
             self.db_path.parent.mkdir(parents=True, exist_ok=True)
+            has_live_database = self._live_database_is_sqlite()
             self._checkpoint_wal()
-            live_fingerprint = self._database_fingerprint()
+            live_fingerprint = (
+                self._database_fingerprint() if has_live_database else None
+            )
             with self._exclusive_restore_connection() as live:
-                if live is not None:
+                if live is not None and live_fingerprint is not None:
                     self._assert_database_was_not_modified(live_fingerprint)
                 with (
                     sqlite3.connect(source) as backup,
