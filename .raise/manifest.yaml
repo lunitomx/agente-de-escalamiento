@@ -1,0 +1,13 @@
+# RaiSE project configuration — commands consumed by `rai gate check`.
+project:
+  name: scaleupagent
+  language: python
+  project_type: python
+  test_command: "uv run --with pytest pytest"
+  lint_command: "uv run --with ruff ruff check coaching escala_server tests"
+  format_command: "uv run --with ruff ruff format --check coaching escala_server tests"
+  # The repository has no typed-package configuration yet. RaiSE skips null gates.
+  type_check_command: null
+
+branches:
+  development: main
