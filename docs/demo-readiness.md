@@ -49,7 +49,7 @@ un One Page Strategic Plan (OPSP) persistido.
   (2026-08-24). Incluye regresión Codex limpia: welcome → progreso con
   `next_step=diagnosis` → OPSP completo → validador instalado.
 - `pytest -q tests/test_scaleup_conversation.py tests/test_scaleup_frontdoor.py tests/test_opsp.py
-  tests/test_scaleup_installer.py` → **16 passed**, sin `PYTHONPATH` manual.
+  tests/test_scaleup_installer.py` → **17 passed**, sin `PYTHONPATH` manual.
   Incluye instalación Codex y confirma que welcome/diagnose son internos y que sólo
   la puerta natural se expone al usuario.
 - Ensayo cronometrado automatizado en instalación Codex limpia, con Lumen Casa:
