@@ -14,7 +14,9 @@ def format_summary(summary: dict) -> str:
 
     worksheets = summary.get("worksheets_completed") or []
     if worksheets:
-        lines.extend(["", "### What We Worked On", "", f"- Worksheets: {', '.join(worksheets)}"])
+        lines.extend(
+            ["", "### What We Worked On", "", f"- Worksheets: {', '.join(worksheets)}"]
+        )
 
     tasks_created = summary.get("tasks_created") or []
     tasks_completed = summary.get("tasks_completed") or []

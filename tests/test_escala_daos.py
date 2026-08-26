@@ -7,20 +7,17 @@ import json
 import sys
 from pathlib import Path
 
-import pytest
-
 # Ensure escala_server is importable
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from escala_server.schema import init_db, SCHEMA_VERSION
 from escala_server.daos import (
-    CompanyDAO,
-    WorksheetDAO,
-    SessionDAO,
     ChangeDAO,
+    CompanyDAO,
+    SessionDAO,
+    WorksheetDAO,
 )
-
+from escala_server.schema import SCHEMA_VERSION, init_db
 
 # ── helpers ────────────────────────────────────────────────────────
 
@@ -55,6 +52,7 @@ class _TestChangeDAO(ChangeDAO):
 
 
 # ─── Schema tests ──────────────────────────────────────────────────
+
 
 class TestSchema:
     def test_init_db_creates_all_tables(self):
@@ -115,6 +113,7 @@ class TestSchema:
 
 
 # ─── CompanyDAO tests ──────────────────────────────────────────────
+
 
 class TestCompanyDAO:
     def setup_method(self):
@@ -180,7 +179,9 @@ class TestCompanyDAO:
         updated = self.dao.update(c["id"], {"name": "Y"})
         assert updated is not None
         # updated_at should differ from created_at after an update
-        assert updated["updated_at"] != updated["created_at"] or True  # may be same if fast
+        assert (
+            updated["updated_at"] != updated["created_at"] or True
+        )  # may be same if fast
 
     def test_create_without_industry_defaults_empty(self):
         c = self.dao.create({"name": "NoIndustry"})
@@ -188,6 +189,7 @@ class TestCompanyDAO:
 
 
 # ─── WorksheetDAO tests ────────────────────────────────────────────
+
 
 class TestWorksheetDAO:
     def setup_method(self):
@@ -254,6 +256,7 @@ class TestWorksheetDAO:
 
 # ─── SessionDAO tests ──────────────────────────────────────────────
 
+
 class TestSessionDAO:
     def setup_method(self):
         self.dao = _TestSessionDAO()
@@ -308,6 +311,7 @@ class TestSessionDAO:
 
 # ─── ChangeDAO tests ───────────────────────────────────────────────
 
+
 class TestChangeDAO:
     def setup_method(self):
         self.dao = _TestChangeDAO()
@@ -315,7 +319,9 @@ class TestChangeDAO:
     def test_log_and_list_by_session(self):
         self.dao.log("c1", "s1", "cash", "po", "precio", "5", "10", "update")
         self.dao.log("c1", "s1", "cash", "po", "clientes", "10", "15", "update")
-        self.dao.log("c2", "s2", "strategy", "swot", "strengths", None, "['a']", "create")
+        self.dao.log(
+            "c2", "s2", "strategy", "swot", "strengths", None, "['a']", "create"
+        )
 
         s1_changes = self.dao.list_by_session("s1")
         assert len(s1_changes) == 2
@@ -328,7 +334,7 @@ class TestChangeDAO:
 
     def test_log_with_all_nulls(self):
         self.dao.log(None, None, None, None, "global_flag", None, "true")
-        changes = self.dao.list_by_session(None)  # Should not match
+        self.dao.list_by_session(None)  # Should not match
         # Find by actual created row
         with self.dao.connection() as conn:
             row = conn.execute(
@@ -361,6 +367,7 @@ class TestChangeDAO:
 
 # ─── BaseDAO tests ─────────────────────────────────────────────────
 
+
 class TestBaseDAO:
     def test_get_connection_returns_row_factory(self):
         dao = _TestCompanyDAO()
@@ -382,9 +389,11 @@ class TestBaseDAO:
             )
             conn.execute("INSERT INTO _test_cm (val) VALUES ('committed')")
         # Same connection (cached), verify it's there
-        row = dao.get_connection().execute(
-            "SELECT val FROM _test_cm WHERE id = 1"
-        ).fetchone()
+        row = (
+            dao.get_connection()
+            .execute("SELECT val FROM _test_cm WHERE id = 1")
+            .fetchone()
+        )
         assert row is not None
         assert row["val"] == "committed"
 
@@ -401,7 +410,5 @@ class TestBaseDAO:
                 raise RuntimeError("boom")
         except RuntimeError:
             pass
-        rows = dao.get_connection().execute(
-            "SELECT * FROM _test_rb"
-        ).fetchall()
+        rows = dao.get_connection().execute("SELECT * FROM _test_rb").fetchall()
         assert len(rows) == 1  # only 'keep' survived

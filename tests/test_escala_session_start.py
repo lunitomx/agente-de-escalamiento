@@ -6,7 +6,6 @@ and the memory engine share the same database instance.
 
 from __future__ import annotations
 
-import json
 import unittest
 
 from escala_server.daos.company_dao import CompanyDAO

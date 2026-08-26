@@ -8,11 +8,8 @@ Verifies that all E20 components work together:
 
 from pathlib import Path
 
-import pytest
-
 DASHBOARDS_DIR = (
-    Path(__file__).resolve().parent.parent
-    / "escala_server" / "static" / "dashboards"
+    Path(__file__).resolve().parent.parent / "escala_server" / "static" / "dashboards"
 )
 
 
@@ -24,18 +21,19 @@ class TestScalingContextModule:
 
     def test_module_importable(self):
         """scaling_context module should be importable."""
-        import escala_server.scaling_context  # noqa: F811
         assert True
 
     def test_get_scaling_context_no_args_returns_error(self):
         """Calling get_scaling_context() without args should return error."""
         from escala_server.scaling_context import get_scaling_context
+
         result = get_scaling_context()
         assert result["status"] == "error"
 
     def test_get_scaling_context_invalid_category(self):
         """Calling with invalid category should return error dict (not crash)."""
         from escala_server.scaling_context import get_scaling_context
+
         result = get_scaling_context(category="nonexistent")
         assert "status" in result
 

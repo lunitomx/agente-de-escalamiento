@@ -4,7 +4,6 @@ Tests the migration from sample YAML data to SQLite.
 Uses the actual .scaleup/ directory in the project as source data.
 """
 
-import json
 import os
 import sqlite3
 import tempfile
@@ -12,9 +11,7 @@ from pathlib import Path
 
 import pytest
 
-from escala_server.daos import init_db
-from escala_server.migrate import migrate_from_yaml, read_yaml_file, _parse_simple_yaml
-
+from escala_server.migrate import _parse_simple_yaml, migrate_from_yaml, read_yaml_file
 
 # ─── Simple YAML Parser Tests ──────────────────────────────────
 
@@ -78,7 +75,7 @@ class TestSimpleYamlParser:
         assert result == {"items": [], "name": "test"}
 
     def test_quoted_strings(self):
-        text = 'name: "Test Corp"\ndesc: \'A great company\'\n'
+        text = "name: \"Test Corp\"\ndesc: 'A great company'\n"
         result = _parse_simple_yaml(text)
         assert result == {"name": "Test Corp", "desc": "A great company"}
 
@@ -88,7 +85,9 @@ class TestSimpleYamlParser:
         assert result == {"person": {"name": "John", "age": 30}}
 
     def test_block_scalar(self):
-        text = "summary: >\n  This is a long\n  description that\n  spans multiple lines\n"
+        text = (
+            "summary: >\n  This is a long\n  description that\n  spans multiple lines\n"
+        )
         result = _parse_simple_yaml(text)
         assert "summary" in result
         assert "description" in result["summary"]
@@ -121,7 +120,12 @@ class TestReadYamlFile:
         """Read a knowledge base YAML file."""
         project_root = Path(__file__).resolve().parent.parent
         yaml_path = (
-            project_root / ".scaleup" / "knowledge" / "strategy" / "concepts" / "brand-promise.yaml"
+            project_root
+            / ".scaleup"
+            / "knowledge"
+            / "strategy"
+            / "concepts"
+            / "brand-promise.yaml"
         )
         if not yaml_path.exists():
             pytest.skip("brand-promise.yaml not found")

@@ -1,13 +1,17 @@
 """Tests for router module."""
+
 from __future__ import annotations
 
 import pathlib
 import sys
 
-import pytest
-
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent.parent.parent))
-from coaching.router import PRIORITY_ORDER, SUB_AGENT_COMMANDS, SUB_AGENT_LABELS, detect_priority
+from coaching.router import (
+    PRIORITY_ORDER,
+    SUB_AGENT_COMMANDS,
+    SUB_AGENT_LABELS,
+    detect_priority,
+)
 
 
 class TestRouterDetectPriority:

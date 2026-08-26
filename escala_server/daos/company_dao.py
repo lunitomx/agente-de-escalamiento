@@ -2,7 +2,7 @@
 
 import json
 import uuid
-from typing import Any, Optional
+from typing import Any
 
 from .base import BaseDAO
 
@@ -36,7 +36,7 @@ class CompanyDAO(BaseDAO):
 
     # ── get ─────────────────────────────────────────────────────────
 
-    def get(self, company_id: str) -> Optional[dict[str, Any]]:
+    def get(self, company_id: str) -> dict[str, Any] | None:
         """Look up a single company by its id.
 
         Args:
@@ -78,7 +78,7 @@ class CompanyDAO(BaseDAO):
 
     # ── update ──────────────────────────────────────────────────────
 
-    def update(self, company_id: str, data: dict[str, Any]) -> Optional[dict[str, Any]]:
+    def update(self, company_id: str, data: dict[str, Any]) -> dict[str, Any] | None:
         """Update fields on an existing company.
 
         Args:

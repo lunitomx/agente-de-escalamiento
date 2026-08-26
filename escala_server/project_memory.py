@@ -52,11 +52,16 @@ class ProjectMemoryRuntime:
             return ready
         target = self._backup_path(backup_path)
         if target is None:
-            return self._failure(ValueError("backup path must stay inside project memory"))
+            return self._failure(
+                ValueError("backup path must stay inside project memory")
+            )
         temporary = target.with_suffix(".tmp")
         try:
             target.parent.mkdir(parents=True, exist_ok=True)
-            with sqlite3.connect(self.db_path) as source, sqlite3.connect(temporary) as destination:
+            with (
+                sqlite3.connect(self.db_path) as source,
+                sqlite3.connect(temporary) as destination,
+            ):
                 source.backup(destination)
             candidate = self._health_path(temporary)
             if not candidate.ready:
@@ -79,7 +84,10 @@ class ProjectMemoryRuntime:
         temporary = self.db_path.with_suffix(".restore.tmp")
         try:
             self.db_path.parent.mkdir(parents=True, exist_ok=True)
-            with sqlite3.connect(source) as backup, sqlite3.connect(temporary) as destination:
+            with (
+                sqlite3.connect(source) as backup,
+                sqlite3.connect(temporary) as destination,
+            ):
                 backup.backup(destination)
             restored = self._health_path(temporary)
             if not restored.ready:
@@ -100,18 +108,33 @@ class ProjectMemoryRuntime:
                 integrity = connection.execute("PRAGMA integrity_check").fetchone()
                 if integrity is None or integrity[0] != "ok":
                     return self._failure(ValueError("SQLite integrity check failed"))
-                tables = {row[0] for row in connection.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+                tables = {
+                    row[0]
+                    for row in connection.execute(
+                        "SELECT name FROM sqlite_master WHERE type='table'"
+                    )
+                }
                 if not self._required_tables.issubset(tables):
-                    return self._failure(ValueError("local database schema is incomplete"))
-                version = connection.execute("SELECT value FROM _meta WHERE key = 'schema_version'").fetchone()
+                    return self._failure(
+                        ValueError("local database schema is incomplete")
+                    )
+                version = connection.execute(
+                    "SELECT value FROM _meta WHERE key = 'schema_version'"
+                ).fetchone()
                 if version is None or int(version[0]) != SCHEMA_VERSION:
-                    return self._failure(ValueError("local database schema version is invalid"))
+                    return self._failure(
+                        ValueError("local database schema version is invalid")
+                    )
             return MemoryResult(True, self.db_path)
         except (OSError, sqlite3.Error, ValueError) as error:
             return self._failure(error)
 
     def _backup_path(self, supplied: str | Path | None) -> Path | None:
-        path = self.backups_root / "escala-backup.db" if supplied is None else Path(supplied)
+        path = (
+            self.backups_root / "escala-backup.db"
+            if supplied is None
+            else Path(supplied)
+        )
         try:
             path = path.resolve()
             self._assert_contained(path, self.backups_root)

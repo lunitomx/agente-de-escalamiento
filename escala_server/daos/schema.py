@@ -3,7 +3,6 @@
 import sqlite3
 from pathlib import Path
 
-
 SCHEMA_SQL = """
 CREATE TABLE IF NOT EXISTS companies (
     id TEXT PRIMARY KEY,

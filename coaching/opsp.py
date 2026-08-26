@@ -1,4 +1,5 @@
 """Persistent One-Page Strategic Plan core shared by Claude and Codex."""
+
 from __future__ import annotations
 
 from copy import deepcopy
@@ -17,8 +18,18 @@ ARTIFACT_PATH = Path("work/strategy/opsp.md")
 def load_opsp_knowledge(base_path: str | Path = ".") -> dict[str, Any]:
     """Read the repository's canonical OPSP tool record."""
     base = Path(base_path)
-    candidates = [base / KNOWLEDGE_PATH, Path(__file__).resolve().parents[1] / KNOWLEDGE_PATH, Path(__file__).resolve().parents[1] / "knowledge" / "strategy" / "tools" / "opsp.yaml"]
-    path = next((candidate for candidate in candidates if candidate.exists()), candidates[0])
+    candidates = [
+        base / KNOWLEDGE_PATH,
+        Path(__file__).resolve().parents[1] / KNOWLEDGE_PATH,
+        Path(__file__).resolve().parents[1]
+        / "knowledge"
+        / "strategy"
+        / "tools"
+        / "opsp.yaml",
+    ]
+    path = next(
+        (candidate for candidate in candidates if candidate.exists()), candidates[0]
+    )
     data = read_yaml(path)
     if data.get("id") != "tool-opsp":
         raise ValueError(f"Canonical OPSP knowledge is missing or invalid: {path}")
@@ -56,31 +67,117 @@ def _rows(rows: Any, keys: tuple[str, ...], width: int = 5) -> list[str]:
     rows = rows if isinstance(rows, list) else []
     output = []
     for index in range(width):
-        item = rows[index] if index < len(rows) and isinstance(rows[index], dict) else {}
-        output.append("| " + " | ".join([str(index + 1)] + [_text(item.get(key)) for key in keys]) + " |")
+        item = (
+            rows[index] if index < len(rows) and isinstance(rows[index], dict) else {}
+        )
+        output.append(
+            "| "
+            + " | ".join([str(index + 1)] + [_text(item.get(key)) for key in keys])
+            + " |"
+        )
     return output
 
 
 def render_opsp(data: dict[str, Any]) -> str:
     """Render structured, resumable plan data into its canonical Markdown file."""
-    values = data.get("core_values") if isinstance(data.get("core_values"), list) else []
+    values = (
+        data.get("core_values") if isinstance(data.get("core_values"), list) else []
+    )
     sandbox = data.get("sandbox") if isinstance(data.get("sandbox"), dict) else {}
-    brand = data.get("brand_promise") if isinstance(data.get("brand_promise"), dict) else {}
+    brand = (
+        data.get("brand_promise") if isinstance(data.get("brand_promise"), dict) else {}
+    )
     meta = {
         "schema": "tool-opsp",
         "status": data.get("status", "in_progress"),
         "updated_at": data.get("updated_at"),
         "data": data,
     }
-    lines = ["---", yaml.safe_dump(meta, allow_unicode=True, sort_keys=False).strip(), "---", "", "# One-Page Strategic Plan (OPSP)", "", f"> Empresa: {_text(data.get('company_name')) or 'Tu empresa'} | Actualizado: {_text(data.get('updated_at'))}", "", "## CORE VALUES / Valores Fundamentales", "", "| # | Core Value | Descripción |", "|---|---|---|"]
+    lines = [
+        "---",
+        yaml.safe_dump(meta, allow_unicode=True, sort_keys=False).strip(),
+        "---",
+        "",
+        "# One-Page Strategic Plan (OPSP)",
+        "",
+        f"> Empresa: {_text(data.get('company_name')) or 'Tu empresa'} | Actualizado: {_text(data.get('updated_at'))}",
+        "",
+        "## CORE VALUES / Valores Fundamentales",
+        "",
+        "| # | Core Value | Descripción |",
+        "|---|---|---|",
+    ]
     for index in range(5):
         item = values[index] if index < len(values) else {}
-        item = {"name": item} if isinstance(item, str) else item if isinstance(item, dict) else {}
-        lines.append(f"| {index + 1} | {_text(item.get('name'))} | {_text(item.get('description'))} |")
-    lines += ["", "## PURPOSE / Propósito", "", f"> {_text(data.get('purpose')) or 'Pendiente'}", "", "## BHAG — Meta 10-25 años", "", f"> {_text(data.get('bhag')) or 'Pendiente'}", f"\n**Fecha objetivo:** {_text(data.get('bhag_date')) or 'Pendiente'}", "", "## SANDBOX / Arena Competitiva (3-5 años)", "", "| Elemento | Definición |", "|---|---|"]
-    for key, label in (("revenue_target", "Revenue target"), ("profit_target", "Profit target"), ("market", "Market/Geography"), ("customer_segment", "Customer segment"), ("product_focus", "Product/Service focus")):
+        item = (
+            {"name": item}
+            if isinstance(item, str)
+            else item
+            if isinstance(item, dict)
+            else {}
+        )
+        lines.append(
+            f"| {index + 1} | {_text(item.get('name'))} | {_text(item.get('description'))} |"
+        )
+    lines += [
+        "",
+        "## PURPOSE / Propósito",
+        "",
+        f"> {_text(data.get('purpose')) or 'Pendiente'}",
+        "",
+        "## BHAG — Meta 10-25 años",
+        "",
+        f"> {_text(data.get('bhag')) or 'Pendiente'}",
+        f"\n**Fecha objetivo:** {_text(data.get('bhag_date')) or 'Pendiente'}",
+        "",
+        "## SANDBOX / Arena Competitiva (3-5 años)",
+        "",
+        "| Elemento | Definición |",
+        "|---|---|",
+    ]
+    for key, label in (
+        ("revenue_target", "Revenue target"),
+        ("profit_target", "Profit target"),
+        ("market", "Market/Geography"),
+        ("customer_segment", "Customer segment"),
+        ("product_focus", "Product/Service focus"),
+    ):
         lines.append(f"| {label} | {_text(sandbox.get(key)) or 'Pendiente'} |")
-    lines += ["", "## BRAND PROMISE / Promesa de Marca", "", "| Elemento | Definición |", "|---|---|", f"| Brand Promise | {_text(brand.get('promise')) or 'Pendiente'} |", f"| KPI que la mide | {_text(brand.get('kpi')) or 'Pendiente'} |", "", "## QUARTERLY PLAN / Plan Trimestral", "", f"**Trimestre:** {_text(data.get('quarter')) or 'Pendiente'}", f"**Critical Number:** {_text(data.get('critical_number')) or 'Pendiente'}", "", "### Prioridades de la Empresa", "", "| # | Prioridad | Owner | KPI | Status |", "|---|---|---|---|---|", *_rows(data.get("quarterly_priorities"), ("priority", "owner", "kpi", "status")), "", "## ANNUAL GOALS / Metas Anuales", "", f"**Año:** {_text(data.get('year')) or 'Pendiente'}", f"**Revenue target:** {_text(data.get('annual_revenue')) or 'Pendiente'}", f"**Profit target:** {_text(data.get('annual_profit')) or 'Pendiente'}", "", "### Prioridades Anuales", "", "| # | Prioridad | Owner | KPI |", "|---|---|---|---|", *_rows(data.get("annual_priorities"), ("priority", "owner", "kpi")), ""]
+    lines += [
+        "",
+        "## BRAND PROMISE / Promesa de Marca",
+        "",
+        "| Elemento | Definición |",
+        "|---|---|",
+        f"| Brand Promise | {_text(brand.get('promise')) or 'Pendiente'} |",
+        f"| KPI que la mide | {_text(brand.get('kpi')) or 'Pendiente'} |",
+        "",
+        "## QUARTERLY PLAN / Plan Trimestral",
+        "",
+        f"**Trimestre:** {_text(data.get('quarter')) or 'Pendiente'}",
+        f"**Critical Number:** {_text(data.get('critical_number')) or 'Pendiente'}",
+        "",
+        "### Prioridades de la Empresa",
+        "",
+        "| # | Prioridad | Owner | KPI | Status |",
+        "|---|---|---|---|---|",
+        *_rows(
+            data.get("quarterly_priorities"), ("priority", "owner", "kpi", "status")
+        ),
+        "",
+        "## ANNUAL GOALS / Metas Anuales",
+        "",
+        f"**Año:** {_text(data.get('year')) or 'Pendiente'}",
+        f"**Revenue target:** {_text(data.get('annual_revenue')) or 'Pendiente'}",
+        f"**Profit target:** {_text(data.get('annual_profit')) or 'Pendiente'}",
+        "",
+        "### Prioridades Anuales",
+        "",
+        "| # | Prioridad | Owner | KPI |",
+        "|---|---|---|---|",
+        *_rows(data.get("annual_priorities"), ("priority", "owner", "kpi")),
+        "",
+    ]
     return "\n".join(lines)
 
 
@@ -109,11 +206,20 @@ def update_opsp(context: dict[str, Any]) -> dict[str, Any]:
     artifact = base / ARTIFACT_PATH
     supplied = context.get("data", context.get("opsp", {}))
     if not isinstance(supplied, dict):
-        return {"output": "Necesito los datos del plan en un formato válido.", "artifacts": {}, "errors": ["OPSP data must be a mapping"]}
+        return {
+            "output": "Necesito los datos del plan en un formato válido.",
+            "artifacts": {},
+            "errors": ["OPSP data must be a mapping"],
+        }
     existing = _metadata(artifact).get("data", {})
     profile = read_yaml(base / ".scaleup/agent/memory/company-profile.yaml")
-    defaults = {"company_name": profile.get("company", {}).get("name", ""), "status": "in_progress"}
-    data = _merge(_merge(defaults, existing if isinstance(existing, dict) else {}), supplied)
+    defaults = {
+        "company_name": profile.get("company", {}).get("name", ""),
+        "status": "in_progress",
+    }
+    data = _merge(
+        _merge(defaults, existing if isinstance(existing, dict) else {}), supplied
+    )
     data["updated_at"] = str(context.get("updated_at") or date.today().isoformat())
     completion_errors = _completion_errors(data)
     if context.get("complete") and not completion_errors:
@@ -129,10 +235,22 @@ def update_opsp(context: dict[str, Any]) -> dict[str, Any]:
     if data["status"] == "completed":
         output = "Tu plan en una hoja se guardó y puedes retomarlo cuando quieras."
     elif context.get("complete"):
-        output = "Guardé tu avance; aún faltan datos antes de marcar el plan como completo. " + _next_question(completion_errors)
+        output = (
+            "Guardé tu avance; aún faltan datos antes de marcar el plan como completo. "
+            + _next_question(completion_errors)
+        )
     else:
         output = "Guardé este avance de tu plan en una hoja. ¿Cuál es el propósito de tu empresa más allá de hacer dinero?"
-    return {"output": output, "artifacts": {"opsp": str(ARTIFACT_PATH), "knowledge_id": knowledge["id"], "status": data["status"], "data": data}, "errors": errors}
+    return {
+        "output": output,
+        "artifacts": {
+            "opsp": str(ARTIFACT_PATH),
+            "knowledge_id": knowledge["id"],
+            "status": data["status"],
+            "data": data,
+        },
+        "errors": errors,
+    }
 
 
 def run(context: dict[str, Any]) -> dict[str, Any]:
@@ -140,8 +258,17 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
     artifact = base / ARTIFACT_PATH
     if context.get("action") in {"status", "validate"}:
         errors = validate_opsp(artifact)
-        return {"output": "OPSP válido." if not errors else "OPSP requiere correcciones.", "artifacts": {"opsp": str(ARTIFACT_PATH), "status": _metadata(artifact).get("status")}, "errors": errors}
+        return {
+            "output": "OPSP válido." if not errors else "OPSP requiere correcciones.",
+            "artifacts": {
+                "opsp": str(ARTIFACT_PATH),
+                "status": _metadata(artifact).get("status"),
+            },
+            "errors": errors,
+        }
     return update_opsp(context)
+
+
 def _has_text(value: Any) -> bool:
     return bool(_text(value))
 
@@ -149,7 +276,10 @@ def _has_text(value: Any) -> bool:
 def _valid_values(values: Any) -> bool:
     if not isinstance(values, list) or len(values) < 3:
         return False
-    return all(_has_text(item.get("name") if isinstance(item, dict) else item) for item in values[:3])
+    return all(
+        _has_text(item.get("name") if isinstance(item, dict) else item)
+        for item in values[:3]
+    )
 
 
 def _actionable_priorities(rows: Any, label: str) -> list[str]:
@@ -158,17 +288,33 @@ def _actionable_priorities(rows: Any, label: str) -> list[str]:
         return [f"Completed OPSP needs at least one {label} priority"]
     for index, item in enumerate(rows, start=1):
         if not isinstance(item, dict):
-            return [f"Completed OPSP {label} priority {index} must include priority, owner, and KPI"]
-        missing = [key for key in ("priority", "owner", "kpi") if not _has_text(item.get(key))]
+            return [
+                f"Completed OPSP {label} priority {index} must include priority, owner, and KPI"
+            ]
+        missing = [
+            key for key in ("priority", "owner", "kpi") if not _has_text(item.get(key))
+        ]
         if missing:
-            return [f"Completed OPSP {label} priority {index} missing: {', '.join(missing)}"]
+            return [
+                f"Completed OPSP {label} priority {index} missing: {', '.join(missing)}"
+            ]
     return []
 
 
 def _completion_errors(data: dict[str, Any]) -> list[str]:
     """Minimum user-meaningful content required before calling an OPSP complete."""
     errors: list[str] = []
-    for key in ("company_name", "purpose", "bhag", "bhag_date", "quarter", "critical_number", "year", "annual_revenue", "annual_profit"):
+    for key in (
+        "company_name",
+        "purpose",
+        "bhag",
+        "bhag_date",
+        "quarter",
+        "critical_number",
+        "year",
+        "annual_revenue",
+        "annual_profit",
+    ):
         if not _has_text(data.get(key)):
             errors.append(f"Completed OPSP missing: {key}")
     if not _valid_values(data.get("core_values")):
@@ -176,7 +322,9 @@ def _completion_errors(data: dict[str, Any]) -> list[str]:
     sandbox = data.get("sandbox") if isinstance(data.get("sandbox"), dict) else {}
     if not _has_text(sandbox.get("market")):
         errors.append("Completed OPSP missing: sandbox.market")
-    brand = data.get("brand_promise") if isinstance(data.get("brand_promise"), dict) else {}
+    brand = (
+        data.get("brand_promise") if isinstance(data.get("brand_promise"), dict) else {}
+    )
     for key in ("promise", "kpi"):
         if not _has_text(brand.get(key)):
             errors.append(f"Completed OPSP missing: brand_promise.{key}")

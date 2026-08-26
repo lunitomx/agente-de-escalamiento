@@ -8,7 +8,6 @@ Validates that the KnowledgeIngester:
   - Stores entity properties correctly (description, keywords, line_refs in properties dict)
 """
 
-import json
 import sys
 import uuid
 from pathlib import Path
@@ -18,9 +17,9 @@ import pytest
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "escala_server"))
 
+from escala_server.data.knowledge_ingester import KnowledgeIngester
 from escala_server.graph_engine import _conn_cache as _graph_cache
 from escala_server.memory_engine import _conn_cache as _mem_cache
-from escala_server.data.knowledge_ingester import KnowledgeIngester
 
 JSON_PATH = PROJECT_ROOT / "escala_server" / "data" / "book-knowledge.json"
 
@@ -149,9 +148,7 @@ class TestKnowledgeIngester:
         """ingest_all should create memory facts for each entity."""
         ingester.ingest_all(json_path=str(JSON_PATH))
 
-        facts = ingester.memory_engine.search_facts(
-            "", category="book_knowledge"
-        )
+        facts = ingester.memory_engine.search_facts("", category="book_knowledge")
         assert len(facts) >= 42  # At least one fact per entity
 
         # Each fact should reference an entity name
@@ -240,5 +237,5 @@ class TestKnowledgeIngestRoute:
         from escala_server.server import _build_router
 
         router = _build_router()
-        handler, params = router.dispatch("POST", "/api/knowledge/ingest")
+        handler, _params = router.dispatch("POST", "/api/knowledge/ingest")
         assert handler is not None

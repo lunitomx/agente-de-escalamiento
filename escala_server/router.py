@@ -1,7 +1,7 @@
 """API Router — lightweight URL dispatch for the Escala server."""
 
 import re
-from typing import Any, Callable
+from collections.abc import Callable
 
 
 class Router:
@@ -44,7 +44,9 @@ class Router:
 
         return decorator
 
-    def dispatch(self, method: str, path: str) -> tuple[Callable | None, dict[str, str]]:
+    def dispatch(
+        self, method: str, path: str
+    ) -> tuple[Callable | None, dict[str, str]]:
         """Find handler for method+path. Returns (handler, path_params) or (None, {})."""
         for route_method, pattern, handler, param_names in self._routes:
             if route_method != method:

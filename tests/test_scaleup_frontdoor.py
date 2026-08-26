@@ -1,4 +1,5 @@
 """Deterministic public front-door routing tests."""
+
 from __future__ import annotations
 
 from coaching.router import detect_public_intent, run
@@ -11,7 +12,13 @@ def test_natural_intents_route_without_exposing_commands(tmp_path):
     assert detect_public_intent("Quiero hacer mi plan en una hoja", profile) == "opsp"
     assert detect_public_intent("¿Cómo vamos con las tareas?", profile) == "progress"
 
-    result = run({"action": "frontdoor", "message": "Quiero hacer mi plan en una hoja", "base_path": tmp_path})
+    result = run(
+        {
+            "action": "frontdoor",
+            "message": "Quiero hacer mi plan en una hoja",
+            "base_path": tmp_path,
+        }
+    )
     assert result["errors"] == []
     assert result["artifacts"]["intent"] == "opsp"
     assert result["artifacts"]["requires_command"] is False

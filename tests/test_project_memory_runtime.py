@@ -46,7 +46,9 @@ def test_backup_and_restore_preserve_companies(tmp_path: Path) -> None:
     runtime = ProjectMemoryRuntime(tmp_path)
     assert runtime.ensure_memory().ready is True
     with sqlite3.connect(runtime.db_path) as connection:
-        connection.execute("INSERT INTO companies (id, name) VALUES ('lumen', 'Lumen Casa')")
+        connection.execute(
+            "INSERT INTO companies (id, name) VALUES ('lumen', 'Lumen Casa')"
+        )
 
     backup = runtime.backup()
     runtime.db_path.write_bytes(b"damaged")
@@ -55,7 +57,12 @@ def test_backup_and_restore_preserve_companies(tmp_path: Path) -> None:
     assert backup.ready is True
     assert restored.ready is True
     with sqlite3.connect(runtime.db_path) as connection:
-        assert connection.execute("SELECT name FROM companies WHERE id = 'lumen'").fetchone()[0] == "Lumen Casa"
+        assert (
+            connection.execute(
+                "SELECT name FROM companies WHERE id = 'lumen'"
+            ).fetchone()[0]
+            == "Lumen Casa"
+        )
 
 
 def test_invalid_backup_never_replaces_a_healthy_database(tmp_path: Path) -> None:

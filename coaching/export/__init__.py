@@ -4,10 +4,11 @@ Export module — Action Plan Export.
 Reads 5 data sources from .scaleup/my-company/ and assembles a dated
 5-section markdown document at .scaleup/my-company/exports/YYYY-MM-DD-action-plan.md.
 """
+
 import datetime
 from pathlib import Path
 
-from ..core import read_yaml, ensure_dir
+from ..core import ensure_dir, read_yaml
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -43,6 +44,7 @@ PLACEHOLDER = "> Not configured yet. Run /scaleup-welcome."
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _read_md(path: Path) -> tuple[str, bool]:
     """Return (content, found). If file missing, return placeholder."""
@@ -94,14 +96,13 @@ def _build_next_steps(scores: dict) -> str:
         cmd = ROUTING_RULES.get(priority, f"/scaleup-{priority}")
         lines.append(f"**Priority Focus:** {label} — `{cmd}`")
         lines.append("")
-        lines.append(
-            f"Your lowest score is in **{label}**. "
-            f"Start there with `{cmd}`."
-        )
+        lines.append(f"Your lowest score is in **{label}**. Start there with `{cmd}`.")
         lines.append("")
         lines.append("**Suggested sequence:**")
         lines.append("")
-        others = [k for k in PRIORITY_ORDER if k != priority and k in scores and scores[k]]
+        others = [
+            k for k in PRIORITY_ORDER if k != priority and k in scores and scores[k]
+        ]
         others_sorted = sorted(others, key=lambda k: scores.get(k, 99))
         for key in others_sorted:
             score = scores.get(key, "—")
@@ -109,7 +110,9 @@ def _build_next_steps(scores: dict) -> str:
             lbl = DECISION_LABELS.get(key, key.title())
             lines.append(f"- `{cmd_other}` — {lbl} (score: {score})")
     else:
-        lines.append("Run `/scaleup-diagnose` to complete your assessment and get personalized next steps.")
+        lines.append(
+            "Run `/scaleup-diagnose` to complete your assessment and get personalized next steps."
+        )
     lines.append("")
     lines.append("> To re-evaluate: `/scaleup-diagnose`")
     return "\n".join(lines)
@@ -118,6 +121,7 @@ def _build_next_steps(scores: dict) -> str:
 # ---------------------------------------------------------------------------
 # Core run function
 # ---------------------------------------------------------------------------
+
 
 def run(context: dict) -> dict:
     """
@@ -143,7 +147,7 @@ def run(context: dict) -> dict:
     # --- Read all 5 data sources ---
     scores = _read_scores(base)
 
-    profile_content, profile_found = _read_md(company_dir / "profile.md")
+    _profile_content, profile_found = _read_md(company_dir / "profile.md")
     if not profile_found:
         missing_optional.append("profile.md")
 
@@ -171,7 +175,9 @@ def run(context: dict) -> dict:
         if priority:
             priority_label = DECISION_LABELS.get(priority, priority.title())
             priority_cmd = ROUTING_RULES.get(priority, f"/scaleup-{priority}")
-            scores_body += f"\n\n**Priority focus:** {priority_label} — `{priority_cmd}`"
+            scores_body += (
+                f"\n\n**Priority focus:** {priority_label} — `{priority_cmd}`"
+            )
     else:
         scores_body = "> No diagnosis scores found. Run `/scaleup-diagnose` first."
 
@@ -230,7 +236,13 @@ def run(context: dict) -> dict:
         "output": f"Export generated: {export_path_str}",
         "artifacts": {
             "export_path": export_path_str,
-            "sections_included": ["scores", "goal", "priorities", "tasks", "next_steps"],
+            "sections_included": [
+                "scores",
+                "goal",
+                "priorities",
+                "tasks",
+                "next_steps",
+            ],
             "missing_optional": missing_optional,
         },
         "errors": [],

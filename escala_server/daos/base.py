@@ -6,9 +6,9 @@ for committing (or rolling back) at the appropriate granularity.
 """
 
 import sqlite3
+from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Iterator
 
 from ..schema import init_db
 

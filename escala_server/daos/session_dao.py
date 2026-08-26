@@ -2,7 +2,7 @@
 
 import json
 import uuid
-from typing import Any, Optional
+from typing import Any
 
 from .base import BaseDAO
 
@@ -26,7 +26,7 @@ class SessionDAO(BaseDAO):
 
     # ── get ─────────────────────────────────────────────────────────
 
-    def get(self, session_id: str) -> Optional[dict[str, Any]]:
+    def get(self, session_id: str) -> dict[str, Any] | None:
         """Look up a session by id.
 
         Args:
@@ -68,7 +68,7 @@ class SessionDAO(BaseDAO):
 
     # ── update ──────────────────────────────────────────────────────
 
-    def update(self, session_id: str, data: dict[str, Any]) -> Optional[dict[str, Any]]:
+    def update(self, session_id: str, data: dict[str, Any]) -> dict[str, Any] | None:
         """Update fields on an existing session.
 
         Args:

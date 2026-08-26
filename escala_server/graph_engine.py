@@ -18,10 +18,9 @@ Usage::
 from __future__ import annotations
 
 import json
+import sqlite3
 from pathlib import Path
 from typing import Any
-
-import sqlite3
 
 
 class GraphEngine:
@@ -174,7 +173,9 @@ class GraphEngine:
                         "id": row["eid"],
                         "type": row["etype"],
                         "name": row["ename"],
-                        "properties": json.loads(row["eproperties"]) if row["eproperties"] else {},
+                        "properties": json.loads(row["eproperties"])
+                        if row["eproperties"]
+                        else {},
                     }
 
                     result.append(

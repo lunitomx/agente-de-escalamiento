@@ -13,7 +13,6 @@ import pytest
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "escala_server"))
 
-from escala_server.graph_engine import GraphEngine
 from escala_server.data.knowledge_ingester import KnowledgeIngester
 from escala_server.knowledge_handler import KnowledgeHandler
 
@@ -34,6 +33,7 @@ class TestKnowledgeSearch:
         # Clean up connections
         from escala_server.graph_engine import _conn_cache as _graph_cache
         from escala_server.memory_engine import _conn_cache as _mem_cache
+
         _graph_cache.pop(ingester.graph_engine._db_path, None)
         _mem_cache.pop(ingester.memory_engine._db_path, None)
 
@@ -108,6 +108,7 @@ class TestKnowledgeGetEntity:
         yield handler
         from escala_server.graph_engine import _conn_cache as _graph_cache
         from escala_server.memory_engine import _conn_cache as _mem_cache
+
         _graph_cache.pop(ingester.graph_engine._db_path, None)
         _mem_cache.pop(ingester.memory_engine._db_path, None)
 
@@ -166,6 +167,7 @@ class TestKnowledgeContext:
         yield handler
         from escala_server.graph_engine import _conn_cache as _graph_cache
         from escala_server.memory_engine import _conn_cache as _mem_cache
+
         _graph_cache.pop(ingester.graph_engine._db_path, None)
         _mem_cache.pop(ingester.memory_engine._db_path, None)
 
@@ -232,7 +234,7 @@ class TestKnowledgeRoutes:
         from escala_server.server import _build_router
 
         router = _build_router()
-        handler_fn, params = router.dispatch("GET", "/api/knowledge/search")
+        handler_fn, _params = router.dispatch("GET", "/api/knowledge/search")
         assert handler_fn is not None
 
     def test_entity_route_registered(self):
@@ -240,7 +242,9 @@ class TestKnowledgeRoutes:
         from escala_server.server import _build_router
 
         router = _build_router()
-        handler_fn, params = router.dispatch("GET", "/api/knowledge/entity/power-of-one")
+        handler_fn, params = router.dispatch(
+            "GET", "/api/knowledge/entity/power-of-one"
+        )
         assert handler_fn is not None
         assert params["entity_name"] == "power-of-one"
 
@@ -249,7 +253,7 @@ class TestKnowledgeRoutes:
         from escala_server.server import _build_router
 
         router = _build_router()
-        handler_fn, params = router.dispatch("GET", "/api/knowledge/context")
+        handler_fn, _params = router.dispatch("GET", "/api/knowledge/context")
         assert handler_fn is not None
 
     def test_search_route_not_confused_with_entity(self, handler=None):
@@ -261,6 +265,7 @@ class TestKnowledgeRoutes:
         handler_fn, params = router.dispatch("GET", "/api/knowledge/entity/search")
         assert handler_fn is not None
         assert params["entity_name"] == "search"
+
 
 class TestKnowledgeContextHTTP:
     """Route-level integration tests for /api/knowledge/context via handler."""
@@ -275,6 +280,7 @@ class TestKnowledgeContextHTTP:
         yield handler
         from escala_server.graph_engine import _conn_cache as _graph_cache
         from escala_server.memory_engine import _conn_cache as _mem_cache
+
         _graph_cache.pop(ingester.graph_engine._db_path, None)
         _mem_cache.pop(ingester.memory_engine._db_path, None)
 

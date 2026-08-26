@@ -15,7 +15,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-
 # ─── Simple YAML parser ────────────────────────────────────────
 
 
@@ -34,9 +33,7 @@ def _parse_simple_yaml(text: str) -> Any:
     return _parse_yaml_value(lines, 0, -1)[0]
 
 
-def _parse_yaml_value(
-    lines: list[str], start: int, indent: int
-) -> tuple[Any, int]:
+def _parse_yaml_value(lines: list[str], start: int, indent: int) -> tuple[Any, int]:
     """Parse a YAML value starting at `start`, with parent `indent`.
 
     Returns (value, next_line_index).
@@ -99,7 +96,7 @@ def _parse_yaml_list(
 
         if stripped.startswith("- "):
             item_text = stripped[2:]
-            indent = parent_indent + 2
+            parent_indent + 2
 
             if ":" in item_text and not item_text.startswith(("{", "[", '"', "'")):
                 # Inline mapping: "- key: value"
@@ -114,14 +111,16 @@ def _parse_yaml_list(
                     )
                     if next_stripped and next_indent > current_indent:
                         # Sub-block following list item
-                        sub_val, idx = _parse_yaml_value(
-                            lines, idx + 1, current_indent
-                        )
+                        sub_val, idx = _parse_yaml_value(lines, idx + 1, current_indent)
                         if isinstance(sub_val, dict) and item_text.strip():
                             # Merge inline key-value into sub-block
                             parts = item_text.split(":", 1)
                             inline_key = _strip_quotes(parts[0].strip())
-                            inline_value = _parse_scalar(parts[1].strip()) if len(parts) > 1 else None
+                            inline_value = (
+                                _parse_scalar(parts[1].strip())
+                                if len(parts) > 1
+                                else None
+                            )
                             sub_val[inline_key] = inline_value
                         result.append(sub_val)
                         continue
@@ -142,11 +141,13 @@ def _parse_yaml_list(
                         if next_stripped
                         else 0
                     )
-                    if next_stripped and next_indent > current_indent and not next_stripped.startswith("- "):
+                    if (
+                        next_stripped
+                        and next_indent > current_indent
+                        and not next_stripped.startswith("- ")
+                    ):
                         # Sub-block
-                        sub_val, idx = _parse_yaml_value(
-                            lines, idx + 1, current_indent
-                        )
+                        sub_val, idx = _parse_yaml_value(lines, idx + 1, current_indent)
                         result.append(sub_val)
                         continue
 
@@ -217,15 +218,12 @@ def _parse_yaml_mapping(
                     )
                     has_indented_child = next_indent > current_indent
                     has_indentless_sequence = (
-                        next_indent == current_indent
-                        and next_stripped.startswith("- ")
+                        next_indent == current_indent and next_stripped.startswith("- ")
                     )
                     if next_stripped and (
                         has_indented_child or has_indentless_sequence
                     ):
-                        sub_val, idx = _parse_yaml_value(
-                            lines, idx + 1, current_indent
-                        )
+                        sub_val, idx = _parse_yaml_value(lines, idx + 1, current_indent)
                         result[key] = sub_val
                         continue
                 result[key] = None
@@ -238,7 +236,7 @@ def _parse_yaml_mapping(
                 idx += 1
                 continue
 
-            if value_part.startswith(">") or value_part.startswith("|"):
+            if value_part.startswith((">", "|")):
                 # Multi-line string — collect continuation lines
                 result[key] = _collect_block_string(lines, idx, current_indent)
                 idx += 1
@@ -246,9 +244,7 @@ def _parse_yaml_mapping(
                     l = lines[idx]
                     ls = l.strip()
                     li = len(l) - len(l.lstrip(" "))
-                    if not ls or ls.startswith("#"):
-                        idx += 1
-                    elif li > current_indent:
+                    if not ls or ls.startswith("#") or li > current_indent:
                         idx += 1
                     else:
                         break
@@ -261,11 +257,13 @@ def _parse_yaml_mapping(
                 next_line = lines[next_idx]
                 next_stripped = next_line.strip()
                 next_indent = (
-                    len(next_line) - len(next_line.lstrip(" "))
-                    if next_stripped
-                    else 0
+                    len(next_line) - len(next_line.lstrip(" ")) if next_stripped else 0
                 )
-                if next_stripped and next_indent > current_indent and not next_stripped.startswith("- "):
+                if (
+                    next_stripped
+                    and next_indent > current_indent
+                    and not next_stripped.startswith("- ")
+                ):
                     has_sub_block = True
 
             if has_sub_block:
@@ -282,9 +280,7 @@ def _parse_yaml_mapping(
     return result, idx
 
 
-def _collect_block_string(
-    lines: list[str], start: int, parent_indent: int
-) -> str:
+def _collect_block_string(lines: list[str], start: int, parent_indent: int) -> str:
     """Collect continuation lines of a > or | block scalar."""
     parts = []
     idx = start + 1
@@ -428,7 +424,9 @@ def migrate_from_yaml(db_path: str, yaml_root: str) -> dict[str, Any]:
     try:
         company_dir = yaml_path / "my-company"
         if not company_dir.is_dir():
-            log_entries.append(f"WARNING: {company_dir} not found, no company data imported")
+            log_entries.append(
+                f"WARNING: {company_dir} not found, no company data imported"
+            )
         else:
             # Import profile
             profile_path = company_dir / "profile.md"
@@ -449,10 +447,12 @@ def migrate_from_yaml(db_path: str, yaml_root: str) -> dict[str, Any]:
                     )
                     if conn.total_changes > 0:
                         counts["companies"] += 1
-                        log_entries.append(f"OK: Imported profile.md → company {company_id}")
+                        log_entries.append(
+                            f"OK: Imported profile.md → company {company_id}"
+                        )
                     else:
                         counts["skipped"] += 1
-                        log_entries.append(f"SKIP: profile.md already exists")
+                        log_entries.append("SKIP: profile.md already exists")
                 except Exception as e:
                     counts["errors"] += 1
                     log_entries.append(f"ERROR: profile.md: {e}")
@@ -494,7 +494,10 @@ def migrate_from_yaml(db_path: str, yaml_root: str) -> dict[str, Any]:
                         log_entries.append(f"ERROR: context/{ctx_file.name}: {e}")
 
             # Import quarterly focus and annual goal
-            for fname, tool in [("quarterly-focus.md", "quarterly-focus"), ("annual-goal.md", "annual-goal")]:
+            for fname, tool in [
+                ("quarterly-focus.md", "quarterly-focus"),
+                ("annual-goal.md", "annual-goal"),
+            ]:
                 fpath = company_dir / fname
                 if fpath.exists():
                     try:
@@ -544,17 +547,23 @@ def migrate_from_yaml(db_path: str, yaml_root: str) -> dict[str, Any]:
                                 session_data["frontmatter"] = parts[1].strip()
                                 session_data["body"] = parts[2].strip()
                         data_json = json.dumps(session_data, ensure_ascii=False)
-                        session_id = hashlib.md5(str(session_file).encode()).hexdigest()[:8]
+                        session_id = hashlib.md5(
+                            str(session_file).encode()
+                        ).hexdigest()[:8]
                         conn.execute(
                             "INSERT OR IGNORE INTO sessions (id, data_json) VALUES (?, ?)",
                             (session_id, data_json),
                         )
                         if conn.total_changes > 0:
                             counts["sessions"] += 1
-                            log_entries.append(f"OK: Imported sessions/{session_file.name}")
+                            log_entries.append(
+                                f"OK: Imported sessions/{session_file.name}"
+                            )
                         else:
                             counts["skipped"] += 1
-                            log_entries.append(f"SKIP: sessions/{session_file.name} already exists")
+                            log_entries.append(
+                                f"SKIP: sessions/{session_file.name} already exists"
+                            )
                     except Exception as e:
                         counts["errors"] += 1
                         log_entries.append(f"ERROR: sessions/{session_file.name}: {e}")

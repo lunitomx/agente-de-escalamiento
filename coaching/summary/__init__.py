@@ -10,7 +10,6 @@ from pathlib import Path
 from .engine import build_summary
 from .formatter import format_summary
 
-
 _SUMMARY_RE = re.compile(r"^## Session Summary\s*$", re.MULTILINE)
 
 

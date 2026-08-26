@@ -1,10 +1,10 @@
 """Regression coverage for the no-JSON public ScaleUp conversation."""
+
 from __future__ import annotations
 
 import json
 import subprocess
 from pathlib import Path
-
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 INSTALLER = REPO_ROOT / ".scaleup" / "install.sh"
@@ -12,8 +12,11 @@ INSTALLER = REPO_ROOT / ".scaleup" / "install.sh"
 
 def _say(command: Path, project: Path, message: str) -> str:
     result = subprocess.run(
-        [str(command), "conversation", message], cwd=project,
-        check=True, capture_output=True, text=True,
+        [str(command), "conversation", message],
+        cwd=project,
+        check=True,
+        capture_output=True,
+        text=True,
     )
     return result.stdout
 
@@ -21,7 +24,9 @@ def _say(command: Path, project: Path, message: str) -> str:
 def _journey(command: Path, project: Path) -> None:
     assert "¿Cómo se llama" in _say(command, project, "quiero organizar mi empresa")
     assert "Lumen Casa" in _say(command, project, "Lumen Casa")
-    assert "Cuántas personas" in _say(command, project, "Vendemos iluminación para hogares")
+    assert "Cuántas personas" in _say(
+        command, project, "Vendemos iluminación para hogares"
+    )
     first_question = _say(command, project, "28")
     assert "Del 1 al 5" in first_question
 
@@ -33,11 +38,22 @@ def _journey(command: Path, project: Path) -> None:
     for _ in range(19):
         _say(command, project, "3")
 
-    assert "plan en una hoja" in _say(command, project, "quiero hacer mi plan en una hoja")
+    assert "plan en una hoja" in _say(
+        command, project, "quiero hacer mi plan en una hoja"
+    )
     answers = (
-        "Nos importan diseño honesto, cumplir lo prometido y resolver rápido.", "Iluminar hogares", "Ser líder nacional",
-        "2036", "México", "Entrega en 72 horas; porcentaje puntual", "Q3 2026",
-        "95% puntual", "2026", "$10M", "$1M", "Crecer; Ana; ventas",
+        "Nos importan diseño honesto, cumplir lo prometido y resolver rápido.",
+        "Iluminar hogares",
+        "Ser líder nacional",
+        "2036",
+        "México",
+        "Entrega en 72 horas; porcentaje puntual",
+        "Q3 2026",
+        "95% puntual",
+        "2026",
+        "$10M",
+        "$1M",
+        "Crecer; Ana; ventas",
         "Inventario; Luis; faltantes",
     )
     for answer in answers:
@@ -48,8 +64,11 @@ def _journey(command: Path, project: Path) -> None:
     assert "Nos importan diseño honesto" not in artifact_text
     assert "diseño honesto" in artifact_text
     valid = subprocess.run(
-        [str(command), "validate-opsp", str(artifact)], cwd=project,
-        check=True, capture_output=True, text=True,
+        [str(command), "validate-opsp", str(artifact)],
+        cwd=project,
+        check=True,
+        capture_output=True,
+        text=True,
     )
     assert json.loads(valid.stdout) == {"valid": True, "errors": []}
     assert "Dashboard de Progreso" in _say(command, project, "¿Qué sigue?")
@@ -58,10 +77,18 @@ def _journey(command: Path, project: Path) -> None:
 def _combined_demo_intake(command: Path, project: Path) -> None:
     assert "¿Cómo se llama" in _say(command, project, "quiero organizar mi empresa")
     assert "¿Cómo se llama tu empresa?" in _say(command, project, "todavía no lo sé")
-    assert not (project / ".scaleup" / "agent" / "memory" / "company-profile.yaml").exists()
-    response = _say(command, project, "Se llama Lumen Casa. Vendemos iluminación decorativa… Somos 28 personas.")
+    assert not (
+        project / ".scaleup" / "agent" / "memory" / "company-profile.yaml"
+    ).exists()
+    response = _say(
+        command,
+        project,
+        "Se llama Lumen Casa. Vendemos iluminación decorativa… Somos 28 personas.",
+    )
     assert "Del 1 al 5" in response
-    profile = (project / ".scaleup" / "agent" / "memory" / "company-profile.yaml").read_text(encoding="utf-8")
+    profile = (
+        project / ".scaleup" / "agent" / "memory" / "company-profile.yaml"
+    ).read_text(encoding="utf-8")
     assert "name: Lumen Casa" in profile
     assert "industry: iluminación decorativa" in profile
     assert "employees: 28" in profile
@@ -73,27 +100,43 @@ def test_conversation_persists_natural_journey_in_checkout(tmp_path):
     _journey(REPO_ROOT / ".scaleup" / "bin" / "scaleup-frontdoor", project)
     combined = tmp_path / "checkout-combined"
     combined.mkdir()
-    _combined_demo_intake(REPO_ROOT / ".scaleup" / "bin" / "scaleup-frontdoor", combined)
+    _combined_demo_intake(
+        REPO_ROOT / ".scaleup" / "bin" / "scaleup-frontdoor", combined
+    )
 
 
 def test_natural_plan_request_collects_company_before_plan(tmp_path):
     project = tmp_path / "new-company"
     project.mkdir()
     command = REPO_ROOT / ".scaleup" / "bin" / "scaleup-frontdoor"
-    assert "¿Cómo se llama?" in _say(command, project, "quiero hacer mi plan en una hoja")
+    assert "¿Cómo se llama?" in _say(
+        command, project, "quiero hacer mi plan en una hoja"
+    )
     _say(command, project, "Lumen Casa")
     _say(command, project, "Iluminación")
     response = _say(command, project, "28")
     assert "tres valores" in response
-    assert (project / ".scaleup" / "agent" / "memory" / "company-profile.yaml").is_file()
+    assert (
+        project / ".scaleup" / "agent" / "memory" / "company-profile.yaml"
+    ).is_file()
 
 
 def test_conversation_persists_natural_journey_after_clean_install(tmp_path):
     destination, project = tmp_path / "home", tmp_path / "installed"
     project.mkdir()
     subprocess.run(
-        ["bash", str(INSTALLER), "--target", "codex", "--destination-root", str(destination)],
-        cwd=REPO_ROOT, check=True, capture_output=True, text=True,
+        [
+            "bash",
+            str(INSTALLER),
+            "--target",
+            "codex",
+            "--destination-root",
+            str(destination),
+        ],
+        cwd=REPO_ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
     )
     command = destination / ".codex" / "scaleup" / "bin" / "scaleup-frontdoor"
     _journey(command, project)

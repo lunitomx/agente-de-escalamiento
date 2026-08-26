@@ -1,7 +1,9 @@
 """
 Progress module — completion dashboard per decision.
 """
+
 from pathlib import Path
+
 from ..core import read_yaml
 from ..opsp import ARTIFACT_PATH, validate_opsp
 
@@ -48,7 +50,9 @@ def _completed_opsp(base_path: Path) -> bool:
     if not artifact.is_file() or validate_opsp(artifact):
         return False
     text = artifact.read_text(encoding="utf-8")
-    return text.startswith("---\n") and "status: completed" in text.split("\n---\n", 1)[0]
+    return (
+        text.startswith("---\n") and "status: completed" in text.split("\n---\n", 1)[0]
+    )
 
 
 def _get_worksheets(base_path: Path) -> tuple[list[dict], dict[str, dict]]:
@@ -101,17 +105,40 @@ def run(context: dict) -> dict:
 
     if not scores:
         name = profile.get("company", {}).get("name") or "tu empresa"
-        return {"output": f"Ya tengo el perfil de {name}. Para saber dónde conviene empezar, revisemos cuatro áreas de tu empresa con preguntas sencillas. ¿Te parece si empezamos?", "artifacts": {"company_name": name, "next_step": "diagnosis"}, "errors": []}
+        return {
+            "output": f"Ya tengo el perfil de {name}. Para saber dónde conviene empezar, revisemos cuatro áreas de tu empresa con preguntas sencillas. ¿Te parece si empezamos?",
+            "artifacts": {"company_name": name, "next_step": "diagnosis"},
+            "errors": [],
+        }
 
     if not all_ws:
-        return {"output": "No puedo cargar las guías de seguimiento en esta instalación. Reinstala ScaleUp y vuelve a intentarlo; tus datos de empresa se conservarán.", "artifacts": {}, "errors": ["Empty worksheet registry"]}
+        return {
+            "output": "No puedo cargar las guías de seguimiento en esta instalación. Reinstala ScaleUp y vuelve a intentarlo; tus datos de empresa se conservarán.",
+            "artifacts": {},
+            "errors": ["Empty worksheet registry"],
+        }
 
-    lines = ["## 📊 Dashboard de Progreso", "", "### Estado de las cuatro áreas", "", "| Área | Resultado | Nivel |", "|------|-----------|-------|"]
-    level_labels = {1: "🔴 No iniciado", 2: "🟠 Ad hoc", 3: "🟡 Emergente", 4: "🟢 Establecido", 5: "⭐ Optimizado"}
+    lines = [
+        "## 📊 Dashboard de Progreso",
+        "",
+        "### Estado de las cuatro áreas",
+        "",
+        "| Área | Resultado | Nivel |",
+        "|------|-----------|-------|",
+    ]
+    level_labels = {
+        1: "🔴 No iniciado",
+        2: "🟠 Ad hoc",
+        3: "🟡 Emergente",
+        4: "🟢 Establecido",
+        5: "⭐ Optimizado",
+    }
 
     for dec_key in DECISION_ORDER:
         score = scores.get(dec_key, 0)
-        lines.append(f"| {DECISION_LABELS.get(dec_key, dec_key)} | {score} | {level_labels.get(score, '—')} |")
+        lines.append(
+            f"| {DECISION_LABELS.get(dec_key, dec_key)} | {score} | {level_labels.get(score, '—')} |"
+        )
 
     lines.extend(["", "### Plan de trabajo por área", ""])
 
@@ -119,26 +146,50 @@ def run(context: dict) -> dict:
         dec_ws = [w for w in all_ws if w.get("decision") == dec_key]
         total = len(dec_ws)
         done = sum(1 for w in dec_ws if w["id"] in completed)
-        pct = round((done / total * 100)) if total > 0 else 0
-        lines.append(f"**{DECISION_LABELS.get(dec_key, dec_key)}:** {done}/{total} ({pct}%)")
+        pct = round(done / total * 100) if total > 0 else 0
+        lines.append(
+            f"**{DECISION_LABELS.get(dec_key, dec_key)}:** {done}/{total} ({pct}%)"
+        )
         lines.append("")
         for w in dec_ws:
-            lines.append(f"- {'✅' if w['id'] in completed else '⬜'} {_worksheet_label(w)}")
+            lines.append(
+                f"- {'✅' if w['id'] in completed else '⬜'} {_worksheet_label(w)}"
+            )
         lines.append("")
 
-    lowest_decision = min([d for d in DECISION_ORDER if scores.get(d, 0) > 0], key=lambda d: scores.get(d, 0), default=None)
+    lowest_decision = min(
+        [d for d in DECISION_ORDER if scores.get(d, 0) > 0],
+        key=lambda d: scores.get(d, 0),
+        default=None,
+    )
 
     if lowest_decision:
-        dec_ws = [w for w in all_ws if w.get("decision") == lowest_decision and w["id"] not in completed]
+        dec_ws = [
+            w
+            for w in all_ws
+            if w.get("decision") == lowest_decision and w["id"] not in completed
+        ]
         if dec_ws:
             next_ws = dec_ws[0]
-            lines.extend(["### Siguiente paso", f"- {_worksheet_label(next_ws)} ({DECISION_LABELS.get(lowest_decision, lowest_decision)})", f"- Tiempo estimado: {next_ws.get('time_estimate', '—')}", "- Podemos empezar con este paso cuando quieras.", ""])
+            lines.extend(
+                [
+                    "### Siguiente paso",
+                    f"- {_worksheet_label(next_ws)} ({DECISION_LABELS.get(lowest_decision, lowest_decision)})",
+                    f"- Tiempo estimado: {next_ws.get('time_estimate', '—')}",
+                    "- Podemos empezar con este paso cuando quieras.",
+                    "",
+                ]
+            )
 
-    lines.append("> Puedes revisar de nuevo las cuatro áreas cuando cambie tu situación.")
+    lines.append(
+        "> Puedes revisar de nuevo las cuatro áreas cuando cambie tu situación."
+    )
 
-    total_all = sum(len([w for w in all_ws if w.get("decision") == d]) for d in DECISION_ORDER)
+    total_all = sum(
+        len([w for w in all_ws if w.get("decision") == d]) for d in DECISION_ORDER
+    )
     done_all = sum(1 for w in all_ws if w["id"] in completed)
-    overall_pct = round((done_all / total_all * 100)) if total_all > 0 else 0
+    overall_pct = round(done_all / total_all * 100) if total_all > 0 else 0
 
     return {
         "output": "\n".join(lines),
@@ -146,7 +197,18 @@ def run(context: dict) -> dict:
             "total_worksheets": total_all,
             "completed_worksheets": done_all,
             "completion_pct": overall_pct,
-            "per_decision": {d: {"score": scores.get(d, 0), "total": len([w for w in all_ws if w.get("decision") == d]), "completed": sum(1 for w in all_ws if w.get("decision") == d and w["id"] in completed)} for d in DECISION_ORDER},
+            "per_decision": {
+                d: {
+                    "score": scores.get(d, 0),
+                    "total": len([w for w in all_ws if w.get("decision") == d]),
+                    "completed": sum(
+                        1
+                        for w in all_ws
+                        if w.get("decision") == d and w["id"] in completed
+                    ),
+                }
+                for d in DECISION_ORDER
+            },
         },
         "errors": [],
     }

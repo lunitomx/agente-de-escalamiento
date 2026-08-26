@@ -1,6 +1,5 @@
 """Tests for escala_server.diff — dict_diff function."""
 
-import pytest
 from escala_server.diff import dict_diff
 
 
@@ -112,7 +111,11 @@ class TestDictDiff:
         new = {"a": "string"}
         changes = dict_diff(old, new)
         assert len(changes) == 1
-        assert changes[0] == {"field": "a", "old_value": {"x": 1}, "new_value": "string"}
+        assert changes[0] == {
+            "field": "a",
+            "old_value": {"x": 1},
+            "new_value": "string",
+        }
 
     def test_non_dict_to_dict(self):
         """When a value changes from non-dict to dict."""
@@ -120,7 +123,11 @@ class TestDictDiff:
         new = {"a": {"x": 1}}
         changes = dict_diff(old, new)
         assert len(changes) == 1
-        assert changes[0] == {"field": "a", "old_value": "string", "new_value": {"x": 1}}
+        assert changes[0] == {
+            "field": "a",
+            "old_value": "string",
+            "new_value": {"x": 1},
+        }
 
     def test_empty_dicts(self):
         """Both empty dicts produce no changes."""

@@ -6,15 +6,16 @@ maps answers to trends (regressing/stalling/improving),
 persists entry to pulse-history.yaml, generates course corrections
 for regressing decisions, and returns formatted markdown output.
 """
+
 import datetime
 from pathlib import Path
 
 from ..core import (
+    DECISION_LABELS,
+    ROUTING_RULES,
     load_context,
     read_yaml,
     write_yaml,
-    DECISION_LABELS,
-    ROUTING_RULES,
 )
 
 # ---------------------------------------------------------------------------
@@ -29,6 +30,7 @@ HISTORY_REL_PATH = ".scaleup/my-company/pulse-history.yaml"
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _trend(answer: int) -> str:
     """Map a single pulse answer to a trend label."""
@@ -45,9 +47,7 @@ def _validate_answers(answers: dict) -> list[str]:
     for decision in DECISIONS:
         val = answers.get(decision)
         if val is None:
-            errors.append(
-                f"Missing answer for '{decision}'. Must be -1, 0, or 1."
-            )
+            errors.append(f"Missing answer for '{decision}'. Must be -1, 0, or 1.")
         elif val not in VALID_ANSWER_VALUES:
             errors.append(
                 f"Invalid answer for '{decision}': {val!r}. Must be -1, 0, or 1."
@@ -73,7 +73,9 @@ def _format_answer(val: int) -> str:
     return str(val)
 
 
-def _build_output(today: str, answers: dict, trends: dict, course_corrections: list[str]) -> str:
+def _build_output(
+    today: str, answers: dict, trends: dict, course_corrections: list[str]
+) -> str:
     """Assemble the markdown output."""
     overall_trend = trends.get("overall", "stalling")
 
@@ -104,6 +106,7 @@ def _build_output(today: str, answers: dict, trends: dict, course_corrections: l
 # ---------------------------------------------------------------------------
 # Core run function
 # ---------------------------------------------------------------------------
+
 
 def run(context: dict) -> dict:
     """

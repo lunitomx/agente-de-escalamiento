@@ -5,8 +5,6 @@ import os
 import signal
 import subprocess
 import sys
-import tempfile
-import threading
 import time
 from pathlib import Path
 
@@ -17,13 +15,12 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "escala_server"))
 
 # Import after path setup
-from escala_server.server import EscalaRequestHandler, make_server
-from escala_server.router import Router
-from escala_server.handlers import CompaniesHandler, WorksheetsHandler, SessionsHandler
 from escala_server.cors import CORSHandler
-
+from escala_server.handlers import CompaniesHandler, WorksheetsHandler
+from escala_server.router import Router
 
 # ─── Router Tests ─────────────────────────────────────────────
+
 
 class TestRouter:
     def test_register_and_dispatch_get(self):
@@ -62,6 +59,7 @@ class TestRouter:
 
 # ─── CORS Tests ───────────────────────────────────────────────
 
+
 class TestCORSHandler:
     def test_cors_headers_present(self):
         headers = CORSHandler.get_headers()
@@ -73,9 +71,11 @@ class TestCORSHandler:
 
 # ─── Handler Tests ────────────────────────────────────────────
 
+
 class TestCompaniesHandler:
     def setup_method(self):
         import uuid
+
         self.db_path = f"file:test_co_{uuid.uuid4().hex[:8]}?mode=memory&cache=shared"
         self.handler = CompaniesHandler(db_path=self.db_path)
 
@@ -107,6 +107,7 @@ class TestWorksheetsHandler:
     def setup_method(self):
         # Unique :memory: db per test to avoid state leakage
         import uuid
+
         self.db_path = f"file:test_ws_{uuid.uuid4().hex[:8]}?mode=memory&cache=shared"
         self.handler = WorksheetsHandler(db_path=self.db_path)
 
@@ -124,6 +125,7 @@ class TestWorksheetsHandler:
 
 
 # ─── Server Integration Tests ─────────────────────────────────
+
 
 @pytest.fixture
 def server_process():
