@@ -1,6 +1,6 @@
 # Epic Scope: E22 — Memoria Empresarial Integrada
 
-**Status:** Designed — implementation gated
+**Status:** Planned — ready for story execution
 **Dependencies:** E10 (distribución), E18 (SQLite, memoria, grafo y sesiones)
 **Audited:** 2026-08-26
 **Tamaño:** L
@@ -89,3 +89,53 @@ skills, rutas ni la arquitectura al empresario.
   door.
 - [x] Diagnóstico RaiSE M documentado localmente el 2026-08-26.
 - [x] Base actual: 404 passed, 2 skipped (2026-08-24).
+
+## Implementation Plan
+
+La ruta crítica es S22.2 → S22.3 → S22.4 → S22.5 → S22.6 → S22.7. Se usa
+riesgo primero: antes de modificar la conversación pública se prueba que el
+runtime puede vivir, migrar y aislarse dentro de un proyecto real.
+
+| Pos. | Story | Dependencias | Razonamiento y habilita | Estado | Real |
+|:---:|---|---|---|:---:|:---:|
+| 1 | S22.1 — Contrato y ADR | Ninguna | Fija fuente única, consentimiento y fixture adversarial; evita migrar datos ambiguos. | Done | — |
+| 2 | S22.2 — Runtime, instalación y ciclo SQLite | S22.1 | Walking skeleton: prueba DB local, health, backup y rollback sin servidor ni defaults globales. Habilita todo lo demás. | Ready | — |
+| 3 | S22.3 — Migración YAML idempotente | S22.2 | Lleva el estado existente a la fuente única y prueba repetición/recuperación antes de leerlo en conversación. | Blocked by S22.2 | — |
+| 4 | S22.4 — Inicio y recuperación contextual | S22.2, S22.3 | Recupera sólo datos confirmados y muestra degradación segura; valida el valor entre sesiones. | Blocked by S22.3 | — |
+| 5 | S22.5 — Cierre, hechos y patrones confirmados | S22.2, S22.3 | Añade propuesta, sí/no, fuente y confianza. Puede desarrollarse en paralelo con S22.4 una vez migración esté estable. | Blocked by S22.3 | — |
+| 6 | S22.6 — Front door y continuidad natural | S22.4, S22.5 | Conecta inicio/cierre sin exponer infraestructura y conserva onboarding, diagnóstico, plan y progreso. | Blocked by S22.4/S22.5 | — |
+| 7 | S22.7 — Validación E2E, privacidad y release | S22.6 | Prueba instalación limpia → conversar → confirmar/cerrar → nueva sesión → recuperar en los clientes soportados. | Blocked by S22.6 | — |
+
+No hay una oportunidad de paralelismo segura antes de S22.3: el contrato de
+rutas y la migración definen los datos que consumirán inicio y cierre. Después
+de S22.3, S22.4 y S22.5 pueden avanzar en módulos distintos; se integran en
+S22.6.
+
+## Milestones
+
+| Hito | Historias | Criterio verificable | Demo |
+|---|---|---|---|
+| M1 — Walking skeleton | S22.1–S22.2 | Un proyecto temporal crea, valida, respalda y restaura `.scaleup/memory/escala.db`; ningún dato usa el directorio personal. | Ejecutar el bridge sobre una empresa vacía. |
+| M2 — Memoria confiable | S22.3–S22.5 | Fixture legado migra dos veces sin duplicar; sesión nueva recupera datos confirmados; un candidato rechazado no se guarda. | Migrar, confirmar una decisión y recuperarla en otra sesión. |
+| M3 — Integración E2E | S22.6 | Runtime instalado conserva el recorrido público y recupera contexto desde el front door. | Instalación limpia y conversación natural de continuidad. |
+| M4 — Epic complete | S22.7 | Matriz Claude/Codex pasa, Hermes queda cubierto o limitado explícitamente; privacidad, rollback y regresiones verdes. | Flujo completo de empresa existente, de instalación a segunda sesión. |
+
+### Gates de historia
+
+- S22.2 no puede usar `~/.escala`, un servidor HTTP ni rutas implícitas.
+- S22.3 necesita fixtures de perfil, conversación, plan y worksheet; dos
+  corridas deben producir el mismo conteo de registros.
+- S22.4/S22.5 deben tener tests de ausencia/corrupción de DB y de rechazo de
+  candidato, respectivamente.
+- S22.6 sólo se integra cuando ambos contratos se prueben de forma aislada.
+- S22.7 usa infraestructura real de instalación; mocks no sustituyen el smoke
+  de los artefactos copiados.
+
+### Sequencing Risks
+
+1. El runtime de E18 puede incluir dependencias o rutas globales ocultas; M1
+   las detecta antes de tocar el front door.
+2. Los YAML y Markdown actuales pueden codificar la misma información con
+   nombres distintos; S22.3 conserva proveniencia y prueba idempotencia.
+3. El texto natural puede crear datos falsos; S22.5 separa propuesta de
+   persistencia y exige una respuesta afirmativa inequívoca.
