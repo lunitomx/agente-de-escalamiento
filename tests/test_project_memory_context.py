@@ -362,3 +362,29 @@ def test_v4_context_remains_readable_before_and_after_explicit_upgrade(
     after = ProjectMemorySessionContext(root).load()
     assert after.ready
     assert after.items == before.items
+
+
+def test_v4_context_falls_back_without_writing_for_altered_schema_or_index(
+    tmp_path: Path,
+) -> None:
+    for root_name, mutation in (
+        ("altered-table", "ALTER TABLE memory_facts ADD COLUMN untrusted TEXT"),
+        ("altered-index", "DROP INDEX idx_migration_sources_path"),
+    ):
+        root = migrated_project(tmp_path / root_name)
+        runtime = ProjectMemoryRuntime(root)
+        with sqlite3.connect(runtime.db_path) as connection:
+            connection.execute("DROP TABLE session_memory_proposals")
+            connection.execute("DROP TABLE confirmed_memory_entries")
+            connection.execute("DROP TABLE project_memory_sessions")
+            connection.execute(
+                "UPDATE _meta SET value = ? WHERE key = ?", ("4", "schema_version")
+            )
+            connection.execute(mutation)
+
+        before = runtime.db_path.read_bytes()
+        result = ProjectMemorySessionContext(root).load()
+
+        assert not result.ready
+        assert result.items == ()
+        assert runtime.db_path.read_bytes() == before

@@ -185,34 +185,11 @@ DDL_STATEMENTS = [
     """,
 ]
 
-# S22.4 may safely read these columns from an already-migrated v4 database.
-# This deliberately is a smaller, read-only contract than the v6 write schema:
-# the context bridge never creates, repairs, or upgrades a legacy database.
-_CONTEXT_READ_COLUMNS = {
-    "_meta": {"key", "value"},
-    "memory_facts": {"key", "value", "updated_at"},
-    "migration_sources": {
-        "relative_path",
-        "content_sha256",
-        "import_schema",
-        "source_kind",
-    },
-    "migration_applications": {
-        "id",
-        "relative_path",
-        "content_sha256",
-        "import_schema",
-        "source_kind",
-        "applied_at",
-    },
-    "migration_fact_applications": {
-        "fact_key",
-        "value_sha256",
-        "migration_application_id",
-        "applied_at",
-    },
-    "worksheets": {"id", "category", "tool", "data"},
-}
+# The v4 read-only bridge accepts only the exact historical v4 contract. The
+# first eleven tables and first fourteen indexes are the frozen v4 DDL; later
+# consent-memory objects are deliberately excluded. Building the fingerprint
+# from that DDL keeps column properties and indexes tied to their authority.
+_V4_DDL_STATEMENTS = tuple(DDL_STATEMENTS[:11])
 
 # ── Indexes (created separately after tables) ────────────────────────
 INDEX_STATEMENTS = [
@@ -235,6 +212,8 @@ INDEX_STATEMENTS = [
     "CREATE INDEX IF NOT EXISTS idx_confirmed_memory_entries_session ON confirmed_memory_entries(session_id)",
     "CREATE INDEX IF NOT EXISTS idx_confirmed_memory_entries_kind_status ON confirmed_memory_entries(kind, status)",
 ]
+
+_V4_INDEX_STATEMENTS = tuple(INDEX_STATEMENTS[:14])
 
 
 def _contract_fingerprint(
@@ -304,22 +283,46 @@ def schema_contract_tables_are_present(connection: sqlite3.Connection) -> bool:
 
 
 def context_read_schema_is_valid(connection: sqlite3.Connection) -> bool:
-    """Validate the narrow, read-only v4 context contract without upgrading it."""
+    """Validate the frozen v4 contract without upgrading or repairing it."""
     try:
         version = connection.execute(
             "SELECT value FROM _meta WHERE key = 'schema_version'"
         ).fetchone()
-        if version is None or int(version[0]) not in {4, SCHEMA_VERSION}:
+        if version is None or int(version[0]) != 4:
             return False
-        for table, required in _CONTEXT_READ_COLUMNS.items():
-            actual = {
-                row[1] for row in connection.execute(f"PRAGMA table_info({table})")
-            }
-            if not required.issubset(actual):
-                return False
+        expected_tables, expected = _expected_v4_context_contract()
+        actual_tables = {
+            row[0]
+            for row in connection.execute(
+                "SELECT name FROM sqlite_master WHERE type = 'table' "
+                "AND name NOT LIKE 'sqlite_%'"
+            )
+        }
+        if actual_tables != expected_tables:
+            return False
+        if _contract_fingerprint(connection, expected_tables) != expected:
+            return False
     except (sqlite3.Error, TypeError, ValueError):
         return False
     return True
+
+
+@lru_cache(maxsize=1)
+def _expected_v4_context_contract() -> tuple[frozenset[str], tuple]:
+    """Build the immutable v4 read-only contract from its historical DDL."""
+    with sqlite3.connect(":memory:") as connection:
+        for statement in _V4_DDL_STATEMENTS:
+            connection.execute(statement)
+        for statement in _V4_INDEX_STATEMENTS:
+            connection.execute(statement)
+        tables = frozenset(
+            row[0]
+            for row in connection.execute(
+                "SELECT name FROM sqlite_master WHERE type = 'table' "
+                "AND name NOT LIKE 'sqlite_%'"
+            )
+        )
+        return tables, _contract_fingerprint(connection, tables)
 
 
 def _ensure_v6_format_columns(connection: sqlite3.Connection) -> None:

@@ -287,3 +287,30 @@ def test_v5_consent_tables_upgrade_format_columns_idempotently(tmp_path: Path) -
         }
     assert "provenance_format_version" in proposal_columns
     assert {"entry_format_version", "provenance_format_version"} <= entry_columns
+
+
+def test_path_bearing_statements_are_rejected_before_any_proposal_persists(
+    tmp_path: Path,
+) -> None:
+    close = ProjectMemorySessionClose(tmp_path)
+    assert close.open_session("s-1").ready
+
+    for statement in (
+        "Guardar /etc/passwd como decisión",
+        "Revisar ../../private/plan.yaml",
+        r"Abrir C:\\Users\\owner\\secrets.txt",
+        r"Consultar \\server\\share\\strategy.md",
+    ):
+        result = close.propose("s-1", candidate(statement=statement))
+        assert result.status == "invalid"
+        assert result.reason == "sensitive_or_invalid_statement"
+
+    ordinary = close.propose(
+        "s-1", candidate(statement="Aumentar margen mediante ventas B2B")
+    )
+    assert ordinary.status == "proposed"
+    with sqlite3.connect(ProjectMemoryRuntime(tmp_path).db_path) as db:
+        assert (
+            db.execute("SELECT COUNT(*) FROM session_memory_proposals").fetchone()[0]
+            == 1
+        )

@@ -74,6 +74,8 @@ _SENSITIVE_COMPACT = frozenset(
 _MAX_STATEMENT = 500
 _MAX_IDENTIFIER = 160
 _IDENTIFIER_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{0,159}\Z")
+_ABSOLUTE_PATH_RE = re.compile(r"(?:^|[\s\"'`=:(\[])(?:/|\\\\|[A-Za-z]:[\\/])")
+_TRAVERSAL_PATH_RE = re.compile(r"(?:^|[\\/])\.\.(?:[\\/]|$)")
 
 
 class ProjectMemorySessionClose:
@@ -304,6 +306,7 @@ class ProjectMemorySessionClose:
             not statement
             or len(statement) > _MAX_STATEMENT
             or self._sensitive(statement)
+            or self._has_external_path_form(statement)
         ):
             return "sensitive_or_invalid_statement"
         observations = source.observation_ids
@@ -319,6 +322,13 @@ class ProjectMemorySessionClose:
         ):
             return "invalid_replacement"
         return None
+
+    @staticmethod
+    def _has_external_path_form(statement: str) -> bool:
+        """Reject path-bearing proposals without treating ordinary prose as paths."""
+        return bool(
+            _ABSOLUTE_PATH_RE.search(statement) or _TRAVERSAL_PATH_RE.search(statement)
+        )
 
     @staticmethod
     def _sensitive(value: str) -> bool:
