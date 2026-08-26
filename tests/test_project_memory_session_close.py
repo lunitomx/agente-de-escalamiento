@@ -1,6 +1,7 @@
 """Contract tests for explicit, project-local consent memory."""
 
 import sqlite3
+import threading
 from pathlib import Path
 
 from escala_server.project_memory import ProjectMemoryRuntime
@@ -318,3 +319,79 @@ def test_path_bearing_statements_are_rejected_before_any_proposal_persists(
             db.execute("SELECT COUNT(*) FROM session_memory_proposals").fetchone()[0]
             == 1
         )
+
+
+def test_environment_variable_path_forms_never_persist(tmp_path: Path) -> None:
+    close = ProjectMemorySessionClose(tmp_path)
+    assert close.open_session("s-1").ready
+    for statement in (
+        "Guardar $PLAN_ROOT/strategy.md como decisión",
+        "Guardar ${PLAN_ROOT}/strategy.md como decisión",
+        r"Guardar %PLAN_ROOT%\strategy.md como decisión",
+    ):
+        result = close.propose("s-1", candidate(statement=statement))
+        assert result.status == "invalid"
+        assert result.reason == "sensitive_or_invalid_statement"
+    with sqlite3.connect(ProjectMemoryRuntime(tmp_path).db_path) as db:
+        assert (
+            db.execute("SELECT COUNT(*) FROM session_memory_proposals").fetchone()[0]
+            == 0
+        )
+
+
+def test_threaded_close_never_closes_with_a_forced_pending_proposal(
+    tmp_path: Path,
+) -> None:
+    close = ProjectMemorySessionClose(tmp_path)
+    assert close.open_session("s-1").ready
+    proposed = threading.Event()
+    result: dict[str, object] = {}
+
+    def propose() -> None:
+        result["proposal"] = close.propose("s-1", candidate())
+        proposed.set()
+
+    def close_after_proposal() -> None:
+        assert proposed.wait(timeout=2)
+        result["close"] = ProjectMemorySessionClose(tmp_path).close("s-1")
+
+    proposal_thread = threading.Thread(target=propose)
+    close_thread = threading.Thread(target=close_after_proposal)
+    proposal_thread.start()
+    close_thread.start()
+    proposal_thread.join(timeout=2)
+    close_thread.join(timeout=2)
+
+    assert not proposal_thread.is_alive()
+    assert not close_thread.is_alive()
+    assert result["proposal"].status == "proposed"  # type: ignore[union-attr]
+    assert result["close"].reason == "confirmation_pending"  # type: ignore[union-attr]
+
+
+def test_threaded_proposal_never_appears_after_a_forced_close(tmp_path: Path) -> None:
+    close = ProjectMemorySessionClose(tmp_path)
+    assert close.open_session("s-1").ready
+    closed = threading.Event()
+    result: dict[str, object] = {}
+
+    def close_session() -> None:
+        result["close"] = close.close("s-1")
+        closed.set()
+
+    def propose_after_close() -> None:
+        assert closed.wait(timeout=2)
+        result["proposal"] = ProjectMemorySessionClose(tmp_path).propose(
+            "s-1", candidate()
+        )
+
+    close_thread = threading.Thread(target=close_session)
+    proposal_thread = threading.Thread(target=propose_after_close)
+    close_thread.start()
+    proposal_thread.start()
+    close_thread.join(timeout=2)
+    proposal_thread.join(timeout=2)
+
+    assert not close_thread.is_alive()
+    assert not proposal_thread.is_alive()
+    assert result["close"].closed  # type: ignore[union-attr]
+    assert result["proposal"].reason == "session_not_open"  # type: ignore[union-attr]

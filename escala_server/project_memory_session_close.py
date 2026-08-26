@@ -77,6 +77,9 @@ _IDENTIFIER_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{0,159}\Z")
 _ABSOLUTE_PATH_RE = re.compile(r"(?:^|[\s\"'`=:(\[])(?:/|\\\\|[A-Za-z]:[\\/])")
 _TRAVERSAL_PATH_RE = re.compile(r"(?:^|[\\/])\.\.(?:[\\/]|$)")
 _TILDE_HOME_PATH_RE = re.compile(r"(?:^|[\s\"'`=:(\[])~[\\/]")
+_ENV_PATH_RE = re.compile(
+    r"(?:\$[A-Za-z_][A-Za-z0-9_]*|\$\{[A-Za-z_][A-Za-z0-9_]*\}|%[A-Za-z_][A-Za-z0-9_]*%)[\\/]"
+)
 
 
 class ProjectMemorySessionClose:
@@ -113,6 +116,7 @@ class ProjectMemorySessionClose:
         fingerprint = self._fingerprint(candidate)
         try:
             with self._connection() as db:
+                self._begin_immediate(db)
                 session = db.execute(
                     "SELECT status FROM project_memory_sessions WHERE id = ?",
                     (session_id,),
@@ -163,6 +167,7 @@ class ProjectMemorySessionClose:
         response = self._response(answer)
         try:
             with self._connection() as db:
+                self._begin_immediate(db)
                 row = db.execute(
                     """SELECT id, session_id, kind, statement, origin, observation_ids,
                               replaces_entry_id, response_state
@@ -243,6 +248,7 @@ class ProjectMemorySessionClose:
             return self._close_fallback(ready.reason)
         try:
             with self._connection() as db:
+                self._begin_immediate(db)
                 row = db.execute(
                     "SELECT status FROM project_memory_sessions WHERE id = ?",
                     (session_id,),
@@ -266,9 +272,14 @@ class ProjectMemorySessionClose:
             return self._close_fallback()
 
     def _connection(self) -> sqlite3.Connection:
-        connection = sqlite3.connect(self.runtime.db_path)
+        connection = sqlite3.connect(self.runtime.db_path, isolation_level=None)
         connection.execute("PRAGMA foreign_keys=ON")
         return connection
+
+    @staticmethod
+    def _begin_immediate(db: sqlite3.Connection) -> None:
+        """Serialize consent state transitions before inspecting their state."""
+        db.execute("BEGIN IMMEDIATE")
 
     @staticmethod
     def _response(answer: object) -> str | None:
@@ -331,6 +342,7 @@ class ProjectMemorySessionClose:
             _ABSOLUTE_PATH_RE.search(statement)
             or _TRAVERSAL_PATH_RE.search(statement)
             or _TILDE_HOME_PATH_RE.search(statement)
+            or _ENV_PATH_RE.search(statement)
         )
 
     @staticmethod

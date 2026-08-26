@@ -7,6 +7,7 @@ Tables: companies, worksheets, sessions, changes_log,
 
 import hashlib
 import json
+import re
 import sqlite3
 from functools import lru_cache
 from pathlib import Path
@@ -216,10 +217,34 @@ INDEX_STATEMENTS = [
 _V4_INDEX_STATEMENTS = tuple(INDEX_STATEMENTS[:14])
 
 
+def _normalized_sql(sql: str) -> str:
+    """Compare SQLite DDL structurally, ignoring formatting-only differences."""
+    compact = re.sub(r"\s*([(),])\s*", r"\1", sql)
+    return re.sub(r"\s+", " ", compact).strip().casefold()
+
+
+def _check_constraints(sql: str) -> tuple[str, ...]:
+    """Extract normalized CHECK expressions, including nested parentheses."""
+    checks: list[str] = []
+    start = 0
+    while (match := re.search(r"check\(", sql[start:], re.IGNORECASE)) is not None:
+        cursor = start + match.end()
+        depth = 1
+        expression_start = cursor
+        while cursor < len(sql) and depth:
+            depth += (sql[cursor] == "(") - (sql[cursor] == ")")
+            cursor += 1
+        if depth:
+            return ()
+        checks.append(_normalized_sql(sql[expression_start : cursor - 1]))
+        start = cursor
+    return tuple(checks)
+
+
 def _contract_fingerprint(
     connection: sqlite3.Connection, table_names: frozenset[str]
 ) -> tuple:
-    """Return the SQLite-visible structural contract for the managed tables."""
+    """Return the full SQLite-visible structural contract for managed tables."""
     tables = []
     for table in sorted(table_names):
         columns = tuple(
@@ -235,7 +260,24 @@ def _contract_fingerprint(
                 if row[5]
             )
             indexes.append((name, unique, origin, partial, columns_in_index))
-        tables.append((table, columns, tuple(sorted(indexes))))
+        sql_row = connection.execute(
+            "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = ?", (table,)
+        ).fetchone()
+        table_sql = _normalized_sql(sql_row[0]) if sql_row and sql_row[0] else ""
+        foreign_keys = tuple(
+            (row[2], row[3], row[4], row[5].upper(), row[6].upper(), row[7].upper())
+            for row in connection.execute(f"PRAGMA foreign_key_list({table})")
+        )
+        tables.append(
+            (
+                table,
+                columns,
+                tuple(sorted(indexes)),
+                table_sql,
+                foreign_keys,
+                _check_constraints(table_sql),
+            )
+        )
     return tuple(tables)
 
 
