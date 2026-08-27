@@ -1,7 +1,7 @@
 ---
 epic_id: E61
 title: Corpus Strategy verificado
-status: planned
+status: in_progress
 depends_on: [E58]
 ---
 
@@ -33,6 +33,7 @@ Construir la representación trazable de Strategy para que el agente pueda disti
 | 2 | S61.2 Candidatos/revisión | Registro de aprobación, rechazo y ambigüedad. |
 | 3 | S61.3 Relaciones | Grafo de dependencias con evidencia. |
 | 4 | S61.4 Fidelidad de herramientas | Comparación de formulario, campos y condiciones. |
+| 5 | S61.5 Cobertura exhaustiva | Cada unidad del rango queda mapeada con evidencia, como fuente especial o con handoff explícito. |
 
 ## Criterios de terminación
 
@@ -40,6 +41,11 @@ Construir la representación trazable de Strategy para que el agente pueda disti
 - Toda prescripción y relación obligatoria tiene evidencia.
 - Cero relaciones inventadas, condiciones perdidas o conflictos críticos ocultos.
 - Formularios validados antes de que E69 los vuelva procedimiento.
+
+## Estado de evidencia
+
+- S61.1, S61.2, S61.3 y S61.5 tienen borradores privados trazables; los candidatos siguen sin promoción canónica hasta revisión independiente.
+- S61.4 no se declarará aprobado sin un activo fuente autorizado para validar visualmente los campos de Vision Summary, OPSP y Seven Strata.
 
 ## Handoff y riesgos
 
