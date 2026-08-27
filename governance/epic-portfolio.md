@@ -10,7 +10,7 @@ se alteraron para aparentar cierre.
 | Hallazgo | Disposición | Acción registrada |
 |---|---|---|
 | E42 estaba `complete` aunque sus seis requisitos no tenían prueba maestra vigente. | `active` | Scope y brief corregidos; conserva evidencia histórica, pero exige hardware/skills/aceptación reales. |
-| E43 decía `done` en scope y `planned` en brief sin evidencia de cierre. | `planned` | Todas las historias vuelven a Pending. |
+| E43 tenía documentación contradictoria. | `complete` (gate E42 para release) | Se verificaron las seis historias, el cierre histórico y 135 pruebas focalizadas actuales. |
 | E47 decía `done` y `started` a la vez; RaiSE no era una dependencia de producto. | Reparado; `complete` | Calificación fresca de workspace/OPSP/feedback pasa; la deuda de RaiSE queda aislada en E76. |
 | El backlog raíz seguía apuntando al repositorio viejo y a E1–E5 como plan actual. | Reemplazado | `governance/backlog.md` es la fuente única de trabajo futuro. |
 | Un remoto local `legacy-scaleupagent` contrariaba la política de un único canónico. | Reparado | Retirado sólo de la configuración local; `origin/main` vuelve a sincronizado. |
@@ -32,7 +32,7 @@ se alteraron para aparentar cierre.
 
 ### Planificado, con dependencias explícitas
 
-E43–E46, E44–E45, E57–E75 y E67–E70 permanecen planificados según el orden de
+E44–E46, E57–E75 y E67–E70 permanecen planificados según el orden de
 `backlog.md`. No son deuda olvidada: son trabajo aún no iniciado y no deben
 marcarse como entregados por contener documentos de diseño.
 

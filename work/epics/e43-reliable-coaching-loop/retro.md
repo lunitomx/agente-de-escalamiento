@@ -11,6 +11,14 @@ status: "done"
 Épica completada con éxito. Todas las historias (S43.1-S43.6) están mergeadas a
 `main` y pasan los gates locales.
 
+## Corrección de alcance de release (2026-08-27)
+
+Este cierre acredita implementación y calificación local; no sustituye las
+pruebas de hardware limpio ni la aceptación empresarial final que pertenecen a
+E42. La verificación focalizada actual volvió a ejecutar las suites de los seis
+módulos y obtuvo **135 passed**. Por tanto E43 permanece completa y E42 se
+mantiene como gate externo de promoción/distribución.
+
 | Story | Estado | Evidencia |
 |---|---|---|
 | S43.1 | Done | `coaching.decision` confirmado |
@@ -28,7 +36,8 @@ status: "done"
 - [x] Una pregunta ausente bloquea la conclusión cuando altera la decisión (`clarify`/`blocked`).
 - [x] La respuesta no expone tecnicismos innecesarios al empresario (markdown ejecutivo).
 - [x] Los cuatro pilares tienen casos positivos y negativos aprobados.
-- [x] Línea base E42: se establece evidencia de calificación con 8 casos; no se requiere métrica adicional.
+- [-] Línea base E42: los 8 casos califican la implementación local, pero la
+      evidencia externa de hardware y aceptación humana sigue pendiente en E42.
 - [x] Autoridad local y prohibición de SQLite mantenidas (solo archivos locales).
 - [x] Retrospectiva y evidencia de calificación completadas.
 

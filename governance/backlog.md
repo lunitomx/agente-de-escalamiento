@@ -25,8 +25,8 @@ formalizados no son trabajo activo sólo por existir en `work/epics/`.
 
 | Orden | Épica | Estado real | Por qué va ahora | Gate para avanzar |
 |---:|---|---|---|---|
-| 0 | E76 — Recuperación reproducible de RaiSE | Activo | El entorno de desarrollo no tiene manifest/configuración/grafo reproducible. | `rai doctor` queda sin errores aplicables y el build del grafo es reproducible, sin crear un segundo venv. |
-| 1 | E42 — Qualification y catálogo verdadero | Activo | Es la línea base honesta: hoy los 6 requisitos E42 no tienen prueba maestra vigente. | Hardware limpio macOS/Windows, inventario probado de cada skill distribuido y aceptación humana registrada. |
+| P | E76 — Recuperación reproducible de RaiSE | Activo en paralelo; no bloquea producto | El entorno de desarrollo no tiene manifest/configuración/grafo reproducible. | `rai doctor` queda sin errores aplicables y el build del grafo es reproducible, sin crear un segundo venv ni sobrescribir `.raise` sin autorización explícita. |
+| G | E42 — Qualification y catálogo verdadero | Gate externo de release; paralelo | Es la línea base honesta: hoy los 6 requisitos E42 no tienen prueba maestra vigente. | Hardware limpio macOS/Windows, inventario probado de cada skill distribuido y aceptación humana registrada. |
 | 2 | E47 — Workspace, OPSP y feedback | Completada | Producto re-verificado: workspace, OPSP y feedback local no requieren RaiSE. | 42 pruebas de producto; la reproducibilidad de RaiSE queda aislada en E76. |
 | 3 | E49 — Experiencia diagnóstica y evidencia | Completada | El análisis inicial ya es narrativo, verificable y útil antes de profundizar. | Recibo local, ruta de 90 días y diagnóstico que distingue hechos, inferencias, N/A y preguntas materiales. |
 | 4 | E55 — Onboarding multifuente y conciliación | Completada; GitHub #9 | Corrigió el Welcome para reutilizar hechos locales y distinguir evidencia faltante o incompatible. | Recibo sintético E55, 4 rutas adaptativas y conciliación conservadora probados. |
@@ -35,7 +35,7 @@ formalizados no son trabajo activo sólo por existir en `work/epics/`.
 | 7 | E71 — Inteligencia de mercado | Planificado | Amplía Strategy con mercado, competidores, ICP y customer journey verificables. | Research fechado, fuentes visibles y revisión explícita del dueño. |
 | 8 | E73 — Asesor de dashboards | Planificado | Sugiere visuales de negocio sólo cuando existe evidencia suficiente. | Dashboard recomendado, trazable, sin inventar métricas. |
 | 9 | E74 — Workspace compartido multiempresa | Planificado | Hace colaboración por carpeta compartida sin volver SQLite sincronizado en autoridad. | Markdown/YAML compartido, conflictos explícitos y SQLite sólo como caché local. |
-| 10 | E43 — Ciclo de coaching confiable | Planificado | Convierte evidencia en una respuesta ejecutiva antes de sumar más automatización. | Casos positivos/negativos en las cuatro decisiones y aceptación empresarial. |
+| 10 | E43 — Ciclo de coaching confiable | Completo localmente; gate E42 | Convierte evidencia en una respuesta ejecutiva antes de sumar más automatización. | Casos positivos/negativos verificados; falta solo la aceptación externa de E42 para release. |
 | 11 | E44 — Aprendizaje de resultados | Planificado | Guarda decisión, resultado y aprendizaje confirmado, no “memoria” inventada. | Estado versionado y retrospectiva trimestral controlada. |
 | 12 | E45 + E67 — Especialistas internos y adaptadores | Planificado | Instala Cash, Execution, People y Strategy bajo un solo orquestador. | Una puerta pública, contratos privados, rutas simples rápidas y casos transversales evaluados. |
 | 13 | E46 — Mejora de producto gobernada | Planificado | Sólo se habilita tras datos de resultados y feedback aprobado. | Cambios propuestos, evaluados y aprobados; nunca mutación autónoma. |

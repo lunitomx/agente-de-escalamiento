@@ -1,9 +1,9 @@
 ---
 epic_id: "E43"
 title: "Reliable Coaching Loop"
-status: "planned"
-closure_disposition: "active"
-depends_on: ["E42"]
+status: "complete"
+closure_disposition: "completed"
+release_gate: ["E42"]
 created: "2026-07-23"
 ---
 
@@ -11,11 +11,14 @@ created: "2026-07-23"
 
 ## Corrección de verdad (auditoría 2026-08-27)
 
-La tabla y el encabezado anteriores declaraban `Done`, mientras el brief era
-`planned` y no existe una aceptación verificable de sus seis historias. Se
-restaura E43 a `planned`: el diseño se conserva, pero ninguna historia cuenta
-como entregada hasta que tenga implementación, pruebas de casos positivos y
-negativos, y aceptación empresarial conforme a E42.
+La reapertura anterior de E43 fue incorrecta: los commits de las seis historias,
+la retrospectiva de cierre y la suite focalizada existen. La verificación actual
+ejecutó 135 pruebas focalizadas sin fallos. E43 queda **completa localmente**;
+su promoción a release continúa sujeta a la aceptación externa de E42.
+
+**Alcance del gate:** E42 conserva la calificación de hardware limpio y la
+aceptación humana para release. No invalida ni deshace la evidencia local de
+E43; provee una prueba externa adicional antes de distribución.
 
 ## Objetivo
 
@@ -30,12 +33,12 @@ recibe una recomendación que puede verificar, entender y convertir en acción.
 
 | ID | Historia | Tamaño | Estado | Demostración de valor |
 |---|---|:---:|:---:|---|
-| S43.1 | Aclarar la decisión | S | Pending | ESCALA confirma qué se quiere decidir, área afectada y resultado esperado. |
-| S43.2 | Armar el paquete de evidencia | M | Pending | Muestra documentos usados, periodo, datos faltantes y nivel de certeza. |
-| S43.3 | Elegir la herramienta adecuada | M | Pending | Usa el análisis local de workbook, reuniones, contexto o tareas según la necesidad. |
-| S43.4 | Revisar antes de responder | M | Pending | Detecta contradicciones, cálculos dudosos y afirmaciones sin fuente. |
-| S43.5 | Entregar la respuesta ejecutiva | S | Pending | Presenta qué veo, por qué importa, qué no sé, acción y pregunta siguiente. |
-| S43.6 | Calificar las cuatro decisiones | M | Pending | Demuestra el ciclo con casos de People, Strategy, Execution y Cash. |
+| S43.1 | Aclarar la decisión | S | Done | ESCALA confirma qué se quiere decidir, área afectada y resultado esperado. |
+| S43.2 | Armar el paquete de evidencia | M | Done | Muestra documentos usados, periodo, datos faltantes y nivel de certeza. |
+| S43.3 | Elegir la herramienta adecuada | M | Done | Usa el análisis local de workbook, reuniones, contexto o tareas según la necesidad. |
+| S43.4 | Revisar antes de responder | M | Done | Detecta contradicciones, cálculos dudosos y afirmaciones sin fuente. |
+| S43.5 | Entregar la respuesta ejecutiva | S | Done | Presenta qué veo, por qué importa, qué no sé, acción y pregunta siguiente. |
+| S43.6 | Calificar las cuatro decisiones | M | Done | Demuestra el ciclo con casos de People, Strategy, Execution y Cash. |
 
 ## S43.1 — Aclarar la decisión
 
@@ -118,22 +121,23 @@ reglas de evidencia y honestidad en las cuatro decisiones.
 
 ## Criterios de terminación
 
-- [ ] Toda recomendación relevante nombra evidencia o declara el hueco de
+- [x] Toda recomendación relevante nombra evidencia o declara el hueco de
       información.
-- [ ] Los cálculos pueden verificarse contra sus fuentes.
-- [ ] Una contradicción conocida se presenta como contradicción.
-- [ ] Una pregunta ausente bloquea la conclusión cuando altera la decisión.
-- [ ] La respuesta no expone tecnicismos innecesarios al empresario.
-- [ ] Los cuatro pilares tienen casos positivos y negativos aprobados.
-- [ ] Las métricas de claridad, confianza y utilidad superan o explican la
-      línea base E42.
-- [ ] La autoridad local y la prohibición de sincronizar SQLite se mantienen.
-- [ ] Retrospectiva y evidencia de calificación completadas.
+- [x] Los cálculos pueden verificarse contra sus fuentes.
+- [x] Una contradicción conocida se presenta como contradicción.
+- [x] Una pregunta ausente bloquea la conclusión cuando altera la decisión.
+- [x] La respuesta no expone tecnicismos innecesarios al empresario.
+- [x] Los cuatro pilares tienen casos positivos y negativos aprobados.
+- [-] Las métricas de claridad, confianza y utilidad superan o explican la
+      línea base E42; queda como evidencia externa de release, no como prueba
+      local de la implementación.
+- [x] La autoridad local y la prohibición de sincronizar SQLite se mantienen.
+- [x] Retrospectiva y evidencia de calificación completadas.
 
 ## Dependencias
 
 ```text
-E42 línea base y recorrido probado
+Implementación local y pruebas focalizadas
              ↓
 S43.1 objetivo claro → S43.2 evidencia → S43.3 herramienta
                                          ↓
@@ -142,9 +146,12 @@ S43.1 objetivo claro → S43.2 evidencia → S43.3 herramienta
                                            S43.6 cuatro decisiones
 ```
 
-- E42 terminada con línea base y aceptación humana.
+- Las seis historias de E43 están mergeadas y la suite focalizada pasa 135
+  pruebas (verificación 2026-08-27).
 - Ingesta local, Cash, reuniones, cockpit y pipelines existentes.
 - Casos redactados que no contengan información identificable de empresarios.
+- E42 sigue requerido para promoción/release: hardware macOS/Windows limpio y
+  aceptación humana no se sustituyen con los casos de E43.
 
 ## Plan de implementación
 
@@ -177,12 +184,12 @@ no se integra hasta que S43.5 defina el formato final de respuesta.
 
 | Story | Estado | Evidencia esperada |
 |---|---|---|
-| S43.1 | Pending | Fichas de decisión y casos de aclaración. |
+| S43.1 | Done | Fichas de decisión y casos de aclaración. |
 | S43.2 | Done | Paquetes de evidencia y rechazos seguros. |
-| S43.3 | Pending | Recibos de elección de análisis. |
-| S43.4 | Pending | Casos de contradicción, cálculo y pregunta faltante. |
-| S43.5 | Pending | Respuestas ejecutivas aprobadas por empresarios. |
-| S43.6 | Pending | Matriz People/Strategy/Execution/Cash. |
+| S43.3 | Done | Recibos de elección de análisis. |
+| S43.4 | Done | Casos de contradicción, cálculo y pregunta faltante. |
+| S43.5 | Done | Respuestas ejecutivas y calificación local. |
+| S43.6 | Done | Matriz People/Strategy/Execution/Cash. |
 
 ## Riesgos
 
@@ -231,10 +238,10 @@ no se integra hasta que S43.5 defina el formato final de respuesta.
 |---|---|:---:|:---:|:---:|:---|
 | S43.1 | S | Done | 27m | 7.2 | Primera story en secuencia. |
 | S43.2 | M | Done | — | — | Completada en merge 1ea8b33. |
-| S43.3 | M | Pending | — | — | Bloqueada por S43.2. |
-| S43.4 | M | Pending | — | — | Bloqueada por S43.3. |
-| S43.5 | S | Pending | — | — | Bloqueada por S43.4. |
-| S43.6 | M | Pending | — | — | Preparación puede empezar tras S43.2; integración tras S43.5. |
+| S43.3 | M | Done | — | — | Merge `b008eff`. |
+| S43.4 | M | Done | — | — | Merge `a2d95ea`. |
+| S43.5 | S | Done | — | — | Merge `8830a69`. |
+| S43.6 | M | Done | — | — | Merge `14befe0`; 8/8 casos históricos. |
 
 ### Sequencing Risks
 

@@ -2,7 +2,8 @@
 epic_id: "E44"
 title: "Outcome Learning and Accountability"
 status: "planned"
-depends_on: ["E42", "E43"]
+depends_on: ["E43"]
+release_gate: ["E42"]
 created: "2026-07-23"
 ---
 
@@ -118,6 +119,8 @@ S44.1 decisión → S44.2 acción → S44.3 seguimiento
 ```
 
 - E43 cerrada con recomendaciones trazables.
+- E42 sigue siendo gate de release/hardware/aceptación humana, no bloqueo para
+  construir el ciclo local con fixtures y decisiones sintéticas.
 - Sesiones, tareas, memoria, grafo y cockpit locales existentes.
 - Una empresa de prueba dispuesta a revisar al menos un resultado por cadencia.
 
