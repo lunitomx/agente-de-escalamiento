@@ -18,17 +18,35 @@ from coaching.evidence.facts import (
 
 def test_fact_requires_metric_definition() -> None:
     with pytest.raises(ValidationError):
-        Fact(metric_definition="", period="2026-07", source="test", confidence="high", value=1)
+        Fact(
+            metric_definition="",
+            period="2026-07",
+            source="test",
+            confidence="high",
+            value=1,
+        )
 
 
 def test_fact_requires_source() -> None:
     with pytest.raises(ValidationError):
-        Fact(metric_definition="Ingreso", period="2026-07", source="", confidence="high", value=1)
+        Fact(
+            metric_definition="Ingreso",
+            period="2026-07",
+            source="",
+            confidence="high",
+            value=1,
+        )
 
 
 def test_fact_requires_period() -> None:
     with pytest.raises(ValidationError):
-        Fact(metric_definition="Ingreso", period="", source="test", confidence="high", value=1)
+        Fact(
+            metric_definition="Ingreso",
+            period="",
+            source="test",
+            confidence="high",
+            value=1,
+        )
 
 
 def test_save_and_load_fact(tmp_path: Path) -> None:

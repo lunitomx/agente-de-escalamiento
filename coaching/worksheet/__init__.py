@@ -403,11 +403,12 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
         if state_path.exists():
             existing = read_yaml(state_path)
             if existing and existing.get("status") == "completed":
-                timestamp = __import__("datetime").datetime.now().strftime(
-                    "%Y%m%d-%H%M%S"
+                timestamp = (
+                    __import__("datetime").datetime.now().strftime("%Y%m%d-%H%M%S")
                 )
                 backup_path = (
-                    state_path.parent / f"{state_path.stem}-{timestamp}{state_path.suffix}"
+                    state_path.parent
+                    / f"{state_path.stem}-{timestamp}{state_path.suffix}"
                 )
                 state_path.rename(backup_path)
 

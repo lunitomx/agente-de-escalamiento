@@ -1,10 +1,10 @@
 ---
 epic_id: "E42"
 title: "Product Qualification and Functional Catalog"
-status: "complete"
+status: "active"
 created: "2026-07-22"
-updated: "2026-07-30"
-closed: "2026-07-30"
+updated: "2026-08-27"
+closure_disposition: "active"
 release: "ESCALA Local V2"
 ---
 
@@ -22,10 +22,10 @@ línea base real de instalación, utilidad, claridad, evidencia y límites.
 
 | ID | Historia | Tamaño | Estado | Requisitos |
 |---|---|:---:|:---:|---|
-| S42.1 | Viaje completo e instalaciones limpias | L | complete | REQ-E42-001, REQ-E42-003 |
-| S42.2 | Inventario y prueba real de skills | M | complete | REQ-E42-002 |
-| S42.3 | Escenarios de seguridad y recuperación | M | complete | REQ-E42-004 |
-| S42.4 | Catálogo, PDF y aceptación humana | M | complete | REQ-E42-005, REQ-E42-006 |
+| S42.1 | Viaje completo e instalaciones limpias | L | partial | REQ-E42-001, REQ-E42-003 |
+| S42.2 | Inventario y prueba real de skills | M | active | REQ-E42-002 |
+| S42.3 | Escenarios de seguridad y recuperación | M | partial | REQ-E42-004 |
+| S42.4 | Catálogo, PDF y aceptación humana | M | active | REQ-E42-005, REQ-E42-006 |
 
 ## S42.1 — Viaje completo e instalaciones limpias
 
@@ -123,6 +123,25 @@ Un empresario recibe un catálogo y un PDF en español que explican:
 - [x] Las cuatro historias tienen retrospectiva.
 - [x] La evidencia diferencia pruebas sintéticas, hardware real y aceptación humana.
 - [x] No se publicó ni se transfirieron datos sin autorización.
+
+## Corrección de verdad (auditoría 2026-08-27)
+
+La aceptación maestra vigente verifica **36 de 42** requisitos de E37-E42;
+los seis requisitos de E42 continúan sin `ProvedProof` vigente. Las corridas
+locales y la matriz simulada siguen siendo evidencia útil, pero no sustituyen
+macOS y Windows limpios, la prueba actual de todos los skills entregados ni la
+aceptación explícita de una persona empresaria. Por ello E42 vuelve a estado
+`active`; no se pierde la evidencia histórica y no se declara una aceptación
+que no ocurrió.
+
+Pendiente verificable:
+
+- Repetir S42.1 en macOS y Windows limpios con recibos trazables.
+- Calificar cada skill distribuido, con caso positivo, negativo e invocación
+  actual; los no demostrados se declaran no distribuidos o pendientes.
+- Consolidar S42.3 en recibos de la aceptación maestra.
+- Validar catálogo/PDF contra el inventario y registrar aceptación humana
+  requisito por requisito.
 
 ## Línea base para E43-E46
 

@@ -50,7 +50,9 @@ def test_save_creates_backup_when_overwriting_completed(tmp_path: Path) -> None:
     }
     write_yaml(state_dir / "test-ws.yaml", old_data)
 
-    result = run({"action": "save", "worksheet_name": "test-ws", "base_path": str(base)})
+    result = run(
+        {"action": "save", "worksheet_name": "test-ws", "base_path": str(base)}
+    )
 
     assert result["errors"] == []
     backups = sorted(state_dir.glob("test-ws-*.yaml"))
@@ -80,7 +82,9 @@ def test_save_does_not_backup_in_progress_state(tmp_path: Path) -> None:
     }
     write_yaml(state_dir / "test-ws.yaml", in_progress)
 
-    result = run({"action": "save", "worksheet_name": "test-ws", "base_path": str(base)})
+    result = run(
+        {"action": "save", "worksheet_name": "test-ws", "base_path": str(base)}
+    )
 
     assert result["errors"] == []
     backups = list(state_dir.glob("test-ws-*.yaml"))
@@ -109,7 +113,9 @@ def test_save_first_time_creates_no_backup(tmp_path: Path) -> None:
         },
     )
 
-    result = run({"action": "save", "worksheet_name": "test-ws", "base_path": str(base)})
+    result = run(
+        {"action": "save", "worksheet_name": "test-ws", "base_path": str(base)}
+    )
 
     assert result["errors"] == []
     backups = list(state_dir.glob("test-ws-*.yaml"))

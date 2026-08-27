@@ -1,7 +1,7 @@
 ---
 epic_id: "E42"
 title: "Product Qualification and Functional Catalog"
-status: "draft"
+status: "active"
 created: "2026-07-22"
 ---
 

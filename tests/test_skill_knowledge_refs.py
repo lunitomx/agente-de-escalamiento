@@ -12,14 +12,21 @@ SKILLS_DIR = ROOT / "escala-skills"
 
 # Mapping of repaired references to their real source-of-truth files.
 REPAIRED_REFS: dict[str, Path] = {
-    "conocimiento/strategy/tools/opsp.yaml": ROOT / "conocimiento/strategy/tools/opsp.yaml",
-    "conocimiento/strategy/tools/7-strata.yaml": ROOT / "conocimiento/strategy/tools/7-strata.yaml",
-    "conocimiento/strategy/tools/swt.yaml": ROOT / "conocimiento/strategy/tools/swt.yaml",
-    "conocimiento/people/concepts/core-values.yaml": ROOT / "conocimiento/people/concepts/core-values.yaml",
+    "conocimiento/strategy/tools/opsp.yaml": ROOT
+    / "conocimiento/strategy/tools/opsp.yaml",
+    "conocimiento/strategy/tools/7-strata.yaml": ROOT
+    / "conocimiento/strategy/tools/7-strata.yaml",
+    "conocimiento/strategy/tools/swt.yaml": ROOT
+    / "conocimiento/strategy/tools/swt.yaml",
+    "conocimiento/people/concepts/core-values.yaml": ROOT
+    / "conocimiento/people/concepts/core-values.yaml",
     "conocimiento/people/tools/face.yaml": ROOT / "conocimiento/people/tools/face.yaml",
-    "conocimiento/people/tools/topgrading.yaml": ROOT / "conocimiento/people/tools/topgrading.yaml",
-    "conocimiento/execution/tools/execution-habits.yaml": ROOT / "conocimiento/execution/tools/execution-habits.yaml",
-    "conocimiento/execution/concepts/meeting-rhythm.yaml": ROOT / "conocimiento/execution/concepts/meeting-rhythm.yaml",
+    "conocimiento/people/tools/topgrading.yaml": ROOT
+    / "conocimiento/people/tools/topgrading.yaml",
+    "conocimiento/execution/tools/execution-habits.yaml": ROOT
+    / "conocimiento/execution/tools/execution-habits.yaml",
+    "conocimiento/execution/concepts/meeting-rhythm.yaml": ROOT
+    / "conocimiento/execution/concepts/meeting-rhythm.yaml",
 }
 
 
@@ -78,4 +85,6 @@ def test_no_descriptive_escala_knowledge_md_references_remain() -> None:
 )
 def test_decision_subagents_and_overviews_exist(path: Path) -> None:
     assert path.exists(), f"Missing decision context file: {path.relative_to(ROOT)}"
-    assert path.stat().st_size > 0, f"Decision context file is empty: {path.relative_to(ROOT)}"
+    assert path.stat().st_size > 0, (
+        f"Decision context file is empty: {path.relative_to(ROOT)}"
+    )

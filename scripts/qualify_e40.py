@@ -115,16 +115,35 @@ def main() -> int:
         )
         strategy_ready = build_strategy_plan(
             tuple(
-                StrategyAnswer(key=key, value=f"owner-{key}", status="fact")
+                StrategyAnswer(
+                    key=key,
+                    value=f"owner-{key}",
+                    status="fact",
+                    owner="Ana",
+                )
                 for key in (
                     "vision",
+                    "core_values",
+                    "key_capabilities",
+                    "brand_promises",
+                    "annual_priorities",
+                    "q1_actions",
+                    "q2_actions",
+                    "q3_actions",
                     "purpose",
                     "bhag",
                     "sandbox",
-                    "brand_promise",
-                    "profit_per_x",
                     "annual_goal",
-                    "critical_number",
+                    "q1_goals",
+                    "q2_goals",
+                    "q3_goals",
+                    "values_commitments",
+                    "three_to_five_year_targets",
+                    "profit_per_x",
+                    "annual_critical_number",
+                    "q1_critical_number",
+                    "q2_critical_number",
+                    "q3_critical_number",
                 )
             )
         )

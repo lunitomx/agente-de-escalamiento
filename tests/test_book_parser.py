@@ -23,20 +23,20 @@ from escala_server.data.book_parser import parse_book
 OUTPUT_FILE = PROJECT_ROOT / "escala_server" / "data" / "book-knowledge.json"
 
 
+@pytest.fixture(scope="module")
+def result():
+    """Parse the book once and reuse it across this module's tests."""
+    data = parse_book()
+    OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
+    OUTPUT_FILE.write_text(
+        json.dumps(data, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    return data
+
+
 class TestBookParser:
     """Test suite for the Book Parser."""
-
-    @pytest.fixture(scope="class")
-    def result(self):
-        """Parse the book once and reuse for all tests."""
-        data = parse_book()
-        # Also write it so the output file is always up to date
-        OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
-        OUTPUT_FILE.write_text(
-            json.dumps(data, ensure_ascii=False, indent=2),
-            encoding="utf-8",
-        )
-        return data
 
     # ── Structure tests ──────────────────────────────────────────────────
 

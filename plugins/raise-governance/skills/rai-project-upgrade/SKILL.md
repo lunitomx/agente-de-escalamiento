@@ -61,7 +61,7 @@ cd {project_path}
 HAS_MANIFEST=$([[ -f .raise/manifest.yaml ]] && echo "yes" || echo "no")
 HAS_CONFIG=$([[ -f .raise/config.toml ]] && echo "yes" || echo "no")
 HAS_DB=$([[ -f .raise/rai/raise.db ]] && echo "yes" || echo "no")
-HAS_GLOBAL_DB=$(ls ~/.rai/raise.db 2>/dev/null && echo "yes" || echo "no")
+HAS_GLOBAL_DB=$([[ -f ~/.rai/raise.db ]] && echo "yes" || echo "no")
 
 # Legacy data markers (v2.4)
 HAS_SESSION_STATE=$([[ -f .raise/rai/personal/session-state.yaml ]] && echo "yes" || echo "no")
@@ -82,8 +82,8 @@ Classify:
 | No manifest, no config, has JSONL/YAML personal data | **v2.4.x** | Full upgrade (scaffold + migrate) |
 | No manifest, no config, agents/katas dirs only | **v2.x (minimal)** | Scaffold only |
 | Has manifest, no config | **v3.0.x early** | Partial upgrade |
-| Has manifest + config, no DB | **v3.0.x** | Data migration only |
-| Has manifest + config + DB | **v3.1.x (current)** | Already current — report and exit |
+| Has manifest + config, no global DB | **v3.0.x** | Data migration only |
+| Has manifest + config + global DB | **v3.1.x (current)** | Already current — report and exit |
 
 Present the diagnosis to the developer:
 

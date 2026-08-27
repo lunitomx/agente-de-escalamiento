@@ -80,7 +80,9 @@ def run(context: dict) -> dict:
         next_sec = next_missing_section(state)
         output = f"Guardado: {section}."
         if comp["percent"] < 100:
-            output += f" OPSP al {comp['percent']}% — siguiente sección sugerida: {next_sec}."
+            output += (
+                f" OPSP al {comp['percent']}% — siguiente sección sugerida: {next_sec}."
+            )
         else:
             output += " ¡OPSP completo! Usa action='export' para generar el markdown."
         return {

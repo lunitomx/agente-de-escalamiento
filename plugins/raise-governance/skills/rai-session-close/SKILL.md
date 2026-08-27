@@ -64,7 +64,7 @@ Reflect on the session and build a CloseInput JSON object:
   "session_type": "feature|research|kata|ideation|maintenance",
   "outcomes": ["merged S7884.1", "created RAISE-7959"],
   "patterns": [
-    {"description": "Action + context + reason, 100-300 chars",
+    {"content": "Action + context + reason, 100-300 chars",
      "context": "comma,separated,keywords", "type": "process"}
   ],
   "corrections": [

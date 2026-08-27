@@ -106,9 +106,7 @@ class ExecutionAssessment:
     def __post_init__(self) -> None:
         """Ensure all 10 habits are represented, filling defaults as needed."""
         by_id = {s.habit_id: s for s in self.scores if s.habit_id}
-        self.scores = [
-            by_id.get(h["id"], HabitScore(habit_id=h["id"])) for h in HABITS
-        ]
+        self.scores = [by_id.get(h["id"], HabitScore(habit_id=h["id"])) for h in HABITS]
 
     def to_dict(self) -> dict[str, Any]:
         return {"scores": [s.to_dict() for s in self.scores]}

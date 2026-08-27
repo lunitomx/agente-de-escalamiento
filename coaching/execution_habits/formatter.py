@@ -30,7 +30,11 @@ def render_markdown(
 
     for i, habit in enumerate(HABITS, 1):
         score_obj = score_by_id.get(habit["id"])
-        score_str = str(score_obj.score) if score_obj and score_obj.score is not None else MISSING
+        score_str = (
+            str(score_obj.score)
+            if score_obj and score_obj.score is not None
+            else MISSING
+        )
         notes = score_obj.notes if score_obj and score_obj.notes else ""
         lines.append(f"| {i} | {habit['name']} | {score_str} | {notes} |")
 

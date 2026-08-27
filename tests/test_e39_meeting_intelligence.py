@@ -337,6 +337,9 @@ def test_local_schedule_and_report_are_deterministic_and_escaped(
     assert "&lt;script&gt;" in html
     assert "<script>" not in html
     assert "evidence_missing" in markdown
+    assert "<script>alert('x')</script>\n- none\n\n## Questions" not in markdown
+    assert "evidence_missing\n- none\n\n## Evidence" not in markdown
+    assert markdown.endswith("## Evidence\n- none\n")
     assert str(tmp_path) not in html + markdown
     receipt = render_meeting_report_receipt_json(first_report)
     assert str(tmp_path) not in receipt

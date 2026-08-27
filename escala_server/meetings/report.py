@@ -205,17 +205,22 @@ def _render_markdown(review: ExecutiveReview) -> str:
         "",
         "## Material changes",
     ]
-    lines.extend(f"- {change}" for change in review.material_changes) or lines.append(
-        "- none"
-    )
+    if review.material_changes:
+        lines.extend(f"- {change}" for change in review.material_changes)
+    else:
+        lines.append("- none")
     lines.extend(["", "## Questions"])
-    lines.extend(f"- {question}" for question in review.questions) or lines.append(
-        "- none"
-    )
+    if review.questions:
+        lines.extend(f"- {question}" for question in review.questions)
+    else:
+        lines.append("- none")
     lines.extend(["", "## Evidence"])
-    lines.extend(
-        f"- source: {source_id}" for source_id in review.evidence_source_ids
-    ) or lines.append("- none")
+    if review.evidence_source_ids:
+        lines.extend(
+            f"- source: {source_id}" for source_id in review.evidence_source_ids
+        )
+    else:
+        lines.append("- none")
     return "\n".join(lines) + "\n"
 
 

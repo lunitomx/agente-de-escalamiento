@@ -27,10 +27,7 @@ def test_load_on_fresh_company_has_empty_assessment(tmp_path):
 def test_save_and_load_roundtrip(tmp_path):
     base = str(tmp_path)
     data = {
-        "scores": [
-            {"habit_id": h["id"], "score": 3, "notes": "ok"}
-            for h in HABITS
-        ]
+        "scores": [{"habit_id": h["id"], "score": 3, "notes": "ok"} for h in HABITS]
     }
     save_result = run({"action": "save", "base_path": base, "data": data})
     assert save_result["errors"] == []
@@ -78,10 +75,7 @@ def test_score_identifies_top_weaknesses():
 def test_export_writes_markdown_to_disk(tmp_path):
     base = str(tmp_path)
     data = {
-        "scores": [
-            {"habit_id": h["id"], "score": 4, "notes": "bien"}
-            for h in HABITS
-        ]
+        "scores": [{"habit_id": h["id"], "score": 4, "notes": "bien"} for h in HABITS]
     }
     run({"action": "save", "base_path": base, "data": data})
     result = run(

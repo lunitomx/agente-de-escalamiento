@@ -59,6 +59,7 @@ dev = [
     "pyright>=1.1.0",
     "pytest>=9.0",
     "pytest-cov>=7.0",
+    "ruff>=0.16.4",
 ]
 
 [tool.ruff]
@@ -66,6 +67,12 @@ extend-exclude = [
     ".*",
     "referencias-humberto",
 ]
+
+[tool.ruff.lint]
+# Product gate: syntax/import/undefined-name errors. Security and refactor rules
+# are reviewed in focused RaiSE quality reviews, not inherited from host config.
+select = ["E4", "E7", "E9", "F"]
+ignore = ["E501"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*.py" = ["E402"]

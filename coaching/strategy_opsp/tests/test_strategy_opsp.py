@@ -226,9 +226,7 @@ def test_next_missing_section_follows_canonical_order():
 def test_next_missing_section_returns_none_when_complete():
     from coaching.strategy_opsp.engine import next_missing_section
 
-    complete_state = {
-        section: _dummy_data_for_section(section) for section in SECTIONS
-    }
+    complete_state = {section: _dummy_data_for_section(section) for section in SECTIONS}
 
     assert next_missing_section(complete_state) is None
 
@@ -260,7 +258,9 @@ def test_load_returns_completeness_and_next_section(tmp_path):
         }
     )
     load_result = run({"action": "load", "base_path": base})
-    assert load_result["artifacts"]["completeness"]["percent"] == int(100 / len(SECTIONS))
+    assert load_result["artifacts"]["completeness"]["percent"] == int(
+        100 / len(SECTIONS)
+    )
     assert load_result["artifacts"]["next_section"] == "core_values"
 
 

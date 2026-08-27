@@ -54,9 +54,7 @@ class FACChart:
         raw_functions = data.get("functions", []) if isinstance(data, dict) else []
         return cls(
             functions=[
-                Function.from_dict(f)
-                for f in raw_functions
-                if isinstance(f, dict)
+                Function.from_dict(f) for f in raw_functions if isinstance(f, dict)
             ]
         )
 
@@ -73,15 +71,13 @@ def validate(chart: FACChart, ceo_names: list[str] | None = None) -> list[str]:
         if not func.name.strip():
             errors.append(f"Función #{i}: falta el nombre.")
         if not func.accountable.strip():
-            errors.append(
-                f"Función '{func.name or i}': falta la persona accountable."
-            )
+            errors.append(f"Función '{func.name or i}': falta la persona accountable.")
         if len(func.kpis) == 0:
-            errors.append(
-                f"Función '{func.name or i}': debe tener al menos un KPI."
-            )
+            errors.append(f"Función '{func.name or i}': debe tener al menos un KPI.")
 
-    counts = Counter(f.accountable.strip() for f in chart.functions if f.accountable.strip())
+    counts = Counter(
+        f.accountable.strip() for f in chart.functions if f.accountable.strip()
+    )
     for person, count in counts.items():
         if count > MAX_FUNCTIONS_PER_PERSON:
             errors.append(

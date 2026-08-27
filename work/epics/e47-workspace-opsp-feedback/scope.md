@@ -1,12 +1,22 @@
 ---
 epic_id: "E47"
 title: "Coherencia del viaje instalado: Workspace, OPSP y Feedback"
-status: "done"
+status: "unresolved/review-required"
+closure_disposition: "unresolved/review-required"
 created: "2026-08-09"
 jira_key: "ESCALA-1"
 ---
 
 # E47 — Coherencia del viaje instalado: Workspace, OPSP y Feedback
+
+## Revisión de operación actual (auditoría 2026-08-27)
+
+La retrospectiva conserva evidencia histórica de entrega, pero la instalación
+actual no tiene `manifest.yaml`, configuración de proyecto ni workspace RaiSE
+registrado; `rai doctor` no puede reproducir sus contratos. E47 queda en
+`unresolved/review-required` hasta ejecutar una calificación fresca del viaje
+instalado y separar explícitamente cualquier deuda de herramienta interna de
+los requisitos del producto. No se borra ni se reescribe la evidencia histórica.
 
 ## Objetivo
 

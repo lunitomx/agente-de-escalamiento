@@ -1,12 +1,21 @@
 ---
 epic_id: "E43"
 title: "Reliable Coaching Loop"
-status: "done"
+status: "planned"
+closure_disposition: "active"
 depends_on: ["E42"]
 created: "2026-07-23"
 ---
 
 # E43 — Respuestas confiables antes de recomendar
+
+## Corrección de verdad (auditoría 2026-08-27)
+
+La tabla y el encabezado anteriores declaraban `Done`, mientras el brief era
+`planned` y no existe una aceptación verificable de sus seis historias. Se
+restaura E43 a `planned`: el diseño se conserva, pero ninguna historia cuenta
+como entregada hasta que tenga implementación, pruebas de casos positivos y
+negativos, y aceptación empresarial conforme a E42.
 
 ## Objetivo
 
@@ -21,12 +30,12 @@ recibe una recomendación que puede verificar, entender y convertir en acción.
 
 | ID | Historia | Tamaño | Estado | Demostración de valor |
 |---|---|:---:|:---:|---|
-| S43.1 | Aclarar la decisión | S | Done | ESCALA confirma qué se quiere decidir, área afectada y resultado esperado. |
-| S43.2 | Armar el paquete de evidencia | M | Done | Muestra documentos usados, periodo, datos faltantes y nivel de certeza. |
-| S43.3 | Elegir la herramienta adecuada | M | Done | Usa el análisis local de workbook, reuniones, contexto o tareas según la necesidad. |
-| S43.4 | Revisar antes de responder | M | Done | Detecta contradicciones, cálculos dudosos y afirmaciones sin fuente. |
-| S43.5 | Entregar la respuesta ejecutiva | S | Done | Presenta qué veo, por qué importa, qué no sé, acción y pregunta siguiente. |
-| S43.6 | Calificar las cuatro decisiones | M | Done | Demuestra el ciclo con casos de People, Strategy, Execution y Cash. |
+| S43.1 | Aclarar la decisión | S | Pending | ESCALA confirma qué se quiere decidir, área afectada y resultado esperado. |
+| S43.2 | Armar el paquete de evidencia | M | Pending | Muestra documentos usados, periodo, datos faltantes y nivel de certeza. |
+| S43.3 | Elegir la herramienta adecuada | M | Pending | Usa el análisis local de workbook, reuniones, contexto o tareas según la necesidad. |
+| S43.4 | Revisar antes de responder | M | Pending | Detecta contradicciones, cálculos dudosos y afirmaciones sin fuente. |
+| S43.5 | Entregar la respuesta ejecutiva | S | Pending | Presenta qué veo, por qué importa, qué no sé, acción y pregunta siguiente. |
+| S43.6 | Calificar las cuatro decisiones | M | Pending | Demuestra el ciclo con casos de People, Strategy, Execution y Cash. |
 
 ## S43.1 — Aclarar la decisión
 

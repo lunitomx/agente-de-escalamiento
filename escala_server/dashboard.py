@@ -146,7 +146,10 @@ class DashboardHandler:
 
     def _execution_score(self) -> dict | None:
         """Score based on Execution Habits worksheet."""
-        from coaching.execution_habits.engine import score as execution_habits_score, validate
+        from coaching.execution_habits.engine import (
+            score as execution_habits_score,
+            validate,
+        )
 
         result = self.worksheets.get_worksheets("execution", "execution_habits")
         data = result.get("data") or {}

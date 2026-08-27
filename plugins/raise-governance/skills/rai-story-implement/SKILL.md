@@ -203,6 +203,8 @@ If the story touches multiple packages, run `rai gate check gate-tests --scope p
 _CFG=$(rai manifest env)
 CODE_ROOT_GLOB=$(echo "$_CFG" | python3 -c "import json,sys; print(json.load(sys.stdin).get('code',{}).get('root_glob','') or 'packages/*/src/')")
 DEV_BRANCH=$(echo "$_CFG" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('branches',{}).get('development','main'))")
+# Derive search root from CODE_ROOT_GLOB prefix (strip wildcard suffix; e.g. packages/*/src/ → packages/)
+CODE_SEARCH_ROOT=$(echo "$CODE_ROOT_GLOB" | cut -d'*' -f1)
 
 # Detect runtime_checkable Protocols touched in this story
 changed_files=$(git diff --name-only HEAD...$(git merge-base HEAD "$DEV_BRANCH") -- "$CODE_ROOT_GLOB")
@@ -211,7 +213,7 @@ for f in $changed_files; do
   if grep -q "@runtime_checkable" "$f" 2>/dev/null && [ -n "$protocols" ]; then
     for proto in $protocols; do
       echo "▶ Protocol sweep: $proto (defined in $f)"
-      grep -rn "class .*$proto\b\|$proto\b" packages/ --include="*.py" \
+      grep -rn "class .*$proto\b\|$proto\b" "${CODE_SEARCH_ROOT:-packages/}" --include="*.py" \
         | grep -v "^$f:" \
         | grep -v "test_\|_test\." \
         | grep "class " || true
@@ -235,13 +237,16 @@ done
 _CFG=$(rai manifest env)
 # tier-2: configurable with default — preserves packages/*/src/ for raise-commons
 CODE_ROOT_GLOB=$(echo "$_CFG" | python3 -c "import json,sys; print(json.load(sys.stdin).get('code',{}).get('root_glob','') or 'packages/*/src/')")
+# Derive test discovery path from CODE_ROOT_GLOB (handles both /src/ mid-path and src/ prefix)
+CODE_TESTS_GLOB=$(echo "$CODE_ROOT_GLOB" | sed 's|/src/|/tests/|; s|^src/|tests/|')
 
 # List source modules changed in this story (vs epic/dev branch)
 orphans=0
 changed_modules=$(git diff --name-only HEAD...$(git merge-base HEAD {dev_branch}) -- "$CODE_ROOT_GLOB" | sed 's|.*/src/||; s|/[^/]*$||' | sort -u)
 for mod in $changed_modules; do
   mod_dotted=$(echo "$mod" | tr '/' '.')
-  grep -rl "from $mod_dotted" packages/*/tests/ 2>/dev/null | while read tf; do
+  # shellcheck disable=SC2086
+  grep -rl "from $mod_dotted" $CODE_TESTS_GLOB 2>/dev/null | while read tf; do
     if ! git diff --name-only HEAD...$(git merge-base HEAD {dev_branch}) -- "$tf" | grep -q .; then
       echo "BLOCKED: $tf imports $mod_dotted but was not touched by this story"
       orphans=$((orphans + 1))

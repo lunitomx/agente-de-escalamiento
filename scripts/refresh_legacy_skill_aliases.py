@@ -10,7 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from escala_server.capabilities import (
+from escala_server.capabilities import (  # noqa: E402
     load_capability_catalog,
     load_legacy_aliases,
 )

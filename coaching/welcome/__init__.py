@@ -81,9 +81,7 @@ def run(context: dict) -> dict:
     profile.setdefault("scores", {})
     profile.setdefault("focus", {"current_decision": None, "last_session": None})
     profile.setdefault("coaching", {"level": "shu", "level_source": "auto"})
-    profile.setdefault(
-        "created", str(__import__("datetime").datetime.now().date())
-    )
+    profile.setdefault("created", str(__import__("datetime").datetime.now().date()))
 
     write_yaml(profile_path, profile)
 

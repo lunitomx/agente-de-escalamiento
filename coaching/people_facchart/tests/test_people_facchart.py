@@ -43,9 +43,7 @@ def test_save_and_load_roundtrip(tmp_path):
 
 
 def test_validation_rejects_empty_kpis():
-    chart = FACChart(
-        functions=[Function(name="Sales", accountable="Ana", kpis=[])]
-    )
+    chart = FACChart(functions=[Function(name="Sales", accountable="Ana", kpis=[])])
     errors = validate(chart)
     assert any("KPI" in e for e in errors)
 
@@ -110,9 +108,7 @@ def test_export_writes_markdown_to_disk(tmp_path):
 
 
 def test_render_markdown_shows_pending_marker():
-    chart = FACChart(
-        functions=[Function(name="", accountable="Ana", kpis=["Revenue"])]
-    )
+    chart = FACChart(functions=[Function(name="", accountable="Ana", kpis=["Revenue"])])
     markdown = render_markdown(chart)
     assert "[PENDIENTE]" in markdown
 

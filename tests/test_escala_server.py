@@ -261,9 +261,7 @@ class TestDashboardHandler:
         from coaching.execution_habits.engine import HABITS
 
         scores = [{"habit_id": h["id"], "score": 4} for h in HABITS]
-        ws.save_worksheet(
-            "execution", "execution_habits", {"data": {"scores": scores}}
-        )
+        ws.save_worksheet("execution", "execution_habits", {"data": {"scores": scores}})
         result = self.handler.summary()
         execution = result["data"]["decisions"]["execution"]
         assert execution["score"] == 80
