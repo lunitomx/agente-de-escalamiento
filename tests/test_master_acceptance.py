@@ -188,12 +188,21 @@ def _ledger_data() -> dict[str, Any]:
                         "receipt_path": (
                             f"{evidence_root}/{requirement_id}.receipt.json"
                         ),
-                        "verification_command": [
-                            ".venv/bin/rai",
-                            "gate",
-                            "check",
-                            f"gate-{requirement_id.lower()}",
-                        ],
+                        "verification_command": (
+                            [
+                                ".venv/bin/python",
+                                "scripts/qualify_epic.py",
+                                "--epic",
+                                epic,
+                            ]
+                            if epic in {"E37", "E38", "E39", "E40", "E41"}
+                            else [
+                                ".venv/bin/rai",
+                                "gate",
+                                "check",
+                                f"gate-{requirement_id.lower()}",
+                            ]
+                        ),
                         "required_gates": [
                             "gate-format",
                             "gate-lint",
@@ -437,6 +446,17 @@ def test_canonical_master_acceptance_ledger_matches_approved_plan() -> None:
     assert next(
         item for item in ledger.requirements if item.id == "REQ-E41-002"
     ).platforms == ["windows"]
+    assert all(
+        item.evidence.verification_command
+        == [
+            ".venv/bin/python",
+            "scripts/qualify_epic.py",
+            "--epic",
+            item.owner.epic,
+        ]
+        for item in ledger.requirements
+        if item.owner.epic in {"E37", "E38", "E39", "E40", "E41"}
+    )
     assert "without adapting them to an ESCALA template" in next(
         item.acceptance for item in ledger.requirements if item.id == "REQ-E37-003"
     )

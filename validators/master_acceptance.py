@@ -212,7 +212,7 @@ class EvidenceDeclaration(_StrictModel):
     @field_validator("verification_command")
     @classmethod
     def validate_command(cls, values: list[str]) -> list[str]:
-        if values[0] not in {".venv/bin/rai", "python"}:
+        if values[0] not in {".venv/bin/rai", ".venv/bin/python"}:
             raise ValueError("verification command executable is not allowed")
         for value in values:
             if (
@@ -340,13 +340,26 @@ class AcceptanceRequirement(_StrictModel):
         if requirement_epic != self.owner.epic:
             raise ValueError("requirement ID must match owner epic")
         expected_gate = f"gate-{self.id.lower()}"
-        if self.evidence.verification_command != [
-            ".venv/bin/rai",
-            "gate",
-            "check",
-            expected_gate,
-        ]:
-            raise ValueError("verification command must name the requirement gate")
+        expected_command = (
+            [
+                ".venv/bin/python",
+                "scripts/qualify_epic.py",
+                "--epic",
+                requirement_epic,
+            ]
+            if requirement_epic in {"E37", "E38", "E39", "E40", "E41"}
+            else [".venv/bin/rai", "gate", "check", expected_gate]
+        )
+        legacy_command = [".venv/bin/rai", "gate", "check", expected_gate]
+        allowed_commands = (
+            {tuple(expected_command), tuple(legacy_command)}
+            if requirement_epic in {"E37", "E38", "E39", "E40", "E41"}
+            else {tuple(expected_command)}
+        )
+        if tuple(self.evidence.verification_command) not in allowed_commands:
+            raise ValueError(
+                "verification command does not match the approved epic gate"
+            )
         if expected_gate not in self.evidence.required_gates:
             raise ValueError("requirement gate is missing")
         if isinstance(self.proof, ProvedProof):

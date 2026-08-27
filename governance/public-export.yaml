@@ -8,7 +8,7 @@ source:
 bindings:
   public_boundary:
     path: governance/public-boundary.yaml
-    sha256: 2fff50579bbbd4684a114bdb08739b5fbe8f9258c2ec1582782fec14ef810412
+    sha256: e184a801d89cb743300c5c0ea1f7fd8d5d8353133f2a80fe3be668a35df07602
     hash_kind: semantic
   exposure_baseline:
     path: work/epics/e36-product-truth-ip-governance/stories/s36.2-evidence/baseline.json

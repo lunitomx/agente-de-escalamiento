@@ -31,6 +31,11 @@ path_rules:
       - miembro-board/**
       - scaling_up_llamaparse.md
       - scaling_up_llamaparse.txt
+  - id: deny.source_authority
+    disposition: denied
+    deny_class: derived
+    globs:
+      - "sources/**"
   - id: deny.private_state
     disposition: denied
     deny_class: private

@@ -11,7 +11,7 @@ authorities:
     hash_kind: semantic
   public_export:
     path: governance/public-export.yaml
-    sha256: 3faf9e3e350ef10a17f3e8634df7fbc6a8ed15dfd6e9cbe99e1769c26ada2cea
+    sha256: a0ac8580703e0ba77882d4686e38e8c7064508af4bf850f807ee4786791c824e
     hash_kind: semantic
 source_requirements:
   - id: SRC-CASH-001
@@ -123,7 +123,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-001.json
       receipt_path: work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-001.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e37-001]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E37]
       required_gates: [gate-format, gate-lint, gate-req-e37-001, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -132,7 +132,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 8be1866993f0e3ccff2a11b246221a66f8e21575fe53691291c175c9d5c697fb}
+    proof: {state: proved, receipt_sha256: 6697f122c37e94e24cf2252b7b9ba5e583ba1541bb47d83e45c40eb7a5bd727c}
   - id: REQ-E37-002
     owner: {epic: E37, story: S37.1}
     source_ids: [SRC-LOCAL-001, SRC-SQLITE-001]
@@ -140,7 +140,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-002.json
       receipt_path: work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-002.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e37-002]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E37]
       required_gates: [gate-format, gate-lint, gate-req-e37-002, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -149,7 +149,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: d5169101eb9dd92839e1a4f76752d33457cabcdb704d721dbb50ee3a117c7303}
+    proof: {state: proved, receipt_sha256: a02031a8edd9a155ff67156ac2f0b956ac2395481ae24ea6e2c83a88f89eca03}
   - id: REQ-E37-003
     owner: {epic: E37, story: S37.2}
     source_ids: [SRC-INGEST-001]
@@ -157,7 +157,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-003.json
       receipt_path: work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-003.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e37-003]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E37]
       required_gates: [gate-format, gate-lint, gate-req-e37-003, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -166,7 +166,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 6df201fc77a3ea8279206721cba6bbcf189e0ffefee539cb2fe77d4e4e64fa35}
+    proof: {state: proved, receipt_sha256: 7777846bb824e3168b5dd8b20015a6651ab2b4c60612a0ea60d2d60a053f2b74}
   - id: REQ-E37-004
     owner: {epic: E37, story: S37.2}
     source_ids: [SRC-EVIDENCE-001, SRC-INGEST-001]
@@ -174,7 +174,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-004.json
       receipt_path: work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-004.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e37-004]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E37]
       required_gates: [gate-format, gate-lint, gate-req-e37-004, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -183,7 +183,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 89d9b671d5a31c8199310b399b2eb8b7bd394a8381ecf62d7725eda69b05163d}
+    proof: {state: proved, receipt_sha256: 34860b5ed72aa985909ac1673a6486fa7707a54cc61b318ec3a73340238ad27f}
   - id: REQ-E37-005
     owner: {epic: E37, story: S37.2}
     source_ids: [SRC-EVIDENCE-001, SRC-INGEST-001]
@@ -191,7 +191,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-005.json
       receipt_path: work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-005.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e37-005]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E37]
       required_gates: [gate-format, gate-lint, gate-req-e37-005, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -200,7 +200,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 30ae98b222cd8617d3e6682268e77610c32451e652be09dac4cf302a5edf2693}
+    proof: {state: proved, receipt_sha256: e2b6de1634bc125072d3c6a0ae8e6405571a01e9be391f6934ea013f15c26495}
   - id: REQ-E37-006
     owner: {epic: E37, story: S37.3}
     source_ids: [SRC-SHARING-001]
@@ -208,7 +208,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-006.json
       receipt_path: work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-006.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e37-006]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E37]
       required_gates: [gate-format, gate-lint, gate-req-e37-006, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -217,7 +217,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: c55de158ef63bec6b5a169327f859a6f5dba1dcaa078c4fac6d27c7018d3b5bb}
+    proof: {state: proved, receipt_sha256: 8581def72f0fad2b4418cfee31f46c9d8d374eb4ea8b572aa496bdf0e935b923}
   - id: REQ-E37-007
     owner: {epic: E37, story: S37.3}
     source_ids: [SRC-EVIDENCE-001, SRC-INGEST-001]
@@ -225,7 +225,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-007.json
       receipt_path: work/epics/e37-local-workspace-flexible-ingestion/evidence/REQ-E37-007.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e37-007]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E37]
       required_gates: [gate-format, gate-lint, gate-req-e37-007, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -234,7 +234,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 290c318b8365ced688a54c06d00b392256117f7132f20ea8470d04373f7019c6}
+    proof: {state: proved, receipt_sha256: ac52657db47c39db12364d3761173d3d3f56ca80661ab7945592a779dfbd02de}
   - id: REQ-E38-001
     owner: {epic: E38, story: S38.1}
     source_ids: [SRC-CASH-001, SRC-INGEST-001]
@@ -242,7 +242,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-001.json
       receipt_path: work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-001.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e38-001]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E38]
       required_gates: [gate-format, gate-lint, gate-req-e38-001, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -251,7 +251,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 8e6f5dd03b0dbcfbdd1d530c7454ab254faa6675b5071cdf6e74fdad52847e49}
+    proof: {state: proved, receipt_sha256: 4324becd5de293b4731e2752244c705cba8f77ca9bf61e135c2635cc0846ef52}
   - id: REQ-E38-002
     owner: {epic: E38, story: S38.1}
     source_ids: [SRC-CASH-001, SRC-EVIDENCE-001]
@@ -259,7 +259,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-002.json
       receipt_path: work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-002.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e38-002]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E38]
       required_gates: [gate-format, gate-lint, gate-req-e38-002, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -268,7 +268,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 687ce0f288f0a81aef489eb23ae43a6579d695e6640f0060119a1ed412abdcd2}
+    proof: {state: proved, receipt_sha256: 7f5b6338dc2c967e863073bb25a94f578522906c9767b2f92465f9181b252f01}
   - id: REQ-E38-003
     owner: {epic: E38, story: S38.2}
     source_ids: [SRC-CASH-001]
@@ -276,7 +276,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-003.json
       receipt_path: work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-003.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e38-003]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E38]
       required_gates: [gate-format, gate-lint, gate-req-e38-003, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -285,7 +285,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 01f3dae252667457e611737f1adcd616e12ebd66922d98a40c5182e26f928117}
+    proof: {state: proved, receipt_sha256: 3ba074efb00ef47c8a2806140065fa557a14a7e5e3838cc8e101cd0b940c3652}
   - id: REQ-E38-004
     owner: {epic: E38, story: S38.2}
     source_ids: [SRC-CASH-001, SRC-EVIDENCE-001]
@@ -293,7 +293,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-004.json
       receipt_path: work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-004.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e38-004]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E38]
       required_gates: [gate-format, gate-lint, gate-req-e38-004, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -302,7 +302,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 8028b48379227abed403b9c6d7f465cf88b1a42863cc8c0039c5f3017ac6e663}
+    proof: {state: proved, receipt_sha256: 8d1ff9571824ef3a97cb321c57e11fd1db41f6f99434a990eee572f193ba931e}
   - id: REQ-E38-005
     owner: {epic: E38, story: S38.3}
     source_ids: [SRC-CASH-001]
@@ -310,7 +310,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-005.json
       receipt_path: work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-005.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e38-005]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E38]
       required_gates: [gate-format, gate-lint, gate-req-e38-005, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -319,7 +319,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 5bb71f539be739c6a2132532e9322a09bf2d2cfb30ba628cbcd714133858a4c2}
+    proof: {state: proved, receipt_sha256: db33bf1cd7a952555db6f0ca90f8524f542fc825da60d23896265533796d774f}
   - id: REQ-E38-006
     owner: {epic: E38, story: S38.3}
     source_ids: [SRC-CASH-001, SRC-EVIDENCE-001]
@@ -327,7 +327,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-006.json
       receipt_path: work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-006.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e38-006]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E38]
       required_gates: [gate-format, gate-lint, gate-req-e38-006, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -336,7 +336,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: e47ab3ed46aaddff3f8813c7186f62bbeb570817998221701b4815e6d3133b35}
+    proof: {state: proved, receipt_sha256: 28fdc7ec30ebf3b244177fbc759402d1fcd1aecc77da422b1334e0502c729361}
   - id: REQ-E38-007
     owner: {epic: E38, story: S38.4}
     source_ids: [SRC-CASH-001, SRC-COCKPIT-001]
@@ -344,7 +344,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-007.json
       receipt_path: work/epics/e38-cash-and-financial-intelligence/evidence/REQ-E38-007.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e38-007]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E38]
       required_gates: [gate-format, gate-lint, gate-req-e38-007, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -353,7 +353,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 6c5f5e57135e6af7721c32295045c5c1a4b5bb4338c7fc5805217beac36356a1}
+    proof: {state: proved, receipt_sha256: 07e06e598fa02be8353295dcceab127d417e12dae734b4fdbcd652541add4f44}
   - id: REQ-E39-001
     owner: {epic: E39, story: S39.1}
     source_ids: [SRC-INGEST-001, SRC-MEETING-001, SRC-SHARING-001]
@@ -361,7 +361,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-001.json
       receipt_path: work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-001.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e39-001]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E39]
       required_gates: [gate-format, gate-lint, gate-req-e39-001, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -370,7 +370,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 8dfc595497ff43201998c0dbe5599db912c0b86a5bba7e6c55669336658a6475}
+    proof: {state: proved, receipt_sha256: a54bf393e7f2872694a4516c0c787a022442eec6e0c37722f3cd0334dabd376b}
   - id: REQ-E39-002
     owner: {epic: E39, story: S39.1}
     source_ids: [SRC-EVIDENCE-001, SRC-MEETING-001]
@@ -378,7 +378,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-002.json
       receipt_path: work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-002.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e39-002]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E39]
       required_gates: [gate-format, gate-lint, gate-req-e39-002, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -387,7 +387,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: d74e136f1da47791998e3edfb4742e281293b6c775c16370c040ca8034bae60c}
+    proof: {state: proved, receipt_sha256: 3778080fc216ae901bc7beb90448f1651624576f9a98abbf060f353d88efdcc2}
   - id: REQ-E39-003
     owner: {epic: E39, story: S39.2}
     source_ids: [SRC-EVIDENCE-001, SRC-MEETING-001]
@@ -395,7 +395,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-003.json
       receipt_path: work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-003.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e39-003]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E39]
       required_gates: [gate-format, gate-lint, gate-req-e39-003, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -404,7 +404,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 97a303c0c3b7c4bc7a0080bc2a183292122b06d2414e72300f90f8808fba911e}
+    proof: {state: proved, receipt_sha256: 87ee31a443a417286075b3e0357e08dd419a8823e3b48769fd51b7636b77c339}
   - id: REQ-E39-004
     owner: {epic: E39, story: S39.2}
     source_ids: [SRC-EVIDENCE-001, SRC-MEETING-001]
@@ -412,7 +412,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-004.json
       receipt_path: work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-004.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e39-004]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E39]
       required_gates: [gate-format, gate-lint, gate-req-e39-004, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -421,7 +421,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: f74b653aaa737fcd68af2e38fb7b5627423ce0efd24b689e43551b9643caf5fd}
+    proof: {state: proved, receipt_sha256: d580d3603a8c4c3578ff20db8161893320dabdee4a2d1c75c93197ce486cbf39}
   - id: REQ-E39-005
     owner: {epic: E39, story: S39.3}
     source_ids: [SRC-MEETING-001]
@@ -429,7 +429,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-005.json
       receipt_path: work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-005.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e39-005]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E39]
       required_gates: [gate-format, gate-lint, gate-req-e39-005, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -438,7 +438,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 9a560c66a312351fb15e12f10d6c7d19ea0371d401161f5971d2450f73dfa67c}
+    proof: {state: proved, receipt_sha256: 05845e41d9588c6be1152a56ae346f44dff0d72add91aef93eecbf1ecbf38080}
   - id: REQ-E39-006
     owner: {epic: E39, story: S39.3}
     source_ids: [SRC-EVIDENCE-001, SRC-MEETING-001]
@@ -446,7 +446,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-006.json
       receipt_path: work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-006.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e39-006]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E39]
       required_gates: [gate-format, gate-lint, gate-req-e39-006, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -455,7 +455,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 5f1214b2ca4ae80fed13d576c8711001deae59f256bcc38abdfbcd0912d3b9d9}
+    proof: {state: proved, receipt_sha256: bade49d23ebb9d1fa836e6e2d203c6d980430699b0144e1c6c2d2231b9deefa4}
   - id: REQ-E39-007
     owner: {epic: E39, story: S39.4}
     source_ids: [SRC-LOCAL-001, SRC-MEETING-001, SRC-SHARING-001, SRC-SQLITE-001]
@@ -463,7 +463,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-007.json
       receipt_path: work/epics/e39-meeting-and-team-intelligence/evidence/REQ-E39-007.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e39-007]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E39]
       required_gates: [gate-format, gate-lint, gate-req-e39-007, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -472,7 +472,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: fe1f6befa80e0559f0fec28d77412931e3398a437b2c5cfae30e1f2419779fed}
+    proof: {state: proved, receipt_sha256: 630766ee86dc0985349ce784fecf700339d04b999b384c2a907976f674b8431e}
   - id: REQ-E40-001
     owner: {epic: E40, story: S40.1}
     source_ids: [SRC-COACH-001, SRC-EVIDENCE-001]
@@ -480,7 +480,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-001.json
       receipt_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-001.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e40-001]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E40]
       required_gates: [gate-format, gate-lint, gate-req-e40-001, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -489,7 +489,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: aafab44d35a071f104b99517d894c0ea71c29e64dd32ef6b2ba4fe72acfacd40}
+    proof: {state: proved, receipt_sha256: f84ccf1c611bbc024f0b51421fb329b58b981a0f355f30e36765e7f4fcdca967}
   - id: REQ-E40-002
     owner: {epic: E40, story: S40.1}
     source_ids: [SRC-COACH-001, SRC-COCKPIT-001, SRC-EVIDENCE-001]
@@ -497,7 +497,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-002.json
       receipt_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-002.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e40-002]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E40]
       required_gates: [gate-format, gate-lint, gate-req-e40-002, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -506,7 +506,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 169b4fe278de3159e18f0afa8f49fbf5f6c796d51178d7276c393437440c90cc}
+    proof: {state: proved, receipt_sha256: 013d89d5a6626c1a071e08598ed9f21665e2ed9696cf8d7f46fd1b309170b240}
   - id: REQ-E40-003
     owner: {epic: E40, story: S40.2}
     source_ids: [SRC-COACH-001, SRC-COCKPIT-001]
@@ -514,7 +514,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-003.json
       receipt_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-003.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e40-003]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E40]
       required_gates: [gate-format, gate-lint, gate-req-e40-003, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -523,7 +523,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 0ea318582ff37bc832dcca11f472e19117b2aaed601c00619127ee7ce56c5ecf}
+    proof: {state: proved, receipt_sha256: a62eb77b786aa2ca135e264682762d70aaf609ee92f2a97563415ba37b3175f9}
   - id: REQ-E40-004
     owner: {epic: E40, story: S40.3}
     source_ids: [SRC-COACH-001, SRC-EVIDENCE-001]
@@ -531,7 +531,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-004.json
       receipt_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-004.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e40-004]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E40]
       required_gates: [gate-format, gate-lint, gate-req-e40-004, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -540,7 +540,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: b1425abbdeebbb41d11954a9fc734d176e6ec52b47574f7d29cc915fbdfa0df6}
+    proof: {state: proved, receipt_sha256: c21a865d0ec5d03d28217ebac81e59c151f3d47cf1947fd44afe7caf9d633485}
   - id: REQ-E40-005
     owner: {epic: E40, story: S40.3}
     source_ids: [SRC-COACH-001, SRC-EVIDENCE-001]
@@ -548,7 +548,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-005.json
       receipt_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-005.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e40-005]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E40]
       required_gates: [gate-format, gate-lint, gate-req-e40-005, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -557,7 +557,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 2e4c789876ffe7f4a5c4939252a2a81da299d2cac7f0ebe32609e87a043a35d0}
+    proof: {state: proved, receipt_sha256: 7c86eabc18751f3c29fa96828541751b3eb916816cb86c318b606302ad921b5b}
   - id: REQ-E40-006
     owner: {epic: E40, story: S40.4}
     source_ids: [SRC-COACH-001, SRC-LOCAL-001]
@@ -565,7 +565,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-006.json
       receipt_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-006.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e40-006]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E40]
       required_gates: [gate-format, gate-lint, gate-req-e40-006, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -574,7 +574,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 22618b964fa4c3a3a05550ec17e071b00fde049613b93f791ce1a289511b7299}
+    proof: {state: proved, receipt_sha256: 6a9edbd524234339c54d093696f09057667fe3e48065c858a9793bebfaf49854}
   - id: REQ-E40-007
     owner: {epic: E40, story: S40.2}
     source_ids: [SRC-COCKPIT-001, SRC-EVIDENCE-001]
@@ -582,7 +582,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-007.json
       receipt_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-007.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e40-007]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E40]
       required_gates: [gate-format, gate-lint, gate-req-e40-007, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -591,7 +591,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 7840ac86a614f0be904beb1cd48373aa6b7c192ba019308bbad512dafab27258}
+    proof: {state: proved, receipt_sha256: 09a86eb76ff925702ef96f8e95727fc4acea6c67f5e5005210316e5c06c47ee8}
   - id: REQ-E40-008
     owner: {epic: E40, story: S40.4}
     source_ids: [SRC-COACH-001, SRC-EVIDENCE-001]
@@ -599,7 +599,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-008.json
       receipt_path: work/epics/e40-executive-cockpit-and-coaching/evidence/REQ-E40-008.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e40-008]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E40]
       required_gates: [gate-format, gate-lint, gate-req-e40-008, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -608,7 +608,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 96ac7b31f772a6a7407276ebb665f17cb42a757c52eb7cc69059587a1c8de217}
+    proof: {state: proved, receipt_sha256: 13247a0e128c043982810770979da9e40bc7309b986922a9ed6c3a8288a509be}
   - id: REQ-E41-001
     owner: {epic: E41, story: S41.1}
     source_ids: [SRC-INSTALL-001, SRC-LOCAL-001]
@@ -616,7 +616,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-001.json
       receipt_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-001.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e41-001]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E41]
       required_gates: [gate-format, gate-lint, gate-req-e41-001, gate-tests, gate-types]
     platforms: [macos]
     architecture:
@@ -625,7 +625,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 45c61737a8fc1c8e96feebbc2f058fd01ea304c71073e4c2f852a29953e4c22c}
+    proof: {state: proved, receipt_sha256: e23202f45e32772d76539a04b4dd00bd3cb736325ed68a27f45eb48399845fb4}
   - id: REQ-E41-002
     owner: {epic: E41, story: S41.1}
     source_ids: [SRC-INSTALL-001, SRC-LOCAL-001]
@@ -633,7 +633,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-002.json
       receipt_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-002.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e41-002]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E41]
       required_gates: [gate-format, gate-lint, gate-req-e41-002, gate-tests, gate-types]
     platforms: [windows]
     architecture:
@@ -642,7 +642,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: bf726ecf3e2699158c97e4b97a05adc3a203ef308a16d53d2ab8b4bc3f0e4750}
+    proof: {state: proved, receipt_sha256: 1a3fc09d10c26795b94791872800a0223a6100776c34a5dadebce416d2e29df9}
   - id: REQ-E41-003
     owner: {epic: E41, story: S41.2}
     source_ids: [SRC-INSTALL-001, SRC-LOCAL-001]
@@ -650,7 +650,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-003.json
       receipt_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-003.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e41-003]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E41]
       required_gates: [gate-format, gate-lint, gate-req-e41-003, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -659,7 +659,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 555bc89689406ad33f86c421cd9fe15a2a4889366c110c09829a82bb6414bff5}
+    proof: {state: proved, receipt_sha256: d2aa119e275cfcc9a9657477e08b719c7929741de0995a4bf4334abfd0c0835f}
   - id: REQ-E41-004
     owner: {epic: E41, story: S41.3}
     source_ids: [SRC-INSTALL-001, SRC-LOCAL-001]
@@ -667,7 +667,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-004.json
       receipt_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-004.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e41-004]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E41]
       required_gates: [gate-format, gate-lint, gate-req-e41-004, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -676,7 +676,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: d587b6f555ff5f5dbe4ae01761157030bb176ef8fc53038ebda69e5ed7acb738}
+    proof: {state: proved, receipt_sha256: 9d2634ac6be5a30942542379d5cf511bf13f423470af311632fcdfe2072c3db0}
   - id: REQ-E41-005
     owner: {epic: E41, story: S41.3}
     source_ids: [SRC-INSTALL-001, SRC-QUALIFY-001]
@@ -684,7 +684,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-005.json
       receipt_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-005.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e41-005]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E41]
       required_gates: [gate-format, gate-lint, gate-req-e41-005, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -693,7 +693,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 42754761f7d4380a048a59eaa2cd723fc68a181fcea196feb12ad203beabec90}
+    proof: {state: proved, receipt_sha256: 33552d51ff8dc3bbddd6ec801e8a1d1856806a2355331a68f12544c260c86fd8}
   - id: REQ-E41-006
     owner: {epic: E41, story: S41.2}
     source_ids: [SRC-INSTALL-001, SRC-SHARING-001, SRC-SQLITE-001]
@@ -701,7 +701,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-006.json
       receipt_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-006.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e41-006]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E41]
       required_gates: [gate-format, gate-lint, gate-req-e41-006, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -710,7 +710,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: c2a965a5d6f05df37ee6b422b3082022a382fda879fd53de3c124bfe52357ab7}
+    proof: {state: proved, receipt_sha256: 760aa8f92c8b691d90da03c63418ceca3e881c088e9764fbe19ce8eb9c12259e}
   - id: REQ-E41-007
     owner: {epic: E41, story: S41.4}
     source_ids: [SRC-INSTALL-001, SRC-QUALIFY-001]
@@ -718,7 +718,7 @@ requirements:
     evidence:
       artifact_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-007.json
       receipt_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-007.receipt.json
-      verification_command: [.venv/bin/rai, gate, check, gate-req-e41-007]
+      verification_command: [.venv/bin/python, scripts/qualify_epic.py, --epic, E41]
       required_gates: [gate-format, gate-lint, gate-req-e41-007, gate-tests, gate-types]
     platforms: [macos, windows]
     architecture:
@@ -727,7 +727,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: cf947fd17e98deeae21bb59b73d11c1bbd11a72d676812dcaf2afa0dd11edf63}
+    proof: {state: proved, receipt_sha256: 79d11cec1e4ea9fd44559f9e51424b4e6a9ee76a286e879e1b6aaedaa7404c37}
   - id: REQ-E42-001
     owner: {epic: E42, story: S42.1}
     source_ids: [SRC-QUALIFY-001]

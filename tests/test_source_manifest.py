@@ -11,6 +11,11 @@ from typing import Any
 import pytest
 import yaml
 
+from validators.public_boundary import (
+    PublicPathDisposition,
+    classify_public_path,
+    load_public_boundary_policy,
+)
 from validators.source_authority import load_source_registry
 from validators.source_manifest import (
     ContentType,
@@ -80,6 +85,19 @@ def test_canonical_manifest_covers_every_private_source_line_without_text() -> N
     assert source_manifest_hash(manifest) == receipt.manifest_sha256
     assert "Additional Praise" not in rendered
     assert "source_line_count" in rendered
+
+
+def test_source_authority_artifacts_are_explicitly_denied_from_clean_export() -> None:
+    policy = load_public_boundary_policy(ROOT / "governance/public-boundary.yaml")
+
+    assert (
+        classify_public_path(policy, "sources/source-registry.yaml")
+        is PublicPathDisposition.DENIED
+    )
+    assert (
+        classify_public_path(policy, "sources/source-manifest.jsonl")
+        is PublicPathDisposition.DENIED
+    )
 
 
 def test_heading_builder_records_preamble_as_exclusion_and_preserves_coverage(
