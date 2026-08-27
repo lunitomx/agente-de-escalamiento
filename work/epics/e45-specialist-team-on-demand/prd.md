@@ -1,7 +1,7 @@
 ---
 epic_id: "E45"
 title: "PRD — Especialistas internos bajo demanda"
-status: "planned"
+status: "in_progress"
 depends_on: ["E44", "E49"]
 ---
 

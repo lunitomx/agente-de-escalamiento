@@ -168,6 +168,7 @@ integra después de S44.5 para no mostrar aprendizajes no revisados.
 - API: decisiones, acciones, resultados, aprendizajes y cockpit por empresa.
 - Cobertura: Cash, People, Strategy y Execution; People requiere consentimiento explícito.
 - Calificación técnica reproducible: `scripts/qualify_e44_e45.py`, con cuatro ciclos sintéticos confirmados, consentimiento People, `no_result_yet`, causalidad no reclamada y cockpit sin IDs internos.
+- Protocolo de piloto: `pilot-protocol.md` y `validators/e44_e45_business_pilot.py` definen un recibo privado sin PII para aceptación y retrospectiva reales; no existe todavía un recibo empresarial.
 - Gates locales: `tests/test_outcome_learning.py`, `tests/test_escala_server.py`, `tests/test_qualify_e44_e45.py`, Ruff y Pyright.
 - Pendiente de cierre: una aceptación real de empresario y retrospectiva; la calificación sintética no las sustituye.
 

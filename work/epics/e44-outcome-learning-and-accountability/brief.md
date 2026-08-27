@@ -1,8 +1,8 @@
 ---
 epic_id: "E44"
 title: "Outcome Learning and Accountability"
-status: "planned"
-depends_on: ["E42", "E43"]
+status: "in_progress"
+depends_on: ["E43"]
 created: "2026-07-23"
 ---
 
