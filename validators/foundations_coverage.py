@@ -50,7 +50,7 @@ class FoundationCoverageMatrix(_StrictModel):
 def validate_foundation_coverage(
     matrix: FoundationCoverageMatrix,
     manifest: SourceManifest,
-    known_node_ids: set[str],
+    known_node_evidence: dict[str, set[str]],
 ) -> None:
     if matrix.source_id != manifest.source_id:
         raise ValueError("coverage source differs from manifest")
@@ -80,5 +80,12 @@ def validate_foundation_coverage(
         if row.disposition is FoundationCoverageDisposition.FOUNDATION_MAPPED
         for node_id in row.node_ids
     }
-    if not mapped_ids.issubset(known_node_ids):
+    if not mapped_ids.issubset(known_node_evidence):
         raise ValueError("coverage references unknown foundation node")
+    for row in matrix.rows:
+        if row.disposition is FoundationCoverageDisposition.FOUNDATION_MAPPED:
+            if any(
+                row.unit_id not in known_node_evidence[node_id]
+                for node_id in row.node_ids
+            ):
+                raise ValueError("foundation mapping lacks node evidence")

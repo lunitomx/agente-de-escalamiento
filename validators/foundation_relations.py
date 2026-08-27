@@ -123,7 +123,18 @@ def validate_relation_queue_against_manifest(
         raise ValueError("relation queue source differs from manifest")
     known_units = {unit.unit_id for unit in manifest.units}
     relations = {item.relation_id: item for item in queue.relations}
+    normalized_texts: set[str] = set()
     for relation in queue.relations:
+        normalized = " ".join(relation.working_text.casefold().split())
+        technical_triple = (
+            f"{relation.source_node_id} {relation.relation_type} "
+            f"{relation.target_node_id}"
+        ).casefold()
+        if normalized.rstrip(".,;:!?") == technical_triple:
+            raise ValueError("relation working text must be semantic")
+        if normalized in normalized_texts:
+            raise ValueError("relation working text must be distinct")
+        normalized_texts.add(normalized)
         if relation.source_node_id == relation.target_node_id:
             raise ValueError("relation cannot be a self-link")
         if (

@@ -1,7 +1,7 @@
 ---
 epic_id: E59
 title: Fundamentos, 4D y fidelidad independiente
-status: planned
+status: complete
 depends_on: [E58]
 ---
 

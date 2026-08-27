@@ -112,3 +112,18 @@ def test_real_e59_relation_queue_validates_against_real_manifest() -> None:
         load_source_manifest(root / "sources/source-manifest.jsonl"),
         nodes,
     )
+
+
+@pytest.mark.parametrize("suffix", ["", ".", "!", "?", "..."])
+def test_relation_queue_rejects_technical_triple_as_working_text(suffix: str) -> None:
+    data = _queue().model_dump(mode="json")
+    relation = data["relations"][0]
+    relation["working_text"] = (
+        f"{relation['source_node_id']} {relation['relation_type']} "
+        f"{relation['target_node_id']}{suffix}"
+    )
+    queue = RelationReviewQueue.model_validate(data)
+    with pytest.raises(ValueError, match="must be semantic"):
+        validate_relation_queue_against_manifest(
+            queue, _manifest(), {"node.a", "node.b"}
+        )

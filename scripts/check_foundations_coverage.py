@@ -51,10 +51,16 @@ def main() -> int:
         matrix = FoundationCoverageMatrix.model_validate_json(
             args.matrix.read_text(encoding="utf-8")
         )
-        known_node_ids = {
-            candidate.proposed_node.id for candidate in queue.candidates
-        } | {candidate.proposed_node.id for candidate in draft_candidates}
-        validate_foundation_coverage(matrix, manifest, known_node_ids)
+        all_candidates = [*queue.candidates, *draft_candidates]
+        known_node_evidence = {
+            candidate.proposed_node.id: {
+                unit_id
+                for evidence in candidate.proposed_node.evidence
+                for unit_id in evidence.unit_ids
+            }
+            for candidate in all_candidates
+        }
+        validate_foundation_coverage(matrix, manifest, known_node_evidence)
     except Exception as exc:
         print(f"Status: `fail`\nReason: {exc}")
         return 1

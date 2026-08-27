@@ -64,18 +64,22 @@ def _matrix() -> FoundationCoverageMatrix:
 
 
 def test_foundation_coverage_is_exhaustive_and_references_known_nodes() -> None:
-    validate_foundation_coverage(_matrix(), _manifest(), {"framework.example"})
+    validate_foundation_coverage(
+        _matrix(), _manifest(), {"framework.example": {"source.example.u0001"}}
+    )
 
 
 def test_foundation_coverage_rejects_unknown_node() -> None:
     with pytest.raises(ValueError, match="unknown foundation node"):
-        validate_foundation_coverage(_matrix(), _manifest(), set())
+        validate_foundation_coverage(_matrix(), _manifest(), {})
 
 
 def test_foundation_coverage_rejects_missing_unit() -> None:
     matrix = _matrix().model_copy(update={"rows": _matrix().rows[:1]})
     with pytest.raises(ValueError, match="not exhaustive"):
-        validate_foundation_coverage(matrix, _manifest(), {"framework.example"})
+        validate_foundation_coverage(
+            matrix, _manifest(), {"framework.example": {"source.example.u0001"}}
+        )
 
 
 def test_foundation_coverage_rejects_historical_unit_hidden_as_excluded() -> None:
@@ -112,4 +116,28 @@ def test_foundation_coverage_rejects_historical_unit_hidden_as_excluded() -> Non
         }
     )
     with pytest.raises(ValueError, match="special-source coverage mismatch"):
-        validate_foundation_coverage(matrix, manifest, set())
+        validate_foundation_coverage(matrix, manifest, {})
+
+
+def test_foundation_coverage_rejects_mapping_without_node_evidence() -> None:
+    matrix = _matrix()
+    changed = matrix.rows[0].model_copy(update={"unit_id": "source.example.u0002"})
+    unsafe = matrix.model_copy(
+        update={
+            "rows": [
+                changed,
+                matrix.rows[1].model_copy(
+                    update={
+                        "unit_id": "source.example.u0001",
+                        "disposition": "excluded",
+                        "node_ids": [],
+                        "handoff_epic": None,
+                    }
+                ),
+            ]
+        }
+    )
+    with pytest.raises(ValueError, match="lacks node evidence"):
+        validate_foundation_coverage(
+            unsafe, _manifest(), {"framework.example": {"source.example.u0001"}}
+        )
