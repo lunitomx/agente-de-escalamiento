@@ -4,6 +4,7 @@ import pytest
 
 from validators.foundations_fidelity import (
     FoundationsFidelityError,
+    validate_foundation_candidates_against_manifest,
     validate_foundations_review_queue,
 )
 from validators.ontology_v2 import EvidenceRef, ReviewQueue
@@ -132,3 +133,24 @@ def test_foundations_queue_revalidates_mutated_reviewer_identity() -> None:
     unsafe_queue = queue.model_copy(update={"candidates": [candidate]})
     with pytest.raises(ValueError, match="independent"):
         validate_foundations_review_queue(unsafe_queue, _manifest())
+
+
+def test_candidate_evidence_must_exist_in_manifest() -> None:
+    candidate = _queue().candidates[0]
+    proposed_node = candidate.proposed_node.model_copy(
+        update={
+            "evidence": [
+                EvidenceRef(
+                    source_id="source.example", unit_ids=["source.example.u9999"]
+                )
+            ]
+        }
+    )
+    unsafe_candidate = candidate.model_copy(
+        update={
+            "proposed_node": proposed_node,
+            "locators": ["source.example.u9999"],
+        }
+    )
+    with pytest.raises(FoundationsFidelityError, match="absent from manifest"):
+        validate_foundation_candidates_against_manifest([unsafe_candidate], _manifest())

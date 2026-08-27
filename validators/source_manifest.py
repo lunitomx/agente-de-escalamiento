@@ -155,7 +155,10 @@ def _classify_heading(heading: str) -> ContentType:
         return ContentType.FORMULA
     if any(token in normalized for token in ("worksheet", "chart", "tool", "plan")):
         return ContentType.TOOL_OR_FORM
-    if any(token in normalized for token in ("example", "case", "experience")):
+    if any(
+        token in normalized
+        for token in ("example", "case", "experience", "perceptionist")
+    ):
         return ContentType.HISTORICAL_EXAMPLE
     if any(token in normalized for token in ("reference", "resource", "bibliography")):
         return ContentType.EXTERNAL_REFERENCE

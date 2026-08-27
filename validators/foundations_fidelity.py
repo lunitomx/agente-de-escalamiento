@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 
-from validators.ontology_v2 import EvidenceRef, ReviewQueue
+from validators.ontology_v2 import CandidateNode, EvidenceRef, ReviewQueue
 from validators.source_manifest import SourceManifest
 
 
@@ -25,24 +25,14 @@ def _normalized_working_text(value: str) -> str:
     return _WHITESPACE.sub(" ", value).strip().casefold()
 
 
-def validate_foundations_review_queue(
-    queue: ReviewQueue, manifest: SourceManifest
+def validate_foundation_candidates_against_manifest(
+    candidates: list[CandidateNode], manifest: SourceManifest
 ) -> None:
-    """Bind an E59 queue to one private structural manifest.
+    """Validate candidate evidence and locators against an authenticated manifest."""
 
-    This deliberately validates only identifiers and metadata.  It never reads
-    or emits the underlying corpus, which remains governed by the source
-    boundary.
-    """
-
-    # model_copy(update=...) bypasses Pydantic validation. Re-validate at the
-    # boundary so callers cannot pass an unsafe in-memory queue to this gate.
-    queue = ReviewQueue.model_validate(queue.model_dump(mode="json"))
     known_units = {unit.unit_id for unit in manifest.units}
     seen_text: set[str] = set()
-    candidates = {candidate.candidate_id: candidate for candidate in queue.candidates}
-
-    for candidate in queue.candidates:
+    for candidate in candidates:
         text = _normalized_working_text(candidate.working_text)
         if len(text.split()) < 4:
             raise FoundationsFidelityError("candidate working text is not semantic")
@@ -62,6 +52,17 @@ def validate_foundations_review_queue(
         if not set(candidate.locators).issubset(known_units):
             raise FoundationsFidelityError("candidate locator is absent from manifest")
 
+
+def validate_foundations_review_queue(
+    queue: ReviewQueue, manifest: SourceManifest
+) -> None:
+    """Bind an E59 queue to one private structural manifest."""
+
+    # model_copy(update=...) bypasses Pydantic validation. Re-validate at the
+    # boundary so callers cannot pass an unsafe in-memory queue to this gate.
+    queue = ReviewQueue.model_validate(queue.model_dump(mode="json"))
+    validate_foundation_candidates_against_manifest(queue.candidates, manifest)
+    candidates = {candidate.candidate_id: candidate for candidate in queue.candidates}
     for decision in queue.decisions:
         candidate = candidates[decision.candidate_id]
         if _evidence_units(decision.evidence) != _evidence_units(

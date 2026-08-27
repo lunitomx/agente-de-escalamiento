@@ -38,7 +38,13 @@ def test_checked_in_schema_is_deterministic_and_private_contract_only() -> None:
     assert SCHEMA.read_text(encoding="utf-8") == rendered
     assert len(ontology_schema_hash()) == 64
     assert "scaling_up_llamaparse" not in rendered
-    assert {item.value for item in NodeKind} >= {"decision-area", "tool", "rule"}
+    assert {item.value for item in NodeKind} >= {
+        "decision-area",
+        "tool",
+        "rule",
+        "diagnostic-question",
+        "result",
+    }
     assert {item.value for item in OriginKind} == {
         "source-explicit",
         "source-synthesis",

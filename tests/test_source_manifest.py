@@ -222,3 +222,15 @@ def test_build_and_check_clis_emit_only_private_structural_metadata(
     assert "source text" not in built.stdout
     assert '"status": "pass"' in checked.stdout
     assert "Additional Praise" not in manifest_path.read_text(encoding="utf-8")
+
+
+def test_heading_builder_recognizes_named_historical_case_sections(
+    tmp_path: Path,
+) -> None:
+    content = b"# Perceptionist's Ping\ncase narrative\n"
+    registry_path = _write_fixture_registry(tmp_path, content)
+    registry = load_source_registry(registry_path)
+
+    manifest = build_source_manifest(tmp_path, registry, "fixture-source")
+
+    assert manifest.units[0].content_type is ContentType.HISTORICAL_EXAMPLE

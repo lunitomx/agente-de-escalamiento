@@ -23,6 +23,8 @@ class NodeKind(str, Enum):
     DECISION_AREA = "decision-area"
     FRAMEWORK = "framework"
     PRINCIPLE = "principle"
+    DIAGNOSTIC_QUESTION = "diagnostic-question"
+    RESULT = "result"
     TOOL = "tool"
     ARTIFACT = "artifact"
     PROCEDURE = "procedure"
