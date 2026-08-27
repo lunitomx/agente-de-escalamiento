@@ -35,7 +35,7 @@ Evolucionar la ontología existente de E6 a una autoridad canónica con proceden
 | 1 | S58.1 Schema y vocabulario | Done — contrato v2 privado, schema y vocabulario deterministas. |
 | 2 | S58.2 Origen/evidencia/revisión | Done — cola tipada, evidencia de aprobación y recibo seguro. |
 | 3 | S58.3 Migración E6 | Done — mapa 82/78/4 con hashes y disposición explícita, sin promoción falsa. |
-| 4 | S58.4 Vistas derivadas | YAML/SQLite regenerables desde la autoridad v2. |
+| 4 | S58.4 Vistas derivadas | Done — compilador puro, hash de origen y SQLite derivado no autoritativo. |
 | 5 | S58.5 Integridad | Suite que bloquea huérfanos, duplicados y evidencia inválida. |
 
 ## Criterios de terminación
