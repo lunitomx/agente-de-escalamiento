@@ -1,5 +1,15 @@
 {
   "$defs": {
+    "CandidateReviewOutcome": {
+      "description": "A reviewer outcome for a candidate, without promoting it to ontology.",
+      "enum": [
+        "approve-candidate",
+        "needs-revision",
+        "reject-candidate"
+      ],
+      "title": "CandidateReviewOutcome",
+      "type": "string"
+    },
     "EvidenceRef": {
       "additionalProperties": false,
       "properties": {
@@ -173,10 +183,25 @@
           "title": "Evidence",
           "type": "array"
         },
+        "outcome": {
+          "$ref": "#/$defs/CandidateReviewOutcome"
+        },
         "rationale": {
           "maxLength": 1024,
           "minLength": 1,
           "title": "Rationale",
+          "type": "string"
+        },
+        "review_run_id": {
+          "maxLength": 192,
+          "minLength": 3,
+          "title": "Review Run Id",
+          "type": "string"
+        },
+        "reviewer_id": {
+          "maxLength": 192,
+          "minLength": 3,
+          "title": "Reviewer Id",
           "type": "string"
         },
         "state": {
@@ -186,6 +211,9 @@
       "required": [
         "candidate_id",
         "state",
+        "outcome",
+        "reviewer_id",
+        "review_run_id",
         "rationale"
       ],
       "title": "ReviewDecision",

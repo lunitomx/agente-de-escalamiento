@@ -28,3 +28,7 @@ review_states:
   - approved
   - rejected
   - needs-review
+candidate_review_outcomes:
+  - approve-candidate
+  - needs-revision
+  - reject-candidate

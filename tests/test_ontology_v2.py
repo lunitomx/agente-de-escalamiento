@@ -9,6 +9,7 @@ import yaml
 from pydantic import ValidationError
 
 from validators.ontology_v2 import (
+    CandidateReviewOutcome,
     NodeKind,
     CandidateNode,
     OntologyDocument,
@@ -107,14 +108,22 @@ def test_review_queue_keeps_candidates_distinct_from_approved_knowledge() -> Non
                     }
                 ],
             },
+            "extractor_id": "extractor.example",
+            "extraction_run_id": "run.extract.example",
+            "confidence": 0.91,
+            "working_text": "A distinct working summary of the candidate concept.",
+            "locators": ["source.example.u0001"],
             "unresolved_questions": ["confirm scope"],
         }
     )
     approved = ReviewDecision.model_validate(
         {
             "candidate_id": candidate.candidate_id,
-            "state": "approved",
-            "rationale": "Evidence reviewed.",
+            "state": "needs-review",
+            "outcome": CandidateReviewOutcome.APPROVE_CANDIDATE,
+            "reviewer_id": "reviewer.example",
+            "review_run_id": "run.review.example",
+            "rationale": "Evidence reviewed without promoting the candidate.",
             "evidence": [
                 {"source_id": "source.example", "unit_ids": ["source.example.u0001"]}
             ],
@@ -123,18 +132,21 @@ def test_review_queue_keeps_candidates_distinct_from_approved_knowledge() -> Non
     queue = ReviewQueue(schema_version=2, candidates=[candidate], decisions=[approved])
     assert "Example" in render_review_queue(queue)
 
-    with pytest.raises(
-        ValidationError, match="approved review decision requires evidence"
-    ):
+    with pytest.raises(ValidationError, match="review decision requires evidence"):
         ReviewDecision.model_validate(
             {
                 "candidate_id": candidate.candidate_id,
-                "state": "approved",
+                "state": "needs-review",
+                "outcome": "approve-candidate",
+                "reviewer_id": "reviewer.example",
+                "review_run_id": "run.review.example",
                 "rationale": "No evidence.",
             }
         )
     with pytest.raises(ValidationError, match="unknown candidate"):
         ReviewQueue(schema_version=2, decisions=[approved])
+    with pytest.raises(ValidationError, match="every candidate"):
+        ReviewQueue(schema_version=2, candidates=[candidate])
 
 
 def test_empty_checked_in_review_queue_and_cli_are_safe() -> None:
@@ -194,3 +206,44 @@ def test_document_blocks_duplicate_ids_and_orphaned_links() -> None:
                 ],
             }
         )
+
+
+def test_review_queue_requires_independent_extractor_and_reviewer() -> None:
+    candidate = CandidateNode.model_validate(
+        {
+            "candidate_id": "candidate.framework.example",
+            "extractor_id": "worker.same",
+            "extraction_run_id": "run.extract.same",
+            "confidence": 0.9,
+            "working_text": "A semantic candidate summary for an example framework.",
+            "locators": ["source.example.u0001"],
+            "proposed_node": {
+                "id": "framework.example",
+                "kind": "framework",
+                "canonical_name": "Example framework",
+                "origin": "source-explicit",
+                "review_state": "needs-review",
+                "evidence": [
+                    {
+                        "source_id": "source.example",
+                        "unit_ids": ["source.example.u0001"],
+                    }
+                ],
+            },
+        }
+    )
+    decision = ReviewDecision.model_validate(
+        {
+            "candidate_id": candidate.candidate_id,
+            "state": "needs-review",
+            "outcome": "approve-candidate",
+            "reviewer_id": "worker.same",
+            "review_run_id": "run.review.other",
+            "rationale": "Review remains separate from canonical promotion.",
+            "evidence": [
+                {"source_id": "source.example", "unit_ids": ["source.example.u0001"]}
+            ],
+        }
+    )
+    with pytest.raises(ValidationError, match="independent"):
+        ReviewQueue(schema_version=2, candidates=[candidate], decisions=[decision])

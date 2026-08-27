@@ -54,6 +54,14 @@ class ReviewState(str, Enum):
     NEEDS_REVIEW = "needs-review"
 
 
+class CandidateReviewOutcome(str, Enum):
+    """A reviewer outcome for a candidate, without promoting it to ontology."""
+
+    APPROVE_CANDIDATE = "approve-candidate"
+    NEEDS_REVISION = "needs-revision"
+    REJECT_CANDIDATE = "reject-candidate"
+
+
 class EvidenceRef(_StrictModel):
     source_id: str = Field(min_length=3, max_length=128)
     unit_ids: list[str] = Field(min_length=1, max_length=64)
@@ -139,9 +147,14 @@ class OntologyAlias(_StrictModel):
 class CandidateNode(_StrictModel):
     candidate_id: str = Field(min_length=3, max_length=192)
     proposed_node: OntologyNode
+    extractor_id: str = Field(min_length=3, max_length=192)
+    extraction_run_id: str = Field(min_length=3, max_length=192)
+    confidence: float = Field(ge=0, le=1)
     unresolved_questions: list[str] = Field(default_factory=list, max_length=32)
+    working_text: str = Field(min_length=24, max_length=2048)
+    locators: list[str] = Field(min_length=1, max_length=64)
 
-    @field_validator("candidate_id")
+    @field_validator("candidate_id", "extractor_id", "extraction_run_id")
     @classmethod
     def validate_candidate_id(cls, value: str) -> str:
         if _ID_PATTERN.fullmatch(value) is None:
@@ -155,16 +168,26 @@ class CandidateNode(_StrictModel):
             ReviewState.NEEDS_REVIEW,
         }:
             raise ValueError("candidate cannot carry a terminal review state")
+        evidence_units = {
+            unit_id
+            for evidence in self.proposed_node.evidence
+            for unit_id in evidence.unit_ids
+        }
+        if set(self.locators) != evidence_units:
+            raise ValueError("candidate locators must match proposed-node evidence")
         return self
 
 
 class ReviewDecision(_StrictModel):
     candidate_id: str = Field(min_length=3, max_length=192)
     state: ReviewState
+    outcome: CandidateReviewOutcome
+    reviewer_id: str = Field(min_length=3, max_length=192)
+    review_run_id: str = Field(min_length=3, max_length=192)
     rationale: str = Field(min_length=1, max_length=1024)
     evidence: list[EvidenceRef] = Field(default_factory=list, max_length=64)
 
-    @field_validator("candidate_id")
+    @field_validator("candidate_id", "reviewer_id", "review_run_id")
     @classmethod
     def validate_candidate_id(cls, value: str) -> str:
         if _ID_PATTERN.fullmatch(value) is None:
@@ -175,8 +198,17 @@ class ReviewDecision(_StrictModel):
     def validate_decision(self) -> ReviewDecision:
         if self.state is ReviewState.CANDIDATE:
             raise ValueError("review decision cannot retain candidate state")
-        if self.state is ReviewState.APPROVED and not self.evidence:
-            raise ValueError("approved review decision requires evidence")
+        if self.state is ReviewState.APPROVED:
+            raise ValueError("review queue cannot promote candidate knowledge")
+        if not self.evidence:
+            raise ValueError("review decision requires evidence")
+        expected_state = {
+            CandidateReviewOutcome.APPROVE_CANDIDATE: ReviewState.NEEDS_REVIEW,
+            CandidateReviewOutcome.NEEDS_REVISION: ReviewState.NEEDS_REVIEW,
+            CandidateReviewOutcome.REJECT_CANDIDATE: ReviewState.REJECTED,
+        }[self.outcome]
+        if self.state is not expected_state:
+            raise ValueError("review decision state conflicts with its outcome")
         return self
 
 
@@ -194,6 +226,13 @@ class ReviewQueue(_StrictModel):
             raise ValueError("review decision references unknown candidate")
         if len({item.candidate_id for item in self.decisions}) != len(self.decisions):
             raise ValueError("candidate has multiple review decisions")
+        if set(candidate_ids) != {item.candidate_id for item in self.decisions}:
+            raise ValueError("every candidate requires exactly one review decision")
+        candidates_by_id = {item.candidate_id: item for item in self.candidates}
+        for decision in self.decisions:
+            candidate = candidates_by_id[decision.candidate_id]
+            if candidate.extractor_id == decision.reviewer_id:
+                raise ValueError("extractor and reviewer must be independent")
         return self
 
 
