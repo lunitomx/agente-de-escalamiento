@@ -1,7 +1,7 @@
 ---
 epic_id: E58
 title: Ontología v2 trazable y migración de compatibilidad
-status: active
+status: complete
 depends_on: [E57, E6]
 ---
 
@@ -36,7 +36,7 @@ Evolucionar la ontología existente de E6 a una autoridad canónica con proceden
 | 2 | S58.2 Origen/evidencia/revisión | Done — cola tipada, evidencia de aprobación y recibo seguro. |
 | 3 | S58.3 Migración E6 | Done — mapa 82/78/4 con hashes y disposición explícita, sin promoción falsa. |
 | 4 | S58.4 Vistas derivadas | Done — compilador puro, hash de origen y SQLite derivado no autoritativo. |
-| 5 | S58.5 Integridad | Suite que bloquea huérfanos, duplicados y evidencia inválida. |
+| 5 | S58.5 Integridad | Done — IDs, aliases, relaciones y promoción inválida fallan cerrados. |
 
 ## Criterios de terminación
 
