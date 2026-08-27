@@ -16,6 +16,14 @@ se alteraron para aparentar cierre.
 | Un remoto local `legacy-scaleupagent` contrariaba la política de un único canónico. | Reparado | Retirado sólo de la configuración local; `origin/main` vuelve a sincronizado. |
 | RaiSE no tenía manifest/configuración/grafo de proyecto reproducibles. | E76 completada | Se restauró el contrato mínimo sin venv duplicado; los warnings opcionales quedan documentados, no se fuerzan con infraestructura. |
 
+### Disposición de identificadores no asignados
+
+- **E66:** no existe como épica formal: la auditoría 2026-08-27 no encontró
+  scope, brief, entrada de backlog ni historial Git asociado. Se registra como
+  **no asignada/reservada**, no como trabajo pendiente ni cierre implícito.
+  Sólo podrá reutilizarse mediante un scope nuevo que indique objetivo,
+  dependencias, criterios de terminación y su relación con este registro.
+
 ## Estados canónicos
 
 ### Estados actuales
