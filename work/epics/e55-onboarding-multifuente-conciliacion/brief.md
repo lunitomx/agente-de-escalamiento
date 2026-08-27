@@ -1,7 +1,7 @@
 ---
 epic_id: "E55"
 title: "Onboarding multifuente y conciliación de métricas de negocio"
-status: "started"
+status: "complete"
 created: "2026-08-21"
 jira_key: "ESCALA-11"
 source_issue: "https://github.com/lunitomx/agente-de-escalamiento/issues/9"

@@ -41,14 +41,10 @@ Make `.raise/pipelines/scaleup.yaml` operational through a lightweight guided ru
 - [x] Evidence artifacts are deterministic enough to support session close and later audits.
 - [x] The implementation remains smaller than a generic orchestration framework and uses the existing registry contract.
 
-## Closure Guardrail
+## Closure Guardrail (historical)
 
-E31 is active. S31.1 and S31.2 are complete as stories, but S31.3 remains
-pending. Do not create or rely on an E31 complete tag until S31.3 is implemented,
-reviewed, and the epic Done Criteria are checked with evidence.
-
-Update after S31.3: S31.3 is now complete. E31 may proceed to epic close once
-the Done Criteria are verified against tests and story retrospectives.
+Before S31.3 completed, E31 could not be closed. S31.3 is now complete and its
+integration review, story retrospective and epic scope provide that evidence.
 
 ## Final Status
 
