@@ -1,12 +1,8 @@
-"""Exhaustive, evidence-bound coverage for a single source domain.
-
-The full-source coverage validator is intentionally not reused here: a domain
-slice must account only for the units it owns while still proving that the
-slice is an unmodified subset of the authoritative manifest.
-"""
+"""Exhaustive, evidence-bound coverage for a single source domain."""
 
 from __future__ import annotations
 
+from collections import Counter
 from enum import Enum
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -25,18 +21,42 @@ class DomainCoverageDisposition(str, Enum):
     EXCLUDED = "excluded"
 
 
+_INVENTORY_STATUS = {
+    DomainCoverageDisposition.MAPPED: "classified-pending-independent-review",
+    DomainCoverageDisposition.SPECIAL_SOURCE: "special-source",
+    DomainCoverageDisposition.HANDOFF: "handoff",
+    DomainCoverageDisposition.EXCLUDED: "excluded",
+}
+
+
+class DomainRange(_StrictModel):
+    line_start: int = Field(ge=1)
+    line_end: int = Field(ge=1)
+
+    @model_validator(mode="after")
+    def validate_order(self) -> "DomainRange":
+        if self.line_end < self.line_start:
+            raise ValueError("domain range is invalid")
+        return self
+
+
 class DomainInventoryUnit(_StrictModel):
     source_id: str = Field(min_length=3, max_length=128)
     unit_id: str = Field(min_length=3, max_length=192)
     line_start: int = Field(ge=1)
     line_end: int = Field(ge=1)
     content_type: ContentType
+    sha256: str = Field(min_length=64, max_length=64)
+    domain: str = Field(min_length=2, max_length=64)
+    classification_status: str = Field(min_length=3, max_length=96)
+    exclusion_reason: str | None = None
 
 
 class DomainInventory(_StrictModel):
     schema_version: int = Field(ge=1, le=1)
     source_id: str = Field(min_length=3, max_length=128)
     domain: str = Field(min_length=2, max_length=64)
+    range: DomainRange
     manifest_sha256: str = Field(min_length=64, max_length=64)
     unit_count: int = Field(ge=1)
     units: list[DomainInventoryUnit] = Field(min_length=1)
@@ -74,6 +94,14 @@ class DomainCoverageMatrix(_StrictModel):
     domain: str = Field(min_length=2, max_length=64)
     manifest_sha256: str = Field(min_length=64, max_length=64)
     rows: list[DomainCoverageRow] = Field(min_length=1)
+    classification_counts: dict[str, int] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def validate_declared_counts(self) -> "DomainCoverageMatrix":
+        actual = dict(Counter(row.disposition.value for row in self.rows))
+        if self.classification_counts and self.classification_counts != actual:
+            raise ValueError("domain coverage counts differ from rows")
+        return self
 
 
 def validate_domain_coverage(
@@ -103,6 +131,10 @@ def validate_domain_coverage(
     inventory_ids = {unit.unit_id for unit in inventory.units}
     if len(inventory_ids) != len(inventory.units):
         raise ValueError("duplicate domain inventory unit")
+    if inventory.range.line_start != min(
+        unit.line_start for unit in inventory.units
+    ) or inventory.range.line_end != max(unit.line_end for unit in inventory.units):
+        raise ValueError("domain range differs from its inventory units")
     for unit in inventory.units:
         source_unit = manifest_by_id.get(unit.unit_id)
         if source_unit is None:
@@ -112,6 +144,9 @@ def validate_domain_coverage(
             or source_unit.line_start != unit.line_start
             or source_unit.line_end != unit.line_end
             or source_unit.content_type is not unit.content_type
+            or source_unit.sha256 != unit.sha256
+            or source_unit.exclusion_reason != unit.exclusion_reason
+            or unit.domain != inventory.domain
         ):
             raise ValueError("domain inventory differs from manifest")
 
@@ -121,6 +156,7 @@ def validate_domain_coverage(
     if set(row_ids) != inventory_ids:
         raise ValueError("domain coverage is not exhaustive")
 
+    rows_by_unit = {row.unit_id: row for row in matrix.rows}
     special_ids = {
         unit.unit_id
         for unit in inventory.units
@@ -135,7 +171,10 @@ def validate_domain_coverage(
     if covered_special_ids != special_ids:
         raise ValueError("domain special-source coverage mismatch")
 
-    for row in matrix.rows:
+    for unit in inventory.units:
+        row = rows_by_unit[unit.unit_id]
+        if unit.classification_status != _INVENTORY_STATUS[row.disposition]:
+            raise ValueError("domain inventory status differs from coverage")
         if row.disposition is DomainCoverageDisposition.MAPPED:
             for node_id in row.node_ids:
                 evidence_units = known_node_evidence.get(node_id)

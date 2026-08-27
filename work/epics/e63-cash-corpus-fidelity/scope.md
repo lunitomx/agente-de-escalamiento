@@ -47,6 +47,7 @@ Hacer auditable el conocimiento Cash: fórmulas, unidades, supuestos, señales, 
 
 - S63.1, S63.3 y S63.5 tienen borradores privados trazables; los candidatos siguen sin promoción canónica hasta revisión independiente.
 - S63.2 y S63.4 no se declararán cerradas hasta validar cada fórmula contra activo fuente autorizado y enlazar el bloqueo de comparabilidad de E55.
+- El procedimiento CASh no compila fórmulas hasta revisar la fuente externa citada por el libro; unidad, periodo y comparabilidad siguen siendo contratos E38/E55.
 
 ## Handoff y riesgos
 

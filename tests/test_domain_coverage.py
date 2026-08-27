@@ -46,6 +46,7 @@ def _inventory() -> DomainInventory:
             "schema_version": 1,
             "source_id": manifest.source_id,
             "domain": "strategy",
+            "range": {"line_start": 1, "line_end": 2},
             "manifest_sha256": source_manifest_hash(manifest),
             "unit_count": 2,
             "units": [
@@ -55,6 +56,14 @@ def _inventory() -> DomainInventory:
                     "line_start": unit.line_start,
                     "line_end": unit.line_end,
                     "content_type": unit.content_type,
+                    "sha256": unit.sha256,
+                    "domain": "strategy",
+                    "classification_status": (
+                        "classified-pending-independent-review"
+                        if unit.content_type.value == "section"
+                        else "special-source"
+                    ),
+                    "exclusion_reason": unit.exclusion_reason,
                 }
                 for unit in manifest.units
             ],
@@ -70,6 +79,7 @@ def _matrix() -> DomainCoverageMatrix:
             "source_id": manifest.source_id,
             "domain": "strategy",
             "manifest_sha256": source_manifest_hash(manifest),
+            "classification_counts": {"foundation-mapped": 1, "special-source": 1},
             "rows": [
                 {
                     "unit_id": "source.example.u0001",
@@ -123,3 +133,21 @@ def test_domain_coverage_rejects_inventory_drift() -> None:
             _manifest(),
             {"framework.example": {"source.example.u0001"}},
         )
+
+
+def test_domain_coverage_rejects_status_contradiction() -> None:
+    unit = _inventory().units[0].model_copy(update={"classification_status": "handoff"})
+    unsafe = _inventory().model_copy(update={"units": [unit, _inventory().units[1]]})
+    with pytest.raises(ValueError, match="status differs"):
+        validate_domain_coverage(
+            _matrix(),
+            unsafe,
+            _manifest(),
+            {"framework.example": {"source.example.u0001"}},
+        )
+
+
+def test_domain_coverage_rejects_count_drift() -> None:
+    unsafe = _matrix().model_copy(update={"classification_counts": {"handoff": 2}})
+    with pytest.raises(ValueError, match="counts differ"):
+        DomainCoverageMatrix.model_validate(unsafe.model_dump(mode="json"))
