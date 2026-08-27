@@ -2,7 +2,7 @@
 epic_id: E67
 title: Capacidades internas y adaptadores portables
 status: planned
-depends_on: [E65, E56]
+depends_on: [E45, E65, E56]
 ---
 
 # Scope E67
@@ -16,6 +16,8 @@ Conectar los procedimientos del MVP al orquestador `escala` mediante capacidades
 - Mapa `procedure → capability → lifecycle → evidencia` en el catálogo canónico.
 - Enrutamiento explicable desde intención/evidencia disponible a capacidad interna.
 - Adaptador de instalación Codex y adaptador Claude con extensiones aisladas del core.
+- Generación de los cuatro perfiles de E45 desde un contrato común: Cash,
+  Execution, People y Strategy.
 - Verificación de que los aliases de compatibilidad no alojan lógica propia.
 - Pruebas de paridad de rutas, artifacts y límites entre plataformas.
 
@@ -34,6 +36,7 @@ Conectar los procedimientos del MVP al orquestador `escala` mediante capacidades
 | 2 | S67.2 Codex adapter | Instalación limpia con una sola puerta pública. |
 | 3 | S67.3 Claude adapter | Mismo core semántico con empaque específico mínimo. |
 | 4 | S67.4 Paridad/migración | Reporte de rutas y aliases sin duplicación. |
+| 5 | S67.5 Paquete de especialistas | `.codex/agents/` y `.claude/agents/` se generan desde el core y pasan validación de instalación. |
 
 ## Criterios de terminación
 
@@ -41,6 +44,8 @@ Conectar los procedimientos del MVP al orquestador `escala` mediante capacidades
 - Las seis rutas MVP producen contratos semánticamente equivalentes en ambas plataformas.
 - Core portable no contiene instrucciones exclusivas de una plataforma.
 - Ningún alias ejecuta una segunda implementación.
+- Los cuatro perfiles se instalan como definiciones bajo demanda, no como
+  chats permanentes ni comandos del empresario.
 
 ## Handoff y riesgos
 

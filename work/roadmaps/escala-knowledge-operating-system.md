@@ -19,7 +19,7 @@ fuente privada autorizada
   → evaluación y aprendizaje confirmado
 ```
 
-La ontología existente en `conocimiento/` se evoluciona; no se crea un segundo grafo. SQLite puede ser un índice/caché derivado, nunca la autoridad ni un archivo compartido. La memoria de empresa y líder permanece local; una carpeta sincronizada sólo puede intercambiar archivos de entrada/salida, no la base SQLite.
+La ontología existente en `conocimiento/` se evoluciona; no se crea un segundo grafo. SQLite puede ser un índice/caché derivado, nunca la autoridad ni un archivo compartido. Por defecto la memoria de empresa y líder permanece local. E74 añade una excepción explícita para colaboración: un workspace por empresa en Markdown/YAML, con historial, propuestas y conflictos visibles; nunca una base SQLite compartida.
 
 ## Hechos de partida
 
@@ -46,15 +46,21 @@ E57 → E58 → ┬ E59 (fundamentos)
              ├ E62 (Execution)
              └ E63 (Cash)
                     ↓
-                   E64 → E65 → E67 → E68 → E69 → E70
-                                  ↘ E44 ampliada ↗
+                   E64 → E65 → E45 → E67 → E68 → E69 ─┬→ E70
+                                  ↘ E44 ampliada ↗      │
+
+E49 + E55 + E67 → E71 (market intelligence) ───────────┤
+E38 + E55 + E63 + E65 + E67 → E72 (Cash Learning Day) ─┤
+E38 + E40 + E55 + E65 + E67 → E73 (dashboard advisor) ─┤
+E37 + E52 + E55 + E67 → E74 (workspace multiempresa) ──┤
+E49 + E55 + E65 → E75 (diagnóstico profundo) ──────────┘
 
 E55 continúa en paralelo y es requisito de las rutas que usen evidencia multifuente.
 ```
 
 ## Orden de valor
 
-El primer release de capacidad no espera toda la biblioteca. E65 compila un MVP de seis intervenciones: diagnóstico, OPPP de líder, resumen de visión, prioridad trimestral, ritmo de reuniones y revisión trimestral. E68 exige un piloto trimestral antes de abrir E69, donde se incorpora el resto por olas.
+El primer release de capacidad no espera toda la biblioteca. E65 compila un MVP de seis intervenciones: diagnóstico, OPPP de líder, resumen de visión, prioridad trimestral, ritmo de reuniones y revisión trimestral. E68 exige un piloto trimestral antes de abrir E69, donde se incorpora el resto por olas. E71-E75 son extensiones de producto posteriores a esos contratos: hacen la entrevista más útil sin alterar la única puerta pública ni inventar datos empresariales.
 
 ## Métricas y gates globales
 
@@ -69,6 +75,6 @@ El primer release de capacidad no espera toda la biblioteca. E65 compila un MVP 
 ## No objetivos
 
 - No crear RAG/vector DB como fuente de verdad.
-- No alojar datos, sincronizar SQLite ni incorporar OAuth/conectores de Drive.
+- No alojar datos, sincronizar SQLite ni incorporar OAuth/conectores de Drive propios; E74 sí permite sincronización de archivos Markdown/YAML bajo control del equipo.
 - No construir una metodología completa de autores externos que sólo aparezcan citados en el corpus.
 - No llamar "terminado" al sistema por una demo o por tests sintéticos.

@@ -1,18 +1,20 @@
 ---
 epic_id: "E45"
-title: "Specialist Team on Demand"
+title: "Equipo instalado de cuatro especialistas bajo demanda"
 status: "planned"
-depends_on: ["E42", "E43", "E44"]
+depends_on: ["E44", "E49"]
 created: "2026-07-23"
 ---
 
-# E45 — Especialistas bajo demanda
+# E45 — Equipo instalado de cuatro especialistas bajo demanda
 
 ## Hipótesis
 
-Para un empresario que enfrenta un problema que cruza varias decisiones, un
-equipo pequeño de especialistas con un crítico y un verificador detecta riesgos
-que un solo análisis puede pasar por alto, sin obligarlo a leer un debate interno.
+Para un empresario que enfrenta un problema que cruza varias decisiones,
+ESCALA instala cuatro especialistas —Cash, Execution, People y Strategy— y los
+activa sólo cuando aportan evidencia o una perspectiva que el coach principal
+no debe improvisar. El empresario sigue hablando con un solo agente y no lee
+un debate interno.
 
 A diferencia de ejecutar muchos agentes por costumbre, ESCALA solo activa este
 equipo cuando el problema, la evidencia y el posible impacto justifican el
@@ -35,14 +37,18 @@ a People y Strategy.
 ## Dentro
 
 - Clasificar una pregunta como simple o compleja.
-- Elegir especialistas por la decisión a la que realmente aportan.
+- Instalar y versionar cuatro perfiles: `cash-analyst`,
+  `execution-operator`, `people-coach` y `strategy-analyst`.
+- Elegir uno o dos especialistas por la decisión a la que realmente aportan.
 - Revisar supuestos, cifras, fuentes y desacuerdos.
 - Sintetizar una sola recomendación ejecutiva.
 - Establecer límites de tiempo, rondas y contexto compartido.
 
 ## No-Gos
 
-- No ejecutar especialistas para toda conversación.
+- No ejecutar los cuatro especialistas para toda conversación.
+- No dejar bots autónomos corriendo tras el Welcome; se instalan definiciones,
+  no procesos permanentes.
 - No convertir roles en personajes decorativos.
 - No dar todo el historial empresarial a cada especialista.
 - No permitir que un especialista apruebe una decisión humana.

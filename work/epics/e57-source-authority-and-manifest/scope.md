@@ -19,6 +19,8 @@ Crear la cadena privada de custodia para cada fuente metodológica antes de extr
 - Exclusiones explícitas y verificables para material no metodológico o ilegible.
 - Extensión de la política E36 para negar por defecto corpus y derivados detallados en exportaciones públicas.
 - Validadores de hash, locator, cobertura de líneas y frontera de exportación.
+- Contrato de transparencia: aviso de producto independiente/no oficial,
+  revisión de afirmaciones de afiliación y registro de vocabulario permitido.
 
 ## Fuera
 
@@ -35,6 +37,7 @@ Crear la cadena privada de custodia para cada fuente metodológica antes de extr
 | 2 | S57.2 Manifiesto estructural | JSONL privado con `source_id`, locator, hash y content type. |
 | 3 | S57.3 Frontera de derivados | Reglas deny-by-default y dry run de export. |
 | 4 | S57.4 Validadores | Reporte reproducible de integridad y exclusiones. |
+| 5 | S57.5 Transparencia | Aviso probado en rutas permitidas sin declarar patrocinio, afiliación o autorización inexistentes. |
 
 ## Criterios de terminación
 
@@ -43,6 +46,8 @@ Crear la cadena privada de custodia para cada fuente metodológica antes de extr
 - El clean export no contiene corpus, manifiestos detallados ni derivados denegados.
 - El registro distingue permiso documentado, estado desconocido y pendiente de revisión.
 - Se publica recibo de validación, sin incluir el contenido protegido.
+- El onboarding y la documentación permitida incluyen una declaración de
+  independencia aprobada por el gate de derechos.
 
 ## Dependencias y handoff
 

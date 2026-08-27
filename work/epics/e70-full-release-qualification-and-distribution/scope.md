@@ -2,7 +2,7 @@
 epic_id: E70
 title: Calificación total y gate de distribución
 status: planned
-depends_on: [E36, E42, E68, E69]
+depends_on: [E36, E42, E68, E69, E71, E72, E73, E74, E75]
 ---
 
 # Scope E70
@@ -15,7 +15,8 @@ Tomar una decisión humana de distribución basada en evidencia de cobertura, fi
 
 - Matriz `source_id → node_id → procedure_id → capability_id → test_id → release_status`.
 - Validación de instalación limpia de ambos adaptadores y experiencia de puerta única.
-- Verificación de invariantes local-first: estado local, SQLite no compartido, carpeta sincronizada sólo como intercambio de archivos y sin conectores/OAuth.
+- Verificación de invariantes local-first: caché/SQLite estrictamente local; workspace compartido autorizado en Markdown/YAML con historial, propuestas y conflictos explícitos de E74; sin conectores/OAuth propios.
+- Pruebas de las capacidades añadidas: investigación fechada y consentida, Cash Learning Day, ruteo de profundización, recomendaciones de dashboard y los cuatro especialistas privados.
 - Dry run de export limpio, inventario de dependencias/terceros y escaneo de corpus/derivados denegados.
 - Evidencia de aceptación humana, limitaciones conocidas, huecos externos y decisión de publicar/no publicar.
 
@@ -23,7 +24,7 @@ Tomar una decisión humana de distribución basada en evidencia de cobertura, fi
 
 - Publicar automáticamente tras pasar un test.
 - Resolver derechos por inferencia, borrar historia Git o emitir opiniones jurídicas.
-- Convertir la distribución en un servicio hospedado o sincronización multiwriter.
+- Convertir la distribución en un servicio hospedado, sincronizar SQLite o permitir sobrescritura silenciosa entre colaboradores.
 - Introducir funcionalidad nueva para mejorar el resultado del gate.
 
 ## Historias y secuencia
@@ -32,9 +33,10 @@ Tomar una decisión humana de distribución basada en evidencia de cobertura, fi
 |---:|---|---|
 | 1 | S70.1 Matriz de release | Trazabilidad completa y estado de cada eslabón. |
 | 2 | S70.2 Instalación | Recibos de instalación limpia y rutas empresariales. |
-| 3 | S70.3 Local-first | Pruebas de invariantes de datos/SQLite/carpeta. |
+| 3 | S70.3 Local-first y colaboración | Pruebas de datos privados, SQLite local y workspace Markdown/YAML compartido. |
 | 4 | S70.4 Frontera/IP | Clean export y disposición de derechos explícita. |
 | 5 | S70.5 Aceptación | Lista de límites y decisión humana registrada. |
+| 6 | S70.6 Nuevas capacidades | E71-E75 y E45/E67 pasan contratos, casos adversariales y límites. |
 
 ## Criterios de terminación
 

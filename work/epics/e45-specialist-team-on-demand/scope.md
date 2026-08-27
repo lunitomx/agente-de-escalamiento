@@ -1,22 +1,36 @@
 ---
 epic_id: "E45"
-title: "Specialist Team on Demand"
+title: "Equipo instalado de cuatro especialistas bajo demanda"
 status: "planned"
-depends_on: ["E42", "E43", "E44"]
+depends_on: ["E44", "E49"]
 created: "2026-07-23"
 ---
 
-# E45 — Especialistas bajo demanda
+# E45 — Equipo instalado de cuatro especialistas bajo demanda
 
 ## Objetivo
 
-Resolver problemas empresariales complejos con los especialistas necesarios,
-una crítica independiente y una verificación de evidencia, entregando una sola
-respuesta clara al dueño.
+Resolver problemas empresariales complejos con cuatro especialistas instalados
+por decisión —Cash, Execution, People y Strategy—, una crítica independiente y
+verificación de evidencia, entregando una sola respuesta clara al dueño.
 
 **Valor:** una caída de caja, por ejemplo, puede requerir Cash, Execution,
 Strategy y People. E45 evita que ESCALA responda desde una sola perspectiva o
 simule certeza cuando las áreas discrepan.
+
+## Equipo estable, activación no permanente
+
+| Perfil interno | Se activa cuando | No hace |
+|---|---|---|
+| `cash-analyst` | caja, conciliación, forecast, márgenes, CCC o decisiones financieras | asesoría fiscal/legal ni persiste cifras sin confirmación. |
+| `execution-operator` | prioridades, reuniones, compromisos, KPIs o ritmo | calificar personas o reescribir estrategia. |
+| `people-coach` | accountability, roles, capacidad, desarrollo o tensiones de equipo | inferir rasgos personales ni tomar decisiones laborales. |
+| `strategy-analyst` | mercado, cliente, competencia, diferenciación, visión o customer journey | declarar datos de mercado sin fuente/fecha. |
+
+E45 define el núcleo de roles y el router; E67 lo empaqueta para Codex y
+Claude. No son cuatro chats ni cuatro procesos que sobreviven al Welcome.
+`escala` guarda el estado autorizado y activa, como máximo, los roles
+necesarios para cada intervención.
 
 ## Historias
 
@@ -28,6 +42,7 @@ simule certeza cuando las áreas discrepan.
 | S45.4 | Resolver desacuerdos con evidencia | M | Pending | El sistema distingue acuerdo, desacuerdo y pregunta que falta resolver. |
 | S45.5 | Entregar una sola recomendación | M | Pending | El dueño recibe alternativas, riesgo, decisión sugerida, acción y seguimiento. |
 | S45.6 | Calificar casos transversales | M | Pending | Casos de tres o cuatro decisiones prueban valor frente a un solo coach. |
+| S45.7 | Contratos e instalación de los cuatro perfiles | M | Pending | Cada perfil declara trigger, non-trigger, contexto mínimo, permisos, salida y límites; E67 lo instala sin exponer un comando público. |
 
 ## S45.1 — Decidir cuándo se necesita un equipo
 
@@ -44,7 +59,9 @@ Cada especialista recibe su objetivo, evidencia relevante, huecos conocidos y
 la pregunta que debe responder. No recibe archivos ni memoria que no necesita.
 
 **Termina cuando:** la separación de contexto se puede revisar y permanece
-local; una carpeta compartida no se convierte en canal de autoridad.
+local hasta que E74 habilite un workspace compartido aprobado. Incluso en ese
+caso, cada rol recibe sólo el mínimo necesario; su caché o índice local nunca
+se vuelve autoridad compartida.
 
 ## S45.3 — Incorporar al crítico y verificador
 
@@ -79,10 +96,19 @@ problema de crecimiento con tensión entre estrategia, personas y ejecución.
 **Termina cuando:** el equipo encuentra un riesgo omitido por el análisis simple
 o se demuestra honestamente que no agrega valor y se reduce el diseño.
 
+## S45.7 — Contratos e instalación de los cuatro perfiles
+
+Cada perfil declara trigger, non-trigger, contexto mínimo, permisos, salida,
+límites y pruebas. E45 entrega esos contratos al adaptador E67; E67 es quien
+los instala como definiciones privadas de plataforma.
+
+**Termina cuando:** los cuatro contratos pasan pruebas de activación y E67
+puede empaquetarlos sin convertirlos en comandos o conversaciones públicas.
+
 ## Dentro
 
 - Router simple/complejo.
-- Roles de especialista, crítico, verificador y síntesis.
+- Los cuatro perfiles, crítico, verificador y síntesis.
 - Contexto mínimo y límites de trabajo.
 - Desacuerdos visibles y una respuesta ejecutiva.
 - Comparación frente a una respuesta de un solo coach.
@@ -90,13 +116,16 @@ o se demuestra honestamente que no agrega valor y se reduce el diseño.
 ## Fuera
 
 - Personas ficticias o "consejeros" basados en figuras reales.
-- Ejecución permanente de varios agentes.
+- Ejecución permanente de varios agentes o un quinto bot visible de research;
+  research es una capacidad invocable por el perfil pertinente.
 - Decisiones autónomas sobre personas, presupuesto o publicación.
-- Datos compartidos entre instalaciones.
+- Compartir datos implícitamente entre instalaciones; E74 define el workspace
+  compartido aprobado, su historial y la resolución explícita de conflictos.
 - Mejora automática del producto → E46.
 
 ## Criterios de terminación
 
+- [ ] Los cuatro perfiles tienen contratos y pruebas de trigger/non-trigger.
 - [ ] El router deja casos simples con un solo coach.
 - [ ] Los roles reciben contexto mínimo y verificable.
 - [ ] El crítico encuentra un supuesto o riesgo sembrado.
@@ -111,20 +140,20 @@ o se demuestra honestamente que no agrega valor y se reduce el diseño.
 ## Dependencias
 
 ```text
-E43 evidencia y revisión
-          ↓
-E44 decisiones y resultados
-          ↓
-S45.1 router → S45.2 contexto → S45.3 crítico/verificador
-                                      ↓
-                           S45.4 desacuerdos → S45.5 síntesis
-                                                        ↓
-                                              S45.6 casos transversales
+E49 evidencia y revisión      E44 decisiones y resultados
+          \                    /
+           \                  /
+            S45.7 contratos → S45.1 router → S45.2 contexto → S45.3 crítico/verificador
+                                                               ↓
+                                                    S45.4 desacuerdos → S45.5 síntesis
+                                                                                 ↓
+                                                                       S45.6 casos transversales
 ```
 
-- E43 debe aportar evidencia y límites confiables.
+- E49 debe aportar evidencia y límites confiables.
 - E44 debe aportar decisiones y resultados para valorar el impacto.
-- Los sub-skills People, Strategy, Execution y Cash ya existentes.
+- E67 consume los contratos E45 para empaquetar los perfiles y adaptadores por
+  plataforma; no bloquea el diseño del router.
 - Casos redactados que crucen decisiones sin exponer empresa real.
 
 ## Plan de implementación
@@ -133,17 +162,19 @@ S45.1 router → S45.2 contexto → S45.3 crítico/verificador
 
 | Orden | Historia | Razonamiento | Habilita |
 |---:|---|---|---|
-| 1 | S45.1 | El primer riesgo es convertir todo en trabajo multi-agente. | S45.2-S45.6 |
-| 2 | S45.2 | Define límites de información antes de sumar roles. | S45.3-S45.5 |
-| 3 | S45.3 | Prueba la diferencia entre producir más texto y revisar mejor. | S45.4-S45.5 |
-| 4 | S45.4 | Los desacuerdos deben resolverse antes de diseñar la síntesis. | S45.5 |
-| 5 | S45.5 | Convierte los roles en valor comprensible para el dueño. | S45.6 |
-| 6 | S45.6 | Mide si el equipo merece existir antes de pasar a E46. | Gate hacia E46 |
+| 1 | S45.7 | Fija contratos antes de que una plataforma dicte la arquitectura. | S45.1-S45.3 y E67 |
+| 2 | S45.1 | El primer riesgo es convertir todo en trabajo multi-agente. | S45.2-S45.6 |
+| 3 | S45.2 | Define límites de información antes de sumar roles. | S45.3-S45.5 |
+| 4 | S45.3 | Prueba la diferencia entre producir más texto y revisar mejor. | S45.4-S45.5 |
+| 5 | S45.4 | Los desacuerdos deben resolverse antes de diseñar la síntesis. | S45.5 |
+| 6 | S45.5 | Convierte los roles en valor comprensible para el dueño. | S45.6 |
+| 7 | S45.6 | Mide si el equipo merece existir antes de pasar a E46. | Gate hacia E46 |
 
 ### Hitos
 
 | Hito | Historias | Criterio de éxito |
 |---|---|---|
+| M0 — Contratos | S45.7 | Cuatro perfiles privados y evaluables quedan listos para empaquetar. |
 | M1 — Router útil | S45.1 | Casos simples y complejos siguen rutas diferentes correctamente. |
 | M2 — Equipo con control | S45.2-S45.3 | Contexto mínimo y una falla sembrada son manejados correctamente. |
 | M3 — Síntesis de negocio | S45.4-S45.5 | Un desacuerdo llega a una sola recomendación honesta. |
@@ -164,6 +195,7 @@ la comparación final espera la síntesis de S45.5.
 | S45.4 | Pending | Registro de acuerdo, desacuerdo y pregunta abierta. |
 | S45.5 | Pending | Síntesis ejecutiva probada con empresarios. |
 | S45.6 | Pending | Comparativo de equipo vs. un solo coach. |
+| S45.7 | Pending | Contratos de Cash, Execution, People y Strategy con pruebas. |
 
 ## Riesgos
 
