@@ -165,6 +165,14 @@
           "title": "Candidate Id",
           "type": "string"
         },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "maxItems": 64,
+          "title": "Evidence",
+          "type": "array"
+        },
         "rationale": {
           "maxLength": 1024,
           "minLength": 1,
