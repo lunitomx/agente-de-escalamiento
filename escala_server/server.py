@@ -30,6 +30,7 @@ class EscalaRequestHandler(BaseHTTPRequestHandler):
     dashboard: DashboardHandler = None  # type: ignore
     knowledge: Any = None  # type: ignore[annotation-unchecked]
     advisor: Any = None  # type: ignore[annotation-unchecked]
+    outcomes: Any = None  # type: ignore[annotation-unchecked]
 
     def do_GET(self):
         path = self.path
@@ -187,7 +188,7 @@ def make_server(
         db_path = str(Path.home() / ".escala" / "escala.db")
 
     from .graph_engine import GraphEngine
-    from .handlers import WorksheetsHandler, SessionsHandler
+    from .handlers import OutcomeLearningHandler, WorksheetsHandler, SessionsHandler
     from .knowledge_handler import KnowledgeHandler
     from .business_advisor import BusinessAdvisorHandler
 
@@ -200,6 +201,9 @@ def make_server(
     EscalaRequestHandler.dashboard = DashboardHandler(db_path)
     EscalaRequestHandler.knowledge = KnowledgeHandler(GraphEngine(db_path))
     EscalaRequestHandler.advisor = BusinessAdvisorHandler(db_path)
+    EscalaRequestHandler.outcomes = OutcomeLearningHandler(
+        Path(db_path).expanduser().resolve(strict=False).parent / "outcome-learning"
+    )
 
     server = HTTPServer((host, port), EscalaRequestHandler)
     return server
@@ -341,6 +345,45 @@ def _build_router() -> Router:
         history = (payload or {}).get("history")
         return EscalaRequestHandler.advisor.board_debate(
             decision=decision, context=context, history=history
+        )
+
+    # ── Outcome learning API (E44) ───────────────────────────────
+
+    @router.get("/api/companies/{company_id}/outcomes")
+    def outcome_cockpit(company_id=None, on: str | None = None):
+        assert company_id is not None
+        return EscalaRequestHandler.outcomes.cockpit(company_id, on=on)
+
+    @router.post("/api/companies/{company_id}/outcomes/decisions")
+    def outcome_create_decision(company_id=None, payload=None):
+        assert company_id is not None
+        return EscalaRequestHandler.outcomes.create_decision(company_id, payload or {})
+
+    @router.post("/api/companies/{company_id}/outcomes/{cycle_id}/actions")
+    def outcome_create_action(company_id=None, cycle_id=None, payload=None):
+        assert company_id is not None and cycle_id is not None
+        return EscalaRequestHandler.outcomes.create_action(
+            company_id, cycle_id, payload or {}
+        )
+
+    @router.post("/api/companies/{company_id}/outcomes/{cycle_id}/results/{action_id}")
+    def outcome_create_result(
+        company_id=None, cycle_id=None, action_id=None, payload=None
+    ):
+        assert company_id is not None and cycle_id is not None and action_id is not None
+        return EscalaRequestHandler.outcomes.create_result(
+            company_id, cycle_id, action_id, payload or {}
+        )
+
+    @router.post(
+        "/api/companies/{company_id}/outcomes/{cycle_id}/learnings/{result_id}"
+    )
+    def outcome_confirm_learning(
+        company_id=None, cycle_id=None, result_id=None, payload=None
+    ):
+        assert company_id is not None and cycle_id is not None and result_id is not None
+        return EscalaRequestHandler.outcomes.confirm_learning(
+            company_id, cycle_id, result_id, payload or {}
         )
 
     # ── Cash / Power of One routes ────────────────────────────────

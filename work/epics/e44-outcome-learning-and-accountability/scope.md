@@ -1,7 +1,7 @@
 ---
 epic_id: "E44"
 title: "Outcome Learning and Accountability"
-status: "planned"
+status: "in_progress"
 depends_on: ["E43"]
 release_gate: ["E42"]
 created: "2026-07-23"
@@ -22,12 +22,12 @@ algo ni si la recomendación funcionó.
 
 | ID | Historia | Tamaño | Estado | Demostración de valor |
 |---|---|:---:|:---:|---|
-| S44.1 | Registrar la decisión | M | Pending | Una recomendación puede aceptarse, rechazarse o quedar pendiente con su motivo. |
-| S44.2 | Convertir decisión en acción | M | Pending | Cada acción relevante tiene responsable, plazo, métrica esperada y revisión. |
-| S44.3 | Preguntar en el ritmo correcto | M | Pending | Daily, weekly, mensual o trimestral recuperan solo lo que toca revisar. |
-| S44.4 | Comparar resultado con expectativa | M | Pending | ESCALA diferencia cambio observado, duda y posible explicación. |
-| S44.5 | Confirmar aprendizaje y confianza | M | Pending | El dueño confirma, corrige o rechaza una lección antes de reutilizarla. |
-| S44.6 | Mostrar el tablero de aprendizaje | S | Pending | Vista clara de decisiones, acciones, resultados y aprendizajes por confirmar. |
+| S44.1 | Registrar la decisión | M | Implemented; acceptance pending | Una recomendación puede aceptarse, rechazarse o quedar pendiente con su motivo. |
+| S44.2 | Convertir decisión en acción | M | Implemented; acceptance pending | Cada acción relevante tiene responsable, plazo, métrica esperada y revisión. |
+| S44.3 | Preguntar en el ritmo correcto | M | Implemented; acceptance pending | Daily, weekly, mensual o trimestral recuperan solo lo que toca revisar. |
+| S44.4 | Comparar resultado con expectativa | M | Implemented; acceptance pending | ESCALA diferencia cambio observado, duda y posible explicación. |
+| S44.5 | Confirmar aprendizaje y confianza | M | Implemented; acceptance pending | El dueño confirma, corrige o rechaza una lección antes de reutilizarla. |
+| S44.6 | Mostrar el tablero de aprendizaje | S | Implemented; acceptance pending | Vista clara de decisiones, acciones, resultados y aprendizajes por confirmar. |
 
 ## S44.1 — Registrar la decisión
 
@@ -96,14 +96,14 @@ acción importante sin navegar la memoria técnica.
 
 ## Criterios de terminación
 
-- [ ] Una recomendación puede ligarse a una decisión explícita.
-- [ ] Una decisión aceptada puede llevar una acción con responsable y fecha.
-- [ ] La revisión respeta la cadencia y puede registrar falta de resultado.
-- [ ] Resultado observado, interpretación y causalidad se muestran separados.
-- [ ] El empresario puede confirmar, corregir o rechazar un aprendizaje.
-- [ ] La memoria conserva origen, fecha, confianza y vigencia.
-- [ ] El tablero ejecutivo no expone tecnicismos ni datos de otra empresa.
-- [ ] Los cuatro pilares tienen al menos un ciclo calificado.
+- [x] Una recomendación puede ligarse a una decisión explícita.
+- [x] Una decisión aceptada puede llevar una acción con responsable y fecha.
+- [x] La revisión respeta la cadencia y puede registrar falta de resultado.
+- [x] Resultado observado, interpretación y causalidad se muestran separados.
+- [x] El empresario puede confirmar, corregir o rechazar un aprendizaje.
+- [x] La memoria conserva origen, fecha, confianza y vigencia.
+- [x] El tablero ejecutivo no expone tecnicismos ni datos de otra empresa.
+- [x] Los cuatro pilares tienen al menos un ciclo calificado.
 - [ ] Retrospectiva y evidencia de aceptación completadas.
 
 ## Dependencias
@@ -155,12 +155,20 @@ integra después de S44.5 para no mostrar aprendizajes no revisados.
 
 | Story | Estado | Evidencia esperada |
 |---|---|---|
-| S44.1 | Pending | Registro de decisión aceptada, rechazada y aplazada. |
-| S44.2 | Pending | Acción con responsable, fecha y expectativa. |
-| S44.3 | Pending | Seguimientos por daily, weekly y trimestre. |
-| S44.4 | Pending | Comparaciones sin causalidad inventada. |
-| S44.5 | Pending | Aprendizaje confirmado, corregido y rechazado. |
-| S44.6 | Pending | Vista ejecutiva y prueba de lectura empresarial. |
+| S44.1 | Implemented; owner acceptance pending | Registro de decisión aceptada, rechazada y aplazada. |
+| S44.2 | Implemented; owner acceptance pending | Acción con responsable, fecha y expectativa. |
+| S44.3 | Implemented; owner acceptance pending | Seguimientos por daily, weekly y trimestre. |
+| S44.4 | Implemented; owner acceptance pending | Comparaciones sin causalidad inventada. |
+| S44.5 | Implemented; owner acceptance pending | Aprendizaje confirmado, corregido y rechazado. |
+| S44.6 | Implemented; owner acceptance pending | Vista ejecutiva y prueba de lectura empresarial. |
+
+## Evidencia local (2026-08-27)
+
+- Módulo local: `escala_server/outcome_learning.py`.
+- API: decisiones, acciones, resultados, aprendizajes y cockpit por empresa.
+- Cobertura: Cash, People, Strategy y Execution; People requiere consentimiento explícito.
+- Gates locales: `tests/test_outcome_learning.py`, `tests/test_escala_server.py`, Ruff y Pyright.
+- Pendiente de cierre: una aceptación real de empresario y retrospectiva; no se sustituye por fixtures.
 
 ## Riesgos
 

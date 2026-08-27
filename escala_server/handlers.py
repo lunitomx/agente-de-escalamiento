@@ -5,6 +5,8 @@ the same API contract as the original in-memory handlers.
 """
 
 import json
+from datetime import date
+from pathlib import Path
 from typing import Any
 
 from .daos import CompanyDAO, WorksheetDAO, ChangeDAO, SessionDAO
@@ -236,6 +238,103 @@ class MemoryHandler:
         return {"data": {"id": rid}, "status": "ok"}
 
 
+class OutcomeLearningHandler:
+    """Expose E44's owner-confirmed cycle through the local API surface."""
+
+    def __init__(self, root: Path) -> None:
+        self._root = root
+
+    def cockpit(self, company_id: str, on: str | None = None) -> dict:
+        from .outcome_learning import OutcomeLearningError
+
+        try:
+            cockpit = self._ledger(company_id).cockpit(_parse_date(on) or date.today())
+        except (OutcomeLearningError, ValueError) as exc:
+            return {"status": "error", "message": str(exc)}
+        return {"data": cockpit, "status": "ok"}
+
+    def create_decision(self, company_id: str, payload: dict) -> dict:
+        from .outcome_learning import OutcomeLearningError
+
+        try:
+            record = self._ledger(company_id).register_decision(
+                recommendation=payload.get("recommendation", ""),
+                decision=payload.get("decision", ""),
+                area=payload.get("area", ""),
+                status=payload.get("status", "needs_information"),
+                decided_by=payload.get("decided_by", ""),
+                reason=payload.get("reason", ""),
+                evidence_ids=tuple(payload.get("evidence_ids", [])),
+                today=_parse_date(payload.get("decided_on")),
+            )
+        except (OutcomeLearningError, ValueError, TypeError) as exc:
+            return {"status": "error", "message": str(exc)}
+        return {"data": record, "status": "ok"}
+
+    def create_action(self, company_id: str, cycle_id: str, payload: dict) -> dict:
+        from .outcome_learning import OutcomeLearningError
+
+        try:
+            action = self._ledger(company_id).add_action(
+                cycle_id,
+                description=payload.get("description", ""),
+                owner=payload.get("owner", ""),
+                review_on=_required_date(payload.get("review_on")),
+                cadence=payload.get("cadence", "weekly"),
+                expected_result=payload.get("expected_result", ""),
+                metric=payload.get("metric"),
+            )
+        except (OutcomeLearningError, ValueError, TypeError) as exc:
+            return {"status": "error", "message": str(exc)}
+        return {"data": action, "status": "ok"}
+
+    def create_result(
+        self, company_id: str, cycle_id: str, action_id: str, payload: dict
+    ) -> dict:
+        from .outcome_learning import OutcomeLearningError
+
+        try:
+            result = self._ledger(company_id).record_result(
+                cycle_id,
+                action_id,
+                status=payload.get("status", "no_result_yet"),
+                observed=payload.get("observed"),
+                evidence_ids=tuple(payload.get("evidence_ids", [])),
+                interpretation=payload.get("interpretation"),
+                today=_parse_date(payload.get("recorded_on")),
+            )
+        except (OutcomeLearningError, ValueError, TypeError) as exc:
+            return {"status": "error", "message": str(exc)}
+        return {"data": result, "status": "ok"}
+
+    def confirm_learning(
+        self, company_id: str, cycle_id: str, result_id: str, payload: dict
+    ) -> dict:
+        from .outcome_learning import OutcomeLearningError
+
+        try:
+            learning = self._ledger(company_id).confirm_learning(
+                cycle_id,
+                result_id,
+                statement=payload.get("statement", ""),
+                status=payload.get("status", "confirmed"),
+                confirmed_by=payload.get("confirmed_by", ""),
+                confidence=payload.get("confidence", 0),
+                valid_until=_parse_date(payload.get("valid_until"), optional=True),
+                people_consent=payload.get("people_consent", False),
+                causal_confirmation=payload.get("causal_confirmation", False),
+                today=_parse_date(payload.get("confirmed_on")),
+            )
+        except (OutcomeLearningError, ValueError, TypeError) as exc:
+            return {"status": "error", "message": str(exc)}
+        return {"data": learning, "status": "ok"}
+
+    def _ledger(self, company_id: str):
+        from .outcome_learning import OutcomeLearningLedger
+
+        return OutcomeLearningLedger(self._root, company_id)
+
+
 # ── helpers ──────────────────────────────────────────────────────────
 
 
@@ -246,3 +345,15 @@ def _serialise(value: Any) -> str | None:
     if isinstance(value, (dict, list)):
         return json.dumps(value)
     return str(value)
+
+
+def _parse_date(value: str | None, *, optional: bool = False) -> date | None:
+    if value in (None, ""):
+        return None if optional else date.today()
+    return date.fromisoformat(value)
+
+
+def _required_date(value: str | None) -> date:
+    if value in (None, ""):
+        raise ValueError("date is required")
+    return date.fromisoformat(value)
