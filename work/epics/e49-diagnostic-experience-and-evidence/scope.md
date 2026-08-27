@@ -1,6 +1,6 @@
 # Epic E49: Experiencia diagnóstica y evidencia accionable para Escala — Scope
 
-> **Status:** READY FOR EPIC CLOSE — S49.1–S49.7 complete
+> **Status:** COMPLETE — S49.1–S49.7, retrospective and local acceptance verified
 > **Release:** REL-TBD (diagnostic experience)
 > **Created:** 2026-08-19
 > **Design:** `design.md`
@@ -89,6 +89,11 @@ actionable handoff.
 - [x] Comparison receipt records completion time, abandonment, evidence
   coverage, actionability, and user trust; no raw personal data is committed.
 - [x] Epic retrospective done and merged to `main`.
+
+**Closure re-verification (2026-08-27):** the current full suite passes
+(`1242 passed, 2 skipped`) with Pyright, Ruff check and Ruff format check. The
+acceptance remains scoped to the local coaching engine; production UI and a
+longitudinal human-outcome study remain explicitly outside E49.
 
 ## Dependencies
 

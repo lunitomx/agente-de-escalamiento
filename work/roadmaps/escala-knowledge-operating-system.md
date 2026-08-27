@@ -29,7 +29,7 @@ La ontología existente en `conocimiento/` se evoluciona; no se crea un segundo 
 | E6 ontología YAML y retrieval | Migrarla con compatibilidad; no duplicarla. |
 | E30/E31 pipelines | Reusar su runner; no construir otro motor de workflows. |
 | E35 golden cases | Ampliarlo a fidelidad semántica y cross-platform. |
-| E49/E55 diagnóstico y evidencia | Son los consumidores de hechos y ruta de 90 días; E55 sigue en curso. |
+| E49/E55 diagnóstico y evidencia | Consumidores de hechos y ruta de 90 días; ambos ya tienen recibos locales de aceptación. |
 | E52 memoria consentida y E44 seguimiento | Se integran y amplían; E44 conserva la propiedad del loop de resultados. |
 | E56 catálogo | Se conserva: `escala` es la única entrada instalada; capacidades son internas. |
 
@@ -55,7 +55,7 @@ E38 + E40 + E55 + E65 + E67 → E73 (dashboard advisor) ─┤
 E37 + E52 + E55 + E67 → E74 (workspace multiempresa) ──┤
 E49 + E55 + E65 → E75 (diagnóstico profundo) ──────────┘
 
-E55 continúa en paralelo y es requisito de las rutas que usen evidencia multifuente.
+E55 ya está completada y es requisito satisfecho para las rutas que usen evidencia multifuente.
 ```
 
 ## Orden de valor
