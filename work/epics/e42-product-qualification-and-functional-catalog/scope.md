@@ -136,7 +136,9 @@ que no ocurrió.
 
 Pendiente verificable:
 
-- Repetir S42.1 en macOS y Windows limpios con recibos trazables.
+- Repetir S42.1 en macOS y Windows limpios con recibos trazables, siguiendo
+  hardware-acceptance-protocol.md y validando el recibo privado con
+  scripts/check_e42_release_acceptance.py.
 - Calificar cada skill distribuido, con caso positivo, negativo e invocación
   actual; los no demostrados se declaran no distribuidos o pendientes.
 - Consolidar S42.3 en recibos de la aceptación maestra.
