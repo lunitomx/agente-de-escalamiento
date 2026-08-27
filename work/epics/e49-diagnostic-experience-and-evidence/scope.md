@@ -1,3 +1,11 @@
+---
+epic_id: E49
+title: Experiencia diagnostica y evidencia accionable
+status: complete
+closure_disposition: complete
+closed: 2026-08-27
+---
+
 # Epic E49: Experiencia diagnóstica y evidencia accionable para Escala — Scope
 
 > **Status:** COMPLETE — S49.1–S49.7, retrospective and local acceptance verified

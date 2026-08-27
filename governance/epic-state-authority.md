@@ -30,3 +30,15 @@ Una épica sólo puede aparecer como `complete` cuando el scope, sus criterios d
 terminación, evidencia actual y toda aceptación externa requerida coinciden.
 Un documento antiguo, una prueba sintética o un nombre de commit no sustituyen
 esa verificación.
+
+## Inventario de scopes
+
+El archivo governance/scope-inventory.yaml clasifica cada scope raíz legado y cada
+scope de historia que no representa una épica independiente. El comando
+scripts/check_scope_inventory.py debe pasar antes de aceptar una auditoría:
+detecta un scope sin clasificación, un sub-scope tratado como épica, una raíz
+canónica sin epic_id o sin status, y disposiciones que no existen en la política
+de cierre.
+
+No se cambia el estado de un archivo legado por el inventario: éste registra la
+disposición y la evidencia que ya lo sustentan.

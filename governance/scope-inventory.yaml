@@ -1,0 +1,192 @@
+schema_version: 1
+legacy_scopes:
+  - path: work/epics/e11-agente-escalamiento/scope.md
+    kind: archived_epic
+    legacy_id: E11
+    disposition: complete
+    evidence: scope-declared
+  - path: work/epics/e12-codex-and-update/scope.md
+    kind: archived_epic
+    legacy_id: E12
+    disposition: cancelled/absorbed
+    evidence: scope-declared
+  - path: work/epics/e14-cash-dashboards/scope.md
+    kind: archived_epic
+    legacy_id: E14
+    disposition: complete
+    evidence: scope-declared
+  - path: work/epics/e15-strategy-dashboards/scope.md
+    kind: archived_epic
+    legacy_id: E15
+    disposition: complete
+    evidence: scope-declared
+  - path: work/epics/e16-people-dashboards/scope.md
+    kind: archived_epic
+    legacy_id: E16
+    disposition: complete
+    evidence: scope-declared
+  - path: work/epics/e17-execution-dashboards/scope.md
+    kind: archived_epic
+    legacy_id: E17
+    disposition: complete
+    evidence: scope-declared
+  - path: work/epics/e1801-class-to-skill-learning-loop/scope.md
+    kind: archived_epic
+    legacy_id: E1801
+    disposition: complete
+    evidence: scope-declared
+  - path: work/epics/e1802-escala-server/scope.md
+    kind: archived_epic
+    legacy_id: E1802
+    disposition: complete
+    evidence: scope-declared
+  - path: work/epics/e1901-book-ingestion/scope.md
+    kind: archived_epic
+    legacy_id: E1901
+    disposition: deferred/backlog
+    evidence: scope-declared
+  - path: work/epics/e1902-strategy-core-skills/scope.md
+    kind: archived_epic
+    legacy_id: E1902
+    disposition: superseded/discarded
+    evidence: scope-declared
+  - path: work/epics/e2001-contextual-skills/scope.md
+    kind: archived_epic
+    legacy_id: E2001
+    disposition: complete
+    evidence: scope-declared
+  - path: work/epics/e2002-voice-of-customer-evidence-capture/scope.md
+    kind: archived_epic
+    legacy_id: E2002
+    disposition: superseded/discarded
+    evidence: scope-declared
+  - path: work/epics/e2101-transcript-intelligence-for-escala/scope.md
+    kind: archived_epic
+    legacy_id: E2101
+    disposition: deprecated/discarded
+    evidence: scope-declared
+  - path: work/epics/e2102-verne-board-member/scope.md
+    kind: archived_epic
+    legacy_id: E2102
+    disposition: complete
+    evidence: scope-declared
+  - path: work/epics/e2201-validation-drift-governance/scope.md
+    kind: archived_epic
+    legacy_id: E2201
+    disposition: superseded/discarded
+    evidence: scope-declared
+  - path: work/epics/e2202-verne-audit/scope.md
+    kind: archived_epic
+    legacy_id: E2202
+    disposition: absorbed/descoped
+    evidence: scope-declared
+  - path: work/epics/e23-kokoro-agent/scope.md
+    kind: archived_epic
+    legacy_id: E23
+    disposition: deferred/backlog
+    evidence: scope-declared
+  - path: work/epics/e24-escala-evolve/scope.md
+    kind: archived_epic
+    legacy_id: E24
+    disposition: deferred/backlog
+    evidence: scope-declared
+  - path: work/epics/e25-escala-live/scope.md
+    kind: archived_epic
+    legacy_id: E25
+    disposition: complete
+    evidence: scope-declared
+  - path: work/epics/e29-governance-repair/scope.md
+    kind: archived_epic
+    legacy_id: E29
+    disposition: complete
+    evidence: scope-declared
+  - path: work/epics/e3-agent-framework/scope.md
+    kind: archived_epic
+    legacy_id: E3
+    disposition: complete
+    evidence: retrospective-and-scope
+  - path: work/epics/e30-scaleup-skill-pipelines/scope.md
+    kind: archived_epic
+    legacy_id: E30
+    disposition: complete
+    evidence: scope-declared
+  - path: work/epics/e32-closure-evidence-repair/scope.md
+    kind: archived_epic
+    legacy_id: E32
+    disposition: complete
+    evidence: scope-declared
+  - path: work/epics/e33-backlog-draft-closure/scope.md
+    kind: archived_epic
+    legacy_id: E33
+    disposition: complete
+    evidence: scope-declared
+  - path: work/epics/e34-voice-of-customer-evidence-system/scope.md
+    kind: archived_epic
+    legacy_id: E34
+    disposition: complete
+    evidence: scope-declared
+  - path: work/epics/e35-skill-golden-cases-drift-gates/scope.md
+    kind: archived_epic
+    legacy_id: E35
+    disposition: complete
+    evidence: scope-declared
+  - path: work/epics/e54-e47-closure/scope.md
+    kind: archived_epic
+    legacy_id: E54
+    disposition: absorbed/descoped
+    evidence: retrospective-only
+  - path: work/epics/e6-knowledge-ontology/scope.md
+    kind: archived_epic
+    legacy_id: E6
+    disposition: complete
+    evidence: close-commit-deac2a6
+  - path: work/epics/e7-agent-intelligence/scope.md
+    kind: archived_epic
+    legacy_id: E7
+    disposition: complete
+    evidence: close-commit-7630a5a
+  - path: work/epics/e8-coaching-engine/scope.md
+    kind: archived_epic
+    legacy_id: E8
+    disposition: complete
+    evidence: close-commit-b506046
+  - path: work/epics/e9-value-add/scope.md
+    kind: archived_epic
+    legacy_id: E9
+    disposition: complete
+    evidence: close-commit-483d11f
+  - path: work/epics/e51-issue-debt-remediation/stories/s51.3-subagents-overviews/scope.md
+    kind: story_scope
+    legacy_id: E51
+    disposition: complete
+    evidence: parent-e51
+  - path: work/epics/e51-issue-debt-remediation/stories/s51.4-worksheet-save-harden/scope.md
+    kind: story_scope
+    legacy_id: E51
+    disposition: complete
+    evidence: parent-e51
+  - path: work/epics/e51-issue-debt-remediation/stories/s51.5-guardrails-tracked/scope.md
+    kind: story_scope
+    legacy_id: E51
+    disposition: complete
+    evidence: parent-e51
+  - path: work/epics/e52-conversational-memory/stories/s52.1-persistence-contract/scope.md
+    kind: story_scope
+    legacy_id: E52
+    disposition: complete
+    evidence: parent-e52
+  - path: work/epics/e52-conversational-memory/stories/s52.2-save-load-implementation/scope.md
+    kind: story_scope
+    legacy_id: E52
+    disposition: complete
+    evidence: parent-e52
+  - path: work/epics/e52-conversational-memory/stories/s52.3-welcome-integration/scope.md
+    kind: story_scope
+    legacy_id: E52
+    disposition: complete
+    evidence: parent-e52
+  - path: work/epics/e55-onboarding-multifuente-conciliacion/stories/s55.1-fact-contract/scope.md
+    kind: story_scope
+    legacy_id: E55
+    disposition: complete
+    evidence: parent-e55
