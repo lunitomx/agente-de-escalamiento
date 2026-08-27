@@ -1,6 +1,6 @@
 ---
 epic_id: "E63"
-document_status: "pending-owner-decision"
+document_status: "decision-recorded"
 source_kind: "external-formula-source"
 ---
 
@@ -22,21 +22,29 @@ El título, autores y enlace permiten identificar la obra; no constituyen una
 licencia para copiarla, almacenarla en este repositorio ni distribuir fórmulas
 derivadas como contenido de esa obra.
 
-## Decisión necesaria
+## Decisión registrada — 2026-08-27
 
-Una persona con autoridad sobre derechos de contenido elige una de estas rutas:
+La persona responsable eligió la **ruta 2**: mantener CASh como herramienta
+*source-bounded*.
+
+- ESCALA conserva las categorías, preguntas, guardrails y el bloqueo de
+  comparabilidad de CASh.
+- No compila, atribuye ni distribuye una fórmula de CCC o cash-per-day como
+  contenido de la fuente HBR.
+- Las fórmulas propias de E38 siguen siendo producto independiente y no una
+  reconstrucción de la fuente citada.
+- Esta decisión elimina la necesidad de adquirir o incorporar el activo HBR
+  para E63; no altera la prohibición de almacenar o redistribuirlo.
+
+## Rutas preservadas para una futura revisión de alcance
 
 1. **Aportar acceso lícito para revisión privada.** Compartir una copia o acceso
    adquirido de forma válida sólo para validar la fórmula. El activo y sus
    extractos no se versionan; se registra únicamente un recibo de revisión,
    hash/identificador, alcance de uso y fecha.
-2. **Mantener CASh como herramienta source-bounded.** ESCALA conserva las
-   categorías y el bloqueo actual; no compila ni atribuye fórmula CCC o
-   cash-per-day a la metodología. Las fórmulas propias de E38 siguen siendo
-   producto independiente y no una reconstrucción de la fuente citada.
-3. **Descope explícito.** Retirar del alcance la compilación de fórmulas CASh.
-   Requiere actualizar E63, E65, E69 y el plan de producto, pues cambia el
-   valor comprometido.
+2. **Descope explícito.** Retirar del alcance la estructura CASh. Requiere
+   actualizar E63, E65, E69 y el plan de producto, pues cambia el valor
+   comprometido.
 
 ## Condiciones de aceptación de la ruta 1
 

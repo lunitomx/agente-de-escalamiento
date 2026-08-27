@@ -28,7 +28,7 @@ se alteraron para aparentar cierre.
 | E60 | in_progress | Completar inspección visual autorizada de OPPP/FACe/PACe; la semántica y la cobertura privada ya fueron revisadas. |
 | E61 | in_progress | Completar inspección visual autorizada de SWT, Seven Strata, OPSP y Vision Summary. |
 | E62 | in_progress | Completar inspección visual autorizada de WWW/checklist/agendas; no hay distorsión técnica crítica abierta. |
-| E63 | in_progress | Conseguir y revisar la fuente externa autorizada de fórmulas CASh antes de promover procedimientos. |
+| E63 | in_progress | Mantener CASh source-bounded y completar la revisión independiente de candidatos con evidencia autorizada. |
 | E76 | complete | Contrato RaiSE mínimo, grafo y retrospectiva ya son reproducibles; los warnings opcionales no pertenecen al producto. |
 
 ### Completas verificadas

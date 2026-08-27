@@ -96,8 +96,9 @@ E46 se alimenta de resultados reales de E44/E45; nunca cambia producto solo.
    aceptación y comparación real, no más sustitutos sintéticos.
 2. **E60–E62** cierran sólo la inspección visual autorizada de formularios; sus
    inventarios, fidelidad y validadores ya están terminados técnicamente.
-3. **E63** mantiene bloqueadas las fórmulas CASh hasta recibir fuente externa
-   autorizada; no se promociona ni se inventa una equivalencia.
+3. **E63** mantiene CASh como herramienta *source-bounded*: no atribuye ni
+   compila fórmulas externas; sólo avanza candidatos que tengan evidencia
+   autorizada y revisión independiente.
 4. Tras esos gates, **E64** consolida únicamente candidatos aprobados y habilita
    **E65**, después **E67/E68**.
 5. **E42** recoge pruebas externas durante todo el programa. **E76** está

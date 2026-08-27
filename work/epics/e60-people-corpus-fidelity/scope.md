@@ -44,7 +44,7 @@ Extraer y revisar el dominio People con suficiente fidelidad para que futuras in
 ## Estado de evidencia
 
 - S60.1, S60.2 y S60.4 tienen evidencia privada trazable; candidatos sin promoción canónica hasta revisión independiente.
-- La e-Form oficial pública v20/03 confirma semánticamente OPPP, FACe y PACe; su PDF se usa sólo para validación privada. Sigue pendiente la inspección visual del layout porque el transporte de imagen/archivo no estuvo disponible.
+- La e-Form oficial pública v20/03 confirma semánticamente OPPP, FACe y PACe; su PDF se usa sólo para validación privada. Sigue pendiente la inspección visual del layout porque el transporte de imagen/archivo no estuvo disponible. La evidencia de cierre debe seguir `visual-layout-review-protocol.md` sin persistir el activo.
 
 ## Handoff y riesgos
 
