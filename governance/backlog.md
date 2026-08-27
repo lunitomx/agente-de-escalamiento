@@ -25,20 +25,16 @@ formalizados no son trabajo activo sólo por existir en `work/epics/`.
 
 | Orden | Épica | Estado real | Por qué va ahora | Gate para avanzar |
 |---:|---|---|---|---|
-| P | E76 — Recuperación reproducible de RaiSE | Activo en paralelo; no bloquea producto | El entorno de desarrollo no tiene manifest/configuración/grafo reproducible. | `rai doctor` queda sin errores aplicables y el build del grafo es reproducible, sin crear un segundo venv ni sobrescribir `.raise` sin autorización explícita. |
-| G | E42 — Qualification y catálogo verdadero | Gate externo de release; paralelo | Es la línea base honesta: hoy los 6 requisitos E42 no tienen prueba maestra vigente. | Hardware limpio macOS/Windows, inventario probado de cada skill distribuido y aceptación humana registrada. |
-| 2 | E47 — Workspace, OPSP y feedback | Completada | Producto re-verificado: workspace, OPSP y feedback local no requieren RaiSE. | 42 pruebas de producto; la reproducibilidad de RaiSE queda aislada en E76. |
-| 3 | E49 — Experiencia diagnóstica y evidencia | Completada | El análisis inicial ya es narrativo, verificable y útil antes de profundizar. | Recibo local, ruta de 90 días y diagnóstico que distingue hechos, inferencias, N/A y preguntas materiales. |
-| 4 | E55 — Onboarding multifuente y conciliación | Completada; GitHub #9 | Corrigió el Welcome para reutilizar hechos locales y distinguir evidencia faltante o incompatible. | Recibo sintético E55, 4 rutas adaptativas y conciliación conservadora probados. |
-| 5 | E75 — Diagnóstico adaptativo y deep dive | Planificado | Convierte el diagnóstico en una ruta elegida por el empresario, no una batería de 1–5. | Handoff mínimo y explicable a Cash/Strategy/People/Execution. |
-| 6 | E72 — Cash Learning Day | Planificado | Permite pedir el Excel/documentos adecuados y facilitar Cash a detalle. | Artefactos financieros, preguntas de conciliación y decisiones de 90 días. |
-| 7 | E71 — Inteligencia de mercado | Planificado | Amplía Strategy con mercado, competidores, ICP y customer journey verificables. | Research fechado, fuentes visibles y revisión explícita del dueño. |
-| 8 | E73 — Asesor de dashboards | Planificado | Sugiere visuales de negocio sólo cuando existe evidencia suficiente. | Dashboard recomendado, trazable, sin inventar métricas. |
-| 9 | E74 — Workspace compartido multiempresa | Planificado | Hace colaboración por carpeta compartida sin volver SQLite sincronizado en autoridad. | Markdown/YAML compartido, conflictos explícitos y SQLite sólo como caché local. |
-| 10 | E43 — Ciclo de coaching confiable | Completo localmente; gate E42 | Convierte evidencia en una respuesta ejecutiva antes de sumar más automatización. | Casos positivos/negativos verificados; falta solo la aceptación externa de E42 para release. |
-| 11 | E44 — Aprendizaje de resultados | Planificado | Guarda decisión, resultado y aprendizaje confirmado, no “memoria” inventada. | Estado versionado y retrospectiva trimestral controlada. |
-| 12 | E45 + E67 — Especialistas internos y adaptadores | Planificado | Instala Cash, Execution, People y Strategy bajo un solo orquestador. | Una puerta pública, contratos privados, rutas simples rápidas y casos transversales evaluados. |
-| 13 | E46 — Mejora de producto gobernada | Planificado | Sólo se habilita tras datos de resultados y feedback aprobado. | Cambios propuestos, evaluados y aprobados; nunca mutación autónoma. |
+| G | E42 — Qualification y catálogo verdadero | Gate externo de release; paralelo | Aún faltan 6 requisitos de aceptación maestra, que requieren hardware limpio y aceptación humana. | 42/42 requisitos con recibos reproducibles y aprobación humana; no se sustituyen por fixtures. |
+| 1 | E44 — Aprendizaje de resultados | En curso local; aceptación pendiente | La cadena decisión→acción→resultado→aprendizaje está calificada sintéticamente en cuatro pilares. | Retrospectiva y aceptación real del empresario, sin atribución causal inventada. |
+| 2 | E45 — Especialistas internos | En curso local; piloto pendiente | Contratos, router, contexto mínimo, crítico y verificador están calificados; falta demostrar valor real. | Comparación honesta con coach único, piloto empresarial y empaquetado E67. |
+| 3 | E60–E63 — Fidelidad por dominio | En curso; gates de fuente delimitados | People/Strategy/Execution esperan inspección visual autorizada; Cash además espera fuente externa de fórmulas. | Cero hallazgos críticos abiertos y evidencia fuente suficiente antes de E64. |
+| 4 | E64 — Consolidación ontológica | Planificado; bloqueado por E60–E63 | Sólo consolida candidatos aprobados, no texto crudo ni fórmulas bloqueadas. | Cobertura de estructuras nombradas, evidencia normativa total y cero relaciones rotas. |
+| 5 | E65 + E67 + E68 | Planificado; secuencia posterior | Procedimientos MVP, empaquetado portable y equivalencia Codex/Claude consumen E64. | Contratos, activación/no-activación y golden cases semánticamente equivalentes. |
+| 6 | E69, E71–E75 | Planificado por olas | Biblioteca, research, Cash Learning Day, dashboards, workspace y diagnóstico se abren tras el núcleo portable. | Cada ola conserva procedencia, privacidad, aceptación y pruebas. |
+| 7 | E46 + E70 | Planificado | Mejora gobernada sólo con resultados reales; release sólo con todos los gates. | Aprobación/rollback y aceptación final honesta. |
+| — | E76 — Recuperación reproducible de RaiSE | Completada | Manifest, configuración mínima y grafo ya se recuperaron sin venv duplicado. | No reabrir salvo regresión reproducible propia. |
+| — | E47, E49, E52, E55, E56, E57–E59 | Completadas | Son contratos verificados que las épicas activas pueden consumir. | No reabrir salvo regresión propia demostrada. |
 
 ## Núcleo de conocimiento y distribución
 

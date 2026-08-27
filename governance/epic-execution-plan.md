@@ -12,8 +12,8 @@
 - E49, E52, E55 y E56 están completas y son contratos que se pueden consumir.
 - E42 tiene 36/42 requisitos de aceptación maestra demostrados; los seis
   faltantes requieren hardware limpio y aceptación humana real.
-- E76 cubre la reproducibilidad interna de RaiSE. No bloquea ninguna capacidad
-  empresarial y no se fuerza `rai init --force` ni se sobrescribe `.raise`.
+- E76 está completa: contrato RaiSE mínimo, grafo y retrospectiva reproducibles.
+  Sus warnings opcionales no bloquean ninguna capacidad empresarial.
 - La propuesta arquitectónica entregada por el dueño permanece archivada en
   [`notes/scaleup-operating-agent-completion-audit.md`](notes/scaleup-operating-agent-completion-audit.md).
   Se audita sólo al cierre total de esta meta, como fue solicitado.
@@ -49,10 +49,10 @@ fabrica estado RaiSE ni se bloquea producto.
 ## Carriles y orden real
 
 ```text
-Carril de producto:     E43 ✓ → E44 → E45 ───────────────┐
-Carril de conocimiento:          E57 → E58 → E59..E63 → E64 → E65 ─┤
-                                                              ↓
-Portabilidad:                                             E67 → E68 → E69
+Carril de producto:     E43 ✓ → E44 (en curso) → E45 (en curso) ─┐
+Carril de conocimiento:          E57 ✓ → E58 ✓ → E59 ✓ → E60..E63 (en curso) → E64 → E65 ─┤
+                                                                            ↓
+Portabilidad:                                                           E67 → E68 → E69
                                                               ↓
 Extensiones:                                      E71 / E72 / E73 / E74 / E75
                                                               ↓
@@ -92,14 +92,16 @@ E46 se alimenta de resultados reales de E44/E45; nunca cambia producto solo.
 
 ## Primeras ejecuciones sin espera
 
-1. **E44** inicia el ciclo de aprendizaje aprovechando E43 ya comprobada.
-2. **E57** inicia el manifiesto y límites de autoridad del libro/corpus.
-3. Al cerrar E57, **E58** migra E6 y deja un dictamen explícito para cada
-   artefacto legado: migrado, absorbido o descartado. Nada queda “medio hecho”.
-4. Después de E58, los cuatro dominios E59–E63 se trabajan en paralelo y E45
-   puede continuar tras E44. Se integran sólo por E64/E65 y E67.
-5. E42 recoge pruebas externas durante todo el programa; E76 sólo se retoma
-   cuando haya permiso seguro para reparar su configuración.
+1. **E44/E45** continúan únicamente hacia evidencia empresarial: retrospectiva,
+   aceptación y comparación real, no más sustitutos sintéticos.
+2. **E60–E62** cierran sólo la inspección visual autorizada de formularios; sus
+   inventarios, fidelidad y validadores ya están terminados técnicamente.
+3. **E63** mantiene bloqueadas las fórmulas CASh hasta recibir fuente externa
+   autorizada; no se promociona ni se inventa una equivalencia.
+4. Tras esos gates, **E64** consolida únicamente candidatos aprobados y habilita
+   **E65**, después **E67/E68**.
+5. **E42** recoge pruebas externas durante todo el programa. **E76** está
+   completa y se reabre sólo ante una regresión reproducible propia.
 
 ## Evidencia y cierre transversal
 

@@ -14,27 +14,38 @@ se alteraron para aparentar cierre.
 | E47 decía `done` y `started` a la vez; RaiSE no era una dependencia de producto. | Reparado; `complete` | Calificación fresca de workspace/OPSP/feedback pasa; la deuda de RaiSE queda aislada en E76. |
 | El backlog raíz seguía apuntando al repositorio viejo y a E1–E5 como plan actual. | Reemplazado | `governance/backlog.md` es la fuente única de trabajo futuro. |
 | Un remoto local `legacy-scaleupagent` contrariaba la política de un único canónico. | Reparado | Retirado sólo de la configuración local; `origin/main` vuelve a sincronizado. |
-| RaiSE no tiene manifest/configuración/grafo de proyecto reproducibles. | E76 activo | Se separa de funcionalidades de negocio y no se resuelve creando venvs duplicados. |
+| RaiSE no tenía manifest/configuración/grafo de proyecto reproducibles. | E76 completada | Se restauró el contrato mínimo sin venv duplicado; los warnings opcionales quedan documentados, no se fuerzan con infraestructura. |
 
 ## Estados canónicos
 
-### Activos o revisables
+### Estados actuales
 
 | Épica | Estado | Próxima decisión verificable |
 |---|---|---|
 | E42 | active | Calificar producto en plataformas limpias y registrar aceptación humana. |
-| E52 | complete | Persistencia y reanudación local consentida de Welcome re-verificadas. |
-| E56 | complete | Catálogo canónico y una sola puerta pública publicados y re-verificados. |
-| E47 | complete | Workspace, OPSP y feedback re-verificados; RaiSE reproducible es deuda separada de E76. |
-| E49 | complete | Diagnóstico/evidencia, ruta de 90 días y recibo local re-verificados. |
-| E55 | complete | GitHub #9 resuelto: onboarding multifuente, conciliación y calificación local verificable. |
-| E76 | active | Recuperar el contrato mínimo de RaiSE sin tocar datos de empresa ni duplicar entornos. |
+| E44 | in_progress | Ejecutar retrospectiva y aceptación de empresario; la calificación técnica local ya cubre los cuatro pilares sin reclamar causalidad. |
+| E45 | in_progress | Comparar contra un coach único en piloto empresarial; el router y las rutas de seguridad ya están calificados localmente. |
+| E60 | in_progress | Completar inspección visual autorizada de OPPP/FACe/PACe; la semántica y la cobertura privada ya fueron revisadas. |
+| E61 | in_progress | Completar inspección visual autorizada de SWT, Seven Strata, OPSP y Vision Summary. |
+| E62 | in_progress | Completar inspección visual autorizada de WWW/checklist/agendas; no hay distorsión técnica crítica abierta. |
+| E63 | in_progress | Conseguir y revisar la fuente externa autorizada de fórmulas CASh antes de promover procedimientos. |
+| E76 | complete | Contrato RaiSE mínimo, grafo y retrospectiva ya son reproducibles; los warnings opcionales no pertenecen al producto. |
+
+### Completas verificadas
+
+- E47: workspace, OPSP y feedback local re-verificados; RaiSE reproducible se resolvió en E76.
+- E49: diagnóstico/evidencia, ruta de 90 días y recibo local re-verificados.
+- E52: persistencia y reanudación local consentida de Welcome re-verificadas.
+- E55: GitHub #9 resuelto: onboarding multifuente, conciliación y calificación local verificable.
+- E56: catálogo canónico y una sola puerta pública re-verificados.
+- E57, E58 y E59: cadena de fuente privada, migración ontológica y fundamentos fieles cerrados con evidencia y validadores.
 
 ### Planificado, con dependencias explícitas
 
-E44–E46, E57–E75 y E67–E70 permanecen planificados según el orden de
-`backlog.md`. No son deuda olvidada: son trabajo aún no iniciado y no deben
-marcarse como entregados por contener documentos de diseño.
+E46, E64–E75 y E67–E70 permanecen planificados según el orden de
+`backlog.md`. No son deuda olvidada: su alcance existe, pero no se marcan como
+entregados por contener documentos de diseño. E64 espera que E60–E63 cierren
+sus gates de fuente; E46 espera resultados reales de E44/E45.
 
 ### Legado y disposiciones terminales
 
