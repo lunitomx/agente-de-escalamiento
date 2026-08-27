@@ -12,6 +12,8 @@ work/
 !.raise/rai/identity/core.yaml
 !.raise/rai/personal/
 !.raise/rai/personal/last-diff.json
+!.raise/manifest.yaml
+!.raise/config.toml
 AGENTS.md
 
 # === RaiSE Temp Artifacts ===

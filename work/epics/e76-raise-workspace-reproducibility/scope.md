@@ -1,7 +1,7 @@
 ---
 epic_id: "E76"
 title: "RaiSE workspace reproducibility"
-status: "active"
+status: "complete"
 created: "2026-08-27"
 priority: "P0-development-enabler"
 ---
@@ -47,15 +47,15 @@ adicional cuando el proyecto ya dispone de `.venv`.
 
 | ID | Historia | Estado | Termina cuando |
 |---|---|---|---|
-| S76.1 | Diagnóstico y contrato de inicialización | Active | La causa de manifest/config faltantes está documentada y una instalación limpia es repetible. |
-| S76.2 | Workspace mínimo Codex | Pending | La configuración necesaria queda versionada o generada de forma determinista sin secretos ni venv duplicado. |
-| S76.3 | Grafo y pipeline verificables | Pending | El grafo se construye localmente y el workflow aplicable produce una verificación útil. |
-| S76.4 | Gate y retrospectiva | Pending | `rai doctor` no tiene errores aplicables al contrato elegido y las excepciones opcionales están justificadas. |
+| S76.1 | Diagnóstico y contrato de inicialización | Complete | La causa de manifest/config faltantes está documentada y una instalación limpia es repetible. |
+| S76.2 | Workspace mínimo Codex | Complete | La configuración necesaria queda versionada o generada de forma determinista sin secretos ni venv duplicado. |
+| S76.3 | Grafo y pipeline verificables | Complete | El grafo se construye localmente y el workflow aplicable produce una verificación útil. |
+| S76.4 | Gate y retrospectiva | Complete | `rai doctor` no tiene errores aplicables al contrato elegido y las excepciones opcionales están justificadas. |
 
 ## Criterios de terminación
 
-- [ ] Ningún requisito depende de infraestructura no autorizada o secreta.
-- [ ] El checkout nuevo sigue un único procedimiento reproducible.
-- [ ] La configuración distingue desarrollo RaiSE de instalación de producto.
-- [ ] No se crean entornos virtuales duplicados.
-- [ ] La retrospectiva enlaza cualquier warning residual con dueño y decisión.
+- [x] Ningún requisito depende de infraestructura no autorizada o secreta.
+- [x] El checkout nuevo sigue un único procedimiento reproducible.
+- [x] La configuración distingue desarrollo RaiSE de instalación de producto.
+- [x] No se crean entornos virtuales duplicados.
+- [x] La retrospectiva enlaza cualquier warning residual con dueño y decisión.

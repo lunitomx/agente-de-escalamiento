@@ -1,0 +1,4 @@
+# RaiSE project configuration for local Codex development.
+# This file intentionally contains no credentials, connectors, or company data.
+[rai]
+# Defaults are supplied by the CLI; project commands live in manifest.yaml.
