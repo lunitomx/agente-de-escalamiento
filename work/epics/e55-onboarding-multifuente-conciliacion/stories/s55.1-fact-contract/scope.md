@@ -3,7 +3,7 @@ story_id: "S55.1"
 epic_id: "E55"
 title: "Contrato de hechos con procedencia"
 jira_key: "ESCALA-12"
-status: "started"
+status: "complete"
 created: "2026-08-21"
 ---
 
@@ -27,8 +27,8 @@ created: "2026-08-21"
 
 ## Done when
 
-- [ ] Modelo `Fact` valida campos obligatorios y rechaza confianzas/descripciones inválidas.
-- [ ] `save_fact` persiste y `load_facts` recupera hechos por decisión.
-- [ ] Tests cubren guardado, carga, filtrado, actualización y borrado.
-- [ ] Regresión completa pasa.
-- [ ] Scope commit y merge a `main`.
+- [x] Modelo `Fact` valida campos obligatorios y rechaza confianzas/descripciones inválidas.
+- [x] `save_fact` persiste y `load_facts` recupera hechos por decisión.
+- [x] Tests cubren guardado, carga, filtrado, actualización y borrado.
+- [x] Regresión completa pasa.
+- [x] Scope commit y merge a `main` (`155d4a3`).
