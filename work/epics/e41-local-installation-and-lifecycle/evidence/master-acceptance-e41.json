@@ -43,8 +43,8 @@
       "version": "1.0.0"
     },
     "migration": {
-      "backup_id": "8df5b815baed7539caa2f39272d998bc7496272605da93229abe9e8653e27b72",
-      "backup_relative_path": ".escala-backups/8df5b815baed7539caa2f39272d998bc7496272605da93229abe9e8653e27b72.zip",
+      "backup_id": "15609fbe374206bd3dc9ab2c532c43da274508afb761a95171429b47bb8e5d90",
+      "backup_relative_path": ".escala-backups/15609fbe374206bd3dc9ab2c532c43da274508afb761a95171429b47bb8e5d90.zip",
       "current_schema": 2,
       "previous_schema": 1,
       "rollback_available": true,
@@ -54,8 +54,8 @@
     },
     "rollback": {
       "artifact_sha256": "18ea56da28d9d26debaeca250eaf32c839df87e97abeb399e6faf66514dba557",
-      "backup_id": "8257e77c67af89a716e24d26c9e9e65cda82c8b461a47ad6d8189bc91238d1ad",
-      "backup_relative_path": ".escala-backups/8257e77c67af89a716e24d26c9e9e65cda82c8b461a47ad6d8189bc91238d1ad.zip",
+      "backup_id": "a418cd0db3a6c64e09464047f3d8ed8c36cf34b68157c5884d095d659c1fc263",
+      "backup_relative_path": ".escala-backups/a418cd0db3a6c64e09464047f3d8ed8c36cf34b68157c5884d095d659c1fc263.zip",
       "current_version": "1.0.0",
       "data_authority": "installer_machine",
       "previous_version": "1.0.0",
@@ -63,13 +63,13 @@
       "runtime_authority": "installer_machine",
       "safe_stop_reason": null,
       "schema_version": 1,
-      "source_commit": "80aa606518df5fd504f7f33d1dfbb30b21e0311d",
+      "source_commit": "eef188edcf8fbaeb3b6b80753334f2ae233a7968",
       "status": "pass",
       "verification": "verified"
     },
     "safe_stop": {
-      "backup_id": "2353e31b43bb17ea4d7eebaa3e72583f60821177de57d6ec446acc838efccb57",
-      "backup_relative_path": ".escala-backups/2353e31b43bb17ea4d7eebaa3e72583f60821177de57d6ec446acc838efccb57.zip",
+      "backup_id": "7293d31fea2aad234b882d0b47d601294eef7a0cac9438a63b9e0d171f0858a4",
+      "backup_relative_path": ".escala-backups/7293d31fea2aad234b882d0b47d601294eef7a0cac9438a63b9e0d171f0858a4.zip",
       "current_schema": 2,
       "previous_schema": 2,
       "rollback_available": true,
@@ -88,8 +88,8 @@
     },
     "update": {
       "artifact_sha256": "18ea56da28d9d26debaeca250eaf32c839df87e97abeb399e6faf66514dba557",
-      "backup_id": "8257e77c67af89a716e24d26c9e9e65cda82c8b461a47ad6d8189bc91238d1ad",
-      "backup_relative_path": ".escala-backups/8257e77c67af89a716e24d26c9e9e65cda82c8b461a47ad6d8189bc91238d1ad.zip",
+      "backup_id": "a418cd0db3a6c64e09464047f3d8ed8c36cf34b68157c5884d095d659c1fc263",
+      "backup_relative_path": ".escala-backups/a418cd0db3a6c64e09464047f3d8ed8c36cf34b68157c5884d095d659c1fc263.zip",
       "current_version": "1.1.0",
       "data_authority": "installer_machine",
       "previous_version": "1.0.0",
@@ -97,7 +97,7 @@
       "runtime_authority": "installer_machine",
       "safe_stop_reason": null,
       "schema_version": 1,
-      "source_commit": "80aa606518df5fd504f7f33d1dfbb30b21e0311d",
+      "source_commit": "eef188edcf8fbaeb3b6b80753334f2ae233a7968",
       "status": "pass",
       "verification": "verified"
     },
