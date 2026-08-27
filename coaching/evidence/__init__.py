@@ -14,10 +14,13 @@ from .dashboard import (
     build_evidence_dashboard,
     format_evidence_dashboard,
 )
+from .decision_map import build_decision_map, save_decision_map
 from .engine import discover_sources
+from .entities import EntityCandidate, resolve_entities
 from .facts import load_facts
 from .formatter import format_package, package_summary
 from .models import DecisionRef
+from .reconciliation import FinancialMeasurement, reconcile_financial_measurements
 
 PROFILE_REL_PATH = Path(".escala") / "agent" / "memory" / "company-profile.yaml"
 SESSIONS_REL_PATH = Path(".escala") / "my-company" / "sessions"
@@ -209,6 +212,85 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
                     "pending_count": len(dashboard.pending),
                     "score": None,
                 },
+            },
+            "errors": [],
+        }
+
+    if context.get("action") == "cash_reconciliation":
+        try:
+            measurements = [
+                FinancialMeasurement.model_validate(item)
+                for item in context.get("measurements", [])
+            ]
+        except (TypeError, ValueError) as exc:
+            return {
+                "output": "",
+                "artifacts": {},
+                "errors": [f"measurements inválido: {exc}"],
+            }
+        reconciliation = reconcile_financial_measurements(measurements)
+        return {
+            "output": "## Conciliación financiera\n\n"
+            + "\n".join(f"- {finding.reason}" for finding in reconciliation.findings),
+            "artifacts": {
+                "action": "cash_reconciliation",
+                "reconciliation": reconciliation.model_dump(mode="json"),
+            },
+            "errors": [],
+        }
+
+    if context.get("action") == "entity_resolution":
+        try:
+            candidates = [
+                EntityCandidate.model_validate(item)
+                for item in context.get("candidates", [])
+            ]
+        except (TypeError, ValueError) as exc:
+            return {
+                "output": "",
+                "artifacts": {},
+                "errors": [f"candidates inválido: {exc}"],
+            }
+        resolutions = resolve_entities(candidates)
+        return {
+            "output": "## Resolución de entidades\n\n"
+            + "\n".join(f"- {item.reason}" for item in resolutions),
+            "artifacts": {
+                "action": "entity_resolution",
+                "resolutions": [item.model_dump(mode="json") for item in resolutions],
+            },
+            "errors": [],
+        }
+
+    if context.get("action") == "decision_map":
+        decision = context.get("decision")
+        if not isinstance(decision, str) or not decision:
+            return {
+                "output": "",
+                "artifacts": {},
+                "errors": ["decision es requerida"],
+            }
+        try:
+            requirements = [
+                MetricRequirement.model_validate(item)
+                for item in context.get("requested_metrics", [])
+            ]
+        except (TypeError, ValueError) as exc:
+            return {
+                "output": "",
+                "artifacts": {},
+                "errors": [f"requested_metrics inválido: {exc}"],
+            }
+        dashboard = build_evidence_dashboard(load_facts(base), requirements)
+        decision_map = build_decision_map(dashboard, decision=decision)
+        path = save_decision_map(base, decision_map)
+        return {
+            "output": "## Parking lot de evidencia\n\n"
+            + "\n".join(f"- {item.title}" for item in decision_map.items),
+            "artifacts": {
+                "action": "decision_map",
+                "decision_map": decision_map.model_dump(mode="json"),
+                "path": str(path),
             },
             "errors": [],
         }
