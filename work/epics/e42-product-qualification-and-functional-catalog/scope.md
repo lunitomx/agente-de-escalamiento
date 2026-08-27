@@ -114,12 +114,12 @@ Un empresario recibe un catálogo y un PDF en español que explican:
 
 ## Criterios de terminación de la épica
 
-- [x] REQ-E42-001: recorrido completo probado (local-e2e).
-- [x] REQ-E42-002: inventario y casos de todos los skills (local-e2e).
-- [x] REQ-E42-003: aceptación en macOS y Windows vía matriz simulada en qualification scripts (hardware limpio diferido por decisión del dueño).
-- [x] REQ-E42-004: fallas negativas y recuperación segura (local-e2e).
-- [x] REQ-E42-005: catálogo y PDF verificables.
-- [x] REQ-E42-006: auditoría final y aceptación por decisión del dueño; E2E local como evidencia de cierre.
+- [-] REQ-E42-001: recorrido local sintético existe; falta `ProvedProof` maestro vigente.
+- [-] REQ-E42-002: inventario/casos locales existen; falta recibo maestro de invocación actual para cada skill distribuido.
+- [-] REQ-E42-003: sólo existe matriz simulada; faltan recibos de hardware macOS y Windows limpio.
+- [-] REQ-E42-004: escenarios negativos locales existen; falta consolidación en recibo maestro vigente.
+- [-] REQ-E42-005: catálogo/PDF locales existen; falta validación maestra contra inventario y límites actuales.
+- [-] REQ-E42-006: auditoría local existe; falta aceptación humana explícita requisito por requisito.
 - [x] Las cuatro historias tienen retrospectiva.
 - [x] La evidencia diferencia pruebas sintéticas, hardware real y aceptación humana.
 - [x] No se publicó ni se transfirieron datos sin autorización.
