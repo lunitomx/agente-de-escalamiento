@@ -27,7 +27,7 @@ formalizados no son trabajo activo sólo por existir en `work/epics/`.
 |---:|---|---|---|---|
 | 0 | E76 — Recuperación reproducible de RaiSE | Activo | El entorno de desarrollo no tiene manifest/configuración/grafo reproducible. | `rai doctor` queda sin errores aplicables y el build del grafo es reproducible, sin crear un segundo venv. |
 | 1 | E42 — Qualification y catálogo verdadero | Activo | Es la línea base honesta: hoy los 6 requisitos E42 no tienen prueba maestra vigente. | Hardware limpio macOS/Windows, inventario probado de cada skill distribuido y aceptación humana registrada. |
-| 2 | E47 — Workspace, OPSP y feedback | Revisión requerida | La evidencia histórica existe, pero su contrato no se reproduce en la instalación actual. | Calificación fresca separa producto, configuración de RaiSE y dependencias opcionales. |
+| 2 | E47 — Workspace, OPSP y feedback | Completada | Producto re-verificado: workspace, OPSP y feedback local no requieren RaiSE. | 42 pruebas de producto; la reproducibilidad de RaiSE queda aislada en E76. |
 | 3 | E49 — Experiencia diagnóstica y evidencia | Completada | El análisis inicial ya es narrativo, verificable y útil antes de profundizar. | Recibo local, ruta de 90 días y diagnóstico que distingue hechos, inferencias, N/A y preguntas materiales. |
 | 4 | E55 — Onboarding multifuente y conciliación | Completada; GitHub #9 | Corrigió el Welcome para reutilizar hechos locales y distinguir evidencia faltante o incompatible. | Recibo sintético E55, 4 rutas adaptativas y conciliación conservadora probados. |
 | 5 | E75 — Diagnóstico adaptativo y deep dive | Planificado | Convierte el diagnóstico en una ruta elegida por el empresario, no una batería de 1–5. | Handoff mínimo y explicable a Cash/Strategy/People/Execution. |

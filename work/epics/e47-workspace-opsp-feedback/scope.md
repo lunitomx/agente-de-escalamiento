@@ -1,8 +1,8 @@
 ---
 epic_id: "E47"
 title: "Coherencia del viaje instalado: Workspace, OPSP y Feedback"
-status: "unresolved/review-required"
-closure_disposition: "unresolved/review-required"
+status: "complete"
+closure_disposition: "completed"
 created: "2026-08-09"
 jira_key: "ESCALA-1"
 ---
@@ -11,12 +11,13 @@ jira_key: "ESCALA-1"
 
 ## Revisión de operación actual (auditoría 2026-08-27)
 
-La retrospectiva conserva evidencia histórica de entrega, pero la instalación
-actual no tiene `manifest.yaml`, configuración de proyecto ni workspace RaiSE
-registrado; `rai doctor` no puede reproducir sus contratos. E47 queda en
-`unresolved/review-required` hasta ejecutar una calificación fresca del viaje
-instalado y separar explícitamente cualquier deuda de herramienta interna de
-los requisitos del producto. No se borra ni se reescribe la evidencia histórica.
+La instalación actual no tiene `manifest.yaml`, configuración de proyecto ni
+workspace RaiSE reproducible; esa deuda pertenece a **E76** y no es una
+dependencia de ejecución del producto. La calificación fresca de E47 confirma
+42 pruebas de OPSP, feedback, instalación y workspace; `install.sh` y las
+skills de producto no invocan `rai`. E47 se cierra como contrato de producto.
+La evidencia histórica se conserva sin reescritura y RaiSE permanece como
+herramienta interna de desarrollo, no requisito para un empresario.
 
 ## Objetivo
 
@@ -52,6 +53,11 @@ Hacer que el recorrido instalado de ESCALA sea coherente y recuperable: Codex op
 - [x] Las pruebas distinguen validación técnica de aceptación humana (gates automáticos vs. checklist de calidad conversacional en cada SKILL.md).
 - [x] Jira: Epic `ESCALA-1` y S47.1 `ESCALA-2` creados con la cuenta Eduardo Luna.
 - [x] Regresión, instalación y límites de privacidad verificados con evidencia (S47.6): 1097 passed / 1 fallo preexistente ajeno; canary de boundary público en verde.
+
+**Re-verificación (2026-08-27):** 42 pruebas actuales de OPSP, feedback,
+instalación y workspace pasaron, con Pyright/Ruff/formato limpios. La ausencia
+de manifiesto RaiSE no reabre estos criterios de producto; E76 es su único
+owner.
 
 ## Dependencias
 
