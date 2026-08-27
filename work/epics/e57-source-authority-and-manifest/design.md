@@ -1,6 +1,6 @@
 ---
 epic_id: E57
-status: active
+status: complete
 ---
 
 # E57 — Diseño: autoridad de fuente y manifiesto verificable

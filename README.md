@@ -11,6 +11,13 @@ los dashboards directamente.
 
 Te guía paso a paso a través de las 4 decisiones críticas para escalar: **People, Strategy, Execution y Cash**.
 
+## Independencia metodológica
+
+ESCALA es un producto independiente. No es un producto oficial ni está
+afiliado, patrocinado, aprobado o respaldado por ninguna persona u organización
+externa. Las metodologías, conceptos o materiales que decidas aportar no crean
+una relación oficial ni autorizan su distribución.
+
 ## Quick Start (con agente de IA)
 
 1. **Abre una terminal** en la carpeta local del producto.

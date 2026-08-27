@@ -1,7 +1,7 @@
 ---
 epic_id: E57
 title: Autoridad de fuente y manifiesto verificable
-status: active
+status: complete
 depends_on: [E36, E56]
 ---
 
@@ -89,7 +89,7 @@ Depende de la frontera E36 y respeta la puerta única de E56. Entrega el manifie
 | S57.2 | Done | Manifiesto privado de 407 unidades, cobertura total y 16 pruebas combinadas. |
 | S57.3 | Done | Regla explícita `sources/**` denegada, clean export con regresión y 175 pruebas de frontera/contrato. |
 | S57.4 | Done | Recibo consolidado seguro; custodia, 407 unidades y denegación explícita validadas. |
-| S57.5 | Pending | Copia independiente, tests de superficies permitidas y revisión de vocabulario. |
+| S57.5 | Done | Aviso genérico de independencia en README y prueba contra el escáner público. |
 
 ### Machine
 

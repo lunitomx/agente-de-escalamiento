@@ -1,7 +1,7 @@
 ---
 epic_id: E57
 title: Autoridad de fuente y manifiesto verificable
-status: planned
+status: complete
 depends_on: [E36, E56]
 ---
 
