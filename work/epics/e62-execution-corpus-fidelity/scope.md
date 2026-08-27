@@ -1,7 +1,7 @@
 ---
 epic_id: E62
 title: Corpus Execution verificado
-status: planned
+status: in_progress
 depends_on: [E58]
 ---
 
@@ -33,12 +33,18 @@ Representar Execution como contratos de prioridades, datos, compromisos, hábito
 | 2 | S62.2 Revisión | Pasos, duración, propósito y escalamiento comparados contra fuente. |
 | 3 | S62.3 Herramientas | Campos/KPIs/cadencias formalizados. |
 | 4 | S62.4 Antipatrones | Reglas preventivas con evidencia. |
+| 5 | S62.5 Cobertura exhaustiva | Cada unidad se mapea con evidencia, como fuente especial o con handoff explícito. |
 
 ## Criterios de terminación
 
 - Todos los horizontes de reunión y estructuras nombradas están representados.
 - Reglas, números y campos no se promueven sin evidencia.
 - El revisor independiente no deja distorsiones críticas abiertas.
+
+## Estado de evidencia
+
+- S62.1, S62.2 y S62.5 tienen borradores privados trazables; los candidatos siguen sin promoción canónica hasta revisión independiente.
+- Antes de cerrar S62.3 se validarán visualmente formularios y agendas autorizados; los ritmos no se convertirán en automatizaciones fuera de conversación.
 
 ## Handoff y riesgos
 

@@ -1,7 +1,7 @@
 ---
 epic_id: E63
 title: Corpus Cash verificado
-status: planned
+status: in_progress
 depends_on: [E58]
 related: [E55]
 ---
@@ -34,6 +34,7 @@ Hacer auditable el conocimiento Cash: fórmulas, unidades, supuestos, señales, 
 | 2 | S63.2 Fórmulas/unidades | Schemas y fixtures de uso válido/inválido. |
 | 3 | S63.3 Auditoría | Diferencias de fuente versus candidato resueltas o en review queue. |
 | 4 | S63.4 Integración E55 | Reglas que bloquean datos no comparables. |
+| 5 | S63.5 Cobertura exhaustiva | Cada unidad se mapea con evidencia, como fuente especial o con handoff explícito. |
 
 ## Criterios de terminación
 
@@ -41,6 +42,11 @@ Hacer auditable el conocimiento Cash: fórmulas, unidades, supuestos, señales, 
 - Ningún cálculo aceptado sin unidad, periodo e inputs declarados.
 - Comparaciones incompatibles quedan bloqueadas o marcadas como no comparables.
 - Cero hallazgo crítico de fidelidad pendiente.
+
+## Estado de evidencia
+
+- S63.1, S63.3 y S63.5 tienen borradores privados trazables; los candidatos siguen sin promoción canónica hasta revisión independiente.
+- S63.2 y S63.4 no se declararán cerradas hasta validar cada fórmula contra activo fuente autorizado y enlazar el bloqueo de comparabilidad de E55.
 
 ## Handoff y riesgos
 
