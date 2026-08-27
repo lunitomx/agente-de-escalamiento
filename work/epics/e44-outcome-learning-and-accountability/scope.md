@@ -167,8 +167,9 @@ integra después de S44.5 para no mostrar aprendizajes no revisados.
 - Módulo local: `escala_server/outcome_learning.py`.
 - API: decisiones, acciones, resultados, aprendizajes y cockpit por empresa.
 - Cobertura: Cash, People, Strategy y Execution; People requiere consentimiento explícito.
-- Gates locales: `tests/test_outcome_learning.py`, `tests/test_escala_server.py`, Ruff y Pyright.
-- Pendiente de cierre: una aceptación real de empresario y retrospectiva; no se sustituye por fixtures.
+- Calificación técnica reproducible: `scripts/qualify_e44_e45.py`, con cuatro ciclos sintéticos confirmados, consentimiento People, `no_result_yet`, causalidad no reclamada y cockpit sin IDs internos.
+- Gates locales: `tests/test_outcome_learning.py`, `tests/test_escala_server.py`, `tests/test_qualify_e44_e45.py`, Ruff y Pyright.
+- Pendiente de cierre: una aceptación real de empresario y retrospectiva; la calificación sintética no las sustituye.
 
 ## Riesgos
 

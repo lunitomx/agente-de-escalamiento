@@ -201,10 +201,11 @@ la comparación final espera la síntesis de S45.5.
 
 - Módulo local: `escala_server/specialist_team.py`.
 - API: `POST /api/advisor/team-review`, una sola síntesis para el empresario.
+- Calificación técnica reproducible: `scripts/qualify_e44_e45.py`, con caso simple de un especialista, Cash bloqueado por periodo/unidad ausentes y desacuerdo transversal visible sin votación por mayoría.
 - Pruebas: casos simple, transversal, contexto mínimo, ausencia de periodo/unidad,
-  desacuerdo de precio y contratos de cuatro roles.
+  desacuerdo de precio, contratos de cuatro roles y `tests/test_qualify_e44_e45.py`.
 - Pendiente de cierre: comparación con un solo coach y piloto empresarial; la
-  instalación como definiciones de plataforma pertenece a E67.
+  calificación sintética no los sustituye y la instalación como definiciones de plataforma pertenece a E67.
 
 ## Riesgos
 
