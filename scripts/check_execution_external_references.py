@@ -14,11 +14,26 @@ from validators.external_reference_locators import (
 
 
 TERMS = {
+    "Competing on Internet Time": r"\bCompeting on Internet Time\b",
+    "Cusumano": r"\bCusumano\b",
+    "Facebook": r"\bFacebook\b",
+    "Five Dysfunctions": r"\bFive Dysfunctions\b",
+    "Fred Reichheld": r"\bFred Reichheld\b",
+    "Gazelles Certified Coach": r"\bGazelles (?:International )?Certified Coach\b",
     "Goldratt": r"\bGoldratt\b",
+    "Jack Stack": r"\bJack Stack\b",
+    "Jack Welch": r"\bJack Welch\b",
     "Lean": r"\bLean\b",
     "Lencioni": r"\bLencioni\b",
+    "Marshall Goldsmith": r"\bMarshall Goldsmith\b",
     "Net Promoter": r"\bNet Promoter\b|\bNPS\b",
-    "Stack": r"\bStack\b",
+    "Rosanne Badowski": r"\bRosanne Badowski\b",
+    "Scrum": r"\bScrum\b",
+    "Six Sigma": r"\bSix Sigma\b",
+    "SurveyMonkey": r"\bSurveyMonkey\b",
+    "The Great Game": r"\bThe Great Game\b",
+    "Work-Out": r"\bWork-Out\b",
+    "Yoffie": r"\bYoffie\b",
 }
 
 

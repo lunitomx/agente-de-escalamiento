@@ -45,7 +45,7 @@ Representar Execution como contratos de prioridades, datos, compromisos, hábito
 
 - S62.1, S62.2 y S62.5 tienen borradores privados trazables; los candidatos siguen sin promoción canónica hasta revisión independiente.
 - Antes de cerrar S62.3 se validarán visualmente formularios y agendas autorizados; los ritmos no se convertirán en automatizaciones fuera de conversación.
-- Todo handoff de Execution queda limitado a afirmaciones explícitas de la fuente: nombres de autores, empresas o métodos externos no autorizan reconstruir esas metodologías.
+- Todo handoff de Execution queda limitado a afirmaciones explícitas de la fuente: las metodologías, frameworks, coaches, sistemas de investigación y herramientas externas que podrían reconstruirse se localizan y no autorizan reconstruir esas metodologías.
 - Los ritmos y las referencias externas tienen recibos privados con gate de evidencia exacta; siguen pendientes de aprobación independiente y no sustituyen la validación visual autorizada.
 
 ## Handoff y riesgos
