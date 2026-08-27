@@ -21,11 +21,14 @@ class DomainCoverageDisposition(str, Enum):
     EXCLUDED = "excluded"
 
 
-_INVENTORY_STATUS = {
-    DomainCoverageDisposition.MAPPED: "classified-pending-independent-review",
-    DomainCoverageDisposition.SPECIAL_SOURCE: "special-source",
-    DomainCoverageDisposition.HANDOFF: "handoff",
-    DomainCoverageDisposition.EXCLUDED: "excluded",
+_INVENTORY_STATUSES = {
+    DomainCoverageDisposition.MAPPED: {
+        "classified-pending-independent-review",
+        "foundation-mapped",
+    },
+    DomainCoverageDisposition.SPECIAL_SOURCE: {"special-source"},
+    DomainCoverageDisposition.HANDOFF: {"handoff"},
+    DomainCoverageDisposition.EXCLUDED: {"excluded"},
 }
 
 
@@ -60,11 +63,16 @@ class DomainInventory(_StrictModel):
     manifest_sha256: str = Field(min_length=64, max_length=64)
     unit_count: int = Field(ge=1)
     units: list[DomainInventoryUnit] = Field(min_length=1)
+    classification_complete: bool | None = None
+    classification_counts: dict[str, int] = Field(default_factory=dict)
 
     @model_validator(mode="after")
     def validate_unit_count(self) -> "DomainInventory":
         if self.unit_count != len(self.units):
             raise ValueError("domain inventory unit count differs from units")
+        actual_counts = dict(Counter(unit.classification_status for unit in self.units))
+        if self.classification_counts and self.classification_counts != actual_counts:
+            raise ValueError("domain inventory classification counts differ from units")
         return self
 
 
@@ -173,7 +181,7 @@ def validate_domain_coverage(
 
     for unit in inventory.units:
         row = rows_by_unit[unit.unit_id]
-        if unit.classification_status != _INVENTORY_STATUS[row.disposition]:
+        if unit.classification_status not in _INVENTORY_STATUSES[row.disposition]:
             raise ValueError("domain inventory status differs from coverage")
         if row.disposition is DomainCoverageDisposition.MAPPED:
             for node_id in row.node_ids:

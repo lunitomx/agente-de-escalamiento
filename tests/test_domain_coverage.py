@@ -97,6 +97,27 @@ def _matrix() -> DomainCoverageMatrix:
     )
 
 
+def test_domain_inventory_accepts_and_checks_declared_classification_counts() -> None:
+    inventory = _inventory().model_copy(
+        update={
+            "classification_complete": True,
+            "classification_counts": {
+                "classified-pending-independent-review": 1,
+                "special-source": 1,
+            },
+        }
+    )
+    assert (
+        DomainInventory.model_validate(inventory.model_dump(mode="json")) == inventory
+    )
+
+    with pytest.raises(ValueError, match="classification counts"):
+        DomainInventory.model_validate(
+            inventory.model_dump(mode="json")
+            | {"classification_counts": {"handoff": 2}}
+        )
+
+
 def test_domain_coverage_is_exhaustive_and_evidence_bound() -> None:
     validate_domain_coverage(
         _matrix(),
@@ -133,6 +154,25 @@ def test_domain_coverage_rejects_inventory_drift() -> None:
             _manifest(),
             {"framework.example": {"source.example.u0001"}},
         )
+
+
+def test_domain_coverage_accepts_direct_foundation_mapping_status() -> None:
+    inventory = _inventory().model_copy(
+        update={
+            "units": [
+                _inventory()
+                .units[0]
+                .model_copy(update={"classification_status": "foundation-mapped"}),
+                _inventory().units[1],
+            ]
+        }
+    )
+    validate_domain_coverage(
+        _matrix(),
+        inventory,
+        _manifest(),
+        {"framework.example": {"source.example.u0001"}},
+    )
 
 
 def test_domain_coverage_rejects_status_contradiction() -> None:
