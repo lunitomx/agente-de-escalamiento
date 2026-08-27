@@ -149,7 +149,7 @@ def test_portable_export_installs_without_source_checkout_and_rejects_tampering(
     )
     imports = subprocess.run(
         [
-            sys.executable,
+            str(replacement / "scripts/escala-python"),
             "-c",
             (
                 "import importlib; "
@@ -167,7 +167,7 @@ def test_portable_export_installs_without_source_checkout_and_rejects_tampering(
             ),
         ],
         cwd=tmp_path,
-        env={**os.environ, "PYTHONPATH": str(replacement)},
+        env=os.environ.copy(),
         capture_output=True,
         text=True,
         check=False,

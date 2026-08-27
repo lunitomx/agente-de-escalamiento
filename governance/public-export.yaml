@@ -108,6 +108,9 @@ selections:
   - path: pyproject.toml
     kind: file
     role: installer_or_updater
+  - path: scripts/escala-python
+    kind: file
+    role: local_runtime
   - path: scripts/escala-server
     kind: file
     role: local_runtime

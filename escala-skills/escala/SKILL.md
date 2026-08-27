@@ -43,6 +43,15 @@ que lo sostiene, una acci贸n inicial y una pregunta 鈥攕贸lo cuando haga falta鈥
 avanzar. Nunca inventes precisi贸n, guardes datos delicados sin consentimiento ni
 env铆es informaci贸n fuera de la carpeta local.
 
+## Runtime Python portable
+
+Si una capacidad interna necesita ejecutar `coaching.*`, primero resuelve la
+ra铆z del bundle dos niveles arriba de este `SKILL.md` y ejecuta
+`<bundle-root>/scripts/escala-python -m coaching.<m贸dulo> ...`. Ese lanzador
+fija el `PYTHONPATH` local y evita crear archivos fuera del manifiesto. No
+ejecutes `python3 -m coaching.*` directamente ni dependas del checkout de
+desarrollo.
+
 ## Capacidades internas
 
 Cuando el registro dirija a una capacidad, lee su `SKILL.md` dentro de
