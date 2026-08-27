@@ -299,10 +299,28 @@ class PublicExportPolicy(_StrictModel):
     source: ExportSourceContract
     bindings: ExportPolicyBindings
     selections: list[ExportSourceSelection] = Field(min_length=1)
+    excluded_path_segments: list[str] = Field(default_factory=list)
     generated_paths: GeneratedPaths
     local_only: LocalOnlyContract
     license: LicensePosture
     limits: ExportLimits
+
+    @field_validator("excluded_path_segments")
+    @classmethod
+    def validate_excluded_path_segments(cls, values: list[str]) -> list[str]:
+        if values != sorted(values):
+            raise ValueError("excluded path segments must be sorted")
+        _reject_duplicates(values, "excluded path segments")
+        if any(
+            not value
+            or value != value.strip()
+            or "/" in value
+            or "\\" in value
+            or _SAFE_ID_PATTERN.fullmatch(value) is None
+            for value in values
+        ):
+            raise ValueError("unsafe excluded path segment")
+        return values
 
     @field_validator("selections")
     @classmethod
@@ -1892,6 +1910,15 @@ def _expand_git_selections(
         if not matches:
             _fail(ExportBuildFailure.MISSING_SELECTION)
         selected.extend(matches)
+    if policy.excluded_path_segments:
+        selected = [
+            entry
+            for entry in selected
+            if not any(
+                segment in policy.excluded_path_segments
+                for segment in PurePosixPath(entry.path).parts
+            )
+        ]
     if len(selected) + 3 > policy.limits.max_file_count:
         _fail(ExportBuildFailure.FILE_LIMIT_EXCEEDED)
     folded: set[str] = set()

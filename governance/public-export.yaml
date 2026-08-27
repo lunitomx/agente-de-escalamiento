@@ -33,107 +33,8 @@ selections:
   - path: README.md
     kind: file
     role: operator_documentation
-  - path: coaching/__init__.py
-    kind: file
-    role: local_runtime
-  - path: coaching/core/__init__.py
-    kind: file
-    role: local_runtime
-  - path: coaching/dashboard/__init__.py
-    kind: file
-    role: local_runtime
-  - path: coaching/dashboard/__main__.py
-    kind: file
-    role: local_runtime
-  - path: coaching/diagnose/__init__.py
-    kind: file
-    role: local_runtime
-  - path: coaching/diagnose/__main__.py
-    kind: file
-    role: local_runtime
-  - path: coaching/diagnose/engine.py
-    kind: file
-    role: local_runtime
-  - path: coaching/diagnose/formatter.py
-    kind: file
-    role: local_runtime
-  - path: coaching/export/__init__.py
-    kind: file
-    role: local_runtime
-  - path: coaching/export/__main__.py
-    kind: file
-    role: local_runtime
-  - path: coaching/level/__init__.py
-    kind: file
-    role: local_runtime
-  - path: coaching/level/__main__.py
-    kind: file
-    role: local_runtime
-  - path: coaching/level/engine.py
-    kind: file
-    role: local_runtime
-  - path: coaching/level/formatter.py
-    kind: file
-    role: local_runtime
-  - path: coaching/progress/__init__.py
-    kind: file
-    role: local_runtime
-  - path: coaching/progress/__main__.py
-    kind: file
-    role: local_runtime
-  - path: coaching/progress/engine.py
-    kind: file
-    role: local_runtime
-  - path: coaching/progress/formatter.py
-    kind: file
-    role: local_runtime
-  - path: coaching/pulse/__init__.py
-    kind: file
-    role: local_runtime
-  - path: coaching/pulse/__main__.py
-    kind: file
-    role: local_runtime
-  - path: coaching/router/__init__.py
-    kind: file
-    role: local_runtime
-  - path: coaching/router/__main__.py
-    kind: file
-    role: local_runtime
-  - path: coaching/router/engine.py
-    kind: file
-    role: local_runtime
-  - path: coaching/summary/__init__.py
-    kind: file
-    role: local_runtime
-  - path: coaching/summary/__main__.py
-    kind: file
-    role: local_runtime
-  - path: coaching/summary/engine.py
-    kind: file
-    role: local_runtime
-  - path: coaching/summary/formatter.py
-    kind: file
-    role: local_runtime
-  - path: coaching/welcome/__init__.py
-    kind: file
-    role: local_runtime
-  - path: coaching/welcome/__main__.py
-    kind: file
-    role: local_runtime
-  - path: coaching/welcome/formatter.py
-    kind: file
-    role: local_runtime
-  - path: coaching/worksheet/__init__.py
-    kind: file
-    role: local_runtime
-  - path: coaching/worksheet/__main__.py
-    kind: file
-    role: local_runtime
-  - path: coaching/worksheet/engine.py
-    kind: file
-    role: local_runtime
-  - path: coaching/worksheet/formatter.py
-    kind: file
+  - path: coaching
+    kind: tree
     role: local_runtime
   - path: conocimiento
     kind: tree
@@ -261,6 +162,7 @@ selections:
   - path: validators/worksheet.py
     kind: file
     role: business_validator
+excluded_path_segments: [tests]
 generated_paths:
   package_metadata: ESCALA-PACKAGE.json
   third_party_notices: THIRD_PARTY_NOTICES.md

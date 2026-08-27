@@ -68,7 +68,7 @@ def test_installer_rejects_unknown_arguments_without_side_effects(
     assert not (tmp_path / "home").exists()
 
 
-def _portable_artifact(tmp_path: Path) -> Path:
+def _portable_artifact(destination: Path) -> Path:
     source_commit = subprocess.run(
         ["git", "rev-parse", "HEAD"],
         cwd=ROOT,
@@ -76,24 +76,24 @@ def _portable_artifact(tmp_path: Path) -> Path:
         capture_output=True,
         text=True,
     ).stdout.strip()
-    artifact = tmp_path / "portable-escala"
     build_public_export(
         repository=ROOT,
-        destination=artifact,
+        destination=destination,
         source_commit=source_commit,
         policy=load_public_export_policy(ROOT / "governance/public-export.yaml"),
         inventory=load_third_party_inventory(ROOT / "governance/third-party.yaml"),
     )
-    assert not (artifact / ".git").exists()
-    return artifact
+    assert not (destination / ".git").exists()
+    return destination
 
 
 def _portable_install(artifact: Path, home: Path) -> subprocess.CompletedProcess[str]:
     fake_bin = home.parent / "bin"
     fake_bin.mkdir(exist_ok=True)
-    fake_codex = fake_bin / "codex"
-    fake_codex.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
-    fake_codex.chmod(0o755)
+    for command in ("claude", "hermes", "codex"):
+        executable = fake_bin / command
+        executable.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+        executable.chmod(0o755)
     return subprocess.run(
         ["bash", str(artifact / "install.sh"), "--skills-only"],
         cwd=artifact,
@@ -110,32 +110,74 @@ def _portable_install(artifact: Path, home: Path) -> subprocess.CompletedProcess
 def test_portable_export_installs_without_source_checkout_and_rejects_tampering(
     tmp_path: Path,
 ) -> None:
-    artifact = _portable_artifact(tmp_path)
+    active = _portable_artifact(tmp_path / "active-escala")
+    home = tmp_path / "portable-home"
+    installed = tuple(
+        home / f"{directory}/skills/escala"
+        for directory in (".claude", ".hermes", ".codex")
+    )
 
-    first = _portable_install(artifact, tmp_path / "portable-home")
-    second = _portable_install(artifact, tmp_path / "portable-home")
-    installed = tmp_path / "portable-home/.codex/skills/escala"
-
+    first = _portable_install(active, home)
     assert first.returncode == 0, first.stderr
-    assert second.returncode == 0, second.stderr
-    assert installed.is_symlink()
-    assert installed.resolve() == artifact / "escala-skills/escala"
+    assert all(path.is_symlink() for path in installed)
+    assert all(path.resolve() == active / "escala-skills/escala" for path in installed)
+
+    candidate = _portable_artifact(tmp_path / "tampered-candidate")
+    catalog = candidate / "escala-skills/catalog.yaml"
+    catalog.write_text(
+        catalog.read_text(encoding="utf-8") + "\n# tampered\n", encoding="utf-8"
+    )
+    rejected = _portable_install(candidate, home)
+
+    assert rejected.returncode == 1
+    assert "no pasó su verificación" in rejected.stderr
+    assert all(path.resolve() == active / "escala-skills/escala" for path in installed)
+
+    replacement = _portable_artifact(tmp_path / "replacement-escala")
+    update = _portable_install(replacement, home)
+    idempotent = _portable_install(replacement, home)
+
+    assert update.returncode == 0, update.stderr
+    assert idempotent.returncode == 0, idempotent.stderr
+    assert all(
+        path.resolve() == replacement / "escala-skills/escala" for path in installed
+    )
+    assert not any(
+        "tests" in path.relative_to(replacement).parts
+        for path in replacement.rglob("*")
+        if path.is_file()
+    )
+    imports = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            (
+                "import importlib; "
+                'modules = ("coaching.dashboard", "coaching.decision", '
+                '"coaching.diagnose", "coaching.evidence", '
+                '"coaching.execution_habits", "coaching.export", '
+                '"coaching.level", "coaching.people_facchart", '
+                '"coaching.progress", "coaching.pulse", '
+                '"coaching.qualifier", "coaching.responder", '
+                '"coaching.reviewer", "coaching.router", '
+                '"coaching.selector", "coaching.strategy_opsp", '
+                '"coaching.summary", "coaching.welcome", '
+                '"coaching.worksheet"); '
+                "[importlib.import_module(name) for name in modules]"
+            ),
+        ],
+        cwd=tmp_path,
+        env={**os.environ, "PYTHONPATH": str(replacement)},
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert imports.returncode == 0, imports.stderr
     verification = subprocess.run(
-        [sys.executable, str(artifact / "scripts/verify_portable_bundle.py")],
-        cwd=artifact,
+        [sys.executable, str(replacement / "scripts/verify_portable_bundle.py")],
+        cwd=replacement,
         capture_output=True,
         text=True,
         check=False,
     )
     assert verification.returncode == 0, verification.stderr
-
-    catalog = artifact / "escala-skills/catalog.yaml"
-    catalog.write_text(
-        catalog.read_text(encoding="utf-8") + "\n# tampered\n", encoding="utf-8"
-    )
-    rejected_home = tmp_path / "rejected-home"
-    rejected = _portable_install(artifact, rejected_home)
-
-    assert rejected.returncode == 1
-    assert "no pasó su verificación" in rejected.stderr
-    assert not (rejected_home / ".codex/skills/escala").exists()
