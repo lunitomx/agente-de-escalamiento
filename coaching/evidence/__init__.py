@@ -9,7 +9,13 @@ from pathlib import Path
 from typing import Any
 
 from ..core import read_yaml
+from .dashboard import (
+    MetricRequirement,
+    build_evidence_dashboard,
+    format_evidence_dashboard,
+)
 from .engine import discover_sources
+from .facts import load_facts
 from .formatter import format_package, package_summary
 from .models import DecisionRef
 
@@ -179,6 +185,34 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
         dict with output, artifacts, errors
     """
     base = Path(context.get("base_path", "."))
+    if context.get("action") == "facts_dashboard":
+        requested_metrics = context.get("requested_metrics", [])
+        try:
+            requirements = [
+                MetricRequirement.model_validate(item) for item in requested_metrics
+            ]
+        except (TypeError, ValueError) as exc:
+            return {
+                "output": "",
+                "artifacts": {},
+                "errors": [f"requested_metrics inválido: {exc}"],
+            }
+        dashboard = build_evidence_dashboard(load_facts(base), requirements)
+        return {
+            "output": format_evidence_dashboard(dashboard),
+            "artifacts": {
+                "action": "facts_dashboard",
+                "dashboard": dashboard.model_dump(mode="json"),
+                "summary": {
+                    "known_count": len(dashboard.known),
+                    "not_comparable_count": len(dashboard.not_comparable),
+                    "pending_count": len(dashboard.pending),
+                    "score": None,
+                },
+            },
+            "errors": [],
+        }
+
     freshness_days = context.get("freshness_days", 90)
 
     decision = _load_decision(base)

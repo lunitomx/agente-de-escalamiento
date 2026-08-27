@@ -1,7 +1,8 @@
 ---
 epic_id: "E55"
 title: "Onboarding multifuente y conciliación de métricas de negocio"
-status: "started"
+status: "active"
+closure_disposition: "active"
 created: "2026-08-21"
 jira_key: "ESCALA-11"
 source_issue: "https://github.com/lunitomx/agente-de-escalamiento/issues/9"
@@ -19,9 +20,9 @@ Construir en ESCALA un flujo de onboarding que acepte múltiples fuentes de evid
 
 | ID | Historia | Tamaño | Estado | Termina cuando |
 |---|---|:---:|:---:|---|
-| S55.1 | Contrato de hechos con procedencia (`ESCALA-12`) | 5 | Planned | Un hecho se persiste con definición de métrica, periodo, base de fecha, fuente, nivel de confianza y flag de comparabilidad. |
-| S55.2 | Dashboard de evidencia previo al diagnóstico (`ESCALA-13`) | 5 | Planned | Se muestra información conocida, pendiente y no comparable sin inventar scores. |
-| S55.3 | Onboarding adaptativo de las cuatro decisiones (`ESCALA-14`) | 8 | Planned | El flujo lee hechos autorizados, omite preguntas respondidas, hace una pregunta a la vez y ramifica hacia vacíos reales. |
+| S55.1 | Contrato de hechos con procedencia (`ESCALA-12`) | 5 | Complete | Un hecho se persiste con definición de métrica, periodo, base de fecha, fuente, nivel de confianza y flag de comparabilidad. |
+| S55.2 | Dashboard de evidencia previo al diagnóstico (`ESCALA-13`) | 5 | Complete | Se muestra información conocida, pendiente y no comparable sin inventar scores. |
+| S55.3 | Onboarding adaptativo de las cuatro decisiones (`ESCALA-14`) | 8 | In progress | El flujo lee hechos autorizados, omite preguntas respondidas, hace una pregunta a la vez y ramifica hacia vacíos reales. |
 | S55.4 | Modelo nativo de conciliación financiera (`ESCALA-15`) | 8 | Planned | Se separan gasto entregado, cobro facturado, liquidación, registro contable, compras, cobros e ingreso atribuible; se bloquea comparación de métricas incompatibles. |
 | S55.5 | Resolución conservadora de entidades (`ESCALA-16`) | 5 | Planned | Regla configurable: identificador primario + coincidencia exacta de nombre como respaldo; ambigüedades quedan sin fusionar. |
 | S55.6 | Mapa de decisión y parking lot (`ESCALA-17`) | 3 | Planned | Hallazgos y datos faltantes se convierten en tareas trazables por decisión, prioridad y evidencia requerida. |
@@ -29,8 +30,8 @@ Construir en ESCALA un flujo de onboarding que acepte múltiples fuentes de evid
 
 ## Criterios de terminación
 
-- [ ] Un hecho persistido conserva fuente, periodo, definición, base temporal, confianza y estado de comparabilidad (S55.1).
-- [ ] El dashboard puede existir antes del score y deja claro qué sí se sabe y qué falta (S55.2).
+- [x] Un hecho persistido conserva fuente, periodo, definición, base temporal, confianza y estado de comparabilidad (S55.1).
+- [x] El dashboard puede existir antes del score y deja claro qué sí se sabe y qué falta (S55.2).
 - [ ] Un flujo de conciliación impide comparar métricas de naturaleza distinta sin advertencia explícita (S55.4).
 - [ ] El onboarding reutiliza contexto, pregunta sólo vacíos y conserva una política de deduplicación auditable (S55.3).
 - [ ] El board recibe un paquete de evidencia y declara límites cuando aún faltan datos (S55.2/S55.6).

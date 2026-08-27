@@ -12,6 +12,8 @@ from .conversation import (
     is_state_fresh,
     load_welcome_state,
     respond_to_welcome,
+    respond_to_welcome_with_evidence,
+    respond_to_welcome_from_local_evidence,
     save_welcome_state,
 )
 
@@ -23,6 +25,8 @@ __all__ = [
     "is_state_fresh",
     "load_welcome_state",
     "respond_to_welcome",
+    "respond_to_welcome_with_evidence",
+    "respond_to_welcome_from_local_evidence",
     "run",
     "save_welcome_state",
 ]

@@ -9,6 +9,8 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from coaching.evidence.dashboard import MetricRequirement
+from coaching.evidence.facts import Fact
 from coaching.core import ensure_dir, read_yaml, write_yaml
 from coaching.decision.engine import classify_area
 
@@ -43,6 +45,69 @@ class WelcomeTurn(BaseModel):
 
     question: str = Field(..., min_length=1)
     state: WelcomeState
+
+
+def respond_to_welcome_with_evidence(
+    state: WelcomeState,
+    message: str,
+    *,
+    facts: list[Fact],
+    requirements: list[MetricRequirement],
+) -> WelcomeTurn:
+    """Advance Welcome without asking again for an already-authorized fact."""
+    turn = respond_to_welcome(state, message)
+    if turn.state.phase != "source" or not turn.state.area:
+        return turn
+
+    for requirement in requirements:
+        if requirement.decision not in (None, turn.state.area):
+            continue
+        matching = [
+            fact
+            for fact in facts
+            if fact.metric_definition.casefold()
+            == requirement.metric_definition.casefold()
+            and fact.decision in (None, turn.state.area)
+        ]
+        if any(fact.comparable for fact in matching):
+            continue
+        if matching:
+            question = (
+                f"El dato de {requirement.metric_definition} existe, pero no "
+                f"es comparable todavía. {requirement.question}"
+            )
+        else:
+            question = requirement.question
+        return WelcomeTurn(
+            question=question,
+            state=turn.state.model_copy(update={"next_action": "evidence"}),
+        )
+
+    return WelcomeTurn(
+        question=(
+            "Ya tengo los datos comparables que necesitaba para este primer "
+            "análisis. ¿Quieres que profundicemos ahora?"
+        ),
+        state=turn.state.model_copy(update={"next_action": "direct"}),
+    )
+
+
+def respond_to_welcome_from_local_evidence(
+    state: WelcomeState,
+    message: str,
+    *,
+    base_path: Path,
+    requirements: list[MetricRequirement],
+) -> WelcomeTurn:
+    """Use only local authorized facts for the evidence-aware Welcome route."""
+    from coaching.evidence.facts import load_facts
+
+    return respond_to_welcome_with_evidence(
+        state,
+        message,
+        facts=load_facts(base_path),
+        requirements=requirements,
+    )
 
 
 def begin_welcome(

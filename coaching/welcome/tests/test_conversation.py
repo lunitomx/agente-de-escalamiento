@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
+from coaching.evidence.dashboard import MetricRequirement
+from coaching.evidence.facts import Fact, save_fact
 from coaching.welcome.conversation import (
     MaturityProfile,
     WelcomeState,
     begin_welcome,
     respond_to_welcome,
+    respond_to_welcome_with_evidence,
+    respond_to_welcome_from_local_evidence,
 )
 
 
@@ -59,3 +63,119 @@ def test_returning_user_gets_continuity_prompt() -> None:
     assert turn.state.phase == "continuity"
     assert "execution" in turn.question.lower()
     assert turn.question.count("?") == 1
+
+
+def test_evidence_aware_welcome_skips_known_fact_and_asks_next_gap() -> None:
+    turn = respond_to_welcome_with_evidence(
+        WelcomeState(phase="concern"),
+        "Necesito entender mi cash.",
+        facts=[
+            Fact(
+                metric_definition="Ingreso",
+                period="2026-07",
+                source="ERP",
+                confidence="high",
+                value=100,
+                decision="cash",
+            )
+        ],
+        requirements=[
+            MetricRequirement(
+                metric_definition="Ingreso",
+                decision="cash",
+                question="¿Cuál fue el ingreso?",
+            ),
+            MetricRequirement(
+                metric_definition="Cobros",
+                decision="cash",
+                question="¿Cuánto cobraste realmente?",
+            ),
+        ],
+    )
+
+    assert turn.question == "¿Cuánto cobraste realmente?"
+    assert turn.question.count("?") == 1
+    assert turn.state.next_action == "evidence"
+
+
+def test_evidence_aware_welcome_explains_noncomparable_fact() -> None:
+    turn = respond_to_welcome_with_evidence(
+        WelcomeState(phase="concern"),
+        "Necesito entender mi cash.",
+        facts=[
+            Fact(
+                metric_definition="Cobros",
+                period="2026-07",
+                source="reporte parcial",
+                confidence="medium",
+                value=20,
+                comparable=False,
+                decision="cash",
+            )
+        ],
+        requirements=[
+            MetricRequirement(
+                metric_definition="Cobros",
+                decision="cash",
+                question="¿Qué periodo cubre exactamente?",
+            )
+        ],
+    )
+
+    assert "no es comparable" in turn.question
+    assert turn.question.count("?") == 1
+
+
+def test_evidence_aware_welcome_proceeds_when_all_requirements_are_known() -> None:
+    turn = respond_to_welcome_with_evidence(
+        WelcomeState(phase="concern"),
+        "Necesito entender mi cash.",
+        facts=[
+            Fact(
+                metric_definition="Cobros",
+                period="2026-07",
+                source="ERP",
+                confidence="high",
+                value=20,
+                decision="cash",
+            )
+        ],
+        requirements=[
+            MetricRequirement(
+                metric_definition="Cobros",
+                decision="cash",
+                question="¿Cuánto cobraste?",
+            )
+        ],
+    )
+
+    assert turn.state.next_action == "direct"
+    assert turn.question.count("?") == 1
+
+
+def test_evidence_aware_welcome_loads_only_local_facts(tmp_path) -> None:
+    save_fact(
+        tmp_path,
+        Fact(
+            metric_definition="Cobros",
+            period="2026-07",
+            source="ERP",
+            confidence="high",
+            value=20,
+            decision="cash",
+        ),
+    )
+    turn = respond_to_welcome_from_local_evidence(
+        WelcomeState(phase="concern"),
+        "Necesito entender mi cash.",
+        base_path=tmp_path,
+        requirements=[
+            MetricRequirement(
+                metric_definition="Cobros",
+                decision="cash",
+                question="¿Cuánto cobraste?",
+            )
+        ],
+    )
+
+    assert turn.state.next_action == "direct"
