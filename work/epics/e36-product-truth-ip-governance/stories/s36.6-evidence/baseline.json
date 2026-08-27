@@ -5,7 +5,7 @@
     "data_authority": "installer_machine",
     "epic_identities_sha256": "eb62cd804fa3b0559d20394e27be583b6daa445c6619938b43d4a1a92d052d52",
     "human_legal_review_status": "required",
-    "public_export_sha256": "a0ac8580703e0ba77882d4686e38e8c7064508af4bf850f807ee4786791c824e",
+    "public_export_sha256": "28ef904cfbcbc3dbd51c3f696bf115fa83431f37a25270b6cd4c90efb1e6d941",
     "publication_authorized": false,
     "runtime_authority": "installer_machine",
     "team_exchange": "ordinary_filesystem_documents_only"
@@ -39,8 +39,8 @@
   "contract_status": "pass",
   "epic_count": 6,
   "epic_filter": null,
-  "ledger_markdown_sha256": "4ac2970e80b71fdcca251b1116f57dcfbea1be21afa57cf49f6b106542b55d09",
-  "ledger_sha256": "bf5910430c2b4a090d127c499c9abc9905f0a90bd78799b8d9b3b68d85005647",
+  "ledger_markdown_sha256": "73bc8deb583199ff3bb71283050c5d5f2160fe955393ae5dcc0a94d12b501c3f",
+  "ledger_sha256": "96afdcf4eeb3cf13b95fd4c918cc5acb41d8ff197b71951a44b03b665a355fe3",
   "mission_id": "escala-local-v2-plan-maestro-2607202112",
   "mission_readiness": "unproved",
   "mode": "baseline",
@@ -86,5 +86,5 @@
   "requirement_count": 42,
   "schema_version": 1,
   "unproved_count": 6,
-  "verifier_source_commit": "80aa606518df5fd504f7f33d1dfbb30b21e0311d"
+  "verifier_source_commit": "51c642c9f7144a68709e777154acc9dffd27526f"
 }
