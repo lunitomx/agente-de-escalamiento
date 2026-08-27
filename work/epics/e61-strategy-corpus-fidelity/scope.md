@@ -45,7 +45,7 @@ Construir la representación trazable de Strategy para que el agente pueda disti
 ## Estado de evidencia
 
 - S61.1, S61.2, S61.3 y S61.5 tienen borradores privados trazables; los candidatos siguen sin promoción canónica hasta revisión independiente.
-- S61.4 no se declarará aprobado sin un activo fuente autorizado para validar visualmente los campos de Vision Summary, OPSP y Seven Strata.
+- S61.4 tiene recibo semántico contra la e-Form oficial pública v20/03 para SWT, Seven Strata, OPSP y Vision Summary; sigue pendiente sólo la inspección visual del layout, no la disponibilidad de un activo fuente.
 
 ## Handoff y riesgos
 

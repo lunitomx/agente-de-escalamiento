@@ -1,7 +1,7 @@
 ---
 epic_id: E60
 title: Corpus People verificado
-status: planned
+status: in_progress
 depends_on: [E58]
 ---
 
@@ -40,6 +40,11 @@ Extraer y revisar el dominio People con suficiente fidelidad para que futuras in
 - Toda regla, cifra y campo obligatorio tiene evidencia.
 - Ningún ejemplo se generaliza y ningún método externo se vende como completo.
 - No hay críticos abiertos en el reporte de fidelidad.
+
+## Estado de evidencia
+
+- S60.1, S60.2 y S60.4 tienen evidencia privada trazable; candidatos sin promoción canónica hasta revisión independiente.
+- La e-Form oficial pública v20/03 confirma semánticamente OPPP, FACe y PACe; su PDF se usa sólo para validación privada. Sigue pendiente la inspección visual del layout porque el transporte de imagen/archivo no estuvo disponible.
 
 ## Handoff y riesgos
 
