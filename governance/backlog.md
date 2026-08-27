@@ -37,7 +37,7 @@ en `work/epics/`.
 | 6 | E69, E71–E75 | Planificado por olas | Biblioteca, research, Cash Learning Day, dashboards, workspace y diagnóstico se abren tras el núcleo portable. | Cada ola conserva procedencia, privacidad, aceptación y pruebas. |
 | 7 | E46 + E70 | Planificado | Mejora gobernada sólo con resultados reales; release sólo con todos los gates. | Aprobación/rollback y aceptación final honesta. |
 | — | E76 — Recuperación reproducible de RaiSE | Completada | Manifest, configuración mínima y grafo ya se recuperaron sin venv duplicado. | No reabrir salvo regresión reproducible propia. |
-| — | E47, E49, E52, E55, E56, E57–E59 | Completadas | Son contratos verificados que las épicas activas pueden consumir. | No reabrir salvo regresión propia demostrada. |
+| — | E47, E49, E51, E52, E55, E56, E57–E59 | Completadas | Son contratos verificados que las épicas activas pueden consumir. | No reabrir salvo regresión propia demostrada. |
 
 ## Núcleo de conocimiento y distribución
 

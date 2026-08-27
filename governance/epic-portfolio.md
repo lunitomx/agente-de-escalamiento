@@ -44,6 +44,7 @@ se alteraron para aparentar cierre.
 
 - E47: workspace, OPSP y feedback local re-verificados; RaiSE reproducible se resolvió en E76.
 - E49: diagnóstico/evidencia, ruta de 90 días y recibo local re-verificados.
+- E51: los cinco residuos de issues se re-verificaron; sus cuatro issues de GitHub están cerrados y la evidencia de cierre está versionada.
 - E52: persistencia y reanudación local consentida de Welcome re-verificadas.
 - E55: GitHub #9 resuelto: onboarding multifuente, conciliación y calificación local verificable.
 - E56: catálogo canónico y una sola puerta pública re-verificados.

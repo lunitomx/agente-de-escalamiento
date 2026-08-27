@@ -1,3 +1,11 @@
+---
+epic_id: E51
+title: Remediacion de deuda de issues
+status: complete
+closure_disposition: complete
+closed: 2026-08-27
+---
+
 # E51 Scope
 
 ## In Scope
