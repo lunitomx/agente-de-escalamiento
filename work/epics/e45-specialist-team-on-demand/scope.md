@@ -1,7 +1,7 @@
 ---
 epic_id: "E45"
 title: "Equipo instalado de cuatro especialistas bajo demanda"
-status: "planned"
+status: "in_progress"
 depends_on: ["E44", "E49"]
 created: "2026-07-23"
 ---
@@ -36,13 +36,13 @@ necesarios para cada intervención.
 
 | ID | Historia | Tamaño | Estado | Demostración de valor |
 |---|---|:---:|:---:|---|
-| S45.1 | Decidir cuándo se necesita un equipo | S | Pending | Preguntas simples siguen rápidas; casos complejos explican por qué requieren revisión. |
-| S45.2 | Dar a cada especialista el contexto mínimo | M | Pending | Cash, People, Strategy o Execution reciben solo evidencia pertinente. |
-| S45.3 | Incorporar al crítico y verificador | M | Pending | Un rol desafía supuestos y otro confirma cifras, periodo y fuentes. |
-| S45.4 | Resolver desacuerdos con evidencia | M | Pending | El sistema distingue acuerdo, desacuerdo y pregunta que falta resolver. |
-| S45.5 | Entregar una sola recomendación | M | Pending | El dueño recibe alternativas, riesgo, decisión sugerida, acción y seguimiento. |
-| S45.6 | Calificar casos transversales | M | Pending | Casos de tres o cuatro decisiones prueban valor frente a un solo coach. |
-| S45.7 | Contratos e instalación de los cuatro perfiles | M | Pending | Cada perfil declara trigger, non-trigger, contexto mínimo, permisos, salida y límites; E67 lo instala sin exponer un comando público. |
+| S45.1 | Decidir cuándo se necesita un equipo | S | Implemented; pilot pending | Preguntas simples siguen rápidas; casos complejos explican por qué requieren revisión. |
+| S45.2 | Dar a cada especialista el contexto mínimo | M | Implemented; pilot pending | Cash, People, Strategy o Execution reciben solo evidencia pertinente. |
+| S45.3 | Incorporar al crítico y verificador | M | Implemented; pilot pending | Un rol desafía supuestos y otro confirma cifras, periodo y fuentes. |
+| S45.4 | Resolver desacuerdos con evidencia | M | Implemented; pilot pending | El sistema distingue acuerdo, desacuerdo y pregunta que falta resolver. |
+| S45.5 | Entregar una sola recomendación | M | Implemented; pilot pending | El dueño recibe alternativas, riesgo, decisión sugerida, acción y seguimiento. |
+| S45.6 | Calificar casos transversales | M | Local fixtures; business pilot pending | Casos de tres o cuatro decisiones prueban valor frente a un solo coach. |
+| S45.7 | Contratos e instalación de los cuatro perfiles | M | Implemented; E67 packaging pending | Cada perfil declara trigger, non-trigger, contexto mínimo, permisos, salida y límites; E67 lo instala sin exponer un comando público. |
 
 ## S45.1 — Decidir cuándo se necesita un equipo
 
@@ -125,13 +125,13 @@ puede empaquetarlos sin convertirlos en comandos o conversaciones públicas.
 
 ## Criterios de terminación
 
-- [ ] Los cuatro perfiles tienen contratos y pruebas de trigger/non-trigger.
-- [ ] El router deja casos simples con un solo coach.
-- [ ] Los roles reciben contexto mínimo y verificable.
-- [ ] El crítico encuentra un supuesto o riesgo sembrado.
-- [ ] El verificador bloquea una fuente, cálculo o periodo inválido.
-- [ ] Los desacuerdos muestran evidencia y la pregunta para resolverlos.
-- [ ] La síntesis es una sola respuesta ejecutiva para el empresario.
+- [x] Los cuatro perfiles tienen contratos y pruebas de trigger/non-trigger.
+- [x] El router deja casos simples con un solo coach.
+- [x] Los roles reciben contexto mínimo y verificable.
+- [x] El crítico encuentra un supuesto o riesgo sembrado.
+- [x] El verificador bloquea una fuente, cálculo o periodo inválido.
+- [x] Los desacuerdos muestran evidencia y la pregunta para resolverlos.
+- [x] La síntesis es una sola respuesta ejecutiva para el empresario.
 - [ ] La calificación demuestra valor frente a un solo análisis o reduce el
       equipo si no lo demuestra.
 - [ ] Los límites de rondas, tiempo y privacidad se cumplen.
@@ -189,13 +189,22 @@ la comparación final espera la síntesis de S45.5.
 
 | Story | Estado | Evidencia esperada |
 |---|---|---|
-| S45.1 | Pending | Casos simple/complejo y decisión del router. |
-| S45.2 | Pending | Paquetes mínimos de contexto por rol. |
-| S45.3 | Pending | Hallazgos críticos y verificación de fuentes. |
-| S45.4 | Pending | Registro de acuerdo, desacuerdo y pregunta abierta. |
-| S45.5 | Pending | Síntesis ejecutiva probada con empresarios. |
-| S45.6 | Pending | Comparativo de equipo vs. un solo coach. |
-| S45.7 | Pending | Contratos de Cash, Execution, People y Strategy con pruebas. |
+| S45.1 | Implemented; pilot pending | Casos simple/complejo y decisión del router. |
+| S45.2 | Implemented; pilot pending | Paquetes mínimos de contexto por rol. |
+| S45.3 | Implemented; pilot pending | Hallazgos críticos y verificación de fuentes. |
+| S45.4 | Implemented; pilot pending | Registro de acuerdo, desacuerdo y pregunta abierta. |
+| S45.5 | Implemented; pilot pending | Síntesis ejecutiva probada con empresarios. |
+| S45.6 | Local fixtures; business pilot pending | Comparativo de equipo vs. un solo coach. |
+| S45.7 | Implemented; E67 packaging pending | Contratos de Cash, Execution, People y Strategy con pruebas. |
+
+## Evidencia local (2026-08-27)
+
+- Módulo local: `escala_server/specialist_team.py`.
+- API: `POST /api/advisor/team-review`, una sola síntesis para el empresario.
+- Pruebas: casos simple, transversal, contexto mínimo, ausencia de periodo/unidad,
+  desacuerdo de precio y contratos de cuatro roles.
+- Pendiente de cierre: comparación con un solo coach y piloto empresarial; la
+  instalación como definiciones de plataforma pertenece a E67.
 
 ## Riesgos
 

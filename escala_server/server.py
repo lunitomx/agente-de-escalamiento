@@ -31,6 +31,7 @@ class EscalaRequestHandler(BaseHTTPRequestHandler):
     knowledge: Any = None  # type: ignore[annotation-unchecked]
     advisor: Any = None  # type: ignore[annotation-unchecked]
     outcomes: Any = None  # type: ignore[annotation-unchecked]
+    specialist_team: Any = None  # type: ignore[annotation-unchecked]
 
     def do_GET(self):
         path = self.path
@@ -188,7 +189,12 @@ def make_server(
         db_path = str(Path.home() / ".escala" / "escala.db")
 
     from .graph_engine import GraphEngine
-    from .handlers import OutcomeLearningHandler, WorksheetsHandler, SessionsHandler
+    from .handlers import (
+        OutcomeLearningHandler,
+        SpecialistTeamHandler,
+        WorksheetsHandler,
+        SessionsHandler,
+    )
     from .knowledge_handler import KnowledgeHandler
     from .business_advisor import BusinessAdvisorHandler
 
@@ -204,6 +210,7 @@ def make_server(
     EscalaRequestHandler.outcomes = OutcomeLearningHandler(
         Path(db_path).expanduser().resolve(strict=False).parent / "outcome-learning"
     )
+    EscalaRequestHandler.specialist_team = SpecialistTeamHandler()
 
     server = HTTPServer((host, port), EscalaRequestHandler)
     return server
@@ -385,6 +392,10 @@ def _build_router() -> Router:
         return EscalaRequestHandler.outcomes.confirm_learning(
             company_id, cycle_id, result_id, payload or {}
         )
+
+    @router.post("/api/advisor/team-review")
+    def advisor_team_review(payload=None):
+        return EscalaRequestHandler.specialist_team.review(payload or {})
 
     # ── Cash / Power of One routes ────────────────────────────────
 

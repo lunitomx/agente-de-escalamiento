@@ -335,6 +335,19 @@ class OutcomeLearningHandler:
         return OutcomeLearningLedger(self._root, company_id)
 
 
+class SpecialistTeamHandler:
+    """Local E45 endpoint; it exposes one synthesis, never internal chats."""
+
+    def review(self, payload: dict) -> dict:
+        from .specialist_team import TeamReviewError, review
+
+        try:
+            result = review(payload)
+        except TeamReviewError as exc:
+            return {"status": "error", "message": str(exc)}
+        return {"data": result, "status": "ok"}
+
+
 # ── helpers ──────────────────────────────────────────────────────────
 
 
