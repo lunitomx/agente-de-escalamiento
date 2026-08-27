@@ -134,7 +134,7 @@ puede empaquetarlos sin convertirlos en comandos o conversaciones públicas.
 - [x] La síntesis es una sola respuesta ejecutiva para el empresario.
 - [ ] La calificación demuestra valor frente a un solo análisis o reduce el
       equipo si no lo demuestra.
-- [ ] Los límites de rondas, tiempo y privacidad se cumplen.
+- [x] Los límites de rondas, tiempo y privacidad se cumplen en el router local: máximo una aclaración, presupuesto declarado y evidencia personal/financiera fail-closed fuera de su contexto consentido.
 - [ ] Retrospectiva y aceptación empresarial completadas.
 
 ## Dependencias
@@ -204,7 +204,7 @@ la comparación final espera la síntesis de S45.5.
 - Calificación técnica reproducible: `scripts/qualify_e44_e45.py`, con caso simple de un especialista, Cash bloqueado por periodo/unidad ausentes y desacuerdo transversal visible sin votación por mayoría.
 - Protocolo de piloto: `../e44-outcome-learning-and-accountability/pilot-protocol.md` y `validators/e44_e45_business_pilot.py` obligan dos comparativos, contexto mínimo, una respuesta ejecutiva, límite de ronda y decisión honesta de retener/reducir/seguir midiendo; falta su ejecución empresarial.
 - Pruebas: casos simple, transversal, contexto mínimo, ausencia de periodo/unidad,
-  desacuerdo de precio, contratos de cuatro roles y `tests/test_qualify_e44_e45.py`.
+  desacuerdo de precio, contratos de cuatro roles, límites de ronda/tiempo y privacidad consentida; incluye `tests/test_qualify_e44_e45.py`.
 - Pendiente de cierre: comparación con un solo coach y piloto empresarial; la
   calificación sintética no los sustituye y la instalación como definiciones de plataforma pertenece a E67.
 

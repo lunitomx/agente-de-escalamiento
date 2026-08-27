@@ -119,3 +119,66 @@ def test_local_api_handler_returns_one_executive_synthesis() -> None:
     assert result["status"] == "ok"
     assert "synthesis" in result["data"]
     assert "agents" not in result["data"]["synthesis"]["decision_suggested"].lower()
+
+
+def test_review_enforces_limits_and_reports_them_to_the_owner() -> None:
+    result = review(
+        {
+            "areas": ["cash"],
+            "rounds_used": 1,
+            "time_limit_ms": 1_000,
+            "evidence": [
+                {
+                    "areas": ["cash"],
+                    "source_id": "cash-1",
+                    "period": "2026-Q2",
+                    "unit": "MXN",
+                    "sensitivity": "financial",
+                }
+            ],
+            "claims": [],
+        }
+    )
+    assert result["coordination_limits"]["rounds_allowed"] == 1
+    assert result["coordination_limits"]["rounds_used"] == 1
+    assert result["coordination_limits"]["elapsed_ms"] <= 1_000
+    assert (
+        result["coordination_limits"]["privacy_boundary"]
+        == "tagged-minimum-context-only"
+    )
+
+    with pytest.raises(TeamReviewError, match="one clarification"):
+        review({"areas": ["cash"], "rounds_used": 2, "evidence": [], "claims": []})
+
+
+def test_personal_or_financial_evidence_fails_closed_outside_its_boundary() -> None:
+    with pytest.raises(TeamReviewError, match="People consent"):
+        review(
+            {
+                "areas": ["people"],
+                "evidence": [
+                    {
+                        "areas": ["people"],
+                        "source_id": "people-1",
+                        "sensitivity": "personal",
+                    }
+                ],
+                "claims": [],
+            }
+        )
+    with pytest.raises(TeamReviewError, match="within Cash"):
+        review(
+            {
+                "areas": ["cash", "strategy"],
+                "evidence": [
+                    {
+                        "areas": ["cash", "strategy"],
+                        "source_id": "financial-1",
+                        "period": "2026-Q2",
+                        "unit": "MXN",
+                        "sensitivity": "financial",
+                    }
+                ],
+                "claims": [],
+            }
+        )

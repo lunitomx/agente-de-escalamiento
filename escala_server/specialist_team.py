@@ -8,6 +8,7 @@ then makes evidence gaps and disagreements visible to the business owner.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from time import monotonic
 from typing import Any, Literal
 
 
@@ -105,6 +106,7 @@ def minimum_context(
         if not isinstance(item, dict):
             raise TeamReviewError("evidence item must be an object")
         tags = set(item.get("areas", []))
+        _validate_evidence_privacy(item, tags)
         if area in tags or "shared" in tags:
             selected.append(item)
     return tuple(selected)
@@ -112,6 +114,8 @@ def minimum_context(
 
 def review(request: dict[str, Any]) -> dict[str, Any]:
     """Run one local review and return a single executive-facing synthesis."""
+    started = monotonic()
+    limits = _review_limits(request)
     team = choose_team(request)
     context = {area: minimum_context(request, area) for area in team["areas"]}
     verification = _verify(context)
@@ -133,6 +137,9 @@ def review(request: dict[str, Any]) -> dict[str, Any]:
         "next_question": question,
         "next_action": "Registrar la decisión humana y su seguimiento en ESCALA.",
     }
+    elapsed_ms = int((monotonic() - started) * 1000)
+    if elapsed_ms > limits["time_limit_ms"]:
+        raise TeamReviewError("team review exceeded its declared time limit")
     return {
         "route": team,
         "context_receipts": {area: len(items) for area, items in context.items()},
@@ -140,6 +147,11 @@ def review(request: dict[str, Any]) -> dict[str, Any]:
         "agreements": agreements,
         "disagreements": disagreements,
         "synthesis": synthesis,
+        "coordination_limits": {
+            **limits,
+            "elapsed_ms": elapsed_ms,
+            "privacy_boundary": "tagged-minimum-context-only",
+        },
     }
 
 
@@ -149,6 +161,42 @@ def _areas(raw: Any) -> tuple[DecisionArea, ...]:
     if any(area not in _AREAS for area in raw):
         raise TeamReviewError("unknown decision area")
     return tuple(dict.fromkeys(raw))
+
+
+def _review_limits(request: dict[str, Any]) -> dict[str, int]:
+    rounds_used = request.get("rounds_used", 0)
+    time_limit_ms = request.get("time_limit_ms", 1_000)
+    if (
+        isinstance(rounds_used, bool)
+        or not isinstance(rounds_used, int)
+        or rounds_used < 0
+        or rounds_used > 1
+    ):
+        raise TeamReviewError("team review allows at most one clarification round")
+    if (
+        isinstance(time_limit_ms, bool)
+        or not isinstance(time_limit_ms, int)
+        or not 25 <= time_limit_ms <= 60_000
+    ):
+        raise TeamReviewError("team review time limit must be 25 to 60000 ms")
+    return {
+        "rounds_allowed": 1,
+        "rounds_used": rounds_used,
+        "time_limit_ms": time_limit_ms,
+    }
+
+
+def _validate_evidence_privacy(item: dict[str, Any], tags: set[Any]) -> None:
+    sensitivity = item.get("sensitivity", "business")
+    if sensitivity not in {"business", "financial", "personal"}:
+        raise TeamReviewError("evidence sensitivity is not supported")
+    if sensitivity == "personal":
+        if tags != {"people"}:
+            raise TeamReviewError("personal evidence must stay within People context")
+        if item.get("people_consent") is not True:
+            raise TeamReviewError("personal evidence requires explicit People consent")
+    if sensitivity == "financial" and tags - {"cash"}:
+        raise TeamReviewError("financial evidence must stay within Cash context")
 
 
 def _route_reason(
