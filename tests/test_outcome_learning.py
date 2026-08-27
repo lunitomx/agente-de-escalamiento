@@ -227,3 +227,113 @@ def test_runtime_rejects_unknown_states_and_unsafe_company_id(tmp_path) -> None:
             reason="Motivo.",
         )
     assert OutcomeLearningHandler(tmp_path).cockpit("../unsafe")["status"] == "error"
+
+
+def test_owner_can_update_open_action_without_losing_revision_history(tmp_path) -> None:
+    ledger = OutcomeLearningLedger(tmp_path, "acme")
+    cycle = _accepted(ledger, "cash")
+    action = ledger.add_action(
+        cycle["id"],
+        description="Llamar cartera vencida.",
+        owner="Ana",
+        review_on=date(2026, 8, 28),
+        cadence="daily",
+        expected_result="Cobros actualizados.",
+        metric="cobros",
+    )
+
+    updated = ledger.update_action(
+        cycle["id"],
+        action["id"],
+        owner="Luis",
+        review_on=date(2026, 9, 3),
+        metric=None,
+        metric_provided=True,
+        today=date(2026, 8, 27),
+    )
+
+    assert updated["owner"] == "Luis"
+    assert updated["review_on"] == "2026-09-03"
+    assert updated["metric"] is None
+    assert updated["revisions"] == [
+        {
+            "updated_on": "2026-08-27",
+            "changes": {
+                "owner": {"from": "Ana", "to": "Luis"},
+                "review_on": {"from": "2026-08-28", "to": "2026-09-03"},
+                "metric": {"from": "cobros", "to": None},
+            },
+        }
+    ]
+
+
+def test_owner_can_cancel_open_action_and_prevent_later_result(tmp_path) -> None:
+    ledger = OutcomeLearningLedger(tmp_path, "acme")
+    cycle = _accepted(ledger, "execution")
+    action = ledger.add_action(
+        cycle["id"],
+        description="Preparar WWW.",
+        owner="Ana",
+        review_on=date(2026, 8, 27),
+        cadence="weekly",
+        expected_result="Compromisos visibles.",
+    )
+
+    cancelled = ledger.cancel_action(
+        cycle["id"],
+        action["id"],
+        reason="La prioridad cambió.",
+        cancelled_by="Dueño",
+        today=date(2026, 8, 27),
+    )
+
+    assert cancelled["status"] == "cancelled"
+    assert cancelled["cancel_reason"] == "La prioridad cambió."
+    assert ledger.reviews_due(date(2026, 8, 27)) == []
+    with pytest.raises(OutcomeLearningError, match="open"):
+        ledger.record_result(
+            cycle["id"], action["id"], status="observed", observed="Cambio medido."
+        )
+
+
+def test_handler_exposes_update_and_cancellation_with_owner_controls(tmp_path) -> None:
+    handler = OutcomeLearningHandler(tmp_path)
+    decision = handler.create_decision(
+        "acme",
+        {
+            "recommendation": "Revisar cartera.",
+            "decision": "Llamar cartera vencida.",
+            "area": "cash",
+            "status": "accepted",
+            "decided_by": "Dueño",
+            "reason": "Es la prioridad.",
+        },
+    )
+    cycle_id = decision["data"]["id"]
+    action = handler.create_action(
+        "acme",
+        cycle_id,
+        {
+            "description": "Llamar.",
+            "owner": "Ana",
+            "review_on": "2026-08-28",
+            "cadence": "daily",
+            "expected_result": "Cobros al día.",
+        },
+    )
+    action_id = action["data"]["id"]
+
+    updated = handler.update_action(
+        "acme", cycle_id, action_id, {"owner": "Luis", "updated_on": "2026-08-27"}
+    )
+    cancelled = handler.cancel_action(
+        "acme",
+        cycle_id,
+        action_id,
+        {"reason": "Cambio de prioridad.", "cancelled_by": "Dueño"},
+    )
+
+    assert updated["status"] == "ok"
+    assert updated["data"]["owner"] == "Luis"
+    assert cancelled["status"] == "ok"
+    assert cancelled["data"]["status"] == "cancelled"

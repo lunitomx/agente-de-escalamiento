@@ -98,6 +98,7 @@ acción importante sin navegar la memoria técnica.
 
 - [x] Una recomendación puede ligarse a una decisión explícita.
 - [x] Una decisión aceptada puede llevar una acción con responsable y fecha.
+- [x] El dueño puede editar o cancelar una acción abierta, preservando el motivo y el historial; una acción cancelada no acepta resultados nuevos.
 - [x] La revisión respeta la cadencia y puede registrar falta de resultado.
 - [x] Resultado observado, interpretación y causalidad se muestran separados.
 - [x] El empresario puede confirmar, corregir o rechazar un aprendizaje.
@@ -165,7 +166,7 @@ integra después de S44.5 para no mostrar aprendizajes no revisados.
 ## Evidencia local (2026-08-27)
 
 - Módulo local: `escala_server/outcome_learning.py`.
-- API: decisiones, acciones, resultados, aprendizajes y cockpit por empresa.
+- API: decisiones, acciones, edición/cancelación explícita, resultados, aprendizajes y cockpit por empresa.
 - Cobertura: Cash, People, Strategy y Execution; People requiere consentimiento explícito.
 - Calificación técnica reproducible: `scripts/qualify_e44_e45.py`, con cuatro ciclos sintéticos confirmados, consentimiento People, `no_result_yet`, causalidad no reclamada y cockpit sin IDs internos.
 - Protocolo de piloto: `pilot-protocol.md` y `validators/e44_e45_business_pilot.py` definen un recibo privado sin PII para aceptación y retrospectiva reales; no existe todavía un recibo empresarial.

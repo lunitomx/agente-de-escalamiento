@@ -373,6 +373,28 @@ def _build_router() -> Router:
             company_id, cycle_id, payload or {}
         )
 
+    @router.post(
+        "/api/companies/{company_id}/outcomes/{cycle_id}/actions/{action_id}/update"
+    )
+    def outcome_update_action(
+        company_id=None, cycle_id=None, action_id=None, payload=None
+    ):
+        assert company_id is not None and cycle_id is not None and action_id is not None
+        return EscalaRequestHandler.outcomes.update_action(
+            company_id, cycle_id, action_id, payload or {}
+        )
+
+    @router.post(
+        "/api/companies/{company_id}/outcomes/{cycle_id}/actions/{action_id}/cancel"
+    )
+    def outcome_cancel_action(
+        company_id=None, cycle_id=None, action_id=None, payload=None
+    ):
+        assert company_id is not None and cycle_id is not None and action_id is not None
+        return EscalaRequestHandler.outcomes.cancel_action(
+            company_id, cycle_id, action_id, payload or {}
+        )
+
     @router.post("/api/companies/{company_id}/outcomes/{cycle_id}/results/{action_id}")
     def outcome_create_result(
         company_id=None, cycle_id=None, action_id=None, payload=None

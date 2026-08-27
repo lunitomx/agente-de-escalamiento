@@ -288,6 +288,45 @@ class OutcomeLearningHandler:
             return {"status": "error", "message": str(exc)}
         return {"data": action, "status": "ok"}
 
+    def update_action(
+        self, company_id: str, cycle_id: str, action_id: str, payload: dict
+    ) -> dict:
+        from .outcome_learning import OutcomeLearningError
+
+        try:
+            action = self._ledger(company_id).update_action(
+                cycle_id,
+                action_id,
+                description=payload.get("description"),
+                owner=payload.get("owner"),
+                review_on=_parse_date(payload.get("review_on"), optional=True),
+                cadence=payload.get("cadence"),
+                expected_result=payload.get("expected_result"),
+                metric=payload.get("metric"),
+                metric_provided="metric" in payload,
+                today=_parse_date(payload.get("updated_on"), optional=True),
+            )
+        except (OutcomeLearningError, ValueError, TypeError) as exc:
+            return {"status": "error", "message": str(exc)}
+        return {"data": action, "status": "ok"}
+
+    def cancel_action(
+        self, company_id: str, cycle_id: str, action_id: str, payload: dict
+    ) -> dict:
+        from .outcome_learning import OutcomeLearningError
+
+        try:
+            action = self._ledger(company_id).cancel_action(
+                cycle_id,
+                action_id,
+                reason=payload.get("reason", ""),
+                cancelled_by=payload.get("cancelled_by", ""),
+                today=_parse_date(payload.get("cancelled_on"), optional=True),
+            )
+        except (OutcomeLearningError, ValueError, TypeError) as exc:
+            return {"status": "error", "message": str(exc)}
+        return {"data": action, "status": "ok"}
+
     def create_result(
         self, company_id: str, cycle_id: str, action_id: str, payload: dict
     ) -> dict:

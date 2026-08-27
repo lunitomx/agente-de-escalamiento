@@ -155,8 +155,91 @@ class OutcomeLearningLedger:
             "expected_result": expected_result.strip(),
             "metric": metric.strip() if metric and metric.strip() else None,
             "status": "open",
+            "revisions": [],
         }
         cycle["actions"].append(action)
+        self._save(ledger)
+        return action
+
+    def update_action(
+        self,
+        cycle_id: str,
+        action_id: str,
+        *,
+        description: str | None = None,
+        owner: str | None = None,
+        review_on: date | None = None,
+        cadence: Cadence | None = None,
+        expected_result: str | None = None,
+        metric: str | None = None,
+        metric_provided: bool = False,
+        today: date | None = None,
+    ) -> dict[str, Any]:
+        """Let the owner revise an open commitment without erasing its history."""
+        cycle, ledger = self._cycle(cycle_id)
+        action = self._action(cycle, action_id)
+        if action["status"] != "open":
+            raise OutcomeLearningError("only open actions can be updated")
+        changes: dict[str, dict[str, Any]] = {}
+        for key, value, label in (
+            ("description", description, "description"),
+            ("owner", owner, "owner"),
+            ("expected_result", expected_result, "expected_result"),
+        ):
+            if value is not None:
+                self._require_text(value, label)
+                normalized = value.strip()
+                if action[key] != normalized:
+                    changes[key] = {"from": action[key], "to": normalized}
+                    action[key] = normalized
+        if review_on is not None and action["review_on"] != review_on.isoformat():
+            changes["review_on"] = {
+                "from": action["review_on"],
+                "to": review_on.isoformat(),
+            }
+            action["review_on"] = review_on.isoformat()
+        if cadence is not None:
+            if cadence not in _CADENCE_DAYS:
+                raise OutcomeLearningError("cadence is not supported")
+            if action["cadence"] != cadence:
+                changes["cadence"] = {"from": action["cadence"], "to": cadence}
+                action["cadence"] = cadence
+        if metric_provided:
+            normalized_metric = metric.strip() if metric and metric.strip() else None
+            if action["metric"] != normalized_metric:
+                changes["metric"] = {"from": action["metric"], "to": normalized_metric}
+                action["metric"] = normalized_metric
+        if not changes:
+            raise OutcomeLearningError("action update requires a changed field")
+        action.setdefault("revisions", []).append(
+            {
+                "updated_on": (today or date.today()).isoformat(),
+                "changes": changes,
+            }
+        )
+        self._save(ledger)
+        return action
+
+    def cancel_action(
+        self,
+        cycle_id: str,
+        action_id: str,
+        *,
+        reason: str,
+        cancelled_by: str,
+        today: date | None = None,
+    ) -> dict[str, Any]:
+        """Cancel an open commitment explicitly instead of silently deleting it."""
+        cycle, ledger = self._cycle(cycle_id)
+        action = self._action(cycle, action_id)
+        if action["status"] != "open":
+            raise OutcomeLearningError("only open actions can be cancelled")
+        self._require_text(reason, "reason")
+        self._require_text(cancelled_by, "cancelled_by")
+        action["status"] = "cancelled"
+        action["cancel_reason"] = reason.strip()
+        action["cancelled_by"] = cancelled_by.strip()
+        action["cancelled_on"] = (today or date.today()).isoformat()
         self._save(ledger)
         return action
 
@@ -197,6 +280,8 @@ class OutcomeLearningLedger:
         """Record an observation without automatically claiming causal effect."""
         cycle, ledger = self._cycle(cycle_id)
         action = self._action(cycle, action_id)
+        if action["status"] != "open":
+            raise OutcomeLearningError("only open actions can record results")
         self._validate_ids(evidence_ids, "evidence_id")
         if status not in {"observed", "no_result_yet"}:
             raise OutcomeLearningError("result status is not supported")
