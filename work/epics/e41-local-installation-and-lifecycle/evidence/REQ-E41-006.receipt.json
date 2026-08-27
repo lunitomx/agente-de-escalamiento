@@ -1,7 +1,7 @@
 {
   "artifact_sha256": "5fe83f3e71cad15c7e4c94f0abd2a30d181bc3e9f74ac42f4250369adde2c64b",
-  "command_sha256": "ecff22fb7813b5a3fc09634df78fc98f67b6a8aa0815ea6e445073aec36ed8b3",
-  "declaration_sha256": "f4d4527aec1a92a2d711f3c5b27fc71a90bf32a3c70567f35f82b731f2c06506",
+  "command_sha256": "8f7fc33aeb5d3ebcd096ab36c4266bd7129ae0f0a3bb1878959f9d44db18e387",
+  "declaration_sha256": "ba7524464d790929b17f4ecb9736810264249c412bd9208be5dbfb4f80fd240c",
   "gate_results": [
     {
       "id": "gate-format",
@@ -24,7 +24,7 @@
       "status": "pass"
     }
   ],
-  "ledger_sha256": "1dbe5c06bdba1488dfeccabd95e99e2936977cd6b1759fb66fd66851a364b8c9",
+  "ledger_sha256": "bf5910430c2b4a090d127c499c9abc9905f0a90bd78799b8d9b3b68d85005647",
   "platforms": [
     "macos",
     "windows"
@@ -32,5 +32,5 @@
   "requirement_id": "REQ-E41-006",
   "result": "pass",
   "schema_version": 1,
-  "source_commit": "161ff3898822b15bc3fd26a64b84b337ef43d276"
+  "source_commit": "80aa606518df5fd504f7f33d1dfbb30b21e0311d"
 }
