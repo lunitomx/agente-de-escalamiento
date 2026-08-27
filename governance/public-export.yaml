@@ -210,6 +210,9 @@ selections:
   - path: scripts/escala-server
     kind: file
     role: local_runtime
+  - path: scripts/verify_portable_bundle.py
+    kind: file
+    role: installer_or_updater
   - path: templates
     kind: tree
     role: business_template

@@ -31,6 +31,21 @@ echo "╚═══════════════════════�
 echo -e "${NC}"
 
 # ----------------------
+# Verifica artefacto portable antes de activar enlaces
+# ----------------------
+PORTABLE_BUNDLE=false
+if [[ -f "$SCRIPT_DIR/ESCALA-MANIFEST.json" ]]; then
+    PORTABLE_BUNDLE=true
+    if ! python3 "$SCRIPT_DIR/scripts/verify_portable_bundle.py"; then
+        echo -e "${AMARILLO}⚠ El paquete portable no pasó su verificación y no se instaló.${NC}" >&2
+        exit 1
+    fi
+elif [[ ! -d "$SCRIPT_DIR/.git" ]]; then
+    echo -e "${AMARILLO}⚠ Falta el manifiesto del paquete portable; no se instalarán skills.${NC}" >&2
+    exit 1
+fi
+
+# ----------------------
 # Detecta plataformas
 # ----------------------
 PLATAFORMAS=()
@@ -192,5 +207,9 @@ echo ""
 echo "  Para desinstalar:"
 echo "    ./uninstall.sh       (terminal)"
 echo ""
-echo -e "  ${AMARILLO}Importante:${NC} Skills instalados como symlinks."
-echo "  Cuando hagas git pull, los skills se actualizan automáticamente."
+echo -e "  ${AMARILLO}Importante:${NC} Skills instalados como symlinks locales."
+if [[ "$PORTABLE_BUNDLE" == true ]]; then
+    echo "  Para actualizar, instala un nuevo paquete portable que pase su verificación."
+else
+    echo "  En modo desarrollo, git pull actualiza la copia local de los skills."
+fi
