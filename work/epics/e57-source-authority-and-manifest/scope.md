@@ -86,7 +86,7 @@ Depende de la frontera E36 y respeta la puerta única de E56. Entrega el manifie
 | Story | Estado | Evidencia requerida |
 |---|---|---|
 | S57.1 | Done | Registro tipado, CLI segura y 8 pruebas de hash/derechos/ruta/recibo. |
-| S57.2 | Pending | Manifiesto JSONL, mapa de exclusiones y prueba determinista. |
+| S57.2 | Done | Manifiesto privado de 407 unidades, cobertura total y 16 pruebas combinadas. |
 | S57.3 | Pending | Política de frontera, build limpio y caso negativo. |
 | S57.4 | Pending | CLI/script de validación y recibo sin texto protegido. |
 | S57.5 | Pending | Copia independiente, tests de superficies permitidas y revisión de vocabulario. |
