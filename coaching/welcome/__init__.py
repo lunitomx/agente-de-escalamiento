@@ -182,14 +182,29 @@ def _run_adaptive_conversation(context: dict, base: Path) -> dict:
     for fact in confirmed_facts:
         save_fact(base, fact)
 
+    resumed_from_local_state = False
+    resumed_previous_focus: str | None = None
+    if state is None and context.get("ignore_saved_state") is not True:
+        saved_state = load_welcome_state(base)
+        if saved_state is not None and is_state_fresh(base):
+            state = saved_state
+            resumed_from_local_state = True
+            resumed_previous_focus = saved_state.area or saved_state.previous_focus
+
     facts = load_facts(base)
     dashboard = build_evidence_dashboard(facts, requirements)
     message = context.get("message")
     if not isinstance(message, str) or not message.strip():
-        turn = begin_welcome(
-            returning=bool(context.get("returning", False)),
-            previous_focus=context.get("previous_focus"),
-        )
+        if resumed_from_local_state:
+            turn = begin_welcome(
+                returning=True,
+                previous_focus=resumed_previous_focus,
+            )
+        else:
+            turn = begin_welcome(
+                returning=bool(context.get("returning", False)),
+                previous_focus=context.get("previous_focus"),
+            )
     else:
         turn = respond_to_welcome_with_evidence(
             state or begin_welcome().state,
@@ -209,6 +224,7 @@ def _run_adaptive_conversation(context: dict, base: Path) -> dict:
             "evidence_dashboard": dashboard.model_dump(mode="json"),
             "persisted_state_path": str(state_path) if state_path else None,
             "persisted_fact_count": len(confirmed_facts),
+            "resumed_from_local_state": resumed_from_local_state,
         },
         "errors": [],
     }

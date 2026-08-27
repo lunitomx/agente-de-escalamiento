@@ -176,6 +176,24 @@ def test_adaptive_welcome_persists_only_authorized_confirmed_facts(tmp_path):
     assert len(load_facts(tmp_path)) == 1
 
 
+def test_adaptive_welcome_offers_continuity_from_fresh_authorized_state(tmp_path):
+    """A later local Welcome entry point asks before it resumes saved context."""
+    sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
+    from coaching.welcome import WelcomeState, run, save_welcome_state
+
+    save_welcome_state(
+        tmp_path,
+        WelcomeState(phase="source", area="cash", next_action="evidence"),
+        authorized=True,
+    )
+
+    result = run({"action": "adaptive_conversation", "base_path": str(tmp_path)})
+
+    assert result["errors"] == []
+    assert "La última vez trabajamos en cash" in result["output"]
+    assert result["artifacts"]["resumed_from_local_state"] is True
+
+
 @pytest.mark.parametrize(
     ("decision", "message"),
     [

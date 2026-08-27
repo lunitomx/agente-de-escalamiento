@@ -1,6 +1,7 @@
 # Cierre de ejecución E56
 
-**Estado:** completada localmente; pendiente de la decisión normal de publicar.
+**Estado:** completada y publicada en `main` (`558c182`); re-verificada durante
+la auditoría de 2026-08-27.
 
 ## Historias entregadas
 

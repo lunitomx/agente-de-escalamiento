@@ -11,7 +11,7 @@ se alteraron para aparentar cierre.
 |---|---|---|
 | E42 estaba `complete` aunque sus seis requisitos no tenían prueba maestra vigente. | `active` | Scope y brief corregidos; conserva evidencia histórica, pero exige hardware/skills/aceptación reales. |
 | E43 decía `done` en scope y `planned` en brief sin evidencia de cierre. | `planned` | Todas las historias vuelven a Pending. |
-| E47 decía `done` y `started` a la vez; la instalación actual no reproduce su contrato RaiSE. | `unresolved/review-required` | Se conserva retrospectiva y se exige una calificación fresca. |
+| E47 decía `done` y `started` a la vez; RaiSE no era una dependencia de producto. | Reparado; `complete` | Calificación fresca de workspace/OPSP/feedback pasa; la deuda de RaiSE queda aislada en E76. |
 | El backlog raíz seguía apuntando al repositorio viejo y a E1–E5 como plan actual. | Reemplazado | `governance/backlog.md` es la fuente única de trabajo futuro. |
 | Un remoto local `legacy-scaleupagent` contrariaba la política de un único canónico. | Reparado | Retirado sólo de la configuración local; `origin/main` vuelve a sincronizado. |
 | RaiSE no tiene manifest/configuración/grafo de proyecto reproducibles. | E76 activo | Se separa de funcionalidades de negocio y no se resuelve creando venvs duplicados. |
@@ -23,6 +23,8 @@ se alteraron para aparentar cierre.
 | Épica | Estado | Próxima decisión verificable |
 |---|---|---|
 | E42 | active | Calificar producto en plataformas limpias y registrar aceptación humana. |
+| E52 | complete | Persistencia y reanudación local consentida de Welcome re-verificadas. |
+| E56 | complete | Catálogo canónico y una sola puerta pública publicados y re-verificados. |
 | E47 | complete | Workspace, OPSP y feedback re-verificados; RaiSE reproducible es deuda separada de E76. |
 | E49 | complete | Diagnóstico/evidencia, ruta de 90 días y recibo local re-verificados. |
 | E55 | complete | GitHub #9 resuelto: onboarding multifuente, conciliación y calificación local verificable. |

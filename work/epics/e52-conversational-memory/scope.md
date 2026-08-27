@@ -1,3 +1,10 @@
+---
+epic_id: "E52"
+title: "Persistencia consentida de memoria conversacional"
+status: "complete"
+closure_disposition: "completed"
+---
+
 # E52 Scope
 
 ## In Scope
@@ -20,3 +27,12 @@
 - S52.1: Persistence contract design
 - S52.2: Save/load implementation
 - S52.3: Welcome integration
+
+## Cierre verificado
+
+- `save_welcome_state`, `load_welcome_state` e `is_state_fresh` persisten sólo
+  bajo `.escala/agent/memory/` después de autorización explícita.
+- La entrada `adaptive_conversation` detecta estado fresco local y pregunta si
+  la persona desea continuar; no reanuda silenciosamente.
+- Persistencia, continuidad, Welcome y catálogo pasan sus pruebas locales. No
+  hay almacenamiento remoto ni mensajes crudos persistidos.

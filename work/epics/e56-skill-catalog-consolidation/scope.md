@@ -1,3 +1,10 @@
+---
+epic_id: "E56"
+title: "Un solo orquestador y catálogo canónico de capacidades"
+status: "complete"
+closure_disposition: "completed"
+---
+
 # Alcance E56 — Un solo orquestador y catálogo canónico
 
 ## Dentro del alcance

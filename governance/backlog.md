@@ -45,6 +45,11 @@ formalizados no son trabajo activo sólo por existir en `work/epics/`.
 Estas épicas materializan el corpus verificable de Scaling Up. Se ejecutan en
 orden, después de E42/E49/E55 cuando el producto tenga una línea base fiable:
 
+**Prerrequisitos ya satisfechos:** E52 aporta persistencia local consentida de
+Welcome; E56 aporta la única puerta pública `escala` y el catálogo canónico.
+No deben reabrirse para iniciar E57–E75 salvo que una prueba de regresión
+demuestre una falla propia.
+
 | Ola | Épicas | Resultado |
 |---|---|---|
 | Fuente | E57 | Manifiesto de fuentes, autoridad y procedencia. |
