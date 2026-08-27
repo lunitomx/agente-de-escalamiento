@@ -60,8 +60,8 @@ def main() -> int:
         return 1
     print(
         f"Status: `pass`\nUnits: {len(matrix.rows)}\n"
-        f"Reviewed candidates: {len(queue.candidates)}\n"
-        f"Draft candidates: {len(known_node_ids) - len(queue.candidates)}"
+        f"Queue candidates: {len(queue.candidates)}\n"
+        f"Draft input candidates: {len(draft_candidates)}"
     )
     return 0
 
