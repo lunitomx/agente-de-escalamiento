@@ -13,7 +13,7 @@ se alteraron para aparentar cierre.
 | E43 tenía documentación contradictoria. | `complete` (gate E42 para release) | Se verificaron las seis historias, el cierre histórico y 135 pruebas focalizadas actuales. |
 | E47 decía `done` y `started` a la vez; RaiSE no era una dependencia de producto. | Reparado; `complete` | Calificación fresca de workspace/OPSP/feedback pasa; la deuda de RaiSE queda aislada en E76. |
 | El backlog raíz seguía apuntando al repositorio viejo y a E1–E5 como plan actual. | Reemplazado | `governance/backlog.md` es la fuente única de trabajo futuro. |
-| Un remoto local legacy-scaleupagent contrariaba la politica de un unico canonico. | Reparado parcialmente | El remoto heredado se retiro; la verificacion actual confirma que origin es el unico remoto permitido, pero main esta 46 commits por delante de origin/main. La publicacion/sincronizacion requiere decision explicita, no un push ciego. |
+| El remoto heredado legacy-scaleupagent contrariaba la politica de un unico canonico. | Remoto reparado; sincronizacion pendiente | origin sigue siendo el unico remoto permitido. Mientras haya commits locales sin publicar, el gate de sincronizacion debe consultarse en tiempo real; no se corrige mediante cambios de politica ni push automatico. |
 | RaiSE no tenía manifest/configuración/grafo de proyecto reproducibles. | E76 completada | Se restauró el contrato mínimo sin venv duplicado; los warnings opcionales quedan documentados, no se fuerzan con infraestructura. |
 
 ### Disposición de identificadores no asignados
@@ -72,13 +72,13 @@ sus gates de fuente; E46 espera resultados reales de E44/E45.
 
 ## Gates ejecutados durante la auditoría
 
-- `uv run pytest -q --disable-warnings`: 1362 passed, 2 skipped.
+- `uv run pytest -q --disable-warnings`: pass; el conteo exacto pertenece al resultado actual del runner.
 - `uv run pyright`: 0 errors, 0 warnings.
 - `uv run ruff check coaching escala_server validators scripts tests`: pass.
 - `check_master_acceptance --mode baseline`: 36 proved / 6 unproved; todos los
   no demostrados son de E42.
 - `check_governance_contract`: pass.
-- `check_repository_truth`: falla unicamente synchronized: main esta 46 commits por delante de origin/main; remoto, credenciales, branch y upstream si pasan. No se normaliza mediante cambios de politica ni publicacion ciega.
+- `check_repository_truth`: synchronized permanece bloqueado mientras existan commits locales sin publicar; remoto, credenciales, branch y upstream pasan. El conteo exacto se obtiene del gate actual; no se normaliza mediante cambios de politica ni publicacion ciega.
 
 ## Regla de mantenimiento
 
