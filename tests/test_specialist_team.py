@@ -182,3 +182,28 @@ def test_personal_or_financial_evidence_fails_closed_outside_its_boundary() -> N
                 "claims": [],
             }
         )
+
+
+def test_synthesis_keeps_the_full_executive_contract_without_inventing_owner() -> None:
+    result = review(
+        {
+            "areas": ["cash", "execution"],
+            "evidence": [
+                {
+                    "areas": ["cash"],
+                    "source_id": "cash-1",
+                    "period": "2026-Q2",
+                    "unit": "MXN",
+                },
+                {"areas": ["execution"], "source_id": "ops-1"},
+            ],
+            "claims": [],
+        }
+    )
+    synthesis = result["synthesis"]
+    assert synthesis["status"] == "ready"
+    assert synthesis["primary_constraint"] is None
+    assert synthesis["evidence_ids"] == ("cash-1", "ops-1")
+    assert synthesis["assumptions"] == ()
+    assert synthesis["owner_suggestion"] is None
+    assert synthesis["review_cadence"] is None

@@ -123,7 +123,28 @@ def review(request: dict[str, Any]) -> dict[str, Any]:
     critical = _critic(request, context, verification, disagreements)
     needs_question = verification["blocked"] or bool(disagreements)
     question = _next_question(verification, disagreements)
+    evidence_ids = tuple(
+        dict.fromkeys(
+            str(item["source_id"])
+            for items in context.values()
+            for item in items
+            if item.get("source_id")
+        )
+    )
+    primary_constraint = (
+        verification["gaps"][0]
+        if verification["gaps"]
+        else disagreements[0]["topic"]
+        if disagreements
+        else None
+    )
     synthesis = {
+        "status": "blocked"
+        if verification["blocked"]
+        else "needs_evidence"
+        if disagreements
+        else "ready",
+        "primary_constraint": primary_constraint,
         "decision_suggested": (
             "Pausa la decisión hasta confirmar la evidencia faltante."
             if needs_question
@@ -133,9 +154,13 @@ def review(request: dict[str, Any]) -> dict[str, Any]:
             "Confirmar el dato faltante antes de actuar.",
             "Tomar una acción reversible y medir su resultado.",
         ),
+        "evidence_ids": evidence_ids,
+        "assumptions": (),
         "risk": critical,
         "next_question": question,
         "next_action": "Registrar la decisión humana y su seguimiento en ESCALA.",
+        "owner_suggestion": None,
+        "review_cadence": None,
     }
     elapsed_ms = int((monotonic() - started) * 1000)
     if elapsed_ms > limits["time_limit_ms"]:

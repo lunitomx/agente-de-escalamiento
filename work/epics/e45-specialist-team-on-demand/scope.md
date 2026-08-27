@@ -200,7 +200,7 @@ la comparación final espera la síntesis de S45.5.
 ## Evidencia local (2026-08-27)
 
 - Módulo local: `escala_server/specialist_team.py`.
-- API: `POST /api/advisor/team-review`, una sola síntesis para el empresario.
+- API: `POST /api/advisor/team-review`, una sola síntesis para el empresario con estado, restricción, evidencia, supuestos, alternativas, riesgo, acción y campos explícitamente vacíos cuando no se puede proponer dueño/cadencia.
 - Calificación técnica reproducible: `scripts/qualify_e44_e45.py`, con caso simple de un especialista, Cash bloqueado por periodo/unidad ausentes y desacuerdo transversal visible sin votación por mayoría.
 - Protocolo de piloto: `../e44-outcome-learning-and-accountability/pilot-protocol.md` y `validators/e44_e45_business_pilot.py` obligan dos comparativos, contexto mínimo, una respuesta ejecutiva, límite de ronda y decisión honesta de retener/reducir/seguir midiendo; falta su ejecución empresarial.
 - Pruebas: casos simple, transversal, contexto mínimo, ausencia de periodo/unidad,
