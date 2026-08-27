@@ -18,8 +18,10 @@
   [`closure-dispositions.yaml`](closure-dispositions.yaml).
 
 El detalle de identidades legadas y decisiones de auditoría está en
-[`epic-portfolio.md`](epic-portfolio.md). Los archivos históricos no
-formalizados no son trabajo activo sólo por existir en `work/epics/`.
+[`epic-portfolio.md`](epic-portfolio.md). La autoridad de estado entre scope y
+documentos históricos está en [`epic-state-authority.md`](epic-state-authority.md).
+Los archivos históricos no formalizados no son trabajo activo sólo por existir
+en `work/epics/`.
 
 ## Prioridad de ejecución
 
