@@ -220,6 +220,25 @@ class OntologyDocument(_StrictModel):
     aliases: list[OntologyAlias] = Field(default_factory=list)
     review_queue: list[ReviewDecision] = Field(default_factory=list)
 
+    @model_validator(mode="after")
+    def validate_graph_integrity(self) -> OntologyDocument:
+        node_ids = [node.id for node in self.nodes]
+        if len(node_ids) != len(set(node_ids)):
+            raise ValueError("duplicate ontology node ID")
+        known = set(node_ids)
+        if any(alias.canonical_id not in known for alias in self.aliases):
+            raise ValueError("alias references unknown canonical node")
+        if len([alias.alias for alias in self.aliases]) != len(
+            {alias.alias for alias in self.aliases}
+        ):
+            raise ValueError("duplicate ontology alias")
+        if any(
+            relation.source_id not in known or relation.target_id not in known
+            for relation in self.relations
+        ):
+            raise ValueError("relation references unknown node")
+        return self
+
 
 def ontology_schema() -> dict[str, object]:
     return OntologyDocument.model_json_schema()

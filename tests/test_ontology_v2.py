@@ -162,3 +162,35 @@ def test_schema_cli_never_emits_corpus_content() -> None:
     assert "Status: `pass`" in completed.stdout
     assert "scaling_up_llamaparse" not in completed.stdout
     assert completed.stderr == ""
+
+
+def test_document_blocks_duplicate_ids_and_orphaned_links() -> None:
+    base = {
+        "schema_version": 2,
+        "nodes": [
+            {
+                "id": "tool.one",
+                "kind": "tool",
+                "canonical_name": "One",
+                "origin": "company-local",
+                "review_state": "approved",
+            }
+        ],
+    }
+    with pytest.raises(ValidationError, match="unknown canonical"):
+        OntologyDocument.model_validate(
+            {**base, "aliases": [{"alias": "one", "canonical_id": "tool.missing"}]}
+        )
+    with pytest.raises(ValidationError, match="unknown node"):
+        OntologyDocument.model_validate(
+            {
+                **base,
+                "relations": [
+                    {
+                        "source_id": "tool.one",
+                        "target_id": "tool.missing",
+                        "relation_type": "feeds-into",
+                    }
+                ],
+            }
+        )
