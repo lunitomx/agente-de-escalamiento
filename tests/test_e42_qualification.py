@@ -60,3 +60,27 @@ def test_e42_catalog_pdf_generated() -> None:
     pdf_path = EVIDENCE_DIR / "catalog.pdf"
     assert pdf_path.exists(), f"Catalog PDF not found: {pdf_path}"
     assert pdf_path.stat().st_size > 0
+
+
+def test_e42_catalog_exposes_only_public_front_door() -> None:
+    """The entrepreneur catalog must not surface internal capabilities as commands."""
+
+    result = subprocess.run(
+        [sys.executable, str(ROOT / "scripts/qualify_e42_s42.4.py")],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0, result.stderr
+
+    catalog = (EVIDENCE_DIR / "catalog.md").read_text(encoding="utf-8")
+    receipt = json.loads(
+        (EVIDENCE_DIR / "s42.4-catalog-receipt.json").read_text(encoding="utf-8")
+    )
+
+    assert "`escala`" in catalog
+    assert "`escala-board`" not in catalog
+    assert "62 capacidades internas" in catalog
+    assert receipt["public_skill_count"] == 1
+    assert receipt["internal_capability_count"] == 62

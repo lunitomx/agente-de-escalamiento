@@ -18,6 +18,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from escala_server.capabilities import (  # noqa: E402
+    load_capability_catalog,
+    public_install_skills,
+)
+
 EVIDENCE_DIR = (
     ROOT / "work/epics/e42-product-qualification-and-functional-catalog/evidence"
 )
@@ -59,6 +64,7 @@ def main() -> int:
     s42_3 = evidence.get("S42.3")
 
     skills = _build_skill_inventory(s42_2)
+    public_skill_ids = _public_skill_ids()
 
     catalog = _render_catalog(
         source_commit=source_commit,
@@ -66,6 +72,7 @@ def main() -> int:
         s42_2=s42_2,
         s42_3=s42_3,
         skills=skills,
+        public_skill_ids=public_skill_ids,
     )
 
     EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
@@ -92,6 +99,8 @@ def main() -> int:
         "pdf_status": pdf_result,
         "evidence_loaded": {k: v is not None for k, v in evidence.items()},
         "skill_count": len(skills),
+        "public_skill_count": len(public_skill_ids),
+        "internal_capability_count": len(skills) - len(public_skill_ids),
         "overall_status": _overall_status(s42_1, s42_2, s42_3),
     }
     receipt_path = EVIDENCE_DIR / "s42.4-catalog-receipt.json"
@@ -112,6 +121,13 @@ def _load_evidence() -> dict[str, dict[str, object] | None]:
         else:
             loaded[story] = None
     return loaded
+
+
+def _public_skill_ids() -> set[str]:
+    """Load the only business-facing entry points from the canonical catalog."""
+
+    catalog = load_capability_catalog(SKILLS_DIR / "catalog.yaml")
+    return set(public_install_skills(catalog))
 
 
 def _build_skill_inventory(
@@ -274,6 +290,7 @@ def _render_catalog(
     s42_2: dict[str, object] | None,
     s42_3: dict[str, object] | None,
     skills: list[SkillEntry],
+    public_skill_ids: set[str],
 ) -> str:
     """Render the Spanish markdown catalog."""
     lines: list[str] = [
@@ -340,11 +357,12 @@ def _render_catalog(
                 status = step.get("status", "unknown")
                 rows.append(f"| {step_id} | {description} | S42.1 | {status} |")
 
-    # Skill rows derived from S42.2 or the live inventory.
+    # Only public entry points belong in a business-facing catalog. The full
+    # inventory remains technical E42 evidence; it is not a command menu.
     skill_source = "S42.2" if s42_2 else "inventario local"
-    for skill in skills:
+    public_skills = [skill for skill in skills if skill.id in public_skill_ids]
+    for skill in public_skills:
         problem = skill.business_problem or skill.description
-        # Keep table cells compact; replace newlines.
         problem_inline = " ".join(str(problem).split())
         demonstrated = "demostrado" if skill.demonstrated else "pendiente"
         rows.append(
@@ -355,7 +373,18 @@ def _render_catalog(
         rows.append("| — | — | — | pendiente |")
 
     lines.extend(rows)
-    lines.append("")
+    lines.extend(
+        [
+            "",
+            (
+                f"> {len(skills) - len(public_skills)} capacidades internas "
+                "apoyan a `escala`, pero no son comandos ni funcionalidades "
+                "independientes para el empresario. E42 conserva su inventario "
+                "técnico y su calificación pendiente por separado."
+            ),
+            "",
+        ]
+    )
 
     # Negative cases from S42.1.
     negative_cases = s42_1.get("negative_cases") if s42_1 else None
