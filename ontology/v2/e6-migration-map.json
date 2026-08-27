@@ -1,0 +1,662 @@
+{
+  "entries": [
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "concept-cash-acceleration",
+      "legacy_path": "conocimiento/cash/concepts/cash-acceleration.yaml",
+      "legacy_type": "concept",
+      "sha256": "7f4e46eb020934b4be5df29c18afe10df3f75f3abdb57d01160d59eea0fde081"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "concept-ccc",
+      "legacy_path": "conocimiento/cash/concepts/ccc.yaml",
+      "legacy_type": "concept",
+      "sha256": "fb6829aadeeea0e5c37b526020beb01d49f5d821547b665ed3ca685e7b1fdffa"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "concept-gross-margin",
+      "legacy_path": "conocimiento/cash/concepts/gross-margin.yaml",
+      "legacy_type": "concept",
+      "sha256": "e17835d978b079f60ec460a9eb1bf0c4e50bc88cb768033296923ff8091bfbf7"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "concept-revenue-per-employee",
+      "legacy_path": "conocimiento/cash/concepts/revenue-per-employee.yaml",
+      "legacy_type": "concept",
+      "sha256": "71cedfcde83fca234881de7d4a4bac012ea68065a32f51ffaae51b29054f34b0"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "concept-working-capital",
+      "legacy_path": "conocimiento/cash/concepts/working-capital.yaml",
+      "legacy_type": "concept",
+      "sha256": "b123af3d85865c212a48c5cfe6ef2c14e9ca940d3b4e4ee6de5ae3ac9cc234b9"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "metric-ccc-days",
+      "legacy_path": "conocimiento/cash/metrics/ccc-days.yaml",
+      "legacy_type": "metric",
+      "sha256": "d0c566e9654d5fb2130db011a9768c21ed72d2d66ff03edf97a9a00a4219ee42"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "metric-days-sales-outstanding",
+      "legacy_path": "conocimiento/cash/metrics/days-sales-outstanding.yaml",
+      "legacy_type": "metric",
+      "sha256": "46761f11515983eef6ca027d62e03bcd772dc1c0cc8441a0f03aeca2b3a39c6f"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "metric-gross-margin-percentage",
+      "legacy_path": "conocimiento/cash/metrics/gross-margin-percentage.yaml",
+      "legacy_type": "metric",
+      "sha256": "05148365834bdba4f870e3d2de94cfcc40c1079284da781c396457e9cd7eeb1a"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "metric-revenue-per-employee",
+      "legacy_path": "conocimiento/cash/metrics/revenue-per-employee.yaml",
+      "legacy_type": "metric",
+      "sha256": "867dbbac102f8728c2e49b356bc73ab9afc1ec78623891aaf75498d1e6174f83"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "tool-ar-optimization",
+      "legacy_path": "conocimiento/cash/tools/ar-optimization.yaml",
+      "legacy_type": "tool",
+      "sha256": "6962763757e316e926a3c3831c2639b8ce320ce3958e4befa8ab31584524f704"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "tool-ccc-analysis",
+      "legacy_path": "conocimiento/cash/tools/ccc-analysis.yaml",
+      "legacy_type": "tool",
+      "sha256": "bf2591427f1318d477e21876d030a36e4429c7ee5d44a003ef30490bcbada978"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "tool-power-of-one",
+      "legacy_path": "conocimiento/cash/tools/power-of-one.yaml",
+      "legacy_type": "tool",
+      "sha256": "1c5df57c25c4773417654885e106bcf3ec5c148897bd855c7f28a2d4d6cb0ca5"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "tool-pricing-lever",
+      "legacy_path": "conocimiento/cash/tools/pricing-lever.yaml",
+      "legacy_type": "tool",
+      "sha256": "6d75318d4129d4fe8188098d212f9909fed1588dd9da7679cf7043f35666cca2"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "tool-simple-numbers",
+      "legacy_path": "conocimiento/cash/tools/simple-numbers.yaml",
+      "legacy_type": "tool",
+      "sha256": "2c2755bc2e4c8eb978c6cde92b2c8fcbf28964dd06cf5a7417cf98cb55f5e155"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "worksheet-cash-flow-forecast",
+      "legacy_path": "conocimiento/cash/worksheets/cash-flow-forecast.yaml",
+      "legacy_type": "worksheet",
+      "sha256": "228151db84ac440213deb0e658dd15263631d017fc47d2fae98caa0cc47b34b1"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "worksheet-ccc",
+      "legacy_path": "conocimiento/cash/worksheets/ccc-worksheet.yaml",
+      "legacy_type": "worksheet",
+      "sha256": "9e33fba8b1403c993b7c1ef72a95ef8bdad9082b919bf6e23865063ff8a608b8"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "worksheet-power-of-one",
+      "legacy_path": "conocimiento/cash/worksheets/power-of-one.yaml",
+      "legacy_type": "worksheet",
+      "sha256": "2261ecde7473fd07d36eae477fc424a0cc376ba83666b7e1c6e993e873efbc4f"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "support-contract-not-node",
+      "legacy_id": null,
+      "legacy_path": "conocimiento/coaching/advisor-templates.yaml",
+      "legacy_type": null,
+      "sha256": "f5929e2475bf6e4baa2b5ec6fd87e9f1e3ab841b7683d2478f77cc6b856f0bed"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "support-contract-not-node",
+      "legacy_id": null,
+      "legacy_path": "conocimiento/coaching/daily-checklist.yaml",
+      "legacy_type": null,
+      "sha256": "51e987f1fc740cfbdd41cdfb70d582405349f10f05e323b48e5aafaf1e7a5a91"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "decision-cash",
+      "legacy_path": "conocimiento/decisions/cash.yaml",
+      "legacy_type": "decision",
+      "sha256": "e057de7287d679a0fa9e665e9923ab299e14b321172c98c397bff94af8e3c3f0"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "decision-execution",
+      "legacy_path": "conocimiento/decisions/execution.yaml",
+      "legacy_type": "decision",
+      "sha256": "0192f7af884dbef87860a9da063f12020b696da2b21508d172cc0046cb419409"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "decision-people",
+      "legacy_path": "conocimiento/decisions/people.yaml",
+      "legacy_type": "decision",
+      "sha256": "879848f8577be8214bb512a1187834acc48a9f1874766a1081c1c3b2b4c995d9"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "decision-strategy",
+      "legacy_path": "conocimiento/decisions/strategy.yaml",
+      "legacy_type": "decision",
+      "sha256": "acc1853e95dc4d0251281fab711b6e34b1495b6127349e4ce260fc12b1b57bc8"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "concept-critical-number",
+      "legacy_path": "conocimiento/execution/concepts/critical-number.yaml",
+      "legacy_type": "concept",
+      "sha256": "22ac90e2b3dbde36e5a1a97807d4be7c6868c0bd905172dab29895f91238c815"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "concept-leading-indicators",
+      "legacy_path": "conocimiento/execution/concepts/leading-indicators.yaml",
+      "legacy_type": "concept",
+      "sha256": "8582b9bd3e06861322e19ee8e9b8fbcba19393e38bb88e4fa5609cd13c6e1f88"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "concept-meeting-rhythm",
+      "legacy_path": "conocimiento/execution/concepts/meeting-rhythm.yaml",
+      "legacy_type": "concept",
+      "sha256": "8d3a4e0c88c6628e009ff6a88490206904f1fef884727fc02e968862c012f015"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "concept-priorities-rocks",
+      "legacy_path": "conocimiento/execution/concepts/priorities-rocks.yaml",
+      "legacy_type": "concept",
+      "sha256": "da5b49adef9ceb04d34d5f7b3f7f0195dc4860281702c610896834015c66de84"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "concept-quarterly-theme",
+      "legacy_path": "conocimiento/execution/concepts/quarterly-theme.yaml",
+      "legacy_type": "concept",
+      "sha256": "72f3e68bda60162860e2ce7173d4f7095b42eb204ff06f83a6d28d5b17f1d295"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "metric-critical-number-value",
+      "legacy_path": "conocimiento/execution/metrics/critical-number-value.yaml",
+      "legacy_type": "metric",
+      "sha256": "931eabf7696b5fda0642df6689e74edb648f0ddde7aa2f51978395411206810a"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "metric-meeting-health-score",
+      "legacy_path": "conocimiento/execution/metrics/meeting-health-score.yaml",
+      "legacy_type": "metric",
+      "sha256": "4c3741d87571ae3db7970c277c0990d36fbedd98538bfcf21236528e4c0cdb04"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "metric-rock-completion-rate",
+      "legacy_path": "conocimiento/execution/metrics/rock-completion-rate.yaml",
+      "legacy_type": "metric",
+      "sha256": "2e20c01d445cb084069a8decbc40d10455619a96dc08a71d98ce745ae149a550"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "tool-annual-planning",
+      "legacy_path": "conocimiento/execution/tools/annual-planning.yaml",
+      "legacy_type": "tool",
+      "sha256": "30d27acc940129b9ccafc4883fcbc8d44ced70e2fc4455fa993c132e91e5624c"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "tool-daily-huddle",
+      "legacy_path": "conocimiento/execution/tools/daily-huddle.yaml",
+      "legacy_type": "tool",
+      "sha256": "523a3d465a41ed8930d6c263dd536f313e37501362789518d96a442cf813cb48"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "tool-execution-habits",
+      "legacy_path": "conocimiento/execution/tools/execution-habits.yaml",
+      "legacy_type": "tool",
+      "sha256": "a1a59cb1042ec1a45e3fabd3db56ec9fb00ee604ab254225ef1a526f427cb426"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "tool-quarterly-planning",
+      "legacy_path": "conocimiento/execution/tools/quarterly-planning.yaml",
+      "legacy_type": "tool",
+      "sha256": "df6e0e4915ee04b377ccd452ed2eecedc94ca37a79551b7918adace3d6374dd7"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "tool-scoreboard",
+      "legacy_path": "conocimiento/execution/tools/scoreboard.yaml",
+      "legacy_type": "tool",
+      "sha256": "7c73bd3519c954bc35eb462de0b524e945b2112b4fa4cdb361f0c265f654c73c"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "tool-weekly-meeting",
+      "legacy_path": "conocimiento/execution/tools/weekly-meeting.yaml",
+      "legacy_type": "tool",
+      "sha256": "999e19f5e0f62efdafa86cd39b8f4debdbddfa282bd7e78f90227c8f501c7ea4"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "worksheet-execution-habits",
+      "legacy_path": "conocimiento/execution/worksheets/execution-habits.yaml",
+      "legacy_type": "worksheet",
+      "sha256": "22485a7876d9e638e48fdda96ec1e2a7f6cdb6240f539c07c50e076667b822bd"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "worksheet-kpi-development",
+      "legacy_path": "conocimiento/execution/worksheets/kpi-development.yaml",
+      "legacy_type": "worksheet",
+      "sha256": "d94ecdf270fb58011566db316a6232ae4fefac38d44e928e5171a5dc3ec72993"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "worksheet-meeting-agenda",
+      "legacy_path": "conocimiento/execution/worksheets/meeting-agenda.yaml",
+      "legacy_type": "worksheet",
+      "sha256": "216681c83b53e38b5e1b2fa837405cca2e6273c7126848814100191385512c6a"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "worksheet-quarterly-priorities",
+      "legacy_path": "conocimiento/execution/worksheets/quarterly-priorities.yaml",
+      "legacy_type": "worksheet",
+      "sha256": "9e69cad9878c5fb98b262807f7a3d87b73a69ddeff69dbcf8e0394ce4bf4e072"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "support-contract-not-node",
+      "legacy_id": null,
+      "legacy_path": "conocimiento/ontology/node-types.yaml",
+      "legacy_type": null,
+      "sha256": "66d0d7864bb36916a110ad74489d62bbccb9563cceff513a3470863c712c18d6"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "concept-core-values",
+      "legacy_path": "conocimiento/people/concepts/core-values.yaml",
+      "legacy_type": "concept",
+      "sha256": "edabd94414dcae499d74edd4950ba262155d9ffc84dc146d7525b7c959bf7934"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "concept-culture",
+      "legacy_path": "conocimiento/people/concepts/culture.yaml",
+      "legacy_type": "concept",
+      "sha256": "f9868ba08205ee4091da8a04ae461441ca4b436dac758f94ccd65e6537fc9386"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "concept-disc-assessment",
+      "legacy_path": "conocimiento/people/concepts/disc-assessment.yaml",
+      "legacy_type": "concept",
+      "sha256": "e7e8307de3a61c2cbf3aa08cf8487669087965418e4fb43cff12a7251c71fd03"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "concept-employee-engagement",
+      "legacy_path": "conocimiento/people/concepts/employee-engagement.yaml",
+      "legacy_type": "concept",
+      "sha256": "cd6cd7f46c04dae460b46b3732c5724c5611f15da355eeae957f5cdc79423029"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "concept-love-loathe",
+      "legacy_path": "conocimiento/people/concepts/love-loathe.yaml",
+      "legacy_type": "concept",
+      "sha256": "033fa12a8a15d126b46781b9f2b201c08aad0a3148336d5e27a14283f24e2b46"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "concept-right-people-right-seats",
+      "legacy_path": "conocimiento/people/concepts/right-people-right-seats.yaml",
+      "legacy_type": "concept",
+      "sha256": "877d7fafa5ff312b5a794d4b2925fdddbf4c4cec494118c9eb86d6df1f392fd3"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "metric-employee-satisfaction",
+      "legacy_path": "conocimiento/people/metrics/employee-satisfaction.yaml",
+      "legacy_type": "metric",
+      "sha256": "30aed7e065826b7e873b4f5cfbb1847ff82730f70ca5d26acf46042836e3f902"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "metric-rehire-rate",
+      "legacy_path": "conocimiento/people/metrics/rehire-rate.yaml",
+      "legacy_type": "metric",
+      "sha256": "f25a5fa3661897a0719731e8fba5fce71cbdb554a3dd2175faa49989d9e1a2bf"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "metric-role-fit-score",
+      "legacy_path": "conocimiento/people/metrics/role-fit-score.yaml",
+      "legacy_type": "metric",
+      "sha256": "7ca7cfa1f79fa388b34d3c5b9bab069dbde82b1de6d736695b9959b1d48c798a"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "metric-values-alignment-score",
+      "legacy_path": "conocimiento/people/metrics/values-alignment-score.yaml",
+      "legacy_type": "metric",
+      "sha256": "2f710bdde1fb67dba70145eae755bc46138ef6a892a652df799078f7bc210ed1"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "tool-face",
+      "legacy_path": "conocimiento/people/tools/face.yaml",
+      "legacy_type": "tool",
+      "sha256": "2514b3f4eda836528c1dc6b36e1d9183457d9df70e312ee72ceb3134c79239e5"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "tool-five-manager-activities",
+      "legacy_path": "conocimiento/people/tools/five-manager-activities.yaml",
+      "legacy_type": "tool",
+      "sha256": "551f22a8979afadbd33c988623bfbb9ddedccdfb437e7e3024b69b7aed64c784"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "tool-oppp",
+      "legacy_path": "conocimiento/people/tools/oppp.yaml",
+      "legacy_type": "tool",
+      "sha256": "5bc9881817d95625cd0bb0175ccee6a1f5cce2533cc188c106ee4893bfa783b4"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "tool-pace",
+      "legacy_path": "conocimiento/people/tools/pace.yaml",
+      "legacy_type": "tool",
+      "sha256": "899a5f6ad90f111f99d4dd497c867d77ac1f30efe4f47e56103578ec75479a68"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "tool-team-assessment",
+      "legacy_path": "conocimiento/people/tools/team-assessment.yaml",
+      "legacy_type": "tool",
+      "sha256": "91b1dcf1db43186383bab8cfcdbd20402eda798d9b0a9ef7cdf459e7830062ab"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "tool-topgrading",
+      "legacy_path": "conocimiento/people/tools/topgrading.yaml",
+      "legacy_type": "tool",
+      "sha256": "4ae27893b555d5e46cf45b2e841f845d192c6f2c27201ef6a0a1b203aba46559"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "worksheet-face",
+      "legacy_path": "conocimiento/people/worksheets/face.yaml",
+      "legacy_type": "worksheet",
+      "sha256": "5ae7df824e6e8fbddf6ff5141c800b5096a89ab206f2e6e6ed80b0dced038dfb"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "worksheet-love-loathe",
+      "legacy_path": "conocimiento/people/worksheets/love-loathe.yaml",
+      "legacy_type": "worksheet",
+      "sha256": "79f9325695543a6d4be83d3ab0ffb55167cb09546e190ab58c990be9b2a7a93a"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "worksheet-oppp",
+      "legacy_path": "conocimiento/people/worksheets/oppp.yaml",
+      "legacy_type": "worksheet",
+      "sha256": "0ff7eae9ac914880ce18e20c0f4aa827c49d27c9b1ac3fc11a9c692ce7381403"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "worksheet-team-growth",
+      "legacy_path": "conocimiento/people/worksheets/team-growth.yaml",
+      "legacy_type": "worksheet",
+      "sha256": "1fbf3421650b0a0747721cabc25ea69874784790e388e1e54f9cc59fafe42d4d"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "support-contract-not-node",
+      "legacy_id": null,
+      "legacy_path": "conocimiento/registry/worksheets.yaml",
+      "legacy_type": null,
+      "sha256": "6bcb53f1ab5590558c924eafa746efed4fa9bf847e699e2f42162b1450c72beb"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "stage-growth",
+      "legacy_path": "conocimiento/stages/growth.yaml",
+      "legacy_type": "stage",
+      "sha256": "5dd0617f0095d7d718bb3fec866dbeee04c36f785ba640532c2dc91c0aa5ec70"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "concept-bhag",
+      "legacy_path": "conocimiento/strategy/concepts/bhag.yaml",
+      "legacy_type": "concept",
+      "sha256": "5f827ead43682608372834567d984d80c758fc8f0e0fdff24c8e87f5c612bb6f"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "concept-brand-promise",
+      "legacy_path": "conocimiento/strategy/concepts/brand-promise.yaml",
+      "legacy_type": "concept",
+      "sha256": "cb1775ed7459a28a57fc3130efebf10ba6f4403f9da490dbbd65bb7c841ae73c"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "concept-core-customer",
+      "legacy_path": "conocimiento/strategy/concepts/core-customer.yaml",
+      "legacy_type": "concept",
+      "sha256": "759c41a2f2724c3ed4870633e42810e211d7b766ccee2df67a6bb75d09d57b2c"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "concept-core-purpose",
+      "legacy_path": "conocimiento/strategy/concepts/core-purpose.yaml",
+      "legacy_type": "concept",
+      "sha256": "54778592476030199503ae5d794472e16631a94acad9ab27fce77640cfa46872"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "concept-differentiating-activities",
+      "legacy_path": "conocimiento/strategy/concepts/differentiating-activities.yaml",
+      "legacy_type": "concept",
+      "sha256": "ea63306406dc4fa0d12b034a79b75f38f995b46bcee719a571a8cdea079893da"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "metric-brand-promise-kept-rate",
+      "legacy_path": "conocimiento/strategy/metrics/brand-promise-kept-rate.yaml",
+      "legacy_type": "metric",
+      "sha256": "f9ad31fddda839ebad1a0e056f16e1b3dd8488b98b98b89537a80e5a37e12db8"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "metric-profit-per-x-value",
+      "legacy_path": "conocimiento/strategy/metrics/profit-per-x-value.yaml",
+      "legacy_type": "metric",
+      "sha256": "6807d77e80b940322224cf4efc54e0bae9d193f79d1e96f83b406e9aa98b5ce6"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "metric-revenue-growth-rate",
+      "legacy_path": "conocimiento/strategy/metrics/revenue-growth-rate.yaml",
+      "legacy_type": "metric",
+      "sha256": "00787c411d87974e6e4c0c71f60a772ffe8c338703020f0a5389e1374be68a1c"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "tool-7-strata",
+      "legacy_path": "conocimiento/strategy/tools/7-strata.yaml",
+      "legacy_type": "tool",
+      "sha256": "b7352cd7ec018eafd752c6ea00dda5f56f9d657ad0295043e1418441606e045c"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "tool-opsp",
+      "legacy_path": "conocimiento/strategy/tools/opsp.yaml",
+      "legacy_type": "tool",
+      "sha256": "a1213a0f7d8b2d9f055360ba1cab98b1618ded67c37f7a90e0ad9a79e77904fb"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "tool-profit-per-x",
+      "legacy_path": "conocimiento/strategy/tools/profit-per-x.yaml",
+      "legacy_type": "tool",
+      "sha256": "06c39c7dcf1b5cd19483982d6328be4fec933afe031aa9637620c87953759f30"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "tool-sandbox",
+      "legacy_path": "conocimiento/strategy/tools/sandbox.yaml",
+      "legacy_type": "tool",
+      "sha256": "04a3c0dae4a369f0ea0acd7ee7c84899e975adf0d7ca921a8685283e05049290"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "tool-swt",
+      "legacy_path": "conocimiento/strategy/tools/swt.yaml",
+      "legacy_type": "tool",
+      "sha256": "d02b563046523e8aff38b4fcf8336bcee3c683586d323424ef79ab3ac1804853"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "tool-x-factor",
+      "legacy_path": "conocimiento/strategy/tools/x-factor.yaml",
+      "legacy_type": "tool",
+      "sha256": "f655dd1cec9b6c7b7baa9228fce92b45cd9cabed1bce8542db01fcbe8a2525e4"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "worksheet-7-strata",
+      "legacy_path": "conocimiento/strategy/worksheets/7-strata.yaml",
+      "legacy_type": "worksheet",
+      "sha256": "0177bca0a78cf8a96b13dc3cf5dfd56ce6cbecad186ee59a7a01f94c0ecbf4dd"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "worksheet-core-customer",
+      "legacy_path": "conocimiento/strategy/worksheets/core-customer.yaml",
+      "legacy_type": "worksheet",
+      "sha256": "587fc68a18675eb377a2fdc15b3a2cfd221c7df0b25b9698c35c1aefb013a08b"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "worksheet-opsp",
+      "legacy_path": "conocimiento/strategy/worksheets/opsp.yaml",
+      "legacy_type": "worksheet",
+      "sha256": "8503e01d3b92419de5a925f3733abc7a9b080d0fd9b1f3ffbd75713bc26a96b9"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "worksheet-swt",
+      "legacy_path": "conocimiento/strategy/worksheets/swt.yaml",
+      "legacy_type": "worksheet",
+      "sha256": "03b1e4d7effa380ecdda902485ee8e070dbfd94c00a4851b625bcf2377c63c24"
+    }
+  ],
+  "legacy_root": "conocimiento",
+  "schema_version": 1
+}
