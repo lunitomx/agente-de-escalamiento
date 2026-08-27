@@ -27,6 +27,8 @@ TERMS = {
     "Lencioni": r"\bLencioni\b",
     "Marshall Goldsmith": r"\bMarshall Goldsmith\b",
     "Net Promoter": r"\bNet Promoter\b|\bNPS\b",
+    "Quick Market Intelligence": r"\bQuick Market Intelligence\b",
+    "Growth Process": r"\bGrowth Process\b",
     "Rosanne Badowski": r"\bRosanne Badowski\b",
     "Scrum": r"\bScrum\b",
     "Six Sigma": r"\bSix Sigma\b",
