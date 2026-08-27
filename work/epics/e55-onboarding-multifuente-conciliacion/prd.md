@@ -43,3 +43,10 @@ financieras o de entidades que no tengan definición compatible.
 - S55.1: `Fact` local con los campos de procedencia y comparabilidad.
 - S55.2: `facts_dashboard` separa conocido/no comparable/pendiente y declara
   `score: null`.
+- S55.3: la sesión Welcome adaptativa reutiliza hechos locales, presenta una
+  sola pregunta material y sólo persiste respuestas estructuradas con
+  autorización explícita.
+- S55.4-S55.6: conciliación financiera, entidades y parking lot fallan de
+  forma conservadora ante incompatibilidad o ambigüedad.
+- S55.7: `scripts/qualify_e55.py` genera un recibo sintético y local que
+  prueba consentimiento, ausencia de score, no-fusión y no-comparación.

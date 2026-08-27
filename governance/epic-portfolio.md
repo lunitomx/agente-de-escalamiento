@@ -25,7 +25,7 @@ se alteraron para aparentar cierre.
 | E42 | active | Calificar producto en plataformas limpias y registrar aceptación humana. |
 | E47 | unresolved/review-required | Reproducir la instalación actual y clasificar deuda de producto vs. RaiSE. |
 | E49 | active | Cerrar diagnóstico/evidencia antes de ampliar recomendaciones. |
-| E55 | active | Resolver GitHub #9: onboarding multifuente y conciliación. |
+| E55 | complete | GitHub #9 resuelto: onboarding multifuente, conciliación y calificación local verificable. |
 | E76 | active | Recuperar el contrato mínimo de RaiSE sin tocar datos de empresa ni duplicar entornos. |
 
 ### Planificado, con dependencias explícitas

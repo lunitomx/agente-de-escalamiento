@@ -1,0 +1,40 @@
+{
+  "checks": [
+    {
+      "evidence": "Welcome creates a no-score local evidence dashboard and asks one Cash question.",
+      "id": "E55-01"
+    },
+    {
+      "evidence": "Confirmed facts fail closed without authorization, then persist locally with provenance.",
+      "id": "E55-02"
+    },
+    {
+      "evidence": "Collection and purchase remain incompatible; no ratio is produced.",
+      "id": "E55-03"
+    },
+    {
+      "evidence": "Same-ID, different-name customers remain ambiguous rather than merging.",
+      "id": "E55-04"
+    },
+    {
+      "evidence": "Missing evidence becomes a local open parking-lot item.",
+      "id": "E55-05"
+    }
+  ],
+  "epic": "E55",
+  "fixture": "synthetic-local-company",
+  "negative_cases": [
+    "fact_write_without_explicit_authorization",
+    "score_before_diagnosis",
+    "cross-nature-financial-comparison",
+    "same-id-different-name-entity-fusion",
+    "nonlocal-evidence-parking-lot"
+  ],
+  "schema_version": 1,
+  "status": "pass",
+  "verification_commands": [
+    "uv run pytest coaching/evidence/tests coaching/welcome/tests -q",
+    "uv run pyright coaching/evidence coaching/welcome",
+    "uv run ruff check coaching/evidence coaching/welcome"
+  ]
+}

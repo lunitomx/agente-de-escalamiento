@@ -89,7 +89,7 @@ raise_story_close_full(
     epic_dir="{epic_dir}",
     jira_key="{jira_key}",
     merge_summary="{story_id}: {name} — {1-line summary}",
-    cwd="{cwd}"
+    cwd="{cwd}",
 )
 ```
 

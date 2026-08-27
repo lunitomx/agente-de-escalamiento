@@ -97,6 +97,19 @@ La bienvenida no presenta un formulario largo como requisito de entrada. Si el
 usuario tiene un dolor específico, se ataca ese dolor; si la respuesta es vaga,
 se hace una sola pregunta de encuadre.
 
+### Ruta adaptativa con evidencia
+
+La implementación de una sesión real usa internamente
+`coaching.welcome.run({"action": "adaptive_conversation", ...})`. Antes de
+formular la siguiente pregunta, construye el dashboard de evidencia local y
+consulta requisitos iniciales pequeños para People, Strategy, Execution y
+Cash. El usuario sigue viendo una sola pregunta natural; el dashboard queda
+como artefacto de la sesión, no como una calificación.
+
+Una respuesta nueva sólo se guarda como hecho cuando se entrega con su
+estructura, procedencia, periodo y `persist_authorized=True`. Nunca convertir
+texto libre en un hecho ni persistirlo por inferencia.
+
 ### Cierre
 
 "Hemos avanzado. Esto es lo que tenemos:
@@ -111,6 +124,7 @@ Si el usuario acepta guardar la sesión, persistir el estado conversacional:
 
 ```python
 from coaching.welcome import save_welcome_state
+
 save_welcome_state(base_path, state, authorized=True)
 ```
 
@@ -121,6 +135,7 @@ Al inicio de cada bienvenida:
 1. Intentar cargar estado previo:
    ```python
    from coaching.welcome import load_welcome_state, is_state_fresh
+
    saved = load_welcome_state(base_path)
    ```
 2. Si `saved` existe y `is_state_fresh(base_path)` es True, preguntar:

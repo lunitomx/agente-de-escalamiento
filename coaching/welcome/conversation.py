@@ -47,6 +47,61 @@ class WelcomeTurn(BaseModel):
     state: WelcomeState
 
 
+# These are deliberately small opening requirements, not a maturity scoring
+# rubric. They give Welcome one useful next question per decision while later
+# procedures can request the more specific evidence they genuinely need.
+DEFAULT_ONBOARDING_REQUIREMENTS: tuple[MetricRequirement, ...] = (
+    MetricRequirement(
+        metric_definition="Responsables de liderazgo",
+        decision="people",
+        question="¿Quiénes son hoy las personas responsables de las funciones clave de tu empresa?",
+    ),
+    MetricRequirement(
+        metric_definition="Funciones críticas sin owner",
+        decision="people",
+        question="¿Qué función crítica no tiene todavía una persona claramente responsable?",
+    ),
+    MetricRequirement(
+        metric_definition="Cliente objetivo",
+        decision="strategy",
+        question="¿Cuál es el cliente al que más quieres servir y por qué te elige?",
+    ),
+    MetricRequirement(
+        metric_definition="Propuesta diferenciadora",
+        decision="strategy",
+        question="¿Qué haces de forma distinta a las alternativas que tu cliente considera?",
+    ),
+    MetricRequirement(
+        metric_definition="Prioridad trimestral",
+        decision="execution",
+        question="¿Cuál es la prioridad más importante que tu equipo debe lograr este trimestre?",
+    ),
+    MetricRequirement(
+        metric_definition="Ritmo de reuniones",
+        decision="execution",
+        question="¿Qué reuniones tienen hoy para revisar prioridades y resolver bloqueos?",
+    ),
+    MetricRequirement(
+        metric_definition="Ingreso",
+        decision="cash",
+        question="¿Cuál fue tu ingreso del último periodo cerrado y qué periodo cubre?",
+    ),
+    MetricRequirement(
+        metric_definition="Cobros",
+        decision="cash",
+        question="¿Cuánto cobraste realmente en ese mismo periodo?",
+    ),
+)
+
+
+def default_onboarding_requirements() -> list[MetricRequirement]:
+    """Return independent opening requirements for the four decisions."""
+    return [
+        requirement.model_copy(deep=True)
+        for requirement in DEFAULT_ONBOARDING_REQUIREMENTS
+    ]
+
+
 def respond_to_welcome_with_evidence(
     state: WelcomeState,
     message: str,

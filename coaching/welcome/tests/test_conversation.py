@@ -14,6 +14,19 @@ from coaching.welcome.conversation import (
 )
 
 
+def test_opening_requirements_cover_each_decision() -> None:
+    from coaching.welcome.conversation import default_onboarding_requirements
+
+    assert {
+        requirement.decision for requirement in default_onboarding_requirements()
+    } == {
+        "people",
+        "strategy",
+        "execution",
+        "cash",
+    }
+
+
 def test_first_contact_asks_one_concern_question_without_commands() -> None:
     turn = begin_welcome()
 

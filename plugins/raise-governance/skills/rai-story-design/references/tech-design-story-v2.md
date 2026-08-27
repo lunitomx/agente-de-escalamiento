@@ -138,6 +138,7 @@ Then [outcome]
 # Pseudocode or detailed algorithm description
 # Focus on WHAT steps happen, not necessarily exact syntax
 
+
 def complex_operation(input_data):
     """
     High-level algorithm outline

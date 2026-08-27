@@ -77,7 +77,7 @@ raise_docs_write(
     title="{epic_id}: {epic-name} — Retrospective",
     content="[patrones aprendidos, métricas, insights de proceso]",
     output_path="work/epics/{epic_dir}/retrospective.md",
-    cwd="{cwd}"
+    cwd="{cwd}",
 )
 ```
 

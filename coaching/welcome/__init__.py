@@ -9,6 +9,7 @@ from .conversation import (
     WelcomeState,
     WelcomeTurn,
     begin_welcome,
+    default_onboarding_requirements,
     is_state_fresh,
     load_welcome_state,
     respond_to_welcome,
@@ -22,6 +23,7 @@ __all__ = [
     "WelcomeState",
     "WelcomeTurn",
     "begin_welcome",
+    "default_onboarding_requirements",
     "is_state_fresh",
     "load_welcome_state",
     "respond_to_welcome",
@@ -47,6 +49,9 @@ def run(context: dict) -> dict:
         dict with output, artifacts, errors
     """
     base = Path(context.get("base_path", "."))
+    if context.get("action") == "adaptive_conversation":
+        return _run_adaptive_conversation(context, base)
+
     profile_path = base / ".escala" / "agent" / "memory" / "company-profile.yaml"
 
     name = context.get("company_name", "").strip()
@@ -131,6 +136,80 @@ def run(context: dict) -> dict:
     return {
         "output": "\n".join(output_lines),
         "artifacts": {"profile": profile, "profile_path": str(profile_path)},
+        "errors": [],
+    }
+
+
+def _run_adaptive_conversation(context: dict, base: Path) -> dict:
+    """Run one evidence-aware Welcome turn without exposing implementation details."""
+    from pydantic import ValidationError
+
+    from coaching.evidence.dashboard import MetricRequirement, build_evidence_dashboard
+    from coaching.evidence.facts import Fact, load_facts, save_fact
+
+    state_payload = context.get("conversation_state")
+    try:
+        state = (
+            WelcomeState.model_validate(state_payload)
+            if state_payload is not None
+            else None
+        )
+        requirements_payload = context.get("requested_metrics")
+        requirements = (
+            [MetricRequirement.model_validate(item) for item in requirements_payload]
+            if requirements_payload is not None
+            else default_onboarding_requirements()
+        )
+        confirmed_facts = [
+            Fact.model_validate(item) for item in context.get("confirmed_facts", [])
+        ]
+    except (TypeError, ValidationError, ValueError) as exc:
+        return {
+            "output": "",
+            "artifacts": {},
+            "errors": [f"contexto inválido: {exc}"],
+        }
+
+    if confirmed_facts and not context.get("persist_authorized", False):
+        return {
+            "output": "",
+            "artifacts": {},
+            "errors": [
+                "Las respuestas confirmadas requieren persist_authorized=True "
+                "antes de guardarse localmente."
+            ],
+        }
+    for fact in confirmed_facts:
+        save_fact(base, fact)
+
+    facts = load_facts(base)
+    dashboard = build_evidence_dashboard(facts, requirements)
+    message = context.get("message")
+    if not isinstance(message, str) or not message.strip():
+        turn = begin_welcome(
+            returning=bool(context.get("returning", False)),
+            previous_focus=context.get("previous_focus"),
+        )
+    else:
+        turn = respond_to_welcome_with_evidence(
+            state or begin_welcome().state,
+            message,
+            facts=facts,
+            requirements=requirements,
+        )
+
+    state_path = save_welcome_state(
+        base, turn.state, authorized=bool(context.get("persist_authorized", False))
+    )
+    return {
+        "output": turn.question,
+        "artifacts": {
+            "action": "adaptive_conversation",
+            "welcome_state": turn.state.model_dump(mode="json"),
+            "evidence_dashboard": dashboard.model_dump(mode="json"),
+            "persisted_state_path": str(state_path) if state_path else None,
+            "persisted_fact_count": len(confirmed_facts),
+        },
         "errors": [],
     }
 
