@@ -53,6 +53,7 @@ def render_learning_cockpit_html(cockpit: dict[str, Any]) -> str:
         ("Acciones vencidas", cockpit["actions_overdue"]),
         ("Revisiones pendientes", cockpit["reviews_due"]),
         ("Resultados observados", cockpit["observed_results"]),
+        ("Resultados aún por medir", cockpit["results_pending"]),
         ("Aprendizajes por confirmar", cockpit["learnings_pending"]),
     )
     items = "".join(
@@ -296,6 +297,13 @@ class OutcomeLearningLedger:
             "observed": observed.strip() if observed else None,
             "evidence_ids": list(evidence_ids),
             "interpretation": interpretation.strip() if interpretation else None,
+            "comparison": {
+                "expected_result": action["expected_result"],
+                "observation_status": "available"
+                if status == "observed"
+                else "pending",
+                "difference": "requires_owner_interpretation",
+            },
             "causality": "unconfirmed",
             "recorded_on": (today or date.today()).isoformat(),
         }
@@ -321,8 +329,13 @@ class OutcomeLearningLedger:
     ) -> dict[str, Any]:
         """Store an owner-reviewed lesson; only confirmed lessons are reusable."""
         cycle, ledger = self._cycle(cycle_id)
-        if not any(item["id"] == result_id for item in cycle["results"]):
+        result = next(
+            (item for item in cycle["results"] if item["id"] == result_id), None
+        )
+        if result is None:
             raise OutcomeLearningError("result does not belong to cycle")
+        if result["status"] != "observed":
+            raise OutcomeLearningError("only observed results can produce a learning")
         self._require_text(statement, "statement")
         self._require_text(confirmed_by, "confirmed_by")
         if not 0 <= confidence <= 100:
@@ -373,9 +386,18 @@ class OutcomeLearningLedger:
                 date.fromisoformat(item["review_on"]) < on for item in due
             ),
             "reviews_due": len(due),
-            "observed_results": sum(len(item["results"]) for item in cycles),
+            "observed_results": sum(
+                sum(result["status"] == "observed" for result in item["results"])
+                for item in cycles
+            ),
+            "results_pending": sum(
+                sum(result["status"] == "no_result_yet" for result in item["results"])
+                for item in cycles
+            ),
             "learnings_pending": sum(
-                bool(item["results"]) and not item["learning"] for item in cycles
+                any(result["status"] == "observed" for result in item["results"])
+                and not item["learning"]
+                for item in cycles
             ),
             "next_review": (
                 {

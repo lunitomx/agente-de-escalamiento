@@ -48,6 +48,11 @@ def test_full_cycle_separates_observation_interpretation_and_learning(tmp_path) 
         interpretation="La cobranza mejoró.",
     )
     assert result["causality"] == "unconfirmed"
+    assert result["comparison"] == {
+        "expected_result": "Reducir cuentas vencidas.",
+        "observation_status": "available",
+        "difference": "requires_owner_interpretation",
+    }
     learning = ledger.confirm_learning(
         cycle["id"],
         result["id"],
@@ -96,7 +101,19 @@ def test_no_result_is_valid_and_does_not_create_a_false_failure(tmp_path) -> Non
         cycle["id"], action["id"], status="no_result_yet", observed=None
     )
     assert result["status"] == "no_result_yet"
-    assert ledger.cockpit(date(2026, 8, 28))["learnings_pending"] == 1
+    cockpit = ledger.cockpit(date(2026, 8, 28))
+    assert cockpit["observed_results"] == 0
+    assert cockpit["results_pending"] == 1
+    assert cockpit["learnings_pending"] == 0
+    with pytest.raises(OutcomeLearningError, match="observed"):
+        ledger.confirm_learning(
+            cycle["id"],
+            result["id"],
+            statement="No debe promoverse aún.",
+            status="confirmed",
+            confirmed_by="Dueño",
+            confidence=50,
+        )
 
 
 def test_people_learning_requires_consent_and_other_pillars_can_complete(

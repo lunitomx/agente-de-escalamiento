@@ -100,7 +100,7 @@ acción importante sin navegar la memoria técnica.
 - [x] Una decisión aceptada puede llevar una acción con responsable y fecha.
 - [x] El dueño puede editar o cancelar una acción abierta, preservando el motivo y el historial; una acción cancelada no acepta resultados nuevos.
 - [x] La revisión respeta la cadencia y puede registrar falta de resultado.
-- [x] Resultado observado, interpretación y causalidad se muestran separados.
+- [x] Resultado observado, expectativa, interpretación y causalidad se muestran separados; `no_result_yet` no se cuenta como observado ni genera aprendizaje.
 - [x] El empresario puede confirmar, corregir o rechazar un aprendizaje.
 - [x] La memoria conserva origen, fecha, confianza y vigencia.
 - [x] El tablero ejecutivo no expone tecnicismos ni datos de otra empresa.
