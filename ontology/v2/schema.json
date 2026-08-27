@@ -1,0 +1,238 @@
+{
+  "$defs": {
+    "EvidenceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "source_id": {
+          "maxLength": 128,
+          "minLength": 3,
+          "title": "Source Id",
+          "type": "string"
+        },
+        "unit_ids": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 64,
+          "minItems": 1,
+          "title": "Unit Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "source_id",
+        "unit_ids"
+      ],
+      "title": "EvidenceRef",
+      "type": "object"
+    },
+    "NodeKind": {
+      "enum": [
+        "decision-area",
+        "framework",
+        "principle",
+        "tool",
+        "artifact",
+        "procedure",
+        "step",
+        "rule",
+        "warning",
+        "metric",
+        "role",
+        "routine",
+        "time-horizon",
+        "example",
+        "external-reference",
+        "personal-dimension"
+      ],
+      "title": "NodeKind",
+      "type": "string"
+    },
+    "OntologyAlias": {
+      "additionalProperties": false,
+      "properties": {
+        "alias": {
+          "maxLength": 192,
+          "minLength": 1,
+          "title": "Alias",
+          "type": "string"
+        },
+        "canonical_id": {
+          "maxLength": 192,
+          "minLength": 3,
+          "title": "Canonical Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "alias",
+        "canonical_id"
+      ],
+      "title": "OntologyAlias",
+      "type": "object"
+    },
+    "OntologyNode": {
+      "additionalProperties": false,
+      "properties": {
+        "canonical_name": {
+          "maxLength": 256,
+          "minLength": 1,
+          "title": "Canonical Name",
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "maxItems": 64,
+          "title": "Evidence",
+          "type": "array"
+        },
+        "id": {
+          "maxLength": 192,
+          "minLength": 3,
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/NodeKind"
+        },
+        "origin": {
+          "$ref": "#/$defs/OriginKind"
+        },
+        "review_state": {
+          "$ref": "#/$defs/ReviewState"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "canonical_name",
+        "origin",
+        "review_state"
+      ],
+      "title": "OntologyNode",
+      "type": "object"
+    },
+    "OntologyRelation": {
+      "additionalProperties": false,
+      "properties": {
+        "relation_type": {
+          "maxLength": 96,
+          "minLength": 3,
+          "title": "Relation Type",
+          "type": "string"
+        },
+        "source_id": {
+          "maxLength": 192,
+          "minLength": 3,
+          "title": "Source Id",
+          "type": "string"
+        },
+        "target_id": {
+          "maxLength": 192,
+          "minLength": 3,
+          "title": "Target Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_id",
+        "target_id",
+        "relation_type"
+      ],
+      "title": "OntologyRelation",
+      "type": "object"
+    },
+    "OriginKind": {
+      "enum": [
+        "source-explicit",
+        "source-synthesis",
+        "historical-example",
+        "external-reference",
+        "company-local",
+        "model-hypothesis"
+      ],
+      "title": "OriginKind",
+      "type": "string"
+    },
+    "ReviewDecision": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_id": {
+          "maxLength": 192,
+          "minLength": 3,
+          "title": "Candidate Id",
+          "type": "string"
+        },
+        "rationale": {
+          "maxLength": 1024,
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        },
+        "state": {
+          "$ref": "#/$defs/ReviewState"
+        }
+      },
+      "required": [
+        "candidate_id",
+        "state",
+        "rationale"
+      ],
+      "title": "ReviewDecision",
+      "type": "object"
+    },
+    "ReviewState": {
+      "enum": [
+        "candidate",
+        "approved",
+        "rejected",
+        "needs-review"
+      ],
+      "title": "ReviewState",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "aliases": {
+      "items": {
+        "$ref": "#/$defs/OntologyAlias"
+      },
+      "title": "Aliases",
+      "type": "array"
+    },
+    "nodes": {
+      "items": {
+        "$ref": "#/$defs/OntologyNode"
+      },
+      "title": "Nodes",
+      "type": "array"
+    },
+    "relations": {
+      "items": {
+        "$ref": "#/$defs/OntologyRelation"
+      },
+      "title": "Relations",
+      "type": "array"
+    },
+    "review_queue": {
+      "items": {
+        "$ref": "#/$defs/ReviewDecision"
+      },
+      "title": "Review Queue",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": 2,
+      "title": "Schema Version",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "schema_version"
+  ],
+  "title": "OntologyDocument",
+  "type": "object"
+}

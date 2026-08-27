@@ -1,0 +1,30 @@
+schema_version: 2
+node_kinds:
+  - decision-area
+  - framework
+  - principle
+  - tool
+  - artifact
+  - procedure
+  - step
+  - rule
+  - warning
+  - metric
+  - role
+  - routine
+  - time-horizon
+  - example
+  - external-reference
+  - personal-dimension
+origins:
+  - source-explicit
+  - source-synthesis
+  - historical-example
+  - external-reference
+  - company-local
+  - model-hypothesis
+review_states:
+  - candidate
+  - approved
+  - rejected
+  - needs-review

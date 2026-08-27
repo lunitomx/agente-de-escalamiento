@@ -1,7 +1,7 @@
 ---
 epic_id: E58
 title: Ontología v2 trazable y migración de compatibilidad
-status: planned
+status: active
 depends_on: [E57, E6]
 ---
 

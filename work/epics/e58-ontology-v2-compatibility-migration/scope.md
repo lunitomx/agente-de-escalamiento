@@ -1,7 +1,7 @@
 ---
 epic_id: E58
 title: Ontología v2 trazable y migración de compatibilidad
-status: planned
+status: active
 depends_on: [E57, E6]
 ---
 
@@ -32,7 +32,7 @@ Evolucionar la ontología existente de E6 a una autoridad canónica con proceden
 
 | Orden | Historia | Entrega verificable |
 |---:|---|---|
-| 1 | S58.1 Schema y vocabulario | Schema validado y decisiones de modelado documentadas. |
+| 1 | S58.1 Schema y vocabulario | Done — contrato v2 privado, schema y vocabulario deterministas. |
 | 2 | S58.2 Origen/evidencia/revisión | Modelos tipados y fixtures positivos/negativos. |
 | 3 | S58.3 Migración E6 | Mapa de cada ID viejo a su nodo v2 o disposición explícita. |
 | 4 | S58.4 Vistas derivadas | YAML/SQLite regenerables desde la autoridad v2. |
