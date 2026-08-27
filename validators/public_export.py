@@ -971,6 +971,28 @@ def build_public_export(
     )
 
 
+def validate_export_selection_paths(
+    *,
+    repository: Path,
+    source_commit: str,
+    policy: PublicExportPolicy,
+) -> tuple[str, ...]:
+    """Validate that every configured selection exists in one immutable commit.
+
+    This is intentionally narrower than :func:`build_public_export`: it supports
+    pre-commit qualification when a changed policy cannot yet satisfy the full
+    committed-policy binding required to materialize an artifact.
+    """
+
+    repository_root = _validate_repository(repository)
+    _validate_source_commit(repository_root, source_commit)
+    selected = _expand_git_selections(
+        policy,
+        _read_git_tree(repository_root, source_commit),
+    )
+    return tuple(item.path for item in selected)
+
+
 def verify_public_export(
     *,
     artifact: Path,

@@ -22,7 +22,8 @@ se alteraron para aparentar cierre.
 
 | Épica | Estado | Próxima decisión verificable |
 |---|---|---|
-| E42 | active | Calificar producto en plataformas limpias y registrar aceptación humana. |
+| E10 | active | Reparar bundle portable: una instalación debe sobrevivir sin checkout fuente y conservar sólo la puerta pública. |
+| E42 | active | Calificar producto en plataformas limpias y registrar aceptación humana, usando el artefacto portable reparado por E10. |
 | E44 | in_progress | Ejecutar retrospectiva y aceptación de empresario; la calificación técnica local ya cubre los cuatro pilares sin reclamar causalidad. |
 | E45 | in_progress | Comparar contra un coach único en piloto empresarial; el router y las rutas de seguridad ya están calificados localmente. |
 | E60 | in_progress | Completar inspección visual autorizada de OPPP/FACe/PACe; la semántica y la cobertura privada ya fueron revisadas. |

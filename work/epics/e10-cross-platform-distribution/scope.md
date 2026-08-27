@@ -1,6 +1,30 @@
+---
+epic_id: E10
+title: Distribución portable cross-platform
+status: active
+closure_disposition: active
+updated: 2026-08-27
+---
+
 # E10: ScaleUp Cross-Platform Distribution
 
-**Status:** Complete
+**Status:** Active — closure correction 2026-08-27
+
+## Closure correction — regression of portable distribution
+
+La auditoría del instalador vigente encontró que el contrato histórico de E10
+ya no es verdadero: `install.sh` publica la única puerta `escala` mediante un
+symlink al checkout de desarrollo y el ZIP de lifecycle contiene sólo
+`escala_server`. Ninguno incluye por sí mismo catálogo, capacidades internas ni
+conocimiento requerido por el orquestador. Por ello el resultado declarado
+“sin depender del repo de desarrollo” no está demostrado ni puede seguir
+marcado como completo.
+
+E10 se reabre con **S10.10 — Paquete portable autosuficiente de ESCALA**
+(`stories/s10.10-portable-bundle-repair.md`). Esta corrección no revierte la
+arquitectura de una puerta pública: instala una copia local de sus recursos y
+conserva las capacidades como internas. La aceptación con hardware limpio y
+modelos reales sigue perteneciendo a E42/E68.
 
 ## Objective
 
@@ -143,12 +167,12 @@ Script `scaleup-install` que:
 
 ## Done Criteria
 
-- [x] Los 6 coaching engines construidos y testeados (welcome, diagnose, worksheet, progress, level, router)
-- [x] `scaleup-install` instala exitosamente en Claude Code global
-- [x] `scaleup-install` instala exitosamente en Hermes
-- [x] Ejecutar `/scaleup-welcome` desde un proyecto vacío (fuera de este repo) funciona
-- [x] Ejecutar `/scaleup-diagnose` en Hermes produce el mismo output que en Claude Code
-- [x] Retrospectiva completada
+- [x] Los 6 coaching engines construidos y testeados (welcome, diagnose, worksheet, progress, level, router).
+- [-] El artefacto actual es un bundle completo sin checkout: S10.10 debe sustituir el symlink vivo por recursos instalados y verificados.
+- [-] La puerta `escala` debe funcionar desde una carpeta/proyecto vacío después de retirar el checkout fuente.
+- [-] Claude Code, Hermes y Codex deben recibir sólo la puerta pública desde la copia instalada; las diferencias de comportamiento real se califican en E68.
+- [-] La documentación debe distinguir el ZIP lifecycle del paquete conversacional portable y no prometer independencia que aún no existe.
+- [x] Retrospectiva histórica completada; permanece como registro, no como autoridad de cierre.
 
 ## Risks
 

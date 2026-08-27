@@ -14,7 +14,7 @@ A valid ledger is not a completed product. Mission readiness requires fresh pass
 |---|---|---|
 | Closure dispositions | `governance/closure-dispositions.yaml` | `e5b9e9207fce7bbacd3af0a9e93368d6ccf38f979932d10360a2063924f8f023` |
 | Epic identities | `governance/epic-identities.yaml` | `eb62cd804fa3b0559d20394e27be583b6daa445c6619938b43d4a1a92d052d52` |
-| Public export | `governance/public-export.yaml` | `a0ac8580703e0ba77882d4686e38e8c7064508af4bf850f807ee4786791c824e` |
+| Public export | `governance/public-export.yaml` | `005a72a9cc544d7193c1b490ef82094b1cfaaa68ca55c7896f0e7c3873875b58` |
 
 ## Product-owner source requirements
 

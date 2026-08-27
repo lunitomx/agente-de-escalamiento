@@ -39,6 +39,7 @@ from validators.public_export import (
     render_third_party_notices,
     third_party_inventory_hash,
     validate_export_selections,
+    validate_export_selection_paths,
     verify_public_export,
     write_public_export_build_receipts,
     write_public_export_verification_receipts,
@@ -260,6 +261,20 @@ def test_canonical_selection_is_explicit_and_excludes_internal_families() -> Non
     )
 
     validate_export_selections(policy, boundary)
+
+
+def test_canonical_selections_exist_in_current_git_head() -> None:
+    """A stale allowlist fails before a full immutable export is attempted."""
+
+    source_commit = _git(ROOT, "rev-parse", "HEAD")
+    selected = validate_export_selection_paths(
+        repository=ROOT,
+        source_commit=source_commit,
+        policy=load_public_export_policy(EXPORT_POLICY_PATH),
+    )
+
+    assert "escala-skills/catalog.yaml" in selected
+    assert "conocimiento/retrieval.py" in selected
 
 
 @pytest.mark.parametrize(

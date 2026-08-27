@@ -1,5 +1,10 @@
 # E10: Cross-Platform Distribution — Retrospective
 
+> **Nota de auditoría 2026-08-27:** este documento registra el cierre histórico.
+> No es autoridad de estado. La prueba actual del instalador muestra un symlink
+> al checkout de desarrollo, por lo que la portabilidad prometida se reabrió en
+> S10.10. Ver `scope.md` para el estado canónico y la reparación activa.
+
 ## Summary
 
 Built 6 coaching engine modules and a cross-platform installer that distributes ScaleUp to Claude Code global and Hermes Agent. All 9 stories completed in a single session.

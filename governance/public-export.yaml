@@ -120,9 +120,6 @@ selections:
   - path: coaching/welcome/__main__.py
     kind: file
     role: local_runtime
-  - path: coaching/welcome/engine.py
-    kind: file
-    role: local_runtime
   - path: coaching/welcome/formatter.py
     kind: file
     role: local_runtime

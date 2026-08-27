@@ -38,8 +38,9 @@ AUDITED_EPIC_RULES: tuple[EpicClosureRule, ...] = (
     EpicClosureRule(
         epic_id="E10",
         path="work/epics/e10-cross-platform-distribution/scope.md",
-        expected_status="complete",
-        required_phrases=("Historical Milestones", "Legacy backlog"),
+        expected_status="active",
+        allow_open_done_criteria=True,
+        required_phrases=("Closure correction", "S10.10"),
     ),
     EpicClosureRule(
         epic_id="E11",
