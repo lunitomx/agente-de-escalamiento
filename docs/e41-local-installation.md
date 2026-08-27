@@ -10,11 +10,11 @@
    una carpeta de intercambio de documentos de Google Drive, OneDrive o red.
 4. Verificar estado con `python -m escala_server.lifecycle status ...`.
 
-El ZIP lifecycle probado aquí instala sólo el runtime local. No equivale todavía
-al paquete conversacional completo de ESCALA: la reparación S10.10 de E10 debe
-empaquetar skills, catálogo, conocimiento permitido y adaptadores sin depender
-del checkout fuente. SQLite, configuración, runtime marker y backups permanecen
-en `data_root`. La carpeta sincronizada no contiene autoridad ni SQLite; solo
+El ZIP lifecycle probado aquí instala sólo el runtime local. El paquete
+conversacional completo se genera aparte con el export portable de S10.10: lleva
+skills, catálogo, conocimiento permitido y adaptadores sin depender del
+checkout fuente. SQLite, configuración, runtime marker y backups permanecen en
+`data_root`. La carpeta sincronizada no contiene autoridad ni SQLite; solo
 recibe/entrega documentos ordinarios.
 
 ## Actualizaciones y rollback

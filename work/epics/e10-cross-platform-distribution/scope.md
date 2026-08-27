@@ -12,19 +12,18 @@ updated: 2026-08-27
 
 ## Closure correction — regression of portable distribution
 
-La auditoría del instalador vigente encontró que el contrato histórico de E10
-ya no es verdadero: `install.sh` publica la única puerta `escala` mediante un
-symlink al checkout de desarrollo y el ZIP de lifecycle contiene sólo
-`escala_server`. Ninguno incluye por sí mismo catálogo, capacidades internas ni
-conocimiento requerido por el orquestador. Por ello el resultado declarado
-“sin depender del repo de desarrollo” no está demostrado ni puede seguir
-marcado como completo.
+La auditoría encontró históricamente que `install.sh` publicaba la única
+puerta `escala` mediante un symlink al checkout de desarrollo y que el ZIP de
+lifecycle contenía sólo `escala_server`. El defecto se corrigió en **S10.10**:
+`build_public_export` materializa un artefacto sin `.git`, con manifest
+fail-closed, catálogo, capacidades internas, conocimiento permitido y módulos
+de coaching ejecutables; `scripts/escala-python` fija el runtime desde la raíz
+del bundle. Las regresiones prueban Codex, Claude y Hermes, actualización
+idempotente, rechazo de candidato corrupto e importación limpia del runtime.
 
-E10 se reabre con **S10.10 — Paquete portable autosuficiente de ESCALA**
-(`stories/s10.10-portable-bundle-repair.md`). Esta corrección no revierte la
-arquitectura de una puerta pública: instala una copia local de sus recursos y
-conserva las capacidades como internas. La aceptación con hardware limpio y
-modelos reales sigue perteneciendo a E42/E68.
+E10 conserva estado `active` únicamente hasta que E42/E68 registren la
+aceptación en hardware limpio y con modelos reales. Esa evidencia externa no
+se sustituye por esta reparación local.
 
 ## Objective
 
@@ -168,10 +167,11 @@ Script `scaleup-install` que:
 ## Done Criteria
 
 - [x] Los 6 coaching engines construidos y testeados (welcome, diagnose, worksheet, progress, level, router).
-- [-] El artefacto actual es un bundle completo sin checkout: S10.10 debe sustituir el symlink vivo por recursos instalados y verificados.
-- [-] La puerta `escala` debe funcionar desde una carpeta/proyecto vacío después de retirar el checkout fuente.
-- [-] Claude Code, Hermes y Codex deben recibir sólo la puerta pública desde la copia instalada; las diferencias de comportamiento real se califican en E68.
-- [-] La documentación debe distinguir el ZIP lifecycle del paquete conversacional portable y no prometer independencia que aún no existe.
+- [x] El artefacto portable contiene recursos verificados sin checkout y el instalador rechaza un manifest corrupto antes de activar enlaces.
+- [x] La puerta `escala` y todos los módulos de coaching importan desde una carpeta limpia mediante el runtime del bundle.
+- [x] Claude Code, Hermes y Codex reciben sólo la puerta pública desde la copia instalada; la paridad semántica con modelos reales se califica en E68.
+- [x] La documentación distingue el ZIP lifecycle del paquete conversacional portable y no promete que el primero sea el agente completo.
+- [-] E42/E68 deben registrar hardware limpio y ejecución con modelos reales; este gate externo permanece explícito.
 - [x] Retrospectiva histórica completada; permanece como registro, no como autoridad de cierre.
 
 ## Risks

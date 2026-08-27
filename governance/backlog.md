@@ -27,7 +27,7 @@ en `work/epics/`.
 
 | Orden | Épica | Estado real | Por qué va ahora | Gate para avanzar |
 |---:|---|---|---|---|
-| 0 | E10 — Distribución portable corregida | Activa; regresión histórica verificada | El instalador actual enlaza el checkout y el ZIP omite skills/catálogo/conocimiento; no es el bundle sin repositorio que se declaró. | Instalación aislada sobrevive al retiro del checkout, expone sólo `escala`, valida manifest y preserva datos locales. |
+| 0 | E10 — Distribución portable corregida | Reparación local completa; gate externo E42/E68 | El export portable ya no depende del checkout, verifica manifest, ejecuta coaching desde el bundle y publica sólo `escala`; faltan hardware limpio y modelos reales. | E42/E68 registran la aceptación externa sin sustituirla por fixtures. |
 | G | E42 — Qualification y catálogo verdadero | Gate externo de release; paralelo | Aún faltan 6 requisitos de aceptación maestra, que requieren hardware limpio y aceptación humana; consumirá el bundle corregido de E10. | 42/42 requisitos con recibos reproducibles y aprobación humana; no se sustituyen por fixtures. |
 | 1 | E44 — Aprendizaje de resultados | En curso local; aceptación pendiente | La cadena decisión→acción→resultado→aprendizaje está calificada sintéticamente en cuatro pilares. | Retrospectiva y aceptación real del empresario, sin atribución causal inventada. |
 | 2 | E45 — Especialistas internos | En curso local; piloto pendiente | Contratos, router, contexto mínimo, crítico y verificador están calificados; falta demostrar valor real. | Comparación honesta con coach único, piloto empresarial y empaquetado E67. |

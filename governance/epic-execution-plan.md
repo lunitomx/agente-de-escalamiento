@@ -10,9 +10,9 @@
   focalizadas actuales** pasan. E42 es su gate externo de release, no una razón
   para rehacerla.
 - E49, E52, E55 y E56 están completas y son contratos que se pueden consumir.
-- E10 se reabrió: el instalador vigente depende del checkout y el ZIP lifecycle
-  no incluye el agente completo. S10.10 debe restaurar el bundle portable antes
-  de afirmar instalación empresarial sin repositorio.
+- E10 reparó S10.10 localmente: el export portable ya no depende del checkout,
+  valida manifest y ejecuta coaching desde la raíz del bundle. E42/E68 conservan
+  la aceptación externa en hardware limpio y con modelos reales.
 - E42 tiene 36/42 requisitos de aceptación maestra demostrados; los seis
   faltantes requieren hardware limpio y aceptación humana real sobre el
   artefacto portable corregido.
@@ -53,7 +53,7 @@ fabrica estado RaiSE ni se bloquea producto.
 ## Carriles y orden real
 
 ```text
-Carril de distribución: E10 (S10.10 activo) → E42 (hardware/aceptación) ────────────────┐
+Carril de distribución: E10 (S10.10 ✓) → E42 (hardware/aceptación) ────────────────┐
 Carril de producto:     E43 ✓ → E44 (en curso) → E45 (en curso) ─────────────────────────────┤
 Carril de conocimiento:          E57 ✓ → E58 ✓ → E59 ✓ → E60..E63 (en curso) → E64 → E65 ──────┤
                                                                             ↓
