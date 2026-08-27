@@ -46,8 +46,8 @@ Hacer auditable el conocimiento Cash: fórmulas, unidades, supuestos, señales, 
 ## Estado de evidencia
 
 - S63.1, S63.3 y S63.5 tienen borradores privados trazables; los candidatos siguen sin promoción canónica hasta revisión independiente.
-- S63.2 y S63.4 no se declararán cerradas hasta validar cada fórmula contra activo fuente autorizado y enlazar el bloqueo de comparabilidad de E55.
-- La e-Form oficial pública v20/03 confirma semánticamente la estructura de CASh y Power of One, pero CASh no compila fórmulas hasta revisar la fuente externa citada por el libro; unidad, periodo y comparabilidad siguen siendo contratos E38/E55.
+- S63.2 conserva como candidato la fórmula de Working Capital Days respaldada directamente por `u0320`; el multiplicador literal y su semántica se mantienen sin normalizar hasta revisión independiente.
+- CASh no compila fórmulas hasta revisar la fuente externa citada por el libro; unidad, periodo y comparabilidad siguen siendo contratos E38/E55. La e-Form oficial pública v20/03 sólo confirma semánticamente la estructura de CASh y Power of One.
 
 ## Handoff y riesgos
 
