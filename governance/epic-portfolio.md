@@ -30,7 +30,7 @@ se alteraron para aparentar cierre.
 
 | Épica | Estado | Próxima decisión verificable |
 |---|---|---|
-| E10 | active | S10.10 reparó el bundle portable local; E42/E68 aún deben confirmar hardware limpio y modelos reales. |
+| E10 | active | S10.10 reparó el bundle y S10.11 eliminó instalación implícita/global-pip; E42/E68 aún deben confirmar hardware limpio y modelos reales. |
 | E42 | active | Calificar producto en plataformas limpias y registrar aceptación humana, usando el artefacto portable reparado por E10. |
 | E44 | in_progress | Ejecutar retrospectiva y aceptación de empresario; la calificación técnica local ya cubre los cuatro pilares sin reclamar causalidad. |
 | E45 | in_progress | Comparar contra un coach único en piloto empresarial; el router y las rutas de seguridad ya están calificados localmente. |

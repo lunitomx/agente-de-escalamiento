@@ -27,7 +27,7 @@ en `work/epics/`.
 
 | Orden | Épica | Estado real | Por qué va ahora | Gate para avanzar |
 |---:|---|---|---|---|
-| 0 | E10 — Distribución portable corregida | Reparación local completa; gate externo E42/E68 | El export portable ya no depende del checkout, verifica manifest, ejecuta coaching desde el bundle y publica sólo `escala`; faltan hardware limpio y modelos reales. | E42/E68 registran la aceptación externa sin sustituirla por fixtures. |
+| 0 | E10 — Distribución portable corregida | Reparación local completa; gate externo E42/E68 | El export portable no depende del checkout, verifica manifest, publica sólo `escala` y exige plataforma explícita; el runtime usa `.venv`/`uv`, no pip global. Faltan hardware limpio y modelos reales. | E42/E68 registran la aceptación externa sin sustituirla por fixtures. |
 | G | E42 — Qualification y catálogo verdadero | Gate externo de release; paralelo | Aún faltan 6 requisitos de aceptación maestra, que requieren hardware limpio y aceptación humana; consumirá el bundle corregido de E10. | 42/42 requisitos con recibos reproducibles y aprobación humana; no se sustituyen por fixtures. |
 | 1 | E44 — Aprendizaje de resultados | En curso local; aceptación pendiente | La cadena decisión→acción→resultado→aprendizaje está calificada sintéticamente en cuatro pilares. | Retrospectiva y aceptación real del empresario, sin atribución causal inventada. |
 | 2 | E45 — Especialistas internos | En curso local; piloto pendiente | Contratos, router, contexto mínimo, crítico y verificador están calificados; falta demostrar valor real. | Comparación honesta con coach único, piloto empresarial y empaquetado E67. |
@@ -56,7 +56,7 @@ demuestre una falla propia.
 | Modelo | E58, E59 | Ontología compatible y fundamentos 4D fieles. |
 | Cobertura | E60, E61, E62, E63, E64 | People, Strategy, Execution y Cash transformados en nodos trazables. |
 | Procedimientos | E65, E69 | Intervenciones completas con entradas, reglas, salida y evaluación. |
-| Portabilidad | E67, E68 | Un núcleo portable para Codex/Claude, con adaptadores aislados. |
+| Portabilidad | E67, E68 | Un núcleo portable para Codex/Claude, con adaptadores aislados y empaquetado Agent Plugins v1 sin MCP implícito. |
 | Release | E70 | Instalación limpia, paridad, límites y distribución honesta. |
 
 ## Decisiones de arquitectura ya tomadas

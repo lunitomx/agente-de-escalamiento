@@ -1,6 +1,6 @@
 # Plan de ejecución canónico — ESCALA
 
-> **Actualizado:** 2026-08-27
+> **Actualizado:** 2026-08-28
 > **Propósito:** cerrar la meta de producto con verdad verificable, sin convertir
 > herramientas internas ni aprobaciones rutinarias en bloqueos artificiales.
 
@@ -10,9 +10,10 @@
   focalizadas actuales** pasan. E42 es su gate externo de release, no una razón
   para rehacerla.
 - E49, E52, E55 y E56 están completas y son contratos que se pueden consumir.
-- E10 reparó S10.10 localmente: el export portable ya no depende del checkout,
-  valida manifest y ejecuta coaching desde la raíz del bundle. E42/E68 conservan
-  la aceptación externa en hardware limpio y con modelos reales.
+- E10 reparó S10.10 y S10.11 localmente: el export portable ya no depende
+  del checkout y el instalador exige plataforma explícita, usa `.venv` mediante
+  `uv` y no configura MCPs por detección incidental. E42/E68 conservan la
+  aceptación externa en hardware limpio y con modelos reales.
 - E42 tiene 36/42 requisitos de aceptación maestra demostrados; los seis
   faltantes requieren hardware limpio y aceptación humana real sobre el
   artefacto portable corregido.
@@ -53,7 +54,7 @@ fabrica estado RaiSE ni se bloquea producto.
 ## Carriles y orden real
 
 ```text
-Carril de distribución: E10 (S10.10 ✓) → E42 (hardware/aceptación) ────────────────┐
+Carril de distribución: E10 (S10.10/S10.11 ✓) → E42 (hardware/aceptación) ─────────┐
 Carril de producto:     E43 ✓ → E44 (en curso) → E45 (en curso) ─────────────────────────────┤
 Carril de conocimiento:          E57 ✓ → E58 ✓ → E59 ✓ → E60..E63 (en curso) → E64 → E65 ──────┤
                                                                             ↓
@@ -84,7 +85,7 @@ E46 se alimenta de resultados reales de E44/E45; nunca cambia producto solo.
 | Fidelidad | E63 | Corpus Cash: CASh, CCC, Power of One y los ejercicios del Learning Day. | Después de E58; paralelo. | Fórmulas/periodos verificables, conciliación de entradas y ninguna cifra inventada. |
 | Consolidación | E64 | Resolver candidatos, conflictos, relaciones, cobertura y cola de revisión. | Requiere E59–E63. | Cobertura de estructuras nombradas, 100% de reglas normativas con evidencia y cero relaciones rotas. |
 | Procedimientos | E65 | Compilar los seis procedimientos MVP desde nodos verificados; no desde texto crudo. | Requiere E64, E49 y E52. | Cada procedimiento tiene trigger/no-trigger, entrevista, salida, aceptación, memoria y evaluación. |
-| Portabilidad | E67 | Empaquetar núcleo de skills y cuatro especialistas internos con adaptadores aislados Codex/Claude. | Requiere E45, E65 y E56. | Mismo núcleo portable, una puerta `escala`, adaptadores sin mezclar instrucciones de plataforma. |
+| Portabilidad | E67 | Empaquetar núcleo de skills y cuatro especialistas internos con adaptadores aislados Codex/Claude, incluido paquete Agent Plugins v1 sin ampliar la superficie pública. | Requiere E45, E65 y E56. | Mismo núcleo portable, una puerta `escala`, manifest estándar y adaptadores sin mezclar instrucciones de plataforma. |
 | Calificación | E68 | Probar equivalencia semántica en Codex y Claude con sesiones limpias. | Requiere E67 y E35. | Activación, no-activación y golden cases equivalentes; diferencias reportadas, no ocultas. |
 | Biblioteca | E69 | Entregar el resto de procedimientos por olas, no todos de golpe. | Requiere E68. | Cada ola pasa cobertura, evidencia, activación y aceptación antes de abrir la siguiente. |
 | Extensión | E75 | Diagnóstico narrativo y deep dive elegido por el empresario, nunca una batería 1–5. | S75.1/S75.2 consumen E49/E55; los handoffs S75.3–S75.5 esperan E65. | Handoff explicable hacia People/Strategy/Execution/Cash y preguntas que piden evidencia sólo cuando cambian la decisión. |
