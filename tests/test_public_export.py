@@ -223,6 +223,11 @@ def test_canonical_selection_is_explicit_and_excludes_internal_families() -> Non
         "templates",
         "validators/export.py",
         "validators/session.py",
+        "escala_server/dashboard.py",
+        "escala_server/outcome_learning.py",
+        "escala_server/specialist_team.py",
+        "escala_server/lifecycle",
+        "escala_server/workspace",
     } <= selection_paths
     assert not any(
         "/tests" in path or path.startswith("tests") for path in selection_paths
@@ -967,6 +972,55 @@ def test_selected_server_has_no_private_ingester_dependency() -> None:
 
     assert ".data.knowledge_ingester" not in server_source
     assert '"/api/knowledge/ingest"' not in server_source
+
+
+def test_canonical_export_starts_server_and_lifecycle_in_isolated_process(
+    tmp_path: Path,
+) -> None:
+    """The distribution must not rely on the source checkout at runtime."""
+
+    source_commit = _git(ROOT, "rev-parse", "HEAD")
+    artifact = tmp_path / "artifact"
+    build_public_export(
+        repository=ROOT,
+        destination=artifact,
+        source_commit=source_commit,
+        policy=load_public_export_policy(EXPORT_POLICY_PATH),
+        inventory=load_third_party_inventory(THIRD_PARTY_PATH),
+    )
+    environment = os.environ | {"PYTHONPATH": str(artifact)}
+    workspace = tmp_path / "isolated-workspace"
+    workspace.mkdir()
+    server = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            (
+                "from escala_server.server import make_server; "
+                "server = make_server(host='127.0.0.1', port=0, "
+                "static_root='escala_server/static', db_path='escala.sqlite'); "
+                "server.server_close()"
+            ),
+        ],
+        cwd=workspace,
+        env=environment,
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=10,
+    )
+    lifecycle = subprocess.run(
+        [sys.executable, "-m", "escala_server.lifecycle", "--help"],
+        cwd=workspace,
+        env=environment,
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=10,
+    )
+
+    assert server.returncode == 0, server.stderr
+    assert lifecycle.returncode == 0, lifecycle.stderr
 
 
 def test_selected_package_metadata_is_source_neutral() -> None:

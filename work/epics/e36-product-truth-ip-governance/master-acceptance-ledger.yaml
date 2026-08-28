@@ -11,7 +11,7 @@ authorities:
     hash_kind: semantic
   public_export:
     path: governance/public-export.yaml
-    sha256: 2c78aff0eac9dc676514dcd3037558d83c0db6b4776850259f2284f381daf850
+    sha256: 663900f241760b23cce5ec560b38052c7853e08b4f819dc7818cc5d82b127742
     hash_kind: semantic
 source_requirements:
   - id: SRC-CASH-001
@@ -132,7 +132,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: b521b54a90a2c9bc1cb9f9ef8361ee957e5b9f06d1446d0cdd0b4d1df9af4ecd}
+    proof: {state: proved, receipt_sha256: f1f11c872735ab3548475462cabc5e82011d5db949f2d4967a5c4fa5d001501c}
   - id: REQ-E37-002
     owner: {epic: E37, story: S37.1}
     source_ids: [SRC-LOCAL-001, SRC-SQLITE-001]
@@ -149,7 +149,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: e85e185e05e9bae7555d6c3055793ddac060121bd24edd11619678ec3562a88a}
+    proof: {state: proved, receipt_sha256: 19a6ad6815ce01d9a0c5bc35af9064f5ed121588fa78b1688cfedd25f8b09e92}
   - id: REQ-E37-003
     owner: {epic: E37, story: S37.2}
     source_ids: [SRC-INGEST-001]
@@ -166,7 +166,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: c62d4a09ce0ca07d0a6324e36b594ed3cc765ef3606551d95052bbf88027850f}
+    proof: {state: proved, receipt_sha256: 75d2785cf657eace36c52ceacd29134afb248c252b887decf77d6a75d0d62da0}
   - id: REQ-E37-004
     owner: {epic: E37, story: S37.2}
     source_ids: [SRC-EVIDENCE-001, SRC-INGEST-001]
@@ -183,7 +183,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 120532415d4c3d2db706b053d04bc903f92ae0c7374ca1685bc5862928741912}
+    proof: {state: proved, receipt_sha256: 4aa51e9a33b5ad6c550a1247d524c9980e073e7b8e42e5700c83c2207f66a54b}
   - id: REQ-E37-005
     owner: {epic: E37, story: S37.2}
     source_ids: [SRC-EVIDENCE-001, SRC-INGEST-001]
@@ -200,7 +200,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 05a7d21279ed9678753decaae4a040c72a1675ece469623d962ffa9af4878ac6}
+    proof: {state: proved, receipt_sha256: 93504b8b6af9bcc6d2a092d4fd4508a3ce71f97ccdf63836e99595132f77c4a6}
   - id: REQ-E37-006
     owner: {epic: E37, story: S37.3}
     source_ids: [SRC-SHARING-001]
@@ -217,7 +217,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 5f108f2af7ba34a4a564e6990f7569dcd9633401c40d7957f44f05ffaf881c4b}
+    proof: {state: proved, receipt_sha256: 214926d9c3a5c412759516cd24332639a080a22554c2f5d8827904f99814ccf7}
   - id: REQ-E37-007
     owner: {epic: E37, story: S37.3}
     source_ids: [SRC-EVIDENCE-001, SRC-INGEST-001]
@@ -234,7 +234,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: c4391880f27e90df8120dca600b7cb8ed2de362a9b08c5021fab712100a17c28}
+    proof: {state: proved, receipt_sha256: 39bd113ae470d2f9b3ff27b7f9c95706640137e6242be6c355aaee0138e7f7e8}
   - id: REQ-E38-001
     owner: {epic: E38, story: S38.1}
     source_ids: [SRC-CASH-001, SRC-INGEST-001]
@@ -251,7 +251,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: f1346a101c52c1ec5ce08c2c87a11fac4cdd4d135106ff0492e2ffea34df6314}
+    proof: {state: proved, receipt_sha256: 4743ff9bafe9d10fac68aa32ed221db34236f6098139ba3a1c403df52ab56799}
   - id: REQ-E38-002
     owner: {epic: E38, story: S38.1}
     source_ids: [SRC-CASH-001, SRC-EVIDENCE-001]
@@ -268,7 +268,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 12e3503fdf544f88712983a4c9f19ece0d5c5378b4e93fb066ec9839ee39f6cd}
+    proof: {state: proved, receipt_sha256: 94a5dcab7bcbdc63e38e5b304cd42de7f15f7dff1f505aebc66e5c5f5751cb1b}
   - id: REQ-E38-003
     owner: {epic: E38, story: S38.2}
     source_ids: [SRC-CASH-001]
@@ -285,7 +285,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: dea4adceaee748ffc4066d89ba7ea62284adf8cc706ad35c8dd486f24921f0ee}
+    proof: {state: proved, receipt_sha256: 60f7165fab8f3217fce3b226efc69353e507d2a2094e2499add49de587e4c3c9}
   - id: REQ-E38-004
     owner: {epic: E38, story: S38.2}
     source_ids: [SRC-CASH-001, SRC-EVIDENCE-001]
@@ -302,7 +302,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 7f6d09802347dcdfc22ba743054b3ed866c0c26bc6462299349020e9bad486e9}
+    proof: {state: proved, receipt_sha256: e2e3c13683d60f1c0c0e56bbf4d6e87bcad4c00b0c2ebac3b028b115c0a8fa43}
   - id: REQ-E38-005
     owner: {epic: E38, story: S38.3}
     source_ids: [SRC-CASH-001]
@@ -319,7 +319,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 4648864eb250a9b51ccb5be82609f39e809910d7dc3455efe3a25c11c5915397}
+    proof: {state: proved, receipt_sha256: 8baca6c9700b5e0fda415ce7c5f14d19d1ab2c1489e9c72bbad2b1a09e15680f}
   - id: REQ-E38-006
     owner: {epic: E38, story: S38.3}
     source_ids: [SRC-CASH-001, SRC-EVIDENCE-001]
@@ -336,7 +336,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 6cf7f8e6faeb1e0f4788eb0322d0b1b241e4fd303c731b64120c28445e774f8c}
+    proof: {state: proved, receipt_sha256: 0ed9b799da8233c9930684c0dd2dcfdb592dece481ae77c349245e78f2d595f0}
   - id: REQ-E38-007
     owner: {epic: E38, story: S38.4}
     source_ids: [SRC-CASH-001, SRC-COCKPIT-001]
@@ -353,7 +353,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 9a03898f91e017d88f2e9c1e05047cd20607a7620f70989a5a7e9add8573d110}
+    proof: {state: proved, receipt_sha256: 1214cfc46e0e5fad0b09bb59f65d48cc18bbf59005aaa37769fbb1525b03adda}
   - id: REQ-E39-001
     owner: {epic: E39, story: S39.1}
     source_ids: [SRC-INGEST-001, SRC-MEETING-001, SRC-SHARING-001]
@@ -370,7 +370,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: b2b2c79dd7b5cedc3a5f7b5bf35297b34fdf8d527aabc2a69a0c5b971d37be0d}
+    proof: {state: proved, receipt_sha256: 76075cb444c31ef676058b0cb10e90247102979ad08c0c85fe380b9babd2197e}
   - id: REQ-E39-002
     owner: {epic: E39, story: S39.1}
     source_ids: [SRC-EVIDENCE-001, SRC-MEETING-001]
@@ -387,7 +387,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: e45a7be322ca55c15129f29a31a37f1ebb8fe655eb00fc8150a7d90c8da52ed1}
+    proof: {state: proved, receipt_sha256: 410062e4532a108927a69cb4d64a5186d8f4f19aaed37a21675b0a36dc8ce8ec}
   - id: REQ-E39-003
     owner: {epic: E39, story: S39.2}
     source_ids: [SRC-EVIDENCE-001, SRC-MEETING-001]
@@ -404,7 +404,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 12904c9fc35f851107340f58f7f554f40b89305cc498e0996e32403d3effcb1f}
+    proof: {state: proved, receipt_sha256: 1a20e75cbe0d514ebfa6e80ea89b86b71ea732a88a047095ef21647fb76c9f7f}
   - id: REQ-E39-004
     owner: {epic: E39, story: S39.2}
     source_ids: [SRC-EVIDENCE-001, SRC-MEETING-001]
@@ -421,7 +421,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 7c488fbedb8fcfe331887cda33ae983bb813d5890e77c411053de803f287f0d6}
+    proof: {state: proved, receipt_sha256: 71b09b26021dd2971f45e6d832a2fc22c69ec4a373bbc46679935f85ca129dd7}
   - id: REQ-E39-005
     owner: {epic: E39, story: S39.3}
     source_ids: [SRC-MEETING-001]
@@ -438,7 +438,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 86cb8a8f28deb8a96b3e869578619f5ed4674332c410102a0d5a2880316ca532}
+    proof: {state: proved, receipt_sha256: cdae9f992af9acae4e6884a4b196935cc09f820735bbb3a895c1a2ccb92e2355}
   - id: REQ-E39-006
     owner: {epic: E39, story: S39.3}
     source_ids: [SRC-EVIDENCE-001, SRC-MEETING-001]
@@ -455,7 +455,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: af0a5723b6c9bde660a3696f5b716fba063671135466752be8d1e1344825060d}
+    proof: {state: proved, receipt_sha256: 51298fbd6ae67df15564cf2feaf315b9d096b594254dc84b0d1dcc3e31550af2}
   - id: REQ-E39-007
     owner: {epic: E39, story: S39.4}
     source_ids: [SRC-LOCAL-001, SRC-MEETING-001, SRC-SHARING-001, SRC-SQLITE-001]
@@ -472,7 +472,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 97a0f6390effda447e06a385044dfde2b2512920f56640edb9ab83b194eeb49c}
+    proof: {state: proved, receipt_sha256: e99ed79cc18fa08b45ff61e42f303b1e113c740ed6c3c76d60fce64d97dd5d95}
   - id: REQ-E40-001
     owner: {epic: E40, story: S40.1}
     source_ids: [SRC-COACH-001, SRC-EVIDENCE-001]
@@ -489,7 +489,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 8e98e711902fa69e327080fe09ce48932294a053bd0be0d425db4755c7963d0e}
+    proof: {state: proved, receipt_sha256: b751bf97e2c03939b87a0e4310393f99a613ab42c1f7b372e1596c593e177050}
   - id: REQ-E40-002
     owner: {epic: E40, story: S40.1}
     source_ids: [SRC-COACH-001, SRC-COCKPIT-001, SRC-EVIDENCE-001]
@@ -506,7 +506,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 973b2aa3b0bab1a6e5c62966869fafd1fbf8d12be0c96424af118c8a8aa7b6e1}
+    proof: {state: proved, receipt_sha256: 8b25e9002c23124d66a3187804b8c4ea73f653b9f989eebd87e3c057367590e0}
   - id: REQ-E40-003
     owner: {epic: E40, story: S40.2}
     source_ids: [SRC-COACH-001, SRC-COCKPIT-001]
@@ -523,7 +523,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 132b1bad88b28b4668944b68cc54a9e3fe175dc2334f239392cba2b940559b81}
+    proof: {state: proved, receipt_sha256: 8e7d557923ebf1e05acb60d00d281c2bc85ff0f01b78d720a652b7d54a06b4ba}
   - id: REQ-E40-004
     owner: {epic: E40, story: S40.3}
     source_ids: [SRC-COACH-001, SRC-EVIDENCE-001]
@@ -540,7 +540,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: e42614f9951ab9e4b86df95dc18e8e5ce0ccbca19a3aab23f5998160a6a37f66}
+    proof: {state: proved, receipt_sha256: 0e2bce2f9e492880d5983c13e2dd193496b3d61a74ec5516c315d6474be472d2}
   - id: REQ-E40-005
     owner: {epic: E40, story: S40.3}
     source_ids: [SRC-COACH-001, SRC-EVIDENCE-001]
@@ -557,7 +557,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 5329b5eb861a778d11c14935bcf9a3bab7be787a58100f43283503640e9e5e61}
+    proof: {state: proved, receipt_sha256: 70422fea323ad88c831cce1ffcd83ee58d2ef4cbe60a8743a774c6665993259d}
   - id: REQ-E40-006
     owner: {epic: E40, story: S40.4}
     source_ids: [SRC-COACH-001, SRC-LOCAL-001]
@@ -574,7 +574,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: a96216887422e9ef01688452b37e71418e2fa233451f1fbcbfa887d688a8f9d3}
+    proof: {state: proved, receipt_sha256: 0c6b15c2a5ff253fefcd0456631bd5558dc59691eff952eaf319556bda5136b9}
   - id: REQ-E40-007
     owner: {epic: E40, story: S40.2}
     source_ids: [SRC-COCKPIT-001, SRC-EVIDENCE-001]
@@ -591,7 +591,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: e8dee05a7a0d736c548388bf0c451102315077dee0bef917918e717ce39bceed}
+    proof: {state: proved, receipt_sha256: d07f0dca9c090349c5c4e5b6d17bf392f410bfcd1a1d20d7cacf146aab0da8c9}
   - id: REQ-E40-008
     owner: {epic: E40, story: S40.4}
     source_ids: [SRC-COACH-001, SRC-EVIDENCE-001]
@@ -608,7 +608,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 3ce95613e7d239fbdc60d3b02e31a1b94458db58bfa5785d917be7c69e69db90}
+    proof: {state: proved, receipt_sha256: 93d9f50c955c75036d369d4e7e643a8dbf8f58fd3b0c199ddea855bc61dbefdb}
   - id: REQ-E41-001
     owner: {epic: E41, story: S41.1}
     source_ids: [SRC-INSTALL-001, SRC-LOCAL-001]
@@ -625,7 +625,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 7f1a9348023a064124aad5d29976d1187f0911776ffb62a2d4131437845caaf5}
+    proof: {state: proved, receipt_sha256: 96307acb8db7539303b866d3c52f4d1163c9996e9928ca237d7827f28405980b}
   - id: REQ-E41-002
     owner: {epic: E41, story: S41.1}
     source_ids: [SRC-INSTALL-001, SRC-LOCAL-001]
@@ -642,7 +642,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 544aa9c4e2011ab394b69a3d3a1c45b22f9f1437766ee08415c6aa30d7ca00c4}
+    proof: {state: proved, receipt_sha256: 4680c71d474c7d4df6554a21f6ff1c8031e6f04a944a218f70e48f5b9bcc16ba}
   - id: REQ-E41-003
     owner: {epic: E41, story: S41.2}
     source_ids: [SRC-INSTALL-001, SRC-LOCAL-001]
@@ -659,7 +659,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: c02926d5639b48310bf436739f16c2bff0f60a52639eae7e2616f085c993df41}
+    proof: {state: proved, receipt_sha256: 7ba255ef9f1efc122d6f234cc6867e23a9d4b8de95f0f035d73f02119fb769e4}
   - id: REQ-E41-004
     owner: {epic: E41, story: S41.3}
     source_ids: [SRC-INSTALL-001, SRC-LOCAL-001]
@@ -676,7 +676,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: bfb7d73002a7ce424270fa39ebc07e859ae89b0ab3f0d333f245dacddfc2863c}
+    proof: {state: proved, receipt_sha256: 9c10dde917e7a1faab15838354d4d745ceb691038e0264ca817fc3b452cda302}
   - id: REQ-E41-005
     owner: {epic: E41, story: S41.3}
     source_ids: [SRC-INSTALL-001, SRC-QUALIFY-001]
@@ -693,7 +693,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: f73805a011086d2f92e5b20e16facdd852f8bcc82e1ed55641495a5a670d65aa}
+    proof: {state: proved, receipt_sha256: a739da7c85bf801a0710a6cc9255ef3f661b23dcadaeafd79a22935d5a9a6f6d}
   - id: REQ-E41-006
     owner: {epic: E41, story: S41.2}
     source_ids: [SRC-INSTALL-001, SRC-SHARING-001, SRC-SQLITE-001]
@@ -710,7 +710,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: f26091d920c58ad05f079aaaf131366610e851e6434bd8113132f6de7f061b8d}
+    proof: {state: proved, receipt_sha256: 5ddd6eefb06a519efdce3047d14b2967706f9f4883d53e0194af5aef5b9f1e23}
   - id: REQ-E41-007
     owner: {epic: E41, story: S41.4}
     source_ids: [SRC-INSTALL-001, SRC-QUALIFY-001]
@@ -727,7 +727,7 @@ requirements:
       team_exchange: ordinary_filesystem_documents_only
       authoritative_sqlite_sync: forbidden
     delivery_disposition: complete
-    proof: {state: proved, receipt_sha256: 54bd006e1f8a1902a047ce11c36d357f96033650ca8e7e2bbc621856500866c6}
+    proof: {state: proved, receipt_sha256: 8136505a9ff6e9f778323b31003f7cf881f39b3e0d5c886b2ea6b156a58dd7c9}
   - id: REQ-E42-001
     owner: {epic: E42, story: S42.1}
     source_ids: [SRC-QUALIFY-001]
