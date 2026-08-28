@@ -6,6 +6,7 @@ closure_disposition: "completed"
 created: "2026-08-21"
 jira_key: "ESCALA-11"
 source_issue: "https://github.com/lunitomx/agente-de-escalamiento/issues/9"
+source_issue_closed: "2026-08-28"
 ---
 
 # E55 — Onboarding multifuente y conciliación de métricas de negocio
