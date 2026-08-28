@@ -15,6 +15,7 @@ from .models import (
     RouteAction,
 )
 from .narrative import (
+    CompanyUnderstanding,
     FocusProposal,
     NarrativeAssessment,
     NarrativeFinding,
@@ -32,6 +33,7 @@ __all__ = [
     "FunnelMetrics",
     "PrefillResult",
     "RouteAction",
+    "CompanyUnderstanding",
     "FocusProposal",
     "NarrativeAssessment",
     "NarrativeFinding",
@@ -372,6 +374,7 @@ def _run_narrative_assessment(context: dict, base: Path) -> dict:
         assessment = build_narrative_assessment(
             intake,
             company_summary=context.get("company_summary", ""),
+            company_understanding=context.get("company_understanding", {}),
             findings=context.get("findings", ()),
             proposed_focuses=context.get("proposed_focuses", ()),
             open_questions=context.get("open_questions", ()),
@@ -398,9 +401,11 @@ def _run_narrative_assessment(context: dict, base: Path) -> dict:
     persisted_path: str | None = None
     if wants_persistence:
         profile = dict(read_yaml(profile_path) or {})
+        artifact = assessment_to_artifact(assessment)
         assessments = list(profile.get("narrative_assessments", []))
-        assessments.append(assessment_to_artifact(assessment))
+        assessments.append(artifact)
         profile["narrative_assessments"] = assessments
+        profile["narrative_assessment"] = artifact
         write_yaml(profile_path, profile)
         persisted_path = str(profile_path)
 

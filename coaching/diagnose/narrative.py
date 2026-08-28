@@ -17,6 +17,55 @@ from .models import Confidence, DiagnosticIntake
 Decision = Literal["people", "strategy", "execution", "cash"]
 FindingStatus = Literal["observed", "hypothesis", "unknown", "not_applicable"]
 ConfirmationStatus = Literal["pending", "confirmed", "corrected"]
+CompanyField = Literal[
+    "industry",
+    "offering",
+    "target_customer",
+    "business_model",
+    "primary_challenge",
+]
+
+
+class CompanyUnderstanding(BaseModel):
+    """Confirmed company context, with gaps marked instead of silently omitted."""
+
+    industry: str | None = Field(default=None, max_length=1_000)
+    offering: str | None = Field(default=None, max_length=1_000)
+    target_customer: str | None = Field(default=None, max_length=1_000)
+    business_model: str | None = Field(default=None, max_length=1_000)
+    primary_challenge: str | None = Field(default=None, max_length=1_000)
+    unknown_fields: list[CompanyField] = Field(default_factory=list)
+
+    @field_validator("unknown_fields")
+    @classmethod
+    def unknown_fields_are_unique(cls, value: list[CompanyField]) -> list[CompanyField]:
+        if len(value) != len(set(value)):
+            raise ValueError("company unknown_fields must be unique")
+        return value
+
+    @model_validator(mode="after")
+    def each_company_field_is_known_or_explicitly_unknown(
+        self,
+    ) -> "CompanyUnderstanding":
+        fields: tuple[CompanyField, ...] = (
+            "industry",
+            "offering",
+            "target_customer",
+            "business_model",
+            "primary_challenge",
+        )
+        unknown = set(self.unknown_fields)
+        for field in fields:
+            value = getattr(self, field)
+            if value is None and field not in unknown:
+                raise ValueError(
+                    "company understanding must mark missing fields unknown"
+                )
+            if value is not None and field in unknown:
+                raise ValueError(
+                    "company understanding cannot mark a known field unknown"
+                )
+        return self
 
 
 class NarrativeFinding(BaseModel):
@@ -56,6 +105,7 @@ class NarrativeAssessment(BaseModel):
     """A confirmable diagnosis that makes uncertainty visible before any score."""
 
     company_summary: str = Field(min_length=3, max_length=2_000)
+    company_understanding: CompanyUnderstanding
     findings: list[NarrativeFinding] = Field(min_length=1, max_length=20)
     proposed_focuses: list[FocusProposal] = Field(default_factory=list, max_length=2)
     open_questions: list[str] = Field(default_factory=list, max_length=12)
@@ -86,6 +136,7 @@ def build_narrative_assessment(
     intake: DiagnosticIntake,
     *,
     company_summary: str,
+    company_understanding: CompanyUnderstanding | Mapping[str, object],
     findings: Sequence[NarrativeFinding | Mapping[str, object]],
     proposed_focuses: Sequence[FocusProposal | Mapping[str, object]] = (),
     open_questions: Sequence[str] = (),
@@ -113,6 +164,11 @@ def build_narrative_assessment(
             raise ValueError("narrative assessment crosses decision evidence")
     return NarrativeAssessment(
         company_summary=company_summary,
+        company_understanding=(
+            company_understanding
+            if isinstance(company_understanding, CompanyUnderstanding)
+            else CompanyUnderstanding.model_validate(company_understanding)
+        ),
         findings=normalized_findings,
         proposed_focuses=normalized_focuses,
         open_questions=list(open_questions),
@@ -123,7 +179,21 @@ def build_narrative_assessment(
 def render_narrative_assessment(assessment: NarrativeAssessment) -> str:
     """Render a compact entrepreneur-facing assessment without a score table."""
     lines = ["## Esto es lo que entendí", "", assessment.company_summary, ""]
-    lines.extend(["### Señales que veo", ""])
+    lines.extend(["### Empresa que entendí", ""])
+    labels = {
+        "industry": "Industria",
+        "offering": "Oferta",
+        "target_customer": "Cliente objetivo",
+        "business_model": "Modelo de negocio",
+        "primary_challenge": "Reto actual",
+    }
+    for field, label in labels.items():
+        value = getattr(assessment.company_understanding, field)
+        if value is not None:
+            lines.append(f"- **{label}:** {value}")
+        else:
+            lines.append(f"- **{label}:** todavía no lo sé")
+    lines.extend(["", "### Señales que veo", ""])
     for finding in assessment.findings:
         qualifier = {
             "observed": "observé",

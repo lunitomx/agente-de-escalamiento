@@ -27,11 +27,25 @@ def _evidence() -> DiagnosticEvidence:
     )
 
 
+def _company_understanding(**overrides: object) -> dict[str, object]:
+    value: dict[str, object] = {
+        "industry": "Alimentos",
+        "offering": "Alimentos preparados",
+        "target_customer": "Tiendas independientes",
+        "business_model": "Venta B2B recurrente",
+        "primary_challenge": "Crecer sin tensionar caja",
+        "unknown_fields": [],
+    }
+    value.update(overrides)
+    return value
+
+
 def _context(**overrides: object) -> dict[str, object]:
     context: dict[str, object] = {
         "action": "narrative_assessment",
         "company": {"name": "Nopal Foods"},
         "company_summary": "Nopal Foods vende alimentos y busca crecer sin tensionar caja.",
+        "company_understanding": _company_understanding(),
         "evidence": [_evidence().model_dump(mode="json")],
         "findings": [
             {
@@ -70,6 +84,42 @@ def test_narrative_assessment_renders_evidence_and_unknowns_without_score() -> N
     )
 
 
+def test_company_understanding_makes_missing_fields_explicit() -> None:
+    result = run(
+        _context(
+            company_understanding={
+                "industry": "Alimentos",
+                "offering": None,
+                "target_customer": None,
+                "business_model": None,
+                "primary_challenge": "Crecer con caja estable",
+                "unknown_fields": ["offering", "target_customer", "business_model"],
+            }
+        )
+    )
+
+    assert result["errors"] == []
+    assert "**Oferta:** todavía no lo sé" in result["output"]
+
+
+def test_company_understanding_rejects_silent_missing_field() -> None:
+    result = run(
+        _context(
+            company_understanding={
+                "industry": "Alimentos",
+                "offering": None,
+                "target_customer": "Tiendas",
+                "business_model": "B2B",
+                "primary_challenge": "Caja",
+                "unknown_fields": [],
+            }
+        )
+    )
+
+    assert result["errors"]
+    assert "must mark missing fields unknown" in result["errors"][0]
+
+
 def test_narrative_assessment_rejects_unknown_evidence_reference() -> None:
     intake = build_diagnostic_intake(evidence=[_evidence()])
 
@@ -77,6 +127,7 @@ def test_narrative_assessment_rejects_unknown_evidence_reference() -> None:
         build_narrative_assessment(
             intake,
             company_summary="Empresa con una tensión conocida.",
+            company_understanding=_company_understanding(),
             findings=[
                 {
                     "decision": "cash",
@@ -95,6 +146,7 @@ def test_narrative_assessment_rejects_cross_decision_evidence() -> None:
         build_narrative_assessment(
             intake,
             company_summary="Empresa con una tensión conocida.",
+            company_understanding=_company_understanding(),
             findings=[
                 {
                     "decision": "people",
@@ -152,3 +204,6 @@ def test_confirmed_narrative_assessment_persists_only_when_authorized(tmp_path) 
         tmp_path / ".escala" / "agent" / "memory" / "company-profile.yaml"
     )
     assert profile["narrative_assessments"][0]["confirmation_status"] == "corrected"
+    assert profile["narrative_assessment"]["company_understanding"]["offering"] == (
+        "Alimentos preparados"
+    )

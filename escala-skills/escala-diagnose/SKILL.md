@@ -68,6 +68,14 @@ result = run(
         "base_path": ".",
         "company": {"name": "Ejemplo"},
         "company_summary": "La empresa vende ... y busca ...",
+        "company_understanding": {
+            "industry": "...",
+            "offering": "...",
+            "target_customer": "...",
+            "business_model": "...",
+            "primary_challenge": "...",
+            "unknown_fields": []
+        },
         "evidence": [
             {
                 "evidence_id": "welcome.cash.1",
