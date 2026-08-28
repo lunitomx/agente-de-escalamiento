@@ -143,7 +143,7 @@ def test_missing_yaml_graceful(tmp_path):
 # ---------------------------------------------------------------------------
 
 REQUIRED_SECTION_HEADERS = [
-    "## 1. Diagnosis Scores",
+    "## 1. Diagnosis & Assessment",
     "## 2. Annual Goal",
     "## 3. Active Priorities",
     "## 4. Open Tasks",
@@ -188,7 +188,7 @@ def test_sections_included_in_artifacts(tmp_path):
 
     result = run({"base_path": str(tmp_path)})
     sections = result["artifacts"].get("sections_included", [])
-    for expected in ["scores", "goal", "priorities", "tasks", "next_steps"]:
+    for expected in ["assessment", "goal", "priorities", "tasks", "next_steps"]:
         assert expected in sections, f"Section {expected!r} missing from artifacts"
 
 
@@ -218,3 +218,40 @@ def test_scores_table_in_output(tmp_path):
     export_path = Path(result["artifacts"]["export_path"])
     content = export_path.read_text()
     assert "|" in content, "Expected markdown table in export file"
+
+
+def test_narrative_assessment_appears_without_optional_scores(tmp_path):
+    """A narrative-first company export must not instruct the user to score 1–5."""
+    import yaml
+    from coaching.export import run
+
+    memory = tmp_path / ".escala" / "agent" / "memory"
+    memory.mkdir(parents=True)
+    (memory / "company-profile.yaml").write_text(
+        yaml.dump(
+            {
+                "narrative_assessment": {
+                    "company_summary": "Cobramos después de entregar.",
+                    "confirmation_status": "confirmed",
+                    "company_understanding": {
+                        "industry": "Alimentos",
+                        "offering": "Venta B2B",
+                        "target_customer": "Tiendas",
+                        "business_model": "Recurrente",
+                        "primary_challenge": "Caja",
+                    },
+                    "proposed_focuses": [
+                        {"decision": "cash", "rationale": "Cobranza lenta."}
+                    ],
+                }
+            }
+        )
+    )
+
+    result = run({"base_path": str(tmp_path)})
+    content = Path(result["artifacts"]["export_path"]).read_text()
+
+    assert "## 1. Diagnosis & Assessment" in content
+    assert "Cobramos después de entregar." in content
+    assert "No diagnosis scores found" not in content
+    assert "assessment" in result["artifacts"]["sections_included"]

@@ -14,8 +14,13 @@ Exit codes:
 import sys
 from pathlib import Path
 
-REQUIRED_SECTIONS = [
+DIAGNOSIS_SECTION_HEADERS = {
     "## 1. Diagnosis Scores",
+    "## 1. Diagnosis & Assessment",
+}
+
+REQUIRED_SECTIONS = [
+    "## 1. Diagnosis & Assessment",
     "## 2. Annual Goal",
     "## 3. Active Priorities",
     "## 4. Open Tasks",
@@ -38,6 +43,8 @@ def validate_export(file_path: Path) -> list[str]:
     except Exception as e:
         return [f"Could not read export file: {e}"]
 
+    if not any(section in content for section in DIAGNOSIS_SECTION_HEADERS):
+        errors.append("Missing required diagnosis or assessment section")
     for section in REQUIRED_SECTIONS:
         if section not in content:
             errors.append(f"Missing required section: {section}")

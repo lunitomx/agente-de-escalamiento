@@ -53,3 +53,46 @@ class TestRouterConstants:
         for decision, cmd in SUB_AGENT_COMMANDS.items():
             assert cmd.startswith("/escala-")
             assert decision in cmd
+
+
+def test_router_uses_confirmed_narrative_focus_without_scores(tmp_path):
+    from coaching.core import write_yaml
+    from coaching.router import run
+
+    write_yaml(
+        tmp_path / ".escala" / "agent" / "memory" / "company-profile.yaml",
+        {
+            "narrative_assessment": {
+                "confirmation_status": "confirmed",
+                "proposed_focuses": [
+                    {"decision": "cash", "rationale": "Cobranza lenta."}
+                ],
+            }
+        },
+    )
+
+    result = run({"action": "route", "base_path": str(tmp_path)})
+
+    assert result["errors"] == []
+    assert result["artifacts"]["target_decision"] == "cash"
+    assert "assessment narrativo" in result["output"]
+
+
+def test_router_does_not_auto_route_pending_assessment(tmp_path):
+    from coaching.core import write_yaml
+    from coaching.router import run
+
+    write_yaml(
+        tmp_path / ".escala" / "agent" / "memory" / "company-profile.yaml",
+        {
+            "narrative_assessment": {
+                "confirmation_status": "pending",
+                "proposed_focuses": [{"decision": "cash"}],
+            }
+        },
+    )
+
+    result = run({"action": "route", "base_path": str(tmp_path)})
+
+    assert result["errors"]
+    assert "foco confirmado" in result["errors"][0]

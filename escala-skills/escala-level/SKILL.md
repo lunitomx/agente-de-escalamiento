@@ -1,5 +1,5 @@
 ---
-description: 'Detecta y adapta el nivel de coaching (Shu/Ha/Ri) según scores de diagnóstico. Core Python cross-platform.'
+description: 'Detecta y adapta el nivel de coaching (Shu/Ha/Ri); usa calificación opcional si existe y permite override manual. Core Python cross-platform.'
 name: escala-level
 ---
 
@@ -7,7 +7,7 @@ name: escala-level
 
 ## Purpose
 
-Detectar automáticamente el nivel de coaching del usuario (Shu/Ha/Ri) basado en scores de diagnóstico, y permitir override manual.
+Detectar el nivel de coaching del usuario (Shu/Ha/Ri). Si existe una calificación cuantitativa explícita puede usarse como señal secundaria; si no, inicia en Shu y permite override manual. Nunca pidas 1–5 para poder acompañar al empresario.
 
 ## Architecture
 
@@ -60,4 +60,4 @@ El SKILL.md de cada skill debe incluir:
 | Item | Destination |
 |------|-------------|
 | Level | `.escala/agent/memory/company-profile.yaml` → coaching.level |
-| Auto-detect | Basado en promedio de scores |
+| Auto-detect | Señal secundaria: promedio de calificaciones opcionales |

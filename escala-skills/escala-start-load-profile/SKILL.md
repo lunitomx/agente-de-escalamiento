@@ -24,9 +24,9 @@ From the YAML, extract:
 - `company.growth_stage` — startup / scaling / established / enterprise
 - `company.employees` — employee count
 - `company.industry` — sector
-- `scores.people`, `scores.strategy`, `scores.execution`, `scores.cash` — diagnosis scores (1-5)
-- `scores.last_diagnosis` — date of last diagnosis
-- `focus.current_decision` — what decision they're working on
+- `narrative_assessment` — comprensión confirmada, incógnitas y focos propuestos
+- `scores.people`, `scores.strategy`, `scores.execution`, `scores.cash` — calificaciones opcionales heredadas, si existen
+- `focus.current_decision` — decisión que la persona confirmó que quiere trabajar
 - `focus.last_session` — date of last session
 
 ### Step 3: Check Profile Completeness

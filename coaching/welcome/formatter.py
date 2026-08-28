@@ -34,14 +34,28 @@ def format_summary(profile: dict) -> str:
     if company.get("location"):
         lines.append(f"**Location:** {company['location']}")
 
+    assessment = profile.get("narrative_assessment")
+    if isinstance(assessment, dict):
+        lines.extend(["", "### Assessment narrativo"])
+        summary = assessment.get("company_summary")
+        if isinstance(summary, str) and summary.strip():
+            lines.append(summary.strip())
+        lines.append(f"**Estado:** {assessment.get('confirmation_status', 'pending')}")
+
     scores = profile.get("scores", {})
-    scored = {k: v for k, v in scores.items() if v is not None}
+    scored = {key: value for key, value in scores.items() if value is not None}
     if scored:
-        lines.extend(["", "### Scores"])
+        lines.extend(["", "### Calificación cuantitativa opcional"])
         for decision, score in scored.items():
             lines.append(f"- **{decision.capitalize()}:** {score}/5")
-    else:
-        lines.extend(["", "*No diagnosis scores yet — run `/escala-diagnose` next.*"])
+    elif not isinstance(assessment, dict):
+        lines.extend(
+            [
+                "",
+                "*Aún no hay assessment. Ejecuta `/escala-diagnose` para explicar "
+                "el contexto antes de elegir un foco.*",
+            ]
+        )
 
     focus = profile.get("focus")
     if focus:

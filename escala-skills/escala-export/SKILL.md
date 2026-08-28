@@ -8,7 +8,7 @@ name: escala-export
 ## Purpose
 
 Exportar el estado actual de tu empresa en un documento markdown fechado y compartible.
-El documento incluye scores de diagnóstico, meta anual, prioridades del trimestre, tareas abiertas y próximos pasos recomendados.
+El documento incluye el assessment narrativo confirmado — y una calificación opcional sólo si ya existe — además de meta anual, prioridades del trimestre, tareas abiertas y próximos pasos recomendados.
 
 ## Architecture
 
@@ -72,4 +72,4 @@ If `result["errors"]` is non-empty:
 | Item | Destination |
 |------|-------------|
 | Export file | `.escala/my-company/exports/YYYY-MM-DD-action-plan.md` |
-| Sections | 1. Diagnosis Scores, 2. Annual Goal, 3. Active Priorities, 4. Open Tasks, 5. Next Steps |
+| Sections | 1. Diagnosis & Assessment, 2. Annual Goal, 3. Active Priorities, 4. Open Tasks, 5. Next Steps |

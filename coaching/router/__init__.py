@@ -21,6 +21,23 @@ SUB_AGENT_LABELS = {
     "cash": "Cash — Efectivo",
 }
 
+_CONFIRMED_ASSESSMENTS = {"confirmed", "corrected"}
+
+
+def _confirmed_narrative_focus(profile: dict) -> str | None:
+    assessment = profile.get("narrative_assessment")
+    if not isinstance(assessment, dict):
+        return None
+    if assessment.get("confirmation_status") not in _CONFIRMED_ASSESSMENTS:
+        return None
+    focuses = assessment.get("proposed_focuses")
+    if not isinstance(focuses, list):
+        return None
+    for focus in focuses:
+        if isinstance(focus, dict) and focus.get("decision") in PRIORITY_ORDER:
+            return focus["decision"]
+    return None
+
 
 def detect_priority(scores: dict[str, int]) -> str:
     """Find lowest-scored decision. Tiebreaker: PRIORITY_ORDER."""
@@ -56,8 +73,8 @@ def run(context: dict) -> dict:
         lines = [
             "## Sub-agentes Disponibles",
             "",
-            "| Sub-agente | Comando | Score |",
-            "|------------|---------|-------|",
+            "| Ruta interna | Comando | Señal opcional |",
+            "|---------------|---------|----------------|",
         ]
         for dec_key in PRIORITY_ORDER:
             score = scores.get(dec_key, "—")
@@ -68,7 +85,7 @@ def run(context: dict) -> dict:
             [
                 "",
                 "Para ir a un sub-agente específico, usa su comando directamente.",
-                "O corre `/escala-diagnose` para que el router decida por ti.",
+                "O construye un assessment con `/escala-diagnose` y confirma el foco.",
             ]
         )
         return {
@@ -78,22 +95,37 @@ def run(context: dict) -> dict:
         }
 
     elif action == "route":
-        if not scores:
+        narrative_focus = _confirmed_narrative_focus(profile)
+        if not scores and narrative_focus is None:
             return {
                 "output": "",
                 "artifacts": {},
                 "errors": [
-                    "No hay scores de diagnóstico. Corre `/escala-diagnose` primero."
+                    "Aún no hay un foco confirmado. Construye o corrige el assessment "
+                    "narrativo antes de enrutar."
                 ],
             }
 
-        explicit = context.get("explicit_request", "").lower()
+        raw_explicit = context.get("explicit_request", "")
+        explicit = raw_explicit.lower() if isinstance(raw_explicit, str) else ""
         if explicit and explicit in SUB_AGENT_COMMANDS:
             target = explicit
             reason = "Solicitud explícita del usuario"
-        else:
+        elif scores:
             target = detect_priority(scores)
-            reason = f"Score más bajo ({scores.get(target, '?')}/5)"
+            reason = f"Calificación opcional más baja ({scores.get(target, '?')}/5)"
+        else:
+            target = narrative_focus
+            reason = "Foco confirmado en el assessment narrativo"
+
+        if target not in SUB_AGENT_COMMANDS:
+            return {
+                "output": "",
+                "artifacts": {},
+                "errors": [
+                    "El foco confirmado no corresponde a una decisión disponible."
+                ],
+            }
 
         lines = [
             f"## Routing: {SUB_AGENT_LABELS[target]}",
@@ -102,14 +134,26 @@ def run(context: dict) -> dict:
             "",
             f"Usa `{SUB_AGENT_COMMANDS[target]}` para empezar.",
             "",
-            "### Resumen de Scores",
-            "| Decisión | Score |",
-            "|----------|-------|",
         ]
-        for dec_key in PRIORITY_ORDER:
-            score = scores.get(dec_key, "—")
-            lines.append(
-                f"| {SUB_AGENT_LABELS[dec_key]} | {score}{' ⬅' if dec_key == target else ''} |"
+        if scores:
+            lines.extend(
+                [
+                    "### Calificación cuantitativa opcional",
+                    "| Decisión | Score |",
+                    "|----------|-------|",
+                ]
+            )
+            for dec_key in PRIORITY_ORDER:
+                score = scores.get(dec_key, "—")
+                lines.append(
+                    f"| {SUB_AGENT_LABELS[dec_key]} | {score}{' ⬅' if dec_key == target else ''} |"
+                )
+        else:
+            lines.extend(
+                [
+                    "La ruta se basa en un assessment confirmado, no en un promedio numérico.",
+                    "Confirma que quieres profundizar antes de solicitar datos detallados.",
+                ]
             )
 
         return {
