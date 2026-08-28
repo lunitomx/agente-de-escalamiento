@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "attempted_at": "2026-08-28",
+  "asset_edition": "Growth Tools Spanish eForm v20/03",
+  "asset_url": "https://scalingup.com/wp-content/uploads/2023/03/GT-ESP-DinA4-v20-03_eForm.pdf",
+  "rights_state": "private-validation-only",
+  "purpose": "visual-layout-review for E60, E61, and E62",
+  "asset_persisted": false,
+  "inspection_completed": false,
+  "result": "source_transport_unavailable",
+  "attempts": [
+    {
+      "method": "web_pdf_screenshot",
+      "result": "cache-miss or CDN verification response; no page image available"
+    },
+    {
+      "method": "temporary_direct_download",
+      "result": "connection timeout; temporary directory removed without an asset"
+    }
+  ],
+  "conclusion": "Do not infer topology, columns, rows, or spatial relationships from extracted PDF text. E60-E62 remain pending only their authorized visual-layout receipts.",
+  "next_valid_evidence": "A lawfully accessed visual asset reviewed under visual-layout-review-protocol.md, with a private non-asset receipt validated by scripts/check_form_layout_review.py."
+}
