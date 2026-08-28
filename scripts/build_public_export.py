@@ -43,7 +43,7 @@ def main() -> int:
         policy = load_public_export_policy(args.policy)
         inventory = load_third_party_inventory(args.inventory)
         result = build_public_export(
-            repository=args.repo,
+            repository=args.repo.resolve(),
             destination=args.destination,
             source_commit=args.source_commit,
             policy=policy,

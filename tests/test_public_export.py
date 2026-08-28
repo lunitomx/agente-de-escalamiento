@@ -268,6 +268,36 @@ def test_canonical_selection_is_explicit_and_excludes_internal_families() -> Non
     validate_export_selections(policy, boundary)
 
 
+def test_build_export_cli_accepts_relative_repository_path(tmp_path: Path) -> None:
+    """The documented ``--repo .`` form must work from a project checkout."""
+    source_commit = _git(ROOT, "rev-parse", "HEAD")
+    destination = tmp_path / "artifact"
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "build_public_export.py"),
+            "--repo",
+            ".",
+            "--policy",
+            "governance/public-export.yaml",
+            "--inventory",
+            "governance/third-party.yaml",
+            "--destination",
+            str(destination),
+            "--source-commit",
+            source_commit,
+        ],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    assert (destination / "ESCALA-MANIFEST.json").exists()
+
+
 def test_canonical_selections_exist_in_current_git_head() -> None:
     """A stale allowlist fails before a full immutable export is attempted."""
 
