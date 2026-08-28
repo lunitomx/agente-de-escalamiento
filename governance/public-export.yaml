@@ -66,6 +66,9 @@ selections:
   - path: escala_server/daos
     kind: tree
     role: local_runtime
+  - path: escala_server/dashboard.py
+    kind: file
+    role: local_runtime
   - path: escala_server/diff.py
     kind: file
     role: local_runtime
@@ -78,10 +81,16 @@ selections:
   - path: escala_server/knowledge_handler.py
     kind: file
     role: local_runtime
+  - path: escala_server/lifecycle
+    kind: tree
+    role: local_runtime
   - path: escala_server/memory_engine.py
     kind: file
     role: local_runtime
   - path: escala_server/migrate.py
+    kind: file
+    role: local_runtime
+  - path: escala_server/outcome_learning.py
     kind: file
     role: local_runtime
   - path: escala_server/router.py
@@ -99,7 +108,13 @@ selections:
   - path: escala_server/session
     kind: tree
     role: local_runtime
+  - path: escala_server/specialist_team.py
+    kind: file
+    role: local_runtime
   - path: escala_server/static
+    kind: tree
+    role: local_runtime
+  - path: escala_server/workspace
     kind: tree
     role: local_runtime
   - path: install.sh
