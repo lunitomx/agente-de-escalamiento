@@ -164,6 +164,29 @@ Script `scaleup-install` que:
 
 **Depends on:** S10.7, S10.8
 
+### S10.11: Instalador dirigido y seguro ante PEP 668 (S) — completada localmente
+Reparar el instalador conversacional para que una instalación solicitada para
+una plataforma no configure otras plataformas detectadas ni modifique MCPs
+ajenos. El instalador debe usar o crear el entorno local `.venv` con `uv` para
+el modo standalone cuando el Python del sistema esté administrado, nunca
+forzar `pip` global ni informar éxito si la instalación falló.
+
+**Entrega verificable:**
+- `--platform claude|codex|hermes` selecciona explícitamente el destino; una
+  instalación `--platform claude` no escribe enlaces ni configuración de Codex
+  o Hermes.
+- El modo de varias plataformas requiere una intención explícita
+  (`--all-platforms` o plataformas repetidas); una invocación ambigua se detiene
+  antes de modificar el sistema.
+- El runtime standalone reutiliza `.venv` o lo crea con `uv`; si no puede
+  hacerlo, falla con instrucción accionable y código distinto de cero.
+- Ningún mensaje final declara instalado `escala-coaching` sin una instalación
+  y una importación exitosas en el intérprete elegido.
+- Pruebas cubren PEP 668 simulado, fallos de `uv`, destino único, selección
+  múltiple explícita, preservación de plataformas no elegidas y logs redactados.
+
+**Depends on:** S10.10
+
 ## Done Criteria
 
 - [x] Los 6 coaching engines construidos y testeados (welcome, diagnose, worksheet, progress, level, router).

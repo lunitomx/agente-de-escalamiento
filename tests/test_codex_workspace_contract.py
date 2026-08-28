@@ -84,7 +84,8 @@ def test_installer_delegates_codex_configuration_without_broadening_permissions(
 ):
     installer = (REPOSITORY_ROOT / "install.sh").read_text(encoding="utf-8")
 
-    assert '"$SCRIPT_DIR/scripts/configure_codex_mcp.sh" "$SCRIPT_DIR"' in installer
+    assert '"$configurator" "$SCRIPT_DIR"' in installer
+    assert "--with-rai-mcp" in installer
     assert "~/.rai" not in installer
 
 

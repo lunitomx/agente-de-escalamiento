@@ -28,7 +28,7 @@ def test_skills_only_install_publishes_one_front_door(tmp_path: Path) -> None:
     (skills_dir / "escala-cash").symlink_to(ROOT / "escala-skills/escala-cash")
 
     result = subprocess.run(
-        ["bash", str(INSTALLER), "--skills-only"],
+        ["bash", str(INSTALLER), "--skills-only", "--platform", "codex"],
         cwd=ROOT,
         env={
             "HOME": str(tmp_path / "home"),
@@ -47,7 +47,7 @@ def test_skills_only_install_publishes_one_front_door(tmp_path: Path) -> None:
     assert (
         installed / "../catalog.yaml"
     ).resolve() == ROOT / "escala-skills/catalog.yaml"
-    assert "1 skills instalados" in result.stdout
+    assert "1 skill instalado" in result.stdout
     assert "lenguaje natural" in result.stdout
 
 
@@ -95,7 +95,7 @@ def _portable_install(artifact: Path, home: Path) -> subprocess.CompletedProcess
         executable.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
         executable.chmod(0o755)
     return subprocess.run(
-        ["bash", str(artifact / "install.sh"), "--skills-only"],
+        ["bash", str(artifact / "install.sh"), "--skills-only", "--all-platforms"],
         cwd=artifact,
         env={
             "HOME": str(home),

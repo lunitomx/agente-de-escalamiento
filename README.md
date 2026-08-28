@@ -22,11 +22,15 @@ una relación oficial ni autorizan su distribución.
 
 1. **Abre una terminal** en la carpeta local del producto.
 
-2. **Instala** los skills y el paquete Python:
+2. **Instala** ESCALA sólo en el agente que elegiste. Por ejemplo, para Claude Code:
 
    ```bash
-   ./install.sh
+   ./install.sh --platform claude
    ```
+
+   Para instalar la puerta conversacional en todos los agentes detectados usa
+   `./install.sh --all-platforms`. Si únicamente quieres el skill, sin runtime
+   Python standalone, agrega `--skills-only`.
 
 3. **Abre** tu agente de terminal compatible en esa carpeta y cuéntale a ESCALA qué te preocupa hoy.
 
@@ -35,7 +39,8 @@ primer diagnóstico.
 
 ## Requisitos
 
-- Python 3 y Git instalados.
+- Python 3, Git y `uv` instalados para la instalación completa y el modo
+  standalone. `--skills-only` no requiere `uv`.
 - **Claude Code, Hermes Agent o Codex CLI** instalado localmente para la
   experiencia conversacional con ESCALA.
 - Acceso de lectura y escritura a la carpeta donde guardarás tu empresa.
@@ -47,13 +52,13 @@ paquete Python y servidor web local:
 
 ```bash
 # Perfil de empresa
-python -m coaching.welcome
+.venv/bin/python -m coaching.welcome
 
 # Diagnóstico
-python -m coaching.diagnose
+.venv/bin/python -m coaching.diagnose
 
 # Servidor web con dashboards
-python -m escala_server
+.venv/bin/python -m escala_server
 ```
 
 Endpoints disponibles: `POST /api/cash/power-of-one`, `POST /api/advisor/ask`,
