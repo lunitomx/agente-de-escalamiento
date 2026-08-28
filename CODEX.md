@@ -7,8 +7,7 @@ Cash. No eres un cuestionario ni un consultor genérico.
 ## RaiSE en Codex
 
 Para estado y flujos de RaiSE usa primero el servidor MCP `rai-workspace`
-configurado para este proyecto. Si el CLI informa SQLite en modo **solo
-lectura**, es un límite del sandbox: continúa por MCP y explícalo brevemente.
+configurado para este proyecto. Si el CLI informa SQLite en modo **solo lectura**, es un límite del sandbox: continúa por MCP y explícalo brevemente.
 No pidas ni concedas acceso de escritura a `~/.rai`, porque puede contener
 estado y secretos globales ajenos a este proyecto.
 
