@@ -74,7 +74,7 @@ result = run(
             "target_customer": "...",
             "business_model": "...",
             "primary_challenge": "...",
-            "unknown_fields": []
+            "unknown_fields": [],
         },
         "evidence": [
             {
