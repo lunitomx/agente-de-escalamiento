@@ -107,6 +107,37 @@ def _portable_install(artifact: Path, home: Path) -> subprocess.CompletedProcess
     )
 
 
+def test_portable_complete_install_uses_its_own_venv_and_one_target(
+    tmp_path: Path,
+) -> None:
+    artifact = _portable_artifact(tmp_path / "complete-escala")
+    fake_bin = tmp_path / "bin-complete"
+    fake_bin.mkdir()
+    executable = fake_bin / "claude"
+    executable.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+    executable.chmod(0o755)
+    home = tmp_path / "complete-home"
+
+    completed = subprocess.run(
+        ["bash", str(artifact / "install.sh"), "--platform", "claude"],
+        cwd=artifact,
+        env={
+            "HOME": str(home),
+            "PATH": str(fake_bin) + ":" + os.environ["PATH"],
+        },
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    assert (artifact / ".venv" / "bin" / "python").is_file()
+    assert (home / ".claude" / "skills" / "escala").is_symlink()
+    assert not (home / ".codex").exists()
+    assert not (home / ".hermes").exists()
+    assert "Runtime Python local:" in completed.stdout
+
+
 def test_portable_export_installs_without_source_checkout_and_rejects_tampering(
     tmp_path: Path,
 ) -> None:
