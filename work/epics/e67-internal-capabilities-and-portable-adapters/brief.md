@@ -20,6 +20,7 @@ Los procedimientos del MVP se ejecutan detrás de `escala`, con núcleo común y
 | S67.3 | Adaptador Claude | La misma semántica y artefactos se obtienen sin copiar lógica de metodología. |
 | S67.4 | Paridad y migración | Aliases conservan compatibilidad limitada y ninguna ruta duplica una implementación. |
 | S67.5 | Paquete de especialistas | Los cuatro perfiles de E45 se generan desde núcleo común e instalan sus adaptadores sin crear nuevas puertas públicas. |
+| S67.6 | Compatibilidad Agent Plugins v1 | El mismo núcleo se publica como paquete portable con manifest estándar, skills descubiertos en ubicación fija y extensiones aisladas. |
 
 ## Cierre
 

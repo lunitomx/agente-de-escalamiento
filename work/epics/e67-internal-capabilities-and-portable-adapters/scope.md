@@ -37,6 +37,7 @@ Conectar los procedimientos del MVP al orquestador `escala` mediante capacidades
 | 3 | S67.3 Claude adapter | Mismo core semántico con empaque específico mínimo. |
 | 4 | S67.4 Paridad/migración | Reporte de rutas y aliases sin duplicación. |
 | 5 | S67.5 Paquete de especialistas | `.codex/agents/` y `.claude/agents/` se generan desde el core y pasan validación de instalación. |
+| 6 | S67.6 Agent Plugins v1 | Paquete portable con `plugin.json` y `skills/` validado, sin ampliar la superficie pública. |
 
 ## Criterios de terminación
 
@@ -46,6 +47,9 @@ Conectar los procedimientos del MVP al orquestador `escala` mediante capacidades
 - Ningún alias ejecuta una segunda implementación.
 - Los cuatro perfiles se instalan como definiciones bajo demanda, no como
   chats permanentes ni comandos del empresario.
+- El paquete Agent Plugins conserva exactamente una puerta pública (`escala`),
+  no instala MCPs ni credenciales por defecto y mantiene extensiones de cliente
+  fuera del core.
 
 ## Handoff y riesgos
 

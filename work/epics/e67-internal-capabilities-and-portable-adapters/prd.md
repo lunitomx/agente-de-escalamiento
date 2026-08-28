@@ -26,6 +26,7 @@ aprende nombres de skills, rutas de archivos ni subagentes.
 procedimiento verificado
   → capability contract versionado
   → orquestador Escala
+  → paquete Agent Plugins v1 (opcional de distribución)
   → adaptador Codex o Claude
   → mismo artefacto, evidencia y límites
 ```
@@ -47,6 +48,11 @@ No contienen una segunda versión de la metodología.
    backend central como requisito de instalación.
 5. Si una plataforma no soporta una extensión, el adaptador la declara como
    límite en vez de inventar paridad.
+6. El paquete Agent Plugins conserva sólo la puerta pública `escala`; las
+   capacidades y especialistas internos no se convierten en comandos.
+7. `mcp.json`, credenciales y conectores son opcionales y no se instalan por
+   defecto: su autorización y configuración siguen siendo explícitas por
+   empresa y por plataforma.
 
 ## Entregables
 
@@ -57,6 +63,8 @@ No contienen una segunda versión de la metodología.
 - Matriz de paridad: intentos, ruta elegida, artefacto, evidencia, límites y
   diferencias observadas.
 - Instalador que no sobrescribe memoria empresarial ni exige servicios remotos.
+- Generador y validador de paquete Agent Plugins v1: `plugin.json` de esquema
+  canónico, `skills/` de primer nivel y extensiones de cliente aisladas.
 
 ## Criterios de aceptación
 
@@ -65,6 +73,8 @@ No contienen una segunda versión de la metodología.
 - No existe lógica metodológica duplicada en aliases/adaptadores.
 - Los perfiles privados no aparecen como elecciones del empresario.
 - Un fallo de instalación informa el límite y preserva datos locales.
+- El paquete estándar valida su manifest sin red y no contiene rutas que salgan
+  de su raíz, datos de empresa, secretos ni un MCP habilitado implícitamente.
 - E68 valida en entornos limpios antes de prometer distribución o paridad.
 
 ## Fuera de alcance
