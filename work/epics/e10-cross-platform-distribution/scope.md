@@ -27,7 +27,16 @@ se sustituye por esta reparación local.
 
 ## Objective
 
-Construir los core Python coaching engines faltantes y distribuir el sistema ScaleUp completo (skills + knowledge + coaching engine + validators) como un bundle portable que funcione en Claude Code global, Hermes Agent y Codex — sin depender del repo de desarrollo.
+Calificar la distribución portable de la puerta pública `escala` en plataformas
+limpias y con modelos reales. El bundle debe conservar el runtime, conocimiento
+permitido y capacidades internas necesarios, sin depender del checkout, sin
+instalación global de Python y sin configurar plataformas o MCPs no elegidos.
+
+La construcción histórica de engines, adaptadores y bundle ya está realizada;
+la única parte activa de E10 es la evidencia externa que E42/E68 deben
+registrar. No se debe interpretar este scope como una autorización para volver
+a publicar múltiples skills públicos ni para instalar todas las plataformas por
+detección incidental.
 
 ## Value
 
@@ -37,7 +46,12 @@ Hoy ScaleUp solo funciona dentro de este repo. Al distribuirlo cross-platform:
 - El coaching engine en Python garantiza **consistencia** entre plataformas
 - Un solo `install` actualiza las 3 plataformas
 
-## Current State (Gemba)
+## Historical implementation record (Gemba at creation time)
+
+La siguiente tabla conserva el diagnóstico que originó E10. No describe el
+estado actual ni es criterio de cierre: la fuente vigente es la corrección de
+cierre y los criterios de terminación de esta misma epic.
+
 
 | Componente | Estado | Ubicación |
 |-----------|--------|-----------|
