@@ -34,8 +34,9 @@ en `work/epics/`.
 | 3 | E60–E63 — Fidelidad por dominio | En curso; gates de fuente delimitados | People/Strategy/Execution esperan inspección visual autorizada; Cash conserva CASh como herramienta source-bounded y espera revisión independiente de sus candidatos. | Cero hallazgos críticos abiertos y evidencia fuente suficiente antes de E64. |
 | 4 | E64 — Consolidación ontológica | Planificado; bloqueado por E60–E63 | Sólo consolida candidatos aprobados, no texto crudo ni fórmulas bloqueadas. | Cobertura de estructuras nombradas, evidencia normativa total y cero relaciones rotas. |
 | 5 | E65 + E67 + E68 | Planificado; secuencia posterior | Procedimientos MVP, empaquetado portable y equivalencia Codex/Claude consumen E64. | Contratos, activación/no-activación y golden cases semánticamente equivalentes. |
-| 6 | E69, E71–E75 | Planificado por olas | Biblioteca, research, Cash Learning Day, dashboards, workspace y diagnóstico se abren tras el núcleo portable. | Cada ola conserva procedencia, privacidad, aceptación y pruebas. |
-| 7 | E46 + E70 | Planificado | Mejora gobernada sólo con resultados reales; release sólo con todos los gates. | Aprobación/rollback y aceptación final honesta. |
+| 6 | E75 (S75.1/S75.2) | En curso local | Assessment narrativo, confirmación y consentimiento se reparan ya con E49/E55; Deep Dives siguen esperando E65. | No hay escala 1–5 como entrada y ningún handoff se simula. |
+| 7 | E69, E71–E74 + E75 (S75.3–S75.6) | Planificado por olas | Biblioteca, research, Cash Learning Day, dashboards, workspace y handoffs se abren tras el núcleo portable. | Cada ola conserva procedencia, privacidad, aceptación y pruebas. |
+| 8 | E46 + E70 | Planificado | Mejora gobernada sólo con resultados reales; release sólo con todos los gates. | Aprobación/rollback y aceptación final honesta. |
 | — | E76 — Recuperación reproducible de RaiSE | Completada | Manifest, configuración mínima y grafo ya se recuperaron sin venv duplicado. | No reabrir salvo regresión reproducible propia. |
 | — | E47, E49, E51, E52, E55, E56, E57–E59 | Completadas | Son contratos verificados que las épicas activas pueden consumir. | No reabrir salvo regresión propia demostrada. |
 

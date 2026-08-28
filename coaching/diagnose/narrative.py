@@ -1,0 +1,151 @@
+"""Narrative-first diagnostic contract for the public ESCALA intake.
+
+The model deliberately keeps observations separate from numeric scoring. A
+number can be attached later as an optional, evidence-backed view; it is never
+required to understand a company or to choose a topic for confirmation.
+"""
+
+from __future__ import annotations
+
+from collections.abc import Mapping, Sequence
+from typing import Literal
+
+from pydantic import BaseModel, Field, field_validator, model_validator
+
+from .models import Confidence, DiagnosticIntake
+
+Decision = Literal["people", "strategy", "execution", "cash"]
+FindingStatus = Literal["observed", "hypothesis", "unknown", "not_applicable"]
+ConfirmationStatus = Literal["pending", "confirmed", "corrected"]
+
+
+class NarrativeFinding(BaseModel):
+    """One explainable conclusion drawn from an entrepreneur's detailed answer."""
+
+    decision: Decision
+    statement: str = Field(min_length=3, max_length=1_000)
+    evidence_ids: list[str] = Field(min_length=1, max_length=12)
+    status: FindingStatus = "observed"
+    confidence: Confidence = "medium"
+    implication: str = Field(min_length=3, max_length=1_000)
+
+    @field_validator("evidence_ids")
+    @classmethod
+    def evidence_ids_are_unique(cls, value: list[str]) -> list[str]:
+        if len(value) != len(set(value)):
+            raise ValueError("finding evidence_ids must be unique")
+        return value
+
+
+class FocusProposal(BaseModel):
+    """A bounded next topic, proposed for the entrepreneur to confirm or reject."""
+
+    decision: Decision
+    rationale: str = Field(min_length=3, max_length=1_000)
+    evidence_ids: list[str] = Field(min_length=1, max_length=12)
+
+    @field_validator("evidence_ids")
+    @classmethod
+    def evidence_ids_are_unique(cls, value: list[str]) -> list[str]:
+        if len(value) != len(set(value)):
+            raise ValueError("focus evidence_ids must be unique")
+        return value
+
+
+class NarrativeAssessment(BaseModel):
+    """A confirmable diagnosis that makes uncertainty visible before any score."""
+
+    company_summary: str = Field(min_length=3, max_length=2_000)
+    findings: list[NarrativeFinding] = Field(min_length=1, max_length=20)
+    proposed_focuses: list[FocusProposal] = Field(default_factory=list, max_length=2)
+    open_questions: list[str] = Field(default_factory=list, max_length=12)
+    confirmation_status: ConfirmationStatus = "pending"
+    confirmation_question: str = Field(
+        default=(
+            "Esto es lo que entendí hasta ahora. ¿Lo ves igual, qué corregirías "
+            "y cuál de estos temas te gustaría profundizar primero?"
+        ),
+        min_length=3,
+        max_length=1_000,
+    )
+
+    @model_validator(mode="after")
+    def unknown_only_decisions_cannot_be_focuses(self) -> "NarrativeAssessment":
+        supported_decisions = {
+            finding.decision
+            for finding in self.findings
+            if finding.status in {"observed", "hypothesis"}
+        }
+        for focus in self.proposed_focuses:
+            if focus.decision not in supported_decisions:
+                raise ValueError("an unknown-only decision cannot be proposed as focus")
+        return self
+
+
+def build_narrative_assessment(
+    intake: DiagnosticIntake,
+    *,
+    company_summary: str,
+    findings: Sequence[NarrativeFinding | Mapping[str, object]],
+    proposed_focuses: Sequence[FocusProposal | Mapping[str, object]] = (),
+    open_questions: Sequence[str] = (),
+    confirmation_status: ConfirmationStatus = "pending",
+) -> NarrativeAssessment:
+    """Validate a narrative assessment against its local evidence pack."""
+    evidence_by_id = {item.evidence_id: item for item in intake.evidence}
+    normalized_findings = [
+        item
+        if isinstance(item, NarrativeFinding)
+        else NarrativeFinding.model_validate(item)
+        for item in findings
+    ]
+    normalized_focuses = [
+        item if isinstance(item, FocusProposal) else FocusProposal.model_validate(item)
+        for item in proposed_focuses
+    ]
+    for item in [*normalized_findings, *normalized_focuses]:
+        if set(item.evidence_ids) - set(evidence_by_id):
+            raise ValueError("narrative assessment references unknown evidence")
+        if any(
+            evidence_by_id[evidence_id].decision not in (None, item.decision)
+            for evidence_id in item.evidence_ids
+        ):
+            raise ValueError("narrative assessment crosses decision evidence")
+    return NarrativeAssessment(
+        company_summary=company_summary,
+        findings=normalized_findings,
+        proposed_focuses=normalized_focuses,
+        open_questions=list(open_questions),
+        confirmation_status=confirmation_status,
+    )
+
+
+def render_narrative_assessment(assessment: NarrativeAssessment) -> str:
+    """Render a compact entrepreneur-facing assessment without a score table."""
+    lines = ["## Esto es lo que entendí", "", assessment.company_summary, ""]
+    lines.extend(["### Señales que veo", ""])
+    for finding in assessment.findings:
+        qualifier = {
+            "observed": "observé",
+            "hypothesis": "parece",
+            "unknown": "todavía no sé",
+            "not_applicable": "no aplica",
+        }[finding.status]
+        lines.append(
+            f"- **{finding.decision.title()}** — {qualifier}: "
+            f"{finding.statement}. Implicación: {finding.implication}"
+        )
+    if assessment.open_questions:
+        lines.extend(["", "### Lo que todavía necesito entender", ""])
+        lines.extend(f"- {question}" for question in assessment.open_questions)
+    if assessment.proposed_focuses:
+        lines.extend(["", "### Dónde podríamos profundizar", ""])
+        for focus in assessment.proposed_focuses:
+            lines.append(f"- **{focus.decision.title()}** — {focus.rationale}")
+    lines.extend(["", assessment.confirmation_question])
+    return "\n".join(lines)
+
+
+def assessment_to_artifact(assessment: NarrativeAssessment) -> dict[str, object]:
+    """Return a stable JSON-safe representation for a local approved artifact."""
+    return assessment.model_dump(mode="json")

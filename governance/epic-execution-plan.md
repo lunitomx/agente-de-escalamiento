@@ -87,7 +87,7 @@ E46 se alimenta de resultados reales de E44/E45; nunca cambia producto solo.
 | Portabilidad | E67 | Empaquetar núcleo de skills y cuatro especialistas internos con adaptadores aislados Codex/Claude. | Requiere E45, E65 y E56. | Mismo núcleo portable, una puerta `escala`, adaptadores sin mezclar instrucciones de plataforma. |
 | Calificación | E68 | Probar equivalencia semántica en Codex y Claude con sesiones limpias. | Requiere E67 y E35. | Activación, no-activación y golden cases equivalentes; diferencias reportadas, no ocultas. |
 | Biblioteca | E69 | Entregar el resto de procedimientos por olas, no todos de golpe. | Requiere E68. | Cada ola pasa cobertura, evidencia, activación y aceptación antes de abrir la siguiente. |
-| Extensión | E75 | Diagnóstico narrativo y deep dive elegido por el empresario, nunca una batería 1–5. | Requiere E49, E55 y E65. | Handoff explicable hacia People/Strategy/Execution/Cash y preguntas que piden evidencia sólo cuando cambian la decisión. |
+| Extensión | E75 | Diagnóstico narrativo y deep dive elegido por el empresario, nunca una batería 1–5. | S75.1/S75.2 consumen E49/E55; los handoffs S75.3–S75.5 esperan E65. | Handoff explicable hacia People/Strategy/Execution/Cash y preguntas que piden evidencia sólo cuando cambian la decisión. |
 | Extensión | E71 | Research de mercado, tamaño, competidores, prospectos e investigación fechada. | Requiere E49, E55 y E67. | Fuentes, fecha, nivel de confianza, confirmación del dueño y límites de investigación visibles. |
 | Extensión | E72 | Cash Learning Day y plantilla financiera: carga, reconciliación, facilitación y decisión de 90 días. | Requiere E38, E55, E63, E65 y E67. | Artefacto de Cash usable, cifras trazables, huecos explícitos y plan Who/What/When. |
 | Extensión | E73 | Asesor de dashboards que propone el panel correcto cuando existe evidencia. | Requiere E38, E40, E55, E65 y E67. | No recomienda ni grafica métricas inexistentes; entrega definición de dato, periodo y decisión soportada. |
@@ -97,16 +97,17 @@ E46 se alimenta de resultados reales de E44/E45; nunca cambia producto solo.
 
 ## Primeras ejecuciones sin espera
 
-1. **E44/E45** continúan únicamente hacia evidencia empresarial: retrospectiva,
+1. **E75** inicia S75.1/S75.2: assessment narrativo, evidencia y confirmación; los handoffs a procedimientos permanecen bloqueados por E65.
+2. **E44/E45** continúan únicamente hacia evidencia empresarial: retrospectiva,
    aceptación y comparación real, no más sustitutos sintéticos.
-2. **E60–E62** cierran sólo la inspección visual autorizada de formularios; sus
+3. **E60–E62** cierran sólo la inspección visual autorizada de formularios; sus
    inventarios, fidelidad y validadores ya están terminados técnicamente.
-3. **E63** mantiene CASh como herramienta *source-bounded*: no atribuye ni
+4. **E63** mantiene CASh como herramienta *source-bounded*: no atribuye ni
    compila fórmulas externas; sólo avanza candidatos que tengan evidencia
    autorizada y revisión independiente.
-4. Tras esos gates, **E64** consolida únicamente candidatos aprobados y habilita
+5. Tras esos gates, **E64** consolida únicamente candidatos aprobados y habilita
    **E65**, después **E67/E68**.
-5. **E42** recoge pruebas externas durante todo el programa. **E76** está
+6. **E42** recoge pruebas externas durante todo el programa. **E76** está
    completa y se reabre sólo ante una regresión reproducible propia.
 
 ## Evidencia y cierre transversal

@@ -14,6 +14,14 @@ from .models import (
     PrefillResult,
     RouteAction,
 )
+from .narrative import (
+    FocusProposal,
+    NarrativeAssessment,
+    NarrativeFinding,
+    assessment_to_artifact,
+    build_narrative_assessment,
+    render_narrative_assessment,
+)
 
 __all__ = [
     "DiagnosticEvidence",
@@ -24,10 +32,16 @@ __all__ = [
     "FunnelMetrics",
     "PrefillResult",
     "RouteAction",
+    "FocusProposal",
+    "NarrativeAssessment",
+    "NarrativeFinding",
+    "assessment_to_artifact",
     "build_prefill",
     "build_diagnostic_intake",
     "build_diagnostic_result",
+    "build_narrative_assessment",
     "confirm_prefill",
+    "render_narrative_assessment",
     "score_diagnostic",
 ]
 
@@ -218,6 +232,9 @@ def run(context: dict) -> dict:
         dict with output, artifacts, errors
     """
     base = Path(context.get("base_path", "."))
+    if context.get("action") == "narrative_assessment":
+        return _run_narrative_assessment(context, base)
+
     profile_path = base / ".escala" / "agent" / "memory" / "company-profile.yaml"
     profile = read_yaml(profile_path)
 
@@ -329,6 +346,70 @@ def run(context: dict) -> dict:
             "scores": new_scores,
             "priority": priority,
             "profile_path": str(profile_path),
+        },
+        "errors": [],
+    }
+
+
+def _run_narrative_assessment(context: dict, base: Path) -> dict:
+    """Build a confirmable narrative assessment without a required score."""
+    from pydantic import ValidationError
+
+    from .intake import build_diagnostic_intake
+    from .narrative import (
+        assessment_to_artifact,
+        build_narrative_assessment,
+        render_narrative_assessment,
+    )
+
+    try:
+        intake = build_diagnostic_intake(
+            company=context.get("company"),
+            evidence=context.get("evidence", ()),
+            open_context=context.get("open_context"),
+            owner_context=context.get("owner_context"),
+        )
+        assessment = build_narrative_assessment(
+            intake,
+            company_summary=context.get("company_summary", ""),
+            findings=context.get("findings", ()),
+            proposed_focuses=context.get("proposed_focuses", ()),
+            open_questions=context.get("open_questions", ()),
+            confirmation_status=context.get("confirmation_status", "pending"),
+        )
+    except (TypeError, ValidationError, ValueError) as exc:
+        return {
+            "output": "",
+            "artifacts": {},
+            "errors": [f"contexto inválido: {exc}"],
+        }
+
+    wants_persistence = bool(context.get("persist_authorized", False))
+    if wants_persistence and assessment.confirmation_status == "pending":
+        return {
+            "output": "",
+            "artifacts": {},
+            "errors": [
+                "El assessment requiere confirmación o corrección antes de guardarse."
+            ],
+        }
+
+    profile_path = base / ".escala" / "agent" / "memory" / "company-profile.yaml"
+    persisted_path: str | None = None
+    if wants_persistence:
+        profile = dict(read_yaml(profile_path) or {})
+        assessments = list(profile.get("narrative_assessments", []))
+        assessments.append(assessment_to_artifact(assessment))
+        profile["narrative_assessments"] = assessments
+        write_yaml(profile_path, profile)
+        persisted_path = str(profile_path)
+
+    return {
+        "output": render_narrative_assessment(assessment),
+        "artifacts": {
+            "action": "narrative_assessment",
+            "assessment": assessment_to_artifact(assessment),
+            "persisted_assessment_path": persisted_path,
         },
         "errors": [],
     }

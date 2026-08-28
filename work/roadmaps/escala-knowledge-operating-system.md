@@ -53,14 +53,15 @@ E49 + E55 + E67 → E71 (market intelligence) ───────────�
 E38 + E55 + E63 + E65 + E67 → E72 (Cash Learning Day) ─┤
 E38 + E40 + E55 + E65 + E67 → E73 (dashboard advisor) ─┤
 E37 + E52 + E55 + E67 → E74 (workspace multiempresa) ──┤
-E49 + E55 + E65 → E75 (diagnóstico profundo) ──────────┘
+E49 + E55 → E75.1/.2 (assessment narrativo)
+E65 → E75.3–.6 (diagnóstico profundo) ──────────────────────┘
 
 E55 ya está completada y es requisito satisfecho para las rutas que usen evidencia multifuente.
 ```
 
 ## Orden de valor
 
-El primer release de capacidad no espera toda la biblioteca. E65 compila un MVP de seis intervenciones: diagnóstico, OPPP de líder, resumen de visión, prioridad trimestral, ritmo de reuniones y revisión trimestral. E68 exige un piloto trimestral antes de abrir E69, donde se incorpora el resto por olas. E71-E75 son extensiones de producto posteriores a esos contratos: hacen la entrevista más útil sin alterar la única puerta pública ni inventar datos empresariales.
+El primer release de capacidad no espera toda la biblioteca. E65 compila un MVP de seis intervenciones: diagnóstico, OPPP de líder, resumen de visión, prioridad trimestral, ritmo de reuniones y revisión trimestral. E68 exige un piloto trimestral antes de abrir E69, donde se incorpora el resto por olas. E71-E74 son extensiones de producto posteriores a esos contratos. E75 adelanta sólo el assessment narrativo y la confirmación con E49/E55; sus Deep Dives siguen posteriores a E65. Ninguna de estas rutas altera la única puerta pública ni inventa datos empresariales.
 
 ## Métricas y gates globales
 

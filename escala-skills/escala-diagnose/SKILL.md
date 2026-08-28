@@ -1,106 +1,125 @@
 ---
-description: 'Diagnóstico completo de la empresa en las 4 decisiones (People, Strategy, Execution, Cash) usando el core Python cross-platform.'
+description: 'Diagnóstico narrativo de la empresa en People, Strategy, Execution y Cash: primero evidencia y confirmación; score sólo opcional.'
 name: escala-diagnose
 ---
 
 # Escalamiento Diagnose
 
-## Purpose
+## Propósito
 
-Evaluar el estado de la empresa en las 4 decisiones mediante preguntas guiadas. Generar reporte con scores y priorización. Usa el core module en `.escala/coaching/diagnose/`.
+Entender cómo opera realmente la empresa antes de recomendar una herramienta.
+Este skill produce un assessment narrativo y confirmable: lo que Escala
+entendió, qué evidencia lo sostiene, qué aún no sabe y como máximo dos focos
+posibles para que el empresario elija. No es un cuestionario de madurez.
 
-## Architecture
+## Reglas no negociables
 
-Este skill es un **adapter delgado**. La lógica de scoring, priorización y persistencia vive en Python.
+- Haz una pregunta abierta y concreta por turno; deja espacio para que la
+  persona explique contexto, excepciones, nombres de procesos y ejemplos.
+- No pidas una escala 1–5 ni la uses como requisito de entrada.
+- No conviertas una respuesta vaga en una calificación ni una hipótesis en un
+  hecho. Marca `unknown` o `hypothesis` y pregunta lo mínimo que cambiaría la
+  lectura.
+- Antes de profundizar, devuelve: “esto entendí / esto no sé / esto parece ser
+  el reto / ¿lo ves igual?”. La persona puede corregirlo o escoger otro foco.
+- No pidas estados financieros, archivos de personas ni datos detallados hasta
+  que la persona confirme el Deep Dive; los procedimientos profundos dependen
+  de E65 y no se deben simular.
+- Si la persona pide guardar, solicita autorización explícita. Sin confirmación
+  y `persist_authorized=True`, el assessment no se persiste.
 
-## Steps
+## Conversación
 
-### Step 1: Load Context
+### 1. Recuperar contexto local
 
-```bash
-test -f .escala/agent/memory/company-profile.yaml && echo "EXISTS" || echo "NO_PROFILE"
-```
+Revisa el perfil y evidencia ya autorizados. Si falta perfil, inicia con la
+bienvenida. Si existe información previa, preséntala como propuesta, con fuente
+frescura, y pregunta si sigue vigente.
 
-| Result | Action |
-|--------|--------|
-| NO_PROFILE | Redirect to `/escala-welcome` |
-| EXISTS | Continue |
+### 2. Entender antes de medir
 
-Leer el perfil actual para ver si ya hay scores.
+Con una pregunta por turno, recorre sólo las decisiones relevantes y pide
+relato, no puntaje. Ejemplos de arranque:
 
-### Step 2: Assess Each Decision
+- **People:** “Cuéntame cómo se reparten hoy las decisiones y dónde se atoran.”
+- **Strategy:** “¿Qué vendes, a quién, por qué te eligen y qué alternativa
+  considerarían si tú no existieras?”
+- **Execution:** “Descríbeme una prioridad reciente: quién la llevó, qué pasó,
+  cómo se enteraron y qué cambió.”
+- **Cash:** “Cuéntame cómo entra y sale efectivo durante un ciclo normal; si
+  hay tensión, ¿en qué momento se siente?”
 
-Hacer 5 preguntas por decisión (20 total). Usar escala 1-5:
+Una respuesta con detalle puede bastar para proponer una primera lectura. Pide
+un archivo o un dato adicional sólo si cambia la decisión, su confianza o el
+siguiente paso.
 
-| Score | Nivel |
-|-------|-------|
-| 1 | No iniciado |
-| 2 | Ad hoc |
-| 3 | Emergente |
-| 4 | Establecido |
-| 5 | Optimizado |
+### 3. Construir assessment narrativo
 
-Para cada respuesta, anotar el score como entero 1-5.
+Para cada hallazgo conserva una afirmación, el identificador de evidencia,
+estado (`observed`, `hypothesis`, `unknown` o `not_applicable`), confianza e
+implicación. Construye el artefacto mediante el core local:
 
-### Step 3: Invoke Core Module
-
-Construir JSON con answers y ejecutar:
-
-```bash
-echo '{"answers": {"people_q1": 3, "people_q2": 2, "people_q3": 4, "people_q4": 2, "people_q5": 3, "strategy_q1": 2, "strategy_q2": 3, "strategy_q3": 1, "strategy_q4": 2, "strategy_q5": 3, "execution_q1": 4, "execution_q2": 3, "execution_q3": 2, "execution_q4": 3, "execution_q5": 2, "cash_q1": 1, "cash_q2": 2, "cash_q3": 1, "cash_q4": 3, "cash_q5": 2}, "base_path": ".", "mode": "full"}' | python3 -c "
-import sys, json
-sys.path.insert(0, '.')
+```python
 from coaching.diagnose import run
-ctx = json.loads(sys.stdin.read())
-result = run(ctx)
-print(json.dumps(result, indent=2, ensure_ascii=False))
-"
+
+result = run(
+    {
+        "action": "narrative_assessment",
+        "base_path": ".",
+        "company": {"name": "Ejemplo"},
+        "company_summary": "La empresa vende ... y busca ...",
+        "evidence": [
+            {
+                "evidence_id": "welcome.cash.1",
+                "question_id": "cash-open-1",
+                "decision": "cash",
+                "value": "El cobro suele llegar 60 días después de entregar.",
+                "source_kind": "conversation",
+                "source_ref": "conversation:welcome",
+                "rationale": "Respuesta detallada de la persona dueña.",
+                "confidence": "medium",
+            }
+        ],
+        "findings": [
+            {
+                "decision": "cash",
+                "statement": "El desfase entre entrega y cobro parece tensionar caja",
+                "evidence_ids": ["welcome.cash.1"],
+                "status": "hypothesis",
+                "confidence": "medium",
+                "implication": "Conviene confirmar periodo, cobros y obligaciones antes de decidir.",
+            }
+        ],
+        "proposed_focuses": [
+            {
+                "decision": "cash",
+                "rationale": "Es la señal con mayor impacto declarado por la persona dueña.",
+                "evidence_ids": ["welcome.cash.1"],
+            }
+        ],
+        "open_questions": [
+            "¿Qué periodo cubren esos 60 días y cuál es la variación normal?"
+        ],
+        "confirmation_status": "pending",
+    }
+)
 ```
 
-### Step 4: Quality Gate
+El output no debe mostrar una tabla de scores. Presenta el resumen y pregunta
+si la lectura es correcta. El assessment aprobado se entrega como artefacto
+local **Markdown + JSON** bajo la autoridad existente. Un número sólo puede
+añadirse más adelante si la persona lo pide y existe evidencia suficiente;
+siempre explica denominador, cobertura y límites.
 
-```bash
-python3 .escala/agent/validators/diagnose.py .escala/agent/memory/company-profile.yaml
-```
+### 4. Elegir el siguiente paso
 
-### Step 5: Present Results
+Propón uno o dos focos con su razón. Espera elección o corrección humana. Hasta
+que E65 entregue procedimientos verificados, termina con una pregunta concreta
+que prepare el Deep Dive; no aparentes ejecutar Cash, People, Strategy o
+Execution en profundidad.
 
-Mostrar el `output` del core module. Si hay routing a sub-agente, preguntar si el usuario quiere ir ahora.
+## Compatibilidad heredada
 
-### Contrato E49: resultado explicable
-
-Cuando la evaluación llega desde la bienvenida conversacional, construir el
-intake con evidencia tipada antes de calcular el resultado. Cada respuesta debe
-conservar `evidence_id`, `source_kind`, `source_ref`, `answer_status`,
-`applicability`, `freshness` y `confidence`.
-
-- `not_applicable` y `unknown` nunca se convierten en cero.
-- El denominador y la cobertura se muestran junto al score.
-- El foco debe incluir los IDs de evidencia que lo sostienen y la regla de
-  selección; los empates no se ocultan.
-- La ruta propuesta se limita a dos acciones iniciales, con dueño y métrica por
-  confirmar cuando no existan.
-- El resultado se persiste como artefacto local Markdown + JSON bajo la autoridad
-  existente; no se envía a un servicio hospedado ni activa telemetría.
-
-Si no hay evidencia suficiente, entregar una recomendación provisional y una
-pregunta concreta para completar el dato. No fabricar precisión.
-
-### Step 6: Partial Re-diagnosis
-
-Para re-evaluar solo una decisión:
-
-```bash
-echo '{"answers": {"people_q1": 4, "people_q2": 3, "people_q3": 4, "people_q4": 3, "people_q5": 4}, "decisions": ["people"], "mode": "partial", "base_path": "."}' | python3 -c "
-import sys, json; sys.path.insert(0, '.')
-from coaching.diagnose import run
-print(json.dumps(run(json.loads(sys.stdin.read())), indent=2, ensure_ascii=False))
-"
-```
-
-## Output
-
-| Item | Destination |
-|------|-------------|
-| Scores actualizados | `.escala/agent/memory/company-profile.yaml` |
-| Próximo paso | Sub-agente recomendado |
+El core numérico antiguo permanece sólo para artefactos técnicos ya existentes
+y sus pruebas. Nunca lo presentes como el flujo recomendado ni pidas sus veinte
+respuestas al empresario.

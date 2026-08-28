@@ -1,8 +1,9 @@
 ---
 epic_id: E75
 title: Diagnóstico adaptativo, confirmación y routing a Deep Dives
-status: planned
-depends_on: [E49, E55, E65]
+status: in_progress
+depends_on: [E49, E55]
+blocked_handoffs: [E65]
 related: [E71, E72, E73]
 ---
 
@@ -49,6 +50,15 @@ rutina pide entonces la evidencia detallada del dominio, no antes.
 | S75.4 | Handoff progresivo | Cash, research/strategy, People o Execution reciben sólo la evidencia/datos que requieren. |
 | S75.5 | Learning Day y sugerencias | Propone próximo Learning Day, dashboard o investigación; nada se agenda sin aceptación. |
 | S75.6 | Evaluación | Casos de poca evidencia, N/A, desacuerdo del usuario, cambio de foco y datos sensibles pasan. |
+
+## Entrega inicial autorizada
+
+S75.1 y S75.2 se entregan antes de E65 porque sólo consumen los contratos
+existentes de conversación, evidencia y consentimiento. La entrega reemplaza
+el flujo público que exigía veinte respuestas 1–5 por una conversación abierta
+con hallazgos, incógnitas y confirmación. No invoca ni simula los procedimientos
+de profundidad: S75.3–S75.5 permanecen bloqueadas hasta que E65 los compile
+desde nodos verificados.
 
 ## Métricas de éxito
 

@@ -38,6 +38,7 @@ se alteraron para aparentar cierre.
 | E61 | in_progress | Completar inspección visual autorizada de SWT, Seven Strata, OPSP y Vision Summary. |
 | E62 | in_progress | Completar inspección visual autorizada de WWW/checklist/agendas; no hay distorsión técnica crítica abierta. |
 | E63 | in_progress | Mantener CASh source-bounded y completar la revisión independiente de candidatos con evidencia autorizada. |
+| E75 | in_progress | S75.1/S75.2 sustituyen el cuestionario 1–5 por assessment narrativo confirmable; los handoffs profundos esperan E65. |
 | E76 | complete | Contrato RaiSE mínimo, grafo y retrospectiva ya son reproducibles; los warnings opcionales no pertenecen al producto. |
 
 ### Completas verificadas
@@ -52,10 +53,12 @@ se alteraron para aparentar cierre.
 
 ### Planificado, con dependencias explícitas
 
-E46, E64–E75 y E67–E70 permanecen planificados según el orden de
-`backlog.md`. No son deuda olvidada: su alcance existe, pero no se marcan como
-entregados por contener documentos de diseño. E64 espera que E60–E63 cierren
-sus gates de fuente; E46 espera resultados reales de E44/E45.
+E46, E64–E74, E67–E70 y S75.3–S75.6 permanecen planificados según el orden
+de `backlog.md`. No son deuda olvidada: su alcance existe, pero no se marcan
+como entregados por contener documentos de diseño. E64 espera que E60–E63
+cierren sus gates de fuente; E46 espera resultados reales de E44/E45. E75 está
+`in_progress`: S75.1/S75.2 ya pueden reparar el intake narrativo con E49/E55,
+mientras sus handoffs profundos esperan E65.
 
 ### Legado y disposiciones terminales
 

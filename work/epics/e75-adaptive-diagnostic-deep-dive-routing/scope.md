@@ -1,8 +1,9 @@
 ---
 epic_id: E75
 title: Diagnóstico adaptativo, confirmación y routing a Deep Dives
-status: planned
-depends_on: [E49, E55, E65]
+status: in_progress
+depends_on: [E49, E55]
+blocked_handoffs: [E65]
 related: [E71, E72, E73]
 ---
 
@@ -39,13 +40,18 @@ después, elección humana y solicitud progresiva de evidencia.
 ## Dependencias y secuencia
 
 ```text
-E49 two-speed diagnostic + E55 facts + E65 procedures
+E49 two-speed diagnostic + E55 facts
                        ↓
-S75.1 contract → S75.2 confirmación → S75.3 elección
-                                              ↓
-                          S75.4 handoff → S75.5 sugerencias → S75.6 evals
+S75.1 contract → S75.2 confirmación
+                       ↓
+                   E65 procedures
+                       ↓
+S75.3 elección → S75.4 handoff → S75.5 sugerencias → S75.6 evals
 ```
 
+S75.1 y S75.2 no necesitan E65: corrigen el intake y producen un assessment
+narrativo confirmable. S75.3–S75.5 sí esperan procedimientos verificados de
+E65; hasta entonces el sistema no promete ni ejecuta un Deep Dive inexistente.
 E71/E72/E73 son destinos de handoff; E45 decide si un caso transversal requiere
 más de un especialista, pero el usuario recibe una sola ruta ejecutiva.
 
