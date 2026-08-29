@@ -1,0 +1,142 @@
+---
+epic_id: E77
+title: Biblioteca privada de cursos y packs instalables
+status: planned
+depends_on: [E57, E58, E65, E67, E68]
+related: [E69, E71, E75]
+closure_disposition: active
+---
+
+# Scope E77
+
+## Objetivo
+
+Permitir que un dueño aporte cursos que tiene derecho a usar y los convierta,
+en su instalación local, en paquetes de conocimiento y procedimientos
+internos. ESCALA conserva una única puerta pública y separa con rigor fuente,
+interpretación, datos externos y estado de empresa.
+
+## Contrato de una fuente de curso
+
+Antes de extraer cualquier capacidad, el sistema debe registrar localmente:
+
+- título, autor/instructor, fecha, formato y propietario;
+- permiso o restricción de uso, distribución y retención;
+- hash y localizador del archivo original; para video/audio, timestamps;
+- calidad de captura: original, OCR, transcripción revisada o transcripción
+  ruidosa;
+- clasificación de cada unidad: source-explicit, source-synthesis,
+  historical-example, external-reference, company-local o model-hypothesis;
+- estado: candidato, aprobado para uso local, retirado o bloqueado.
+
+Una transcripción sin timestamps ni revisión humana puede producir candidatos,
+pero no reglas, fórmulas, citas, afirmaciones normativas ni un pack instalable.
+
+## Dentro
+
+- Ingesta local y consentida de curso, transcript, slides, workbook o notas.
+- Manifiesto, procedencia, segmentación y cola de revisión por curso.
+- Compilación de candidatos aprobados al mismo contrato de procedimiento E65.
+- Packs privados con SKILL.md interno, referencias, assets y evals locales.
+- Activación bajo demanda por ESCALA, sin un comando público adicional.
+- Conflictos visibles entre cursos, metodología base, research externo e
+  información confirmada de empresa.
+- Instalación, actualización, desactivación y eliminación explícitas del pack,
+  sin sincronizar SQLite ni publicar contenido crudo.
+- Evals de activación, no-activación, procedencia, IP, privacidad y regresión.
+
+## Fuera
+
+- Guardar contenido de cursos en Git, en el export público o en un plugin
+  compartido por defecto.
+- Extraer material cuyo permiso es desconocido o que el dueño no autorizó.
+- Usar un resumen de clase como evidencia de mercado, salud, legal, finanzas,
+  psicología o desempeño personal.
+- Convertir ejemplos del instructor, marcas, clientes o anécdotas en reglas.
+- Reemplazar E71: el pack puede formular una hipótesis de mercado, pero E71
+  sigue siendo responsable de fuentes externas fechadas, TAM/SAM/SOM y
+  competidores.
+- Reemplazar E69: los procedimientos de Scaling Up siguen su ola fuente y
+  fidelidad propia.
+
+## Historias y secuencia
+
+| Orden | Historia | Entrega verificable | Dependencia |
+|---:|---|---|---|
+| 1 | S77.1 Contrato de fuente y derechos | Schema local, consentimiento, hash, retención y bloqueo fail-closed. | E57, E58 |
+| 2 | S77.2 Curación y revisión | Manifiesto, unidades, candidatos, evidencia y cola de ambigüedades. | S77.1 |
+| 3 | S77.3 Contrato de pack privado | Layout local, lifecycle, activación/desactivación y límites de export. | S77.1, E67 |
+| 4 | S77.4 Compilador de capacidades | Candidatos aprobados → procedimientos E65 → capacidades internas. | S77.2, E65 |
+| 5 | S77.5 Piloto BlackSeller | Pack local de ventas con evaluación humana y sin promover contenido incierto. | S77.2–S77.4 |
+| 6 | S77.6 Evals, conflicto y portabilidad | Casos positivos/negativos, aislamiento de datos y paridad Codex/Claude. | S77.3–S77.5, E68 |
+
+## Caso de diseño: BlackSeller
+
+El material recibido el 2026-08-29 es una transcripción de una sesión llamada
+BlackSeller. Por ahora es una fuente candidata privada: no contiene
+timestamps, permiso de distribución, archivo original verificable ni revisión
+de transcripción. Se conserva sólo este análisis, no el texto recibido.
+
+### Candidatos de trabajo, no capacidades promocionadas
+
+| Candidato | Valor empresarial | Entregable posible | Límite |
+|---|---|---|---|
+| Mapa producto → resultado | Reencuadrar una oferta en impacto del cliente. | Hipótesis de valor por segmento. | Requiere confirmación de cliente; no promete ROI. |
+| Comité de compra y personajes | Diferenciar usuario, influenciador, comprador y operador. | Mapa de stakeholders y mensajes por hipótesis. | No perfila personas ni inventa motivaciones. |
+| Mercado y oportunidad | Formular supuestos sobre tamaño, segmentos y participación. | Brief de preguntas, rango y supuestos. | E71 verifica datos, fuentes y competidores. |
+| Diferenciación y oferta complementaria | Identificar valor agregado, servicio y prueba. | Experimento de oferta de 90 días. | No recomienda descuentos ni pricing sin evidencia. |
+| Funnel y capacidad comercial | Relacionar meta, ticket, conversión, actividad y capacidad. | Modelo editable con unidades y supuestos. | Datos de empresa se confirman; no se copian cifras de clase. |
+| Descubrimiento y práctica de pitch | Preparar una conversación por problema, rol y evidencia. | Guion de descubrimiento y ensayo. | No usa manipulación, afirmaciones médicas/psicológicas ni cierres engañosos. |
+
+### Material que permanece bloqueado o como referencia externa
+
+- La regla 80/20, libros citados, PNL, salud personal, motivación, Pareto,
+  Sun Tzu y metodologías ajenas son referencias externas, no conocimiento
+  completo del pack.
+- Anécdotas de ventas, marcas, cifras, estudios de caso y recomendaciones del
+  instructor quedan como ejemplos históricos o hipótesis.
+- Cualquier afirmación sobre seguridad, medicina, patrimonio, retorno,
+  demencia, riqueza o desempeño se bloquea hasta una fuente adecuada y el
+  límite de uso correspondiente.
+
+## Criterios de terminación
+
+- Ningún curso sin permiso y procedencia local pasa de candidato a pack.
+- Todo procedimiento promovido tiene trigger, non-trigger, preguntas,
+  decisiones, salida, criterios de aceptación, actualización de estado y evals.
+- El empresario no ve comandos técnicos ni necesita elegir mini-agentes.
+- El paquete declara qué sabe, qué no sabe, qué viene de la fuente y qué debe
+  validarse con datos de su empresa o research externo.
+- Contenido crudo, archivos privados, credenciales y SQLite quedan fuera de
+  Git, export público, Agent Plugin y carpetas sincronizadas por defecto.
+- BlackSeller obtiene una decisión de revisión humana: promover una capacidad,
+  corregirla, mantenerla como borrador o retirarla.
+- La instalación y retiro de un pack preservan la memoria aprobada de empresa.
+
+## Riesgos
+
+| Riesgo | Mitigación |
+|---|---|
+| Curso convincente pero transcripción errónea | timestamps, hash, revisión independiente y cola de ambigüedades. |
+| Infracción de derechos o filtración de contenido | local-only por defecto, permiso explícito y exclusión fail-closed del export. |
+| Curso contradice metodología o datos de empresa | procedencia visible, conflicto explícito y confirmación humana. |
+| Proliferación de mini bots | una puerta pública; packs son capacidades internas bajo demanda. |
+| Consejos de alto riesgo | limitar a hipótesis/ejercicios y exigir fuentes o profesional competente. |
+
+## Plan de ejecución RaiSE
+
+~~~text
+rai-session-start
+→ rai-epic-run E77
+  → S77.1 source/rights contract
+  → S77.2 curate + independent fidelity review
+  → S77.3 private pack lifecycle
+  → S77.4 compile verified procedures
+  → S77.5 BlackSeller pilot
+  → S77.6 cross-platform + privacy evals
+→ rai-epic-close
+~~~
+
+Cada historia requiere diseño, prueba positiva/negativa, revisión independiente,
+recibo de privacidad y retrospectiva. El material del curso nunca se adjunta a
+un commit ni a una salida de diagnóstico.

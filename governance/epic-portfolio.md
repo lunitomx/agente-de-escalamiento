@@ -53,7 +53,7 @@ se alteraron para aparentar cierre.
 
 ### Planificado, con dependencias explícitas
 
-E46, E64–E74, E67–E70 y S75.3–S75.6 permanecen planificados según el orden
+E46, E64–E74, E67–E70, E77 y S75.3–S75.6 permanecen planificados según el orden
 de `backlog.md`. No son deuda olvidada: su alcance existe, pero no se marcan
 como entregados por contener documentos de diseño. E64 espera que E60–E63
 cierren sus gates de fuente; E46 espera resultados reales de E44/E45. E75 está

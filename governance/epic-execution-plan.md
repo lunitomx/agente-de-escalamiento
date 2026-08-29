@@ -60,7 +60,7 @@ Carril de conocimiento:          E57 ✓ → E58 ✓ → E59 ✓ → E60..E63 (e
                                                                             ↓
 Portabilidad:                                                           E67 → E68 → E69
                                                               ↓
-Extensiones:                                      E71 / E72 / E73 / E74 / E75
+Extensiones:                                      E71 / E72 / E73 / E74 / E75 / E77
                                                               ↓
 Release:                                                    E70
 
@@ -93,6 +93,7 @@ E46 se alimenta de resultados reales de E44/E45; nunca cambia producto solo.
 | Extensión | E72 | Cash Learning Day y plantilla financiera: carga, reconciliación, facilitación y decisión de 90 días. | Requiere E38, E55, E63, E65 y E67. | Artefacto de Cash usable, cifras trazables, huecos explícitos y plan Who/What/When. |
 | Extensión | E73 | Asesor de dashboards que propone el panel correcto cuando existe evidencia. | Requiere E38, E40, E55, E65 y E67. | No recomienda ni grafica métricas inexistentes; entrega definición de dato, periodo y decisión soportada. |
 | Extensión | E74 | Workspace compartido/multiempresa: Markdown/YAML compartido, SQLite sólo caché local. | Requiere E37, E52, E55 y E67. | Aislamiento por empresa, conflictos explícitos y jamás sincronización de SQLite como autoridad. |
+| Extensión | E77 | Biblioteca privada de cursos: fuente autorizada → candidatos revisados → pack local bajo ESCALA. | Requiere E57/E58, E65, E67 y E68; coordina con E69/E71/E75. | Procedencia, derechos, privacidad, no-activación y retiro verificables; nunca contenido crudo en distribución. |
 | Aprendizaje | E46 | Mejora gobernada desde señales aprobadas de uso/resultados, no auto-mutación. | Tras E44/E45 y feedback suficiente. | Hipótesis, evaluación A/B o equivalente, aprobación y rollback; cambios nunca automáticos. |
 | Release | E70 | Validación, instalación y distribución completa y honesta. | Requiere E42, E68, E69 y E71–E75. | Instalación limpia, paridad cross-platform, límites de IP/privacidad claros y aceptación final. |
 
