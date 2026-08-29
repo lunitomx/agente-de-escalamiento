@@ -37,6 +37,9 @@ una relación oficial ni autorizan su distribución.
 El agente te guiará para crear o actualizar tu perfil de empresa y hacer tu
 primer diagnóstico.
 
+Si vas a invitar empresarios a probarlo, comparte la guía de
+[Piloto privado](PILOTO-EMPRESARIOS.md).
+
 ## Requisitos
 
 - Python 3, Git y `uv` instalados para la instalación completa y el modo
