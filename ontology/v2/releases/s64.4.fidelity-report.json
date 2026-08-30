@@ -1,0 +1,21 @@
+{
+  "audit_id": "s64.4",
+  "coverage_matrix_id": "s64.3",
+  "coverage_matrix_sha256": "182e057cc9df3014b5dda75fb7d848e069d8939c3f438ff33f8307a80d720ec5",
+  "excluded_count": 0,
+  "exclusion_count": 3,
+  "integrity_status": "pass",
+  "manifest_sha256": "5ea20b3f6bc7b8ba68f489493a6a6a31a61f86c4d6c43ef5926e69eec58b6c00",
+  "mapped_count": 76,
+  "node_count": 76,
+  "qualified_metric_count": 1,
+  "qualified_rule_count": 7,
+  "qualified_tool_count": 9,
+  "relation_count": 9,
+  "release_id": "s64.1",
+  "release_sha256": "c93ee72efb0c62ecec03c772f3788152c2cb9f93d60e9f9f023290e387628fac",
+  "review_required_count": 3,
+  "schema_version": 1,
+  "scope": "authorized-release-only",
+  "status": "pass"
+}
