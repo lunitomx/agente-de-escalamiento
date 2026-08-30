@@ -5,17 +5,17 @@ trigger:
 - El equipo quiere definir un ritmo de reuniones.
 non_trigger:
 - No imponga reuniones sin necesidad de seguimiento.
-objective: Proponer una cadencia verificable y sus vacíos.
+objective: Proponer cuatro ritmos verificables sin ejecutarlos.
 required_inputs:
 - id: input.execution-context
-  description: Contexto autorizado de ejecución o estado desconocido.
+  description: Contexto de ejecución y prioridad propuesta o desconocida.
   required: true
   accepted_statuses:
   - known
   - unknown
 optional_inputs:
 - id: input.existing-rhythm
-  description: Cadencias autorizadas que ya existen.
+  description: Cadencias existentes, propósito y responsables autorizados.
   required: false
   accepted_statuses:
   - known
@@ -23,19 +23,19 @@ optional_inputs:
   - not-applicable
 interview_questions:
 - id: question.rhythm-gap
-  prompt: ¿Qué seguimiento falta en la operación actual?
+  prompt: ¿Qué propósito, dueño y restricciones tiene cada ritmo propuesto?
   required: true
 steps:
 - id: step.propose-meeting-rhythm
-  action: Proponga cadencia y declare restricciones conocidas.
+  action: Proponga cuatro ritmos sin calendario ni automatización.
   produces:
   - artifact.meeting-rhythm
 decision_rules:
 - id: rule.purpose-before-meeting
-  statement: Cada reunión propuesta necesita propósito verificable.
+  statement: Cada ritmo requiere propósito, dueño y aceptación explícita.
 warnings:
 - id: warning.no-silent-inference
-  statement: No suponga disponibilidad ni responsables del equipo.
+  statement: No cree reuniones, calendarios ni automatizaciones.
 output_contract:
   artifact:
     status: unknown
@@ -46,7 +46,7 @@ output_contract:
     confirmed_by: null
   assumptions: []
   open_questions:
-  - ¿Qué responsables y horarios deben confirmarse?
+  - ¿Qué propósito, dueño y aceptación falta confirmar?
   owner:
     status: unknown
     value: null
@@ -77,7 +77,7 @@ output_contract:
     confirmed_by: null
 acceptance_criteria:
 - id: criterion.cadence-visible
-  statement: La cadencia propuesta conserva responsables y revisión visibles.
+  statement: Incluya daily, weekly, monthly y quarterly como propuestas.
 state_updates:
 - id: state.propose-meeting-rhythm
   path: state/company/execution.yaml
@@ -85,7 +85,7 @@ state_updates:
   confirmation: null
 handoff:
   next_procedure_id: procedure.scaleup-quarterly-review
-  condition: El equipo confirma una cadencia de revisión.
+  condition: El equipo acepta una cadencia de revisión.
 evidence_refs:
 - digest.sha256.087f20a1c8f00a43ab1ce5ba66f6b66759b7bf716a12b4fa69cda0886ada5df8
 - digest.sha256.156f02e76670c5eaf6f53af3797ee50c994f612367236d6697dc9d9e81d020c2

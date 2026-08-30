@@ -5,17 +5,17 @@ trigger:
 - El equipo quiere definir una prioridad trimestral.
 non_trigger:
 - No priorice sin foco y evidencia confirmados.
-objective: Proponer una prioridad trimestral verificable.
+objective: Proponer un plan trimestral verificable.
 required_inputs:
 - id: input.primary-constraint
-  description: Foco autorizado o estado desconocido.
+  description: Diagnóstico confirmado o propuesto con restricción única.
   required: true
   accepted_statuses:
   - known
   - unknown
 optional_inputs:
 - id: input.priority-evidence
-  description: Evidencia autorizada de prioridades actuales.
+  description: Baseline, unidad, dueño y compromisos autorizados.
   required: false
   accepted_statuses:
   - known
@@ -23,19 +23,19 @@ optional_inputs:
   - not-applicable
 interview_questions:
 - id: question.quarterly-outcome
-  prompt: ¿Qué resultado debe cambiar este trimestre?
+  prompt: ¿Qué resultado único confirma baseline, unidad, dueño y fecha?
   required: true
 steps:
 - id: step.propose-quarterly-priority
-  action: Proponga resultado y registre evidencia faltante.
+  action: Proponga prioridad, Critical Number y compromisos sin ejecutar cambios.
   produces:
   - artifact.quarterly-priority
 decision_rules:
 - id: rule.one-priority
-  statement: No sustituya foco por una lista de prioridades.
+  statement: Permita una prioridad o exija justificación explícita.
 warnings:
 - id: warning.no-silent-inference
-  statement: No asigne dueño ni KPI sin confirmación.
+  statement: No acepte KPI sin unidad, baseline, dueño y fecha.
 output_contract:
   artifact:
     status: unknown
@@ -46,7 +46,7 @@ output_contract:
     confirmed_by: null
   assumptions: []
   open_questions:
-  - ¿Quién confirma dueño, KPI y fecha?
+  - ¿Qué confirma prioridad, KPI, dueño, fecha y revisión?
   owner:
     status: unknown
     value: null
@@ -77,7 +77,7 @@ output_contract:
     confirmed_by: null
 acceptance_criteria:
 - id: criterion.actionable-priority
-  statement: La prioridad muestra dueño, medida y siguiente revisión.
+  statement: Incluya prioridad, medida, baseline, dueño, compromiso y revisión.
 state_updates:
 - id: state.propose-quarterly-priority
   path: state/current-quarter.yaml
@@ -85,7 +85,7 @@ state_updates:
   confirmation: null
 handoff:
   next_procedure_id: procedure.install-meeting-rhythm
-  condition: La prioridad requiere una cadencia de seguimiento.
+  condition: La prioridad propuesta requiere cadencia de seguimiento.
 evidence_refs:
 - digest.sha256.0363cf6b8cd7427f21401b4303261152bcfe75add8c4ead2064ea50c35954bd3
 - digest.sha256.087f20a1c8f00a43ab1ce5ba66f6b66759b7bf716a12b4fa69cda0886ada5df8
