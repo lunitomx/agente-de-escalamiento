@@ -40,7 +40,7 @@ def test_valid_contract_is_complete_unknown_safe_and_release_bounded() -> None:
     assert contract.output_contract.review_cadence.status == "unknown"
     assert contract.output_contract.assumptions == []
     assert contract.output_contract.open_questions
-    validate_procedure_against_release(contract, load_canonical_release(RELEASE))
+    validate_procedure_against_release(contract)
 
 
 @pytest.mark.parametrize(
@@ -100,7 +100,7 @@ def test_rejects_evidence_that_is_not_in_authorized_release() -> None:
     contract = ProcedureContract.model_validate(payload)
 
     with pytest.raises(ValueError, match="unknown release evidence"):
-        validate_procedure_against_release(contract, load_canonical_release(RELEASE))
+        validate_procedure_against_release(contract)
 
 
 def test_no_raw_source_or_silent_unknown_fields_are_accepted() -> None:
@@ -155,13 +155,11 @@ def test_known_value_requires_company_evidence_consent_and_human_confirmation() 
     )
     contract = ProcedureContract.model_validate(payload)
     with pytest.raises(ValueError, match="requires trusted registry"):
-        validate_procedure_against_release(contract, load_canonical_release(RELEASE))
+        validate_procedure_against_release(contract)
 
     artifact["evidence_ids"] = ["fact.fake"]
     with pytest.raises(ValueError, match="requires trusted registry"):
-        validate_procedure_against_release(
-            ProcedureContract.model_validate(payload), load_canonical_release(RELEASE)
-        )
+        validate_procedure_against_release(ProcedureContract.model_validate(payload))
     with pytest.raises(TypeError):
         validate_procedure_against_release(  # type: ignore[call-arg]
             ProcedureContract.model_validate(payload),
@@ -222,6 +220,7 @@ def test_public_release_validation_does_not_accept_a_forged_registry_argument() 
     parameters = inspect.signature(validate_procedure_against_release).parameters
     assert "registry" not in parameters
     assert "base_path" not in parameters
+    assert "release" not in parameters
     payload = _valid_payload()
     output = payload["output_contract"]
     assert isinstance(output, dict)
@@ -238,9 +237,7 @@ def test_public_release_validation_does_not_accept_a_forged_registry_argument() 
         }
     )
     with pytest.raises(ValueError, match="requires trusted registry"):
-        validate_procedure_against_release(
-            ProcedureContract.model_validate(payload), load_canonical_release(RELEASE)
-        )
+        validate_procedure_against_release(ProcedureContract.model_validate(payload))
 
 
 def test_chdir_cannot_replace_the_trusted_project_root(
@@ -267,9 +264,7 @@ def test_chdir_cannot_replace_the_trusted_project_root(
         }
     )
     with pytest.raises(ValueError, match="requires trusted registry"):
-        validate_procedure_against_release(
-            ProcedureContract.model_validate(payload), load_canonical_release(RELEASE)
-        )
+        validate_procedure_against_release(ProcedureContract.model_validate(payload))
 
 
 def test_missing_scaleup_identity_rejects_workspace_authority(
@@ -280,3 +275,24 @@ def test_missing_scaleup_identity_rejects_workspace_authority(
     monkeypatch.setattr(procedure_contract, "_TRUSTED_PROJECT_ROOT", fake_root)
     with pytest.raises(ValueError, match="trusted workspace identity is invalid"):
         procedure_contract._trusted_workspace_root()
+
+
+def test_public_validation_rejects_a_forged_release_argument() -> None:
+    canonical = load_canonical_release(RELEASE)
+    forged = canonical.model_copy(
+        update={
+            "nodes": [
+                canonical.nodes[0].model_copy(
+                    update={
+                        "evidence_refs": [
+                            "digest.sha256.ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+                        ]
+                    }
+                )
+            ]
+        }
+    )
+    with pytest.raises(TypeError):
+        validate_procedure_against_release(  # type: ignore[call-arg]
+            load_procedure_contract(FIXTURE), forged
+        )

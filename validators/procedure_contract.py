@@ -16,7 +16,7 @@ from typing import Literal
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-from validators.ontology_v2 import CanonicalRelease, OriginKind
+from validators.ontology_v2 import OriginKind, load_canonical_release
 
 
 _ID = re.compile(r"^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$")
@@ -452,11 +452,16 @@ def _load_local_trust_registry() -> _TrustedRegistry | None:
     )
 
 
-def validate_procedure_against_release(
-    procedure: ProcedureContract,
-    release: CanonicalRelease,
-) -> None:
-    """Validate E64 methodology evidence and mandatory local trust in one route."""
+def validate_procedure_against_release(procedure: ProcedureContract) -> None:
+    """Validate against the canonical E64 release and mandatory local trust.
+
+    The release is deliberately loaded from the verified project root. Callers
+    cannot supply a release object, digest list, or alternate path.
+    """
+    root = _trusted_workspace_root()
+    release = load_canonical_release(
+        root / "ontology" / "v2" / "releases" / "s64.1.json"
+    )
     release_refs = {
         evidence_ref for node in release.nodes for evidence_ref in node.evidence_refs
     }
