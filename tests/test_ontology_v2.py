@@ -35,6 +35,13 @@ VOCABULARY = ROOT / "ontology/v2/vocabulary.yaml"
 SCRIPT = ROOT / "scripts/check_ontology_v2_schema.py"
 QUEUE = ROOT / "ontology/v2/review-queue.json"
 QUEUE_SCRIPT = ROOT / "scripts/check_ontology_review_queue.py"
+RELEASE = ROOT / "ontology/v2/releases/s64.1.json"
+RELEASE_SCRIPT = ROOT / "scripts/build_canonical_release.py"
+EXPECTED_RELEASE_MANIFEST = {
+    "nodes": 76,
+    "exclusions": 3,
+    "exclusion_reasons": {"needs-revision": 3},
+}
 
 
 def test_checked_in_schema_is_deterministic_and_private_contract_only() -> None:
@@ -396,3 +403,40 @@ def test_canonical_release_rejects_unsafe_or_nonexclusive_entries(
         encoding="utf-8",
     )
     assert load_canonical_release(path).release_id == "s64.1"
+
+
+def test_checked_in_s64_1_release_is_rendered_safe_and_has_expected_partition() -> None:
+    release = load_canonical_release(RELEASE)
+    rendered = render_canonical_release(release)
+    assert RELEASE.read_text(encoding="utf-8") == rendered
+    assert len(release.nodes) == EXPECTED_RELEASE_MANIFEST["nodes"]
+    assert len(release.exclusions) == EXPECTED_RELEASE_MANIFEST["exclusions"]
+    assert {
+        reason: sum(item.reason_code == reason for item in release.exclusions)
+        for reason in EXPECTED_RELEASE_MANIFEST["exclusion_reasons"]
+    } == EXPECTED_RELEASE_MANIFEST["exclusion_reasons"]
+    assert all(node.review_outcome == "approve-candidate" for node in release.nodes)
+    assert all(node.candidate_receipt and node.review_receipt for node in release.nodes)
+    assert all(
+        item.candidate_receipt and item.review_receipt for item in release.exclusions
+    )
+    candidate_ids = [node.candidate_id for node in release.nodes] + [
+        item.candidate_id for item in release.exclusions
+    ]
+    assert len(candidate_ids) == len(set(candidate_ids))
+    assert "working_text" not in rendered
+    assert "locators" not in rendered
+    assert "/home/" not in rendered
+    assert "http:" not in rendered
+    assert "https:" not in rendered
+
+
+def test_release_cli_requires_explicit_authorized_input() -> None:
+    completed = subprocess.run(
+        [sys.executable, str(RELEASE_SCRIPT), "--release", "release.json"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode != 0
+    assert "--queue" in completed.stderr
