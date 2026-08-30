@@ -1,7 +1,7 @@
 ---
 epic_id: E64
 title: Consolidación ontológica y release de cobertura
-status: in_progress
+status: complete
 depends_on: [E59, E60, E61, E62, E63]
 ---
 
@@ -45,6 +45,10 @@ Promover únicamente conocimiento aprobado de las cinco pasadas a una versión c
 
 E65 sólo consume esta release. No se acepta una salida "verde" si la cola de revisión contiene hallazgos críticos.
 
+### Frontera de la release
+
+E64 queda completa para la **release autorizada interna**: sus relaciones, cobertura e integridad son reproducibles y los tres candidatos Cash siguen explícitamente en `review-required`. No certifica fidelidad semántica del libro o de un corpus privado; esa verificación exige fuentes autorizadas y permanece fuera de esta release.
+
 ## Implementation Plan
 
 > Added by `/rai-epic-plan` on 2026-08-30. No `design.md` or `ux-design.md`
@@ -87,7 +91,7 @@ unreviewed form is an exclusion, never a green result.
 | S64.1 | M | Done | 2026-08-30 | — | Source-safe canonical release: 76 nodes and 3 explicit exclusions from 79 authorized candidates. Independent review passed with one documented nonblocking semantic-label limitation. |
 | S64.2 | M | Done | 2026-08-30 | — | Integrity gate is `not-assessed` without an authorized relationship manifest; it passes only with a valid manifest, never by inference. |
 | S64.3 | M | Done | 2026-08-30 | — | Deterministic safe matrix has 76 mapped records and 3 Cash review-required records; no percentage conceals them. |
-| S64.4 | M | Pending | — | — | Starts only when S64.2 and S64.3 pass without critical findings. |
+| S64.4 | M | Done | 2026-08-30 | — | Authorised-release audit passes exactly: 76 mapped, 3 Cash review-required, 9 qualified tools, 7 rules and 1 metric. |
 
 ### Sequencing Risks
 

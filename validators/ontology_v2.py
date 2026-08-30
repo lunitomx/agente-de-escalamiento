@@ -404,11 +404,89 @@ class CanonicalReleaseRelation(_StrictModel):
     source_id: str = Field(min_length=3, max_length=192)
     target_id: str = Field(min_length=3, max_length=192)
     relation_type: str = Field(min_length=3, max_length=96)
+    evidence_refs: list[str] = Field(min_length=1, max_length=64)
 
     @field_validator("source_id", "target_id", "relation_type")
     @classmethod
     def validate_relation_identifier(cls, value: str) -> str:
         return _validate_nonlegacy_identifier(value, "release relation identifier")
+
+    @field_validator("evidence_refs")
+    @classmethod
+    def validate_relation_evidence_refs(cls, values: list[str]) -> list[str]:
+        if len(values) != len(set(values)):
+            raise ValueError("duplicate relation evidence reference")
+        return sorted(_validate_opaque_reference(value) for value in values)
+
+
+class AuthorizedReleaseRelationship(_StrictModel):
+    """One safe relationship projection approved without source prose."""
+
+    source_id: str = Field(min_length=3, max_length=192)
+    target_id: str = Field(min_length=3, max_length=192)
+    relation_type: Literal["belongs-to-decision"]
+    evidence_refs: list[str] = Field(min_length=1, max_length=64)
+
+    @field_validator("source_id", "target_id")
+    @classmethod
+    def validate_relationship_identifier(cls, value: str) -> str:
+        return _validate_nonlegacy_identifier(value, "relationship projection ID")
+
+    @field_validator("evidence_refs")
+    @classmethod
+    def validate_relationship_evidence_refs(cls, values: list[str]) -> list[str]:
+        if len(values) != len(set(values)):
+            raise ValueError("duplicate relationship evidence reference")
+        return sorted(_validate_opaque_reference(value) for value in values)
+
+
+class AuthorizedMetricQualification(_StrictModel):
+    """Safe metric metadata needed to compile the public integrity manifest."""
+
+    canonical_id: str = Field(min_length=3, max_length=192)
+    definition_ref: str = Field(min_length=3, max_length=192)
+    unit: str = Field(min_length=1, max_length=96)
+
+    @field_validator("canonical_id")
+    @classmethod
+    def validate_metric_qualification_id(cls, value: str) -> str:
+        return _validate_nonlegacy_identifier(value, "metric qualification ID")
+
+    @field_validator("definition_ref")
+    @classmethod
+    def validate_metric_qualification_ref(cls, value: str) -> str:
+        return _validate_opaque_reference(value)
+
+    @field_validator("unit")
+    @classmethod
+    def validate_metric_qualification_unit(cls, value: str) -> str:
+        return _validate_safe_label(value)
+
+
+class AuthorizedRelationshipProjection(_StrictModel):
+    """Versioned safe source for the S64.4 relation manifest, never a queue."""
+
+    schema_version: Literal[1]
+    release_id: Literal["s64.1"]
+    relationships: list[AuthorizedReleaseRelationship] = Field(
+        min_length=1, max_length=128
+    )
+    metric_qualifications: list[AuthorizedMetricQualification] = Field(
+        min_length=1, max_length=32
+    )
+
+    @model_validator(mode="after")
+    def validate_projection_uniqueness(self) -> "AuthorizedRelationshipProjection":
+        relationship_keys = [
+            (item.source_id, item.target_id, item.relation_type)
+            for item in self.relationships
+        ]
+        if len(relationship_keys) != len(set(relationship_keys)):
+            raise ValueError("duplicate relationship projection")
+        metric_ids = [item.canonical_id for item in self.metric_qualifications]
+        if len(metric_ids) != len(set(metric_ids)):
+            raise ValueError("duplicate metric qualification")
+        return self
 
 
 class CanonicalNodeIntegrityContract(_StrictModel):
@@ -523,6 +601,16 @@ def validate_canonical_release_integrity(
             or relation.target_id not in nodes_by_id
         ):
             raise _release_integrity_error("relation-references-unknown-node")
+        source = nodes_by_id[relation.source_id]
+        target = nodes_by_id[relation.target_id]
+        if source.kind is not NodeKind.TOOL:
+            raise _release_integrity_error("relation-source-is-not-tool")
+        if target.kind is not NodeKind.DECISION_AREA:
+            raise _release_integrity_error("relation-target-is-not-decision")
+        if relation.relation_type != "belongs-to-decision":
+            raise _release_integrity_error("relation-type-is-not-authorized")
+        if not set(relation.evidence_refs).issubset(source.evidence_refs):
+            raise _release_integrity_error("relation-references-unknown-evidence")
 
     contracts_by_id = {
         contract.canonical_id: contract for contract in manifest.node_contracts
@@ -535,6 +623,7 @@ def validate_canonical_release_integrity(
     if any(node.canonical_id not in contracts_by_id for node in relevant_nodes):
         raise _release_integrity_error("published-node-missing-integrity-contract")
 
+    expected_relations: set[tuple[str, str, str]] = set()
     tool_count = rule_count = metric_count = 0
     for node in relevant_nodes:
         contract = contracts_by_id[node.canonical_id]
@@ -549,16 +638,10 @@ def validate_canonical_release_integrity(
                 for decision_id in contract.decision_ids
             ):
                 raise _release_integrity_error("tool-references-invalid-decision")
-            expected_relations = {
+            expected_relations.update(
                 (node.canonical_id, decision_id, "belongs-to-decision")
                 for decision_id in contract.decision_ids
-            }
-            published_relations = {
-                (relation.source_id, relation.target_id, relation.relation_type)
-                for relation in manifest.relations
-            }
-            if not expected_relations.issubset(published_relations):
-                raise _release_integrity_error("tool-missing-decision-relation")
+            )
             tool_count += 1
         elif node.kind is NodeKind.RULE:
             if contract.decision_ids or contract.definition_ref or contract.unit:
@@ -578,6 +661,13 @@ def validate_canonical_release_integrity(
             if contract.definition_ref not in node.evidence_refs:
                 raise _release_integrity_error("metric-references-unknown-definition")
             metric_count += 1
+
+    published_relations = {
+        (relation.source_id, relation.target_id, relation.relation_type)
+        for relation in manifest.relations
+    }
+    if published_relations != expected_relations:
+        raise _release_integrity_error("relations-do-not-exactly-match-contracts")
 
     return CanonicalReleaseIntegrityReceipt(
         schema_version=1,
@@ -602,6 +692,123 @@ def load_canonical_release_integrity_manifest(
         )
     except Exception as exc:
         raise ValueError("canonical release integrity manifest invalid") from exc
+
+
+def load_authorized_relationship_projection(
+    path: Path,
+) -> AuthorizedRelationshipProjection:
+    try:
+        return AuthorizedRelationshipProjection.model_validate_json(
+            path.read_text(encoding="utf-8")
+        )
+    except Exception as exc:
+        raise ValueError("authorized relationship projection contract invalid") from exc
+
+
+def build_canonical_release_integrity_manifest(
+    release: CanonicalRelease,
+    projection: AuthorizedRelationshipProjection | None,
+) -> CanonicalReleaseIntegrityManifest:
+    """Compile only approved safe relationship metadata into a manifest."""
+    if projection is None or projection.release_id != release.release_id:
+        raise ValueError("authorized relationship projection is required")
+    nodes_by_id = {node.canonical_id: node for node in release.nodes}
+    relationships: list[CanonicalReleaseRelation] = []
+    tool_decisions: dict[str, list[str]] = {}
+    for relationship in projection.relationships:
+        source = nodes_by_id.get(relationship.source_id)
+        target = nodes_by_id.get(relationship.target_id)
+        if source is None or target is None:
+            raise ValueError("relationship projection references unknown node")
+        if (
+            source.kind is not NodeKind.TOOL
+            or target.kind is not NodeKind.DECISION_AREA
+        ):
+            raise ValueError("relationship projection has incompatible node kinds")
+        if not set(relationship.evidence_refs).issubset(source.evidence_refs):
+            raise ValueError("relationship projection references unknown evidence")
+        relationships.append(
+            CanonicalReleaseRelation(
+                source_id=relationship.source_id,
+                target_id=relationship.target_id,
+                relation_type=relationship.relation_type,
+                evidence_refs=relationship.evidence_refs,
+            )
+        )
+        tool_decisions.setdefault(relationship.source_id, []).append(
+            relationship.target_id
+        )
+
+    published_tool_ids = {
+        node.canonical_id for node in release.nodes if node.kind is NodeKind.TOOL
+    }
+    relationship_source_ids = {item.source_id for item in projection.relationships}
+    if relationship_source_ids != published_tool_ids:
+        raise ValueError(
+            "relationship projection does not exactly cover published tools"
+        )
+    if len(projection.relationships) != len(relationship_source_ids):
+        raise ValueError("relationship projection has multiple decisions for tool")
+
+    metric_qualifications = {
+        item.canonical_id: item for item in projection.metric_qualifications
+    }
+    published_metric_ids = {
+        node.canonical_id for node in release.nodes if node.kind is NodeKind.METRIC
+    }
+    if set(metric_qualifications) != published_metric_ids:
+        raise ValueError("metric qualifications do not exactly cover published metrics")
+    contracts: list[CanonicalNodeIntegrityContract] = []
+    for node in release.nodes:
+        if node.kind is NodeKind.TOOL:
+            contracts.append(
+                CanonicalNodeIntegrityContract(
+                    canonical_id=node.canonical_id,
+                    decision_ids=tool_decisions.get(node.canonical_id, []),
+                )
+            )
+        elif node.kind is NodeKind.RULE:
+            contracts.append(
+                CanonicalNodeIntegrityContract(
+                    canonical_id=node.canonical_id, evidence_refs=node.evidence_refs
+                )
+            )
+        elif node.kind is NodeKind.METRIC:
+            qualification = metric_qualifications.get(node.canonical_id)
+            if qualification is None:
+                raise ValueError("metric qualification missing from projection")
+            if qualification.definition_ref not in node.evidence_refs:
+                raise ValueError("metric qualification references unknown evidence")
+            contracts.append(
+                CanonicalNodeIntegrityContract(
+                    canonical_id=node.canonical_id,
+                    definition_ref=qualification.definition_ref,
+                    unit=qualification.unit,
+                )
+            )
+    return CanonicalReleaseIntegrityManifest(
+        schema_version=1,
+        release_id=release.release_id,
+        relations=sorted(
+            relationships,
+            key=lambda item: (item.source_id, item.target_id, item.relation_type),
+        ),
+        node_contracts=sorted(contracts, key=lambda item: item.canonical_id),
+    )
+
+
+def render_canonical_release_integrity_manifest(
+    manifest: CanonicalReleaseIntegrityManifest,
+) -> str:
+    return (
+        json.dumps(
+            manifest.model_dump(mode="json"),
+            ensure_ascii=True,
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n"
+    )
 
 
 def render_canonical_release_integrity_receipt(
