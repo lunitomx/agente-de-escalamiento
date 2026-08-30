@@ -17,9 +17,12 @@ if str(ROOT) not in sys.path:
 
 from validators.ontology_v2 import (  # noqa: E402
     CoverageMatrix,
+    build_canonical_release_integrity_manifest,
+    load_authorized_relationship_projection,
     load_canonical_release,
     load_canonical_release_integrity_manifest,
     load_coverage_matrix,
+    render_canonical_release_integrity_manifest,
     validate_canonical_release_integrity,
     validate_coverage_matrix,
 )
@@ -30,11 +33,17 @@ def _sha256(path: Path) -> str:
 
 
 def audit_authorized_release(
-    release_path: Path, manifest_path: Path, matrix_path: Path
+    release_path: Path, projection_path: Path, manifest_path: Path, matrix_path: Path
 ) -> dict[str, Any]:
     """Return a bounded PASS report or fail closed without source inspection."""
     release = load_canonical_release(release_path)
+    projection = load_authorized_relationship_projection(projection_path)
     manifest = load_canonical_release_integrity_manifest(manifest_path)
+    expected_manifest = build_canonical_release_integrity_manifest(release, projection)
+    if render_canonical_release_integrity_manifest(
+        manifest
+    ) != render_canonical_release_integrity_manifest(expected_manifest):
+        raise ValueError("integrity manifest does not match authorized projection")
     matrix: CoverageMatrix = load_coverage_matrix(matrix_path)
     receipt = validate_canonical_release_integrity(release, manifest)
     if receipt.status != "pass" or receipt.relations_state != "relations-validated":
@@ -63,6 +72,7 @@ def audit_authorized_release(
         "integrity_status": receipt.status,
         "mapped_count": mapped_count,
         "manifest_sha256": _sha256(manifest_path),
+        "relationship_projection_sha256": _sha256(projection_path),
         "node_count": receipt.node_count,
         "qualified_metric_count": receipt.qualified_metric_count,
         "qualified_rule_count": receipt.qualified_rule_count,
@@ -84,6 +94,7 @@ def render_fidelity_report(report: dict[str, Any]) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--release", type=Path, required=True)
+    parser.add_argument("--projection", type=Path, required=True)
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--matrix", type=Path, required=True)
     parser.add_argument("--report", type=Path, required=True)
@@ -91,7 +102,9 @@ def main() -> int:
     args = parser.parse_args()
     try:
         rendered = render_fidelity_report(
-            audit_authorized_release(args.release, args.manifest, args.matrix)
+            audit_authorized_release(
+                args.release, args.projection, args.manifest, args.matrix
+            )
         )
         if args.check:
             return 0 if args.report.read_text(encoding="utf-8") == rendered else 1

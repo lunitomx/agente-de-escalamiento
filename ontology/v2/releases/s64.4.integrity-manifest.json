@@ -11,125 +11,220 @@
       "canonical_id": "rule.brand-promises-measurable",
       "decision_ids": [],
       "definition_ref": null,
-      "evidence_refs": ["digest.sha256.04235128faa857c97a6f35c7f8466be591bfd448ee4fe076299af5d098d5b3cb"],
+      "evidence_refs": [
+        "digest.sha256.04235128faa857c97a6f35c7f8466be591bfd448ee4fe076299af5d098d5b3cb"
+      ],
       "unit": null
     },
     {
       "canonical_id": "rule.face-gap-signals",
       "decision_ids": [],
       "definition_ref": null,
-      "evidence_refs": ["digest.sha256.cf1a931e2bfd98f5ec4e4e03432f5d7d46f346d097175e42b658c0f2cde74d08"],
+      "evidence_refs": [
+        "digest.sha256.cf1a931e2bfd98f5ec4e4e03432f5d7d46f346d097175e42b658c0f2cde74d08"
+      ],
       "unit": null
     },
     {
       "canonical_id": "rule.face-single-accountable",
       "decision_ids": [],
       "definition_ref": null,
-      "evidence_refs": ["digest.sha256.87372a7938be853414c49e13a7e93c90f78d77d6beb9a48dd4257c7232b5a0b5"],
+      "evidence_refs": [
+        "digest.sha256.87372a7938be853414c49e13a7e93c90f78d77d6beb9a48dd4257c7232b5a0b5"
+      ],
       "unit": null
     },
     {
       "canonical_id": "rule.healthy-team-first",
       "decision_ids": [],
       "definition_ref": null,
-      "evidence_refs": ["digest.sha256.bef937a6fe33ff9bd2b10decc9ec3d6c5a9cd4492293c13e9380d5ef779f2c02"],
+      "evidence_refs": [
+        "digest.sha256.bef937a6fe33ff9bd2b10decc9ec3d6c5a9cd4492293c13e9380d5ef779f2c02"
+      ],
       "unit": null
     },
     {
       "canonical_id": "rule.non-sequential-adoption",
       "decision_ids": [],
       "definition_ref": null,
-      "evidence_refs": ["digest.sha256.2f92b20686b59c9437816f5f81ceb9c958a9ebc6a11e6cd0f54af0eb89c9193a"],
+      "evidence_refs": [
+        "digest.sha256.2f92b20686b59c9437816f5f81ceb9c958a9ebc6a11e6cd0f54af0eb89c9193a"
+      ],
       "unit": null
     },
     {
       "canonical_id": "rule.opsp-quarterly-actions",
       "decision_ids": [],
       "definition_ref": null,
-      "evidence_refs": ["digest.sha256.3d3c3b955a9fd737bcb1e6013ceed2d27daa14c4ab8a738265cc686e6c59d5f3"],
+      "evidence_refs": [
+        "digest.sha256.3d3c3b955a9fd737bcb1e6013ceed2d27daa14c4ab8a738265cc686e6c59d5f3"
+      ],
       "unit": null
     },
     {
       "canonical_id": "rule.pace-process-accountability",
       "decision_ids": [],
       "definition_ref": null,
-      "evidence_refs": ["digest.sha256.4a63b9f71eb1ff45ab8d2d73355044e4b8cc228ff8d30c7f3c0e0eab5a0230c2"],
+      "evidence_refs": [
+        "digest.sha256.4a63b9f71eb1ff45ab8d2d73355044e4b8cc228ff8d30c7f3c0e0eab5a0230c2"
+      ],
       "unit": null
     },
     {
       "canonical_id": "tool.cash-acceleration-strategies",
-      "decision_ids": ["decision.cash"],
+      "decision_ids": [
+        "decision.cash"
+      ],
       "definition_ref": null,
       "evidence_refs": [],
       "unit": null
     },
     {
       "canonical_id": "tool.critical-number",
-      "decision_ids": ["decision.execution"],
+      "decision_ids": [
+        "decision.execution"
+      ],
       "definition_ref": null,
       "evidence_refs": [],
       "unit": null
     },
     {
       "canonical_id": "tool.face",
-      "decision_ids": ["decision.people"],
+      "decision_ids": [
+        "decision.people"
+      ],
       "definition_ref": null,
       "evidence_refs": [],
       "unit": null
     },
     {
       "canonical_id": "tool.oppp",
-      "decision_ids": ["decision.people"],
+      "decision_ids": [
+        "decision.people"
+      ],
       "definition_ref": null,
       "evidence_refs": [],
       "unit": null
     },
     {
       "canonical_id": "tool.opsp",
-      "decision_ids": ["decision.strategy"],
+      "decision_ids": [
+        "decision.strategy"
+      ],
       "definition_ref": null,
       "evidence_refs": [],
       "unit": null
     },
     {
       "canonical_id": "tool.pace",
-      "decision_ids": ["decision.people"],
+      "decision_ids": [
+        "decision.people"
+      ],
       "definition_ref": null,
       "evidence_refs": [],
       "unit": null
     },
     {
       "canonical_id": "tool.strategy-seven-strata",
-      "decision_ids": ["decision.strategy"],
+      "decision_ids": [
+        "decision.strategy"
+      ],
       "definition_ref": null,
       "evidence_refs": [],
       "unit": null
     },
     {
       "canonical_id": "tool.swt",
-      "decision_ids": ["decision.strategy"],
+      "decision_ids": [
+        "decision.strategy"
+      ],
       "definition_ref": null,
       "evidence_refs": [],
       "unit": null
     },
     {
       "canonical_id": "tool.vision-summary",
-      "decision_ids": ["decision.strategy"],
+      "decision_ids": [
+        "decision.strategy"
+      ],
       "definition_ref": null,
       "evidence_refs": [],
       "unit": null
     }
   ],
   "relations": [
-    {"relation_type": "belongs-to-decision", "source_id": "tool.cash-acceleration-strategies", "target_id": "decision.cash"},
-    {"relation_type": "belongs-to-decision", "source_id": "tool.critical-number", "target_id": "decision.execution"},
-    {"relation_type": "belongs-to-decision", "source_id": "tool.face", "target_id": "decision.people"},
-    {"relation_type": "belongs-to-decision", "source_id": "tool.oppp", "target_id": "decision.people"},
-    {"relation_type": "belongs-to-decision", "source_id": "tool.opsp", "target_id": "decision.strategy"},
-    {"relation_type": "belongs-to-decision", "source_id": "tool.pace", "target_id": "decision.people"},
-    {"relation_type": "belongs-to-decision", "source_id": "tool.strategy-seven-strata", "target_id": "decision.strategy"},
-    {"relation_type": "belongs-to-decision", "source_id": "tool.swt", "target_id": "decision.strategy"},
-    {"relation_type": "belongs-to-decision", "source_id": "tool.vision-summary", "target_id": "decision.strategy"}
+    {
+      "evidence_refs": [
+        "digest.sha256.254cb8090dcc6c5e697ba8e4c991cbb2eb2b4b31ba3ab4936e3c1bbb099092df"
+      ],
+      "relation_type": "belongs-to-decision",
+      "source_id": "tool.cash-acceleration-strategies",
+      "target_id": "decision.cash"
+    },
+    {
+      "evidence_refs": [
+        "digest.sha256.1a9138ec7a9f2c4559c82158cc1df6639b0ff0129d4d1b6724c831cb8b7f4195"
+      ],
+      "relation_type": "belongs-to-decision",
+      "source_id": "tool.critical-number",
+      "target_id": "decision.execution"
+    },
+    {
+      "evidence_refs": [
+        "digest.sha256.04a4a553f240a712c831cee697661ebe6e685fef16b9aece75e515ade87ad0c6"
+      ],
+      "relation_type": "belongs-to-decision",
+      "source_id": "tool.face",
+      "target_id": "decision.people"
+    },
+    {
+      "evidence_refs": [
+        "digest.sha256.6b02fcf55679e0b779193d465d290bf1b408586de4bb7ac2dd2cbc2c4f93633c"
+      ],
+      "relation_type": "belongs-to-decision",
+      "source_id": "tool.oppp",
+      "target_id": "decision.people"
+    },
+    {
+      "evidence_refs": [
+        "digest.sha256.25722823e16df8925b6fa63ae3b3c63074abd77179233a2c9f20b91d46db2e5f"
+      ],
+      "relation_type": "belongs-to-decision",
+      "source_id": "tool.opsp",
+      "target_id": "decision.strategy"
+    },
+    {
+      "evidence_refs": [
+        "digest.sha256.c4548fb13397d2591a4a9b08e6198e5c775da6e3dbd7f5630c9117686959252c"
+      ],
+      "relation_type": "belongs-to-decision",
+      "source_id": "tool.pace",
+      "target_id": "decision.people"
+    },
+    {
+      "evidence_refs": [
+        "digest.sha256.ae37c29321574cb72a4be45d7ca8c676ebbf0bb6c05b38a26d450270d5c0dd99"
+      ],
+      "relation_type": "belongs-to-decision",
+      "source_id": "tool.strategy-seven-strata",
+      "target_id": "decision.strategy"
+    },
+    {
+      "evidence_refs": [
+        "digest.sha256.8e61ad0b79d9b0aa63501b5fbbc140d6abaa103cfa989d13286f801957f67ae3"
+      ],
+      "relation_type": "belongs-to-decision",
+      "source_id": "tool.swt",
+      "target_id": "decision.strategy"
+    },
+    {
+      "evidence_refs": [
+        "digest.sha256.c5ba480fc53038a2520db8c13cf8e082521316f309fb7276f68751560597751b"
+      ],
+      "relation_type": "belongs-to-decision",
+      "source_id": "tool.vision-summary",
+      "target_id": "decision.strategy"
+    }
   ],
   "release_id": "s64.1",
   "schema_version": 1

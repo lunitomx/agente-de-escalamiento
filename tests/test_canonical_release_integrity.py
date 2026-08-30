@@ -39,6 +39,9 @@ def test_manifest_rejects_hanging_and_duplicate_relations() -> None:
                 "source_id": "tool.face",
                 "target_id": "decision.people",
                 "relation_type": "belongs-to-decision",
+                "evidence_refs": [
+                    "digest.sha256.04a4a553f240a712c831cee697661ebe6e685fef16b9aece75e515ade87ad0c6"
+                ],
             }
         ],
         "node_contracts": [],
@@ -58,6 +61,9 @@ def test_manifest_rejects_hanging_and_duplicate_relations() -> None:
                 "source_id": "tool.face",
                 "target_id": "decision.unknown",
                 "relation_type": "belongs-to-decision",
+                "evidence_refs": [
+                    "digest.sha256.04a4a553f240a712c831cee697661ebe6e685fef16b9aece75e515ade87ad0c6"
+                ],
             }
         ],
     }
@@ -87,6 +93,7 @@ def test_manifest_requires_every_qualified_node_and_kind_specific_metadata() -> 
             "source_id": node.canonical_id,
             "target_id": "decision.people",
             "relation_type": "belongs-to-decision",
+            "evidence_refs": node.evidence_refs,
         }
         for node in release.nodes
         if node.kind.value == "tool"
@@ -137,7 +144,7 @@ def test_manifest_requires_every_qualified_node_and_kind_specific_metadata() -> 
             "node_contracts": contracts,
         }
     )
-    with pytest.raises(ValueError, match="tool-missing-decision-relation"):
+    with pytest.raises(ValueError, match="relations-do-not-exactly-match-contracts"):
         validate_canonical_release_integrity(release, missing_relation)
 
     unknown_evidence = [dict(contract) for contract in contracts]

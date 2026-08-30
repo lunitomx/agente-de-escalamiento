@@ -1,0 +1,85 @@
+{
+  "metric_qualifications": [
+    {
+      "canonical_id": "metric.cash-conversion-cycle",
+      "definition_ref": "digest.sha256.70b6cfb6ff1f372fe9e4e0b6e70e81a526d3f7cbcb6c988922178c0af1c70e09",
+      "unit": "days"
+    }
+  ],
+  "relationships": [
+    {
+      "evidence_refs": [
+        "digest.sha256.254cb8090dcc6c5e697ba8e4c991cbb2eb2b4b31ba3ab4936e3c1bbb099092df"
+      ],
+      "relation_type": "belongs-to-decision",
+      "source_id": "tool.cash-acceleration-strategies",
+      "target_id": "decision.cash"
+    },
+    {
+      "evidence_refs": [
+        "digest.sha256.1a9138ec7a9f2c4559c82158cc1df6639b0ff0129d4d1b6724c831cb8b7f4195"
+      ],
+      "relation_type": "belongs-to-decision",
+      "source_id": "tool.critical-number",
+      "target_id": "decision.execution"
+    },
+    {
+      "evidence_refs": [
+        "digest.sha256.04a4a553f240a712c831cee697661ebe6e685fef16b9aece75e515ade87ad0c6"
+      ],
+      "relation_type": "belongs-to-decision",
+      "source_id": "tool.face",
+      "target_id": "decision.people"
+    },
+    {
+      "evidence_refs": [
+        "digest.sha256.6b02fcf55679e0b779193d465d290bf1b408586de4bb7ac2dd2cbc2c4f93633c"
+      ],
+      "relation_type": "belongs-to-decision",
+      "source_id": "tool.oppp",
+      "target_id": "decision.people"
+    },
+    {
+      "evidence_refs": [
+        "digest.sha256.25722823e16df8925b6fa63ae3b3c63074abd77179233a2c9f20b91d46db2e5f"
+      ],
+      "relation_type": "belongs-to-decision",
+      "source_id": "tool.opsp",
+      "target_id": "decision.strategy"
+    },
+    {
+      "evidence_refs": [
+        "digest.sha256.c4548fb13397d2591a4a9b08e6198e5c775da6e3dbd7f5630c9117686959252c"
+      ],
+      "relation_type": "belongs-to-decision",
+      "source_id": "tool.pace",
+      "target_id": "decision.people"
+    },
+    {
+      "evidence_refs": [
+        "digest.sha256.ae37c29321574cb72a4be45d7ca8c676ebbf0bb6c05b38a26d450270d5c0dd99"
+      ],
+      "relation_type": "belongs-to-decision",
+      "source_id": "tool.strategy-seven-strata",
+      "target_id": "decision.strategy"
+    },
+    {
+      "evidence_refs": [
+        "digest.sha256.8e61ad0b79d9b0aa63501b5fbbc140d6abaa103cfa989d13286f801957f67ae3"
+      ],
+      "relation_type": "belongs-to-decision",
+      "source_id": "tool.swt",
+      "target_id": "decision.strategy"
+    },
+    {
+      "evidence_refs": [
+        "digest.sha256.c5ba480fc53038a2520db8c13cf8e082521316f309fb7276f68751560597751b"
+      ],
+      "relation_type": "belongs-to-decision",
+      "source_id": "tool.vision-summary",
+      "target_id": "decision.strategy"
+    }
+  ],
+  "release_id": "s64.1",
+  "schema_version": 1
+}
