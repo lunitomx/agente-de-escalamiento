@@ -21,6 +21,7 @@ ExclusionReason: TypeAlias = Literal[
     "generic-candidate",
     "blocked-source",
     "external-content-source-bounded",
+    "review-not-independent",
 ]
 
 
@@ -90,6 +91,38 @@ def _validate_opaque_reference(value: str) -> str:
     return value
 
 
+def _validate_safe_label(value: str) -> str:
+    """Permit concise public labels, never source prose, URLs, or paths."""
+    if value.lower().startswith(("e6.", "e6-", "e56.", "e56-", "legacy.")):
+        raise ValueError("legacy safe label is not authorized")
+    if (
+        not value.strip()
+        or value != value.strip()
+        or len(value) > 96
+        or len(value.split()) > 12
+        or any(ord(char) < 32 or ord(char) == 127 for char in value)
+        or "/" in value
+        or "\\" in value
+        or "://" in value
+        or value.lower().startswith("www.")
+    ):
+        raise ValueError("unsafe safe label")
+    return value
+
+
+def _validate_nonlegacy_identifier(value: str, label: str) -> str:
+    value = _validate_safe_identifier(value, label)
+    legacy_prefixes = ("e6.", "e6-", "e56.", "e56-", "legacy.", "legacy-")
+    if value.startswith(legacy_prefixes) or (
+        label != "source ID"
+        and value.startswith(
+            ("concept-", "metric-", "tool-", "worksheet-", "decision-")
+        )
+    ):
+        raise ValueError(f"legacy {label} is not authorized")
+    return value
+
+
 class AuthorizedProjectionCandidate(_StrictModel):
     """Safe, one-way metadata projection from an authorized private review."""
 
@@ -100,6 +133,7 @@ class AuthorizedProjectionCandidate(_StrictModel):
     origin: OriginKind
     aliases: list[str] = Field(default_factory=list, max_length=64)
     source_ids: list[str] = Field(min_length=1, max_length=64)
+    evidence_refs: list[str] = Field(min_length=1, max_length=64)
     candidate_receipt: str = Field(min_length=3, max_length=192)
     review_receipt: str = Field(min_length=3, max_length=192)
     review_outcome: CandidateReviewOutcome
@@ -113,14 +147,28 @@ class AuthorizedProjectionCandidate(_StrictModel):
     @field_validator("candidate_id", "canonical_id")
     @classmethod
     def validate_projection_id(cls, value: str) -> str:
-        return _validate_safe_identifier(value, "projection ID")
+        return _validate_nonlegacy_identifier(value, "projection ID")
+
+    @field_validator("canonical_name")
+    @classmethod
+    def validate_projection_name(cls, value: str) -> str:
+        return _validate_safe_label(value)
 
     @field_validator("source_ids")
     @classmethod
     def validate_projection_source_ids(cls, values: list[str]) -> list[str]:
         if len(values) != len(set(values)):
             raise ValueError("duplicate source ID")
-        return sorted(_validate_safe_identifier(value, "source ID") for value in values)
+        return sorted(
+            _validate_nonlegacy_identifier(value, "source ID") for value in values
+        )
+
+    @field_validator("evidence_refs")
+    @classmethod
+    def validate_projection_evidence_refs(cls, values: list[str]) -> list[str]:
+        if len(values) != len(set(values)):
+            raise ValueError("duplicate evidence reference")
+        return sorted(_validate_opaque_reference(value) for value in values)
 
     @field_validator("candidate_receipt", "review_receipt")
     @classmethod
@@ -130,23 +178,16 @@ class AuthorizedProjectionCandidate(_StrictModel):
     @field_validator("aliases")
     @classmethod
     def validate_projection_aliases(cls, values: list[str]) -> list[str]:
-        if any(not value.strip() for value in values) or len(values) != len(
-            set(values)
-        ):
+        if len(values) != len(set(values)):
             raise ValueError("duplicate or empty alias")
-        return sorted(values)
-
-    @model_validator(mode="after")
-    def validate_independent_review(self) -> AuthorizedProjectionCandidate:
-        if not self.reviewer_independent:
-            raise ValueError("reviewer must be independent")
-        return self
+        return sorted(_validate_safe_label(value) for value in values)
 
 
 class AuthorizedCandidateProjection(_StrictModel):
     """Strictly allowlisted input; deliberately separate from ``ReviewQueue``."""
 
     schema_version: Literal[1]
+    authorization_scope: Literal["e59-e63-reviewed"]
     candidates: list[AuthorizedProjectionCandidate] = Field(
         min_length=1, max_length=256
     )
@@ -154,11 +195,8 @@ class AuthorizedCandidateProjection(_StrictModel):
     @model_validator(mode="after")
     def validate_projection_candidates(self) -> AuthorizedCandidateProjection:
         candidate_ids = [candidate.candidate_id for candidate in self.candidates]
-        canonical_ids = [candidate.canonical_id for candidate in self.candidates]
         if len(candidate_ids) != len(set(candidate_ids)):
             raise ValueError("duplicate projection candidate ID")
-        if len(canonical_ids) != len(set(canonical_ids)):
-            raise ValueError("duplicate projection canonical ID")
         return self
 
 
@@ -170,6 +208,7 @@ class CanonicalReleaseNode(_StrictModel):
     origin: OriginKind
     aliases: list[str] = Field(default_factory=list, max_length=64)
     source_ids: list[str] = Field(min_length=1, max_length=64)
+    evidence_refs: list[str] = Field(min_length=1, max_length=64)
     candidate_receipt: str = Field(min_length=3, max_length=192)
     review_receipt: str = Field(min_length=3, max_length=192)
     review_outcome: Literal[CandidateReviewOutcome.APPROVE_CANDIDATE]
@@ -177,14 +216,28 @@ class CanonicalReleaseNode(_StrictModel):
     @field_validator("canonical_id", "candidate_id")
     @classmethod
     def validate_release_id(cls, value: str) -> str:
-        return _validate_safe_identifier(value, "release ID")
+        return _validate_nonlegacy_identifier(value, "release ID")
+
+    @field_validator("canonical_name")
+    @classmethod
+    def validate_release_name(cls, value: str) -> str:
+        return _validate_safe_label(value)
 
     @field_validator("source_ids")
     @classmethod
     def validate_release_source_ids(cls, values: list[str]) -> list[str]:
         if len(values) != len(set(values)):
             raise ValueError("duplicate source ID")
-        return sorted(_validate_safe_identifier(value, "source ID") for value in values)
+        return sorted(
+            _validate_nonlegacy_identifier(value, "source ID") for value in values
+        )
+
+    @field_validator("evidence_refs")
+    @classmethod
+    def validate_release_evidence_refs(cls, values: list[str]) -> list[str]:
+        if len(values) != len(set(values)):
+            raise ValueError("duplicate evidence reference")
+        return sorted(_validate_opaque_reference(value) for value in values)
 
     @field_validator("candidate_receipt", "review_receipt")
     @classmethod
@@ -194,11 +247,9 @@ class CanonicalReleaseNode(_StrictModel):
     @field_validator("aliases")
     @classmethod
     def validate_release_aliases(cls, values: list[str]) -> list[str]:
-        if any(not value.strip() for value in values) or len(values) != len(
-            set(values)
-        ):
+        if len(values) != len(set(values)):
             raise ValueError("duplicate or empty alias")
-        return sorted(values)
+        return sorted(_validate_safe_label(value) for value in values)
 
 
 class CanonicalReleaseExclusion(_StrictModel):
@@ -208,11 +259,12 @@ class CanonicalReleaseExclusion(_StrictModel):
     candidate_receipt: str = Field(min_length=3, max_length=192)
     review_receipt: str = Field(min_length=3, max_length=192)
     source_ids: list[str] = Field(min_length=1, max_length=64)
+    evidence_refs: list[str] = Field(min_length=1, max_length=64)
 
     @field_validator("candidate_id")
     @classmethod
     def validate_exclusion_id(cls, value: str) -> str:
-        return _validate_safe_identifier(value, "candidate ID")
+        return _validate_nonlegacy_identifier(value, "candidate ID")
 
     @field_validator("candidate_receipt", "review_receipt")
     @classmethod
@@ -224,7 +276,16 @@ class CanonicalReleaseExclusion(_StrictModel):
     def validate_exclusion_source_ids(cls, values: list[str]) -> list[str]:
         if len(values) != len(set(values)):
             raise ValueError("duplicate source ID")
-        return sorted(_validate_safe_identifier(value, "source ID") for value in values)
+        return sorted(
+            _validate_nonlegacy_identifier(value, "source ID") for value in values
+        )
+
+    @field_validator("evidence_refs")
+    @classmethod
+    def validate_exclusion_evidence_refs(cls, values: list[str]) -> list[str]:
+        if len(values) != len(set(values)):
+            raise ValueError("duplicate evidence reference")
+        return sorted(_validate_opaque_reference(value) for value in values)
 
 
 class CanonicalRelease(_StrictModel):
@@ -254,6 +315,8 @@ class CanonicalRelease(_StrictModel):
 def _exclusion_reason(
     candidate: AuthorizedProjectionCandidate,
 ) -> tuple[ExclusionDisposition, ExclusionReason] | None:
+    if not candidate.reviewer_independent:
+        return "review-required", "review-not-independent"
     if candidate.external_content:
         return "review-required", "external-content-source-bounded"
     if not candidate.source_bounded:
@@ -291,6 +354,7 @@ def build_canonical_release(
                     origin=candidate.origin,
                     aliases=candidate.aliases,
                     source_ids=candidate.source_ids,
+                    evidence_refs=candidate.evidence_refs,
                     candidate_receipt=candidate.candidate_receipt,
                     review_receipt=candidate.review_receipt,
                     review_outcome=CandidateReviewOutcome.APPROVE_CANDIDATE,
@@ -306,6 +370,7 @@ def build_canonical_release(
                     candidate_receipt=candidate.candidate_receipt,
                     review_receipt=candidate.review_receipt,
                     source_ids=candidate.source_ids,
+                    evidence_refs=candidate.evidence_refs,
                 )
             )
     return CanonicalRelease(

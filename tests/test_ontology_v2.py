@@ -36,6 +36,7 @@ SCRIPT = ROOT / "scripts/check_ontology_v2_schema.py"
 QUEUE = ROOT / "ontology/v2/review-queue.json"
 QUEUE_SCRIPT = ROOT / "scripts/check_ontology_review_queue.py"
 RELEASE = ROOT / "ontology/v2/releases/s64.1.json"
+PROJECTION = ROOT / "ontology/v2/releases/s64.1.projection.json"
 RELEASE_SCRIPT = ROOT / "scripts/build_canonical_release.py"
 EXPECTED_RELEASE_MANIFEST = {
     "nodes": 76,
@@ -270,6 +271,7 @@ def test_review_queue_requires_independent_extractor_and_reviewer() -> None:
 def test_authorized_projection_is_allowlisted_and_requires_independent_review() -> None:
     payload = {
         "schema_version": 1,
+        "authorization_scope": "e59-e63-reviewed",
         "candidates": [
             {
                 "candidate_id": "candidate.framework.example",
@@ -279,6 +281,7 @@ def test_authorized_projection_is_allowlisted_and_requires_independent_review() 
                 "origin": "source-explicit",
                 "aliases": ["Framework example"],
                 "source_ids": ["source.example"],
+                "evidence_refs": ["digest.sha256.abc123"],
                 "candidate_receipt": "digest.candidate.abc123",
                 "review_receipt": "digest.review.def456",
                 "review_outcome": "approve-candidate",
@@ -308,12 +311,40 @@ def test_authorized_projection_is_allowlisted_and_requires_independent_review() 
         with pytest.raises(ValidationError):
             AuthorizedCandidateProjection.model_validate(unsafe)
 
-    unsafe = {
-        **payload,
-        "candidates": [{**payload["candidates"][0], "reviewer_independent": False}],
-    }
-    with pytest.raises(ValidationError, match="independent"):
-        AuthorizedCandidateProjection.model_validate(unsafe)
+    for unsafe_name in (
+        "A source-like paragraph that contains enough words to be mistaken for an excerpt from a private source document and must never become a label.",
+        "https://private.example/source",
+        "/private/source/file.txt",
+        "line one\nline two",
+    ):
+        with pytest.raises(ValidationError, match="safe label"):
+            AuthorizedCandidateProjection.model_validate(
+                {
+                    **payload,
+                    "candidates": [
+                        {**payload["candidates"][0], "canonical_name": unsafe_name}
+                    ],
+                }
+            )
+    for legacy_field, legacy_value in (
+        ("candidate_id", "e6.candidate.example"),
+        ("canonical_id", "concept-example"),
+        ("source_ids", ["e56.source.example"]),
+        ("aliases", ["e56.legacy.alias"]),
+    ):
+        with pytest.raises(ValidationError, match="legacy"):
+            AuthorizedCandidateProjection.model_validate(
+                {
+                    **payload,
+                    "candidates": [
+                        {**payload["candidates"][0], legacy_field: legacy_value}
+                    ],
+                }
+            )
+    with pytest.raises(ValidationError, match="authorization_scope"):
+        AuthorizedCandidateProjection.model_validate(
+            {**payload, "authorization_scope": "e6-reviewed"}
+        )
 
 
 def test_canonical_release_is_deterministic_and_partitions_projection() -> None:
@@ -325,12 +356,14 @@ def test_canonical_release_is_deterministic_and_partitions_projection() -> None:
         "origin": "source-explicit",
         "aliases": ["Framework example", "Example framework"],
         "source_ids": ["source.example"],
+        "evidence_refs": ["digest.sha256.evidenceaaa", "digest.sha256.evidencebbb"],
         "candidate_receipt": "digest.candidate.abc123",
         "review_receipt": "digest.review.def456",
         "review_outcome": "approve-candidate",
         "reviewer_independent": True,
         "receipts_valid": True,
         "source_bounded": True,
+        "external_content": False,
         "blocked": False,
         "generic": False,
     }
@@ -341,7 +374,11 @@ def test_canonical_release_is_deterministic_and_partitions_projection() -> None:
         "review_outcome": "needs-revision",
     }
     projection = AuthorizedCandidateProjection.model_validate(
-        {"schema_version": 1, "candidates": [deferred, approved]}
+        {
+            "schema_version": 1,
+            "authorization_scope": "e59-e63-reviewed",
+            "candidates": [deferred, approved],
+        }
     )
     release = build_canonical_release(projection)
     assert [node.candidate_id for node in release.nodes] == [approved["candidate_id"]]
@@ -350,6 +387,7 @@ def test_canonical_release_is_deterministic_and_partitions_projection() -> None:
     ]
     assert release.exclusions[0].reason_code == "needs-revision"
     assert release.nodes[0].aliases == sorted(approved["aliases"])
+    assert release.nodes[0].evidence_refs == sorted(approved["evidence_refs"])
     assert render_canonical_release(release) == render_canonical_release(
         CanonicalRelease.model_validate(release.model_dump())
     )
@@ -365,29 +403,52 @@ def test_builder_excludes_unbounded_or_invalid_receipt_candidates() -> None:
         "origin": "source-explicit",
         "aliases": [],
         "source_ids": ["source.example"],
+        "evidence_refs": ["digest.sha256.evidenceaaa"],
         "candidate_receipt": "digest.candidate.abc123",
         "review_receipt": "digest.review.def456",
         "review_outcome": "approve-candidate",
         "reviewer_independent": True,
         "receipts_valid": True,
         "source_bounded": True,
+        "external_content": False,
         "blocked": False,
         "generic": False,
     }
-    for field, expected_reason in (
-        ("source_bounded", "blocked-source"),
-        ("receipts_valid", "missing-or-invalid-receipt"),
+    for field, expected_reason, expected_disposition in (
+        ("source_bounded", "blocked-source", "review-required"),
+        ("receipts_valid", "missing-or-invalid-receipt", "review-required"),
+        ("reviewer_independent", "review-not-independent", "review-required"),
+        ("blocked", "blocked-source", "review-required"),
+        ("generic", "generic-candidate", "excluded"),
+        ("external_content", "external-content-source-bounded", "review-required"),
     ):
         projection = AuthorizedCandidateProjection.model_validate(
             {
                 "schema_version": 1,
-                "candidates": [{**candidate, field: False}],
+                "authorization_scope": "e59-e63-reviewed",
+                "candidates": [{**candidate, field: not candidate[field]}],
             }
         )
         release = build_canonical_release(projection)
         assert release.nodes == []
-        assert release.exclusions[0].disposition == "review-required"
+        assert release.exclusions[0].disposition == expected_disposition
         assert release.exclusions[0].reason_code == expected_reason
+
+    for outcome, expected_reason in (
+        ("needs-revision", "needs-revision"),
+        ("reject-candidate", "reject-candidate"),
+    ):
+        projection = AuthorizedCandidateProjection.model_validate(
+            {
+                "schema_version": 1,
+                "authorization_scope": "e59-e63-reviewed",
+                "candidates": [{**candidate, "review_outcome": outcome}],
+            }
+        )
+        assert (
+            build_canonical_release(projection).exclusions[0].reason_code
+            == expected_reason
+        )
 
 
 def test_canonical_release_rejects_unsafe_or_nonexclusive_entries(
@@ -405,6 +466,7 @@ def test_canonical_release_rejects_unsafe_or_nonexclusive_entries(
                 "origin": "source-explicit",
                 "aliases": [],
                 "source_ids": ["source.example"],
+                "evidence_refs": ["digest.sha256.evidenceaaa"],
                 "candidate_receipt": "digest.candidate.abc123",
                 "review_receipt": "digest.review.def456",
                 "review_outcome": "approve-candidate",
@@ -426,6 +488,7 @@ def test_canonical_release_rejects_unsafe_or_nonexclusive_entries(
                 "candidate_receipt": "digest.candidate.abc123",
                 "review_receipt": "digest.review.def456",
                 "source_ids": ["source.example"],
+                "evidence_refs": ["digest.sha256.evidenceaaa"],
             }
         ],
     }
@@ -440,6 +503,9 @@ def test_canonical_release_rejects_unsafe_or_nonexclusive_entries(
 
 
 def test_checked_in_s64_1_release_is_rendered_safe_and_has_expected_partition() -> None:
+    projection = AuthorizedCandidateProjection.model_validate_json(
+        PROJECTION.read_text(encoding="utf-8")
+    )
     release = load_canonical_release(RELEASE)
     rendered = render_canonical_release(release)
     assert RELEASE.read_text(encoding="utf-8") == rendered
@@ -458,6 +524,9 @@ def test_checked_in_s64_1_release_is_rendered_safe_and_has_expected_partition() 
         item.candidate_id for item in release.exclusions
     ]
     assert len(candidate_ids) == len(set(candidate_ids))
+    assert len(projection.candidates) == 79
+    assert render_canonical_release(build_canonical_release(projection)) == rendered
+    assert all(candidate.evidence_refs for candidate in projection.candidates)
     assert "working_text" not in rendered
     assert "locators" not in rendered
     assert "/home/" not in rendered
@@ -473,4 +542,60 @@ def test_release_cli_requires_explicit_authorized_input() -> None:
         text=True,
     )
     assert completed.returncode != 0
-    assert "--queue" in completed.stderr
+    assert "--projection" in completed.stderr
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(RELEASE_SCRIPT),
+            "--projection",
+            str(PROJECTION),
+            "--release",
+            str(RELEASE),
+            "--check",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0
+
+
+def test_projection_allows_duplicate_canonical_id_when_one_candidate_is_excluded() -> (
+    None
+):
+    base = {
+        "candidate_id": "candidate.framework.approved",
+        "canonical_id": "framework.example",
+        "kind": "framework",
+        "canonical_name": "Example Framework",
+        "origin": "source-explicit",
+        "aliases": [],
+        "source_ids": ["source.example"],
+        "evidence_refs": ["digest.sha256.evidenceaaa"],
+        "candidate_receipt": "digest.candidate.abc123",
+        "review_receipt": "digest.review.def456",
+        "review_outcome": "approve-candidate",
+        "reviewer_independent": True,
+        "receipts_valid": True,
+        "source_bounded": True,
+        "blocked": False,
+        "generic": False,
+    }
+    projection = AuthorizedCandidateProjection.model_validate(
+        {
+            "schema_version": 1,
+            "authorization_scope": "e59-e63-reviewed",
+            "candidates": [
+                base,
+                {
+                    **base,
+                    "candidate_id": "candidate.framework.deferred",
+                    "review_outcome": "needs-revision",
+                },
+            ],
+        }
+    )
+    release = build_canonical_release(projection)
+    assert len(release.nodes) == 1
+    assert len(release.exclusions) == 1
