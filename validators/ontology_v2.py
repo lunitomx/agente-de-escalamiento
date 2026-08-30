@@ -7,12 +7,21 @@ import hashlib
 import json
 from pathlib import Path
 import re
-from typing import Literal
+from typing import Literal, TypeAlias
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
 _ID_PATTERN = re.compile(r"^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$")
+ExclusionDisposition: TypeAlias = Literal["excluded", "review-required"]
+ExclusionReason: TypeAlias = Literal[
+    "needs-revision",
+    "reject-candidate",
+    "missing-or-invalid-receipt",
+    "generic-candidate",
+    "blocked-source",
+    "external-content-source-bounded",
+]
 
 
 class _StrictModel(BaseModel):
@@ -194,15 +203,8 @@ class CanonicalReleaseNode(_StrictModel):
 
 class CanonicalReleaseExclusion(_StrictModel):
     candidate_id: str = Field(min_length=3, max_length=192)
-    disposition: Literal["excluded", "review-required"]
-    reason_code: Literal[
-        "needs-revision",
-        "reject-candidate",
-        "missing-or-invalid-receipt",
-        "generic-candidate",
-        "blocked-source",
-        "external-content-source-bounded",
-    ]
+    disposition: ExclusionDisposition
+    reason_code: ExclusionReason
     candidate_receipt: str = Field(min_length=3, max_length=192)
     review_receipt: str = Field(min_length=3, max_length=192)
     source_ids: list[str] = Field(min_length=1, max_length=64)
@@ -251,7 +253,7 @@ class CanonicalRelease(_StrictModel):
 
 def _exclusion_reason(
     candidate: AuthorizedProjectionCandidate,
-) -> tuple[str, str] | None:
+) -> tuple[ExclusionDisposition, ExclusionReason] | None:
     if candidate.external_content:
         return "review-required", "external-content-source-bounded"
     if candidate.blocked:
