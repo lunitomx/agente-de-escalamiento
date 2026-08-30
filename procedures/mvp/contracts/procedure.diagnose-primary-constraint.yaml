@@ -1,0 +1,98 @@
+id: procedure.diagnose-primary-constraint
+version: 1.0.0
+provenance: source-synthesis
+trigger:
+- El líder pide identificar una restricción primaria.
+non_trigger:
+- Use un especialista cuando ya eligió una herramienta.
+objective: Proponer foco verificable o registrar evidencia faltante.
+required_inputs:
+- id: input.company-context
+  description: Contexto autorizado de empresa o estado desconocido.
+  required: true
+  accepted_statuses:
+  - known
+  - unknown
+optional_inputs:
+- id: input.decision-evidence
+  description: Evidencia autorizada sobre decisiones actuales.
+  required: false
+  accepted_statuses:
+  - known
+  - unknown
+  - not-applicable
+interview_questions:
+- id: question.primary-pain
+  prompt: ¿Qué resultado limita más el avance ahora?
+  required: true
+steps:
+- id: step.collect-context
+  action: Recopile sólo contexto autorizado y registre desconocidos.
+  produces:
+  - artifact.diagnostic-summary
+decision_rules:
+- id: rule.one-primary-constraint
+  statement: Seleccione un foco sólo con evidencia suficiente.
+warnings:
+- id: warning.no-silent-inference
+  statement: No convierta información faltante en un hecho.
+output_contract:
+  artifact:
+    status: unknown
+    value: null
+    origin: null
+    evidence_ids: []
+    consent_receipt: null
+    confirmed_by: null
+  assumptions: []
+  open_questions:
+  - ¿Qué evidencia falta para confirmar el foco?
+  owner:
+    status: unknown
+    value: null
+    origin: null
+    evidence_ids: []
+    consent_receipt: null
+    confirmed_by: null
+  kpi:
+    status: unknown
+    value: null
+    origin: null
+    evidence_ids: []
+    consent_receipt: null
+    confirmed_by: null
+  who_what_when:
+    status: unknown
+    value: null
+    origin: null
+    evidence_ids: []
+    consent_receipt: null
+    confirmed_by: null
+  review_cadence:
+    status: unknown
+    value: null
+    origin: null
+    evidence_ids: []
+    consent_receipt: null
+    confirmed_by: null
+acceptance_criteria:
+- id: criterion.visible-unknowns
+  statement: Cada desconocido queda como pregunta abierta visible.
+state_updates:
+- id: state.propose-primary-constraint
+  path: state/current-quarter.yaml
+  mode: proposed
+  confirmation: null
+handoff:
+  next_procedure_id: procedure.set-quarterly-priority
+  condition: El foco y un responsable son confirmados.
+evidence_refs:
+- digest.sha256.087f20a1c8f00a43ab1ce5ba66f6b66759b7bf716a12b4fa69cda0886ada5df8
+- digest.sha256.2bf797c7b2027ad118a2f6e05ab5af2ff5139da0ed922c70732f3abc69e5f7a6
+- digest.sha256.2f92b20686b59c9437816f5f81ceb9c958a9ebc6a11e6cd0f54af0eb89c9193a
+- digest.sha256.32ae7ac6dda5dd0736a65838ebffdda19361a16ad266b347f93b004f48ddff64
+- digest.sha256.3db24e9cc77b8cc5b91867099d36cd4f30673f3c3845b84953fb55909275a465
+- digest.sha256.8c1ef1cd1c2e1c13910cc53a49ab7e797f249edee50d3b32de006869519f6f3e
+- digest.sha256.904f0962d3fcfe50608fd17fc699edf7b71636f0d4b4f1db6b084728e70222c5
+- digest.sha256.aa8c099c5ab29f0eaba97dde8b9b2ce6ac673af491d84fcf5f53ae01906eeb4c
+- digest.sha256.b14ef604fed1c6ffb98adf0d7fc6b2e213a7ae5211918d06b6d3b576ed643653

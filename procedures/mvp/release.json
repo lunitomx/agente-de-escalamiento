@@ -1,0 +1,289 @@
+{
+  "node_to_procedures": {
+    "artifact.who-what-when": [
+      "procedure.build-leader-oppp",
+      "procedure.build-vision-summary",
+      "procedure.diagnose-primary-constraint",
+      "procedure.install-meeting-rhythm",
+      "procedure.scaleup-quarterly-review",
+      "procedure.set-quarterly-priority"
+    ],
+    "decision.cash": [
+      "procedure.diagnose-primary-constraint"
+    ],
+    "decision.execution": [
+      "procedure.diagnose-primary-constraint"
+    ],
+    "decision.people": [
+      "procedure.diagnose-primary-constraint"
+    ],
+    "decision.strategy": [
+      "procedure.diagnose-primary-constraint"
+    ],
+    "discipline.data": [
+      "procedure.scaleup-quarterly-review"
+    ],
+    "discipline.meeting-rhythm": [
+      "procedure.install-meeting-rhythm"
+    ],
+    "discipline.priorities": [
+      "procedure.scaleup-quarterly-review",
+      "procedure.set-quarterly-priority"
+    ],
+    "framework.4d": [
+      "procedure.diagnose-primary-constraint"
+    ],
+    "framework.organizational-core": [
+      "procedure.build-vision-summary"
+    ],
+    "framework.strategy-seven-strata": [
+      "procedure.build-vision-summary"
+    ],
+    "personal-dimension.achievements": [
+      "procedure.build-leader-oppp"
+    ],
+    "personal-dimension.relationships": [
+      "procedure.build-leader-oppp"
+    ],
+    "personal-dimension.rituals": [
+      "procedure.build-leader-oppp"
+    ],
+    "personal-dimension.wealth": [
+      "procedure.build-leader-oppp"
+    ],
+    "principle.get-it-down-then-right": [
+      "procedure.build-leader-oppp",
+      "procedure.scaleup-quarterly-review"
+    ],
+    "principle.iterative-adoption": [
+      "procedure.scaleup-quarterly-review"
+    ],
+    "principle.right-questions": [
+      "procedure.diagnose-primary-constraint"
+    ],
+    "principle.routine-sets-you-free": [
+      "procedure.install-meeting-rhythm"
+    ],
+    "question.select-primary-decision": [
+      "procedure.diagnose-primary-constraint"
+    ],
+    "routine.daily-huddle": [
+      "procedure.install-meeting-rhythm"
+    ],
+    "routine.monthly-management-meeting": [
+      "procedure.install-meeting-rhythm"
+    ],
+    "routine.quarterly-and-annual-planning": [
+      "procedure.install-meeting-rhythm",
+      "procedure.scaleup-quarterly-review"
+    ],
+    "routine.quarterly-theme": [
+      "procedure.set-quarterly-priority"
+    ],
+    "routine.weekly-meeting": [
+      "procedure.install-meeting-rhythm"
+    ],
+    "rule.non-sequential-adoption": [
+      "procedure.diagnose-primary-constraint"
+    ],
+    "rule.opsp-quarterly-actions": [
+      "procedure.set-quarterly-priority"
+    ],
+    "tool.critical-number": [
+      "procedure.set-quarterly-priority"
+    ],
+    "tool.oppp": [
+      "procedure.build-leader-oppp"
+    ],
+    "tool.strategy-seven-strata": [
+      "procedure.build-vision-summary"
+    ],
+    "tool.swt": [
+      "procedure.build-vision-summary"
+    ],
+    "tool.vision-summary": [
+      "procedure.build-vision-summary"
+    ]
+  },
+  "procedures": [
+    {
+      "evidence_refs": [
+        "digest.sha256.04fc65800170b623297310f4180dc00605d5b6048023713b289a363b287da046",
+        "digest.sha256.087f20a1c8f00a43ab1ce5ba66f6b66759b7bf716a12b4fa69cda0886ada5df8",
+        "digest.sha256.094789ffd7794af193b9ee92c3f63ae6da4ca885a4254d8f91a4380ba240db66",
+        "digest.sha256.2a495ba4ca3d63f8af4374c114ed0520a8d6c0126bd90df7fa3fce2cbbd0b171",
+        "digest.sha256.5d44a49ccca384c9fb093e2b0f16d05250f435f1e6c4271d0a6fa7525f640092",
+        "digest.sha256.6b02fcf55679e0b779193d465d290bf1b408586de4bb7ac2dd2cbc2c4f93633c",
+        "digest.sha256.e05201e99df261d9d7acc10d15011c88d1c2968796aa1ec455bf6952c03f051f"
+      ],
+      "input_node_refs": {
+        "input.leader-context": [
+          "tool.oppp"
+        ],
+        "input.personal-dimensions": [
+          "personal-dimension.achievements",
+          "personal-dimension.relationships",
+          "personal-dimension.rituals",
+          "personal-dimension.wealth"
+        ]
+      },
+      "node_ids": [
+        "artifact.who-what-when",
+        "personal-dimension.achievements",
+        "personal-dimension.relationships",
+        "personal-dimension.rituals",
+        "personal-dimension.wealth",
+        "principle.get-it-down-then-right",
+        "tool.oppp"
+      ],
+      "procedure_id": "procedure.build-leader-oppp"
+    },
+    {
+      "evidence_refs": [
+        "digest.sha256.087f20a1c8f00a43ab1ce5ba66f6b66759b7bf716a12b4fa69cda0886ada5df8",
+        "digest.sha256.8e61ad0b79d9b0aa63501b5fbbc140d6abaa103cfa989d13286f801957f67ae3",
+        "digest.sha256.ae37c29321574cb72a4be45d7ca8c676ebbf0bb6c05b38a26d450270d5c0dd99",
+        "digest.sha256.c01ac638cd696e02b93b01bd1cc8d01d576c763631d7356cd4abde1a1c8215a1",
+        "digest.sha256.c5ba480fc53038a2520db8c13cf8e082521316f309fb7276f68751560597751b",
+        "digest.sha256.ebf5f7f6c6cb35a393812df4643ab9b8bcef335841c8caa399c61c1dfa577e14"
+      ],
+      "input_node_refs": {
+        "input.organization-context": [
+          "framework.organizational-core"
+        ],
+        "input.strategy-evidence": [
+          "tool.strategy-seven-strata",
+          "tool.swt"
+        ]
+      },
+      "node_ids": [
+        "artifact.who-what-when",
+        "framework.organizational-core",
+        "framework.strategy-seven-strata",
+        "tool.strategy-seven-strata",
+        "tool.swt",
+        "tool.vision-summary"
+      ],
+      "procedure_id": "procedure.build-vision-summary"
+    },
+    {
+      "evidence_refs": [
+        "digest.sha256.087f20a1c8f00a43ab1ce5ba66f6b66759b7bf716a12b4fa69cda0886ada5df8",
+        "digest.sha256.2bf797c7b2027ad118a2f6e05ab5af2ff5139da0ed922c70732f3abc69e5f7a6",
+        "digest.sha256.2f92b20686b59c9437816f5f81ceb9c958a9ebc6a11e6cd0f54af0eb89c9193a",
+        "digest.sha256.32ae7ac6dda5dd0736a65838ebffdda19361a16ad266b347f93b004f48ddff64",
+        "digest.sha256.3db24e9cc77b8cc5b91867099d36cd4f30673f3c3845b84953fb55909275a465",
+        "digest.sha256.8c1ef1cd1c2e1c13910cc53a49ab7e797f249edee50d3b32de006869519f6f3e",
+        "digest.sha256.904f0962d3fcfe50608fd17fc699edf7b71636f0d4b4f1db6b084728e70222c5",
+        "digest.sha256.aa8c099c5ab29f0eaba97dde8b9b2ce6ac673af491d84fcf5f53ae01906eeb4c",
+        "digest.sha256.b14ef604fed1c6ffb98adf0d7fc6b2e213a7ae5211918d06b6d3b576ed643653"
+      ],
+      "input_node_refs": {
+        "input.company-context": [
+          "framework.4d"
+        ],
+        "input.decision-evidence": [
+          "question.select-primary-decision"
+        ]
+      },
+      "node_ids": [
+        "artifact.who-what-when",
+        "decision.cash",
+        "decision.execution",
+        "decision.people",
+        "decision.strategy",
+        "framework.4d",
+        "principle.right-questions",
+        "question.select-primary-decision",
+        "rule.non-sequential-adoption"
+      ],
+      "procedure_id": "procedure.diagnose-primary-constraint"
+    },
+    {
+      "evidence_refs": [
+        "digest.sha256.087f20a1c8f00a43ab1ce5ba66f6b66759b7bf716a12b4fa69cda0886ada5df8",
+        "digest.sha256.156f02e76670c5eaf6f53af3797ee50c994f612367236d6697dc9d9e81d020c2",
+        "digest.sha256.383901a20744923a4d2740bd67a2945d9f693f5f90d15db98be1906eda1e2907",
+        "digest.sha256.525f69f9a4b2c8047063fb39cce2615417f8da4a79f97b670c1fe6461ad2156a",
+        "digest.sha256.8363fa22f4611fda17f9f6ce9ca9a18b1ff42fc83c968283e8bc3df6f744f827",
+        "digest.sha256.8667780c0ced760c1e7962f0b99acf9e9d36c3572753c52da2047e90a505bcce",
+        "digest.sha256.e2bdfa05e32a15f4add948bb79a67818514d939e43ffa1a3983baa263c2a0290"
+      ],
+      "input_node_refs": {
+        "input.execution-context": [
+          "discipline.meeting-rhythm"
+        ],
+        "input.existing-rhythm": [
+          "routine.monthly-management-meeting",
+          "routine.weekly-meeting"
+        ]
+      },
+      "node_ids": [
+        "artifact.who-what-when",
+        "discipline.meeting-rhythm",
+        "principle.routine-sets-you-free",
+        "routine.daily-huddle",
+        "routine.monthly-management-meeting",
+        "routine.quarterly-and-annual-planning",
+        "routine.weekly-meeting"
+      ],
+      "procedure_id": "procedure.install-meeting-rhythm"
+    },
+    {
+      "evidence_refs": [
+        "digest.sha256.087f20a1c8f00a43ab1ce5ba66f6b66759b7bf716a12b4fa69cda0886ada5df8",
+        "digest.sha256.3c6d2463373ee1b04a01c5bd942a7d18fa187b13182951dc305029f0d6f9980d",
+        "digest.sha256.5019ed43bbbf065c2d2f0de06652b471c7b0bc5bf83813c1aaa2d44990d4db81",
+        "digest.sha256.8667780c0ced760c1e7962f0b99acf9e9d36c3572753c52da2047e90a505bcce",
+        "digest.sha256.9257904434875a1fb5d0f5c9838304bf274a8dfb32a600c8f62d3c8d0ff301f2",
+        "digest.sha256.e05201e99df261d9d7acc10d15011c88d1c2968796aa1ec455bf6952c03f051f"
+      ],
+      "input_node_refs": {
+        "input.current-quarter": [
+          "discipline.priorities"
+        ],
+        "input.review-evidence": [
+          "discipline.data",
+          "routine.quarterly-and-annual-planning"
+        ]
+      },
+      "node_ids": [
+        "artifact.who-what-when",
+        "discipline.data",
+        "discipline.priorities",
+        "principle.get-it-down-then-right",
+        "principle.iterative-adoption",
+        "routine.quarterly-and-annual-planning"
+      ],
+      "procedure_id": "procedure.scaleup-quarterly-review"
+    },
+    {
+      "evidence_refs": [
+        "digest.sha256.0363cf6b8cd7427f21401b4303261152bcfe75add8c4ead2064ea50c35954bd3",
+        "digest.sha256.087f20a1c8f00a43ab1ce5ba66f6b66759b7bf716a12b4fa69cda0886ada5df8",
+        "digest.sha256.1a9138ec7a9f2c4559c82158cc1df6639b0ff0129d4d1b6724c831cb8b7f4195",
+        "digest.sha256.3d3c3b955a9fd737bcb1e6013ceed2d27daa14c4ab8a738265cc686e6c59d5f3",
+        "digest.sha256.5019ed43bbbf065c2d2f0de06652b471c7b0bc5bf83813c1aaa2d44990d4db81"
+      ],
+      "input_node_refs": {
+        "input.primary-constraint": [
+          "tool.critical-number"
+        ],
+        "input.priority-evidence": [
+          "discipline.priorities",
+          "rule.opsp-quarterly-actions"
+        ]
+      },
+      "node_ids": [
+        "artifact.who-what-when",
+        "discipline.priorities",
+        "routine.quarterly-theme",
+        "rule.opsp-quarterly-actions",
+        "tool.critical-number"
+      ],
+      "procedure_id": "procedure.set-quarterly-priority"
+    }
+  ],
+  "release_sha256": "c93ee72efb0c62ecec03c772f3788152c2cb9f93d60e9f9f023290e387628fac",
+  "schema_version": 1
+}

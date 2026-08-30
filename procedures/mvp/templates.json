@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "templates": [
+    {
+      "id": "procedure.diagnose-primary-constraint",
+      "node_ids": ["framework.4d", "decision.people", "decision.strategy", "decision.execution", "decision.cash", "question.select-primary-decision", "principle.right-questions", "rule.non-sequential-adoption", "artifact.who-what-when"],
+      "input_node_refs": {"input.company-context": ["framework.4d"], "input.decision-evidence": ["question.select-primary-decision"]},
+      "contract": {
+        "id": "procedure.diagnose-primary-constraint", "version": "1.0.0", "provenance": "source-synthesis",
+        "trigger": ["El líder pide identificar una restricción primaria."],
+        "non_trigger": ["Use un especialista cuando ya eligió una herramienta."],
+        "objective": "Proponer foco verificable o registrar evidencia faltante.",
+        "required_inputs": [{"id":"input.company-context","description":"Contexto autorizado de empresa o estado desconocido.","required":true,"accepted_statuses":["known","unknown"]}],
+        "optional_inputs": [{"id":"input.decision-evidence","description":"Evidencia autorizada sobre decisiones actuales.","required":false,"accepted_statuses":["known","unknown","not-applicable"]}],
+        "interview_questions": [{"id":"question.primary-pain","prompt":"¿Qué resultado limita más el avance ahora?","required":true}],
+        "steps": [{"id":"step.collect-context","action":"Recopile sólo contexto autorizado y registre desconocidos.","produces":["artifact.diagnostic-summary"]}],
+        "decision_rules": [{"id":"rule.one-primary-constraint","statement":"Seleccione un foco sólo con evidencia suficiente."}],
+        "warnings": [{"id":"warning.no-silent-inference","statement":"No convierta información faltante en un hecho."}],
+        "output_contract": {"artifact":{"status":"unknown","value":null},"assumptions":[],"open_questions":["¿Qué evidencia falta para confirmar el foco?"],"owner":{"status":"unknown","value":null},"kpi":{"status":"unknown","value":null},"who_what_when":{"status":"unknown","value":null},"review_cadence":{"status":"unknown","value":null}},
+        "acceptance_criteria": [{"id":"criterion.visible-unknowns","statement":"Cada desconocido queda como pregunta abierta visible."}],
+        "state_updates": [{"id":"state.propose-primary-constraint","path":"state/current-quarter.yaml","mode":"proposed"}],
+        "handoff":{"next_procedure_id":"procedure.set-quarterly-priority","condition":"El foco y un responsable son confirmados."}
+      }
+    },
+    {
+      "id": "procedure.build-leader-oppp",
+      "node_ids": ["tool.oppp", "personal-dimension.relationships", "personal-dimension.achievements", "personal-dimension.rituals", "personal-dimension.wealth", "principle.get-it-down-then-right", "artifact.who-what-when"],
+      "input_node_refs": {"input.leader-context": ["tool.oppp"], "input.personal-dimensions": ["personal-dimension.relationships", "personal-dimension.achievements", "personal-dimension.rituals", "personal-dimension.wealth"]},
+      "contract": {
+        "id":"procedure.build-leader-oppp","version":"1.0.0","provenance":"source-synthesis",
+        "trigger":["El líder quiere construir un plan personal."],
+        "non_trigger":["No sustituya una conversación personal detallada."],
+        "objective":"Proponer un plan personal con vacíos explícitos.",
+        "required_inputs":[{"id":"input.leader-context","description":"Contexto autorizado del líder o estado desconocido.","required":true,"accepted_statuses":["known","unknown"]}],
+        "optional_inputs":[{"id":"input.personal-dimensions","description":"Detalles autorizados de dimensiones personales.","required":false,"accepted_statuses":["known","unknown","not-applicable"]}],
+        "interview_questions":[{"id":"question.personal-outcome","prompt":"¿Qué resultado personal importa más ahora?","required":true}],
+        "steps":[{"id":"step.collect-personal-context","action":"Registre respuestas detalladas y vacíos explícitos.","produces":["artifact.leader-oppp"]}],
+        "decision_rules":[{"id":"rule.no-generic-plan","statement":"No complete un plan con frases genéricas."}],
+        "warnings":[{"id":"warning.no-silent-inference","statement":"No infiera prioridades personales no confirmadas."}],
+        "output_contract":{"artifact":{"status":"unknown","value":null},"assumptions":[],"open_questions":["¿Qué detalle personal falta confirmar?"],"owner":{"status":"unknown","value":null},"kpi":{"status":"unknown","value":null},"who_what_when":{"status":"unknown","value":null},"review_cadence":{"status":"unknown","value":null}},
+        "acceptance_criteria":[{"id":"criterion.detailed-responses","statement":"Las respuestas conservan detalle o incertidumbre explícita."}],
+        "state_updates":[{"id":"state.propose-leader-oppp","path":"state/leader/oppp.yaml","mode":"proposed"}],
+        "handoff":{"next_procedure_id":"procedure.scaleup-quarterly-review","condition":"El líder confirma un siguiente paso."}
+      }
+    },
+    {
+      "id": "procedure.build-vision-summary",
+      "node_ids": ["tool.vision-summary", "framework.organizational-core", "framework.strategy-seven-strata", "tool.strategy-seven-strata", "tool.swt", "artifact.who-what-when"],
+      "input_node_refs": {"input.organization-context": ["framework.organizational-core"], "input.strategy-evidence": ["tool.strategy-seven-strata", "tool.swt"]},
+      "contract": {
+        "id":"procedure.build-vision-summary","version":"1.0.0","provenance":"source-synthesis",
+        "trigger":["El equipo quiere resumir su visión estratégica."],
+        "non_trigger":["No complete visión sin evidencia estratégica detallada."],
+        "objective":"Proponer una visión resumida o evidenciar vacíos.",
+        "required_inputs":[{"id":"input.organization-context","description":"Contexto autorizado de organización o estado desconocido.","required":true,"accepted_statuses":["known","unknown"]}],
+        "optional_inputs":[{"id":"input.strategy-evidence","description":"Evidencia estratégica autorizada disponible.","required":false,"accepted_statuses":["known","unknown","not-applicable"]}],
+        "interview_questions":[{"id":"question.vision-outcome","prompt":"¿Qué dirección estratégica desea aclarar?","required":true}],
+        "steps":[{"id":"step.collect-strategy-context","action":"Recopile evidencia autorizada y declare vacíos.","produces":["artifact.vision-summary"]}],
+        "decision_rules":[{"id":"rule.no-invented-strategy","statement":"No invente estrategia para llenar una plantilla."}],
+        "warnings":[{"id":"warning.no-silent-inference","statement":"No trate hipótesis como decisiones aprobadas."}],
+        "output_contract":{"artifact":{"status":"unknown","value":null},"assumptions":[],"open_questions":["¿Qué evidencia estratégica falta confirmar?"],"owner":{"status":"unknown","value":null},"kpi":{"status":"unknown","value":null},"who_what_when":{"status":"unknown","value":null},"review_cadence":{"status":"unknown","value":null}},
+        "acceptance_criteria":[{"id":"criterion.strategy-gaps-visible","statement":"Los vacíos estratégicos quedan visibles antes de aprobar."}],
+        "state_updates":[{"id":"state.propose-vision-summary","path":"state/company/strategy.yaml","mode":"proposed"}],
+        "handoff":{"next_procedure_id":"procedure.set-quarterly-priority","condition":"La dirección y sus vacíos son confirmados."}
+      }
+    },
+    {
+      "id": "procedure.set-quarterly-priority",
+      "node_ids": ["tool.critical-number", "discipline.priorities", "routine.quarterly-theme", "rule.opsp-quarterly-actions", "artifact.who-what-when"],
+      "input_node_refs": {"input.primary-constraint": ["tool.critical-number"], "input.priority-evidence": ["discipline.priorities", "rule.opsp-quarterly-actions"]},
+      "contract": {
+        "id":"procedure.set-quarterly-priority","version":"1.0.0","provenance":"source-synthesis",
+        "trigger":["El equipo quiere definir una prioridad trimestral."],
+        "non_trigger":["No priorice sin foco y evidencia confirmados."],
+        "objective":"Proponer una prioridad trimestral verificable.",
+        "required_inputs":[{"id":"input.primary-constraint","description":"Foco autorizado o estado desconocido.","required":true,"accepted_statuses":["known","unknown"]}],
+        "optional_inputs":[{"id":"input.priority-evidence","description":"Evidencia autorizada de prioridades actuales.","required":false,"accepted_statuses":["known","unknown","not-applicable"]}],
+        "interview_questions":[{"id":"question.quarterly-outcome","prompt":"¿Qué resultado debe cambiar este trimestre?","required":true}],
+        "steps":[{"id":"step.propose-quarterly-priority","action":"Proponga resultado y registre evidencia faltante.","produces":["artifact.quarterly-priority"]}],
+        "decision_rules":[{"id":"rule.one-priority","statement":"No sustituya foco por una lista de prioridades."}],
+        "warnings":[{"id":"warning.no-silent-inference","statement":"No asigne dueño ni KPI sin confirmación."}],
+        "output_contract":{"artifact":{"status":"unknown","value":null},"assumptions":[],"open_questions":["¿Quién confirma dueño, KPI y fecha?"],"owner":{"status":"unknown","value":null},"kpi":{"status":"unknown","value":null},"who_what_when":{"status":"unknown","value":null},"review_cadence":{"status":"unknown","value":null}},
+        "acceptance_criteria":[{"id":"criterion.actionable-priority","statement":"La prioridad muestra dueño, medida y siguiente revisión."}],
+        "state_updates":[{"id":"state.propose-quarterly-priority","path":"state/current-quarter.yaml","mode":"proposed"}],
+        "handoff":{"next_procedure_id":"procedure.install-meeting-rhythm","condition":"La prioridad requiere una cadencia de seguimiento."}
+      }
+    },
+    {
+      "id": "procedure.install-meeting-rhythm",
+      "node_ids": ["discipline.meeting-rhythm", "routine.daily-huddle", "routine.weekly-meeting", "routine.monthly-management-meeting", "routine.quarterly-and-annual-planning", "principle.routine-sets-you-free", "artifact.who-what-when"],
+      "input_node_refs": {"input.execution-context": ["discipline.meeting-rhythm"], "input.existing-rhythm": ["routine.weekly-meeting", "routine.monthly-management-meeting"]},
+      "contract": {
+        "id":"procedure.install-meeting-rhythm","version":"1.0.0","provenance":"source-synthesis",
+        "trigger":["El equipo quiere definir un ritmo de reuniones."],
+        "non_trigger":["No imponga reuniones sin necesidad de seguimiento."],
+        "objective":"Proponer una cadencia verificable y sus vacíos.",
+        "required_inputs":[{"id":"input.execution-context","description":"Contexto autorizado de ejecución o estado desconocido.","required":true,"accepted_statuses":["known","unknown"]}],
+        "optional_inputs":[{"id":"input.existing-rhythm","description":"Cadencias autorizadas que ya existen.","required":false,"accepted_statuses":["known","unknown","not-applicable"]}],
+        "interview_questions":[{"id":"question.rhythm-gap","prompt":"¿Qué seguimiento falta en la operación actual?","required":true}],
+        "steps":[{"id":"step.propose-meeting-rhythm","action":"Proponga cadencia y declare restricciones conocidas.","produces":["artifact.meeting-rhythm"]}],
+        "decision_rules":[{"id":"rule.purpose-before-meeting","statement":"Cada reunión propuesta necesita propósito verificable."}],
+        "warnings":[{"id":"warning.no-silent-inference","statement":"No suponga disponibilidad ni responsables del equipo."}],
+        "output_contract":{"artifact":{"status":"unknown","value":null},"assumptions":[],"open_questions":["¿Qué responsables y horarios deben confirmarse?"],"owner":{"status":"unknown","value":null},"kpi":{"status":"unknown","value":null},"who_what_when":{"status":"unknown","value":null},"review_cadence":{"status":"unknown","value":null}},
+        "acceptance_criteria":[{"id":"criterion.cadence-visible","statement":"La cadencia propuesta conserva responsables y revisión visibles."}],
+        "state_updates":[{"id":"state.propose-meeting-rhythm","path":"state/company/execution.yaml","mode":"proposed"}],
+        "handoff":{"next_procedure_id":"procedure.scaleup-quarterly-review","condition":"El equipo confirma una cadencia de revisión."}
+      }
+    },
+    {
+      "id": "procedure.scaleup-quarterly-review",
+      "node_ids": ["routine.quarterly-and-annual-planning", "principle.get-it-down-then-right", "principle.iterative-adoption", "discipline.data", "discipline.priorities", "artifact.who-what-when"],
+      "input_node_refs": {"input.current-quarter": ["discipline.priorities"], "input.review-evidence": ["discipline.data", "routine.quarterly-and-annual-planning"]},
+      "contract": {
+        "id":"procedure.scaleup-quarterly-review","version":"1.0.0","provenance":"source-synthesis",
+        "trigger":["El equipo quiere revisar el trimestre actual."],
+        "non_trigger":["No atribuya causalidad sin evidencia confirmada."],
+        "objective":"Proponer una nueva iteración o declarar evidencia faltante.",
+        "required_inputs":[{"id":"input.current-quarter","description":"Estado autorizado del trimestre o desconocido.","required":true,"accepted_statuses":["known","unknown"]}],
+        "optional_inputs":[{"id":"input.review-evidence","description":"Evidencia autorizada de resultados del trimestre.","required":false,"accepted_statuses":["known","unknown","not-applicable"]}],
+        "interview_questions":[{"id":"question.review-learning","prompt":"¿Qué resultado y aprendizaje deben revisarse?","required":true}],
+        "steps":[{"id":"step.review-quarter","action":"Compare evidencia autorizada y declare incertidumbre.","produces":["artifact.quarterly-review"]}],
+        "decision_rules":[{"id":"rule.no-invented-causality","statement":"No atribuya resultados a causas no verificadas."}],
+        "warnings":[{"id":"warning.no-silent-inference","statement":"No convierta una hipótesis en aprendizaje confirmado."}],
+        "output_contract":{"artifact":{"status":"unknown","value":null},"assumptions":[],"open_questions":["¿Qué evidencia falta para la siguiente iteración?"],"owner":{"status":"unknown","value":null},"kpi":{"status":"unknown","value":null},"who_what_when":{"status":"unknown","value":null},"review_cadence":{"status":"unknown","value":null}},
+        "acceptance_criteria":[{"id":"criterion.iteration-bounded","statement":"La revisión separa hechos, supuestos y preguntas."}],
+        "state_updates":[{"id":"state.propose-quarterly-review","path":"state/current-quarter.yaml","mode":"proposed"}],
+        "handoff":{"next_procedure_id":"procedure.diagnose-primary-constraint","condition":"La revisión revela un nuevo foco posible."}
+      }
+    }
+  ]
+}

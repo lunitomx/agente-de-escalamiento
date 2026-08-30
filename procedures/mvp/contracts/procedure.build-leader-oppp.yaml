@@ -1,0 +1,96 @@
+id: procedure.build-leader-oppp
+version: 1.0.0
+provenance: source-synthesis
+trigger:
+- El líder quiere construir un plan personal.
+non_trigger:
+- No sustituya una conversación personal detallada.
+objective: Proponer un plan personal con vacíos explícitos.
+required_inputs:
+- id: input.leader-context
+  description: Contexto autorizado del líder o estado desconocido.
+  required: true
+  accepted_statuses:
+  - known
+  - unknown
+optional_inputs:
+- id: input.personal-dimensions
+  description: Detalles autorizados de dimensiones personales.
+  required: false
+  accepted_statuses:
+  - known
+  - unknown
+  - not-applicable
+interview_questions:
+- id: question.personal-outcome
+  prompt: ¿Qué resultado personal importa más ahora?
+  required: true
+steps:
+- id: step.collect-personal-context
+  action: Registre respuestas detalladas y vacíos explícitos.
+  produces:
+  - artifact.leader-oppp
+decision_rules:
+- id: rule.no-generic-plan
+  statement: No complete un plan con frases genéricas.
+warnings:
+- id: warning.no-silent-inference
+  statement: No infiera prioridades personales no confirmadas.
+output_contract:
+  artifact:
+    status: unknown
+    value: null
+    origin: null
+    evidence_ids: []
+    consent_receipt: null
+    confirmed_by: null
+  assumptions: []
+  open_questions:
+  - ¿Qué detalle personal falta confirmar?
+  owner:
+    status: unknown
+    value: null
+    origin: null
+    evidence_ids: []
+    consent_receipt: null
+    confirmed_by: null
+  kpi:
+    status: unknown
+    value: null
+    origin: null
+    evidence_ids: []
+    consent_receipt: null
+    confirmed_by: null
+  who_what_when:
+    status: unknown
+    value: null
+    origin: null
+    evidence_ids: []
+    consent_receipt: null
+    confirmed_by: null
+  review_cadence:
+    status: unknown
+    value: null
+    origin: null
+    evidence_ids: []
+    consent_receipt: null
+    confirmed_by: null
+acceptance_criteria:
+- id: criterion.detailed-responses
+  statement: Las respuestas conservan detalle o incertidumbre explícita.
+state_updates:
+- id: state.propose-leader-oppp
+  path: state/leader/oppp.yaml
+  mode: proposed
+  confirmation: null
+handoff:
+  next_procedure_id: procedure.scaleup-quarterly-review
+  condition: El líder confirma un siguiente paso.
+evidence_refs:
+- digest.sha256.04fc65800170b623297310f4180dc00605d5b6048023713b289a363b287da046
+- digest.sha256.087f20a1c8f00a43ab1ce5ba66f6b66759b7bf716a12b4fa69cda0886ada5df8
+- digest.sha256.094789ffd7794af193b9ee92c3f63ae6da4ca885a4254d8f91a4380ba240db66
+- digest.sha256.2a495ba4ca3d63f8af4374c114ed0520a8d6c0126bd90df7fa3fce2cbbd0b171
+- digest.sha256.5d44a49ccca384c9fb093e2b0f16d05250f435f1e6c4271d0a6fa7525f640092
+- digest.sha256.6b02fcf55679e0b779193d465d290bf1b408586de4bb7ac2dd2cbc2c4f93633c
+- digest.sha256.e05201e99df261d9d7acc10d15011c88d1c2968796aa1ec455bf6952c03f051f
