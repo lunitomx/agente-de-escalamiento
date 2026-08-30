@@ -38,6 +38,74 @@ _DENIED_CANDIDATE_IDS = {
     "candidate.cash.procedure.cash-tool",
     "candidate.cash.rule.cash-initiative",
 }
+_MVP_SURFACES = {
+    "procedure.diagnose-primary-constraint": {
+        "inputs": {"input.company-context", "input.decision-evidence"},
+        "questions": {"question.primary-pain"},
+        "steps": {"step.collect-context"},
+        "produces": {"artifact.diagnostic-summary"},
+        "rules": {"rule.one-primary-constraint"},
+        "warnings": {"warning.no-silent-inference"},
+        "criteria": {"criterion.visible-unknowns"},
+        "state": {("state.propose-primary-constraint", "state/current-quarter.yaml")},
+        "handoff": "procedure.set-quarterly-priority",
+    },
+    "procedure.build-leader-oppp": {
+        "inputs": {"input.leader-context", "input.personal-dimensions"},
+        "questions": {"question.personal-outcome"},
+        "steps": {"step.collect-personal-context"},
+        "produces": {"artifact.leader-oppp"},
+        "rules": {"rule.no-generic-plan"},
+        "warnings": {"warning.no-silent-inference"},
+        "criteria": {"criterion.detailed-responses"},
+        "state": {("state.propose-leader-oppp", "state/leader/oppp.yaml")},
+        "handoff": "procedure.scaleup-quarterly-review",
+    },
+    "procedure.build-vision-summary": {
+        "inputs": {"input.organization-context", "input.strategy-evidence"},
+        "questions": {"question.vision-outcome"},
+        "steps": {"step.collect-strategy-context"},
+        "produces": {"artifact.vision-summary"},
+        "rules": {"rule.no-invented-strategy"},
+        "warnings": {"warning.no-silent-inference"},
+        "criteria": {"criterion.strategy-gaps-visible"},
+        "state": {("state.propose-vision-summary", "state/company/strategy.yaml")},
+        "handoff": "procedure.set-quarterly-priority",
+    },
+    "procedure.set-quarterly-priority": {
+        "inputs": {"input.primary-constraint", "input.priority-evidence"},
+        "questions": {"question.quarterly-outcome"},
+        "steps": {"step.propose-quarterly-priority"},
+        "produces": {"artifact.quarterly-priority"},
+        "rules": {"rule.one-priority"},
+        "warnings": {"warning.no-silent-inference"},
+        "criteria": {"criterion.actionable-priority"},
+        "state": {("state.propose-quarterly-priority", "state/current-quarter.yaml")},
+        "handoff": "procedure.install-meeting-rhythm",
+    },
+    "procedure.install-meeting-rhythm": {
+        "inputs": {"input.execution-context", "input.existing-rhythm"},
+        "questions": {"question.rhythm-gap"},
+        "steps": {"step.propose-meeting-rhythm"},
+        "produces": {"artifact.meeting-rhythm"},
+        "rules": {"rule.purpose-before-meeting"},
+        "warnings": {"warning.no-silent-inference"},
+        "criteria": {"criterion.cadence-visible"},
+        "state": {("state.propose-meeting-rhythm", "state/company/execution.yaml")},
+        "handoff": "procedure.scaleup-quarterly-review",
+    },
+    "procedure.scaleup-quarterly-review": {
+        "inputs": {"input.current-quarter", "input.review-evidence"},
+        "questions": {"question.review-learning"},
+        "steps": {"step.review-quarter"},
+        "produces": {"artifact.quarterly-review"},
+        "rules": {"rule.no-invented-causality"},
+        "warnings": {"warning.no-silent-inference"},
+        "criteria": {"criterion.iteration-bounded"},
+        "state": {("state.propose-quarterly-review", "state/current-quarter.yaml")},
+        "handoff": "procedure.diagnose-primary-constraint",
+    },
+}
 
 
 class _StrictModel(BaseModel):
@@ -162,6 +230,73 @@ def _load_release(root: Path) -> CanonicalRelease:
         raise ValueError("canonical E64 release unavailable") from exc
 
 
+def _reject_unapproved_references(value: object) -> None:
+    """Reject denied candidate IDs wherever a template can hide a reference."""
+    if isinstance(value, str):
+        if value.startswith("candidate.") or value in _DENIED_CANDIDATE_IDS:
+            raise ValueError("template contains a denied candidate reference")
+        return
+    if isinstance(value, dict):
+        for key, nested in value.items():
+            _reject_unapproved_references(key)
+            _reject_unapproved_references(nested)
+        return
+    if isinstance(value, list):
+        for nested in value:
+            _reject_unapproved_references(nested)
+
+
+def _validate_compiled_surface(
+    contract: ProcedureContract, template: MvpTemplate, evidence_refs: list[str]
+) -> None:
+    """Keep every identifier-bearing field inside the fixed MVP surface."""
+    surface = _MVP_SURFACES[template.id]
+    if contract.id != template.id:
+        raise ValueError("template procedure ID does not match its contract")
+    if contract.id not in MVP_PROCEDURE_IDS:
+        raise ValueError("procedure is outside the MVP")
+    if contract.handoff.next_procedure_id not in MVP_PROCEDURE_IDS:
+        raise ValueError("handoff references a procedure outside the MVP")
+    if contract.handoff.next_procedure_id != surface["handoff"]:
+        raise ValueError("handoff does not match the approved MVP surface")
+    if {
+        item.id for item in contract.required_inputs + contract.optional_inputs
+    } != surface["inputs"]:
+        raise ValueError("procedure inputs do not match the approved MVP surface")
+    if {item.id for item in contract.interview_questions} != surface["questions"]:
+        raise ValueError("interview references do not match the approved MVP surface")
+    if {item.id for item in contract.steps} != surface["steps"]:
+        raise ValueError("step IDs do not match the approved MVP surface")
+    if {output for step in contract.steps for output in step.produces} != surface[
+        "produces"
+    ]:
+        raise ValueError("step outputs do not match the approved MVP surface")
+    if {item.id for item in contract.decision_rules} != surface["rules"]:
+        raise ValueError("rule IDs do not match the approved MVP surface")
+    if {item.id for item in contract.warnings} != surface["warnings"]:
+        raise ValueError("warning IDs do not match the approved MVP surface")
+    if {item.id for item in contract.acceptance_criteria} != surface["criteria"]:
+        raise ValueError("criteria do not match the approved MVP surface")
+    if {(item.id, item.path) for item in contract.state_updates} != surface["state"]:
+        raise ValueError("state updates do not match the approved MVP surface")
+    if any(
+        item.mode != "proposed" or item.confirmation is not None
+        for item in contract.state_updates
+    ):
+        raise ValueError("compiled MVP state updates must remain proposed")
+    output_values = (
+        contract.output_contract.artifact,
+        contract.output_contract.owner,
+        contract.output_contract.kpi,
+        contract.output_contract.who_what_when,
+        contract.output_contract.review_cadence,
+    )
+    if any(value.status != "unknown" for value in output_values):
+        raise ValueError("compiled MVP outputs must remain unknown")
+    if contract.evidence_refs != evidence_refs:
+        raise ValueError("compiled evidence does not match approved release nodes")
+
+
 def _compile(root: Path) -> CompiledMvpProcedures:
     projection = _load_projection(root)
     canonical = _load_release(root)
@@ -174,6 +309,8 @@ def _compile(root: Path) -> CompiledMvpProcedures:
     traces: list[ProcedureTrace] = []
     node_to_procedures: dict[str, list[str]] = {}
     for template in sorted(projection.templates, key=lambda item: item.id):
+        _reject_unapproved_references(template.contract)
+        _reject_unapproved_references(template.input_node_refs)
         if any(node_id.startswith("candidate.") for node_id in template.node_ids):
             raise ValueError("candidate IDs cannot compile procedures")
         unknown_node_ids = set(template.node_ids) - set(released_nodes)
@@ -194,8 +331,7 @@ def _compile(root: Path) -> CompiledMvpProcedures:
             contract = ProcedureContract.model_validate(payload)
         except Exception as exc:
             raise ValueError("MVP procedure contract template invalid") from exc
-        if contract.id != template.id:
-            raise ValueError("template procedure ID does not match its contract")
+        _validate_compiled_surface(contract, template, evidence_refs)
         validate_procedure_against_release(contract)
         trace = ProcedureTrace(
             procedure_id=template.id,

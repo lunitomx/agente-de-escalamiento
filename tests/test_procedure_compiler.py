@@ -85,7 +85,7 @@ def test_compiled_contracts_keep_complete_unknown_safe_output_contract() -> None
                     },
                 ),
             ),
-            "candidate IDs cannot compile procedures",
+            "denied candidate reference",
         ),
         (
             lambda payload: (
@@ -141,6 +141,33 @@ def test_compiler_rejects_missing_cash_exclusion_boundary(
     monkeypatch.setattr(compiler, "_release_path", lambda _root: release_path)
 
     with pytest.raises(ValueError, match="cash exclusions are incomplete"):
+        compile_mvp_procedures()
+
+
+def test_compiler_rejects_candidate_hidden_in_step_outputs(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    payload = _projection()
+    payload["templates"][0]["contract"]["steps"][0]["produces"] = [  # type: ignore[index]
+        "candidate.cash.procedure.cash-tool"
+    ]
+    _use_projection(monkeypatch, tmp_path, payload)
+
+    with pytest.raises(ValueError, match="denied candidate reference"):
+        compile_mvp_procedures()
+
+
+@pytest.mark.parametrize("handoff", ["procedure.cash-tool", "procedure.unreviewed"])
+def test_compiler_rejects_handoff_outside_the_mvp(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, handoff: str
+) -> None:
+    payload = _projection()
+    payload["templates"][0]["contract"]["handoff"]["next_procedure_id"] = handoff  # type: ignore[index]
+    _use_projection(monkeypatch, tmp_path, payload)
+
+    with pytest.raises(
+        ValueError, match="handoff references a procedure outside the MVP"
+    ):
         compile_mvp_procedures()
 
 
