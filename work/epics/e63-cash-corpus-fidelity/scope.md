@@ -45,8 +45,8 @@ Hacer auditable el conocimiento Cash: fórmulas, unidades, supuestos, señales, 
 
 ## Estado de evidencia
 
-- S63.1, S63.3 y S63.5 tienen borradores privados trazables; los candidatos siguen sin promoción canónica hasta revisión independiente.
-- S63.2 conserva como candidato la fórmula de Working Capital Days respaldada directamente por `u0320`; el multiplicador literal y su semántica se mantienen sin normalizar hasta revisión independiente.
+- S63.1, S63.3 y S63.5 tienen evidencia privada trazable; la revisión independiente `run.e63.review.002` aprobó únicamente los candidatos source-bounded y dejó dos en `needs-revision`. Ninguno se promueve de forma canónica hasta E64.
+- S63.2 conserva como candidato la fórmula de Working Capital Days respaldada directamente por `u0320`; la revisión independiente confirmó que el multiplicador literal y su semántica deben mantenerse sin normalizar y fuera de compilación hasta una resolución futura autorizada.
 - Decisión de producto registrada: CASh se mantiene como herramienta *source-bounded*. No se compila, atribuye ni distribuye fórmula de CCC o cash-per-day procedente de la fuente externa; unidad, periodo y comparabilidad siguen siendo contratos E38/E55. Las fórmulas propias de E38 son producto independiente y no una reconstrucción de la fuente citada. La e-Form oficial pública v20/03 sólo confirma semánticamente la estructura de CASh y Power of One. La evidencia de la decisión está en `source-authorization-request.md`.
 
 ## Handoff y riesgos
