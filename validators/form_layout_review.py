@@ -18,6 +18,7 @@ _REFERENCE = re.compile(r"^[a-z][a-z0-9-]{2,63}$")
 
 class FormLayoutCheck(_StrictModel):
     tool_ref: str = Field(min_length=3, max_length=128)
+    form_part: Literal["front", "back"] | None = None
     page: int = Field(ge=1, le=99)
     topology_status: Literal["matched"]
     checked_axes: int = Field(ge=1, le=32)
@@ -42,8 +43,20 @@ class FormLayoutReviewReceipt(_StrictModel):
     def validate_private_review(self) -> "FormLayoutReviewReceipt":
         if not _REFERENCE.fullmatch(self.reviewer_ref):
             raise ValueError("reviewer reference must be an opaque identifier")
-        form_refs = [item.tool_ref for item in self.forms]
-        if len(form_refs) != len(set(form_refs)):
+        repeated_refs = {
+            item.tool_ref
+            for item in self.forms
+            if sum(other.tool_ref == item.tool_ref for other in self.forms) > 1
+        }
+        for tool_ref in repeated_refs:
+            matching = [item for item in self.forms if item.tool_ref == tool_ref]
+            if (
+                any(item.form_part is None for item in matching)
+                and len({item.page for item in matching}) > 1
+            ):
+                raise ValueError("repeated visual form requires an explicit part")
+        form_keys = [(item.tool_ref, item.form_part) for item in self.forms]
+        if len(form_keys) != len(set(form_keys)):
             raise ValueError("visual review repeats a form")
         return self
 

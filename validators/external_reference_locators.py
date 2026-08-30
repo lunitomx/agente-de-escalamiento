@@ -22,6 +22,14 @@ class ExternalReferenceLocatorReceipt(_StrictModel):
     status: str = Field(min_length=3, max_length=96)
     rule: str = Field(min_length=24, max_length=1024)
     locators: list[ExternalReferenceLocator] = Field(default_factory=list)
+    reviewer_id: str | None = Field(default=None, min_length=3, max_length=192)
+    review_run_id: str | None = Field(default=None, min_length=3, max_length=192)
+
+    @model_validator(mode="after")
+    def validate_audit_identity(self) -> "ExternalReferenceLocatorReceipt":
+        if (self.reviewer_id is None) != (self.review_run_id is None):
+            raise ValueError("external locator audit identity must be complete")
+        return self
 
     @model_validator(mode="after")
     def validate_unique_units(self) -> "ExternalReferenceLocatorReceipt":

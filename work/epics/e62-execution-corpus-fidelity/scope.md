@@ -43,10 +43,10 @@ Representar Execution como contratos de prioridades, datos, compromisos, hábito
 
 ## Estado de evidencia
 
-- S62.1, S62.2 y S62.5 tienen borradores privados trazables; los candidatos siguen sin promoción canónica hasta revisión independiente.
-- Antes de cerrar S62.3 se validarán visualmente formularios y agendas autorizados; los ritmos no se convertirán en automatizaciones fuera de conversación.
+- La revisión independiente y sus reauditorías validaron los nueve candidatos como source-bounded. Los recibos privados conservan decisiones de candidato; ninguna se promueve todavía a la ontología canónica.
+- S62.3 quedó visualmente validada mediante el recibo privado `s62.3-visual-layout-review-2026-08-30.json`; los ritmos no se convierten en automatizaciones fuera de conversación.
 - Todo handoff de Execution queda limitado a afirmaciones explícitas de la fuente: las metodologías, frameworks, coaches, sistemas de investigación y herramientas externas que podrían reconstruirse se localizan y no autorizan reconstruir esas metodologías.
-- Los ritmos y las referencias externas tienen recibos privados con gate de evidencia exacta; la e-Form oficial pública v20/03 confirma semánticamente WWW y el checklist. Sigue pendiente la inspección visual autorizada del layout, con recibo privado conforme a `../e60-people-corpus-fidelity/visual-layout-review-protocol.md`.
+- Los ritmos y las referencias externas tienen recibos privados con gate de evidencia exacta; la e-Form oficial pública v20/03 confirma semánticamente WWW y el checklist, y la inspección visual quedó registrada en `s62.3-visual-layout-review-2026-08-30.json` conforme al protocolo privado.
 
 ## Handoff y riesgos
 

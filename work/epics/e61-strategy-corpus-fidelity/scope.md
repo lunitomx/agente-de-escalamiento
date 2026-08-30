@@ -44,8 +44,8 @@ Construir la representación trazable de Strategy para que el agente pueda disti
 
 ## Estado de evidencia
 
-- S61.1, S61.2, S61.3 y S61.5 tienen borradores privados trazables; los candidatos siguen sin promoción canónica hasta revisión independiente.
-- S61.4 tiene recibo semántico contra la e-Form oficial pública v20/03 para SWT, Seven Strata, OPSP y Vision Summary; sigue pendiente sólo la inspección visual del layout, no la disponibilidad de un activo fuente. El recibo privado se prepara con `../e60-people-corpus-fidelity/visual-layout-review-protocol.md`.
+- Las revisiones independientes y sus reauditorías validaron los quince candidatos y siete relaciones como source-bounded. Los recibos privados conservan decisiones de candidato; nada se promueve todavía a la ontología canónica.
+- S61.4 tiene recibo semántico y el recibo visual privado `s61.4-visual-layout-review-2026-08-30.json` para SWT, Seven Strata, las dos páginas de OPSP y Vision Summary. El activo se eliminó; no se infiere topología desde texto.
 
 ## Handoff y riesgos
 

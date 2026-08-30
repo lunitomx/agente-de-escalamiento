@@ -9,6 +9,7 @@ from scripts.check_execution_external_references import (
     scan_reference_locators,
 )
 from validators.domain_coverage import DomainInventory
+from validators.external_reference_locators import ExternalReferenceLocatorReceipt
 
 
 def _inventory() -> DomainInventory:
@@ -58,3 +59,23 @@ def test_private_terms_fail_closed_when_not_a_nonempty_string_mapping(tmp_path) 
 
     with pytest.raises(ValueError, match="non-empty strings"):
         load_private_terms(terms_path)
+
+
+def test_external_locator_receipt_requires_complete_optional_audit_identity() -> None:
+    payload = {
+        "schema_version": 1,
+        "domain": "execution",
+        "status": "independently-reviewed-source-bounded",
+        "rule": "External methods remain bounded and cannot be reconstructed.",
+        "locators": [],
+        "reviewer_id": "reviewer-001",
+        "review_run_id": "run-001",
+    }
+    assert (
+        ExternalReferenceLocatorReceipt.model_validate(payload).reviewer_id
+        == "reviewer-001"
+    )
+
+    payload.pop("review_run_id")
+    with pytest.raises(ValueError, match="audit identity"):
+        ExternalReferenceLocatorReceipt.model_validate(payload)

@@ -62,3 +62,19 @@ def test_visual_layout_receipt_rejects_repeated_form_or_unresolved_mismatch() ->
     payload["forms"][0]["mismatch_count"] = 1
     with pytest.raises(ValueError):
         FormLayoutReviewReceipt.model_validate(payload)
+
+
+def test_visual_layout_receipt_allows_distinct_front_and_back_parts() -> None:
+    payload = _receipt().model_dump(mode="json")
+    payload["forms"] = [
+        payload["forms"][0] | {"tool_ref": "tool-opsp", "form_part": "front"},
+        payload["forms"][0] | {"tool_ref": "tool-opsp", "form_part": "back", "page": 3},
+    ]
+    validate_form_layout_review(FormLayoutReviewReceipt.model_validate(payload))
+
+
+def test_visual_layout_receipt_rejects_repeated_tool_without_parts() -> None:
+    payload = _receipt().model_dump(mode="json")
+    payload["forms"].append(payload["forms"][0] | {"page": 3})
+    with pytest.raises(ValueError, match="requires an explicit part"):
+        FormLayoutReviewReceipt.model_validate(payload)
