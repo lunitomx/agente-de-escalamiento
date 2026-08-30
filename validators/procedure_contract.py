@@ -43,7 +43,7 @@ def _text(value: str, label: str) -> str:
         raise ValueError(f"unsafe {label}")
     if (
         any(ord(char) < 32 or ord(char) == 127 for char in value)
-        or "/" in value
+        or ("/" in value and value != "Who/What/When")
         or "\\" in value
         or "://" in value
         or value.lower().startswith("www.")
@@ -288,6 +288,25 @@ class ProcedureHandoff(_StrictModel):
         return _text(value, "handoff condition")
 
 
+class ProcedureTrustRegistry(_StrictModel):
+    """Allowlisted local IDs supplied by E49/E52/E55 adapters at validation time."""
+
+    schema_version: Literal[1]
+    evidence_ids: list[str] = Field(default_factory=list, max_length=256)
+    consent_receipts: list[str] = Field(default_factory=list, max_length=256)
+    human_ids: list[str] = Field(default_factory=list, max_length=256)
+    confirmation_record_ids: list[str] = Field(default_factory=list, max_length=256)
+
+    @field_validator(
+        "evidence_ids", "consent_receipts", "human_ids", "confirmation_record_ids"
+    )
+    @classmethod
+    def validate_registry_ids(cls, values: list[str]) -> list[str]:
+        if len(values) != len(set(values)):
+            raise ValueError("duplicate trusted registry ID")
+        return sorted(_id(value, "trusted registry ID") for value in values)
+
+
 class ProcedureContract(_StrictModel):
     """An authored, non-executing internal procedure contract."""
 
@@ -379,3 +398,53 @@ def validate_procedure_against_release(
     unknown_refs = set(procedure.evidence_refs) - release_refs
     if unknown_refs:
         raise ValueError("procedure contract references unknown release evidence")
+
+
+def validate_procedure_against_trust(
+    procedure: ProcedureContract, registry: ProcedureTrustRegistry | None
+) -> None:
+    """Fail closed for known output or confirmed state without local trust records.
+
+    The registry is an adapter boundary: E49/E52/E55 must create it from
+    authorized local evidence and consent records. This contract never invents
+    those records or treats syntactically valid IDs as trustworthy by itself.
+    """
+    known_values = [
+        value
+        for value in (
+            procedure.output_contract.artifact,
+            procedure.output_contract.owner,
+            procedure.output_contract.kpi,
+            procedure.output_contract.who_what_when,
+            procedure.output_contract.review_cadence,
+        )
+        if value.status == "known"
+    ]
+    confirmations = [
+        update.confirmation
+        for update in procedure.state_updates
+        if update.mode == "confirmed" and update.confirmation is not None
+    ]
+    if not known_values and not confirmations:
+        return
+    if registry is None:
+        raise ValueError("known or confirmed procedure state requires trusted registry")
+
+    trusted_evidence = set(registry.evidence_ids)
+    trusted_consent = set(registry.consent_receipts)
+    trusted_humans = set(registry.human_ids)
+    trusted_confirmation = set(registry.confirmation_record_ids)
+    for value in known_values:
+        if not set(value.evidence_ids).issubset(trusted_evidence):
+            raise ValueError("known value references untrusted evidence")
+        if value.consent_receipt not in trusted_consent:
+            raise ValueError("known value references untrusted consent")
+        if value.confirmed_by not in trusted_humans:
+            raise ValueError("known value references untrusted human")
+    for confirmation in confirmations:
+        if confirmation.record_id not in trusted_confirmation:
+            raise ValueError("confirmed update references untrusted confirmation")
+        if confirmation.consent_receipt not in trusted_consent:
+            raise ValueError("confirmed update references untrusted consent")
+        if confirmation.confirmed_by not in trusted_humans:
+            raise ValueError("confirmed update references untrusted human")
