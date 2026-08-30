@@ -10,6 +10,7 @@ from pydantic import ValidationError
 
 from validators.ontology_v2 import (
     AuthorizedCandidateProjection,
+    CanonicalRelease,
     CandidateReviewOutcome,
     NodeKind,
     CandidateNode,
@@ -20,7 +21,10 @@ from validators.ontology_v2 import (
     render_review_queue,
     OriginKind,
     ReviewState,
+    build_canonical_release,
+    load_canonical_release,
     ontology_schema_hash,
+    render_canonical_release,
     render_ontology_schema,
 )
 
@@ -303,3 +307,92 @@ def test_authorized_projection_is_allowlisted_and_requires_independent_review() 
     }
     with pytest.raises(ValidationError, match="independent"):
         AuthorizedCandidateProjection.model_validate(unsafe)
+
+
+def test_canonical_release_is_deterministic_and_partitions_projection() -> None:
+    approved = {
+        "candidate_id": "candidate.framework.example",
+        "canonical_id": "framework.example",
+        "kind": "framework",
+        "canonical_name": "Example Framework",
+        "origin": "source-explicit",
+        "aliases": ["Framework example", "Example framework"],
+        "source_ids": ["source.example"],
+        "candidate_receipt": "digest.candidate.abc123",
+        "review_receipt": "digest.review.def456",
+        "review_outcome": "approve-candidate",
+        "reviewer_independent": True,
+        "receipts_valid": True,
+        "source_bounded": True,
+        "blocked": False,
+        "generic": False,
+    }
+    deferred = {
+        **approved,
+        "candidate_id": "candidate.cash.example",
+        "canonical_id": "cash.example",
+        "review_outcome": "needs-revision",
+    }
+    projection = AuthorizedCandidateProjection.model_validate(
+        {"schema_version": 1, "candidates": [deferred, approved]}
+    )
+    release = build_canonical_release(projection)
+    assert [node.candidate_id for node in release.nodes] == [approved["candidate_id"]]
+    assert [item.candidate_id for item in release.exclusions] == [
+        deferred["candidate_id"]
+    ]
+    assert release.exclusions[0].reason_code == "needs-revision"
+    assert release.nodes[0].aliases == sorted(approved["aliases"])
+    assert render_canonical_release(release) == render_canonical_release(
+        CanonicalRelease.model_validate(release.model_dump())
+    )
+    assert "working_text" not in render_canonical_release(release)
+
+
+def test_canonical_release_rejects_unsafe_or_nonexclusive_entries(
+    tmp_path: Path,
+) -> None:
+    valid = {
+        "schema_version": 1,
+        "release_id": "s64.1",
+        "nodes": [
+            {
+                "canonical_id": "framework.example",
+                "candidate_id": "candidate.framework.example",
+                "kind": "framework",
+                "canonical_name": "Example Framework",
+                "origin": "source-explicit",
+                "aliases": [],
+                "source_ids": ["source.example"],
+                "candidate_receipt": "digest.candidate.abc123",
+                "review_receipt": "digest.review.def456",
+                "review_outcome": "approve-candidate",
+            }
+        ],
+        "exclusions": [],
+    }
+    with pytest.raises(ValidationError):
+        CanonicalRelease.model_validate(
+            {**valid, "nodes": [{**valid["nodes"][0], "locator": "private"}]}
+        )
+    duplicated = {
+        **valid,
+        "exclusions": [
+            {
+                "candidate_id": "candidate.framework.example",
+                "disposition": "excluded",
+                "reason_code": "generic-candidate",
+                "candidate_receipt": "digest.candidate.abc123",
+                "review_receipt": "digest.review.def456",
+                "source_ids": ["source.example"],
+            }
+        ],
+    }
+    with pytest.raises(ValidationError, match="exactly once"):
+        CanonicalRelease.model_validate(duplicated)
+    path = tmp_path / "release.json"
+    path.write_text(
+        render_canonical_release(CanonicalRelease.model_validate(valid)),
+        encoding="utf-8",
+    )
+    assert load_canonical_release(path).release_id == "s64.1"
