@@ -154,8 +154,127 @@ def test_confirmation_is_required_before_confirmed_persistence() -> None:
             confirmation_id="confirmation.vision.owner",
             consent_receipt="consent.local.vision",
             confirmed_by="person.company.owner",
+            artifact_id=artifact.artifact_id,
+            artifact_digest=artifact.artifact_digest,
         ),
     )
     assert request.mode == "confirmed"
     assert request.path == "state/company/strategy.yaml"
     assert request.writes_state is False
+
+
+def test_hypotheses_from_commitments_are_explicit_assumptions() -> None:
+    artifact = build_narrative_artifact(
+        "procedure.build-vision-summary",
+        {
+            "purpose": _known(
+                "Ayudamos a dueños a operar con mayor claridad.", "company-local"
+            ),
+            "customer": {"status": "unknown"},
+            "differentiator": {"status": "unknown"},
+            "future_direction": {"status": "unknown"},
+        },
+        commitments={
+            "owner": _known(
+                "Creemos que la dirección coordinará este trabajo.", "model-hypothesis"
+            ),
+            "kpi": {"status": "unknown"},
+            "who_what_when": _known(
+                "Creemos que el equipo acordará la fecha esta semana.",
+                "model-hypothesis",
+            ),
+            "review_cadence": {"status": "unknown"},
+        },
+    )
+
+    assert artifact.assumptions == ["owner", "who_what_when"]
+
+
+def test_public_narrative_artifact_cannot_be_constructed_with_mismatched_surface() -> (
+    None
+):
+    artifact = build_narrative_artifact(
+        "procedure.build-vision-summary",
+        {
+            "purpose": _known(
+                "Ayudamos a dueños a operar con mayor claridad.", "company-local"
+            ),
+            "customer": {"status": "unknown"},
+            "differentiator": {"status": "unknown"},
+            "future_direction": {"status": "unknown"},
+        },
+        commitments={
+            "owner": {"status": "unknown"},
+            "kpi": {"status": "unknown"},
+            "who_what_when": {"status": "unknown"},
+            "review_cadence": {"status": "unknown"},
+        },
+    )
+    payload = artifact.model_dump(mode="json")
+    payload["context"] = "personal"
+    with pytest.raises(
+        ValidationError, match="context does not match procedure surface"
+    ):
+        type(artifact).model_validate(payload)
+
+    payload = artifact.model_dump(mode="json")
+    payload["fields"]["secret"] = {"status": "unknown"}
+    with pytest.raises(ValidationError, match="procedure surface"):
+        type(artifact).model_validate(payload)
+
+    payload = artifact.model_dump(mode="json")
+    payload["persistence"]["path"] = "state/company/../private.yaml"
+    with pytest.raises(
+        ValidationError, match="persistence path does not match procedure surface"
+    ):
+        type(artifact).model_validate(payload)
+
+
+def test_confirmation_cannot_be_reused_for_a_different_draft_or_path() -> None:
+    first = build_narrative_artifact(
+        "procedure.build-vision-summary",
+        {
+            "purpose": _known(
+                "Ayudamos a dueños a operar con mayor claridad.", "company-local"
+            ),
+            "customer": {"status": "unknown"},
+            "differentiator": {"status": "unknown"},
+            "future_direction": {"status": "unknown"},
+        },
+        commitments={
+            "owner": {"status": "unknown"},
+            "kpi": {"status": "unknown"},
+            "who_what_when": {"status": "unknown"},
+            "review_cadence": {"status": "unknown"},
+        },
+    )
+    second = build_narrative_artifact(
+        "procedure.build-vision-summary",
+        {
+            "purpose": _known(
+                "Ayudamos a clínicas a reducir errores de coordinación.",
+                "company-local",
+            ),
+            "customer": {"status": "unknown"},
+            "differentiator": {"status": "unknown"},
+            "future_direction": {"status": "unknown"},
+        },
+        commitments={
+            "owner": {"status": "unknown"},
+            "kpi": {"status": "unknown"},
+            "who_what_when": {"status": "unknown"},
+            "review_cadence": {"status": "unknown"},
+        },
+    )
+    confirmation = ArtifactConfirmation(
+        confirmation_id="confirmation.vision.owner",
+        consent_receipt="consent.local.vision",
+        confirmed_by="person.company.owner",
+        artifact_id=first.artifact_id,
+        artifact_digest=first.artifact_digest,
+    )
+
+    with pytest.raises(
+        ValueError, match="confirmation does not match narrative artifact"
+    ):
+        request_confirmed_persistence(second, confirmation)

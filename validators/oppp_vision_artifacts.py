@@ -1,12 +1,14 @@
 """Narrative-only internal artifacts for the E65 OPPP and Vision MVP.
 
-This module builds in-memory drafts.  It intentionally does not read private
-sources, resolve a person, or write company state.  A separate trusted adapter
-must perform any actual persistence after explicit human confirmation.
+This module builds in-memory drafts. It never reads private sources, resolves a
+person, or writes company state. A separate trusted adapter must perform any
+actual persistence after an explicit confirmation bound to this exact draft.
 """
 
 from __future__ import annotations
 
+import hashlib
+import json
 from typing import Literal, Mapping
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -18,6 +20,24 @@ _DETAIL_MINIMUM = 20
 _NARRATIVE_STATUS = Literal["known", "unknown", "not-applicable"]
 _NARRATIVE_ORIGIN = Literal["personal-statement", "company-local", "model-hypothesis"]
 _CONTEXT = Literal["personal", "company"]
+_COMMITMENT_FIELDS = ("owner", "kpi", "who_what_when", "review_cadence")
+_ACCEPTANCE_CRITERIA = (
+    "detailed narrative or explicit unknown",
+    "owner KPI Who What When and cadence visible",
+    "human confirmation before state persistence",
+)
+_ARTIFACT_SPECS: dict[str, tuple[_CONTEXT, tuple[str, ...], str]] = {
+    "procedure.build-leader-oppp": (
+        "personal",
+        ("relationships", "achievements", "rituals", "wealth"),
+        "state/leader/oppp.yaml",
+    ),
+    "procedure.build-vision-summary": (
+        "company",
+        ("purpose", "customer", "differentiator", "future_direction"),
+        "state/company/strategy.yaml",
+    ),
+}
 
 
 class _StrictModel(BaseModel):
@@ -67,6 +87,8 @@ class ArtifactConfirmation(_StrictModel):
     confirmation_id: str = Field(pattern=r"^[a-z][a-z0-9._-]{2,127}$")
     consent_receipt: str = Field(pattern=r"^[a-z][a-z0-9._-]{2,127}$")
     confirmed_by: str = Field(pattern=r"^[a-z][a-z0-9._-]{2,127}$")
+    artifact_id: str = Field(pattern=r"^artifact\.sha256\.[a-f0-9]{64}$")
+    artifact_digest: str = Field(pattern=r"^[a-f0-9]{64}$")
 
 
 class ProposedPersistence(_StrictModel):
@@ -84,6 +106,61 @@ class ProposedPersistence(_StrictModel):
         return self
 
 
+def _canonical_payload(
+    procedure_id: str,
+    context: _CONTEXT,
+    fields: Mapping[str, NarrativeAnswer],
+    commitments: Mapping[str, NarrativeAnswer],
+    assumptions: list[str],
+    open_questions: list[str],
+    acceptance_criteria: tuple[str, ...],
+    path: str,
+) -> bytes:
+    payload = {
+        "acceptance_criteria": acceptance_criteria,
+        "assumptions": assumptions,
+        "commitments": {
+            name: answer.model_dump(mode="json")
+            for name, answer in sorted(commitments.items())
+        },
+        "context": context,
+        "fields": {
+            name: answer.model_dump(mode="json")
+            for name, answer in sorted(fields.items())
+        },
+        "open_questions": open_questions,
+        "path": path,
+        "procedure_id": procedure_id,
+    }
+    return json.dumps(
+        payload, ensure_ascii=False, separators=(",", ":"), sort_keys=True
+    ).encode()
+
+
+def _artifact_digest(
+    procedure_id: str,
+    context: _CONTEXT,
+    fields: Mapping[str, NarrativeAnswer],
+    commitments: Mapping[str, NarrativeAnswer],
+    assumptions: list[str],
+    open_questions: list[str],
+    acceptance_criteria: tuple[str, ...],
+    path: str,
+) -> str:
+    return hashlib.sha256(
+        _canonical_payload(
+            procedure_id,
+            context,
+            fields,
+            commitments,
+            assumptions,
+            open_questions,
+            acceptance_criteria,
+            path,
+        )
+    ).hexdigest()
+
+
 class NarrativeArtifact(_StrictModel):
     procedure_id: Literal[
         "procedure.build-leader-oppp", "procedure.build-vision-summary"
@@ -95,21 +172,57 @@ class NarrativeArtifact(_StrictModel):
     open_questions: list[str]
     acceptance_criteria: tuple[str, ...]
     persistence: ProposedPersistence
+    artifact_id: str = Field(pattern=r"^artifact\.sha256\.[a-f0-9]{64}$")
+    artifact_digest: str = Field(pattern=r"^[a-f0-9]{64}$")
 
-
-_ARTIFACT_SPECS: dict[str, tuple[_CONTEXT, tuple[str, ...], str]] = {
-    "procedure.build-leader-oppp": (
-        "personal",
-        ("relationships", "achievements", "rituals", "wealth"),
-        "state/leader/oppp.yaml",
-    ),
-    "procedure.build-vision-summary": (
-        "company",
-        ("purpose", "customer", "differentiator", "future_direction"),
-        "state/company/strategy.yaml",
-    ),
-}
-_COMMITMENT_FIELDS = ("owner", "kpi", "who_what_when", "review_cadence")
+    @model_validator(mode="after")
+    def validate_public_surface(self) -> "NarrativeArtifact":
+        context, field_names, state_path = _ARTIFACT_SPECS[self.procedure_id]
+        if self.context != context:
+            raise ValueError("context does not match procedure surface")
+        if tuple(self.fields) != field_names:
+            raise ValueError("artifact fields do not match the procedure surface")
+        if tuple(self.commitments) != _COMMITMENT_FIELDS:
+            raise ValueError("commitments do not match the procedure surface")
+        if self.persistence.path != state_path:
+            raise ValueError("persistence path does not match procedure surface")
+        if (
+            self.persistence.mode != "proposed"
+            or self.persistence.confirmation is not None
+        ):
+            raise ValueError("narrative artifact must retain proposed persistence")
+        all_answers = {**self.fields, **self.commitments}
+        expected_assumptions = [
+            name
+            for name, answer in all_answers.items()
+            if answer.origin == "model-hypothesis"
+        ]
+        if self.assumptions != expected_assumptions:
+            raise ValueError("assumptions must list every model hypothesis")
+        expected_questions = [
+            name for name, answer in all_answers.items() if answer.status == "unknown"
+        ]
+        if self.open_questions != expected_questions:
+            raise ValueError("open questions must list every unknown answer")
+        if self.acceptance_criteria != _ACCEPTANCE_CRITERIA:
+            raise ValueError(
+                "acceptance criteria do not match narrative artifact policy"
+            )
+        expected_digest = _artifact_digest(
+            self.procedure_id,
+            self.context,
+            self.fields,
+            self.commitments,
+            self.assumptions,
+            self.open_questions,
+            self.acceptance_criteria,
+            self.persistence.path,
+        )
+        if self.artifact_digest != expected_digest:
+            raise ValueError("artifact digest does not match canonical payload")
+        if self.artifact_id != f"artifact.sha256.{expected_digest}":
+            raise ValueError("artifact ID does not match canonical payload")
+        return self
 
 
 def _compiled_contract_ids() -> set[str]:
@@ -120,7 +233,7 @@ def _answers(
     values: Mapping[str, NarrativeAnswer | Mapping[str, object]],
     expected: tuple[str, ...],
 ) -> dict[str, NarrativeAnswer]:
-    if set(values) != set(expected):
+    if tuple(values) != expected:
         raise ValueError("artifact fields do not match the procedure surface")
     return {field: NarrativeAnswer.model_validate(values[field]) for field in expected}
 
@@ -151,7 +264,7 @@ def build_narrative_artifact(
     *,
     commitments: Mapping[str, NarrativeAnswer | Mapping[str, object]],
 ) -> NarrativeArtifact:
-    """Build a proposed draft from both compiled-contract and interview inputs."""
+    """Build a proposed draft from a compiled procedure and interview inputs."""
     if procedure_id not in _compiled_contract_ids():
         raise ValueError("OPPP or Vision procedure is not in the compiled MVP")
     context, field_names, state_path = _ARTIFACT_SPECS[procedure_id]
@@ -159,40 +272,53 @@ def build_narrative_artifact(
     resolved_commitments = _answers(commitments, _COMMITMENT_FIELDS)
     _validate_origins(context, resolved_fields, require_known=True)
     _validate_origins(context, resolved_commitments, require_known=False)
-
     all_answers = {**resolved_fields, **resolved_commitments}
-    unknowns = [
-        name for name, answer in all_answers.items() if answer.status == "unknown"
-    ]
-    hypotheses = [
+    assumptions = [
         name
-        for name, answer in resolved_fields.items()
+        for name, answer in all_answers.items()
         if answer.origin == "model-hypothesis"
     ]
+    open_questions = [
+        name for name, answer in all_answers.items() if answer.status == "unknown"
+    ]
+    digest = _artifact_digest(
+        procedure_id,
+        context,
+        resolved_fields,
+        resolved_commitments,
+        assumptions,
+        open_questions,
+        _ACCEPTANCE_CRITERIA,
+        state_path,
+    )
     return NarrativeArtifact(
         procedure_id=procedure_id,
         context=context,
         fields=resolved_fields,
         commitments=resolved_commitments,
-        assumptions=hypotheses,
-        open_questions=unknowns,
-        acceptance_criteria=(
-            "detailed narrative or explicit unknown",
-            "owner KPI Who What When and cadence visible",
-            "human confirmation before state persistence",
-        ),
+        assumptions=assumptions,
+        open_questions=open_questions,
+        acceptance_criteria=_ACCEPTANCE_CRITERIA,
         persistence=ProposedPersistence(mode="proposed", path=state_path),
+        artifact_id=f"artifact.sha256.{digest}",
+        artifact_digest=digest,
     )
 
 
 def request_confirmed_persistence(
     artifact: NarrativeArtifact, confirmation: ArtifactConfirmation | None
 ) -> ProposedPersistence:
-    """Return a confirmation receipt; never write state from this runtime."""
+    """Bind consent to exactly one valid draft; never write state from this runtime."""
+    validated = NarrativeArtifact.model_validate(artifact.model_dump(mode="json"))
     if confirmation is None:
         raise ValueError("explicit human confirmation is required")
+    if (
+        confirmation.artifact_id != validated.artifact_id
+        or confirmation.artifact_digest != validated.artifact_digest
+    ):
+        raise ValueError("confirmation does not match narrative artifact")
     return ProposedPersistence(
         mode="confirmed",
-        path=artifact.persistence.path,
+        path=validated.persistence.path,
         confirmation=confirmation,
     )
