@@ -85,8 +85,8 @@ unreviewed form is an exclusion, never a green result.
 | Story | Size | Status | Actual | Velocity | Notes |
 |-------|:----:|:------:|:------:|:--------:|-------|
 | S64.1 | M | Done | 2026-08-30 | — | Source-safe canonical release: 76 nodes and 3 explicit exclusions from 79 authorized candidates. Independent review passed with one documented nonblocking semantic-label limitation. |
-| S64.2 | M | Pending | — | — | Starts after S64.1 produces the canonical candidate set. |
-| S64.3 | M | Pending | — | — | Starts after S64.1; may run in parallel with S64.2. |
+| S64.2 | M | Done | 2026-08-30 | — | Integrity gate is `not-assessed` without an authorized relationship manifest; it passes only with a valid manifest, never by inference. |
+| S64.3 | M | Done | 2026-08-30 | — | Deterministic safe matrix has 76 mapped records and 3 Cash review-required records; no percentage conceals them. |
 | S64.4 | M | Pending | — | — | Starts only when S64.2 and S64.3 pass without critical findings. |
 
 ### Sequencing Risks
