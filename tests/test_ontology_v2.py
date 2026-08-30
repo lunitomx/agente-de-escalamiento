@@ -9,6 +9,7 @@ import yaml
 from pydantic import ValidationError
 
 from validators.ontology_v2 import (
+    AuthorizedCandidateProjection,
     CandidateReviewOutcome,
     NodeKind,
     CandidateNode,
@@ -253,3 +254,52 @@ def test_review_queue_requires_independent_extractor_and_reviewer() -> None:
     )
     with pytest.raises(ValidationError, match="independent"):
         ReviewQueue(schema_version=2, candidates=[candidate], decisions=[decision])
+
+
+def test_authorized_projection_is_allowlisted_and_requires_independent_review() -> None:
+    payload = {
+        "schema_version": 1,
+        "candidates": [
+            {
+                "candidate_id": "candidate.framework.example",
+                "canonical_id": "framework.example",
+                "kind": "framework",
+                "canonical_name": "Example Framework",
+                "origin": "source-explicit",
+                "aliases": ["Framework example"],
+                "source_ids": ["source.example"],
+                "candidate_receipt": "digest.candidate.abc123",
+                "review_receipt": "digest.review.def456",
+                "review_outcome": "approve-candidate",
+                "reviewer_independent": True,
+                "receipts_valid": True,
+                "source_bounded": True,
+                "blocked": False,
+                "generic": False,
+            }
+        ],
+    }
+    projection = AuthorizedCandidateProjection.model_validate(payload)
+    assert projection.candidates[0].source_ids == ["source.example"]
+    assert projection.candidates[0].candidate_receipt == "digest.candidate.abc123"
+
+    for forbidden_field in (
+        "working_text",
+        "locators",
+        "source_url",
+        "source_text",
+        "path",
+    ):
+        unsafe = {
+            **payload,
+            "candidates": [{**payload["candidates"][0], forbidden_field: "unsafe"}],
+        }
+        with pytest.raises(ValidationError):
+            AuthorizedCandidateProjection.model_validate(unsafe)
+
+    unsafe = {
+        **payload,
+        "candidates": [{**payload["candidates"][0], "reviewer_independent": False}],
+    }
+    with pytest.raises(ValidationError, match="independent"):
+        AuthorizedCandidateProjection.model_validate(unsafe)

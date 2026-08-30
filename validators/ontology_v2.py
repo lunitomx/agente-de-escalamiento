@@ -64,6 +64,94 @@ class CandidateReviewOutcome(str, Enum):
     REJECT_CANDIDATE = "reject-candidate"
 
 
+_OPAQUE_REFERENCE_PATTERN = re.compile(r"^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$")
+
+
+def _validate_safe_identifier(value: str, label: str) -> str:
+    if _ID_PATTERN.fullmatch(value) is None:
+        raise ValueError(f"unsafe {label}")
+    return value
+
+
+def _validate_opaque_reference(value: str) -> str:
+    if _OPAQUE_REFERENCE_PATTERN.fullmatch(value) is None:
+        raise ValueError("unsafe opaque reference")
+    if any(token in value for token in ("url", "path", "file", "locator")):
+        raise ValueError("unsafe opaque reference")
+    return value
+
+
+class AuthorizedProjectionCandidate(_StrictModel):
+    """Safe, one-way metadata projection from an authorized private review."""
+
+    candidate_id: str = Field(min_length=3, max_length=192)
+    canonical_id: str = Field(min_length=3, max_length=192)
+    kind: NodeKind
+    canonical_name: str = Field(min_length=1, max_length=256)
+    origin: OriginKind
+    aliases: list[str] = Field(default_factory=list, max_length=64)
+    source_ids: list[str] = Field(min_length=1, max_length=64)
+    candidate_receipt: str = Field(min_length=3, max_length=192)
+    review_receipt: str = Field(min_length=3, max_length=192)
+    review_outcome: CandidateReviewOutcome
+    reviewer_independent: bool
+    receipts_valid: bool
+    source_bounded: bool
+    blocked: bool
+    generic: bool
+
+    @field_validator("candidate_id", "canonical_id")
+    @classmethod
+    def validate_projection_id(cls, value: str) -> str:
+        return _validate_safe_identifier(value, "projection ID")
+
+    @field_validator("source_ids")
+    @classmethod
+    def validate_projection_source_ids(cls, values: list[str]) -> list[str]:
+        if len(values) != len(set(values)):
+            raise ValueError("duplicate source ID")
+        return sorted(_validate_safe_identifier(value, "source ID") for value in values)
+
+    @field_validator("candidate_receipt", "review_receipt")
+    @classmethod
+    def validate_projection_receipts(cls, value: str) -> str:
+        return _validate_opaque_reference(value)
+
+    @field_validator("aliases")
+    @classmethod
+    def validate_projection_aliases(cls, values: list[str]) -> list[str]:
+        if any(not value.strip() for value in values) or len(values) != len(
+            set(values)
+        ):
+            raise ValueError("duplicate or empty alias")
+        return sorted(values)
+
+    @model_validator(mode="after")
+    def validate_independent_review(self) -> AuthorizedProjectionCandidate:
+        if not self.reviewer_independent:
+            raise ValueError("reviewer must be independent")
+        return self
+
+
+class AuthorizedCandidateProjection(_StrictModel):
+    """Strictly allowlisted input; deliberately separate from ``ReviewQueue``."""
+
+    schema_version: Literal[1]
+    candidates: list[AuthorizedProjectionCandidate] = Field(
+        min_length=1, max_length=256
+    )
+
+    @model_validator(mode="after")
+    def validate_projection_candidates(self) -> AuthorizedCandidateProjection:
+        candidate_ids = [candidate.candidate_id for candidate in self.candidates]
+        canonical_ids = [candidate.canonical_id for candidate in self.candidates]
+        if len(candidate_ids) != len(set(candidate_ids)):
+            raise ValueError("duplicate projection candidate ID")
+        if len(canonical_ids) != len(set(canonical_ids)):
+            raise ValueError("duplicate projection canonical ID")
+        return self
+
+
 class EvidenceRef(_StrictModel):
     source_id: str = Field(min_length=3, max_length=128)
     unit_ids: list[str] = Field(min_length=1, max_length=64)
