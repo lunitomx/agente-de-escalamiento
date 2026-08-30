@@ -1,0 +1,63 @@
+id: procedure.diagnose-primary-constraint
+version: 1.0.0
+provenance: source-synthesis
+trigger:
+  - A leader wants to identify one primary constraint.
+non_trigger:
+  - Use a specialist procedure when the leader already selected a tool.
+objective: Produce a bounded primary-constraint decision or identify missing evidence.
+required_inputs:
+  - id: input.company-context
+    description: Authorized company context or an explicit unknown state.
+    required: true
+    accepted_statuses: [known, unknown]
+optional_inputs:
+  - id: input.evidence-pack
+    description: Optional reconciled evidence pack.
+    required: false
+    accepted_statuses: [known, unknown]
+interview_questions:
+  - id: question.primary-pain
+    prompt: What outcome is most constrained right now?
+    required: true
+steps:
+  - id: step.collect-context
+    action: Gather only authorized context and record unknowns.
+    produces: [artifact.diagnostic-summary]
+decision_rules:
+  - id: rule.one-primary-constraint
+    statement: Select one primary constraint only when sufficient evidence exists.
+warnings:
+  - id: warning.no-silent-inference
+    statement: Do not convert missing company information into a fact.
+output_contract:
+  artifact:
+    status: unknown
+    value: null
+  assumptions: []
+  open_questions:
+    - What evidence would confirm the primary constraint?
+  owner:
+    status: unknown
+    value: null
+  kpi:
+    status: unknown
+    value: null
+  who_what_when:
+    status: unknown
+    value: null
+  review_cadence:
+    status: unknown
+    value: null
+acceptance_criteria:
+  - id: criterion.no-silent-inference
+    statement: Every unknown is visible as an unknown or an open question.
+state_updates:
+  - id: state.record-provisional-decision
+    path: state/current-quarter.yaml
+    mode: proposed
+handoff:
+  next_procedure_id: procedure.quarterly-priority
+  condition: A primary constraint and accountable owner are confirmed.
+evidence_refs:
+  - digest.sha256.2f92b20686b59c9437816f5f81ceb9c958a9ebc6a11e6cd0f54af0eb89c9193a
