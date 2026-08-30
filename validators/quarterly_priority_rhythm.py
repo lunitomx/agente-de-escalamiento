@@ -8,7 +8,8 @@ before any proposal can become an operational commitment.
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, timedelta
+import math
 import re
 from typing import Literal
 
@@ -87,6 +88,13 @@ class CriticalNumber(_StrictModel):
     def validate_owner(cls, value: str) -> str:
         return _id(value, "critical number owner")
 
+    @field_validator("baseline")
+    @classmethod
+    def validate_finite_baseline(cls, value: float) -> float:
+        if not math.isfinite(value):
+            raise ValueError("critical number baseline must be finite")
+        return value
+
 
 class WhoWhatWhen(_StrictModel):
     owner_id: str
@@ -123,11 +131,13 @@ class MeetingCadence(_StrictModel):
 
 
 class AutomationProposal(_StrictModel):
+    """A suggestion only; E52 has not supplied a trusted acceptance authority."""
+
     id: str
     purpose: str
     status: Literal["proposed"]
-    accepted: bool = False
-    acceptance_receipt: str | None = None
+    accepted: Literal[False] = False
+    acceptance_receipt: Literal[None] = None
 
     @field_validator("id")
     @classmethod
@@ -139,21 +149,6 @@ class AutomationProposal(_StrictModel):
     def validate_purpose(cls, value: str) -> str:
         return _text(value, "automation proposal purpose")
 
-    @field_validator("acceptance_receipt")
-    @classmethod
-    def validate_receipt(cls, value: str | None) -> str | None:
-        return None if value is None else _id(value, "automation acceptance receipt")
-
-    @model_validator(mode="after")
-    def require_explicit_acceptance(self) -> "AutomationProposal":
-        if self.accepted and self.acceptance_receipt is None:
-            raise ValueError("accepted automation requires an acceptance receipt")
-        if not self.accepted and self.acceptance_receipt is not None:
-            raise ValueError(
-                "unaccepted automation must not carry an acceptance receipt"
-            )
-        return self
-
 
 class QuarterlyPriorityRhythmPlan(_StrictModel):
     """A complete, proposed 90-day plan; it is intentionally non-executing."""
@@ -163,6 +158,8 @@ class QuarterlyPriorityRhythmPlan(_StrictModel):
     priority: str
     priority_candidates: list[str] = Field(min_length=1, max_length=16)
     priority_justification: str | None = None
+    window_start: date
+    window_end: date
     critical_number: CriticalNumber
     commitments: list[WhoWhatWhen] = Field(min_length=1, max_length=16)
     meeting_cadences: list[MeetingCadence] = Field(min_length=4, max_length=4)
@@ -205,6 +202,13 @@ class QuarterlyPriorityRhythmPlan(_StrictModel):
             raise ValueError(
                 "multiple priority candidates require explicit justification"
             )
+        if self.window_end != self.window_start + timedelta(days=90):
+            raise ValueError("window end must equal start plus 90 days")
+        if any(
+            item.due_on < self.window_start or item.due_on > self.window_end
+            for item in self.commitments
+        ):
+            raise ValueError("every commitment due date must be within plan window")
         if self.critical_number.owner_id not in set(owners):
             raise ValueError(
                 "critical number owner requires a Who What When commitment"
