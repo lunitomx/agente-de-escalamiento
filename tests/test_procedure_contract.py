@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import inspect
 from pathlib import Path
 
 import pytest
@@ -206,3 +207,27 @@ def test_canonical_who_what_when_label_remains_valid() -> None:
         ProcedureContract.model_validate(payload).interview_questions[0].prompt
         == "Who/What/When"
     )
+
+
+def test_public_release_validation_does_not_accept_a_forged_registry_argument() -> None:
+    parameters = inspect.signature(validate_procedure_against_release).parameters
+    assert "registry" not in parameters
+    payload = _valid_payload()
+    output = payload["output_contract"]
+    assert isinstance(output, dict)
+    artifact = output["artifact"]
+    assert isinstance(artifact, dict)
+    artifact.update(
+        {
+            "status": "known",
+            "value": "confirmed artifact",
+            "origin": "company-local",
+            "evidence_ids": ["fact.fake"],
+            "consent_receipt": "consent.fake",
+            "confirmed_by": "person.fake",
+        }
+    )
+    with pytest.raises(ValueError, match="requires trusted registry"):
+        validate_procedure_against_release(
+            ProcedureContract.model_validate(payload), load_canonical_release(RELEASE)
+        )

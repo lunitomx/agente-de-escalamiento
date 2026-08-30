@@ -289,7 +289,7 @@ class ProcedureHandoff(_StrictModel):
         return _text(value, "handoff condition")
 
 
-class ProcedureTrustRegistry(_StrictModel):
+class _TrustedRegistry(_StrictModel):
     """Allowlisted local IDs supplied by E49/E52/E55 adapters at validation time."""
 
     schema_version: Literal[1]
@@ -389,7 +389,7 @@ def load_procedure_contract(path: Path) -> ProcedureContract:
         raise ValueError("procedure contract invalid") from exc
 
 
-def load_local_trust_registry(base_path: Path) -> ProcedureTrustRegistry | None:
+def load_local_trust_registry(base_path: Path) -> _TrustedRegistry | None:
     """Derive trust only from E49/E52/E55 local-authority artifacts.
 
     This adapter intentionally has no registry argument. A missing or malformed
@@ -410,7 +410,7 @@ def load_local_trust_registry(base_path: Path) -> ProcedureTrustRegistry | None:
     consent_receipt = (
         "consent.local." + hashlib.sha256(authorized_at.encode("utf-8")).hexdigest()
     )
-    return ProcedureTrustRegistry(
+    return _TrustedRegistry(
         schema_version=1,
         evidence_ids=[
             "evidence.local." + hashlib.sha256(fact.fact_id.encode("utf-8")).hexdigest()
@@ -442,7 +442,7 @@ def validate_procedure_against_release(
 
 
 def _validate_procedure_against_trust(
-    procedure: ProcedureContract, registry: ProcedureTrustRegistry | None
+    procedure: ProcedureContract, registry: _TrustedRegistry | None
 ) -> None:
     """Fail closed for known output or confirmed state without local trust records.
 
