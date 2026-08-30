@@ -397,6 +397,217 @@ def load_canonical_release(path: Path) -> CanonicalRelease:
         raise ValueError("canonical release contract invalid") from exc
 
 
+class CanonicalReleaseRelation(_StrictModel):
+    """A public-safe typed relation declared for a canonical release."""
+
+    source_id: str = Field(min_length=3, max_length=192)
+    target_id: str = Field(min_length=3, max_length=192)
+    relation_type: str = Field(min_length=3, max_length=96)
+
+    @field_validator("source_id", "target_id", "relation_type")
+    @classmethod
+    def validate_relation_identifier(cls, value: str) -> str:
+        return _validate_nonlegacy_identifier(value, "release relation identifier")
+
+
+class CanonicalNodeIntegrityContract(_StrictModel):
+    """Explicit, safe metadata required to qualify a release node by kind."""
+
+    canonical_id: str = Field(min_length=3, max_length=192)
+    decision_ids: list[str] = Field(default_factory=list, max_length=16)
+    evidence_refs: list[str] = Field(default_factory=list, max_length=64)
+    definition_ref: str | None = Field(default=None, max_length=192)
+    unit: str | None = Field(default=None, max_length=96)
+
+    @field_validator("canonical_id")
+    @classmethod
+    def validate_contract_id(cls, value: str) -> str:
+        return _validate_nonlegacy_identifier(value, "integrity contract ID")
+
+    @field_validator("decision_ids")
+    @classmethod
+    def validate_contract_decision_ids(cls, values: list[str]) -> list[str]:
+        if len(values) != len(set(values)):
+            raise ValueError("duplicate decision ID")
+        return sorted(
+            _validate_nonlegacy_identifier(value, "integrity decision ID")
+            for value in values
+        )
+
+    @field_validator("evidence_refs")
+    @classmethod
+    def validate_contract_evidence_refs(cls, values: list[str]) -> list[str]:
+        if len(values) != len(set(values)):
+            raise ValueError("duplicate integrity evidence reference")
+        return sorted(_validate_opaque_reference(value) for value in values)
+
+    @field_validator("definition_ref")
+    @classmethod
+    def validate_contract_definition_ref(cls, value: str | None) -> str | None:
+        return None if value is None else _validate_opaque_reference(value)
+
+    @field_validator("unit")
+    @classmethod
+    def validate_contract_unit(cls, value: str | None) -> str | None:
+        return None if value is None else _validate_safe_label(value)
+
+
+class CanonicalReleaseIntegrityManifest(_StrictModel):
+    """Optional publication of relations and node qualification metadata."""
+
+    schema_version: Literal[1]
+    release_id: Literal["s64.1"]
+    relations: list[CanonicalReleaseRelation] = Field(default_factory=list)
+    node_contracts: list[CanonicalNodeIntegrityContract] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def validate_manifest_uniqueness(self) -> CanonicalReleaseIntegrityManifest:
+        relations = [
+            (item.source_id, item.target_id, item.relation_type)
+            for item in self.relations
+        ]
+        if len(relations) != len(set(relations)):
+            raise ValueError("duplicate release relation")
+        contract_ids = [item.canonical_id for item in self.node_contracts]
+        if len(contract_ids) != len(set(contract_ids)):
+            raise ValueError("duplicate node integrity contract")
+        return self
+
+
+class CanonicalReleaseIntegrityReceipt(_StrictModel):
+    """Bounded verification result; it never contains source labels or prose."""
+
+    schema_version: Literal[1]
+    status: Literal["pass"]
+    release_id: Literal["s64.1"]
+    node_count: int = Field(ge=0)
+    exclusion_count: int = Field(ge=0)
+    relation_count: int = Field(ge=0)
+    qualified_tool_count: int = Field(ge=0)
+    qualified_rule_count: int = Field(ge=0)
+    qualified_metric_count: int = Field(ge=0)
+    relations_state: Literal["no-relations-published", "relations-validated"]
+
+
+def _release_integrity_error(reason: str) -> ValueError:
+    """Keep failures safe: callers receive a stable rule, never private content."""
+    return ValueError(f"canonical release integrity failed: {reason}")
+
+
+def validate_canonical_release_integrity(
+    release: CanonicalRelease,
+    manifest: CanonicalReleaseIntegrityManifest | None = None,
+) -> CanonicalReleaseIntegrityReceipt:
+    """Validate public topology without reading or inferring source material."""
+    if manifest is None:
+        return CanonicalReleaseIntegrityReceipt(
+            schema_version=1,
+            status="pass",
+            release_id=release.release_id,
+            node_count=len(release.nodes),
+            exclusion_count=len(release.exclusions),
+            relation_count=0,
+            qualified_tool_count=0,
+            qualified_rule_count=0,
+            qualified_metric_count=0,
+            relations_state="no-relations-published",
+        )
+    if manifest.release_id != release.release_id:
+        raise _release_integrity_error("manifest-release-mismatch")
+
+    nodes_by_id = {node.canonical_id: node for node in release.nodes}
+    for relation in manifest.relations:
+        if (
+            relation.source_id not in nodes_by_id
+            or relation.target_id not in nodes_by_id
+        ):
+            raise _release_integrity_error("relation-references-unknown-node")
+
+    contracts_by_id = {
+        contract.canonical_id: contract for contract in manifest.node_contracts
+    }
+    if any(contract_id not in nodes_by_id for contract_id in contracts_by_id):
+        raise _release_integrity_error("contract-references-unknown-node")
+
+    relevant_kinds = {NodeKind.TOOL, NodeKind.RULE, NodeKind.METRIC}
+    relevant_nodes = [node for node in release.nodes if node.kind in relevant_kinds]
+    if any(node.canonical_id not in contracts_by_id for node in relevant_nodes):
+        raise _release_integrity_error("published-node-missing-integrity-contract")
+
+    tool_count = rule_count = metric_count = 0
+    for node in relevant_nodes:
+        contract = contracts_by_id[node.canonical_id]
+        if node.kind is NodeKind.TOOL:
+            if not contract.decision_ids:
+                raise _release_integrity_error("tool-missing-decision")
+            if any(
+                decision_id not in nodes_by_id
+                or nodes_by_id[decision_id].kind is not NodeKind.DECISION_AREA
+                for decision_id in contract.decision_ids
+            ):
+                raise _release_integrity_error("tool-references-invalid-decision")
+            expected_relations = {
+                (node.canonical_id, decision_id, "belongs-to-decision")
+                for decision_id in contract.decision_ids
+            }
+            published_relations = {
+                (relation.source_id, relation.target_id, relation.relation_type)
+                for relation in manifest.relations
+            }
+            if not expected_relations.issubset(published_relations):
+                raise _release_integrity_error("tool-missing-decision-relation")
+            tool_count += 1
+        elif node.kind is NodeKind.RULE:
+            if not contract.evidence_refs:
+                raise _release_integrity_error("rule-missing-evidence")
+            if not set(contract.evidence_refs).issubset(node.evidence_refs):
+                raise _release_integrity_error("rule-references-unknown-evidence")
+            rule_count += 1
+        elif node.kind is NodeKind.METRIC:
+            if contract.definition_ref is None:
+                raise _release_integrity_error("metric-missing-definition")
+            if contract.unit is None:
+                raise _release_integrity_error("metric-missing-unit")
+            if contract.definition_ref not in node.evidence_refs:
+                raise _release_integrity_error("metric-references-unknown-definition")
+            metric_count += 1
+
+    return CanonicalReleaseIntegrityReceipt(
+        schema_version=1,
+        status="pass",
+        release_id=release.release_id,
+        node_count=len(release.nodes),
+        exclusion_count=len(release.exclusions),
+        relation_count=len(manifest.relations),
+        qualified_tool_count=tool_count,
+        qualified_rule_count=rule_count,
+        qualified_metric_count=metric_count,
+        relations_state="relations-validated",
+    )
+
+
+def load_canonical_release_integrity_manifest(
+    path: Path,
+) -> CanonicalReleaseIntegrityManifest:
+    try:
+        return CanonicalReleaseIntegrityManifest.model_validate_json(
+            path.read_text(encoding="utf-8")
+        )
+    except Exception as exc:
+        raise ValueError("canonical release integrity manifest invalid") from exc
+
+
+def render_canonical_release_integrity_receipt(
+    receipt: CanonicalReleaseIntegrityReceipt,
+) -> str:
+    return (
+        json.dumps(
+            receipt.model_dump(mode="json"), ensure_ascii=True, indent=2, sort_keys=True
+        )
+        + "\n"
+    )
+
+
 class EvidenceRef(_StrictModel):
     source_id: str = Field(min_length=3, max_length=128)
     unit_ids: list[str] = Field(min_length=1, max_length=64)
