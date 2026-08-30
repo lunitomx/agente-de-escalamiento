@@ -11,6 +11,7 @@ from dataclasses import dataclass
 import hashlib
 import json
 from pathlib import Path
+import re
 from typing import Any, Literal
 
 import yaml
@@ -38,6 +39,11 @@ _DENIED_CANDIDATE_IDS = {
     "candidate.cash.procedure.cash-tool",
     "candidate.cash.rule.cash-initiative",
 }
+_DENIED_REFERENCE_TOKEN = re.compile(
+    r"(?<![a-z0-9_.-])(?:candidate\.[a-z0-9]+(?:[._-][a-z0-9]+)*|"
+    + "|".join(re.escape(value) for value in sorted(_DENIED_CANDIDATE_IDS))
+    + r")(?![a-z0-9_.-])"
+)
 _MVP_SURFACES = {
     "procedure.diagnose-primary-constraint": {
         "inputs": {"input.company-context", "input.decision-evidence"},
@@ -233,7 +239,7 @@ def _load_release(root: Path) -> CanonicalRelease:
 def _reject_unapproved_references(value: object) -> None:
     """Reject denied candidate IDs wherever a template can hide a reference."""
     if isinstance(value, str):
-        if value.startswith("candidate.") or value in _DENIED_CANDIDATE_IDS:
+        if _DENIED_REFERENCE_TOKEN.search(value):
             raise ValueError("template contains a denied candidate reference")
         return
     if isinstance(value, dict):

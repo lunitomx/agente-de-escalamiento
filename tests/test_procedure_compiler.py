@@ -171,6 +171,57 @@ def test_compiler_rejects_handoff_outside_the_mvp(
         compile_mvp_procedures()
 
 
+@pytest.mark.parametrize(
+    "mutate",
+    [
+        lambda payload: payload["templates"][0]["contract"]["steps"][0].__setitem__(  # type: ignore[index]
+            "action", "Prepare candidate.cash.procedure.cash-tool now."
+        ),
+        lambda payload: payload["templates"][0]["contract"]["interview_questions"][
+            0
+        ].__setitem__(  # type: ignore[index]
+            "prompt", "Explain candidate.cash.metric.working-capital-days now."
+        ),
+        lambda payload: payload["templates"][0]["contract"]["decision_rules"][
+            0
+        ].__setitem__(  # type: ignore[index]
+            "statement", "Avoid candidate.cash.rule.cash-initiative entirely."
+        ),
+        lambda payload: payload["templates"][0]["contract"][
+            "output_contract"
+        ].__setitem__(  # type: ignore[index]
+            "assumptions", ["Trace candidate.cash.procedure.cash-tool safely."]
+        ),
+        lambda payload: payload["templates"][0]["contract"]["output_contract"][
+            "artifact"
+        ].__setitem__(  # type: ignore[index]
+            "value", "Trace candidate.cash.procedure.cash-tool safely."
+        ),
+    ],
+)
+def test_compiler_rejects_denied_id_tokens_inside_nested_text(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, mutate: object
+) -> None:
+    payload = _projection()
+    mutate(payload)  # type: ignore[operator]
+    _use_projection(monkeypatch, tmp_path, payload)
+
+    with pytest.raises(ValueError, match="denied candidate reference"):
+        compile_mvp_procedures()
+
+
+def test_compiler_keeps_ordinary_business_language_without_id_token(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    payload = _projection()
+    payload["templates"][0]["contract"]["interview_questions"][0]["prompt"] = (  # type: ignore[index]
+        "A candidate may clarify the plan."
+    )
+    _use_projection(monkeypatch, tmp_path, payload)
+
+    assert compile_mvp_procedures().contracts
+
+
 def test_generated_files_are_deterministic_and_validate_as_contracts() -> None:
     assert build_mvp_procedure_files()
     assert build_mvp_procedure_files(check=True)
