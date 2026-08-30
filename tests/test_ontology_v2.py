@@ -356,6 +356,40 @@ def test_canonical_release_is_deterministic_and_partitions_projection() -> None:
     assert "working_text" not in render_canonical_release(release)
 
 
+def test_builder_excludes_unbounded_or_invalid_receipt_candidates() -> None:
+    candidate = {
+        "candidate_id": "candidate.framework.example",
+        "canonical_id": "framework.example",
+        "kind": "framework",
+        "canonical_name": "Example Framework",
+        "origin": "source-explicit",
+        "aliases": [],
+        "source_ids": ["source.example"],
+        "candidate_receipt": "digest.candidate.abc123",
+        "review_receipt": "digest.review.def456",
+        "review_outcome": "approve-candidate",
+        "reviewer_independent": True,
+        "receipts_valid": True,
+        "source_bounded": True,
+        "blocked": False,
+        "generic": False,
+    }
+    for field, expected_reason in (
+        ("source_bounded", "blocked-source"),
+        ("receipts_valid", "missing-or-invalid-receipt"),
+    ):
+        projection = AuthorizedCandidateProjection.model_validate(
+            {
+                "schema_version": 1,
+                "candidates": [{**candidate, field: False}],
+            }
+        )
+        release = build_canonical_release(projection)
+        assert release.nodes == []
+        assert release.exclusions[0].disposition == "review-required"
+        assert release.exclusions[0].reason_code == expected_reason
+
+
 def test_canonical_release_rejects_unsafe_or_nonexclusive_entries(
     tmp_path: Path,
 ) -> None:

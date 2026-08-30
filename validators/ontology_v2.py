@@ -256,6 +256,8 @@ def _exclusion_reason(
 ) -> tuple[ExclusionDisposition, ExclusionReason] | None:
     if candidate.external_content:
         return "review-required", "external-content-source-bounded"
+    if not candidate.source_bounded:
+        return "review-required", "blocked-source"
     if candidate.blocked:
         return "review-required", "blocked-source"
     if candidate.generic:
