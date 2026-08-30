@@ -42,15 +42,15 @@ def main() -> int:
         return 1
     if args.format == "json":
         print(render_canonical_release_integrity_receipt(receipt), end="")
-        return 0
+        return 0 if receipt.status == "pass" else 2
     print("# ESCALA Canonical Release Integrity Receipt\n")
-    print("- Status: `pass`")
+    print(f"- Status: `{receipt.status}`")
     print(f"- Release: `{receipt.release_id}`")
     print(f"- Nodes verified: {receipt.node_count}")
     print(f"- Exclusions verified: {receipt.exclusion_count}")
     print(f"- Relations verified: {receipt.relation_count}")
     print(f"- Relations state: `{receipt.relations_state}`")
-    return 0
+    return 0 if receipt.status == "pass" else 2
 
 
 if __name__ == "__main__":

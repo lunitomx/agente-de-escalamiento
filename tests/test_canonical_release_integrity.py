@@ -22,7 +22,7 @@ SCRIPT = ROOT / "scripts/check_canonical_release_integrity.py"
 def test_s64_1_without_manifest_reports_no_relations_published() -> None:
     receipt = validate_canonical_release_integrity(load_canonical_release(RELEASE))
 
-    assert receipt.status == "pass"
+    assert receipt.status == "not-assessed"
     assert receipt.relations_state == "no-relations-published"
     assert receipt.relation_count == 0
     assert receipt.qualified_tool_count == 0
@@ -157,6 +157,35 @@ def test_manifest_requires_every_qualified_node_and_kind_specific_metadata() -> 
             ),
         )
 
+    for canonical_id, field, value, expected in (
+        (
+            "tool.face",
+            "evidence_refs",
+            ["digest.sha256.unrelated"],
+            "tool-has-inapplicable-field",
+        ),
+        (
+            "metric.cash-conversion-cycle",
+            "evidence_refs",
+            ["digest.sha256.unrelated"],
+            "metric-has-inapplicable-field",
+        ),
+    ):
+        invalid = [dict(contract) for contract in contracts]
+        invalid[by_id[canonical_id]][field] = value
+        with pytest.raises(ValueError, match=expected):
+            validate_canonical_release_integrity(
+                release,
+                CanonicalReleaseIntegrityManifest.model_validate(
+                    {
+                        "schema_version": 1,
+                        "release_id": "s64.1",
+                        "relations": relations,
+                        "node_contracts": invalid,
+                    }
+                ),
+            )
+
 
 def test_cli_receipt_is_bounded_and_manifest_errors_do_not_echo_input(
     tmp_path: Path,
@@ -167,7 +196,8 @@ def test_cli_receipt_is_bounded_and_manifest_errors_do_not_echo_input(
         capture_output=True,
         text=True,
     )
-    assert completed.returncode == 0
+    assert completed.returncode == 2
+    assert '"status": "not-assessed"' in completed.stdout
     assert '"relations_state": "no-relations-published"' in completed.stdout
     assert "Who What When" not in completed.stdout
     assert completed.stderr == ""

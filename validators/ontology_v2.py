@@ -478,7 +478,7 @@ class CanonicalReleaseIntegrityReceipt(_StrictModel):
     """Bounded verification result; it never contains source labels or prose."""
 
     schema_version: Literal[1]
-    status: Literal["pass"]
+    status: Literal["pass", "not-assessed"]
     release_id: Literal["s64.1"]
     node_count: int = Field(ge=0)
     exclusion_count: int = Field(ge=0)
@@ -502,7 +502,7 @@ def validate_canonical_release_integrity(
     if manifest is None:
         return CanonicalReleaseIntegrityReceipt(
             schema_version=1,
-            status="pass",
+            status="not-assessed",
             release_id=release.release_id,
             node_count=len(release.nodes),
             exclusion_count=len(release.exclusions),
@@ -538,6 +538,8 @@ def validate_canonical_release_integrity(
     for node in relevant_nodes:
         contract = contracts_by_id[node.canonical_id]
         if node.kind is NodeKind.TOOL:
+            if contract.evidence_refs or contract.definition_ref or contract.unit:
+                raise _release_integrity_error("tool-has-inapplicable-field")
             if not contract.decision_ids:
                 raise _release_integrity_error("tool-missing-decision")
             if any(
@@ -558,12 +560,16 @@ def validate_canonical_release_integrity(
                 raise _release_integrity_error("tool-missing-decision-relation")
             tool_count += 1
         elif node.kind is NodeKind.RULE:
+            if contract.decision_ids or contract.definition_ref or contract.unit:
+                raise _release_integrity_error("rule-has-inapplicable-field")
             if not contract.evidence_refs:
                 raise _release_integrity_error("rule-missing-evidence")
             if not set(contract.evidence_refs).issubset(node.evidence_refs):
                 raise _release_integrity_error("rule-references-unknown-evidence")
             rule_count += 1
         elif node.kind is NodeKind.METRIC:
+            if contract.decision_ids or contract.evidence_refs:
+                raise _release_integrity_error("metric-has-inapplicable-field")
             if contract.definition_ref is None:
                 raise _release_integrity_error("metric-missing-definition")
             if contract.unit is None:
