@@ -44,3 +44,55 @@ Promover únicamente conocimiento aprobado de las cinco pasadas a una versión c
 ## Handoff y riesgos
 
 E65 sólo consume esta release. No se acepta una salida "verde" si la cola de revisión contiene hallazgos críticos.
+
+## Implementation Plan
+
+> Added by `/rai-epic-plan` on 2026-08-30. No `design.md` or `ux-design.md`
+> exists for this legacy governed scope, so the plan preserves its approved
+> scope and records hard source gates rather than bypassing them.
+
+### Story Sequence
+
+| Order | Story | Size | Dependencies | Milestone | Rationale |
+|:-----:|-------|:----:|--------------|-----------|-----------|
+| 1 | S64.1 — Normalización | M | E59; E60–E63 validated candidate receipts | M1 | Canonical IDs, aliases and explicit exclusions must exist before any integrity or coverage statement. |
+| 2 | S64.2 — Integridad | M | S64.1 | M2 | Checks orphan nodes, invalid relations and provenance after the canonical set is stable. |
+| 3 | S64.3 — Cobertura | M | S64.1 | M2 | Builds the source→node matrix independently of integrity checks, so omissions remain visible. |
+| 4 | S64.4 — Fidelidad | M | S64.2, S64.3 | M3 | Audits critical findings and creates the internal release only when both gates agree. |
+
+### Milestones
+
+| Milestone | Stories | Target | Success Criteria |
+|-----------|---------|--------|------------------|
+| **M0: Upstream source gate** | E60–E63 | Before S64.1 | E60–E62 have authorized visual-layout receipts; E63 remains source-bounded with its independent review. |
+| **M1: Canonical skeleton** | S64.1 | After M0 | A versioned candidate set has aliases, evidence and explicit exclusions, with no raw source text. |
+| **M2: Measurable release** | S64.2, S64.3 | After M1 | Integrity and coverage validators pass independently and report all exclusions. |
+| **M3: Epic complete** | S64.4 | After M2 | No critical fidelity finding remains; internal release is ready for E65 and retrospective is complete. |
+
+### Parallel Work Streams
+
+```text
+Hard source gate: E60–E63 ──► S64.1 ─┬─► S64.2 ─┐
+                                     └─► S64.3 ─┴─► S64.4
+```
+
+**Merge point:** S64.4 accepts only the intersection of an integrity-passing
+canonical set and a coverage-passing matrix. A blocked candidate or an
+unreviewed form is an exclusion, never a green result.
+
+### Progress Tracking
+
+| Story | Size | Status | Actual | Velocity | Notes |
+|-------|:----:|:------:|:------:|:--------:|-------|
+| S64.1 | M | Blocked | — | — | E60–E62 await authorized visual-layout receipts; E63 independent review is complete but remains source-bounded. |
+| S64.2 | M | Pending | — | — | Starts after S64.1 produces the canonical candidate set. |
+| S64.3 | M | Pending | — | — | Starts after S64.1; may run in parallel with S64.2. |
+| S64.4 | M | Pending | — | — | Starts only when S64.2 and S64.3 pass without critical findings. |
+
+### Sequencing Risks
+
+| Risk | L/I | Mitigation |
+|------|:---:|------------|
+| Text extraction hides a form-layout defect | M/H | Require the private visual-layout receipts before S64.1; do not infer topology from text. |
+| Blocked Cash formula leaks into canonical knowledge | M/H | Retain E63 dependency receipt and exclude blocked/needs-revision candidates from the release. |
+| A coverage percentage obscures an exclusion | M/M | Matrix must label every source unit as mapped, excluded or review-required with reason. |
