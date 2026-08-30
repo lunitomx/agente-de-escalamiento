@@ -8,10 +8,8 @@ from pydantic import ValidationError
 
 from validators.procedure_contract import (
     ProcedureContract,
-    ProcedureTrustRegistry,
     load_procedure_contract,
     validate_procedure_against_release,
-    validate_procedure_against_trust,
 )
 from validators.ontology_v2 import load_canonical_release
 
@@ -25,16 +23,6 @@ def _valid_payload() -> dict[str, object]:
     return ProcedureContract.model_validate(
         load_procedure_contract(FIXTURE).model_dump(mode="python")
     ).model_dump(mode="python")
-
-
-def _trusted_registry() -> ProcedureTrustRegistry:
-    return ProcedureTrustRegistry(
-        schema_version=1,
-        evidence_ids=["fact.authorized.context"],
-        consent_receipts=["consent.memory.authorized"],
-        human_ids=["person.company.owner"],
-        confirmation_record_ids=["confirmation.current-quarter.owner"],
-    )
 
 
 def test_valid_contract_is_complete_unknown_safe_and_release_bounded() -> None:
@@ -163,13 +151,12 @@ def test_known_value_requires_company_evidence_consent_and_human_confirmation() 
     )
     contract = ProcedureContract.model_validate(payload)
     with pytest.raises(ValueError, match="requires trusted registry"):
-        validate_procedure_against_trust(contract, None)
-    validate_procedure_against_trust(contract, _trusted_registry())
+        validate_procedure_against_release(contract, load_canonical_release(RELEASE))
 
     artifact["evidence_ids"] = ["fact.fake"]
-    with pytest.raises(ValueError, match="untrusted evidence"):
-        validate_procedure_against_trust(
-            ProcedureContract.model_validate(payload), _trusted_registry()
+    with pytest.raises(ValueError, match="requires trusted registry"):
+        validate_procedure_against_release(
+            ProcedureContract.model_validate(payload), load_canonical_release(RELEASE)
         )
 
 

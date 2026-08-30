@@ -8,6 +8,7 @@ Evidence is checked solely against the safe E64 canonical release.
 from __future__ import annotations
 
 from pathlib import Path
+import hashlib
 import re
 from typing import Literal
 
@@ -388,19 +389,59 @@ def load_procedure_contract(path: Path) -> ProcedureContract:
         raise ValueError("procedure contract invalid") from exc
 
 
+def load_local_trust_registry(base_path: Path) -> ProcedureTrustRegistry | None:
+    """Derive trust only from E49/E52/E55 local-authority artifacts.
+
+    This adapter intentionally has no registry argument. A missing or malformed
+    authorized Welcome receipt is not replaced with a caller-provided boolean.
+    E52 currently provides no authoritative human/confirmation register, so
+    those sets remain empty and a confirmed update fails closed until its
+    dedicated adapter is implemented.
+    """
+    from coaching.core import read_yaml
+    from coaching.evidence.facts import load_facts
+
+    payload = read_yaml(
+        base_path / ".escala" / "agent" / "memory" / "welcome-state.yaml"
+    )
+    authorized_at = payload.get("authorized_at") if isinstance(payload, dict) else None
+    if not isinstance(authorized_at, str) or not authorized_at:
+        return None
+    consent_receipt = (
+        "consent.local." + hashlib.sha256(authorized_at.encode("utf-8")).hexdigest()
+    )
+    return ProcedureTrustRegistry(
+        schema_version=1,
+        evidence_ids=[
+            "evidence.local." + hashlib.sha256(fact.fact_id.encode("utf-8")).hexdigest()
+            for fact in load_facts(base_path)
+        ],
+        consent_receipts=[consent_receipt],
+        human_ids=[],
+        confirmation_record_ids=[],
+    )
+
+
 def validate_procedure_against_release(
-    procedure: ProcedureContract, release: CanonicalRelease
+    procedure: ProcedureContract,
+    release: CanonicalRelease,
+    *,
+    base_path: Path | None = None,
 ) -> None:
-    """Fail closed unless every opaque reference belongs to approved E64 evidence."""
+    """Validate E64 methodology evidence and mandatory local trust in one route."""
     release_refs = {
         evidence_ref for node in release.nodes for evidence_ref in node.evidence_refs
     }
     unknown_refs = set(procedure.evidence_refs) - release_refs
     if unknown_refs:
         raise ValueError("procedure contract references unknown release evidence")
+    _validate_procedure_against_trust(
+        procedure,
+        None if base_path is None else load_local_trust_registry(base_path),
+    )
 
 
-def validate_procedure_against_trust(
+def _validate_procedure_against_trust(
     procedure: ProcedureContract, registry: ProcedureTrustRegistry | None
 ) -> None:
     """Fail closed for known output or confirmed state without local trust records.
