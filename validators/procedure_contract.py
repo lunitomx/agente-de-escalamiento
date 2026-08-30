@@ -389,18 +389,24 @@ def load_procedure_contract(path: Path) -> ProcedureContract:
         raise ValueError("procedure contract invalid") from exc
 
 
-def load_local_trust_registry(base_path: Path) -> _TrustedRegistry | None:
-    """Derive trust only from E49/E52/E55 local-authority artifacts.
+def _trusted_workspace_root() -> Path:
+    """Return the active project root; procedure callers cannot supply a path."""
+    return Path.cwd().resolve()
 
-    This adapter intentionally has no registry argument. A missing or malformed
-    authorized Welcome receipt is not replaced with a caller-provided boolean.
-    E52 currently provides no authoritative human/confirmation register, so
-    those sets remain empty and a confirmed update fails closed until its
-    dedicated adapter is implemented.
+
+def _load_local_trust_registry() -> _TrustedRegistry | None:
+    """Derive trust only from the canonical E49/E52/E55 project state.
+
+    The public validator has no path, provider, handle, or registry parameter.
+    Its only authority is the active workspace used by the runner. A missing or
+    malformed authorized Welcome receipt fails closed. E52 currently provides
+    no authoritative human/confirmation register, so confirmed updates remain
+    blocked until that dedicated adapter exists.
     """
     from coaching.core import read_yaml
     from coaching.evidence.facts import load_facts
 
+    base_path = _trusted_workspace_root()
     payload = read_yaml(
         base_path / ".escala" / "agent" / "memory" / "welcome-state.yaml"
     )
@@ -425,8 +431,6 @@ def load_local_trust_registry(base_path: Path) -> _TrustedRegistry | None:
 def validate_procedure_against_release(
     procedure: ProcedureContract,
     release: CanonicalRelease,
-    *,
-    base_path: Path | None = None,
 ) -> None:
     """Validate E64 methodology evidence and mandatory local trust in one route."""
     release_refs = {
@@ -435,10 +439,7 @@ def validate_procedure_against_release(
     unknown_refs = set(procedure.evidence_refs) - release_refs
     if unknown_refs:
         raise ValueError("procedure contract references unknown release evidence")
-    _validate_procedure_against_trust(
-        procedure,
-        None if base_path is None else load_local_trust_registry(base_path),
-    )
+    _validate_procedure_against_trust(procedure, _load_local_trust_registry())
 
 
 def _validate_procedure_against_trust(

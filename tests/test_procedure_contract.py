@@ -159,6 +159,12 @@ def test_known_value_requires_company_evidence_consent_and_human_confirmation() 
         validate_procedure_against_release(
             ProcedureContract.model_validate(payload), load_canonical_release(RELEASE)
         )
+    with pytest.raises(TypeError):
+        validate_procedure_against_release(  # type: ignore[call-arg]
+            ProcedureContract.model_validate(payload),
+            load_canonical_release(RELEASE),
+            base_path=ROOT,
+        )
 
 
 @pytest.mark.parametrize(
@@ -212,6 +218,7 @@ def test_canonical_who_what_when_label_remains_valid() -> None:
 def test_public_release_validation_does_not_accept_a_forged_registry_argument() -> None:
     parameters = inspect.signature(validate_procedure_against_release).parameters
     assert "registry" not in parameters
+    assert "base_path" not in parameters
     payload = _valid_payload()
     output = payload["output_contract"]
     assert isinstance(output, dict)
