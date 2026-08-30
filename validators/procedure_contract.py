@@ -10,6 +10,7 @@ from __future__ import annotations
 from pathlib import Path
 import hashlib
 import re
+import tomllib
 from typing import Literal
 
 import yaml
@@ -389,9 +390,32 @@ def load_procedure_contract(path: Path) -> ProcedureContract:
         raise ValueError("procedure contract invalid") from exc
 
 
+_TRUSTED_PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+
 def _trusted_workspace_root() -> Path:
-    """Return the active project root; procedure callers cannot supply a path."""
-    return Path.cwd().resolve()
+    """Return the canonical ScaleUp project root after identity verification."""
+    root = _TRUSTED_PROJECT_ROOT
+    version_path = root / ".scaleup" / "VERSION"
+    manifest_path = root / ".raise" / "manifest.yaml"
+    project_path = root / "pyproject.toml"
+    if (
+        not version_path.is_file()
+        or not manifest_path.is_file()
+        or not project_path.is_file()
+    ):
+        raise ValueError("trusted workspace identity is invalid")
+    if not version_path.read_text(encoding="utf-8").strip():
+        raise ValueError("trusted workspace identity is invalid")
+    try:
+        project = tomllib.loads(project_path.read_text(encoding="utf-8"))
+    except tomllib.TOMLDecodeError as exc:
+        raise ValueError("trusted workspace identity is invalid") from exc
+    if project.get("project", {}).get("name") != "escala-coaching":
+        raise ValueError("trusted workspace identity is invalid")
+    if not (root / "ontology" / "v2" / "releases" / "s64.1.json").is_file():
+        raise ValueError("trusted workspace release is unavailable")
+    return root
 
 
 def _load_local_trust_registry() -> _TrustedRegistry | None:

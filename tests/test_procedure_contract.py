@@ -5,10 +5,13 @@ import inspect
 from pathlib import Path
 
 import pytest
+
+import validators.procedure_contract as procedure_contract
 from pydantic import ValidationError
 
 from validators.procedure_contract import (
     ProcedureContract,
+    _trusted_workspace_root,
     load_procedure_contract,
     validate_procedure_against_release,
 )
@@ -238,3 +241,42 @@ def test_public_release_validation_does_not_accept_a_forged_registry_argument() 
         validate_procedure_against_release(
             ProcedureContract.model_validate(payload), load_canonical_release(RELEASE)
         )
+
+
+def test_chdir_cannot_replace_the_trusted_project_root(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    fake_root = tmp_path / "forged-workspace"
+    fake_root.mkdir()
+    monkeypatch.chdir(fake_root)
+    assert _trusted_workspace_root() == ROOT.resolve()
+
+    payload = _valid_payload()
+    output = payload["output_contract"]
+    assert isinstance(output, dict)
+    artifact = output["artifact"]
+    assert isinstance(artifact, dict)
+    artifact.update(
+        {
+            "status": "known",
+            "value": "forged artifact",
+            "origin": "company-local",
+            "evidence_ids": ["fact.fake"],
+            "consent_receipt": "consent.fake",
+            "confirmed_by": "person.fake",
+        }
+    )
+    with pytest.raises(ValueError, match="requires trusted registry"):
+        validate_procedure_against_release(
+            ProcedureContract.model_validate(payload), load_canonical_release(RELEASE)
+        )
+
+
+def test_missing_scaleup_identity_rejects_workspace_authority(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    fake_root = tmp_path / "without-scaleup-identity"
+    fake_root.mkdir()
+    monkeypatch.setattr(procedure_contract, "_TRUSTED_PROJECT_ROOT", fake_root)
+    with pytest.raises(ValueError, match="trusted workspace identity is invalid"):
+        procedure_contract._trusted_workspace_root()
