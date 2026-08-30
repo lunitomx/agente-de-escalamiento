@@ -161,6 +161,7 @@ class QuarterlyPriorityRhythmPlan(_StrictModel):
     status: Literal["proposed"]
     diagnosis: ConfirmedDiagnosis
     priority: str
+    priority_candidates: list[str] = Field(min_length=1, max_length=16)
     priority_justification: str | None = None
     critical_number: CriticalNumber
     commitments: list[WhoWhatWhen] = Field(min_length=1, max_length=16)
@@ -174,6 +175,13 @@ class QuarterlyPriorityRhythmPlan(_StrictModel):
     @classmethod
     def validate_priority_text(cls, value: str | None) -> str | None:
         return None if value is None else _text(value, "priority")
+
+    @field_validator("priority_candidates")
+    @classmethod
+    def validate_priority_candidates(cls, values: list[str]) -> list[str]:
+        if len(values) != len(set(values)):
+            raise ValueError("duplicate priority candidate")
+        return [_text(value, "priority candidate") for value in values]
 
     @model_validator(mode="after")
     def validate_complete_single_priority_draft(self) -> "QuarterlyPriorityRhythmPlan":
@@ -191,6 +199,12 @@ class QuarterlyPriorityRhythmPlan(_StrictModel):
             raise ValueError("duplicate meeting cadence")
         if self.diagnosis.status == "proposed" and self.priority_justification is None:
             raise ValueError("proposed diagnosis requires priority justification")
+        if self.priority not in self.priority_candidates:
+            raise ValueError("selected priority must be among priority candidates")
+        if len(self.priority_candidates) > 1 and self.priority_justification is None:
+            raise ValueError(
+                "multiple priority candidates require explicit justification"
+            )
         if self.critical_number.owner_id not in set(owners):
             raise ValueError(
                 "critical number owner requires a Who What When commitment"

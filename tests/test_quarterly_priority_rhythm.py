@@ -20,6 +20,7 @@ def _plan() -> dict[str, object]:
             "confirmation_receipt": "receipt.diagnosis.confirmed",
         },
         "priority": "Reduce collection cycle",
+        "priority_candidates": ["Reduce collection cycle"],
         "priority_justification": None,
         "critical_number": {
             "name": "collection days",
@@ -101,9 +102,9 @@ def test_plan_fails_closed_when_required_planning_data_is_missing(
 
 def test_plan_rejects_more_than_one_primary_priority() -> None:
     payload = _plan()
-    payload["priority"] = "Reduce collection cycle; launch new market"
+    payload["priority_candidates"] = ["Reduce collection cycle", "Launch new market"]
 
-    with pytest.raises(ValidationError, match="unsafe priority"):
+    with pytest.raises(ValidationError, match="multiple priority candidates"):
         QuarterlyPriorityRhythmPlan.model_validate(payload)
 
 
