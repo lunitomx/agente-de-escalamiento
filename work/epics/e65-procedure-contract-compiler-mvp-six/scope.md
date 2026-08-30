@@ -1,7 +1,7 @@
 ---
 epic_id: E65
 title: Compilador de procedimientos y MVP de seis intervenciones
-status: planned
+status: in_progress
 depends_on: [E64, E49, E52]
 related: [E55, E56, E44]
 ---
