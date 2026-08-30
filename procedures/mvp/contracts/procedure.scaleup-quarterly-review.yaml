@@ -1,0 +1,95 @@
+id: procedure.scaleup-quarterly-review
+version: 1.0.0
+provenance: source-synthesis
+trigger:
+- El equipo quiere revisar el trimestre actual.
+non_trigger:
+- No atribuya causalidad sin evidencia confirmada.
+objective: Proponer una nueva iteración o declarar evidencia faltante.
+required_inputs:
+- id: input.current-quarter
+  description: Estado autorizado del trimestre o desconocido.
+  required: true
+  accepted_statuses:
+  - known
+  - unknown
+optional_inputs:
+- id: input.review-evidence
+  description: Evidencia autorizada de resultados del trimestre.
+  required: false
+  accepted_statuses:
+  - known
+  - unknown
+  - not-applicable
+interview_questions:
+- id: question.review-learning
+  prompt: ¿Qué resultado y aprendizaje deben revisarse?
+  required: true
+steps:
+- id: step.review-quarter
+  action: Compare evidencia autorizada y declare incertidumbre.
+  produces:
+  - artifact.quarterly-review
+decision_rules:
+- id: rule.no-invented-causality
+  statement: No atribuya resultados a causas no verificadas.
+warnings:
+- id: warning.no-silent-inference
+  statement: No convierta una hipótesis en aprendizaje confirmado.
+output_contract:
+  artifact:
+    status: unknown
+    value: null
+    origin: null
+    evidence_ids: []
+    consent_receipt: null
+    confirmed_by: null
+  assumptions: []
+  open_questions:
+  - ¿Qué evidencia falta para la siguiente iteración?
+  owner:
+    status: unknown
+    value: null
+    origin: null
+    evidence_ids: []
+    consent_receipt: null
+    confirmed_by: null
+  kpi:
+    status: unknown
+    value: null
+    origin: null
+    evidence_ids: []
+    consent_receipt: null
+    confirmed_by: null
+  who_what_when:
+    status: unknown
+    value: null
+    origin: null
+    evidence_ids: []
+    consent_receipt: null
+    confirmed_by: null
+  review_cadence:
+    status: unknown
+    value: null
+    origin: null
+    evidence_ids: []
+    consent_receipt: null
+    confirmed_by: null
+acceptance_criteria:
+- id: criterion.iteration-bounded
+  statement: La revisión separa hechos, supuestos y preguntas.
+state_updates:
+- id: state.propose-quarterly-review
+  path: state/current-quarter.yaml
+  mode: proposed
+  confirmation: null
+handoff:
+  next_procedure_id: procedure.diagnose-primary-constraint
+  condition: La revisión revela un nuevo foco posible.
+evidence_refs:
+- digest.sha256.087f20a1c8f00a43ab1ce5ba66f6b66759b7bf716a12b4fa69cda0886ada5df8
+- digest.sha256.3c6d2463373ee1b04a01c5bd942a7d18fa187b13182951dc305029f0d6f9980d
+- digest.sha256.5019ed43bbbf065c2d2f0de06652b471c7b0bc5bf83813c1aaa2d44990d4db81
+- digest.sha256.8667780c0ced760c1e7962f0b99acf9e9d36c3572753c52da2047e90a505bcce
+- digest.sha256.9257904434875a1fb5d0f5c9838304bf274a8dfb32a600c8f62d3c8d0ff301f2
+- digest.sha256.e05201e99df261d9d7acc10d15011c88d1c2968796aa1ec455bf6952c03f051f
