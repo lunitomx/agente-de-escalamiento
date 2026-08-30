@@ -114,3 +114,81 @@ def test_no_raw_source_or_silent_unknown_fields_are_accepted() -> None:
     artifact["value"] = None
     with pytest.raises(ValidationError, match="known value requires a non-empty value"):
         ProcedureContract.model_validate(payload)
+
+
+def test_known_value_requires_company_evidence_consent_and_human_confirmation() -> None:
+    payload = _valid_payload()
+    output = payload["output_contract"]
+    assert isinstance(output, dict)
+    artifact = output["artifact"]
+    assert isinstance(artifact, dict)
+    artifact.update({"status": "known", "value": "confirmed artifact"})
+    with pytest.raises(
+        ValidationError, match="known value requires an allowed typed origin"
+    ):
+        ProcedureContract.model_validate(payload)
+
+    artifact["origin"] = "model-hypothesis"
+    with pytest.raises(
+        ValidationError, match="known value requires an allowed typed origin"
+    ):
+        ProcedureContract.model_validate(payload)
+
+    artifact["origin"] = "company-local"
+    with pytest.raises(
+        ValidationError,
+        match="known value requires evidence, consent, and human confirmation",
+    ):
+        ProcedureContract.model_validate(payload)
+
+    artifact.update(
+        {
+            "origin": "company-local",
+            "evidence_ids": ["fact.authorized.context"],
+            "consent_receipt": "consent.memory.authorized",
+            "confirmed_by": "person.company.owner",
+        }
+    )
+    assert (
+        ProcedureContract.model_validate(payload).output_contract.artifact.status
+        == "known"
+    )
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("objective", "https://example.test/private-source"),
+        ("objective", "state/company/secret.yaml"),
+        ("objective", "source_id private-passage"),
+        (
+            "objective",
+            "one two three four five six seven eight nine ten eleven twelve thirteen",
+        ),
+    ],
+)
+def test_contract_text_is_bounded_and_cannot_be_a_locator_or_passage(
+    field: str, value: str
+) -> None:
+    payload = _valid_payload()
+    payload[field] = value
+    with pytest.raises(ValidationError, match="unsafe procedure objective"):
+        ProcedureContract.model_validate(payload)
+
+
+def test_confirmed_state_updates_require_a_typed_human_consent_record() -> None:
+    payload = _valid_payload()
+    update = payload["state_updates"][0]  # type: ignore[index]
+    update["mode"] = "confirmed"
+    with pytest.raises(ValidationError, match="requires a human consent record"):
+        ProcedureContract.model_validate(payload)
+
+    update["confirmation"] = {
+        "record_id": "confirmation.current-quarter.owner",
+        "origin": "company-local",
+        "consent_receipt": "consent.memory.authorized",
+        "confirmed_by": "person.company.owner",
+    }
+    assert (
+        ProcedureContract.model_validate(payload).state_updates[0].mode == "confirmed"
+    )

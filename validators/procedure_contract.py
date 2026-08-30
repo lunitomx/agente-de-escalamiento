@@ -33,9 +33,26 @@ def _id(value: str, label: str) -> str:
 
 
 def _text(value: str, label: str) -> str:
-    if not value.strip() or value != value.strip() or len(value) > 500:
+    """Allow concise authored labels, never locators, URLs, or source passages."""
+    if (
+        not value.strip()
+        or value != value.strip()
+        or len(value) > 96
+        or len(value.split()) > 12
+    ):
         raise ValueError(f"unsafe {label}")
-    if any(ord(char) < 32 or ord(char) == 127 for char in value):
+    if (
+        any(ord(char) < 32 or ord(char) == 127 for char in value)
+        or "/" in value
+        or "\\" in value
+        or "://" in value
+        or value.lower().startswith("www.")
+        or re.search(
+            r"\b(source[_ -]?id|source text|verbatim|copyright|all rights reserved|page \d+)\b",
+            value,
+            flags=re.IGNORECASE,
+        )
+    ):
         raise ValueError(f"unsafe {label}")
     return value
 
@@ -125,18 +142,62 @@ class OutputValue(_StrictModel):
 
     status: Literal["known", "unknown", "not-applicable"]
     value: str | None = Field(default=None, max_length=500)
+    origin: OriginKind | None = None
+    evidence_ids: list[str] = Field(default_factory=list, max_length=32)
+    consent_receipt: str | None = Field(default=None, max_length=128)
+    confirmed_by: str | None = Field(default=None, max_length=128)
 
     @field_validator("value")
     @classmethod
     def validate_value(cls, value: str | None) -> str | None:
         return None if value is None else _text(value, "output value")
 
+    @field_validator("evidence_ids")
+    @classmethod
+    def validate_evidence_ids(cls, values: list[str]) -> list[str]:
+        if len(values) != len(set(values)):
+            raise ValueError("duplicate output evidence ID")
+        return [_id(value, "output evidence ID") for value in values]
+
+    @field_validator("consent_receipt")
+    @classmethod
+    def validate_consent_receipt(cls, value: str | None) -> str | None:
+        return None if value is None else _id(value, "consent receipt")
+
+    @field_validator("confirmed_by")
+    @classmethod
+    def validate_confirmed_by(cls, value: str | None) -> str | None:
+        return None if value is None else _id(value, "human confirmer")
+
     @model_validator(mode="after")
     def validate_status_value(self) -> "OutputValue":
-        if self.status == "known" and self.value is None:
-            raise ValueError("known value requires a non-empty value")
-        if self.status != "known" and self.value is not None:
-            raise ValueError("unknown or not-applicable value must be null")
+        if self.status == "known":
+            if self.value is None:
+                raise ValueError("known value requires a non-empty value")
+            if self.origin not in {
+                OriginKind.SOURCE_EXPLICIT,
+                OriginKind.SOURCE_SYNTHESIS,
+                OriginKind.COMPANY_LOCAL,
+            }:
+                raise ValueError("known value requires an allowed typed origin")
+            if (
+                not self.evidence_ids
+                or self.consent_receipt is None
+                or self.confirmed_by is None
+            ):
+                raise ValueError(
+                    "known value requires evidence, consent, and human confirmation"
+                )
+        elif (
+            self.value is not None
+            or self.origin is not None
+            or self.evidence_ids
+            or self.consent_receipt is not None
+            or self.confirmed_by is not None
+        ):
+            raise ValueError(
+                "unknown or not-applicable value must not carry a value or evidence"
+            )
         return self
 
 
@@ -173,10 +234,23 @@ class ProcedureOutputContract(_StrictModel):
         return self
 
 
+class StateConfirmation(_StrictModel):
+    record_id: str = Field(min_length=3, max_length=128)
+    origin: Literal[OriginKind.COMPANY_LOCAL]
+    consent_receipt: str = Field(min_length=3, max_length=128)
+    confirmed_by: str = Field(min_length=3, max_length=128)
+
+    @field_validator("record_id", "consent_receipt", "confirmed_by")
+    @classmethod
+    def validate_confirmation_id(cls, value: str) -> str:
+        return _id(value, "state confirmation ID")
+
+
 class StateUpdate(_StrictModel):
     id: str = Field(min_length=3, max_length=128)
     path: str = Field(min_length=8, max_length=256)
     mode: Literal["proposed", "confirmed"]
+    confirmation: StateConfirmation | None = None
 
     @field_validator("id")
     @classmethod
@@ -189,6 +263,14 @@ class StateUpdate(_StrictModel):
         if _STATE_PATH.fullmatch(value) is None or ".." in value:
             raise ValueError("unsafe state update path")
         return value
+
+    @model_validator(mode="after")
+    def validate_confirmation(self) -> "StateUpdate":
+        if self.mode == "confirmed" and self.confirmation is None:
+            raise ValueError("confirmed state update requires a human consent record")
+        if self.mode == "proposed" and self.confirmation is not None:
+            raise ValueError("proposed state update must not carry a confirmation")
+        return self
 
 
 class ProcedureHandoff(_StrictModel):
