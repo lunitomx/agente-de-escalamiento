@@ -1,0 +1,798 @@
+{
+  "matrix_id": "s64.3",
+  "records": [
+    {
+      "candidate_id": "candidate.accelerator.coaching",
+      "evidence_refs": [
+        "digest.sha256.84491126cba885c21deab98a7bcca0512436a4b486d00e42b10b831921576a29"
+      ],
+      "node_id": "accelerator.coaching",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.accelerator.learning",
+      "evidence_refs": [
+        "digest.sha256.7a62dd61330e30ac2f600708838d663840cd6c740675659f90c99af277ccc5c9"
+      ],
+      "node_id": "accelerator.learning",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.accelerator.technology",
+      "evidence_refs": [
+        "digest.sha256.fdb78a5b5bfc5f82d6480a16da1457d61b7d5a076a9349d2811ee23e570accf3"
+      ],
+      "node_id": "accelerator.technology",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.barrier.leadership",
+      "evidence_refs": [
+        "digest.sha256.b5b4c4b996c47f3724e4c27a93621ff68248f177b9f10f44706eeafc10a25be5"
+      ],
+      "node_id": "barrier.leadership",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.barrier.marketing",
+      "evidence_refs": [
+        "digest.sha256.c22001e9d0d41d16249128caa3dd79b3d85e14ba0a2280e705075567512986fb"
+      ],
+      "node_id": "barrier.marketing",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.barrier.scalable-infrastructure",
+      "evidence_refs": [
+        "digest.sha256.3fbd5327156a388cc14cac51baf77a6c9ccfd7e10ae9b74df4d99a5241e0f837"
+      ],
+      "node_id": "barrier.scalable-infrastructure",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.cash.framework.financial-drivers",
+      "evidence_refs": [
+        "digest.sha256.7aae7ae9e9b59f525a2940ce7a148df38e7b33c0b7bf0d4a140e6780e74e63cc"
+      ],
+      "node_id": "framework.four-financial-drivers",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.cash.framework.financial-levers",
+      "evidence_refs": [
+        "digest.sha256.7d64a9ffffae524e419413334ec958ea26acc3f908b1307d89dc556e0882e363"
+      ],
+      "node_id": "framework.financial-levers",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.cash.framework.power-of-one",
+      "evidence_refs": [
+        "digest.sha256.8053f4a115923ebe996170ec2ddd32b8845929022ec9470dca88e14652a3ddee"
+      ],
+      "node_id": "framework.power-of-one",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.cash.metric.ccc",
+      "evidence_refs": [
+        "digest.sha256.70b6cfb6ff1f372fe9e4e0b6e70e81a526d3f7cbcb6c988922178c0af1c70e09"
+      ],
+      "node_id": "metric.cash-conversion-cycle",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.cash.metric.working-capital-days",
+      "evidence_refs": [
+        "digest.sha256.0febcf289e29392f74b3ab364c1deba745c98151df1e053bb4e69d6249bf2888"
+      ],
+      "node_id": null,
+      "reason_code": "needs-revision",
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "review-required"
+    },
+    {
+      "candidate_id": "candidate.cash.procedure.cash-tool",
+      "evidence_refs": [
+        "digest.sha256.1492d99361c0e4b2c3a0ba855a1cc592b784879f054a9ff3788e8ac46fae2fe7"
+      ],
+      "node_id": null,
+      "reason_code": "needs-revision",
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "review-required"
+    },
+    {
+      "candidate_id": "candidate.cash.rule.cash-initiative",
+      "evidence_refs": [
+        "digest.sha256.71fcda6829831c40a5f85382270aeae031d80603a7bc40aec09f1e4b9cf4fb08"
+      ],
+      "node_id": null,
+      "reason_code": "needs-revision",
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "review-required"
+    },
+    {
+      "candidate_id": "candidate.cash.tool.cash",
+      "evidence_refs": [
+        "digest.sha256.254cb8090dcc6c5e697ba8e4c991cbb2eb2b4b31ba3ab4936e3c1bbb099092df"
+      ],
+      "node_id": "tool.cash-acceleration-strategies",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.decision.cash",
+      "evidence_refs": [
+        "digest.sha256.32ae7ac6dda5dd0736a65838ebffdda19361a16ad266b347f93b004f48ddff64"
+      ],
+      "node_id": "decision.cash",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.decision.execution",
+      "evidence_refs": [
+        "digest.sha256.904f0962d3fcfe50608fd17fc699edf7b71636f0d4b4f1db6b084728e70222c5"
+      ],
+      "node_id": "decision.execution",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.decision.people",
+      "evidence_refs": [
+        "digest.sha256.b14ef604fed1c6ffb98adf0d7fc6b2e213a7ae5211918d06b6d3b576ed643653"
+      ],
+      "node_id": "decision.people",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.decision.strategy",
+      "evidence_refs": [
+        "digest.sha256.8c1ef1cd1c2e1c13910cc53a49ab7e797f249edee50d3b32de006869519f6f3e"
+      ],
+      "node_id": "decision.strategy",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.demand.people-reputation",
+      "evidence_refs": [
+        "digest.sha256.60862729c84c3d23895fbe726efa5119fdf8166273412baa638bc185bb3b577b"
+      ],
+      "node_id": "demand.people-reputation",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.demand.process-productivity",
+      "evidence_refs": [
+        "digest.sha256.eb3d2d681d9a18571f3112cb1e86ceba73d137f6bf947cc060dda9f01c543ea3"
+      ],
+      "node_id": "demand.process-productivity",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.discipline.data",
+      "evidence_refs": [
+        "digest.sha256.9257904434875a1fb5d0f5c9838304bf274a8dfb32a600c8f62d3c8d0ff301f2"
+      ],
+      "node_id": "discipline.data",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.discipline.meeting-rhythm",
+      "evidence_refs": [
+        "digest.sha256.525f69f9a4b2c8047063fb39cce2615417f8da4a79f97b670c1fe6461ad2156a"
+      ],
+      "node_id": "discipline.meeting-rhythm",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.discipline.priorities",
+      "evidence_refs": [
+        "digest.sha256.5019ed43bbbf065c2d2f0de06652b471c7b0bc5bf83813c1aaa2d44990d4db81"
+      ],
+      "node_id": "discipline.priorities",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.execution.artifact.who-what-when",
+      "evidence_refs": [
+        "digest.sha256.087f20a1c8f00a43ab1ce5ba66f6b66759b7bf716a12b4fa69cda0886ada5df8"
+      ],
+      "node_id": "artifact.who-what-when",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.execution.framework.rockefeller-habits",
+      "evidence_refs": [
+        "digest.sha256.d254c95daedd079ff81c29c553b436f62ef2ea4bc6c5d882021bc37167ff1027"
+      ],
+      "node_id": "framework.rockefeller-habits",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.execution.routine.daily-huddle",
+      "evidence_refs": [
+        "digest.sha256.383901a20744923a4d2740bd67a2945d9f693f5f90d15db98be1906eda1e2907"
+      ],
+      "node_id": "routine.daily-huddle",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.execution.routine.monthly-management",
+      "evidence_refs": [
+        "digest.sha256.e2bdfa05e32a15f4add948bb79a67818514d939e43ffa1a3983baa263c2a0290"
+      ],
+      "node_id": "routine.monthly-management-meeting",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.execution.routine.quarterly-annual",
+      "evidence_refs": [
+        "digest.sha256.8667780c0ced760c1e7962f0b99acf9e9d36c3572753c52da2047e90a505bcce"
+      ],
+      "node_id": "routine.quarterly-and-annual-planning",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.execution.routine.quarterly-theme",
+      "evidence_refs": [
+        "digest.sha256.0363cf6b8cd7427f21401b4303261152bcfe75add8c4ead2064ea50c35954bd3"
+      ],
+      "node_id": "routine.quarterly-theme",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.execution.routine.weekly-meeting",
+      "evidence_refs": [
+        "digest.sha256.156f02e76670c5eaf6f53af3797ee50c994f612367236d6697dc9d9e81d020c2"
+      ],
+      "node_id": "routine.weekly-meeting",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.execution.rule.healthy-team-first",
+      "evidence_refs": [
+        "digest.sha256.bef937a6fe33ff9bd2b10decc9ec3d6c5a9cd4492293c13e9380d5ef779f2c02"
+      ],
+      "node_id": "rule.healthy-team-first",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.execution.tool.critical-number",
+      "evidence_refs": [
+        "digest.sha256.1a9138ec7a9f2c4559c82158cc1df6639b0ff0129d4d1b6724c831cb8b7f4195"
+      ],
+      "node_id": "tool.critical-number",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.framework.4d",
+      "evidence_refs": [
+        "digest.sha256.aa8c099c5ab29f0eaba97dde8b9b2ce6ac673af491d84fcf5f53ae01906eeb4c"
+      ],
+      "node_id": "framework.4d",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.framework.demands",
+      "evidence_refs": [
+        "digest.sha256.7357ecaf2da26df22bb8d0240a31d4ce33654ad68e583d674826c996a1ddab1c"
+      ],
+      "node_id": "framework.demands",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.framework.disciplines",
+      "evidence_refs": [
+        "digest.sha256.d609ad989510fe9c69078bf80f4cedb132ce9b5147521bc9e5f3f86e5b1f02f0"
+      ],
+      "node_id": "framework.disciplines",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.framework.driver",
+      "evidence_refs": [
+        "digest.sha256.2b91d9c5b6a87ecfb831a557e01ca3aba16e72a94fb69970e38b96b933a20853"
+      ],
+      "node_id": "framework.driver",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.framework.results",
+      "evidence_refs": [
+        "digest.sha256.18c0e78d4779b3550cec1049ca95e6fc0f734eddc34ed604a84c2a40acd6efc1"
+      ],
+      "node_id": "framework.results",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.people.face-gap-signals",
+      "evidence_refs": [
+        "digest.sha256.cf1a931e2bfd98f5ec4e4e03432f5d7d46f346d097175e42b658c0f2cde74d08"
+      ],
+      "node_id": "rule.face-gap-signals",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.people.face-single-accountable",
+      "evidence_refs": [
+        "digest.sha256.87372a7938be853414c49e13a7e93c90f78d77d6beb9a48dd4257c7232b5a0b5"
+      ],
+      "node_id": "rule.face-single-accountable",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.people.job-scorecard",
+      "evidence_refs": [
+        "digest.sha256.bf76aefa43b9eac8ffc9b61d15b99fc24525348ee53c0601d902b6574bc201c7"
+      ],
+      "node_id": "external.job-scorecard",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.people.manager-coaching-rhythm",
+      "evidence_refs": [
+        "digest.sha256.49bc50856e70810dfc92be9b7d572f8caaa6634cd5e0848576a5915d21134917"
+      ],
+      "node_id": "routine.manager-coaching-rhythm",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.people.pace-process-accountability",
+      "evidence_refs": [
+        "digest.sha256.4a63b9f71eb1ff45ab8d2d73355044e4b8cc228ff8d30c7f3c0e0eab5a0230c2"
+      ],
+      "node_id": "rule.pace-process-accountability",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.people.tool.face",
+      "evidence_refs": [
+        "digest.sha256.04a4a553f240a712c831cee697661ebe6e685fef16b9aece75e515ade87ad0c6"
+      ],
+      "node_id": "tool.face",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.people.tool.oppp",
+      "evidence_refs": [
+        "digest.sha256.6b02fcf55679e0b779193d465d290bf1b408586de4bb7ac2dd2cbc2c4f93633c"
+      ],
+      "node_id": "tool.oppp",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.people.tool.pace",
+      "evidence_refs": [
+        "digest.sha256.c4548fb13397d2591a4a9b08e6198e5c775da6e3dbd7f5630c9117686959252c"
+      ],
+      "node_id": "tool.pace",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.personal-dimension.achievements",
+      "evidence_refs": [
+        "digest.sha256.5d44a49ccca384c9fb093e2b0f16d05250f435f1e6c4271d0a6fa7525f640092"
+      ],
+      "node_id": "personal-dimension.achievements",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.personal-dimension.relationships",
+      "evidence_refs": [
+        "digest.sha256.04fc65800170b623297310f4180dc00605d5b6048023713b289a363b287da046"
+      ],
+      "node_id": "personal-dimension.relationships",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.personal-dimension.rituals",
+      "evidence_refs": [
+        "digest.sha256.2a495ba4ca3d63f8af4374c114ed0520a8d6c0126bd90df7fa3fce2cbbd0b171"
+      ],
+      "node_id": "personal-dimension.rituals",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.personal-dimension.wealth",
+      "evidence_refs": [
+        "digest.sha256.094789ffd7794af193b9ee92c3f63ae6da4ca885a4254d8f91a4380ba240db66"
+      ],
+      "node_id": "personal-dimension.wealth",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.principle.get-it-down-then-right",
+      "evidence_refs": [
+        "digest.sha256.e05201e99df261d9d7acc10d15011c88d1c2968796aa1ec455bf6952c03f051f"
+      ],
+      "node_id": "principle.get-it-down-then-right",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.principle.iterative-adoption",
+      "evidence_refs": [
+        "digest.sha256.3c6d2463373ee1b04a01c5bd942a7d18fa187b13182951dc305029f0d6f9980d"
+      ],
+      "node_id": "principle.iterative-adoption",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.principle.right-questions",
+      "evidence_refs": [
+        "digest.sha256.2bf797c7b2027ad118a2f6e05ab5af2ff5139da0ed922c70732f3abc69e5f7a6"
+      ],
+      "node_id": "principle.right-questions",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.principle.routine-sets-you-free",
+      "evidence_refs": [
+        "digest.sha256.8363fa22f4611fda17f9f6ce9ca9a18b1ff42fc83c968283e8bc3df6f744f827"
+      ],
+      "node_id": "principle.routine-sets-you-free",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.principle.simple-not-simpler",
+      "evidence_refs": [
+        "digest.sha256.a047daca2df2059cf55d12927a07b4fe7cc509c0e53e0e3de47621be3d821322"
+      ],
+      "node_id": "principle.simple-not-simpler",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.question.cash",
+      "evidence_refs": [
+        "digest.sha256.4fd82896d22e5890be052e1f703d454c984d1527756a7259838b5b2cf942d977"
+      ],
+      "node_id": "question.cash",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.question.execution",
+      "evidence_refs": [
+        "digest.sha256.cd1743c8395090531562bf2f0154a82b55c0fbc0b9e77c334fd0790b428af51d"
+      ],
+      "node_id": "question.execution",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.question.people",
+      "evidence_refs": [
+        "digest.sha256.a02de302404e78e89bd7eb77abcc77eee6252efa397bc106451138d57372ea23"
+      ],
+      "node_id": "question.people",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.question.select-primary-decision",
+      "evidence_refs": [
+        "digest.sha256.3db24e9cc77b8cc5b91867099d36cd4f30673f3c3845b84953fb55909275a465"
+      ],
+      "node_id": "question.select-primary-decision",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.question.strategy",
+      "evidence_refs": [
+        "digest.sha256.80b1e1f2372f6db49e93628e3a39b07d393ee8e2126fe7d2513a4d2d04baa423"
+      ],
+      "node_id": "question.strategy",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.result.cash-flow",
+      "evidence_refs": [
+        "digest.sha256.5e707e8bf3d8d5f9726e9eb765ee5f171f07c6ab8e0eb57eab3569173581201a"
+      ],
+      "node_id": "result.cash-flow",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.result.profitability",
+      "evidence_refs": [
+        "digest.sha256.e050f66812dad8c3ab503ee34fe7c8ab0bbcfd228fb90355d57c16294085919e"
+      ],
+      "node_id": "result.profitability",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.result.time",
+      "evidence_refs": [
+        "digest.sha256.74ef4da4bb5e86e85fedb1076b8f5864d51fd3b5a6829805ceb90d96d7e58b1c"
+      ],
+      "node_id": "result.time",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.result.valuation",
+      "evidence_refs": [
+        "digest.sha256.576aeb67d2c1c53165d196e9636c60ae6614736b7633ce09d7d4bdb026c28697"
+      ],
+      "node_id": "result.valuation",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.rule.non-sequential-adoption",
+      "evidence_refs": [
+        "digest.sha256.2f92b20686b59c9437816f5f81ceb9c958a9ebc6a11e6cd0f54af0eb89c9193a"
+      ],
+      "node_id": "rule.non-sequential-adoption",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.strategy.framework.core",
+      "evidence_refs": [
+        "digest.sha256.ebf5f7f6c6cb35a393812df4643ab9b8bcef335841c8caa399c61c1dfa577e14"
+      ],
+      "node_id": "framework.organizational-core",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.strategy.framework.seven-strata",
+      "evidence_refs": [
+        "digest.sha256.c01ac638cd696e02b93b01bd1cc8d01d576c763631d7356cd4abde1a1c8215a1"
+      ],
+      "node_id": "framework.strategy-seven-strata",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.strategy.rule.brand-promises",
+      "evidence_refs": [
+        "digest.sha256.04235128faa857c97a6f35c7f8466be591bfd448ee4fe076299af5d098d5b3cb"
+      ],
+      "node_id": "rule.brand-promises-measurable",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.strategy.rule.opsp-actions",
+      "evidence_refs": [
+        "digest.sha256.3d3c3b955a9fd737bcb1e6013ceed2d27daa14c4ab8a738265cc686e6c59d5f3"
+      ],
+      "node_id": "rule.opsp-quarterly-actions",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.strategy.stratum.brand-promise-guarantee",
+      "evidence_refs": [
+        "digest.sha256.12a2993fd28cc3fa12cdd53256f5ecd19c15f4efd6396e136c642b853215c4d7"
+      ],
+      "node_id": "principle.strategy-brand-promise-guarantee",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.strategy.stratum.differentiating-activities",
+      "evidence_refs": [
+        "digest.sha256.8ed45e0b51160c4b8a2e2adbefe53dc9f412fd64379074005d51c5b7dc1561b9"
+      ],
+      "node_id": "principle.strategy-differentiating-activities",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.strategy.stratum.mindshare",
+      "evidence_refs": [
+        "digest.sha256.7d7c8bcc1fff38c231568631760f09fb138ece48771653ce4d80a53fe11367a7"
+      ],
+      "node_id": "principle.strategy-mindshare",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.strategy.stratum.one-phrase-strategy",
+      "evidence_refs": [
+        "digest.sha256.a161d588ac53ee675fc1300478bcc7a0d408f056a420beb30bf13a9e3e43fe6f"
+      ],
+      "node_id": "principle.strategy-one-phrase-strategy",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.strategy.stratum.profit-per-x-bhag",
+      "evidence_refs": [
+        "digest.sha256.095e7ac508c5b05d75b1658dc1b9c0b9f7b74490cabbdc49b0e3fa56eaef3c6a"
+      ],
+      "node_id": "principle.strategy-profit-per-x-bhag",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.strategy.stratum.sandbox-brand-promises",
+      "evidence_refs": [
+        "digest.sha256.a6b1e465ac0f06d9c00482cde024148e8b9da57e104be58e37f9f13705b0c515"
+      ],
+      "node_id": "principle.strategy-sandbox-brand-promises",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.strategy.stratum.x-factor",
+      "evidence_refs": [
+        "digest.sha256.504f7af72f9b27861d3cfcfc487f9ab7e25864fa189b546c6d3345fbb6bdd0f3"
+      ],
+      "node_id": "principle.strategy-x-factor",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.strategy.tool.opsp",
+      "evidence_refs": [
+        "digest.sha256.25722823e16df8925b6fa63ae3b3c63074abd77179233a2c9f20b91d46db2e5f"
+      ],
+      "node_id": "tool.opsp",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.strategy.tool.seven-strata",
+      "evidence_refs": [
+        "digest.sha256.ae37c29321574cb72a4be45d7ca8c676ebbf0bb6c05b38a26d450270d5c0dd99"
+      ],
+      "node_id": "tool.strategy-seven-strata",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.strategy.tool.swt",
+      "evidence_refs": [
+        "digest.sha256.8e61ad0b79d9b0aa63501b5fbbc140d6abaa103cfa989d13286f801957f67ae3"
+      ],
+      "node_id": "tool.swt",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    },
+    {
+      "candidate_id": "candidate.strategy.tool.vision-summary",
+      "evidence_refs": [
+        "digest.sha256.c5ba480fc53038a2520db8c13cf8e082521316f309fb7276f68751560597751b"
+      ],
+      "node_id": "tool.vision-summary",
+      "reason_code": null,
+      "source_id": "scaling-up-llamaparse-2014",
+      "status": "mapped"
+    }
+  ],
+  "release_id": "s64.1",
+  "release_sha256": "c93ee72efb0c62ecec03c772f3788152c2cb9f93d60e9f9f023290e387628fac",
+  "schema_version": 1
+}
