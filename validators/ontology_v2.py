@@ -23,6 +23,7 @@ ExclusionReason: TypeAlias = Literal[
     "external-content-source-bounded",
     "review-not-independent",
 ]
+CoverageStatus: TypeAlias = Literal["mapped", "excluded", "review-required"]
 
 
 class _StrictModel(BaseModel):
@@ -612,6 +613,144 @@ def render_canonical_release_integrity_receipt(
         )
         + "\n"
     )
+
+
+class CoverageRecord(_StrictModel):
+    """One safe coverage result for a source/candidate release partition."""
+
+    source_id: str = Field(min_length=3, max_length=192)
+    candidate_id: str = Field(min_length=3, max_length=192)
+    node_id: str | None = Field(default=None, min_length=3, max_length=192)
+    status: CoverageStatus
+    reason_code: ExclusionReason | None = None
+    evidence_refs: list[str] = Field(min_length=1, max_length=64)
+
+    @field_validator("source_id")
+    @classmethod
+    def validate_coverage_source_id(cls, value: str) -> str:
+        return _validate_nonlegacy_identifier(value, "source ID")
+
+    @field_validator("candidate_id")
+    @classmethod
+    def validate_coverage_candidate_id(cls, value: str) -> str:
+        return _validate_nonlegacy_identifier(value, "candidate ID")
+
+    @field_validator("node_id")
+    @classmethod
+    def validate_coverage_node_id(cls, value: str | None) -> str | None:
+        if value is None:
+            return value
+        return _validate_nonlegacy_identifier(value, "node ID")
+
+    @field_validator("evidence_refs")
+    @classmethod
+    def validate_coverage_evidence_refs(cls, values: list[str]) -> list[str]:
+        if len(values) != len(set(values)):
+            raise ValueError("duplicate evidence reference")
+        return sorted(_validate_opaque_reference(value) for value in values)
+
+    @model_validator(mode="after")
+    def validate_coverage_status(self) -> "CoverageRecord":
+        if self.status == "mapped":
+            if self.node_id is None or self.reason_code is not None:
+                raise ValueError("mapped coverage requires a node and no reason")
+        elif self.node_id is not None or self.reason_code is None:
+            raise ValueError("non-mapped coverage requires no node and a reason")
+        return self
+
+
+class CoverageMatrix(_StrictModel):
+    """Versioned safe source-to-node coverage; exclusions stay first-class."""
+
+    schema_version: Literal[1]
+    matrix_id: Literal["s64.3"]
+    release_id: Literal["s64.1"]
+    release_sha256: str = Field(min_length=64, max_length=64)
+    records: list[CoverageRecord] = Field(min_length=1, max_length=512)
+
+    @field_validator("release_sha256")
+    @classmethod
+    def validate_release_sha256(cls, value: str) -> str:
+        if re.fullmatch(r"[0-9a-f]{64}", value) is None:
+            raise ValueError("invalid release SHA-256")
+        return value
+
+    @model_validator(mode="after")
+    def validate_matrix_partition(self) -> "CoverageMatrix":
+        record_keys = [(item.source_id, item.candidate_id) for item in self.records]
+        if len(record_keys) != len(set(record_keys)):
+            raise ValueError("duplicate source/candidate coverage record")
+        return self
+
+
+def _release_sha256(release: CanonicalRelease) -> str:
+    return hashlib.sha256(render_canonical_release(release).encode("utf-8")).hexdigest()
+
+
+def build_coverage_matrix(release: CanonicalRelease | None) -> CoverageMatrix:
+    """Make every canonical mapping and exclusion visible without source text."""
+    if release is None:
+        raise ValueError("canonical release is required")
+    records: list[CoverageRecord] = []
+    for node in release.nodes:
+        records.extend(
+            CoverageRecord(
+                source_id=source_id,
+                candidate_id=node.candidate_id,
+                node_id=node.canonical_id,
+                status="mapped",
+                evidence_refs=node.evidence_refs,
+            )
+            for source_id in node.source_ids
+        )
+    for exclusion in release.exclusions:
+        records.extend(
+            CoverageRecord(
+                source_id=source_id,
+                candidate_id=exclusion.candidate_id,
+                status=exclusion.disposition,
+                reason_code=exclusion.reason_code,
+                evidence_refs=exclusion.evidence_refs,
+            )
+            for source_id in exclusion.source_ids
+        )
+    return CoverageMatrix(
+        schema_version=1,
+        matrix_id="s64.3",
+        release_id=release.release_id,
+        release_sha256=_release_sha256(release),
+        records=sorted(records, key=lambda item: (item.source_id, item.candidate_id)),
+    )
+
+
+def render_coverage_matrix(matrix: CoverageMatrix) -> str:
+    return (
+        json.dumps(
+            matrix.model_dump(mode="json"), ensure_ascii=True, indent=2, sort_keys=True
+        )
+        + "\n"
+    )
+
+
+def load_coverage_matrix(path: Path) -> CoverageMatrix:
+    try:
+        return CoverageMatrix.model_validate_json(path.read_text(encoding="utf-8"))
+    except Exception as exc:
+        raise ValueError("coverage matrix contract invalid") from exc
+
+
+def validate_coverage_matrix(
+    matrix: CoverageMatrix,
+    release: CanonicalRelease,
+) -> None:
+    """Assert the matrix is exactly the release partition, never a percentage."""
+    expected = build_coverage_matrix(release)
+    if matrix.release_id != release.release_id:
+        raise ValueError("coverage matrix references another release")
+    if matrix.release_sha256 != expected.release_sha256:
+        raise ValueError("coverage matrix release digest does not match release")
+    if matrix.records != expected.records:
+        raise ValueError("coverage matrix does not exactly match release partition")
 
 
 class EvidenceRef(_StrictModel):

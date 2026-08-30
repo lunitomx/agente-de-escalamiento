@@ -22,10 +22,14 @@ from validators.ontology_v2 import (
     OriginKind,
     ReviewState,
     build_canonical_release,
+    build_coverage_matrix,
     load_canonical_release,
+    load_coverage_matrix,
     ontology_schema_hash,
     render_canonical_release,
+    render_coverage_matrix,
     render_ontology_schema,
+    validate_coverage_matrix,
 )
 
 
@@ -38,6 +42,8 @@ QUEUE_SCRIPT = ROOT / "scripts/check_ontology_review_queue.py"
 RELEASE = ROOT / "ontology/v2/releases/s64.1.json"
 PROJECTION = ROOT / "ontology/v2/releases/s64.1.projection.json"
 RELEASE_SCRIPT = ROOT / "scripts/build_canonical_release.py"
+COVERAGE = ROOT / "ontology/v2/releases/s64.3.coverage.json"
+COVERAGE_SCRIPT = ROOT / "scripts/build_coverage_matrix.py"
 EXPECTED_RELEASE_MANIFEST = {
     "nodes": 76,
     "exclusions": 3,
@@ -599,3 +605,97 @@ def test_projection_allows_duplicate_canonical_id_when_one_candidate_is_excluded
     release = build_canonical_release(projection)
     assert len(release.nodes) == 1
     assert len(release.exclusions) == 1
+
+
+def test_coverage_matrix_is_deterministic_and_keeps_exclusions_visible() -> None:
+    release = load_canonical_release(RELEASE)
+    matrix = build_coverage_matrix(release)
+
+    assert matrix.release_id == "s64.1"
+    assert len(matrix.records) == 79
+    assert sum(record.status == "mapped" for record in matrix.records) == 76
+    assert sum(record.status == "review-required" for record in matrix.records) == 3
+    assert sum(record.status == "excluded" for record in matrix.records) == 0
+    assert all(
+        record.node_id is None and record.reason_code == "needs-revision"
+        for record in matrix.records
+        if record.status == "review-required"
+    )
+    assert all(
+        record.node_id is not None and record.reason_code is None
+        for record in matrix.records
+        if record.status == "mapped"
+    )
+    assert "percentage" not in render_coverage_matrix(matrix).lower()
+
+
+def test_coverage_matrix_rejects_hidden_or_invalid_partition() -> None:
+    release = load_canonical_release(RELEASE)
+    matrix = build_coverage_matrix(release)
+    invalid = matrix.model_copy(update={"records": matrix.records[:-1]})
+    with pytest.raises(ValueError, match="exactly match release partition"):
+        validate_coverage_matrix(invalid, release)
+
+    invalid_digest = matrix.model_copy(update={"release_sha256": "0" * 64})
+    with pytest.raises(ValueError, match="release digest"):
+        validate_coverage_matrix(invalid_digest, release)
+
+    with pytest.raises(ValidationError, match="mapped coverage"):
+        type(matrix.records[0]).model_validate(
+            {
+                **matrix.records[0].model_dump(),
+                "node_id": None,
+            }
+        )
+
+    excluded = type(matrix.records[0]).model_validate(
+        {
+            **matrix.records[0].model_dump(),
+            "node_id": None,
+            "status": "excluded",
+            "reason_code": "generic-candidate",
+        }
+    )
+    assert excluded.status == "excluded"
+
+
+def test_checked_in_s64_3_coverage_is_exact_safe_and_complete() -> None:
+    release = load_canonical_release(RELEASE)
+    matrix = load_coverage_matrix(COVERAGE)
+
+    assert COVERAGE.read_text(encoding="utf-8") == render_coverage_matrix(matrix)
+    validate_coverage_matrix(matrix, release)
+    assert matrix == build_coverage_matrix(release)
+    rendered = render_coverage_matrix(matrix)
+    assert "working_text" not in rendered
+    assert "locators" not in rendered
+    assert "/home/" not in rendered
+    assert "http:" not in rendered
+    assert "https:" not in rendered
+
+
+def test_coverage_cli_requires_release_and_exactly_rebuilds_matrix() -> None:
+    completed = subprocess.run(
+        [sys.executable, str(COVERAGE_SCRIPT), "--matrix", "coverage.json"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode != 0
+    assert "--release" in completed.stderr
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(COVERAGE_SCRIPT),
+            "--release",
+            str(RELEASE),
+            "--matrix",
+            str(COVERAGE),
+            "--check",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0
