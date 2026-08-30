@@ -27,6 +27,39 @@ def _request(**overrides: object) -> PrimaryConstraintRequest:
         "company_understanding": _company(),
         "evidence": [
             {
+                "evidence_id": "conversation.people.1",
+                "question_id": "people-detail",
+                "decision": "people",
+                "value": "La dirección describe responsabilidades, pero aún discute algunas decisiones clave.",
+                "source_kind": "conversation",
+                "source_ref": "conversation:welcome",
+                "rationale": "Respuesta detallada de la dirección.",
+                "freshness": "current",
+                "confidence": "medium",
+            },
+            {
+                "evidence_id": "conversation.strategy.1",
+                "question_id": "strategy-detail",
+                "decision": "strategy",
+                "value": "La empresa vende soporte diferenciado a empresas medianas con proyectos recurrentes.",
+                "source_kind": "conversation",
+                "source_ref": "conversation:welcome",
+                "rationale": "Respuesta detallada de la dirección.",
+                "freshness": "current",
+                "confidence": "medium",
+            },
+            {
+                "evidence_id": "conversation.execution.1",
+                "question_id": "execution-detail",
+                "decision": "execution",
+                "value": "El equipo revisa proyectos semanalmente, aunque faltan responsables en algunos acuerdos.",
+                "source_kind": "conversation",
+                "source_ref": "conversation:welcome",
+                "rationale": "Respuesta detallada de la dirección.",
+                "freshness": "current",
+                "confidence": "medium",
+            },
+            {
                 "evidence_id": "conversation.cash.1",
                 "question_id": "cash-detail",
                 "decision": "cash",
@@ -36,26 +69,26 @@ def _request(**overrides: object) -> PrimaryConstraintRequest:
                 "rationale": "Respuesta detallada de la dirección.",
                 "freshness": "current",
                 "confidence": "medium",
-            }
+            },
         ],
         "decision_assessments": [
             {
                 "decision": "people",
-                "status": "unknown",
-                "rationale": "Aún no hay detalle del equipo de liderazgo.",
-                "evidence_ids": [],
+                "status": "hypothesis",
+                "rationale": "Hay responsabilidades que requieren confirmación detallada.",
+                "evidence_ids": ["conversation.people.1"],
             },
             {
                 "decision": "strategy",
-                "status": "unknown",
-                "rationale": "Aún no hay detalle de la propuesta de valor.",
-                "evidence_ids": [],
+                "status": "known",
+                "rationale": "La oferta y cliente objetivo fueron descritos por la dirección.",
+                "evidence_ids": ["conversation.strategy.1"],
             },
             {
                 "decision": "execution",
-                "status": "unknown",
-                "rationale": "Aún no hay detalle de prioridades y cadencias.",
-                "evidence_ids": [],
+                "status": "hypothesis",
+                "rationale": "El seguimiento existe, pero sus acuerdos requieren confirmación.",
+                "evidence_ids": ["conversation.execution.1"],
             },
             {
                 "decision": "cash",
@@ -90,15 +123,21 @@ def test_selects_one_requested_supported_constraint_without_a_score() -> None:
     assert all(item.priority_reason for item in result.decision_explanations)
 
 
-def test_unknown_requested_decision_returns_evidence_gap_not_an_invented_focus() -> (
-    None
-):
-    result = diagnose_primary_constraint(_request(requested_primary_decision="people"))
+def test_missing_evidence_in_any_area_blocks_selection_and_returns_all_gaps() -> None:
+    assessments = list(_request().decision_assessments)
+    assessments[0] = assessments[0].model_copy(
+        update={"status": "unknown", "evidence_ids": []}
+    )
+    assessments[2] = assessments[2].model_copy(
+        update={"status": "unknown", "evidence_ids": []}
+    )
+
+    result = diagnose_primary_constraint(_request(decision_assessments=assessments))
 
     assert result.primary_constraint is None
-    assert result.missing_evidence == ["people"]
+    assert result.missing_evidence == ["people", "execution"]
     assert result.persistence_status == "proposed_not_persisted"
-    assert "People" in result.confirmation_prompt
+    assert "Cash" in result.confirmation_prompt
 
 
 def test_rejects_untraced_evidence_and_cross_decision_assessment() -> None:
@@ -134,3 +173,40 @@ def test_rejects_multiple_assessments_for_one_decision() -> None:
 
     with pytest.raises(ValueError, match="exactly once"):
         PrimaryConstraintRequest.model_validate(payload)
+
+
+@pytest.mark.parametrize(
+    ("evidence_change", "match"),
+    [
+        ({"decision": None}, "crosses decision evidence"),
+        ({"source_kind": "estimate"}, "unsupported evidence source"),
+        ({"answer_status": "inference"}, "factual narrative evidence"),
+        ({"value": None}, "detailed narrative evidence"),
+        ({"value": "general"}, "detailed narrative evidence"),
+    ],
+)
+def test_rejects_generic_or_untrusted_evidence(
+    evidence_change: dict[str, object], match: str
+) -> None:
+    payload = _request().model_dump(mode="python")
+    payload["evidence"][3].update(evidence_change)
+
+    with pytest.raises(ValueError, match=match):
+        PrimaryConstraintRequest.model_validate(payload)
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "match"),
+    [
+        ("assumptions", ["x" * 97], "unsafe output text"),
+        ("open_questions", ["https://example.test/secret"], "unsafe output text"),
+        ("open_questions", ["state/company/secret.yaml"], "unsafe output text"),
+    ],
+)
+def test_revalidates_operational_output_text(
+    field: str, value: list[str], match: str
+) -> None:
+    request = _request(**{field: value})
+
+    with pytest.raises(ValueError, match=match):
+        diagnose_primary_constraint(request)

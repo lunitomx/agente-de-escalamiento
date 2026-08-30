@@ -26,6 +26,7 @@ FindingStatus = Literal["known", "hypothesis", "unknown"]
 PERSISTENCE_REASON = "E52 no ha entregado un adaptador confiable de consentimiento y persistencia; la propuesta no se guardó."
 _DECISIONS: tuple[Decision, ...] = ("people", "strategy", "execution", "cash")
 _PROCEDURE_ID = "procedure.diagnose-primary-constraint"
+_NARRATIVE_SOURCE_KINDS = {"conversation", "user_file", "crm_export", "profile", "opsp"}
 
 
 class _StrictModel(BaseModel):
@@ -88,11 +89,16 @@ class PrimaryConstraintRequest(_StrictModel):
             unknown = set(assessment.evidence_ids) - set(evidence_by_id)
             if unknown:
                 raise ValueError("assessment references unknown evidence")
-            if any(
-                evidence_by_id[evidence_id].decision not in (None, assessment.decision)
-                for evidence_id in assessment.evidence_ids
-            ):
-                raise ValueError("assessment crosses decision evidence")
+            for evidence_id in assessment.evidence_ids:
+                evidence = evidence_by_id[evidence_id]
+                if evidence.decision != assessment.decision:
+                    raise ValueError("assessment crosses decision evidence")
+                if evidence.source_kind not in _NARRATIVE_SOURCE_KINDS:
+                    raise ValueError("assessment uses unsupported evidence source")
+                if evidence.answer_status != "fact":
+                    raise ValueError("assessment requires factual narrative evidence")
+                if not _is_detailed_narrative(evidence.value):
+                    raise ValueError("assessment requires detailed narrative evidence")
         return self
 
 
@@ -149,8 +155,20 @@ def _output_contract(
             [*request.open_questions, *contract.output_contract.open_questions]
         )
     )
-    return contract.output_contract.model_copy(
-        update={"assumptions": list(request.assumptions), "open_questions": questions}
+    payload = contract.output_contract.model_dump(mode="python")
+    payload["assumptions"] = list(request.assumptions)
+    payload["open_questions"] = questions
+    return ProcedureOutputContract.model_validate(payload)
+
+
+def _is_detailed_narrative(value: object) -> bool:
+    if not isinstance(value, str):
+        return False
+    normalized = value.strip()
+    return (
+        len(normalized) >= 20
+        and len(normalized.split()) >= 4
+        and normalized.lower() not in {"n/a", "none", "unknown", "generic", "general"}
     )
 
 
@@ -187,9 +205,15 @@ def diagnose_primary_constraint(
     contract = _diagnosis_contract()
     by_decision = {item.decision: item for item in request.decision_assessments}
     requested = request.requested_primary_decision
+    missing: list[Decision] = [
+        assessment.decision
+        for assessment in request.decision_assessments
+        if assessment.status == "unknown"
+    ]
     selected = (
         by_decision[requested]
         if requested is not None
+        and not missing
         and by_decision[requested].status in {"known", "hypothesis"}
         else None
     )
@@ -202,9 +226,6 @@ def diagnose_primary_constraint(
         )
         if selected is not None
         else None
-    )
-    missing: list[Decision] = (
-        [requested] if requested is not None and selected is None else []
     )
     if primary is None and not missing:
         missing = list(_DECISIONS)
