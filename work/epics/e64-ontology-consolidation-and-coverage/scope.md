@@ -1,7 +1,7 @@
 ---
 epic_id: E64
 title: Consolidación ontológica y release de cobertura
-status: planned
+status: in_progress
 depends_on: [E59, E60, E61, E62, E63]
 ---
 
@@ -84,7 +84,7 @@ unreviewed form is an exclusion, never a green result.
 
 | Story | Size | Status | Actual | Velocity | Notes |
 |-------|:----:|:------:|:------:|:--------:|-------|
-| S64.1 | M | Blocked | — | — | E60–E62 await authorized visual-layout receipts; E63 independent review is complete but remains source-bounded. |
+| S64.1 | M | Done | 2026-08-30 | — | Source-safe canonical release: 76 nodes and 3 explicit exclusions from 79 authorized candidates. Independent review passed with one documented nonblocking semantic-label limitation. |
 | S64.2 | M | Pending | — | — | Starts after S64.1 produces the canonical candidate set. |
 | S64.3 | M | Pending | — | — | Starts after S64.1; may run in parallel with S64.2. |
 | S64.4 | M | Pending | — | — | Starts only when S64.2 and S64.3 pass without critical findings. |
