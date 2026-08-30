@@ -140,3 +140,65 @@ rai-session-start
 Cada historia requiere diseño, prueba positiva/negativa, revisión independiente,
 recibo de privacidad y retrospectiva. El material del curso nunca se adjunta a
 un commit ni a una salida de diagnóstico.
+
+
+## Implementation Plan
+
+> Added by RaiSE epic planning on 2026-08-30. The design artifact is absent
+> because E77 was initialized as a governed planning epic; this plan uses the
+> existing scope/PRD and local graph queries, which returned no additional
+> patterns. It does not waive any hard dependency.
+
+### Story Sequence
+
+| Order | Story | Size | Dependencies | Milestone | Rationale |
+|:-----:|-------|:----:|--------------|-----------|-----------|
+| 1 | S77.1 — Contrato de fuente y derechos | M | E57, E58 ✓ | M1 | Establishes the irreversible privacy/IP boundary before any extraction or local storage. |
+| 2 | S77.2 — Curación y revisión | M | S77.1 | M1 | Produces candidates and ambiguity queue without compiling or exposing course content. |
+| 3 | S77.3 — Contrato de pack privado | M | S77.1, E67 | M2 | Makes pack lifecycle compatible with the canonical capability map rather than creating a parallel skill system. |
+| 4 | S77.4 — Compilador de capacidades | L | S77.2, E65 | M2 | Reuses the approved procedure contract; raw course fragments can never directly become a capability. |
+| 5 | S77.5 — Piloto BlackSeller | M | S77.2–S77.4, source permission, original/timestamps | M3 | Validates one bounded sales pack with human review before generalizing the system. |
+| 6 | S77.6 — Evals, conflicto y portabilidad | L | S77.3–S77.5, E68 | M4 | Demonstrates no-activation, conflict, privacy and Codex/Claude semantic parity before epic close. |
+
+### Milestones
+
+| Milestone | Stories | Target | Success Criteria |
+|-----------|---------|--------|------------------|
+| **M1: Private source skeleton** | S77.1, S77.2 | After review approval | Authorized local source produces only attributable candidates, gaps and a review queue; no raw course data enters Git/export. |
+| **M2: Safe compilation path** | S77.3, S77.4 | After E65/E67 complete | Pack lifecycle and procedure compiler share canonical contracts; invalid, unlicensed or unapproved candidates fail closed. |
+| **M3: BlackSeller pilot** | S77.5 | After M2 + source proof | One owner approves a bounded sales exercise; claims remain scoped and artifacts preserve provenance. |
+| **M4: Epic complete** | S77.6 | After E68 complete | Privacy, activation/no-activation, conflict and cross-platform evals pass; retrospective confirms no raw-content leakage. |
+
+### Parallel Work Streams
+
+```text
+Critical: S77.1 ──► S77.2 ───────────────► S77.5 ──► S77.6
+                      │                       ▲
+E67 gate:              └──► S77.3 ───────────┤
+E65 gate:              └──► S77.4 ───────────┘
+E68 gate:                                      └──► S77.6
+```
+
+**Merge points:** S77.1 is the privacy/IP gate. S77.3 and S77.4 may proceed
+in parallel only after their respective upstream epics close. S77.5 joins both;
+S77.6 cannot start before the BlackSeller pilot and E68 qualification.
+
+### Progress Tracking
+
+| Story | Size | Status | Actual | Velocity | Notes |
+|-------|:----:|:------:|:------:|:--------:|-------|
+| S77.1 | M | Ready after review | — | — | E57/E58 complete; no course source is needed to build the generic fail-closed contract. |
+| S77.2 | M | Pending | — | — | Starts only after S77.1; BlackSeller remains a candidate without raw content in repository. |
+| S77.3 | M | Blocked | — | — | Hard dependency: E67 capability/adapters are planned. |
+| S77.4 | L | Blocked | — | — | Hard dependency: E65 procedure compiler is planned. |
+| S77.5 | M | Blocked | — | — | Needs S77.4 plus explicit rights, original asset/hash and timestamps/review for BlackSeller. |
+| S77.6 | L | Blocked | — | — | Hard dependency: E68 semantic cross-platform qualification is planned. |
+
+### Sequencing Risks
+
+| Risk | L/I | Mitigation |
+|------|:---:|------------|
+| Course material leaks through test fixtures or export | H/H | S77.1 blocks storage/export before extraction; tests use synthetic fixtures only. |
+| A generic pack duplicates E65/E67 behavior | M/H | S77.3/S77.4 consume canonical maps/contracts; no independent router or public command. |
+| BlackSeller transcript is inaccurate or unlicensed | H/H | Keep it candidate-only until permission, source hash and review evidence exist. |
+| The team treats a trainer claim as business evidence | M/H | Origin labels, explicit conflict view and E71 handoff for external market facts. |
