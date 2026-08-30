@@ -278,3 +278,61 @@ def test_confirmation_cannot_be_reused_for_a_different_draft_or_path() -> None:
         ValueError, match="confirmation does not match narrative artifact"
     ):
         request_confirmed_persistence(second, confirmation)
+
+
+def test_input_mapping_order_normalizes_to_one_digest_and_confirmation() -> None:
+    fields = {
+        "purpose": _known(
+            "Ayudamos a dueños a operar con mayor claridad.", "company-local"
+        ),
+        "customer": {"status": "unknown"},
+        "differentiator": {"status": "unknown"},
+        "future_direction": {"status": "unknown"},
+    }
+    commitments = {
+        "owner": {"status": "unknown"},
+        "kpi": {"status": "unknown"},
+        "who_what_when": {"status": "unknown"},
+        "review_cadence": {"status": "unknown"},
+    }
+    first = build_narrative_artifact(
+        "procedure.build-vision-summary", fields, commitments=commitments
+    )
+    reversed_draft = build_narrative_artifact(
+        "procedure.build-vision-summary",
+        dict(reversed(tuple(fields.items()))),
+        commitments=dict(reversed(tuple(commitments.items()))),
+    )
+
+    assert tuple(reversed_draft.fields) == (
+        "purpose",
+        "customer",
+        "differentiator",
+        "future_direction",
+    )
+    assert tuple(reversed_draft.commitments) == (
+        "owner",
+        "kpi",
+        "who_what_when",
+        "review_cadence",
+    )
+    assert reversed_draft.artifact_digest == first.artifact_digest
+    assert reversed_draft.artifact_id == first.artifact_id
+
+    payload = first.model_dump(mode="json")
+    payload["fields"] = dict(reversed(tuple(payload["fields"].items())))
+    payload["commitments"] = dict(reversed(tuple(payload["commitments"].items())))
+    direct = type(first).model_validate(payload)
+    assert direct.artifact_digest == first.artifact_digest
+    assert tuple(direct.fields) == tuple(first.fields)
+
+    confirmation = ArtifactConfirmation(
+        confirmation_id="confirmation.vision.owner",
+        consent_receipt="consent.local.vision",
+        confirmed_by="person.company.owner",
+        artifact_id=first.artifact_id,
+        artifact_digest=first.artifact_digest,
+    )
+    assert (
+        request_confirmed_persistence(reversed_draft, confirmation).mode == "confirmed"
+    )

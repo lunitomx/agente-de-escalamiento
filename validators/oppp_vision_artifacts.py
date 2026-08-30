@@ -175,6 +175,29 @@ class NarrativeArtifact(_StrictModel):
     artifact_id: str = Field(pattern=r"^artifact\.sha256\.[a-f0-9]{64}$")
     artifact_digest: str = Field(pattern=r"^[a-f0-9]{64}$")
 
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_mapping_order(cls, value: object) -> object:
+        """Accept mapping order from callers, then store canonical field order."""
+        if not isinstance(value, Mapping):
+            return value
+        payload = dict(value)
+        procedure_id = payload.get("procedure_id")
+        if not isinstance(procedure_id, str):
+            return payload
+        specification = _ARTIFACT_SPECS.get(procedure_id)
+        if specification is None:
+            return payload
+        _, field_names, _ = specification
+        for name, expected in (
+            ("fields", field_names),
+            ("commitments", _COMMITMENT_FIELDS),
+        ):
+            mapping = payload.get(name)
+            if isinstance(mapping, Mapping) and set(mapping) == set(expected):
+                payload[name] = {key: mapping[key] for key in expected}
+        return payload
+
     @model_validator(mode="after")
     def validate_public_surface(self) -> "NarrativeArtifact":
         context, field_names, state_path = _ARTIFACT_SPECS[self.procedure_id]
@@ -233,7 +256,7 @@ def _answers(
     values: Mapping[str, NarrativeAnswer | Mapping[str, object]],
     expected: tuple[str, ...],
 ) -> dict[str, NarrativeAnswer]:
-    if tuple(values) != expected:
+    if set(values) != set(expected):
         raise ValueError("artifact fields do not match the procedure surface")
     return {field: NarrativeAnswer.model_validate(values[field]) for field in expected}
 
