@@ -74,5 +74,8 @@ Thumbs.db
 
 # === Generated user data (exports, not source) ===
 .scaleup/my-company/exports/
+# === Private course library and installable packs (E77) ===
+.scaleup/course-library/
+
 
 !.env.example
