@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "platform": "claude-code",
+  "public_entrypoint": "escala",
+  "core_skill": "../../escala-skills/escala/SKILL.md",
+  "local_state": "consent-required",
+  "remote_extensions": {
+    "enabled_by_default": false
+  }
+}
