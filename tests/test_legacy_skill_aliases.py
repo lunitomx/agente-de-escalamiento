@@ -24,9 +24,15 @@ def test_legacy_aliases_are_generated_from_the_catalog() -> None:
 
 
 def test_legacy_aliases_only_redirect_to_a_canonical_contract() -> None:
-    for root in (ROOT / ".claude/legacy-skills", ROOT / ".agents/skills"):
+    for root in (ROOT / ".claude/legacy-skills", ROOT / ".agents/legacy-skills"):
         for path in root.glob("scaleup-*/SKILL.md"):
             content = path.read_text(encoding="utf-8")
             assert "Alias temporal de compatibilidad" in content
             assert "no contiene lógica ni metodología propia" in content
             assert "../../../escala-skills/escala-" in content
+
+
+def test_legacy_aliases_are_not_in_discoverable_skill_roots() -> None:
+    for root in (ROOT / ".claude/skills", ROOT / ".agents/skills"):
+        if root.exists():
+            assert not list(root.glob("scaleup-*/SKILL.md"))

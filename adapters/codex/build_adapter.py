@@ -20,6 +20,9 @@ from typing import Any
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 AUTHORIZED_CATALOG_PATH = REPOSITORY_ROOT / "capabilities" / "mvp" / "catalog.json"
+CANONICAL_SKILL_PATH = REPOSITORY_ROOT / "escala-skills" / "escala" / "SKILL.md"
+CANONICAL_CATALOG_REFERENCE = "../../capabilities/mvp/catalog.json"
+CODEX_CATALOG_REFERENCE = "../../core/escala-capability-contract.json"
 if str(REPOSITORY_ROOT) not in sys.path:
     sys.path.insert(0, str(REPOSITORY_ROOT))
 
@@ -32,27 +35,6 @@ from validators.capability_map import (  # noqa: E402
 
 class CodexAdapterError(ValueError):
     """Raised before an unsafe or incomplete adapter can be published."""
-
-
-_SKILL = """---
-name: escala
-description: >
-  Puerta única de ESCALA para empresarios: entiende una necesidad en lenguaje
-  natural, recupera sólo contexto autorizado y coordina la capacidad interna
-  correcta sin mostrar comandos ni un catálogo técnico.
----
-
-# ESCALA
-
-Ayuda a la persona a avanzar su empresa con una conversación clara y una sola
-pregunta útil cuando falte contexto. Usa únicamente el contrato portable en
-`../../core/escala-capability-contract.json`; no expongas su vocabulario
-técnico, sus rutas internas ni opciones de implementación.
-
-Antes de proponer o guardar un cambio, confirma el contexto autorizado y la
-decisión de la persona. No inventes información, no habilites integraciones y
-no cambies configuraciones del entorno.
-"""
 
 
 def _resolve_directory(path: Path, *, name: str) -> Path:
@@ -123,6 +105,24 @@ def _write_json(path: Path, value: dict[str, Any]) -> None:
     )
 
 
+def _portable_skill() -> str:
+    """Project the one public skill without duplicating its methodology.
+
+    The generated Codex package places its catalog under ``core/`` while the
+    repository skill reaches it through ``capabilities/mvp``. Rewriting that
+    single relative reference is packaging, not adapter-local behavior.
+    """
+    try:
+        source = CANONICAL_SKILL_PATH.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise CodexAdapterError("canonical public skill is unavailable") from exc
+    if source.count(CANONICAL_CATALOG_REFERENCE) != 1:
+        raise CodexAdapterError(
+            "canonical public skill has an invalid catalog reference"
+        )
+    return source.replace(CANONICAL_CATALOG_REFERENCE, CODEX_CATALOG_REFERENCE)
+
+
 def _build_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
     return {
         "adapter": "codex",
@@ -191,7 +191,7 @@ def build_codex_adapter(
         _write_json(temporary / "core" / "escala-capability-contract.json", catalog)
         _write_json(temporary / "codex-adapter.json", _build_manifest(catalog))
         (temporary / "skills" / "escala" / "SKILL.md").write_text(
-            _SKILL, encoding="utf-8"
+            _portable_skill(), encoding="utf-8"
         )
         _assert_complete(temporary, catalog)
         os.replace(temporary, destination)

@@ -15,6 +15,7 @@ from adapters.codex.build_adapter import CodexAdapterError, build_codex_adapter
 
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG = ROOT / "capabilities" / "mvp" / "catalog.json"
+CANONICAL_SKILL = ROOT / "escala-skills" / "escala" / "SKILL.md"
 
 
 def _read_json(path: Path) -> dict[str, object]:
@@ -63,6 +64,10 @@ def test_public_door_hides_internal_route_names_and_platform_details(
     )
 
     skill = (destination / "skills" / "escala" / "SKILL.md").read_text(encoding="utf-8")
+    expected = CANONICAL_SKILL.read_text(encoding="utf-8").replace(
+        "../../capabilities/mvp/catalog.json",
+        "../../core/escala-capability-contract.json",
+    )
     source = _read_json(CATALOG)
     capabilities = cast(list[dict[str, object]], source["capabilities"])
     forbidden = [
@@ -80,6 +85,7 @@ def test_public_door_hides_internal_route_names_and_platform_details(
     assert "mcp" not in skill.lower()
     assert "credential" not in skill.lower()
     assert all(item not in skill for item in forbidden)
+    assert skill == expected
 
 
 def test_relative_or_outside_destination_is_rejected_before_writes(
