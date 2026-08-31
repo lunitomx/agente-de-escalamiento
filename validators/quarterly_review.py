@@ -23,7 +23,9 @@ _TEXT_MAX = 300
 _CAUSAL_LANGUAGE = re.compile(
     r"\b(because|caused|causes|causing|resulted in|led to|due to|therefore|"
     r"as a result|attributed to|driven by|porque|caus[óo]|provoc[óo]|"
-    r"result[óo] en|debido a|por lo tanto|atribui(?:do|da)|gener[óo])\b",
+    r"result[óo] en|debido a|por lo tanto|atribui(?:do|da)|gener[óo]|"
+    r"improved|increased|reduced|decreased|grew|declined|aument[óo]|reduj[óo]|"
+    r"increment[óo]|disminuy[óo])\b",
     re.IGNORECASE,
 )
 
@@ -43,14 +45,14 @@ def _text(value: str, label: str) -> str:
         not value.strip()
         or value != value.strip()
         or len(value) > _TEXT_MAX
-        or "\\n" in value
+        or "\n" in value
         or "://" in value
         or "/" in value
-        or "\\\\" in value
+        or "\\" in value
     ):
         raise ValueError(f"unsafe {label}")
     if _CAUSAL_LANGUAGE.search(value):
-        raise ValueError(f"causal language is not allowed in {label}")
+        raise ValueError(f"causal or outcome language is not allowed in {label}")
     return value
 
 
@@ -138,6 +140,14 @@ class Measurement(_StrictModel):
         _in_period(self.measured_on, self.period, "measurement date")
         for evidence in (*self.baseline_evidence, *self.current_evidence):
             _in_period(evidence.observed_on, self.period, "evidence date")
+            if evidence.observed_on > self.measured_on:
+                raise ValueError("evidence date cannot follow measurement date")
+        if max(item.observed_on for item in self.baseline_evidence) > min(
+            item.observed_on for item in self.current_evidence
+        ):
+            raise ValueError(
+                "baseline evidence must be before or equal to current evidence"
+            )
         delta = self.current - self.baseline
         direction: Literal["increased", "decreased", "unchanged"]
         if delta > 0:
@@ -157,6 +167,7 @@ ClaimKind = Literal["fact", "hypothesis", "assumption", "commitment", "no-result
 class ReviewClaim(_StrictModel):
     period: str
     kind: ClaimKind
+    reported_on: date
     statement: str
     evidence: list[EvidenceReference] = Field(min_length=1)
     causal_claim: Literal[False] = False
@@ -181,8 +192,21 @@ class ReviewClaim(_StrictModel):
 
     @model_validator(mode="after")
     def validate_evidence_period(self) -> "ReviewClaim":
+        _in_period(self.reported_on, self.period, "claim report date")
         for evidence in self.evidence:
             _in_period(evidence.observed_on, self.period, "evidence date")
+            if evidence.observed_on > self.reported_on:
+                raise ValueError("evidence date cannot follow claim report date")
+        required_prefix = {
+            "fact": "Observation:",
+            "hypothesis": "Hypothesis:",
+        }.get(self.kind)
+        if required_prefix is not None and not self.statement.startswith(
+            required_prefix
+        ):
+            raise ValueError(
+                f"{self.kind} statement must use {required_prefix} grammar"
+            )
         return self
 
 
@@ -222,6 +246,8 @@ class PlannedCommitment(_StrictModel):
         _in_period(self.due_on, self.period, "commitment due date")
         for evidence in self.evidence:
             _in_period(evidence.observed_on, self.period, "evidence date")
+            if evidence.observed_on > self.due_on:
+                raise ValueError("evidence date cannot follow commitment due date")
         return self
 
 
@@ -255,6 +281,8 @@ class ReportedCommitment(_StrictModel):
         _in_period(self.reported_on, self.period, "commitment report date")
         for evidence in self.evidence:
             _in_period(evidence.observed_on, self.period, "evidence date")
+            if evidence.observed_on > self.reported_on:
+                raise ValueError("evidence date cannot follow commitment report date")
         return self
 
 
@@ -288,6 +316,8 @@ class PlannedCadence(_StrictModel):
         _in_period(self.planned_on, self.period, "cadence planned date")
         for evidence in self.evidence:
             _in_period(evidence.observed_on, self.period, "evidence date")
+            if evidence.observed_on > self.planned_on:
+                raise ValueError("evidence date cannot follow cadence planned date")
         return self
 
 
@@ -316,6 +346,8 @@ class ReportedCadence(_StrictModel):
         _in_period(self.reported_on, self.period, "cadence report date")
         for evidence in self.evidence:
             _in_period(evidence.observed_on, self.period, "evidence date")
+            if evidence.observed_on > self.reported_on:
+                raise ValueError("evidence date cannot follow cadence report date")
         return self
 
 

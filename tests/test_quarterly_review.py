@@ -30,24 +30,28 @@ def _review() -> dict[str, object]:
             {
                 "period": _PERIOD,
                 "kind": "fact",
-                "statement": "Collections were measured at 68 days.",
+                "reported_on": "2026-09-30",
+                "statement": "Observation: collection days measured at 68.",
                 "evidence": [_evidence("current", "2026-09-30")],
             },
             {
                 "period": _PERIOD,
                 "kind": "hypothesis",
-                "statement": "Earlier invoice review may have helped collections.",
+                "reported_on": "2026-09-07",
+                "statement": "Hypothesis: invoice timing may merit further observation.",
                 "evidence": [_evidence("invoice-review")],
             },
             {
                 "period": _PERIOD,
                 "kind": "assumption",
-                "statement": "Customer mix remained comparable.",
+                "reported_on": "2026-09-07",
+                "statement": "Customer mix is treated as comparable.",
                 "evidence": [_evidence("customer-mix")],
             },
             {
                 "period": _PERIOD,
                 "kind": "commitment",
+                "reported_on": "2026-09-07",
                 "statement": "Finance will reconcile disputed invoices.",
                 "evidence": [_evidence("commitment")],
             },
@@ -101,7 +105,7 @@ def test_review_preserves_claim_types_and_evidence_without_causality() -> None:
     assert review.measurement.delta == -8
     assert review.measurement.direction == "decreased"
     assert review.claims[1].kind == "hypothesis"
-    assert review.claims[1].statement.endswith("helped collections.")
+    assert review.claims[1].statement.startswith("Hypothesis:")
     assert review.claims[1].causal_claim is False
     assert review.www_comparison is not None
     assert review.www_comparison[0].planned_evidence[0].id == "evidence.commitment-plan"
@@ -120,6 +124,7 @@ def test_no_result_yet_requires_all_claims_to_remain_no_result_yet() -> None:
         {
             "period": _PERIOD,
             "kind": "no-result-yet",
+            "reported_on": "2026-09-07",
             "statement": "The quarter has not closed and no result is available.",
             "evidence": [_evidence("period-open")],
         }
@@ -145,7 +150,8 @@ def test_no_result_yet_requires_all_claims_to_remain_no_result_yet() -> None:
         {
             "period": _PERIOD,
             "kind": "fact",
-            "statement": "A result was measured.",
+            "reported_on": "2026-09-07",
+            "statement": "Observation: a result was measured.",
             "evidence": [_evidence("false-result")],
         }
     )
@@ -193,7 +199,7 @@ def test_all_narrative_fields_reject_causal_language(field: tuple[object, ...]) 
         payload[field[0]] = causal_text  # type: ignore[index]
     else:
         payload[field[0]][field[1]][field[2]] = causal_text  # type: ignore[index]
-    with pytest.raises(ValidationError, match="causal language"):
+    with pytest.raises(ValidationError, match="causal or outcome language"):
         build_quarterly_review(payload)
 
 
@@ -248,4 +254,97 @@ def test_commitment_due_on_accepts_quarter_boundaries_and_rejects_outside() -> N
     payload = _review()
     payload["planned_commitments"][0]["due_on"] = "2026-10-01"  # type: ignore[index]
     with pytest.raises(ValidationError, match="due date"):
+        build_quarterly_review(payload)
+
+
+@pytest.mark.parametrize(
+    "statement",
+    [
+        "Observation: collection days improved.",
+        "Hypothesis: invoices reduced collection days.",
+        "Observation: collection days aumentó.",
+        "Hypothesis: invoices redujo collection days.",
+    ],
+)
+def test_fact_and_hypothesis_reject_outcome_verbs(statement: str) -> None:
+    payload = _review()
+    payload["claims"][0]["statement"] = statement  # type: ignore[index]
+    with pytest.raises(ValidationError, match="causal or outcome language"):
+        build_quarterly_review(payload)
+
+
+def test_fact_and_hypothesis_require_observation_or_hypothesis_grammar() -> None:
+    payload = _review()
+    payload["claims"][0]["statement"] = "Collection days measured at 68."  # type: ignore[index]
+    with pytest.raises(ValidationError, match="Observation"):
+        build_quarterly_review(payload)
+
+    payload = _review()
+    payload["claims"][1]["statement"] = "Invoice timing may merit observation."  # type: ignore[index]
+    with pytest.raises(ValidationError, match="Hypothesis"):
+        build_quarterly_review(payload)
+
+
+@pytest.mark.parametrize(
+    ("path", "value", "match"),
+    [
+        (
+            ("measurement", "current_evidence", 0, "observed_on"),
+            "2026-10-01",
+            "measurement",
+        ),
+        (("claims", 0, "evidence", 0, "observed_on"), "2026-10-01", "claim"),
+        (
+            ("planned_commitments", 0, "evidence", 0, "observed_on"),
+            "2026-10-01",
+            "commitment",
+        ),
+        (
+            ("reported_commitments", 0, "evidence", 0, "observed_on"),
+            "2026-10-01",
+            "commitment",
+        ),
+        (
+            ("planned_cadences", 0, "evidence", 0, "observed_on"),
+            "2026-10-01",
+            "cadence",
+        ),
+        (
+            ("reported_cadences", 0, "evidence", 0, "observed_on"),
+            "2026-10-01",
+            "cadence",
+        ),
+    ],
+)
+def test_review_rejects_evidence_recorded_after_its_event(
+    path: tuple[object, ...], value: object, match: str
+) -> None:
+    payload = _review()
+    target: object = payload
+    for part in path[:-1]:
+        target = target[part]  # type: ignore[index]
+    target[path[-1]] = value  # type: ignore[index]
+    with pytest.raises(ValidationError, match=match):
+        build_quarterly_review(payload)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("proposed_learning", "Observation:\ncollection days measured at 68."),
+        ("proposed_decision", "Observation: collection\\days measured at 68."),
+    ],
+)
+def test_narrative_rejects_actual_newline_and_backslash(field: str, value: str) -> None:
+    payload = _review()
+    payload[field] = value
+    with pytest.raises(ValidationError, match="unsafe proposed review text"):
+        build_quarterly_review(payload)
+
+
+def test_measurement_rejects_baseline_evidence_after_current_evidence() -> None:
+    payload = _review()
+    payload["measurement"]["current_evidence"][0]["observed_on"] = "2026-09-29"  # type: ignore[index]
+    payload["measurement"]["baseline_evidence"][0]["observed_on"] = "2026-09-30"  # type: ignore[index]
+    with pytest.raises(ValidationError, match="baseline evidence"):
         build_quarterly_review(payload)
