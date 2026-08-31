@@ -269,6 +269,37 @@ marker_count() {
     grep -Fxc -- "$marker" "$file" || true
 }
 
+validate_claude_block() {
+    local file="$1"
+    local begin="$2"
+    local end="$3"
+    local line
+    local state="outside"
+    local begin_count=0
+
+    [[ ! -f "$file" ]] && return 0
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        case "$line" in
+            "$begin")
+                if [[ "$state" != "outside" || "$begin_count" != "0" ]]; then
+                    return 1
+                fi
+                state="inside"
+                begin_count=1
+                ;;
+            "$end")
+                if [[ "$state" != "inside" ]]; then
+                    return 1
+                fi
+                state="outside"
+                ;;
+            *"ESCALA:BEGIN"*|*"ESCALA:END"*)
+                return 1
+                ;;
+        esac
+    done < "$file"
+    [[ "$state" == "outside" ]]
+}
 render_claude_block() {
     local skill_dir="$1"
     local catalog_path="$2"
@@ -299,7 +330,6 @@ prepare_claude_instructions() {
     local begin="<!-- ESCALA:BEGIN -->"
     local end="<!-- ESCALA:END -->"
     local begin_count
-    local end_count
     local prepared
     local line
     local replacing=false
@@ -309,12 +339,11 @@ prepare_claude_instructions() {
         return 1
     fi
     mkdir -p "$claude_root"
-    begin_count="$(marker_count "$target" "$begin")"
-    end_count="$(marker_count "$target" "$end")"
-    if [[ "$begin_count" != "0" || "$end_count" != "0" ]] && [[ "$begin_count" != "1" || "$end_count" != "1" ]]; then
-        echo "El bloque ESCALA existente en CLAUDE.md está incompleto; no se modificó." >&2
+    if ! validate_claude_block "$target" "$begin" "$end"; then
+        echo "El bloque ESCALA existente en CLAUDE.md está incompleto o malformado; no se modificó." >&2
         return 1
     fi
+    begin_count="$(marker_count "$target" "$begin")"
     prepared="$(mktemp "$claude_root/.escala-claude.XXXXXX")" || {
         echo "No se pudo preparar el contrato Claude de ESCALA." >&2
         return 1

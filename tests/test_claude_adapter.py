@@ -148,6 +148,39 @@ def test_malformed_managed_claude_block_fails_before_skill_install(
     assert not (home / ".claude" / "skills" / "escala").exists()
 
 
+def test_inverted_claude_markers_fail_before_skill_install(tmp_path: Path) -> None:
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    claude = bin_dir / "claude"
+    claude.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+    claude.chmod(0o755)
+    home = tmp_path / "home"
+    instructions = home / ".claude" / "CLAUDE.md"
+    instructions.parent.mkdir(parents=True)
+    original = (
+        "# Mis reglas\n"
+        "<!-- ESCALA:END -->\n"
+        "contenido que debe conservarse\n"
+        "<!-- ESCALA:BEGIN -->\n"
+        "contenido posterior que debe conservarse\n"
+    )
+    instructions.write_text(original, encoding="utf-8")
+
+    completed = subprocess.run(
+        ["bash", str(INSTALLER), "--skills-only", "--platform", "claude"],
+        cwd=ROOT,
+        env={"HOME": str(home), "PATH": f"{bin_dir}:{os.environ['PATH']}"},
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert completed.returncode == 1
+    assert "incompleto o malformado" in completed.stderr
+    assert instructions.read_text(encoding="utf-8") == original
+    assert not (home / ".claude" / "skills" / "escala").exists()
+
+
 def test_checkout_claude_surface_exposes_only_escala() -> None:
     skills = ROOT / ".claude" / "skills"
     assert sorted(path.name for path in skills.iterdir()) == ["escala"]
