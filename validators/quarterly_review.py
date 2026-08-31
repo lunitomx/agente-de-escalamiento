@@ -1,8 +1,8 @@
-"""Evidence-bounded quarterly review drafts for the E65 MVP.
+"""Structured, evidence-bounded quarterly review drafts for the E65 MVP.
 
-This module evaluates only reported, period-bound evidence. It never infers
-causality, writes company state, marks commitments complete, or schedules a
-future review. Those actions require later trusted adapters.
+Claims deliberately have no free narrative field.  They are bounded records and
+are rendered by code, so a caller cannot turn a quarterly observation or a
+hypothesis into an unverified causal story.
 """
 
 from __future__ import annotations
@@ -10,7 +10,7 @@ from __future__ import annotations
 import math
 import re
 from datetime import date
-from typing import Literal
+from typing import Annotated, Literal, Union
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
@@ -19,13 +19,8 @@ from validators.procedure_compiler import compile_mvp_procedures
 
 _ID = re.compile(r"^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$")
 _PERIOD = re.compile(r"^(?P<year>\d{4})-q(?P<quarter>[1-4])$")
-_TEXT_MAX = 300
-_CAUSAL_LANGUAGE = re.compile(
-    r"\b(because|caused|causes|causing|resulted in|led to|due to|therefore|"
-    r"as a result|attributed to|driven by|porque|caus[óo]|provoc[óo]|"
-    r"result[óo] en|debido a|por lo tanto|atribui(?:do|da)|gener[óo]|"
-    r"improved|increased|reduced|decreased|grew|declined|aument[óo]|reduj[óo]|"
-    r"increment[óo]|disminuy[óo])\b",
+_FORBIDDEN_ID_TERMS = re.compile(
+    r"(?:^|[._-])(boosted|rose|improved|increased|reduced|decreased|explains|enabled|made|aument[óo]|reduj[óo]|explica|habilit[óo]|hizo)(?:$|[._-])",
     re.IGNORECASE,
 )
 
@@ -35,24 +30,8 @@ class _StrictModel(BaseModel):
 
 
 def _identifier(value: str, label: str) -> str:
-    if _ID.fullmatch(value) is None:
+    if _ID.fullmatch(value) is None or _FORBIDDEN_ID_TERMS.search(value):
         raise ValueError(f"unsafe {label}")
-    return value
-
-
-def _text(value: str, label: str) -> str:
-    if (
-        not value.strip()
-        or value != value.strip()
-        or len(value) > _TEXT_MAX
-        or "\n" in value
-        or "://" in value
-        or "/" in value
-        or "\\" in value
-    ):
-        raise ValueError(f"unsafe {label}")
-    if _CAUSAL_LANGUAGE.search(value):
-        raise ValueError(f"causal or outcome language is not allowed in {label}")
     return value
 
 
@@ -62,15 +41,12 @@ def _period_bounds(period: str) -> tuple[date, date]:
         raise ValueError("unsafe period")
     year = int(match.group("year"))
     quarter = int(match.group("quarter"))
-    month = ((quarter - 1) * 3) + 1
-    start = date(year, month, 1)
+    start_month = (quarter - 1) * 3 + 1
+    start = date(year, start_month, 1)
     if quarter == 4:
-        end = date(year, 12, 31)
-    else:
-        end = date(year, month + 3, 1).fromordinal(
-            date(year, month + 3, 1).toordinal() - 1
-        )
-    return start, end
+        return start, date(year, 12, 31)
+    next_quarter = date(year, start_month + 3, 1)
+    return start, date.fromordinal(next_quarter.toordinal() - 1)
 
 
 def _in_period(value: date, period: str, label: str) -> date:
@@ -98,11 +74,105 @@ def _evidence(values: list[EvidenceReference]) -> list[EvidenceReference]:
     return values
 
 
+class _PeriodEvidence(_StrictModel):
+    period: str
+    reported_on: date
+    evidence: list[EvidenceReference] = Field(min_length=1)
+
+    @field_validator("period")
+    @classmethod
+    def validate_period(cls, value: str) -> str:
+        _period_bounds(value)
+        return value
+
+    @field_validator("evidence")
+    @classmethod
+    def validate_evidence(
+        cls, value: list[EvidenceReference]
+    ) -> list[EvidenceReference]:
+        return _evidence(value)
+
+    @model_validator(mode="after")
+    def validate_evidence_time(self) -> "_PeriodEvidence":
+        _in_period(self.reported_on, self.period, "report date")
+        for item in self.evidence:
+            _in_period(item.observed_on, self.period, "evidence date")
+            if item.observed_on > self.reported_on:
+                raise ValueError("evidence date cannot follow report date")
+        return self
+
+
+class Observation(_PeriodEvidence):
+    """A single observed measurement, not an explanation or relationship."""
+
+    kind: Literal["fact"]
+    metric_id: str
+    value: float
+    unit_id: str
+
+    @field_validator("metric_id", "unit_id")
+    @classmethod
+    def validate_identifier(cls, value: str) -> str:
+        return _identifier(value, "observation identifier")
+
+    @field_validator("value")
+    @classmethod
+    def validate_value(cls, value: float) -> float:
+        if not math.isfinite(value):
+            raise ValueError("observation value must be finite")
+        return value
+
+
+class Hypothesis(_PeriodEvidence):
+    """A bounded research question; it does not encode a causal conclusion."""
+
+    kind: Literal["hypothesis"]
+    model_origin: Literal["model-hypothesis"]
+    factor_id: str
+    metric_id: str
+
+    @field_validator("factor_id", "metric_id")
+    @classmethod
+    def validate_identifier(cls, value: str) -> str:
+        return _identifier(value, "hypothesis identifier")
+
+
+class Assumption(_PeriodEvidence):
+    kind: Literal["assumption"]
+    assumption_id: str
+
+    @field_validator("assumption_id")
+    @classmethod
+    def validate_identifier(cls, value: str) -> str:
+        return _identifier(value, "assumption ID")
+
+
+class CommitmentClaim(_PeriodEvidence):
+    kind: Literal["commitment"]
+    commitment_id: str
+
+    @field_validator("commitment_id")
+    @classmethod
+    def validate_identifier(cls, value: str) -> str:
+        return _identifier(value, "commitment ID")
+
+
+class NoResultYet(_PeriodEvidence):
+    kind: Literal["no-result-yet"]
+    reason_id: Literal["period-open", "evidence-pending", "measurement-pending"]
+
+
+ReviewClaim = Annotated[
+    Union[Observation, Hypothesis, Assumption, CommitmentClaim, NoResultYet],
+    Field(discriminator="kind"),
+]
+
+
 class Measurement(_StrictModel):
     period: str
     measured_on: date
-    name: str
-    unit: str
+    metric_id: str
+    unit_id: str
     baseline: float
     current: float
     baseline_evidence: list[EvidenceReference] = Field(min_length=1)
@@ -116,10 +186,10 @@ class Measurement(_StrictModel):
         _period_bounds(value)
         return value
 
-    @field_validator("name", "unit")
+    @field_validator("metric_id", "unit_id")
     @classmethod
-    def validate_text(cls, value: str) -> str:
-        return _text(value, "measurement text")
+    def validate_identifier(cls, value: str) -> str:
+        return _identifier(value, "measurement identifier")
 
     @field_validator("baseline", "current")
     @classmethod
@@ -136,11 +206,11 @@ class Measurement(_StrictModel):
         return _evidence(value)
 
     @model_validator(mode="after")
-    def validate_period_and_derive_comparison(self) -> "Measurement":
+    def validate_time_and_derive(self) -> "Measurement":
         _in_period(self.measured_on, self.period, "measurement date")
-        for evidence in (*self.baseline_evidence, *self.current_evidence):
-            _in_period(evidence.observed_on, self.period, "evidence date")
-            if evidence.observed_on > self.measured_on:
+        for item in (*self.baseline_evidence, *self.current_evidence):
+            _in_period(item.observed_on, self.period, "evidence date")
+            if item.observed_on > self.measured_on:
                 raise ValueError("evidence date cannot follow measurement date")
         if max(item.observed_on for item in self.baseline_evidence) > min(
             item.observed_on for item in self.current_evidence
@@ -150,63 +220,11 @@ class Measurement(_StrictModel):
             )
         delta = self.current - self.baseline
         direction: Literal["increased", "decreased", "unchanged"]
-        if delta > 0:
-            direction = "increased"
-        elif delta < 0:
-            direction = "decreased"
-        else:
-            direction = "unchanged"
+        direction = (
+            "increased" if delta > 0 else "decreased" if delta < 0 else "unchanged"
+        )
         if self.delta != delta or self.direction != direction:
             return self.model_copy(update={"delta": delta, "direction": direction})
-        return self
-
-
-ClaimKind = Literal["fact", "hypothesis", "assumption", "commitment", "no-result-yet"]
-
-
-class ReviewClaim(_StrictModel):
-    period: str
-    kind: ClaimKind
-    reported_on: date
-    statement: str
-    evidence: list[EvidenceReference] = Field(min_length=1)
-    causal_claim: Literal[False] = False
-
-    @field_validator("period")
-    @classmethod
-    def validate_period(cls, value: str) -> str:
-        _period_bounds(value)
-        return value
-
-    @field_validator("statement")
-    @classmethod
-    def validate_statement(cls, value: str) -> str:
-        return _text(value, "claim statement")
-
-    @field_validator("evidence")
-    @classmethod
-    def validate_evidence(
-        cls, value: list[EvidenceReference]
-    ) -> list[EvidenceReference]:
-        return _evidence(value)
-
-    @model_validator(mode="after")
-    def validate_evidence_period(self) -> "ReviewClaim":
-        _in_period(self.reported_on, self.period, "claim report date")
-        for evidence in self.evidence:
-            _in_period(evidence.observed_on, self.period, "evidence date")
-            if evidence.observed_on > self.reported_on:
-                raise ValueError("evidence date cannot follow claim report date")
-        required_prefix = {
-            "fact": "Observation:",
-            "hypothesis": "Hypothesis:",
-        }.get(self.kind)
-        if required_prefix is not None and not self.statement.startswith(
-            required_prefix
-        ):
-            raise ValueError(
-                f"{self.kind} statement must use {required_prefix} grammar"
-            )
         return self
 
 
@@ -214,7 +232,7 @@ class PlannedCommitment(_StrictModel):
     period: str
     id: str
     owner_id: str
-    action: str
+    action_id: str
     due_on: date
     evidence: list[EvidenceReference] = Field(min_length=1)
 
@@ -224,15 +242,10 @@ class PlannedCommitment(_StrictModel):
         _period_bounds(value)
         return value
 
-    @field_validator("id", "owner_id")
+    @field_validator("id", "owner_id", "action_id")
     @classmethod
-    def validate_id(cls, value: str) -> str:
-        return _identifier(value, "commitment ID")
-
-    @field_validator("action")
-    @classmethod
-    def validate_action(cls, value: str) -> str:
-        return _text(value, "commitment action")
+    def validate_identifier(cls, value: str) -> str:
+        return _identifier(value, "commitment identifier")
 
     @field_validator("evidence")
     @classmethod
@@ -242,54 +255,29 @@ class PlannedCommitment(_StrictModel):
         return _evidence(value)
 
     @model_validator(mode="after")
-    def validate_dates(self) -> "PlannedCommitment":
+    def validate_time(self) -> "PlannedCommitment":
         _in_period(self.due_on, self.period, "commitment due date")
-        for evidence in self.evidence:
-            _in_period(evidence.observed_on, self.period, "evidence date")
-            if evidence.observed_on > self.due_on:
+        for item in self.evidence:
+            _in_period(item.observed_on, self.period, "evidence date")
+            if item.observed_on > self.due_on:
                 raise ValueError("evidence date cannot follow commitment due date")
         return self
 
 
-class ReportedCommitment(_StrictModel):
-    period: str
+class ReportedCommitment(_PeriodEvidence):
     id: str
-    reported_on: date
     status: Literal["reported-complete", "reported-open", "no-result-yet"]
-    evidence: list[EvidenceReference] = Field(min_length=1)
-
-    @field_validator("period")
-    @classmethod
-    def validate_period(cls, value: str) -> str:
-        _period_bounds(value)
-        return value
 
     @field_validator("id")
     @classmethod
     def validate_id(cls, value: str) -> str:
         return _identifier(value, "commitment ID")
 
-    @field_validator("evidence")
-    @classmethod
-    def validate_evidence(
-        cls, value: list[EvidenceReference]
-    ) -> list[EvidenceReference]:
-        return _evidence(value)
-
-    @model_validator(mode="after")
-    def validate_dates(self) -> "ReportedCommitment":
-        _in_period(self.reported_on, self.period, "commitment report date")
-        for evidence in self.evidence:
-            _in_period(evidence.observed_on, self.period, "evidence date")
-            if evidence.observed_on > self.reported_on:
-                raise ValueError("evidence date cannot follow commitment report date")
-        return self
-
 
 class PlannedCadence(_StrictModel):
     period: str
     cadence: Literal["daily", "weekly", "monthly", "quarterly"]
-    purpose: str
+    purpose_id: str
     planned_on: date
     evidence: list[EvidenceReference] = Field(min_length=1)
 
@@ -299,10 +287,10 @@ class PlannedCadence(_StrictModel):
         _period_bounds(value)
         return value
 
-    @field_validator("purpose")
+    @field_validator("purpose_id")
     @classmethod
-    def validate_purpose(cls, value: str) -> str:
-        return _text(value, "cadence purpose")
+    def validate_id(cls, value: str) -> str:
+        return _identifier(value, "cadence purpose ID")
 
     @field_validator("evidence")
     @classmethod
@@ -312,59 +300,53 @@ class PlannedCadence(_StrictModel):
         return _evidence(value)
 
     @model_validator(mode="after")
-    def validate_dates(self) -> "PlannedCadence":
+    def validate_time(self) -> "PlannedCadence":
         _in_period(self.planned_on, self.period, "cadence planned date")
-        for evidence in self.evidence:
-            _in_period(evidence.observed_on, self.period, "evidence date")
-            if evidence.observed_on > self.planned_on:
+        for item in self.evidence:
+            _in_period(item.observed_on, self.period, "evidence date")
+            if item.observed_on > self.planned_on:
                 raise ValueError("evidence date cannot follow cadence planned date")
         return self
 
 
-class ReportedCadence(_StrictModel):
-    period: str
+class ReportedCadence(_PeriodEvidence):
     cadence: Literal["daily", "weekly", "monthly", "quarterly"]
-    reported_on: date
     status: Literal["reported-held", "reported-not-held", "no-result-yet"]
-    evidence: list[EvidenceReference] = Field(min_length=1)
-
-    @field_validator("period")
-    @classmethod
-    def validate_period(cls, value: str) -> str:
-        _period_bounds(value)
-        return value
-
-    @field_validator("evidence")
-    @classmethod
-    def validate_evidence(
-        cls, value: list[EvidenceReference]
-    ) -> list[EvidenceReference]:
-        return _evidence(value)
-
-    @model_validator(mode="after")
-    def validate_dates(self) -> "ReportedCadence":
-        _in_period(self.reported_on, self.period, "cadence report date")
-        for evidence in self.evidence:
-            _in_period(evidence.observed_on, self.period, "evidence date")
-            if evidence.observed_on > self.reported_on:
-                raise ValueError("evidence date cannot follow cadence report date")
-        return self
 
 
 class CommitmentComparison(_StrictModel):
     id: str
-    planned_action: str
+    planned_action_id: str
     planned_evidence: list[EvidenceReference]
     reported_status: Literal["reported-complete", "reported-open", "no-result-yet"]
     reported_evidence: list[EvidenceReference]
+    summary: str
 
 
 class CadenceComparison(_StrictModel):
     cadence: Literal["daily", "weekly", "monthly", "quarterly"]
-    planned_purpose: str
+    planned_purpose_id: str
     planned_evidence: list[EvidenceReference]
     reported_status: Literal["reported-held", "reported-not-held", "no-result-yet"]
     reported_evidence: list[EvidenceReference]
+    summary: str
+
+
+LearningKind = Literal[
+    "continue-measurement", "request-evidence", "reassess-constraint"
+]
+DecisionKind = Literal["continue-review", "request-evidence", "reassess-constraint"]
+
+
+class ReviewProposal(_StrictModel):
+    learning_kind: LearningKind
+    decision_kind: DecisionKind
+    subject_id: str
+
+    @field_validator("subject_id")
+    @classmethod
+    def validate_subject(cls, value: str) -> str:
+        return _identifier(value, "proposal subject ID")
 
 
 class ProposedReviewPersistence(_StrictModel):
@@ -376,7 +358,9 @@ class ProposedReviewPersistence(_StrictModel):
 
 class NextReview(_StrictModel):
     status: Literal["proposed"] = "proposed"
-    prompt: str = "Confirm when to hold the next quarterly review."
+    prompt: Literal["Confirm when to hold the next quarterly review."] = (
+        "Confirm when to hold the next quarterly review."
+    )
     scheduled_on: Literal[None] = None
 
 
@@ -388,8 +372,7 @@ class QuarterlyReviewInput(_StrictModel):
     reported_commitments: list[ReportedCommitment] | None = None
     planned_cadences: list[PlannedCadence] | None = None
     reported_cadences: list[ReportedCadence] | None = None
-    proposed_learning: str
-    proposed_decision: str
+    proposal: ReviewProposal
 
     @field_validator("period")
     @classmethod
@@ -397,34 +380,26 @@ class QuarterlyReviewInput(_StrictModel):
         _period_bounds(value)
         return value
 
-    @field_validator("proposed_learning", "proposed_decision")
-    @classmethod
-    def validate_proposal(cls, value: str) -> str:
-        return _text(value, "proposed review text")
-
     @model_validator(mode="after")
-    def validate_review_boundary(self) -> "QuarterlyReviewInput":
-        pairs = (
+    def validate_boundary(self) -> "QuarterlyReviewInput":
+        for planned, reported, name in (
             (self.planned_commitments, self.reported_commitments, "commitment"),
             (self.planned_cadences, self.reported_cadences, "cadence"),
-        )
-        for planned, reported, name in pairs:
+        ):
             if (planned is None) != (reported is None):
                 raise ValueError(
                     f"both planned and reported {name} inputs are required"
                 )
         if self.measurement is None and any(
-            claim.kind != "no-result-yet" for claim in self.claims
+            item.kind != "no-result-yet" for item in self.claims
         ):
             raise ValueError(
                 "missing measurement requires all claims to be no-result-yet"
             )
         if self.measurement is not None and self.measurement.period != self.period:
             raise ValueError("measurement period must match review period")
-        for claim in self.claims:
-            if claim.period != self.period:
-                raise ValueError("claim period must match review period")
         for items, label in (
+            (self.claims, "claim"),
             (self.planned_commitments, "planned commitment"),
             (self.reported_commitments, "reported commitment"),
             (self.planned_cadences, "planned cadence"),
@@ -440,6 +415,7 @@ class QuarterlyReview(_StrictModel):
     period: str
     measurement: Measurement | None
     claims: list[ReviewClaim]
+    rendered_claims: list[str]
     www_comparison: list[CommitmentComparison] | None
     cadence_comparison: list[CadenceComparison] | None
     learning: str
@@ -449,20 +425,50 @@ class QuarterlyReview(_StrictModel):
     persistence: ProposedReviewPersistence
 
 
+def _render_claim(item: ReviewClaim) -> str:
+    if isinstance(item, Observation):
+        return f"Observation: {item.metric_id} measured {item.value:g} {item.unit_id}."
+    if isinstance(item, Hypothesis):
+        return f"Hypothesis to investigate: {item.factor_id} and {item.metric_id}."
+    if isinstance(item, Assumption):
+        return f"Assumption awaiting confirmation: {item.assumption_id}."
+    if isinstance(item, CommitmentClaim):
+        return f"Commitment under review: {item.commitment_id}."
+    return f"No result yet: {item.reason_id}."
+
+
+def _render_learning(kind: LearningKind, subject: str) -> str:
+    return {
+        "continue-measurement": f"Learning proposal: continue measuring {subject}.",
+        "request-evidence": f"Learning proposal: request evidence for {subject}.",
+        "reassess-constraint": f"Learning proposal: reassess constraint {subject}.",
+    }[kind]
+
+
+def _render_decision(kind: DecisionKind, subject: str) -> str:
+    return {
+        "continue-review": f"Decision proposal: continue review of {subject}.",
+        "request-evidence": f"Decision proposal: request evidence for {subject}.",
+        "reassess-constraint": f"Decision proposal: reassess constraint {subject}.",
+    }[kind]
+
+
 def _ensure_review_contract() -> None:
-    identifiers = {contract.id for contract in compile_mvp_procedures().contracts}
-    if "procedure.scaleup-quarterly-review" not in identifiers:
+    if "procedure.scaleup-quarterly-review" not in {
+        contract.id for contract in compile_mvp_procedures().contracts
+    }:
         raise ValueError("quarterly review procedure is not in the MVP release")
 
 
 def _compare_commitments(
-    planned: list[PlannedCommitment] | None,
-    reported: list[ReportedCommitment] | None,
+    planned: list[PlannedCommitment] | None, reported: list[ReportedCommitment] | None
 ) -> list[CommitmentComparison] | None:
     if planned is None or reported is None:
         return None
-    planned_by_id = {item.id: item for item in planned}
-    reported_by_id = {item.id: item for item in reported}
+    planned_by_id, reported_by_id = (
+        {item.id: item for item in planned},
+        {item.id: item for item in reported},
+    )
     if len(planned_by_id) != len(planned) or len(reported_by_id) != len(reported):
         raise ValueError("duplicate commitment comparison ID")
     if set(planned_by_id) != set(reported_by_id):
@@ -470,23 +476,25 @@ def _compare_commitments(
     return [
         CommitmentComparison(
             id=item.id,
-            planned_action=item.action,
+            planned_action_id=item.action_id,
             planned_evidence=item.evidence,
             reported_status=reported_by_id[item.id].status,
             reported_evidence=reported_by_id[item.id].evidence,
+            summary=f"Commitment {item.id}: {reported_by_id[item.id].status}.",
         )
         for item in planned
     ]
 
 
 def _compare_cadences(
-    planned: list[PlannedCadence] | None,
-    reported: list[ReportedCadence] | None,
+    planned: list[PlannedCadence] | None, reported: list[ReportedCadence] | None
 ) -> list[CadenceComparison] | None:
     if planned is None or reported is None:
         return None
-    planned_by_name = {item.cadence: item for item in planned}
-    reported_by_name = {item.cadence: item for item in reported}
+    planned_by_name, reported_by_name = (
+        {item.cadence: item for item in planned},
+        {item.cadence: item for item in reported},
+    )
     if len(planned_by_name) != len(planned) or len(reported_by_name) != len(reported):
         raise ValueError("duplicate cadence comparison")
     if set(planned_by_name) != set(reported_by_name):
@@ -494,10 +502,11 @@ def _compare_cadences(
     return [
         CadenceComparison(
             cadence=item.cadence,
-            planned_purpose=item.purpose,
+            planned_purpose_id=item.purpose_id,
             planned_evidence=item.evidence,
             reported_status=reported_by_name[item.cadence].status,
             reported_evidence=reported_by_name[item.cadence].evidence,
+            summary=f"Cadence {item.cadence}: {reported_by_name[item.cadence].status}.",
         )
         for item in planned
     ]
@@ -515,23 +524,26 @@ def build_quarterly_review(
     cadence_comparison = _compare_cadences(
         review_input.planned_cadences, review_input.reported_cadences
     )
-    open_questions: list[str] = []
-    if review_input.measurement is None:
-        open_questions.append("measurement")
+    questions = [] if review_input.measurement is not None else ["measurement"]
     if www_comparison is None:
-        open_questions.append("who-what-when")
+        questions.append("who-what-when")
     if cadence_comparison is None:
-        open_questions.append("cadence")
+        questions.append("cadence")
     return QuarterlyReview(
         procedure_id="procedure.scaleup-quarterly-review",
         period=review_input.period,
         measurement=review_input.measurement,
         claims=review_input.claims,
+        rendered_claims=[_render_claim(item) for item in review_input.claims],
         www_comparison=www_comparison,
         cadence_comparison=cadence_comparison,
-        learning=review_input.proposed_learning,
-        decision=review_input.proposed_decision,
-        open_questions=open_questions,
+        learning=_render_learning(
+            review_input.proposal.learning_kind, review_input.proposal.subject_id
+        ),
+        decision=_render_decision(
+            review_input.proposal.decision_kind, review_input.proposal.subject_id
+        ),
+        open_questions=questions,
         next_review=NextReview(),
         persistence=ProposedReviewPersistence(),
     )
