@@ -1,0 +1,11 @@
+[
+  {"case_id":"ACT-001","action":"route","resolved_intent":"diagnose-primary-constraint"},
+  {"case_id":"ACT-002","action":"route","resolved_intent":"build-leader-oppp"},
+  {"case_id":"ACT-003","action":"route","resolved_intent":"build-vision-summary"},
+  {"case_id":"ACT-004","action":"route","resolved_intent":"set-quarterly-priority"},
+  {"case_id":"ACT-005","action":"route","resolved_intent":"install-meeting-rhythm"},
+  {"case_id":"ACT-006","action":"route","resolved_intent":"run-quarterly-review"},
+  {"case_id":"ACT-007","action":"clarify","resolved_intent":null},
+  {"case_id":"ACT-008","action":"clarify","resolved_intent":null},
+  {"case_id":"ACT-009","action":"route","resolved_intent":"set-quarterly-priority"}
+]
