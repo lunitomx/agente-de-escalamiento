@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "catalog_id": "escala.mvp-capability-map.v1",
+  "lifecycle": [
+    "route",
+    "collect-authorized-evidence",
+    "run-procedure",
+    "validate-artifact",
+    "propose-state",
+    "handoff"
+  ],
+  "specialist_profiles": [
+    {
+      "id": "specialist.cash.v1",
+      "area": "cash",
+      "kind": "role-definition",
+      "contract_ref": "e45.specialist.cash.v1"
+    },
+    {
+      "id": "specialist.execution.v1",
+      "area": "execution",
+      "kind": "role-definition",
+      "contract_ref": "e45.specialist.execution.v1"
+    },
+    {
+      "id": "specialist.people.v1",
+      "area": "people",
+      "kind": "role-definition",
+      "contract_ref": "e45.specialist.people.v1"
+    },
+    {
+      "id": "specialist.strategy.v1",
+      "area": "strategy",
+      "kind": "role-definition",
+      "contract_ref": "e45.specialist.strategy.v1"
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "capability.diagnose-primary-constraint",
+      "procedure_id": "procedure.diagnose-primary-constraint",
+      "intents": ["diagnose-primary-constraint"],
+      "aliases": ["diagnose", "primary-constraint"],
+      "evidence_kinds": ["company-context"],
+      "specialist_profiles": [
+        "specialist.cash.v1",
+        "specialist.execution.v1",
+        "specialist.people.v1",
+        "specialist.strategy.v1"
+      ]
+    },
+    {
+      "id": "capability.build-leader-oppp",
+      "procedure_id": "procedure.build-leader-oppp",
+      "intents": ["build-leader-oppp"],
+      "aliases": ["leader-oppp", "personal-plan"],
+      "evidence_kinds": ["leader-context"],
+      "specialist_profiles": ["specialist.people.v1"]
+    },
+    {
+      "id": "capability.build-vision-summary",
+      "procedure_id": "procedure.build-vision-summary",
+      "intents": ["build-vision-summary"],
+      "aliases": ["vision-summary", "strategy-vision"],
+      "evidence_kinds": ["organization-context"],
+      "specialist_profiles": ["specialist.strategy.v1"]
+    },
+    {
+      "id": "capability.set-quarterly-priority",
+      "procedure_id": "procedure.set-quarterly-priority",
+      "intents": ["set-quarterly-priority"],
+      "aliases": ["quarterly-priority", "quarterly-focus"],
+      "evidence_kinds": ["primary-constraint"],
+      "specialist_profiles": ["specialist.execution.v1"]
+    },
+    {
+      "id": "capability.install-meeting-rhythm",
+      "procedure_id": "procedure.install-meeting-rhythm",
+      "intents": ["install-meeting-rhythm"],
+      "aliases": ["meeting-rhythm", "operating-rhythm"],
+      "evidence_kinds": ["execution-context"],
+      "specialist_profiles": ["specialist.execution.v1"]
+    },
+    {
+      "id": "capability.scaleup-quarterly-review",
+      "procedure_id": "procedure.scaleup-quarterly-review",
+      "intents": ["scaleup-quarterly-review"],
+      "aliases": ["quarterly-review", "review-quarter"],
+      "evidence_kinds": ["current-quarter"],
+      "specialist_profiles": ["specialist.execution.v1"]
+    }
+  ]
+}
