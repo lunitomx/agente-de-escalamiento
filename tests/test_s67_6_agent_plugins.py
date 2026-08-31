@@ -101,6 +101,14 @@ def test_discovery_is_limited_to_direct_skills_children(tmp_path: Path) -> None:
     assert discover_public_skills(root) == ("escala",)
 
 
+def test_rejects_an_empty_mcp_directory(tmp_path: Path) -> None:
+    package = _build(tmp_path)
+    (package / "mcp").mkdir()
+
+    with pytest.raises(AgentPluginError, match="package_surface_invalid"):
+        load_agent_plugin(package)
+
+
 def test_builder_rejects_an_output_outside_its_explicit_root(tmp_path: Path) -> None:
     allowed_root = tmp_path / "allowed"
     allowed_root.mkdir()

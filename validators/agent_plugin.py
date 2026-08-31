@@ -22,10 +22,13 @@ AUTHORIZED_CATALOG_PATH = REPOSITORY_ROOT / "capabilities" / "mvp" / "catalog.js
 AGENT_PLUGIN_SCHEMA_URL = "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json"
 PUBLIC_SKILL_NAME = "escala"
 SKILL_CATALOG_REFERENCE = "references/capability-catalog.json"
-PACKAGE_FILES = frozenset(
+PACKAGE_PATHS = frozenset(
     {
         "plugin.json",
+        "skills",
+        f"skills/{PUBLIC_SKILL_NAME}",
         f"skills/{PUBLIC_SKILL_NAME}/SKILL.md",
+        f"skills/{PUBLIC_SKILL_NAME}/references",
         f"skills/{PUBLIC_SKILL_NAME}/{SKILL_CATALOG_REFERENCE}",
     }
 )
@@ -124,10 +127,8 @@ def _validate_no_symlinks(root: Path) -> None:
 
 
 def _validate_surface(root: Path) -> None:
-    actual = {
-        path.relative_to(root).as_posix() for path in root.rglob("*") if path.is_file()
-    }
-    if actual != PACKAGE_FILES:
+    actual = {path.relative_to(root).as_posix() for path in root.rglob("*")}
+    if actual != PACKAGE_PATHS:
         raise AgentPluginError("package_surface_invalid")
     if discover_public_skills(root) != (PUBLIC_SKILL_NAME,):
         raise AgentPluginError("public_skill_discovery_invalid")
