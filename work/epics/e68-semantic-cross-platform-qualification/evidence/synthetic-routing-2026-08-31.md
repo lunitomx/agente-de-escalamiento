@@ -15,12 +15,21 @@ intenciones normalizadas.
 
 ## Claude Code
 
-- Cliente: `2.1.241`, ejecución sin persistencia y sin tools.
-- Resultado: no hubo inferencia ni clasificación.
-- Motivo observado: `OAuth session expired and could not be refreshed`.
-
+- Cliente: `2.1.251`, cuenta Team `Humansys`, ejecución sin persistencia.
+- Resultado: JSON válido con 6/6 rutas esperadas:
+  - A: `diagnose-primary-constraint`
+  - B: `build-leader-oppp`
+  - C: `build-vision-summary`
+  - D: `set-quarterly-priority`
+  - E: `install-meeting-rhythm`
+  - F: `run-quarterly-review`
+- La primera ejecución tras renovar OAuth falló antes de enviar inferencia por
+  sintaxis inválida de `--tools ''`; el reintento sin ese parámetro ejecutó una
+  única inferencia y produjo el resultado anterior.
 ## Interpretación
 
-Es evidencia parcial, no calificación cross-platform. No permite declarar
-paridad ni cerrar S68.4/E68. Tras renovar OAuth de Claude, debe repetirse la
-misma suite y registrar ambos resultados en S68.3/S68.4.
+La ruta sintética es equivalente entre Codex CLI y Claude Code: ambos
+produjeron las seis intenciones esperadas. Esta evidencia elimina el bloqueo
+de autenticación y permite continuar S68.3/S68.4, pero por sí sola no cierra
+E68: aún faltan receipts estructurados, reporte de paridad y el piloto humano
+trimestral definidos en las historias restantes.
