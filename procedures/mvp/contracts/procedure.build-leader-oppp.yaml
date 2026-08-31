@@ -84,7 +84,7 @@ state_updates:
   mode: proposed
   confirmation: null
 handoff:
-  next_procedure_id: procedure.scaleup-quarterly-review
+  next_procedure_id: procedure.quarterly-review
   condition: El líder confirma un siguiente paso.
 evidence_refs:
 - digest.sha256.04fc65800170b623297310f4180dc00605d5b6048023713b289a363b287da046

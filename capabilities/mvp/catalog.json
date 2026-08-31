@@ -82,9 +82,9 @@
       "specialist_profiles": ["specialist.execution.v1"]
     },
     {
-      "id": "capability.scaleup-quarterly-review",
-      "procedure_id": "procedure.scaleup-quarterly-review",
-      "intents": ["scaleup-quarterly-review"],
+      "id": "capability.quarterly-review",
+      "procedure_id": "procedure.quarterly-review",
+      "intents": ["run-quarterly-review"],
       "aliases": ["quarterly-review", "review-quarter"],
       "evidence_kinds": ["current-quarter"],
       "specialist_profiles": ["specialist.execution.v1"]

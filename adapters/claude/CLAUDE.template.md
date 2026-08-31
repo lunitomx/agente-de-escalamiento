@@ -1,10 +1,12 @@
+<!-- ESCALA:BEGIN -->
 # ESCALA for Claude Code
 
 ## Boundary
 
-Use the portable core at `../../escala-skills/escala/SKILL.md` as the single
-public entrypoint. Do not turn internal material into additional public
-commands, and do not add a separate interpretation layer here.
+Use `{{ESCALA_SKILL_PATH}}` as the single public entrypoint. Its portable
+capability contract is `{{ESCALA_CAPABILITY_CATALOG}}`. Do not turn internal
+material into additional public commands or add a separate interpretation
+layer here.
 
 ## Local operation
 
@@ -17,3 +19,4 @@ missing evidence in business language.
 Remote extensions are disabled by default. Do not create external
 configuration, transmit business context, or assume a service is available
 without an explicit company-level authorization.
+<!-- ESCALA:END -->

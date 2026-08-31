@@ -84,7 +84,7 @@ state_updates:
   mode: proposed
   confirmation: null
 handoff:
-  next_procedure_id: procedure.scaleup-quarterly-review
+  next_procedure_id: procedure.quarterly-review
   condition: El equipo acepta una cadencia de revisión.
 evidence_refs:
 - digest.sha256.087f20a1c8f00a43ab1ce5ba66f6b66759b7bf716a12b4fa69cda0886ada5df8

@@ -40,7 +40,7 @@
         "output_contract":{"artifact":{"status":"unknown","value":null},"assumptions":[],"open_questions":["¿Qué detalle personal falta confirmar?"],"owner":{"status":"unknown","value":null},"kpi":{"status":"unknown","value":null},"who_what_when":{"status":"unknown","value":null},"review_cadence":{"status":"unknown","value":null}},
         "acceptance_criteria":[{"id":"criterion.detailed-responses","statement":"Las respuestas conservan detalle o incertidumbre explícita."}],
         "state_updates":[{"id":"state.propose-leader-oppp","path":"state/leader/oppp.yaml","mode":"proposed"}],
-        "handoff":{"next_procedure_id":"procedure.scaleup-quarterly-review","condition":"El líder confirma un siguiente paso."}
+        "handoff":{"next_procedure_id":"procedure.quarterly-review","condition":"El líder confirma un siguiente paso."}
       }
     },
     {
@@ -103,15 +103,15 @@
         "output_contract":{"artifact":{"status":"unknown","value":null},"assumptions":[],"open_questions":["¿Qué propósito, dueño y aceptación falta confirmar?"],"owner":{"status":"unknown","value":null},"kpi":{"status":"unknown","value":null},"who_what_when":{"status":"unknown","value":null},"review_cadence":{"status":"unknown","value":null}},
         "acceptance_criteria":[{"id":"criterion.cadence-visible","statement":"Incluya daily, weekly, monthly y quarterly como propuestas."}],
         "state_updates":[{"id":"state.propose-meeting-rhythm","path":"state/company/execution.yaml","mode":"proposed"}],
-        "handoff":{"next_procedure_id":"procedure.scaleup-quarterly-review","condition":"El equipo acepta una cadencia de revisión."}
+        "handoff":{"next_procedure_id":"procedure.quarterly-review","condition":"El equipo acepta una cadencia de revisión."}
       }
     },
     {
-      "id": "procedure.scaleup-quarterly-review",
+      "id": "procedure.quarterly-review",
       "node_ids": ["routine.quarterly-and-annual-planning", "principle.get-it-down-then-right", "principle.iterative-adoption", "discipline.data", "discipline.priorities", "artifact.who-what-when"],
       "input_node_refs": {"input.current-quarter": ["discipline.priorities"], "input.review-evidence": ["discipline.data", "routine.quarterly-and-annual-planning"]},
       "contract": {
-        "id":"procedure.scaleup-quarterly-review","version":"1.0.0","provenance":"source-synthesis",
+        "id":"procedure.quarterly-review","version":"1.0.0","provenance":"source-synthesis",
         "trigger":["El equipo quiere revisar el trimestre actual."],
         "non_trigger":["No atribuya causalidad sin evidencia confirmada."],
         "objective":"Proponer una nueva iteración o declarar evidencia faltante.",

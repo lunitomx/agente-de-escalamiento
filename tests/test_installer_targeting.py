@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import shutil
 import stat
 import subprocess
 from pathlib import Path
@@ -44,8 +45,14 @@ def _minimal_checkout(root: Path) -> Path:
     skill = checkout / "escala-skills" / "escala"
     skill.mkdir(parents=True)
     (skill / "SKILL.md").write_text(
-        "---\\nname: escala\\ndescription: test\\n---\\n", encoding="utf-8"
+        "---\nname: escala\ndescription: test\n---\n", encoding="utf-8"
     )
+    capability_catalog = checkout / "capabilities" / "mvp" / "catalog.json"
+    capability_catalog.parent.mkdir(parents=True)
+    shutil.copy2(ROOT / "capabilities" / "mvp" / "catalog.json", capability_catalog)
+    adapter = checkout / "adapters" / "claude"
+    adapter.mkdir(parents=True)
+    shutil.copy2(ROOT / "adapters" / "claude" / "CLAUDE.template.md", adapter)
     (checkout / "install.sh").write_text(
         INSTALLER.read_text(encoding="utf-8"), encoding="utf-8"
     )

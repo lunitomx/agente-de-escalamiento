@@ -7,7 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURES = ROOT / "tests/fixtures/skill_golden_cases"
 CORE_FIXTURES = FIXTURES / "core"
-SKILLS_ROOT = ROOT / ".claude/skills"
+SKILLS_ROOT = ROOT / ".claude/legacy-skills"
 SPEC = importlib.util.spec_from_file_location(
     "skill_golden_cases",
     ROOT / "validators/skill_golden_cases.py",

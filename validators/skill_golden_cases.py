@@ -106,7 +106,7 @@ def golden_case_expectation_hash(case: SkillGoldenCase) -> str:
 
 def validate_golden_case_file(
     fixture_path: Path,
-    skills_root: Path = Path(".claude/skills"),
+    skills_root: Path = Path(".claude/legacy-skills"),
 ) -> list[str]:
     """Return readable validation errors for one golden-case fixture file."""
     try:
@@ -126,7 +126,7 @@ def validate_golden_case_file(
 
 def validate_golden_case_directory(
     fixtures_dir: Path,
-    skills_root: Path = Path(".claude/skills"),
+    skills_root: Path = Path(".claude/legacy-skills"),
 ) -> list[str]:
     """Return readable validation errors for all YAML fixtures in a directory."""
     fixture_paths = sorted(fixtures_dir.glob("*.yaml"))
