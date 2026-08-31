@@ -36,6 +36,9 @@ selections:
   - path: adapters/claude
     kind: tree
     role: agent_skill
+  - path: adapters/codex/agents
+    kind: tree
+    role: agent_skill
   - path: capabilities/mvp/catalog.json
     kind: file
     role: agent_skill
