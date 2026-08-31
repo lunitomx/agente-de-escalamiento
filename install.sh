@@ -109,7 +109,7 @@ if [[ -f "$SCRIPT_DIR/ESCALA-MANIFEST.json" ]]; then
         echo -e "${AMARILLO}⚠ El paquete portable no pasó su verificación y no se instaló.${NC}" >&2
         exit 1
     fi
-elif [[ ! -d "$SCRIPT_DIR/.git" ]]; then
+elif [[ ! -e "$SCRIPT_DIR/.git" ]]; then
     echo -e "${AMARILLO}⚠ Falta el manifiesto del paquete portable; no se instalarán skills.${NC}" >&2
     exit 1
 fi
@@ -259,9 +259,148 @@ install_on() {
     echo -e "    ${VERDE}✓${NC} 1 skill instalado (symlink) en ${destination}"
 }
 
+marker_count() {
+    local file="$1"
+    local marker="$2"
+    if [[ ! -f "$file" ]]; then
+        printf "0\n"
+        return 0
+    fi
+    grep -Fxc -- "$marker" "$file" || true
+}
+
+validate_claude_block() {
+    local file="$1"
+    local begin="$2"
+    local end="$3"
+    local line
+    local state="outside"
+    local begin_count=0
+
+    [[ ! -f "$file" ]] && return 0
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        case "$line" in
+            "$begin")
+                if [[ "$state" != "outside" || "$begin_count" != "0" ]]; then
+                    return 1
+                fi
+                state="inside"
+                begin_count=1
+                ;;
+            "$end")
+                if [[ "$state" != "inside" ]]; then
+                    return 1
+                fi
+                state="outside"
+                ;;
+            *"ESCALA:BEGIN"*|*"ESCALA:END"*)
+                return 1
+                ;;
+        esac
+    done < "$file"
+    [[ "$state" == "outside" ]]
+}
+render_claude_block() {
+    local skill_dir="$1"
+    local catalog_path="$2"
+    local template="$SCRIPT_DIR/adapters/claude/CLAUDE.template.md"
+    local line
+    if [[ ! -f "$template" ]]; then
+        echo "No está disponible el contrato Claude de ESCALA." >&2
+        return 1
+    fi
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        case "$line" in
+            *"{{ESCALA_SKILL_PATH}}"*)
+                printf "El skill público de ESCALA está en %s/SKILL.md.\n" "$skill_dir"
+                ;;
+            *"{{ESCALA_CAPABILITY_CATALOG}}"*)
+                printf "El contrato portable de capacidades está en %s.\n" "$catalog_path"
+                ;;
+            *) printf "%s\n" "$line" ;;
+        esac
+    done < "$template"
+}
+
+prepare_claude_instructions() {
+    local claude_root="$1"
+    local target="$claude_root/CLAUDE.md"
+    local skill_dir="$SCRIPT_DIR/escala-skills/escala"
+    local catalog_path="$SCRIPT_DIR/capabilities/mvp/catalog.json"
+    local begin="<!-- ESCALA:BEGIN -->"
+    local end="<!-- ESCALA:END -->"
+    local begin_count
+    local prepared
+    local line
+    local replacing=false
+
+    if [[ ! -f "$skill_dir/SKILL.md" || ! -f "$catalog_path" ]]; then
+        echo "Faltan los artefactos portables de ESCALA para Claude." >&2
+        return 1
+    fi
+    mkdir -p "$claude_root"
+    if ! validate_claude_block "$target" "$begin" "$end"; then
+        echo "El bloque ESCALA existente en CLAUDE.md está incompleto o malformado; no se modificó." >&2
+        return 1
+    fi
+    begin_count="$(marker_count "$target" "$begin")"
+    prepared="$(mktemp "$claude_root/.escala-claude.XXXXXX")" || {
+        echo "No se pudo preparar el contrato Claude de ESCALA." >&2
+        return 1
+    }
+    if [[ "$begin_count" == "0" ]]; then
+        {
+            if [[ -f "$target" && -s "$target" ]]; then
+                cat "$target"
+                printf "\n\n"
+            fi
+            render_claude_block "$skill_dir" "$catalog_path"
+        } > "$prepared" || {
+            rm -f "$prepared"
+            return 1
+        }
+    else
+        while IFS= read -r line || [[ -n "$line" ]]; do
+            if [[ "$line" == "$begin" ]]; then
+                render_claude_block "$skill_dir" "$catalog_path"
+                replacing=true
+                continue
+            fi
+            if [[ "$line" == "$end" && "$replacing" == true ]]; then
+                replacing=false
+                continue
+            fi
+            if [[ "$replacing" == false ]]; then
+                printf "%s\n" "$line"
+            fi
+        done < "$target" > "$prepared" || {
+            rm -f "$prepared"
+            return 1
+        }
+    fi
+    printf "%s\n" "$prepared"
+}
+
+install_claude() {
+    local claude_root="$HOME/.claude"
+    local prepared
+    if ! prepared="$(prepare_claude_instructions "$claude_root")"; then
+        return 1
+    fi
+    if ! install_on "Claude Code" "$claude_root/skills"; then
+        rm -f "$prepared"
+        return 1
+    fi
+    if ! mv -f -- "$prepared" "$claude_root/CLAUDE.md"; then
+        rm -f "$prepared"
+        echo "No se pudo activar el contrato Claude de ESCALA." >&2
+        return 1
+    fi
+    echo -e "    ${VERDE}✓${NC} Contrato ESCALA actualizado en ${claude_root}/CLAUDE.md"
+}
 for platform in "${TARGET_PLATFORMS[@]}"; do
     case "$platform" in
-        claude) install_on "Claude Code" "$HOME/.claude/skills" ;;
+        claude) install_claude ;;
         hermes) install_on "Hermes Agent" "$HOME/.hermes/skills" ;;
         codex) install_on "Codex CLI" "$HOME/.codex/skills" ;;
     esac

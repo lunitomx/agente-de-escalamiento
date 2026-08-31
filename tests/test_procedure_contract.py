@@ -3,6 +3,7 @@ from __future__ import annotations
 from copy import deepcopy
 import inspect
 from pathlib import Path
+from typing import Callable, cast
 
 import pytest
 
@@ -21,6 +22,11 @@ from validators.ontology_v2 import load_canonical_release
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/procedure_contract/valid.yaml"
 RELEASE = ROOT / "ontology/v2/releases/s64.1.json"
+
+
+def _invoke_validator_with_legacy_arguments(*args: object, **kwargs: object) -> object:
+    legacy_validator = cast(Callable[..., object], validate_procedure_against_release)
+    return legacy_validator(*args, **kwargs)
 
 
 def _valid_payload() -> dict[str, object]:
@@ -161,7 +167,7 @@ def test_known_value_requires_company_evidence_consent_and_human_confirmation() 
     with pytest.raises(ValueError, match="requires trusted registry"):
         validate_procedure_against_release(ProcedureContract.model_validate(payload))
     with pytest.raises(TypeError):
-        validate_procedure_against_release(  # type: ignore[call-arg]
+        _invoke_validator_with_legacy_arguments(
             ProcedureContract.model_validate(payload),
             load_canonical_release(RELEASE),
             base_path=ROOT,
@@ -293,6 +299,6 @@ def test_public_validation_rejects_a_forged_release_argument() -> None:
         }
     )
     with pytest.raises(TypeError):
-        validate_procedure_against_release(  # type: ignore[call-arg]
+        _invoke_validator_with_legacy_arguments(
             load_procedure_contract(FIXTURE), forged
         )

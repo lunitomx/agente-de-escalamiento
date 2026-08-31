@@ -5,7 +5,7 @@
       "procedure.build-vision-summary",
       "procedure.diagnose-primary-constraint",
       "procedure.install-meeting-rhythm",
-      "procedure.scaleup-quarterly-review",
+      "procedure.quarterly-review",
       "procedure.set-quarterly-priority"
     ],
     "decision.cash": [
@@ -21,13 +21,13 @@
       "procedure.diagnose-primary-constraint"
     ],
     "discipline.data": [
-      "procedure.scaleup-quarterly-review"
+      "procedure.quarterly-review"
     ],
     "discipline.meeting-rhythm": [
       "procedure.install-meeting-rhythm"
     ],
     "discipline.priorities": [
-      "procedure.scaleup-quarterly-review",
+      "procedure.quarterly-review",
       "procedure.set-quarterly-priority"
     ],
     "framework.4d": [
@@ -53,10 +53,10 @@
     ],
     "principle.get-it-down-then-right": [
       "procedure.build-leader-oppp",
-      "procedure.scaleup-quarterly-review"
+      "procedure.quarterly-review"
     ],
     "principle.iterative-adoption": [
-      "procedure.scaleup-quarterly-review"
+      "procedure.quarterly-review"
     ],
     "principle.right-questions": [
       "procedure.diagnose-primary-constraint"
@@ -75,7 +75,7 @@
     ],
     "routine.quarterly-and-annual-planning": [
       "procedure.install-meeting-rhythm",
-      "procedure.scaleup-quarterly-review"
+      "procedure.quarterly-review"
     ],
     "routine.quarterly-theme": [
       "procedure.set-quarterly-priority"
@@ -255,7 +255,7 @@
         "principle.iterative-adoption",
         "routine.quarterly-and-annual-planning"
       ],
-      "procedure_id": "procedure.scaleup-quarterly-review"
+      "procedure_id": "procedure.quarterly-review"
     },
     {
       "evidence_refs": [

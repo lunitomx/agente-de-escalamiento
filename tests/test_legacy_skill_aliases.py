@@ -24,7 +24,7 @@ def test_legacy_aliases_are_generated_from_the_catalog() -> None:
 
 
 def test_legacy_aliases_only_redirect_to_a_canonical_contract() -> None:
-    for root in (ROOT / ".claude/skills", ROOT / ".agents/skills"):
+    for root in (ROOT / ".claude/legacy-skills", ROOT / ".agents/skills"):
         for path in root.glob("scaleup-*/SKILL.md"):
             content = path.read_text(encoding="utf-8")
             assert "Alias temporal de compatibilidad" in content

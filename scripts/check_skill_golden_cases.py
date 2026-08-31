@@ -34,7 +34,7 @@ def main() -> int:
     parser.add_argument(
         "--skills-root",
         type=Path,
-        default=ROOT / ".claude/skills",
+        default=ROOT / ".claude/legacy-skills",
     )
     parser.add_argument(
         "--changelog",

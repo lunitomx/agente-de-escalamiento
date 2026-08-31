@@ -1770,7 +1770,12 @@ def _validate_build_destination(destination: Path, *, repository: Path) -> Path:
     folded_parts = [part.casefold() for part in destination.parts]
     if any(marker in part for marker in synchronized_markers for part in folded_parts):
         _fail(ExportBuildFailure.DESTINATION_SYNCHRONIZED)
-    if resolved != temporary_root and not resolved.is_relative_to(temporary_root):
+    if resolved == temporary_root or not resolved.is_relative_to(temporary_root):
+        _fail(ExportBuildFailure.DESTINATION_OUTSIDE_TEMP)
+    # Never materialize an artifact directly under the shared system temporary
+    # root. A caller must provide a private temporary directory and an artifact
+    # path inside it.
+    if len(resolved.relative_to(temporary_root).parts) < 2:
         _fail(ExportBuildFailure.DESTINATION_OUTSIDE_TEMP)
     return resolved
 

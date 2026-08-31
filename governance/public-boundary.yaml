@@ -63,6 +63,10 @@ path_rules:
       - tests/**
       - validators/epic_closure.py
       - validators/pipeline_runner.py
+      - validators/capability_map.py
+      - validators/procedure_compiler.py
+      - validators/procedure_contract.py
+      - validators/quarterly_review.py
       - validators/pipelines.py
       - work/**
   - id: canary.product_entry
@@ -85,6 +89,12 @@ path_rules:
       - scripts/**
       - templates/**
       - validators/**
+  - id: canary.portable_adapter
+    disposition: candidate_public
+    deny_class: null
+    globs:
+      - adapters/claude/**
+      - capabilities/mvp/catalog.json
 vocabulary_rules:
   - id: public.product_identity
     targets: [path, text]

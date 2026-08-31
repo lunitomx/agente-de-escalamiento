@@ -32,7 +32,7 @@ MVP_PROCEDURE_IDS = (
     "procedure.build-vision-summary",
     "procedure.set-quarterly-priority",
     "procedure.install-meeting-rhythm",
-    "procedure.scaleup-quarterly-review",
+    "procedure.quarterly-review",
 )
 _DENIED_CANDIDATE_IDS = {
     "candidate.cash.metric.working-capital-days",
@@ -65,7 +65,7 @@ _MVP_SURFACES = {
         "warnings": {"warning.no-silent-inference"},
         "criteria": {"criterion.detailed-responses"},
         "state": {("state.propose-leader-oppp", "state/leader/oppp.yaml")},
-        "handoff": "procedure.scaleup-quarterly-review",
+        "handoff": "procedure.quarterly-review",
     },
     "procedure.build-vision-summary": {
         "inputs": {"input.organization-context", "input.strategy-evidence"},
@@ -98,9 +98,9 @@ _MVP_SURFACES = {
         "warnings": {"warning.no-silent-inference"},
         "criteria": {"criterion.cadence-visible"},
         "state": {("state.propose-meeting-rhythm", "state/company/execution.yaml")},
-        "handoff": "procedure.scaleup-quarterly-review",
+        "handoff": "procedure.quarterly-review",
     },
-    "procedure.scaleup-quarterly-review": {
+    "procedure.quarterly-review": {
         "inputs": {"input.current-quarter", "input.review-evidence"},
         "questions": {"question.review-learning"},
         "steps": {"step.review-quarter"},
@@ -125,7 +125,7 @@ class MvpTemplate(_StrictModel):
         "procedure.build-vision-summary",
         "procedure.set-quarterly-priority",
         "procedure.install-meeting-rhythm",
-        "procedure.scaleup-quarterly-review",
+        "procedure.quarterly-review",
     ]
     node_ids: list[str] = Field(min_length=1, max_length=32)
     input_node_refs: dict[str, list[str]] = Field(min_length=1, max_length=32)

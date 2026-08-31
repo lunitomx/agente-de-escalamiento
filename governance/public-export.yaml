@@ -8,7 +8,7 @@ source:
 bindings:
   public_boundary:
     path: governance/public-boundary.yaml
-    sha256: e184a801d89cb743300c5c0ea1f7fd8d5d8353133f2a80fe3be668a35df07602
+    sha256: 1e8810b79ad55e555eee1122254bd0bb81dd5febc015f7e790836da69d3895f8
     hash_kind: semantic
   exposure_baseline:
     path: work/epics/e36-product-truth-ip-governance/stories/s36.2-evidence/baseline.json
@@ -33,6 +33,12 @@ selections:
   - path: README.md
     kind: file
     role: operator_documentation
+  - path: adapters/claude
+    kind: tree
+    role: agent_skill
+  - path: capabilities/mvp/catalog.json
+    kind: file
+    role: agent_skill
   - path: coaching
     kind: tree
     role: local_runtime

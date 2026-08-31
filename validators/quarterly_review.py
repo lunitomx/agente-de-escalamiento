@@ -496,7 +496,7 @@ class QuarterlyReviewInput(_StrictModel):
 
 
 class QuarterlyReview(_StrictModel):
-    procedure_id: Literal["procedure.scaleup-quarterly-review"]
+    procedure_id: Literal["procedure.quarterly-review"]
     period: str
     measurement: Measurement | None
     claims: list[ReviewClaim]
@@ -539,7 +539,7 @@ def _render_decision(kind: DecisionKind, subject: str) -> str:
 
 
 def _ensure_review_contract() -> None:
-    if "procedure.scaleup-quarterly-review" not in {
+    if "procedure.quarterly-review" not in {
         contract.id for contract in compile_mvp_procedures().contracts
     }:
         raise ValueError("quarterly review procedure is not in the MVP release")
@@ -615,7 +615,7 @@ def build_quarterly_review(
     if cadence_comparison is None:
         questions.append("cadence")
     return QuarterlyReview(
-        procedure_id="procedure.scaleup-quarterly-review",
+        procedure_id="procedure.quarterly-review",
         period=review_input.period,
         measurement=review_input.measurement,
         claims=review_input.claims,

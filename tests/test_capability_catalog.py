@@ -37,7 +37,7 @@ def test_every_tracked_legacy_skill_has_one_explicit_alias() -> None:
     catalog = load_capability_catalog(CATALOG_PATH)
     legacy_sources = {
         path.parent.name
-        for path in (ROOT / ".claude/skills").glob("scaleup-*/SKILL.md")
+        for path in (ROOT / ".claude/legacy-skills").glob("scaleup-*/SKILL.md")
     }
 
     aliases = load_legacy_aliases(catalog)
@@ -84,6 +84,6 @@ def test_catalog_fails_closed_when_missing() -> None:
 def test_public_skill_references_the_canonical_catalog_and_hides_commands() -> None:
     skill = (ROOT / "escala-skills/escala/SKILL.md").read_text(encoding="utf-8")
 
-    assert "../catalog.yaml" in skill
+    assert "../../capabilities/mvp/catalog.json" in skill
     assert "No le pidas" in skill
     assert "slash-command" in skill
