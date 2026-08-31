@@ -7,6 +7,7 @@ text in the repository.
 
 from __future__ import annotations
 
+from datetime import date
 from enum import Enum
 import hashlib
 import json
@@ -47,6 +48,10 @@ class CourseFormat(str, Enum):
     TRANSCRIPT = "transcript"
     VIDEO = "video"
     WORKBOOK = "workbook"
+
+
+class DistributionStatus(str, Enum):
+    NOT_AUTHORIZED = "not_authorized"
 
 
 class RightsStatus(str, Enum):
@@ -121,8 +126,10 @@ class CourseSourceManifest(_StrictModel):
     course_id: str = Field(min_length=3, max_length=128)
     title: str = Field(min_length=1, max_length=512)
     instructor: str = Field(min_length=1, max_length=256)
+    acquired_on: date
     format: CourseFormat
     owner_id: str = Field(min_length=3, max_length=128)
+    distribution_status: DistributionStatus
     rights_status: RightsStatus
     rights_evidence: list[RightsEvidence] = Field(default_factory=list)
     capture_quality: CaptureQuality

@@ -26,7 +26,9 @@ def _manifest_data(content: bytes, **overrides: object) -> dict[str, object]:
         "course_id": "sales-foundations",
         "title": "Synthetic sales workshop",
         "instructor": "Synthetic instructor",
+        "acquired_on": "2026-08-31",
         "format": "transcript",
+        "distribution_status": "not_authorized",
         "owner_id": "local-owner",
         "rights_status": "documented_local_use",
         "rights_evidence": [{"kind": "owner_attestation", "locator": "local-record"}],
@@ -123,6 +125,19 @@ def test_manifest_rejects_missing_retention(tmp_path: Path) -> None:
     manifest_path = _write_manifest(
         tmp_path, _manifest_data(content, retention=""), content
     )
+
+    with pytest.raises(CourseSourceError, match="manifest contract invalid"):
+        load_course_source_manifest(tmp_path, manifest_path)
+
+
+@pytest.mark.parametrize("field", ["acquired_on", "distribution_status"])
+def test_manifest_requires_custody_date_and_distribution(
+    tmp_path: Path, field: str
+) -> None:
+    content = b"synthetic source only\\n"
+    data = _manifest_data(content)
+    data.pop(field)
+    manifest_path = _write_manifest(tmp_path, data, content)
 
     with pytest.raises(CourseSourceError, match="manifest contract invalid"):
         load_course_source_manifest(tmp_path, manifest_path)
