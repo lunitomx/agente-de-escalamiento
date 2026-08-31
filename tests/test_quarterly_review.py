@@ -148,7 +148,7 @@ def test_claims_reject_free_or_causal_narrative_surfaces(
     claim.update(injected)
     with pytest.raises(
         ValidationError,
-        match="Extra inputs|unsafe hypothesis identifier|unsafe observation identifier",
+        match="Extra inputs|safe taxonomy",
     ):
         build_quarterly_review(payload)
 
@@ -194,7 +194,7 @@ def test_no_result_yet_is_explicit_and_exclusive_without_measurement() -> None:
     ("path", "value", "match"),
     [
         (("period",), "", "period"),
-        (("measurement", "metric_id"), "metric.boosted", "identifier"),
+        (("measurement", "metric_id"), "metric.boosted", "safe taxonomy"),
         (("measurement", "baseline"), None, "baseline"),
         (("measurement", "current_evidence"), [], "evidence"),
         (("proposal", "subject_id"), "cash explains sales", "proposal subject"),
@@ -284,3 +284,37 @@ def test_arbitrary_multiline_and_backslash_fields_are_not_in_the_schema() -> Non
     payload["proposal"]["statement"] = "boosted\\nrevenue"  # type: ignore[index]
     with pytest.raises(ValidationError, match="Extra inputs"):
         build_quarterly_review(payload)
+
+
+@pytest.mark.parametrize(
+    "identifier",
+    [
+        "metric.causes-cash",
+        "metric.improves-cash",
+        "metric.growth",
+        "metric.raises-cash",
+        "metric.drives-cash",
+        "metric.boosts-cash",
+        "metric.aumenta-cash",
+        "metric.mejora-cash",
+        "metric.safe-looking-unknown",
+    ],
+)
+def test_rendered_identifiers_must_be_allowlisted_not_merely_lexical(
+    identifier: str,
+) -> None:
+    payload = _review()
+    payload["claims"][0]["metric_id"] = identifier  # type: ignore[index]
+    with pytest.raises(ValidationError, match="safe taxonomy"):
+        build_quarterly_review(payload)
+
+
+def test_allowed_neutral_taxonomy_identifiers_render() -> None:
+    review = build_quarterly_review(_review())
+    assert (
+        review.rendered_claims[0]
+        == "Observation: metric.collection-days measured 68 unit.days."
+    )
+    assert review.rendered_claims[1] == (
+        "Hypothesis to investigate: factor.invoice-timing and metric.collection-days."
+    )

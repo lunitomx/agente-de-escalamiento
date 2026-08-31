@@ -19,10 +19,64 @@ from validators.procedure_compiler import compile_mvp_procedures
 
 _ID = re.compile(r"^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$")
 _PERIOD = re.compile(r"^(?P<year>\d{4})-q(?P<quarter>[1-4])$")
-_FORBIDDEN_ID_TERMS = re.compile(
-    r"(?:^|[._-])(boosted|rose|improved|increased|reduced|decreased|explains|enabled|made|aument[óo]|reduj[óo]|explica|habilit[óo]|hizo)(?:$|[._-])",
+_SAFE_METRIC_IDS = frozenset(
+    {
+        "metric.collection-days",
+        "metric.cash-balance",
+        "metric.receivables-days",
+        "metric.revenue",
+    }
+)
+_SAFE_UNIT_IDS = frozenset({"unit.days", "unit.currency", "unit.percent"})
+_SAFE_FACTOR_IDS = frozenset(
+    {
+        "factor.invoice-timing",
+        "factor.customer-mix",
+        "factor.meeting-rhythm",
+    }
+)
+_SAFE_ASSUMPTION_IDS = frozenset({"assumption.customer-mix-comparable"})
+_SAFE_COMMITMENT_IDS = frozenset(
+    {
+        "commitment.reconcile-disputes",
+        "commitment.invoice-review",
+    }
+)
+_SAFE_ACTION_IDS = frozenset({"action.review-receivables"})
+_SAFE_PURPOSE_IDS = frozenset({"purpose.review-collections"})
+_SAFE_SUBJECT_IDS = _SAFE_METRIC_IDS | frozenset(
+    {
+        "constraint.cash",
+        "constraint.people",
+        "constraint.strategy",
+        "constraint.execution",
+    }
+)
+_TAXONOMY_FORBIDDEN_TERMS = re.compile(
+    r"(?:^|[._-])(causes|improves|growth|raises|drives|boosts|rose|"
+    r"aumenta|mejora|crecimiento|eleva|impulsa)(?:$|[._-])",
     re.IGNORECASE,
 )
+
+
+def _validate_safe_taxonomy() -> None:
+    for identifier in (
+        _SAFE_METRIC_IDS
+        | _SAFE_UNIT_IDS
+        | _SAFE_FACTOR_IDS
+        | _SAFE_ASSUMPTION_IDS
+        | _SAFE_COMMITMENT_IDS
+        | _SAFE_ACTION_IDS
+        | _SAFE_PURPOSE_IDS
+        | _SAFE_SUBJECT_IDS
+    ):
+        if _ID.fullmatch(identifier) is None or _TAXONOMY_FORBIDDEN_TERMS.search(
+            identifier
+        ):
+            raise RuntimeError("safe taxonomy contains an unsafe rendered identifier")
+
+
+_validate_safe_taxonomy()
 
 
 class _StrictModel(BaseModel):
@@ -30,8 +84,14 @@ class _StrictModel(BaseModel):
 
 
 def _identifier(value: str, label: str) -> str:
-    if _ID.fullmatch(value) is None or _FORBIDDEN_ID_TERMS.search(value):
+    if _ID.fullmatch(value) is None:
         raise ValueError(f"unsafe {label}")
+    return value
+
+
+def _allow(value: str, allowed: frozenset[str], label: str) -> str:
+    if value not in allowed:
+        raise ValueError(f"{label} is not in the safe taxonomy")
     return value
 
 
@@ -110,10 +170,15 @@ class Observation(_PeriodEvidence):
     value: float
     unit_id: str
 
-    @field_validator("metric_id", "unit_id")
+    @field_validator("metric_id")
     @classmethod
-    def validate_identifier(cls, value: str) -> str:
-        return _identifier(value, "observation identifier")
+    def validate_metric(cls, value: str) -> str:
+        return _allow(value, _SAFE_METRIC_IDS, "observation metric")
+
+    @field_validator("unit_id")
+    @classmethod
+    def validate_unit(cls, value: str) -> str:
+        return _allow(value, _SAFE_UNIT_IDS, "observation unit")
 
     @field_validator("value")
     @classmethod
@@ -131,10 +196,15 @@ class Hypothesis(_PeriodEvidence):
     factor_id: str
     metric_id: str
 
-    @field_validator("factor_id", "metric_id")
+    @field_validator("factor_id")
     @classmethod
-    def validate_identifier(cls, value: str) -> str:
-        return _identifier(value, "hypothesis identifier")
+    def validate_factor(cls, value: str) -> str:
+        return _allow(value, _SAFE_FACTOR_IDS, "hypothesis factor")
+
+    @field_validator("metric_id")
+    @classmethod
+    def validate_metric(cls, value: str) -> str:
+        return _allow(value, _SAFE_METRIC_IDS, "hypothesis metric")
 
 
 class Assumption(_PeriodEvidence):
@@ -144,7 +214,7 @@ class Assumption(_PeriodEvidence):
     @field_validator("assumption_id")
     @classmethod
     def validate_identifier(cls, value: str) -> str:
-        return _identifier(value, "assumption ID")
+        return _allow(value, _SAFE_ASSUMPTION_IDS, "assumption ID")
 
 
 class CommitmentClaim(_PeriodEvidence):
@@ -154,7 +224,7 @@ class CommitmentClaim(_PeriodEvidence):
     @field_validator("commitment_id")
     @classmethod
     def validate_identifier(cls, value: str) -> str:
-        return _identifier(value, "commitment ID")
+        return _allow(value, _SAFE_COMMITMENT_IDS, "commitment ID")
 
 
 class NoResultYet(_PeriodEvidence):
@@ -186,10 +256,15 @@ class Measurement(_StrictModel):
         _period_bounds(value)
         return value
 
-    @field_validator("metric_id", "unit_id")
+    @field_validator("metric_id")
     @classmethod
-    def validate_identifier(cls, value: str) -> str:
-        return _identifier(value, "measurement identifier")
+    def validate_metric(cls, value: str) -> str:
+        return _allow(value, _SAFE_METRIC_IDS, "measurement metric")
+
+    @field_validator("unit_id")
+    @classmethod
+    def validate_unit(cls, value: str) -> str:
+        return _allow(value, _SAFE_UNIT_IDS, "measurement unit")
 
     @field_validator("baseline", "current")
     @classmethod
@@ -242,10 +317,20 @@ class PlannedCommitment(_StrictModel):
         _period_bounds(value)
         return value
 
-    @field_validator("id", "owner_id", "action_id")
+    @field_validator("id")
     @classmethod
-    def validate_identifier(cls, value: str) -> str:
-        return _identifier(value, "commitment identifier")
+    def validate_commitment(cls, value: str) -> str:
+        return _allow(value, _SAFE_COMMITMENT_IDS, "planned commitment")
+
+    @field_validator("owner_id")
+    @classmethod
+    def validate_owner(cls, value: str) -> str:
+        return _identifier(value, "commitment owner")
+
+    @field_validator("action_id")
+    @classmethod
+    def validate_action(cls, value: str) -> str:
+        return _allow(value, _SAFE_ACTION_IDS, "commitment action")
 
     @field_validator("evidence")
     @classmethod
@@ -271,7 +356,7 @@ class ReportedCommitment(_PeriodEvidence):
     @field_validator("id")
     @classmethod
     def validate_id(cls, value: str) -> str:
-        return _identifier(value, "commitment ID")
+        return _allow(value, _SAFE_COMMITMENT_IDS, "commitment ID")
 
 
 class PlannedCadence(_StrictModel):
@@ -290,7 +375,7 @@ class PlannedCadence(_StrictModel):
     @field_validator("purpose_id")
     @classmethod
     def validate_id(cls, value: str) -> str:
-        return _identifier(value, "cadence purpose ID")
+        return _allow(value, _SAFE_PURPOSE_IDS, "cadence purpose ID")
 
     @field_validator("evidence")
     @classmethod
@@ -346,7 +431,7 @@ class ReviewProposal(_StrictModel):
     @field_validator("subject_id")
     @classmethod
     def validate_subject(cls, value: str) -> str:
-        return _identifier(value, "proposal subject ID")
+        return _allow(value, _SAFE_SUBJECT_IDS, "proposal subject ID")
 
 
 class ProposedReviewPersistence(_StrictModel):
