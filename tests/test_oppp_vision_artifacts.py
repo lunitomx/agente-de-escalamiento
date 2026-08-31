@@ -42,7 +42,9 @@ def test_oppp_draft_preserves_detailed_personal_answers_and_visible_gaps() -> No
 
     assert artifact.context == "personal"
     assert artifact.persistence.mode == "proposed"
-    assert artifact.fields["relationships"].text.startswith("Reservaré")
+    relationship_text = artifact.fields["relationships"].text
+    assert relationship_text is not None
+    assert relationship_text.startswith("Reservaré")
     assert {"achievements", "wealth", "kpi"}.issubset(artifact.open_questions)
     assert artifact.assumptions == []
 
