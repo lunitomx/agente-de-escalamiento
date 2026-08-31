@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -101,6 +103,33 @@ def test_unsafe_destination_is_rejected_before_writes(
         )
 
     assert not destination.exists()
+
+
+def test_cli_builds_the_same_local_adapter(tmp_path: Path) -> None:
+    allowed_root = tmp_path / "install"
+    allowed_root.mkdir()
+    output = allowed_root / "escala"
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "adapters" / "codex" / "build_adapter.py"),
+            "--catalog",
+            str(CATALOG),
+            "--allowed-root",
+            str(allowed_root),
+            "--output",
+            str(output),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    assert completed.stdout.strip() == str(output)
+    assert (output / "skills" / "escala" / "SKILL.md").is_file()
 
 
 def test_existing_destination_and_invalid_catalog_never_publish_partial_output(

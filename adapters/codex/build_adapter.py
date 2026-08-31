@@ -11,11 +11,16 @@ import argparse
 import json
 import os
 import shutil
+import sys
 import tempfile
 from pathlib import Path
 from typing import Any
 
-from validators.capability_map import (
+REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
+if str(REPOSITORY_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPOSITORY_ROOT))
+
+from validators.capability_map import (  # noqa: E402
     CapabilityMapError,
     load_capability_map,
     validate_capability_map,
