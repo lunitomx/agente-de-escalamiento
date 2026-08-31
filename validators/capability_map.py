@@ -28,7 +28,7 @@ from validators.procedure_compiler import (
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CAPABILITY_MAP_PATH = REPOSITORY_ROOT / "capabilities" / "mvp" / "catalog.json"
 _ID = re.compile(r"^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*$")
-_RECEIPT = re.compile(r"^receipt\.[a-z0-9][a-z0-9.-]{2,127}$")
+_RECEIPT = re.compile(r"^receipt\.sha256\.[a-f0-9]{64}$")
 _LIFECYCLE = (
     "route",
     "collect-authorized-evidence",
@@ -150,7 +150,7 @@ class CapabilityMap(_StrictModel):
 class AuthorizedEvidence(_StrictModel):
     kind: str
     receipt: str
-    status: Literal["known", "confirmed"]
+    status: Literal["confirmed"]
 
     @field_validator("kind")
     @classmethod
@@ -233,7 +233,7 @@ def route_capability(
 ) -> CapabilityRoute:
     """Resolve one declared intent after its required evidence is authorized.
 
-    Unknown or missing evidence is a boundary, not a heuristic: callers must
+    Evidence that is only known, missing, malformed, or not confirmed is a boundary, not a heuristic: callers must
     ask their next business question before selecting a procedure.
     """
     active_map = capability_map or load_capability_map()

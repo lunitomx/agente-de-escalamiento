@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 from pathlib import Path
 
 import pytest
@@ -25,7 +26,7 @@ def _evidence(*kinds: str) -> tuple[AuthorizedEvidence, ...]:
     return tuple(
         AuthorizedEvidence(
             kind=kind,
-            receipt=f"receipt.{index:03d}-{kind}",
+            receipt=f"receipt.sha256.{hashlib.sha256(f'{index}:{kind}'.encode()).hexdigest()}",
             status="confirmed",
         )
         for index, kind in enumerate(kinds, start=1)
@@ -74,8 +75,14 @@ def test_unknown_intent_and_missing_or_unknown_evidence_fail_closed() -> None:
     with pytest.raises(ValueError, match="status"):
         AuthorizedEvidence(
             kind="company-context",
-            receipt="receipt.001-company-context",
+            receipt=f"receipt.sha256.{'0' * 64}",
             status="unknown",  # type: ignore[arg-type]
+        )
+    with pytest.raises(ValueError, match="receipt"):
+        AuthorizedEvidence(
+            kind="company-context",
+            receipt="receipt.forged",
+            status="confirmed",
         )
 
 
