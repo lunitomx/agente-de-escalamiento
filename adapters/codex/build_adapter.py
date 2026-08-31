@@ -21,6 +21,7 @@ from typing import Any
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 AUTHORIZED_CATALOG_PATH = REPOSITORY_ROOT / "capabilities" / "mvp" / "catalog.json"
 CANONICAL_SKILL_PATH = REPOSITORY_ROOT / "escala-skills" / "escala" / "SKILL.md"
+CANONICAL_AGENT_DIRECTORY = REPOSITORY_ROOT / "adapters" / "codex" / "agents"
 CANONICAL_CATALOG_REFERENCE = "../../capabilities/mvp/catalog.json"
 CODEX_CATALOG_REFERENCE = "../../core/escala-capability-contract.json"
 if str(REPOSITORY_ROOT) not in sys.path:
@@ -30,6 +31,10 @@ from validators.capability_map import (  # noqa: E402
     CapabilityMapError,
     load_capability_map,
     validate_capability_map,
+)
+from validators.specialist_agents import (  # noqa: E402
+    SPECIALIST_AREAS,
+    validate_specialist_artifacts,
 )
 
 
@@ -129,6 +134,7 @@ def _build_manifest(catalog: dict[str, Any]) -> dict[str, Any]:
         "capability_catalog_id": catalog["catalog_id"],
         "capability_contract": "core/escala-capability-contract.json",
         "public_skills": ["escala"],
+        "private_agents": [f"escala-{area}" for area in SPECIALIST_AREAS],
         "schema_version": 1,
         "security": {
             "credentials_required": False,
@@ -144,6 +150,7 @@ def _assert_complete(directory: Path, catalog: dict[str, Any]) -> None:
         "codex-adapter.json",
         "core/escala-capability-contract.json",
         "skills/escala/SKILL.md",
+        *(f"agents/escala-{area}.toml" for area in SPECIALIST_AREAS),
     }
     actual = {
         path.relative_to(directory).as_posix()
@@ -164,6 +171,11 @@ def _assert_complete(directory: Path, catalog: dict[str, Any]) -> None:
     )
     if manifest != _build_manifest(catalog):
         raise CodexAdapterError("adapter manifest is invalid")
+    for area in SPECIALIST_AREAS:
+        source = CANONICAL_AGENT_DIRECTORY / f"escala-{area}.toml"
+        generated = directory / "agents" / source.name
+        if generated.read_bytes() != source.read_bytes():
+            raise CodexAdapterError("adapter private agent projection is invalid")
 
 
 def _cleanup_temporary(temporary: Path | None) -> None:
@@ -185,14 +197,23 @@ def build_codex_adapter(
     try:
         destination, root = _validate_output(output, allowed_root)
         catalog = _load_catalog(catalog_path)
+        specialist_errors = validate_specialist_artifacts()
+        if specialist_errors:
+            raise CodexAdapterError(
+                "private specialist artifacts are invalid: " + ",".join(specialist_errors)
+            )
         temporary = Path(tempfile.mkdtemp(prefix=".escala-codex-", dir=root))
         (temporary / "core").mkdir()
         (temporary / "skills" / "escala").mkdir(parents=True)
+        (temporary / "agents").mkdir()
         _write_json(temporary / "core" / "escala-capability-contract.json", catalog)
         _write_json(temporary / "codex-adapter.json", _build_manifest(catalog))
         (temporary / "skills" / "escala" / "SKILL.md").write_text(
             _portable_skill(), encoding="utf-8"
         )
+        for area in SPECIALIST_AREAS:
+            source = CANONICAL_AGENT_DIRECTORY / f"escala-{area}.toml"
+            shutil.copyfile(source, temporary / "agents" / source.name)
         _assert_complete(temporary, catalog)
         os.replace(temporary, destination)
     except CodexAdapterError:

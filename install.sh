@@ -12,17 +12,20 @@ VERSION="1.1.0"
 SKILLS_ONLY=false
 ALL_PLATFORMS=false
 WITH_RAISE_MCP=false
+WITH_SPECIALISTS=false
 REQUESTED_PLATFORMS=()
 
 usage() {
     cat >&2 <<'USAGE'
-Uso: ./install.sh (--platform claude|codex|hermes [--platform ...] | --all-platforms) [--skills-only] [--with-rai-mcp]
+Uso: ./install.sh (--platform claude|codex|hermes [--platform ...] | --all-platforms) [--skills-only] [--with-specialists] [--with-rai-mcp]
 
 Opciones:
   --platform NOMBRE  Instala sólo en Claude Code, Codex CLI o Hermes Agent.
                       Se puede repetir para elegir varias plataformas.
   --all-platforms    Instala en todas las plataformas detectadas.
   --skills-only      Instala únicamente la puerta conversacional ESCALA.
+  --with-specialists Instala los cuatro subagentes internos de ESCALA en Claude
+                     y/o Codex. No crea comandos públicos ni se activa solo.
   --with-rai-mcp     Configura el MCP local de RaiSE para Codex (requiere
                       --platform codex o --all-platforms; nunca es implícito).
   --help             Muestra esta ayuda.
@@ -57,6 +60,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --with-rai-mcp)
             WITH_RAISE_MCP=true
+            shift
+            ;;
+        --with-specialists)
+            WITH_SPECIALISTS=true
             shift
             ;;
         --help|-h)
@@ -179,9 +186,27 @@ if [[ "$WITH_RAISE_MCP" == true ]]; then
     fi
 fi
 
-# ----------------------
 # Runtime Python local (nunca pip global)
 # ----------------------
+SPECIALISTS_ENABLED=false
+specialist_platform_selected=false
+for platform in "${TARGET_PLATFORMS[@]}"; do
+    if [[ "$platform" == "claude" || "$platform" == "codex" ]]; then
+        specialist_platform_selected=true
+    fi
+done
+
+if [[ "$WITH_SPECIALISTS" == true && "$specialist_platform_selected" == false ]]; then
+    echo "--with-specialists requiere seleccionar Claude o Codex." >&2
+    exit 2
+fi
+
+if [[ "$specialist_platform_selected" == true ]]; then
+    if [[ "$SKILLS_ONLY" == false || "$WITH_SPECIALISTS" == true ]]; then
+        SPECIALISTS_ENABLED=true
+    fi
+fi
+
 PYTHON_RUNTIME=""
 install_python_runtime() {
     local venv_python="$SCRIPT_DIR/.venv/bin/python"
@@ -257,6 +282,47 @@ install_on() {
 
     ln -sfn "$skill_dir" "$destination/escala"
     echo -e "    ${VERDE}✓${NC} 1 skill instalado (symlink) en ${destination}"
+}
+
+validate_specialist_sources() {
+    local platform="$1"
+    local extension="$2"
+    local source="$SCRIPT_DIR/adapters/$platform/agents"
+    local area
+    for area in cash execution people strategy; do
+        if [[ ! -f "$source/escala-$area.$extension" ]]; then
+            echo "Falta el subagente interno ESCALA para $platform: escala-$area.$extension" >&2
+            return 1
+        fi
+    done
+}
+
+install_specialists_on() {
+    local platform="$1"
+    local source="$2"
+    local destination="$3"
+    local extension="$4"
+    local area
+    local agent
+    local prepared
+
+    if [[ "$SPECIALISTS_ENABLED" != true ]]; then
+        return 0
+    fi
+    mkdir -p "$destination"
+    for area in cash execution people strategy; do
+        agent="escala-$area.$extension"
+        prepared="$(mktemp "$destination/.escala-agent.XXXXXX")" || {
+            echo "No se pudo preparar el subagente interno $agent." >&2
+            return 1
+        }
+        if ! cp "$source/$agent" "$prepared" || ! mv -f -- "$prepared" "$destination/$agent"; then
+            rm -f -- "$prepared"
+            echo "No se pudo instalar el subagente interno $agent." >&2
+            return 1
+        fi
+    done
+    echo -e "    ${VERDE}✓${NC} 4 subagentes internos instalados en ${destination}"
 }
 
 marker_count() {
@@ -387,6 +453,10 @@ install_claude() {
     if ! prepared="$(prepare_claude_instructions "$claude_root")"; then
         return 1
     fi
+    if [[ "$SPECIALISTS_ENABLED" == true ]] && ! validate_specialist_sources "claude" "md"; then
+        rm -f "$prepared"
+        return 1
+    fi
     if ! install_on "Claude Code" "$claude_root/skills"; then
         rm -f "$prepared"
         return 1
@@ -396,13 +466,27 @@ install_claude() {
         echo "No se pudo activar el contrato Claude de ESCALA." >&2
         return 1
     fi
+    if ! install_specialists_on "Claude Code" "$SCRIPT_DIR/adapters/claude/agents" "$claude_root/agents" "md"; then
+        return 1
+    fi
     echo -e "    ${VERDE}✓${NC} Contrato ESCALA actualizado en ${claude_root}/CLAUDE.md"
+}
+
+install_codex() {
+    local codex_root="$HOME/.codex"
+    if [[ "$SPECIALISTS_ENABLED" == true ]] && ! validate_specialist_sources "codex" "toml"; then
+        return 1
+    fi
+    if ! install_on "Codex CLI" "$codex_root/skills"; then
+        return 1
+    fi
+    install_specialists_on "Codex CLI" "$SCRIPT_DIR/adapters/codex/agents" "$codex_root/agents" "toml"
 }
 for platform in "${TARGET_PLATFORMS[@]}"; do
     case "$platform" in
         claude) install_claude ;;
         hermes) install_on "Hermes Agent" "$HOME/.hermes/skills" ;;
-        codex) install_on "Codex CLI" "$HOME/.codex/skills" ;;
+        codex) install_codex ;;
     esac
 done
 
@@ -447,6 +531,9 @@ echo -e "${VERDE}╚════════════════════
 echo ""
 echo "  Plataformas configuradas: ${TARGET_PLATFORMS[*]}"
 echo "  Skill público instalado: escala (las capacidades internas se cargan bajo demanda)"
+if [[ "$SPECIALISTS_ENABLED" == true ]]; then
+    echo "  Subagentes internos instalados: Cash, Execution, People y Strategy"
+fi
 echo "  Runtime Python local: $PYTHON_RUNTIME"
 echo ""
 echo "  Próximo paso: abre tu agente de IA y cuéntale a ESCALA qué te preocupa hoy."
