@@ -18,7 +18,7 @@ from escala_server.capabilities import (  # noqa: E402
 LEGACY_GLOB = "scale" + "up-*/SKILL.md"
 
 
-LEGACY_ROOTS = (ROOT / ".claude" / "legacy-skills", ROOT / ".agents" / "skills")
+LEGACY_ROOTS = (ROOT / ".claude" / "legacy-skills", ROOT / ".agents" / "legacy-skills")
 
 
 def render(alias: str, target: str, notice: str) -> str:

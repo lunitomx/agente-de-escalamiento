@@ -1,0 +1,187 @@
+{
+  "adapters": {
+    "claude": {
+      "core_capability_catalog": "capabilities/mvp/catalog.json",
+      "core_skill": "escala-skills/escala/SKILL.md",
+      "manifest": "adapters/claude/adapter.json",
+      "public_entrypoint": "escala"
+    },
+    "codex": {
+      "builder": "adapters/codex/build_adapter.py",
+      "core_capability_contract": "core/escala-capability-contract.json",
+      "public_entrypoint": "escala"
+    }
+  },
+  "capabilities": [
+    {
+      "aliases": [
+        "diagnose",
+        "primary-constraint"
+      ],
+      "capability_id": "capability.diagnose-primary-constraint",
+      "evidence_kinds": [
+        "company-context"
+      ],
+      "intent": "diagnose-primary-constraint",
+      "lifecycle": [
+        "route",
+        "collect-authorized-evidence",
+        "run-procedure",
+        "validate-artifact",
+        "propose-state",
+        "handoff"
+      ],
+      "procedure_id": "procedure.diagnose-primary-constraint",
+      "specialist_profiles": [
+        "specialist.cash.v1",
+        "specialist.execution.v1",
+        "specialist.people.v1",
+        "specialist.strategy.v1"
+      ]
+    },
+    {
+      "aliases": [
+        "leader-oppp",
+        "personal-plan"
+      ],
+      "capability_id": "capability.build-leader-oppp",
+      "evidence_kinds": [
+        "leader-context"
+      ],
+      "intent": "build-leader-oppp",
+      "lifecycle": [
+        "route",
+        "collect-authorized-evidence",
+        "run-procedure",
+        "validate-artifact",
+        "propose-state",
+        "handoff"
+      ],
+      "procedure_id": "procedure.build-leader-oppp",
+      "specialist_profiles": [
+        "specialist.people.v1"
+      ]
+    },
+    {
+      "aliases": [
+        "vision-summary",
+        "strategy-vision"
+      ],
+      "capability_id": "capability.build-vision-summary",
+      "evidence_kinds": [
+        "organization-context"
+      ],
+      "intent": "build-vision-summary",
+      "lifecycle": [
+        "route",
+        "collect-authorized-evidence",
+        "run-procedure",
+        "validate-artifact",
+        "propose-state",
+        "handoff"
+      ],
+      "procedure_id": "procedure.build-vision-summary",
+      "specialist_profiles": [
+        "specialist.strategy.v1"
+      ]
+    },
+    {
+      "aliases": [
+        "quarterly-priority",
+        "quarterly-focus"
+      ],
+      "capability_id": "capability.set-quarterly-priority",
+      "evidence_kinds": [
+        "primary-constraint"
+      ],
+      "intent": "set-quarterly-priority",
+      "lifecycle": [
+        "route",
+        "collect-authorized-evidence",
+        "run-procedure",
+        "validate-artifact",
+        "propose-state",
+        "handoff"
+      ],
+      "procedure_id": "procedure.set-quarterly-priority",
+      "specialist_profiles": [
+        "specialist.execution.v1"
+      ]
+    },
+    {
+      "aliases": [
+        "meeting-rhythm",
+        "operating-rhythm"
+      ],
+      "capability_id": "capability.install-meeting-rhythm",
+      "evidence_kinds": [
+        "execution-context"
+      ],
+      "intent": "install-meeting-rhythm",
+      "lifecycle": [
+        "route",
+        "collect-authorized-evidence",
+        "run-procedure",
+        "validate-artifact",
+        "propose-state",
+        "handoff"
+      ],
+      "procedure_id": "procedure.install-meeting-rhythm",
+      "specialist_profiles": [
+        "specialist.execution.v1"
+      ]
+    },
+    {
+      "aliases": [
+        "quarterly-review",
+        "review-quarter"
+      ],
+      "capability_id": "capability.quarterly-review",
+      "evidence_kinds": [
+        "current-quarter"
+      ],
+      "intent": "run-quarterly-review",
+      "lifecycle": [
+        "route",
+        "collect-authorized-evidence",
+        "run-procedure",
+        "validate-artifact",
+        "propose-state",
+        "handoff"
+      ],
+      "procedure_id": "procedure.quarterly-review",
+      "specialist_profiles": [
+        "specialist.execution.v1"
+      ]
+    }
+  ],
+  "migration": {
+    "catalog_alias_count": 39,
+    "historical_router": {
+      "catalog": "escala-skills/catalog.yaml",
+      "role": "legacy-alias-resolution-only"
+    },
+    "materialized_wrapper_count": 42,
+    "public_aliases": [],
+    "wrapper_roots": [
+      ".claude/legacy-skills",
+      ".agents/legacy-skills"
+    ]
+  },
+  "portable_core": {
+    "catalog": "capabilities/mvp/catalog.json",
+    "catalog_id": "escala.mvp-capability-map.v1",
+    "lifecycle": [
+      "route",
+      "collect-authorized-evidence",
+      "run-procedure",
+      "validate-artifact",
+      "propose-state",
+      "handoff"
+    ],
+    "skill": "escala-skills/escala/SKILL.md"
+  },
+  "public_entrypoint": "escala",
+  "schema_version": 1,
+  "story_id": "S67.4"
+}
