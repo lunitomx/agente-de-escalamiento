@@ -8,7 +8,9 @@ routes a business request or installs into a home directory.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+from contextlib import suppress
 import os
 import shutil
 import sys
@@ -17,6 +19,7 @@ from pathlib import Path
 from typing import Any
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
+AUTHORIZED_CATALOG_PATH = REPOSITORY_ROOT / "capabilities" / "mvp" / "catalog.json"
 if str(REPOSITORY_ROOT) not in sys.path:
     sys.path.insert(0, str(REPOSITORY_ROOT))
 
@@ -67,8 +70,8 @@ def _validate_output(output: Path, allowed_root: Path) -> tuple[Path, Path]:
         raise CodexAdapterError("allowed_root must be a directory")
     if not output.is_absolute():
         raise CodexAdapterError("output must be an absolute path")
-    if output.exists():
-        raise CodexAdapterError("output already exists")
+    if os.path.lexists(output) or output.is_symlink():
+        raise CodexAdapterError("output already exists or is a symlink")
     resolved_parent = _resolve_directory(output.parent, name="output parent")
     resolved_output = resolved_parent / output.name
     try:
@@ -79,6 +82,28 @@ def _validate_output(output: Path, allowed_root: Path) -> tuple[Path, Path]:
 
 
 def _load_catalog(catalog_path: Path) -> dict[str, Any]:
+    """Load only the exact, approved E67 catalog projection.
+
+    A structurally valid lookalike is not authority.  The adapter accepts a
+    copied input only when its bytes, parsed content, and catalog identity all
+    match the checked-in E67 authority exactly.
+    """
+
+    try:
+        authority_bytes = AUTHORIZED_CATALOG_PATH.read_bytes()
+        input_bytes = catalog_path.read_bytes()
+        authority_raw = json.loads(authority_bytes)
+        raw = json.loads(input_bytes)
+    except (OSError, json.JSONDecodeError) as exc:
+        raise CodexAdapterError("catalog is unavailable") from exc
+    if input_bytes != authority_bytes:
+        raise CodexAdapterError("catalog does not match approved E67 authority")
+    if raw != authority_raw or raw.get("catalog_id") != authority_raw.get("catalog_id"):
+        raise CodexAdapterError(
+            "catalog identity does not match approved E67 authority"
+        )
+    if hashlib.sha256(input_bytes).digest() != hashlib.sha256(authority_bytes).digest():
+        raise CodexAdapterError("catalog digest does not match approved E67 authority")
     try:
         catalog = load_capability_map(catalog_path)
     except CapabilityMapError as exc:
@@ -86,10 +111,6 @@ def _load_catalog(catalog_path: Path) -> dict[str, Any]:
     errors = validate_capability_map(catalog)
     if errors:
         raise CodexAdapterError(f"catalog is invalid: {','.join(errors)}")
-    try:
-        raw = json.loads(catalog_path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
-        raise CodexAdapterError("catalog is unavailable") from exc
     if raw != catalog.model_dump(mode="json"):
         raise CodexAdapterError("catalog is not canonical")
     return raw
@@ -145,6 +166,12 @@ def _assert_complete(directory: Path, catalog: dict[str, Any]) -> None:
         raise CodexAdapterError("adapter manifest is invalid")
 
 
+def _cleanup_temporary(temporary: Path | None) -> None:
+    if temporary is not None and temporary.exists():
+        with suppress(OSError):
+            shutil.rmtree(temporary)
+
+
 def build_codex_adapter(
     *, catalog_path: Path, output: Path, allowed_root: Path
 ) -> Path:
@@ -154,10 +181,11 @@ def build_codex_adapter(
     directory and atomically renamed only after the complete package validates.
     """
 
-    destination, root = _validate_output(output, allowed_root)
-    catalog = _load_catalog(catalog_path)
-    temporary = Path(tempfile.mkdtemp(prefix=".escala-codex-", dir=root))
+    temporary: Path | None = None
     try:
+        destination, root = _validate_output(output, allowed_root)
+        catalog = _load_catalog(catalog_path)
+        temporary = Path(tempfile.mkdtemp(prefix=".escala-codex-", dir=root))
         (temporary / "core").mkdir()
         (temporary / "skills" / "escala").mkdir(parents=True)
         _write_json(temporary / "core" / "escala-capability-contract.json", catalog)
@@ -167,9 +195,14 @@ def build_codex_adapter(
         )
         _assert_complete(temporary, catalog)
         os.replace(temporary, destination)
+    except CodexAdapterError:
+        _cleanup_temporary(temporary)
+        raise
+    except OSError as exc:
+        _cleanup_temporary(temporary)
+        raise CodexAdapterError("filesystem operation failed") from exc
     except Exception:
-        if temporary.exists():
-            shutil.rmtree(temporary)
+        _cleanup_temporary(temporary)
         raise
     return destination
 

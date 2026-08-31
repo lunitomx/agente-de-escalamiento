@@ -6,8 +6,9 @@ import json
 import subprocess
 import sys
 from pathlib import Path
+from typing import cast
 
-import pytest
+import pytest  # type: ignore[reportMissingImports]
 
 from adapters.codex.build_adapter import CodexAdapterError, build_codex_adapter
 
@@ -63,14 +64,15 @@ def test_public_door_hides_internal_route_names_and_platform_details(
 
     skill = (destination / "skills" / "escala" / "SKILL.md").read_text(encoding="utf-8")
     source = _read_json(CATALOG)
+    capabilities = cast(list[dict[str, object]], source["capabilities"])
     forbidden = [
         item
-        for capability in source["capabilities"]
+        for capability in capabilities
         for item in (
-            capability["id"],
-            capability["procedure_id"],
-            *capability["intents"],
-            *capability["aliases"],
+            str(capability["id"]),
+            str(capability["procedure_id"]),
+            *cast(list[str], capability["intents"]),
+            *cast(list[str], capability["aliases"]),
         )
     ]
 
@@ -80,29 +82,19 @@ def test_public_door_hides_internal_route_names_and_platform_details(
     assert all(item not in skill for item in forbidden)
 
 
-@pytest.mark.parametrize(
-    "output,allowed_root",
-    [
-        ("relative", "allowed"),
-        ("/tmp/other", "/tmp/allowed"),
-    ],
-)
-def test_unsafe_destination_is_rejected_before_writes(
-    tmp_path: Path, output: str, allowed_root: str
+def test_relative_or_outside_destination_is_rejected_before_writes(
+    tmp_path: Path,
 ) -> None:
     root = tmp_path / "allowed"
     root.mkdir()
-    destination = tmp_path / output
-    permitted = root
-
-    with pytest.raises(CodexAdapterError, match="output"):
-        build_codex_adapter(
-            catalog_path=CATALOG,
-            output=destination,
-            allowed_root=permitted,
-        )
-
-    assert not destination.exists()
+    for destination in (Path("relative"), tmp_path / "outside"):
+        with pytest.raises(CodexAdapterError, match="output"):
+            build_codex_adapter(
+                catalog_path=CATALOG,
+                output=destination,
+                allowed_root=root,
+            )
+        assert not destination.exists()
 
 
 def test_cli_builds_the_same_local_adapter(tmp_path: Path) -> None:
@@ -130,6 +122,69 @@ def test_cli_builds_the_same_local_adapter(tmp_path: Path) -> None:
     assert completed.returncode == 0, completed.stderr
     assert completed.stdout.strip() == str(output)
     assert (output / "skills" / "escala" / "SKILL.md").is_file()
+
+
+def test_mutated_but_valid_catalog_is_not_an_authorized_e67_authority(
+    tmp_path: Path,
+) -> None:
+    allowed_root = tmp_path / "install"
+    allowed_root.mkdir()
+    mutated = tmp_path / "catalog.json"
+    raw = _read_json(CATALOG)
+    capabilities = cast(list[dict[str, object]], raw["capabilities"])
+    first = capabilities[0]
+    aliases = cast(list[str], first["aliases"])
+    aliases[0] = "diagnostic"
+    mutated.write_text(json.dumps(raw, indent=2) + "\n", encoding="utf-8")
+    destination = allowed_root / "escala"
+
+    with pytest.raises(CodexAdapterError, match="approved E67 authority"):
+        build_codex_adapter(
+            catalog_path=mutated,
+            output=destination,
+            allowed_root=allowed_root,
+        )
+
+    assert not destination.exists()
+    assert list(allowed_root.glob(".escala-codex-*")) == []
+
+
+def test_dangling_symlink_destination_is_rejected_and_cli_is_clean(
+    tmp_path: Path,
+) -> None:
+    allowed_root = tmp_path / "install"
+    allowed_root.mkdir()
+    destination = allowed_root / "escala"
+    destination.symlink_to(tmp_path / "missing")
+
+    with pytest.raises(CodexAdapterError, match="symlink"):
+        build_codex_adapter(
+            catalog_path=CATALOG,
+            output=destination,
+            allowed_root=allowed_root,
+        )
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "adapters" / "codex" / "build_adapter.py"),
+            "--catalog",
+            str(CATALOG),
+            "--allowed-root",
+            str(allowed_root),
+            "--output",
+            str(destination),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert destination.is_symlink()
+    assert completed.returncode == 2
+    assert "Traceback" not in completed.stderr
+    assert "symlink" in completed.stdout
 
 
 def test_existing_destination_and_invalid_catalog_never_publish_partial_output(
