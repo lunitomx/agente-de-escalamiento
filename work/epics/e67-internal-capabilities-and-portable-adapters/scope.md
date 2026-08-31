@@ -1,7 +1,7 @@
 ---
 epic_id: E67
 title: Capacidades internas y adaptadores portables
-status: planned
+status: in_progress
 depends_on: [E45, E65, E56]
 ---
 
@@ -54,3 +54,7 @@ Conectar los procedimientos del MVP al orquestador `escala` mediante capacidades
 ## Handoff y riesgos
 
 E68 recibe builds instalables y una matriz de paridad. No se intenta corregir diferencias de modelo ocultándolas: se reportan y se prueban.
+
+## Dependencia operativa
+
+E45 tiene implementación técnica disponible, pero conserva una validación empresarial externa pendiente. E67 puede construir y verificar el empaquetado técnico desde su contrato común; no declarará aceptación empresarial ni sustituirá el piloto de E45.
