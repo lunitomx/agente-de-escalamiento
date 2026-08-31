@@ -92,6 +92,7 @@ def test_authorized_local_source_yields_bounded_candidate_receipt(
     ("field", "value", "expected_status"),
     [
         ("review_status", "pending", "candidate_only"),
+        ("review_status", "rejected", "blocked"),
         ("lifecycle_status", "blocked", "blocked"),
     ],
 )

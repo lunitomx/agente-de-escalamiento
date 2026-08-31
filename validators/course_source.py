@@ -1,7 +1,8 @@
 """Fail-closed local custody contracts for private course sources.
 
-This module intentionally handles metadata and fingerprints only.  It never
-reads, returns, logs, or stores the text of a course in the repository.
+This module intentionally handles metadata and fingerprints only. It reads raw
+bytes solely to verify a declared hash; it never returns, logs, or stores course
+text in the repository.
 """
 
 from __future__ import annotations
@@ -276,6 +277,13 @@ def promotion_decision(manifest: CourseSourceManifest) -> PromotionDecision:
         return PromotionDecision(
             status="blocked",
             reason="rights_not_documented",
+            allowed_actions=[],
+            blocked_actions=sorted(_ALL_ACTIONS),
+        )
+    if manifest.review_status is ReviewStatus.REJECTED:
+        return PromotionDecision(
+            status="blocked",
+            reason="human_review_rejected",
             allowed_actions=[],
             blocked_actions=sorted(_ALL_ACTIONS),
         )
