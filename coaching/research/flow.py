@@ -20,6 +20,10 @@ Actions (JSON on stdin, like ``coaching.tracker``):
   owner's decisions as local facts, outside findings as assumptions, gaps as
   open questions) and, for a report past its review date, the offer to
   refresh it. ``base_path`` and ``today``.
+- ``check_sources``: a sample of a saved report's web sources (``reference``
+  = its local path, as in ``index.yaml``; ``limit``, default 3). Without
+  ``pages`` it returns the links to open; with ``pages`` ({source_id: page
+  text}) it says, per source, whether the quoted excerpt is on the page.
 
 The private specialist never writes state; this module does.
 """
@@ -42,6 +46,7 @@ from coaching.research.engine import (
     grade_claim,
     is_own_company,
 )
+from coaching.research.sampling import SAMPLE_SIZE, SourceCheck, check_sources
 from coaching.research.models import (
     Comparable,
     DecisionOption,
@@ -55,6 +60,8 @@ from coaching.research.models import (
 from coaching.research.report import (
     build_report,
     comparables_message,
+    load_index,
+    load_saved_report,
     report_message,
     save_report,
 )
@@ -78,6 +85,7 @@ class FlowResult(BaseModel):
     report: ResearchReport | None = None
     saved_to: str | None = None
     diagnostic_inputs: DiagnosticInputs | None = None
+    source_checks: list[SourceCheck] = Field(default_factory=list[SourceCheck])
     errors: list[str] = Field(default_factory=list)
 
 
@@ -237,6 +245,39 @@ def _diagnosis(context: Mapping[str, object]) -> FlowResult:
     )
 
 
+_PAGES = TypeAdapter(dict[str, str])
+
+
+def _check_sources(context: Mapping[str, object]) -> FlowResult:
+    """Sample a saved report's sources and check their quotes (E83 S83.5)."""
+    base = Path(_text(context, "base_path") or ".")
+    reference = _text(context, "reference")
+    entry = next(
+        (item for item in load_index(base) if item.reference == reference), None
+    )
+    if entry is None:
+        raise _Refusal("unknown_report")
+    report = load_saved_report(base, entry)
+    if report is None:
+        raise _Refusal("detail_unreadable", messages.DETAIL_UNREADABLE)
+    raw_limit = context.get("limit", SAMPLE_SIZE)
+    limit = raw_limit if isinstance(raw_limit, int) and raw_limit > 0 else SAMPLE_SIZE
+    raw_pages = context.get("pages")
+    pages = {} if raw_pages is None else _PAGES.validate_python(raw_pages)
+    checks = check_sources(report, pages, limit)
+    if raw_pages is None:
+        message = messages.sources_to_open(len(checks))
+    else:
+        count = {
+            result: sum(item.result == result for item in checks)
+            for result in ("aparece", "no_aparece", "sin_revisar")
+        }
+        message = messages.sources_checked(
+            count["aparece"], count["no_aparece"], count["sin_revisar"]
+        )
+    return FlowResult(action="check_sources", source_checks=checks, message=message)
+
+
 _ACTIONS = {
     "frame": _frame,
     "grade": _grade,
@@ -244,6 +285,7 @@ _ACTIONS = {
     "report": _report,
     "save": _save,
     "diagnosis": _diagnosis,
+    "check_sources": _check_sources,
 }
 
 

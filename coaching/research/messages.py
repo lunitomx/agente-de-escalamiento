@@ -104,3 +104,19 @@ def stale_offer(question: str, researched_on: date, review_by: date) -> str:
         f"pasó su fecha de revisión ({spanish_date(review_by)}). ¿La actualizamos "
         "antes de usarla para ver tu empresa?"
     )
+
+
+def sources_to_open(count: int) -> str:
+    return (
+        f"Elegí {count} fuentes del reporte. Abre cada enlace y dame el texto "
+        "de la página; reviso si la cita está ahí."
+    )
+
+
+def sources_checked(found: int, missing: int, unchecked: int) -> str:
+    text = f"Revisé las fuentes: {found} con la cita en la página, {missing} sin ella"
+    if unchecked:
+        text += f" y {unchecked} sin revisar"
+    if missing:
+        text += ". Las que no la tienen no cuentan hasta volver a confirmarlas"
+    return text + "."
