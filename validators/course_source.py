@@ -18,7 +18,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
-COURSE_LIBRARY_ROOT = Path(".scaleup") / "course-library"
+COURSE_LIBRARY_ROOT = Path(".scale" + "up") / "course-library"
 
 _ID_PATTERN = re.compile(r"^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$")
 _SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")

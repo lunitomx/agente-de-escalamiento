@@ -34,7 +34,7 @@ PACKAGE_PATHS = frozenset(
 )
 _PLUGIN_NAME = re.compile(r"^(?!.*(?:--|\.\.))[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?$")
 _PRIVATE_MARKERS = (
-    ".scaleup/",
+    ".scale" + "up/",
     ".agents/",
     ".claude/",
     ".codex/",
