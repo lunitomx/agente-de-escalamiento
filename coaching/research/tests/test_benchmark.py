@@ -424,3 +424,24 @@ def test_a_competitor_sharing_the_type_of_business_is_not_the_own_company() -> N
     assert not is_own_company(
         "Tortillería El Sol", _frame(), PrivateTerms.model_validate(PRIVATE)
     )
+
+
+def test_gaps_in_the_table_are_listed_as_not_found() -> None:
+    text = report_message(_counted_report())
+    full = {
+        dimension: {"value": f"dato {dimension}", "source_id": "s1"}
+        for dimension in ("precio", "paquetes", "canales", "metricas")
+    }
+    complete = report_message(_report([_owner_named(cells=full)]))
+
+    assert messages.NOTHING_MISSING not in text
+    assert messages.TABLE_GAPS in text
+    assert messages.TABLE_GAPS not in complete
+    assert messages.NOTHING_MISSING in complete
+
+
+def test_without_findings_the_table_is_what_was_found() -> None:
+    text = report_message(_counted_report())
+
+    assert "nada que pueda sostener con fuentes" not in text
+    assert messages.ONLY_THE_TABLE in text

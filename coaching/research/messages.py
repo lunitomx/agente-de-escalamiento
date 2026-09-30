@@ -38,6 +38,8 @@ NO_COUNTED_COMPARABLES = (
 )
 WHICH_LOOK_ALIKE = "¿Cuáles se parecen al tuyo? Sólo cuento los que me digas que sí."
 NOT_FOUND_CELL = "no encontrado"
+ONLY_THE_TABLE = "Lo que encontré: lo que está en la tabla, con su fuente."
+TABLE_GAPS = "Lo que en la tabla dice «no encontrado»: no hallé una fuente que lo diga."
 
 
 def comparing_with(names: list[str]) -> str:

@@ -206,6 +206,30 @@ def comparables_message(
     return "\n\n".join(blocks)
 
 
+def _findings(report: ResearchReport) -> str:
+    if report.claims:
+        return "Lo que encontré:\n" + "\n".join(
+            _finding(report, claim) for claim in report.claims
+        )
+    if any(item.counted for item in report.comparables):
+        return messages.ONLY_THE_TABLE
+    return "Lo que encontré: nada que pueda sostener con fuentes."
+
+
+def _missing(report: ResearchReport) -> list[str]:
+    """What was not found, including the gaps of the comparables table."""
+    lines = [f"- {item}" for item in report.not_found]
+    gaps = any(
+        dimension not in item.cells
+        for item in report.comparables
+        if item.counted
+        for dimension in DIMENSIONS
+    )
+    if gaps:
+        lines.append(f"- {messages.TABLE_GAPS}")
+    return lines
+
+
 def report_message(report: ResearchReport) -> str:
     """The short result shown to the owner; it always ends asking the decision."""
     blocks: list[str] = []
@@ -214,12 +238,7 @@ def report_message(report: ResearchReport) -> str:
     table = _comparables_block(report)
     if table is not None:
         blocks.append(table)
-    blocks.append(
-        "Lo que encontré:\n"
-        + "\n".join(_finding(report, claim) for claim in report.claims)
-        if report.claims
-        else "Lo que encontré: nada que pueda sostener con fuentes."
-    )
+    blocks.append(_findings(report))
     contrary = _contrary(report)
     blocks.append(
         "Lo que dice lo contrario:\n"
@@ -228,8 +247,8 @@ def report_message(report: ResearchReport) -> str:
     blocks.append(
         "Lo que no encontré:\n"
         + (
-            "\n".join(f"- {item}" for item in report.not_found)
-            if report.not_found
+            "\n".join(missing)
+            if (missing := _missing(report))
             else messages.NOTHING_MISSING
         )
     )
