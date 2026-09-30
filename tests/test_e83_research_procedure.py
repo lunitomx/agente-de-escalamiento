@@ -125,3 +125,12 @@ def test_research_procedure_says_the_diagnosis_starts_from_the_decision() -> Non
     assert '"pages"' in text
     assert "sin_revisar" in text  # a page not opened is never "verified"
     assert "Claude Desktop tampoco está verificado" in text
+
+
+def test_codex_search_off_line_is_concrete_only_where_verified() -> None:
+    """S83.5 matrix: codex-cli 0.157.1 defaults to cached search (no live page)."""
+    text = _procedure()
+
+    assert "codex --search" in text
+    assert 'web_search = "live"' in text
+    assert "cached" in text

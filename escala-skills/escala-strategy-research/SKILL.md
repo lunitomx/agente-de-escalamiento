@@ -67,6 +67,14 @@ si tienes una herramienta de búsqueda web, `"search_mode": "web"`; si no,
 Con lo que pegue, sus fuentes van con `"origin": "dueño"` o
 `"origin": "archivo_empresa"`. Las reglas de "confirmado" no se relajan.
 
+En Codex (visto con codex-cli 0.157.1): sin `--search` la búsqueda viene en
+modo `cached` (un índice, sin abrir la página en vivo) y lo que devuelve no es
+una cita de una página abierta. Ahí usa `"search_mode": "sin_busqueda"` y di en
+una línea: "Aquí la búsqueda en vivo está apagada: abre Codex con
+`codex --search` (o pon `web_search = "live"` en `~/.codex/config.toml`), o
+pégame dos o tres fuentes y sigo con eso." En las demás herramientas usa la
+línea de arriba tal cual.
+
 ## Pasos
 
 Todas las llamadas son `echo '<json>' | python3 -m coaching.research` desde la
