@@ -50,4 +50,4 @@ Las áreas coinciden con Cash/People/Strategy/Execution de ESCALA; Critical Numb
 | S82.3 | Flujo guiado: identidad → conexión → selección de hoja propia con confirmación | M | planned |
 | S82.4 | Llenado: proponer filas desde prioridades/rocks de ESCALA y escribir tras confirmación | M | planned |
 | S82.5 | Mantenimiento previo a reunión: vencidos, `Done`, estado | S | planned |
-| S82.6 | Spike: escritura en Sheets (MCP de Sheets, conector ChatGPT) | S | planned |
+| S82.6 | Spike: escritura en Sheets (MCP de Sheets, ChatGPT Work) | S | planned |

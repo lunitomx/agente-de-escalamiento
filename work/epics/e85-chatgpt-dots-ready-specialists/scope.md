@@ -18,6 +18,9 @@ Muchos usuarios de ESCALA usan ChatGPT. Ofrecerles ESCALA y sus especialistas pr
 
 ## Hechos conocidos (2026-09-30)
 
+- **Superficies objetivo (decisión del dueño, 2026-09-30):** ChatGPT **Work** y **Codex**. El chat normal de ChatGPT queda fuera.
+- ChatGPT Work (lanzado 2026-07-09): agente que usa apps conectadas, divide la meta en pasos y entrega hojas, slides, docs o web apps; tiene soporte de plugins. No verificado: si puede instalar ESCALA ni si edita una Google Sheet existente.
+- Codex: ESCALA ya tiene adaptador (E67).
 - Dots: agentes siempre activos con computadora y navegador propios en la nube, conectados a >4,000 apps; disponibles para Pro y Business Premium, no en EEE/Suiza/Reino Unido.
 - ESCALA hoy tiene adaptadores para Claude y Codex (E67); no para ChatGPT.
 
@@ -25,7 +28,7 @@ Muchos usuarios de ESCALA usan ChatGPT. Ofrecerles ESCALA y sus especialistas pr
 
 1. ¿Un tercero puede empaquetar y distribuir dots preconfigurados, o cada usuario crea el suyo con instrucciones?
 2. Dónde viviría la carpeta local de la empresa si el dot corre en la nube; qué implica para la privacidad (E79).
-3. Si no hay dots para todos: ¿qué superficie de ChatGPT (GPT, proyecto, app) sirve como alternativa?
+3. ¿Cómo se empaqueta ESCALA para ChatGPT Work (plugin, instrucciones, app)? ¿Work puede escribir en el tracker de E82?
 
 ## Fuera
 
