@@ -28,6 +28,7 @@ from coaching.research.models import (
     ResearchFrame,
     ResearchReport,
     SourceRecord,
+    without_urls,
 )
 
 RESEARCH_DIR = Path(".escala") / "my-company" / "research"
@@ -81,10 +82,10 @@ def build_report(
 
 
 def _cite(report: ResearchReport, ids: list[str]) -> str:
-    return _cite_sources(report.sources, ids)
+    return cite_sources(report.sources, ids)
 
 
-def _cite_sources(sources: list[SourceRecord], ids: list[str]) -> str:
+def cite_sources(sources: list[SourceRecord], ids: list[str]) -> str:
     by_id = {source.source_id: source for source in sources}
     parts: list[str] = []
     for source_id in ids:
@@ -111,14 +112,19 @@ def _finding(report: ResearchReport, claim: ResearchClaim) -> str:
     return line
 
 
-def _option(option: DecisionOption) -> str:
-    text = f"{option.label}) {option.text}"
+def decision_text(option: DecisionOption) -> str:
+    """The option as a sentence, without its letter."""
+    text = option.text
     if option.kind == "esperar" and option.missing_data and option.by_date:
         text += (
             f": antes consigo {option.missing_data} para el "
             f"{messages.spanish_date(option.by_date)}"
         )
     return text
+
+
+def _option(option: DecisionOption) -> str:
+    return f"{option.label}) {decision_text(option)}"
 
 
 def _contrary(report: ResearchReport) -> list[str]:
@@ -129,7 +135,7 @@ def _contrary(report: ResearchReport) -> list[str]:
     ]
 
 
-_COLUMN = {
+COLUMN_LABELS = {
     "precio": "Precio",
     "paquetes": "Paquetes",
     "canales": "Dónde vende",
@@ -162,7 +168,7 @@ def _comparables_block(report: ResearchReport) -> str | None:
     candidates = [item.name for item in report.comparables if not item.counted]
     frame = report.frame
     if counted:
-        header = ["Negocio", *(_COLUMN[dimension] for dimension in DIMENSIONS)]
+        header = ["Negocio", *(COLUMN_LABELS[dimension] for dimension in DIMENSIONS)]
         lines = [
             messages.table_title(frame.offer_category or "", frame.geography or ""),
             "",
@@ -196,7 +202,7 @@ def comparables_message(
         ]
         lines += [
             f"- {item.name}: {item.why} "
-            f"({_cite_sources(sources, [item.found_in or ''])})"
+            f"({cite_sources(sources, [item.found_in or ''])})"
             for item in candidates
         ]
         blocks.append("\n".join(lines))
@@ -317,6 +323,19 @@ def load_index(base: Path) -> list[IndexEntry]:
         return []
 
 
+def load_saved_report(base: Path, entry: IndexEntry) -> ResearchReport | None:
+    """The structured report behind an index line, or None if unreadable.
+
+    Only a file inside the research folder is read, whatever the index says.
+    """
+    name = Path(entry.reference).with_suffix(".json").name
+    try:
+        raw = (base / RESEARCH_DIR / name).read_text(encoding="utf-8")
+        return ResearchReport.model_validate_json(raw)
+    except (OSError, ValidationError):
+        return None
+
+
 def _free_path(folder: Path, stem: str) -> Path:
     path = folder / f"{stem}.md"
     counter = 2
@@ -334,12 +353,15 @@ def save_report(report: ResearchReport, base: Path) -> Path:
     folder.mkdir(parents=True, exist_ok=True)
     path = _free_path(folder, f"{report.researched_on.isoformat()}-{report.frame.mode}")
     path.write_text(render_markdown(report), encoding="utf-8")
+    path.with_suffix(".json").write_text(
+        report.model_dump_json(indent=2), encoding="utf-8"
+    )
     entry = IndexEntry(
         reference=(RESEARCH_DIR / path.name).as_posix(),
         mode=report.frame.mode,
         question=report.frame.question,
         decision_area=report.frame.decision_area,
-        decision=_option(report.chosen),
+        decision=without_urls(_option(report.chosen)),
         researched_on=report.researched_on,
         review_by=report.review_by,
     )

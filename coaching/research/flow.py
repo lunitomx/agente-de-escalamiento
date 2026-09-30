@@ -16,6 +16,14 @@ Actions (JSON on stdin, like ``coaching.tracker``):
   decision question. Nothing is saved. Needs ``frame.confirmed``.
 - ``save``: same input plus ``chosen`` (option label) and
   ``user_confirmed: true``; writes under ``.escala/my-company/research/``.
+- ``diagnosis``: the saved research as input for the next diagnosis (the
+  owner's decisions as local facts, outside findings as assumptions, gaps as
+  open questions) and, for a report past its review date, the offer to
+  refresh it. ``base_path`` and ``today``.
+- ``check_sources``: a sample of a saved report's web sources (``reference``
+  = its local path, as in ``index.yaml``; ``limit``, default 3). Without
+  ``pages`` it returns the links to open; with ``pages`` ({source_id: page
+  text}) it says, per source, whether the quoted excerpt is on the page.
 
 The private specialist never writes state; this module does.
 """
@@ -30,6 +38,11 @@ from typing import cast
 from pydantic import BaseModel, Field, TypeAdapter, ValidationError
 
 from coaching.research import messages
+from coaching.research.diagnosis import (
+    DiagnosticInputs,
+    load_diagnostic_inputs,
+    misfits,
+)
 from coaching.research.engine import (
     RejectedQuery,
     build_queries,
@@ -37,6 +50,7 @@ from coaching.research.engine import (
     grade_claim,
     is_own_company,
 )
+from coaching.research.sampling import SAMPLE_SIZE, SourceCheck, check_sources
 from coaching.research.models import (
     Comparable,
     DecisionOption,
@@ -50,6 +64,8 @@ from coaching.research.models import (
 from coaching.research.report import (
     build_report,
     comparables_message,
+    load_index,
+    load_saved_report,
     report_message,
     save_report,
 )
@@ -72,6 +88,8 @@ class FlowResult(BaseModel):
     comparables: list[Comparable] = Field(default_factory=list[Comparable])
     report: ResearchReport | None = None
     saved_to: str | None = None
+    diagnostic_inputs: DiagnosticInputs | None = None
+    source_checks: list[SourceCheck] = Field(default_factory=list[SourceCheck])
     errors: list[str] = Field(default_factory=list)
 
 
@@ -138,9 +156,30 @@ def _frame(context: Mapping[str, object]) -> FlowResult:
     )
 
 
+def _must_fit(
+    *,
+    as_of: date,
+    claims: list[ResearchClaim] | None = None,
+    comparables: list[Comparable] | None = None,
+    not_found: list[str] | None = None,
+    options: list[DecisionOption] | None = None,
+) -> None:
+    """Every text must reach the next diagnosis whole; none is ever cut."""
+    bad = misfits(
+        claims=claims or [],
+        comparables=comparables or [],
+        not_found=not_found or [],
+        options=options or [],
+        as_of=as_of,
+    )
+    if bad:
+        raise _Refusal("finding_too_long", messages.finding_too_long(bad))
+
+
 def _grade(context: Mapping[str, object]) -> FlowResult:
     sources = _SOURCES.validate_python(context.get("sources", []))
     claims = _CLAIMS.validate_python(context.get("claims", []))
+    _must_fit(as_of=_today(context), claims=claims)
     by_id = {source.source_id: source for source in sources}
     as_of = _today(context)
     return FlowResult(
@@ -166,6 +205,7 @@ def _comparables(context: Mapping[str, object]) -> FlowResult:
     comparables = _COMPARABLES.validate_python(context.get("comparables", []))
     check_comparables(frame, sources, comparables)
     _no_own_company(frame, comparables, private)
+    _must_fit(as_of=_today(context), comparables=comparables)
     return FlowResult(
         action="comparables",
         comparables=comparables,
@@ -183,15 +223,25 @@ def _build(context: Mapping[str, object], chosen: str | None) -> ResearchReport:
         if checked.rejected or checked.accepted != frame.queries:
             raise _Refusal("private_query", messages.NO_SAFE_QUERY)
         _no_own_company(frame, comparables, private)
+    claims = _CLAIMS.validate_python(context.get("claims", []))
+    options = _OPTIONS.validate_python(context.get("options", []))
+    not_found = _TEXTS.validate_python(context.get("not_found", []))
+    _must_fit(
+        as_of=_today(context),
+        claims=claims,
+        comparables=comparables,
+        not_found=not_found,
+        options=options,
+    )
     return build_report(
         frame=frame,
         researched_on=_today(context),
         sources=_SOURCES.validate_python(context.get("sources", [])),
-        claims=_CLAIMS.validate_python(context.get("claims", [])),
-        options=_OPTIONS.validate_python(context.get("options", [])),
+        claims=claims,
+        options=options,
         recommendation=_text(context, "recommendation") or "",
         recommendation_reason=_text(context, "recommendation_reason") or "",
-        not_found=_TEXTS.validate_python(context.get("not_found", [])),
+        not_found=not_found,
         limits=_TEXTS.validate_python(context.get("limits", [])),
         chosen=chosen,
         comparables=comparables,
@@ -220,12 +270,58 @@ def _save(context: Mapping[str, object]) -> FlowResult:
     )
 
 
+def _diagnosis(context: Mapping[str, object]) -> FlowResult:
+    """Saved research as input for the next diagnosis (E83 S83.5)."""
+    base = Path(_text(context, "base_path") or ".")
+    inputs = load_diagnostic_inputs(base, _today(context))
+    return FlowResult(
+        action="diagnosis",
+        diagnostic_inputs=inputs,
+        message="\n\n".join(inputs.refresh_offers),
+    )
+
+
+_PAGES = TypeAdapter(dict[str, str])
+
+
+def _check_sources(context: Mapping[str, object]) -> FlowResult:
+    """Sample a saved report's sources and check their quotes (E83 S83.5)."""
+    base = Path(_text(context, "base_path") or ".")
+    reference = _text(context, "reference")
+    entry = next(
+        (item for item in load_index(base) if item.reference == reference), None
+    )
+    if entry is None:
+        raise _Refusal("unknown_report")
+    report = load_saved_report(base, entry)
+    if report is None:
+        raise _Refusal("detail_unreadable", messages.DETAIL_UNREADABLE)
+    raw_limit = context.get("limit", SAMPLE_SIZE)
+    limit = raw_limit if isinstance(raw_limit, int) and raw_limit > 0 else SAMPLE_SIZE
+    raw_pages = context.get("pages")
+    pages = {} if raw_pages is None else _PAGES.validate_python(raw_pages)
+    checks = check_sources(report, pages, limit)
+    if raw_pages is None:
+        message = messages.sources_to_open(len(checks))
+    else:
+        count = {
+            result: sum(item.result == result for item in checks)
+            for result in ("aparece", "no_aparece", "sin_revisar")
+        }
+        message = messages.sources_checked(
+            count["aparece"], count["no_aparece"], count["sin_revisar"]
+        )
+    return FlowResult(action="check_sources", source_checks=checks, message=message)
+
+
 _ACTIONS = {
     "frame": _frame,
     "grade": _grade,
     "comparables": _comparables,
     "report": _report,
     "save": _save,
+    "diagnosis": _diagnosis,
+    "check_sources": _check_sources,
 }
 
 

@@ -25,6 +25,15 @@ procedimiento. Nunca digas "módulo", "triangulación", "TAM" ni "benchmark".
 - "Confirmado" lo decide el módulo (tres fuentes de distintos publicadores,
   con fecha, de los últimos 90 días). No pongas `status` ni `confidence` a mano.
 - Un modo por conversación. Máximo tres hallazgos y dos o tres opciones.
+- Escribe cada hallazgo en **10 palabras o menos, con su cifra**, sin «/» ni
+  links (la línea que llega al diagnóstico, con su etiqueta, no pasa de 12).
+  Lo mismo para lo no encontrado, cada dato de la tabla y el dato de un
+  "todavía no". El módulo no recorta: si no cabe, responde
+  `finding_too_long` con su `message`; reescríbelo más corto, conservando la
+  cifra, y vuelve a llamar.
+  - Bien: "El kilo de tortilla en Puebla cuesta 17 pesos".
+  - Mal (15 palabras; fuente y fecha ya van en la fuente):
+    "Según datos del SNIIM, en Puebla el kilo de tortilla ronda los 17 pesos en septiembre".
 - Toda investigación termina en una decisión que elige el empresario, incluida
   "todavía no: primero consigo [dato] para el [fecha]".
 - Se guarda sólo con su "sí" y su opción elegida. El módulo escribe en
@@ -36,7 +45,10 @@ procedimiento. Nunca digas "módulo", "triangulación", "TAM" ni "benchmark".
   fuente; si no hay fuente, la celda dice "no encontrado", nunca un estimado.
   Los números de otro negocio (ventas, clientes) sólo si los publicó en una
   página con link.
-- No prometas pasos para ChatGPT: hoy no está verificado (E85).
+- No prometas pasos para ChatGPT: hoy no está verificado (E85). En Claude.ai
+  / Claude Desktop tampoco está verificado de punta a punta: no digas al
+  empresario que ahí ya funciona; usa la regla de "¿Hay búsqueda en
+  internet?".
 - Un paso por mensaje, en español llano. Usa tal cual el `message` que devuelve
   el módulo.
 
@@ -63,6 +75,14 @@ si tienes una herramienta de búsqueda web, `"search_mode": "web"`; si no,
 
 Con lo que pegue, sus fuentes van con `"origin": "dueño"` o
 `"origin": "archivo_empresa"`. Las reglas de "confirmado" no se relajan.
+
+En Codex (visto con codex-cli 0.157.1): sin `--search` la búsqueda viene en
+modo `cached` (un índice, sin abrir la página en vivo) y lo que devuelve no es
+una cita de una página abierta. Ahí usa `"search_mode": "sin_busqueda"` y di en
+una línea: "Aquí la búsqueda en vivo está apagada: abre Codex con
+`codex --search` (o pon `web_search = "live"` en `~/.codex/config.toml`), o
+pégame dos o tres fuentes y sigo con eso." En las demás herramientas usa la
+línea de arriba tal cual.
 
 ## Pasos
 
@@ -173,7 +193,30 @@ Sólo cuando elija una opción y diga que sí:
  "...": "lo mismo que en el paso 4"}
 ```
 
-Di el `message` (dónde quedó y cuándo conviene revisarlo).
+Di el `message` (dónde quedó, que el siguiente diagnóstico parte de esta
+decisión y cuándo conviene revisarlo). Lo que dicen las fuentes entra a ese
+diagnóstico sólo como supuesto; la decisión del empresario, como hecho.
+
+### Paso 5b: Revisar citas (si lo pide, o antes de apoyarse en el reporte)
+
+Toma una muestra de las fuentes web del reporte guardado (`reference` es la
+ruta que devolvió `save`):
+
+```json
+{"action": "check_sources", "base_path": ".", "reference": "<saved_to>", "limit": 3}
+```
+
+Abre cada link de `source_checks` y vuelve a llamar con el texto de cada
+página:
+
+```json
+{"action": "check_sources", "base_path": ".", "reference": "<saved_to>",
+ "pages": {"s1": "<texto de la página que abriste>"}}
+```
+
+Di el `message`. Una fuente con `no_aparece` no cuenta hasta volver a
+confirmarla. Si no pudiste abrir una página, no la pases en `pages`: queda
+`sin_revisar`, nunca "verificada".
 
 ### Paso 6: Qué sigue
 

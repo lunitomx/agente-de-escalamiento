@@ -214,6 +214,7 @@ def test_save_writes_only_under_the_company_research_folder(tmp_path: Path) -> N
         p.relative_to(tmp_path).as_posix() for p in tmp_path.rglob("*") if p.is_file()
     )
     assert written == [
+        ".escala/my-company/research/2026-09-30-benchmark.json",  # S83.5
         ".escala/my-company/research/2026-09-30-benchmark.md",
         ".escala/my-company/research/index.yaml",
     ]

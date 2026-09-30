@@ -22,6 +22,9 @@ SEARCH_OFF = (
     "fuentes (el link de un competidor, una cotización que te llegó, lo que te "
     "dicen tus clientes) y sigo con eso, diciéndote hasta dónde llega."
 )
+LINK_IN_REPORT = "(enlace en el reporte)"
+STALE_MARK = "[vencida] "
+DETAIL_UNREADABLE = "no pude leer el detalle"
 NEEDS_OFFER = (
     "¿Qué vendes exactamente y en qué ciudad o zona? Con eso armo las búsquedas."
 )
@@ -88,6 +91,45 @@ def frame_message(decision_informed: str, queries: list[str]) -> str:
 
 def saved_message(review_by: date) -> str:
     return (
-        "Listo, quedó guardado en tu carpeta con tu decisión. Conviene "
-        f"revisarlo antes del {spanish_date(review_by)}."
+        "Listo, quedó guardado en tu carpeta con tu decisión. La próxima vez "
+        "que veamos tu empresa, parto de esta decisión. Conviene revisarlo "
+        f"antes del {spanish_date(review_by)}."
+    )
+
+
+def stale_offer(question: str, researched_on: date, review_by: date) -> str:
+    """A research past its review date is offered for refresh before use."""
+    return (
+        f"Tu investigación «{question}» es del {spanish_date(researched_on)} y ya "
+        f"pasó su fecha de revisión ({spanish_date(review_by)}). ¿La actualizamos "
+        "antes de usarla para ver tu empresa?"
+    )
+
+
+def sources_to_open(count: int) -> str:
+    return (
+        f"Elegí {count} fuentes del reporte. Abre cada enlace y dame el texto "
+        "de la página; reviso si la cita está ahí."
+    )
+
+
+def sources_checked(found: int, missing: int, unchecked: int) -> str:
+    text = f"Revisé las fuentes: {found} con la cita en la página, {missing} sin ella"
+    if unchecked:
+        text += f" y {unchecked} sin revisar"
+    if missing:
+        text += ". Las que no la tienen no cuentan hasta volver a confirmarlas"
+    return text + "."
+
+
+FINDING_EXAMPLE = "El kilo de tortilla en Puebla cuesta 17 pesos"
+
+
+def finding_too_long(texts: list[str]) -> str:
+    listed = "; ".join(f"«{text}»" for text in texts)
+    return (
+        f"Esto no cabe entero en el siguiente diagnóstico: {listed}. Reescríbelo "
+        "en 10 palabras o menos, sin «/» ni links, y conserva la cifra; por "
+        f"ejemplo: «{FINDING_EXAMPLE}». No lo recorto yo: una cifra cortada "
+        "cambia el sentido."
     )

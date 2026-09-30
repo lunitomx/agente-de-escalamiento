@@ -36,6 +36,28 @@ Revisa el perfil y evidencia ya autorizados. Si falta perfil, inicia con la
 bienvenida. Si existe información previa, preséntala como propuesta, con fuente
 frescura, y pregunta si sigue vigente.
 
+Revisa también si el empresario ya investigó algo fuera de su empresa y tomó
+una decisión (desde la raíz del proyecto):
+
+```bash
+echo '{"action": "diagnosis", "base_path": ".", "today": "2026-09-30"}' | python3 -m coaching.research
+```
+
+`diagnostic_inputs` trae, listo para los campos que el diagnóstico ya tiene:
+
+- `evidence`: cada decisión que el empresario confirmó al cerrar una
+  investigación, como hecho local que apunta a su reporte guardado. Úsala como
+  cualquier otra evidencia.
+- `assumptions`: lo que dicen fuentes de fuera, con su estado y mes. Pásalo a
+  `assumptions` del diagnóstico; nunca como hecho.
+- `open_questions`: lo que la investigación no encontró y el dato que el
+  empresario quedó en conseguir. Pásalo a `open_questions`.
+
+Si `refresh_offers` no viene vacío (una investigación pasó su fecha de
+revisión), di primero ese `message` y espera su respuesta: la evidencia vencida
+entra `stale` y con confianza baja. Si no hay nada guardado, sigue sin
+mencionarlo.
+
 ### 2. Entender antes de medir
 
 Con una pregunta por turno, recorre sólo las decisiones relevantes y pide
@@ -125,6 +147,15 @@ Propón uno o dos focos con su razón. Espera elección o corrección humana. Ha
 que E65 entregue procedimientos verificados, termina con una pregunta concreta
 que prepare el Deep Dive; no aparentes ejecutar Cash, People, Strategy o
 Execution en profundidad.
+
+Si el reto parece de Strategy (demanda, clientes, zona nueva) o de Cash por
+precio o margen, y no hay una investigación vigente sobre eso, ofrece en texto
+como siguiente paso posible: "Si quieres, antes de decidir vemos cómo cobran
+negocios parecidos / cómo está tu mercado, sin usar datos de tu empresa en las
+búsquedas". Si dice que sí, lo lleva `escala` con el especialista de strategy.
+La elección de ruta automática (E75 S75.3) aún no existe: no simules el
+traspaso ni digas que ya empezó la investigación. En People o Execution no lo
+ofrezcas (el freno es interno).
 
 ## Compatibilidad heredada
 
