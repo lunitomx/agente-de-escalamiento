@@ -134,3 +134,13 @@ def test_codex_search_off_line_is_concrete_only_where_verified() -> None:
     assert "codex --search" in text
     assert 'web_search = "live"' in text
     assert "cached" in text
+
+
+def test_procedure_asks_for_short_findings_that_keep_their_figure() -> None:
+    """S83.5: a finding reaches the diagnosis whole or is rejected, never cut."""
+    text = _procedure()
+
+    assert "10 palabras o menos, con su cifra" in text
+    assert "finding_too_long" in text
+    assert "El kilo de tortilla en Puebla cuesta 17 pesos" in text  # good
+    assert "ronda los 17 pesos en septiembre" in text  # bad: too long
