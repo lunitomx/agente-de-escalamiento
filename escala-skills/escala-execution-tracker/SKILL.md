@@ -1,5 +1,5 @@
 ---
-description: 'Encuentra la pestaña propia del empresario en la hoja compartida de su grupo de accountability, con su confirmación, sin mirar las de los demás; propone filas y prepara la reunión sin mover nada.'
+description: 'Encuentra la pestaña propia del empresario en la hoja compartida de su grupo de accountability, con su confirmación, sin mirar las de los demás; propone filas de compromisos y Rocks y prepara la reunión sin mover nada.'
 name: escala-execution-tracker
 ---
 
@@ -36,6 +36,8 @@ escriba un comando ni le nombres este procedimiento.
 - **Antes de la reunión sólo se sugiere.** Nunca muevas filas a Done, nunca
   marques nada como terminado ni cambies fechas. Una fecha que el módulo no
   pudo leer queda "por confirmar": pregúntala, no la adivines.
+- **Nunca adivines el trimestre** de sus Rocks. Manda el que dice su hoja; si
+  el módulo pregunta, pregúntale y vuelve a llamar con su respuesta.
 - Un paso por mensaje, en español llano. Usa tal cual el `message` que devuelve
   el módulo.
 
@@ -112,6 +114,21 @@ el módulo pide insertar filas antes, dilo tal cual. Si pregunta por el
 Critical Number o por un área, espera su respuesta y vuelve a llamar con el
 plan corregido. Nada se mueve sin su sí.
 
+### Paso 6b: Proponer sus Rocks del trimestre
+
+Si quiere llenar también sus Rocks (Quarterly Goals), es la misma llamada del
+paso 6 con `"table": "rocks"` (sin `month`). Las prioridades del trimestre son
+sus Rocks; manda en `plan` también `"quarter": "Q4-2026"` si lo definieron.
+
+El módulo usa el trimestre que dice el título de su tabla ("Quarterly Goals
+(Rocks) - Q4-2026"). Si no lo dice o no se entiende, el `message` pregunta de
+qué trimestre son y no trae bloque para pegar: pregúntale y vuelve a llamar
+con `"quarter": "<su respuesta>"`. Si su hoja dice un trimestre y el plan
+otro, el mensaje lo señala y pregunta; espera su decisión. Sólo van las
+columnas que tiene su tabla de Rocks (en la plantilla: área y Rock); si falta
+la del KPI, el mensaje lo dice. Di el `message` completo: tabla, bloque, celda
+exacta y cómo deshacer.
+
 ### Paso 7: Antes de tu reunión
 
 Cuando el empresario mencione su reunión del grupo (o pida revisar su hoja),
@@ -120,9 +137,15 @@ con su pestaña confirmada:
 `{"action": "prepare", "base_path": ".", "connector_text": "<texto>", "file_title": "<título>", "file_id": "<id>", "today": "AAAA-MM-DD"}`
 
 (o `"pasted_text"` en lugar de `connector_text`). Manda `today` con la fecha de
-hoy. El módulo revisa sólo sus compromisos del mes: vencidos, terminados que
+hoy. El módulo revisa sus compromisos del mes: vencidos, terminados que
 puede pasar a Done (con el bloque para pegar y la celda exacta), filas sin KPI
-o sin fecha, y fechas "por confirmar". No guarda nada.
+o sin fecha, y fechas "por confirmar". Aparte, en su propio bloque, revisa sus
+Rocks del trimestre: vencidos, sin KPI o sin fecha (sólo si su tabla tiene esa
+columna) y fechas por confirmar. No guarda nada.
+
+Una fecha como `03/04/2026` se lee día/mes (o mes/día) sólo si las demás
+fechas de su pestaña lo muestran sin contradecirse, y el mensaje lo dice; si
+no, queda "por confirmar": pregúntala, no la adivines.
 
 Di el `message` completo ("Antes de tu reunión: 2 compromisos vencidos, 1
 terminado que puedes pasar a Done."). Termina con lo que tiene que decidir;
@@ -136,5 +159,5 @@ Si la pestaña no tiene compromisos, ofrece el paso 6.
 |------|-------------|
 | Referencia a su pestaña (archivo + nombre de pestaña) | `.escala/my-company/tracker.yaml` |
 | Su pestaña leída (sólo en la conversación) | `sheet` del módulo; no se guarda |
-| Filas propuestas + bloque para pegar | `proposal` / `paste_block` del módulo; las pega el empresario |
+| Filas propuestas + bloque para pegar | `proposal` (o `rock_proposal` para Rocks) / `paste_block` del módulo; las pega el empresario |
 | Preparación de la reunión + bloque para Done | `prep` / `paste_block` del módulo; nada se mueve sin él |
