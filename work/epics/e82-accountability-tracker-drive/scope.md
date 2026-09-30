@@ -51,3 +51,44 @@ Las áreas coinciden con Cash/People/Strategy/Execution de ESCALA; Critical Numb
 | S82.4 | Llenado: proponer filas desde prioridades/rocks de ESCALA y escribir tras confirmación | M | planned (ESCALA-54) — tras S82.6 |
 | S82.5 | Mantenimiento previo a reunión: vencidos, `Done`, estado | S | planned (ESCALA-55) |
 | S82.6 | Spike: escritura en Sheets (MCP de Sheets, ChatGPT Work) | S | planned (ESCALA-56) — antes de S82.4 |
+
+Orden de ejecución: S82.3 → S82.6 → S82.4 → S82.5. Diseño detallado en `design.md`.
+
+| Historia | Depende de | Entrega concreta |
+|---|---|---|
+| S82.3 | S82.2 | `identity.py` (candidatas, placeholder, `TrackerLink`, pestaña pegada) + procedimiento interno `escala-execution-tracker` al que se llega desde `escala` |
+| S82.6 | S82.1 | Tabla verificada GO/NO-GO por superficie (ChatGPT Work, MCP de Sheets en Claude y en Codex) sobre una copia sintética |
+| S82.4 | S82.3, S82.6 | `proposal.py`: filas desde `quarterly_plan`, bloque para pegar; escritura directa sólo con GO |
+| S82.5 | S82.3 | `maintenance.py`: vencidos, pasar a Done, faltantes; sólo propone |
+
+## Criterios de terminado
+
+- Un empresario, desde `escala` y sin nombrar comandos, llega a "esta es tu hoja, ¿es la tuya?" y confirma.
+- Una pestaña con placeholder ("Name 6") nunca se elige sin confirmación.
+- S82.4 entrega filas pegables y consistentes con la hoja; ninguna escritura sin GO de S82.6 y un sí explícito.
+- S82.5 entrega la preparación de la reunión sin mover nada.
+- Ningún dato de otros participantes se usa, se guarda ni se escribe; los tests usan sólo fixtures sintéticos.
+
+### Machine
+```yaml
+modules_affected:
+  - path: coaching/tracker/
+    change: modify
+  - path: escala-skills/escala-execution-tracker/SKILL.md
+    change: create
+  - path: escala-skills/catalog.yaml
+    change: modify
+decisions:
+  - id: D1
+    choice: "Sin comandos públicos nuevos; un procedimiento interno reachable sólo desde escala"
+    rationale: "Experiencia ultra simple para un empresario no técnico"
+    constraint: "Ningún alias o comando público nuevo"
+  - id: D3
+    choice: "MVP para pegar; escritura directa condicionada a S82.6"
+    rationale: "El conector verificado no edita celdas"
+    constraint: "S82.6 antes de S82.4"
+constraints:
+  - "Nunca escribir ni usar hojas de otros participantes"
+  - "Datos de la empresa sólo en .escala/my-company/; tests sintéticos"
+  - "No afirmar soporte de ChatGPT Work (E85)"
+```
