@@ -163,6 +163,14 @@ class ResearchReport(_Strict):
         return self
 
 
+class PrivateTerms(_Strict):
+    """What must never travel in a search: the company, its people, its figures."""
+
+    company_names: list[str] = Field(default_factory=list)
+    people: list[str] = Field(default_factory=list)
+    figures: list[str] = Field(default_factory=list)
+
+
 class IndexEntry(_Strict):
     """One line of ``.escala/my-company/research/index.yaml`` (no URLs)."""
 
