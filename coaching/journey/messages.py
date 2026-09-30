@@ -18,3 +18,8 @@ ASK_UPDATE = (
     "tiempo. ¿Lo revisamos para ver qué cambió? Son 5 pasos y unos 5 minutos. "
     "Si prefieres, lo vemos después."
 )
+
+LATER = (
+    "Va, no te vuelvo a preguntar por esto en un mes. Si antes quieres verlo, "
+    "sólo dime."
+)
