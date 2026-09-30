@@ -7,7 +7,7 @@ a cell that already holds something.
 
 from __future__ import annotations
 
-from coaching.tracker.parser import cell_ref, commitments_layout
+from coaching.tracker.parser import cell_ref, commitments_layout, done_layout
 
 Row = list[str | None]
 
@@ -130,3 +130,29 @@ def test_sheet_without_commitments_table_has_no_layout() -> None:
 def test_cell_ref_handles_double_letters() -> None:
     assert cell_ref(0, 0) == "A1"
     assert cell_ref(9, 26) == "AA10"
+
+
+# --- S82.5: where finished rows can be pasted in Done -------------------------
+
+
+def test_done_layout_points_below_the_last_done_row() -> None:
+    grid = _sheet(_row(None, "Cash", "Cobrar", "90%", "30/10/2026")) + [
+        _row("Done - record anything you want to keep track"),
+        _row(None, "Focus Area", "Goals/Rock/Action"),
+        _row(None, "People", "Contraté gerente"),
+        _row(),
+        _row(),
+        _row("Notas del coach"),
+    ]
+
+    layout = done_layout(grid)
+
+    assert layout is not None
+    assert layout.fields == ["focus", "text"]
+    assert layout.headers == ["Focus Area", "Goals/Rock/Action"]
+    assert cell_ref(layout.first_free_row, layout.focus_col) == "B15"
+    assert layout.free_rows == 2  # the custom block below ends the table
+
+
+def test_done_layout_is_none_without_a_done_table() -> None:
+    assert done_layout(_sheet()) is None

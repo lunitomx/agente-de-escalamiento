@@ -221,7 +221,7 @@ def propose_rows(
     )
 
 
-def _paste_cell(value: str | None) -> str:
+def paste_cell(value: str | None) -> str:
     """One pasted cell: no tab or line break inside, never a formula."""
     text = " ".join((value or "").split())
     return text.lstrip("=").strip()
@@ -243,7 +243,7 @@ def to_paste_block(rows: list[ProposedRow], fields: list[Column] | None = None) 
     """Tab-separated rows in the sheet's column order, ready to paste in Sheets."""
     order = fields or DEFAULT_FIELDS
     return "\n".join(
-        "\t".join(_paste_cell(_value(row, field)) for field in order) for row in rows
+        "\t".join(paste_cell(_value(row, field)) for field in order) for row in rows
     )
 
 

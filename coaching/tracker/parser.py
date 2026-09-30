@@ -177,8 +177,8 @@ def parse_sheet(rows: Grid) -> TrackerSheet:
     return sheet
 
 
-class CommitmentsLayout(BaseModel):
-    """Where the Monthly Commitments table sits, to say where to paste.
+class TableLayout(BaseModel):
+    """Where a table (Monthly Commitments or Done) sits, to say where to paste.
 
     Rows and columns are 0-based grid positions; ``free_rows`` is ``None`` when
     nothing follows the table (the rows below are open).
@@ -202,8 +202,8 @@ def _ends_table(first: str | None, table_in_column_a: bool) -> bool:
     return _section_of(first) is not None or _key(first) in _IDENTITY
 
 
-def commitments_layout(rows: Grid) -> CommitmentsLayout | None:
-    """Locate the commitments table and its first run of empty rows.
+def _table_layout(rows: Grid, section: Section) -> TableLayout | None:
+    """Locate a section's table and its first run of empty rows.
 
     A row counts as used when any table column (labeled or the unlabeled
     status/note columns) holds something, so a paste never lands on a cell
@@ -213,7 +213,7 @@ def commitments_layout(rows: Grid) -> CommitmentsLayout | None:
         (
             index
             for index, row in enumerate(rows)
-            if _cell(row, 0) and _section_of(_cell(row, 0) or "") == "commitments"
+            if _cell(row, 0) and _section_of(_cell(row, 0) or "") == section
         ),
         None,
     )
@@ -244,7 +244,7 @@ def commitments_layout(rows: Grid) -> CommitmentsLayout | None:
         if any(_cell(row, i) is not None for i, _ in columns):
             last_used = index
     first_free = last_used + 1
-    return CommitmentsLayout(
+    return TableLayout(
         header_row=header_row,
         focus_col=focus_col,
         headers=[_cell(header, i) or "" for i, _ in labeled],
@@ -252,6 +252,20 @@ def commitments_layout(rows: Grid) -> CommitmentsLayout | None:
         first_free_row=first_free,
         free_rows=None if end is None else end - first_free,
     )
+
+
+# S82.4 name, kept for callers that only deal with Monthly Commitments.
+CommitmentsLayout = TableLayout
+
+
+def commitments_layout(rows: Grid) -> TableLayout | None:
+    """Where new Monthly Commitments rows can be pasted (S82.4)."""
+    return _table_layout(rows, "commitments")
+
+
+def done_layout(rows: Grid) -> TableLayout | None:
+    """Where finished rows can be pasted in Done (S82.5)."""
+    return _table_layout(rows, "done")
 
 
 def cell_ref(row: int, col: int) -> str:

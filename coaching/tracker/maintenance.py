@@ -13,6 +13,12 @@ import re
 import unicodedata
 from datetime import date
 
+from pydantic import BaseModel, ConfigDict, Field
+
+from coaching.tracker.models import TrackerItem, TrackerSheet
+from coaching.tracker.parser import Column
+from coaching.tracker.proposal import paste_cell
+
 _MONTHS: dict[str, int] = {
     **{
         name: number
@@ -83,3 +89,107 @@ def parse_due(text: str | None) -> date | None:
 def is_finished(status: str | None) -> bool:
     """True only for the closed "finished" vocabulary of the design."""
     return status is not None and _fold(status).strip(" .;:,!") in FINISHED
+
+
+class ReviewedItem(BaseModel):
+    """One commitment as the owner wrote it, plus the date ESCALA could read."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    focus_area: str | None
+    text: str
+    kpi: str | None
+    due: str | None
+    due_date: date | None
+    status: str | None
+
+
+class MeetingPrep(BaseModel):
+    """Suggestions for the group meeting; nothing here was moved or written."""
+
+    today: date
+    reviewed: int = 0
+    overdue: list[ReviewedItem] = Field(default_factory=list[ReviewedItem])
+    finished: list[ReviewedItem] = Field(default_factory=list[ReviewedItem])
+    already_in_done: list[ReviewedItem] = Field(default_factory=list[ReviewedItem])
+    missing_kpi: list[ReviewedItem] = Field(default_factory=list[ReviewedItem])
+    missing_due: list[ReviewedItem] = Field(default_factory=list[ReviewedItem])
+    unclear_due: list[ReviewedItem] = Field(default_factory=list[ReviewedItem])
+
+    @property
+    def has_findings(self) -> bool:
+        return any(
+            [
+                self.overdue,
+                self.finished,
+                self.already_in_done,
+                self.missing_kpi,
+                self.missing_due,
+                self.unclear_due,
+            ]
+        )
+
+
+def _same_text(text: str) -> str:
+    return _fold(text).strip(" .;:,")
+
+
+def _reviewed(item: TrackerItem, text: str) -> ReviewedItem:
+    return ReviewedItem(
+        focus_area=item.focus_area,
+        text=text,
+        kpi=item.kpi,
+        due=item.due,
+        due_date=parse_due(item.due),
+        status=item.status,
+    )
+
+
+def review_before_meeting(sheet: TrackerSheet, today: date) -> MeetingPrep:
+    """Overdue, finished (to move to Done) and incomplete monthly commitments.
+
+    Only rows with a written commitment are reviewed; Rocks and Done are left
+    alone. A date that cannot be read is "por confirmar", never overdue.
+    """
+    in_done = {_same_text(item.text) for item in sheet.done if item.text}
+    prep = MeetingPrep(today=today)
+    for item in sheet.commitments:
+        if item.text is None:
+            continue  # a template row with only the area filled in
+        row = _reviewed(item, item.text)
+        prep.reviewed += 1
+        if is_finished(item.status):
+            done_already = _same_text(row.text) in in_done
+            (prep.already_in_done if done_already else prep.finished).append(row)
+            continue
+        if row.kpi is None:
+            prep.missing_kpi.append(row)
+        if row.due is None:
+            prep.missing_due.append(row)
+        elif row.due_date is None:
+            prep.unclear_due.append(row)
+        elif row.due_date < today:
+            prep.overdue.append(row)
+    return prep
+
+
+DONE_FIELDS: list[Column] = ["focus", "text"]
+
+
+def _value(item: ReviewedItem, field: Column) -> str | None:
+    values: dict[Column, str | None] = {
+        "focus": item.focus_area,
+        "text": item.text,
+        "kpi": item.kpi,
+        "due": item.due,
+        "status": item.status,
+    }
+    return values.get(field)
+
+
+def to_done_block(items: list[ReviewedItem], fields: list[Column] | None) -> str:
+    """Tab-separated rows in the Done table's column order, ready to paste."""
+    order = fields or DONE_FIELDS
+    return "\n".join(
+        "\t".join(paste_cell(_value(item, field)) for field in order) for item in items
+    )
