@@ -645,3 +645,182 @@ def test_connector_path_still_needs_the_confirmed_tab_name(tmp_path: Path) -> No
     )
 
     assert result.errors == ["needs_tab_name"]
+
+
+# --- S82.5: before the group meeting (suggestions only) -----------------------
+
+_PASTED_WITH_DONE = (
+    "Participant Name\t\tAna Demo\n"
+    "Monthly Commitments\n"
+    "\tFocus Area\tPriorities\tKPIs\tDue Dates\n"
+    "\tCash\tCobrar cartera\t90%\t30/10/2026\n"
+    "\tPeople\tContratar gerente\t1\t15/10/2026\tHecho\n"
+    "\tExecution\tLanzar curso\t\t03/04/2026\n"
+    "\n"
+    "Done - record anything you want to keep track\n"
+    "\tFocus Area\tGoals/Rock/Action\n"
+    "\tStrategy\tDefinir cliente ideal\n"
+)
+
+
+def _prepare(base: str, **extra: object) -> FlowResult:
+    context: dict[str, object] = {
+        "action": "prepare",
+        "base_path": base,
+        "connector_text": _workbook(),
+        "file_title": "Tracker del grupo",
+        "file_id": "f-1",
+        "today": "2026-11-02",
+    }
+    context.update(extra)
+    return run(context)
+
+
+def _confirm_pasted(base: str, pasted: str) -> None:
+    run(
+        {
+            "action": "confirm",
+            "base_path": base,
+            "user_confirmed": True,
+            "tab_name": "Ana",
+            "pasted_text": pasted,
+        }
+    )
+
+
+def test_prepare_needs_a_confirmed_tab_first(tmp_path: Path) -> None:
+    result = _prepare(str(tmp_path))
+
+    assert result.errors == ["needs_confirmed_tab"]
+    assert result.prep is None
+    assert all(marker not in _dump(result) for marker in MARKERS.values())
+
+
+def test_prepare_lists_overdue_with_the_date_as_written(tmp_path: Path) -> None:
+    _confirm_ana(str(tmp_path))
+
+    result = _prepare(str(tmp_path))
+
+    assert result.errors == []
+    assert result.prep is not None
+    assert [item.text for item in result.prep.overdue] == [f"Cobrar {MARKERS['Ana']}"]
+    assert result.message.startswith("Antes de tu reunión: 1 compromiso vencido.")
+    assert "30/10/2026" in result.message
+    assert "No moví nada en tu hoja." in result.message
+    assert result.message.endswith("?")
+    assert result.paste_block == ""
+
+
+def test_prepare_uses_the_injected_reference_date(tmp_path: Path) -> None:
+    _confirm_ana(str(tmp_path))
+
+    result = _prepare(str(tmp_path), today="2026-10-01")
+
+    assert result.prep is not None and result.prep.overdue == []
+
+
+def test_prepare_with_a_bad_date_asks_for_today(tmp_path: Path) -> None:
+    _confirm_ana(str(tmp_path))
+
+    result = _prepare(str(tmp_path), today="mañana")
+
+    assert result.errors == ["bad_today"]
+    assert result.prep is None
+
+
+def test_prepare_suggests_done_with_block_cell_and_undo(tmp_path: Path) -> None:
+    _confirm_pasted(str(tmp_path), _PASTED_WITH_DONE)
+    before = _files_snapshot(tmp_path)
+
+    result = _prepare(str(tmp_path), connector_text=None, pasted_text=_PASTED_WITH_DONE)
+
+    assert result.errors == []
+    assert result.paste_block == "People\tContratar gerente"
+    message = result.message
+    assert message.startswith(
+        "Antes de tu reunión: 1 compromiso vencido, 1 terminado que puedes pasar "
+        "a Done, 1 sin KPI y 1 con fecha por confirmar."
+    )
+    assert "**B11**" in message  # first empty row of the Done table
+    assert result.paste_block in message
+    assert "«03/04/2026»" in message  # ambiguous: asked, never guessed
+    assert "Ctrl+Z" in message and "No uses «Restaurar esta versión»" in message
+    assert "No moví nada en tu hoja." in message
+    assert "No elimines la fila completa." in message
+    assert message.endswith(
+        "¿Pasas «Contratar gerente» a Done? ¿Qué hacemos con «Cobrar cartera»: "
+        "nueva fecha o ya no va? ¿Me dices los KPI y las fechas que faltan?"
+    )
+    assert _files_snapshot(tmp_path) == before
+
+
+def test_prepare_on_an_empty_sheet_offers_to_propose_rows(tmp_path: Path) -> None:
+    empty = "Participant Name\t\tAna Demo\nMonthly Commitments\n"
+    _confirm_pasted(str(tmp_path), empty)
+
+    result = _prepare(str(tmp_path), connector_text=None, pasted_text=empty)
+
+    assert result.errors == []
+    assert "todavía no tiene compromisos del mes" in result.message
+    assert result.message.endswith("?")
+
+
+def test_prepare_on_a_different_file_asks_for_the_tab_again(tmp_path: Path) -> None:
+    _confirm_ana(str(tmp_path))
+
+    result = _prepare(str(tmp_path), file_title="Otro archivo", file_id="f-2")
+
+    assert result.errors == ["link_mismatch"]
+    assert result.prep is None
+
+
+def test_prepare_user_messages_have_no_internal_jargon(tmp_path: Path) -> None:
+    _confirm_pasted(str(tmp_path), _PASTED_WITH_DONE)
+
+    message = _prepare(
+        str(tmp_path), connector_text=None, pasted_text=_PASTED_WITH_DONE
+    ).message
+
+    for word in ["tracker", "TSV", "MCP", "escala-", "skill", "yaml", "grid"]:
+        assert word.lower() not in message.lower(), word
+
+
+def test_privacy_prepare_keeps_other_tabs_out_and_writes_nothing(
+    tmp_path: Path,
+) -> None:
+    _confirm_ana(str(tmp_path))
+    before = _files_snapshot(tmp_path)
+
+    result = _prepare(str(tmp_path))
+
+    dump = _dump(result)
+    for marker in _foreign("Ana"):
+        assert marker not in dump, marker
+    assert _files_snapshot(tmp_path) == before  # ESCALA only suggests
+
+
+def test_prep_message_plural_and_up_to_date() -> None:
+    from datetime import date
+
+    from coaching.tracker.maintenance import review_before_meeting
+    from coaching.tracker.messages import PREP_UP_TO_DATE, prep_message
+    from coaching.tracker.models import TrackerItem, TrackerSheet
+
+    today = date(2026, 11, 2)
+    finished = TrackerSheet(
+        commitments=[
+            TrackerItem(text=f"T{i}", kpi="1", due="30/11/2026", status="done")
+            for i in range(2)
+        ]
+    )
+    on_track = TrackerSheet(
+        commitments=[TrackerItem(text="Abrir", kpi="1", due="30/11/2026")]
+    )
+
+    many = prep_message(review_before_meeting(finished, today), None, "Ana", "x")
+    fine = prep_message(review_before_meeting(on_track, today), None, "Ana", "")
+
+    assert many.startswith("Antes de tu reunión: 2 terminados que puedes pasar")
+    assert "Si decides pasarlos a Done:" in many
+    assert many.endswith("¿Pasas los terminados a Done?")
+    assert fine == PREP_UP_TO_DATE
