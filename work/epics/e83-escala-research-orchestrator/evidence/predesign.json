@@ -1,0 +1,28 @@
+{
+  "schema_version": "2",
+  "epic": "ESCALA-49",
+  "registry_hash": null,
+  "graph_revision": null,
+  "source_commit": "6b13dd2",
+  "note": "Gemba walk by direct reading of the ESCALA surface and related epic docs; no graph queries (pipeline engine broken, defect A53) and no Jira reads (stories ESCALA-57..61 already exist).",
+  "claims": [
+    {"id": "C1", "capability": "Single public entry point, closed procedure catalog", "queries": ["escala-skills/escala/SKILL.md", "escala-skills/catalog.yaml", "tests/test_capability_catalog.py:26-27"], "hits": ["public_entrypoint: escala", "baseline canonical_procedures 63, len(capabilities) 64 (after E82)"], "disposition": "reuse", "jira_refs": []},
+    {"id": "C2", "capability": "Route market/competition requests to Strategy", "queries": ["escala-skills/catalog.yaml routes", "escala_server/capabilities.py route_request (run 2026-09-30)"], "hits": ["strategy route keywords: estrategia, opsp, cliente, competencia, rumbo", "'Quiero saber cómo está mi mercado', 'Cómo cobran mis competidores', 'Qué tendencias vienen para mi sector' -> escala-welcome (intent:clarify)"], "disposition": "extend", "jira_refs": ["ESCALA-57"]},
+    {"id": "C3", "capability": "Strategy private specialist that already owns market claims", "queries": ["adapters/specialists/contract.json", "adapters/claude/agents/escala-strategy.md", "validators/specialist_agents.py", "tests/test_specialist_team.py:96-98"], "hits": ["trigger: customer, market, competition, differentiation, vision, or journey", "limit: never present market claims without source and date", "choose_team({'areas': ['research']}) raises unknown area"], "disposition": "reuse", "jira_refs": []},
+    {"id": "C4", "capability": "SWT (strengths, weaknesses, trends)", "queries": ["escala-skills/escala-strategy-swt/SKILL.md", "escala-skills/catalog.yaml"], "hits": ["escala-strategy-swt keep (SWT canónico), built only from internal session data", "escala-strategy-swot disposition merge"], "disposition": "extend", "jira_refs": ["ESCALA-60"]},
+    {"id": "C5", "capability": "Evidence package and facts with provenance", "queries": ["coaching/evidence/models.py", "coaching/evidence/facts.py", "coaching/core/__init__.py:34"], "hits": ["EvidenceSource.locator must start with .escala/ and not be a URL", "Fact.source passes require_local_ref: rejects URLs"], "disposition": "extend", "rejected": ["storing web URLs as Fact.source: rejected by validator by design (E55 D4)"], "jira_refs": ["ESCALA-61"]},
+    {"id": "C6", "capability": "Diagnosis that consumes evidence", "queries": ["coaching/diagnose/models.py", "coaching/diagnose/primary_constraint.py:60-103"], "hits": ["SourceKind: conversation, user_file, crm_export, profile, opsp, estimate", "assessment evidence must be answer_status 'fact' from narrative source kinds", "PrimaryConstraintRequest has assumptions and open_questions lists"], "disposition": "reuse", "jira_refs": ["ESCALA-61"]},
+    {"id": "C7", "capability": "Research contract, market sizing, competitors (planned, not built)", "queries": ["work/epics/e71-market-intelligence-research/{scope,prd,design}.md", "git log --all | grep -i e71|s71"], "hits": ["E71 (ESCALA-35) status planned; ResearchRequest/ResearchClaim/MarketEstimate/ResearchBrief sketched; no commits implementing it"], "disposition": "extend", "unknown": true, "jira_refs": ["ESCALA-35"]},
+    {"id": "C8", "capability": "Diagnosis hands off to max two deep dives chosen by the user", "queries": ["work/epics/e75-adaptive-diagnostic-deep-dive-routing/{scope,design}.md"], "hits": ["handoff to research/market among deep dives; max two proposed; user chooses; no deep dive without confirmed focus"], "disposition": "reuse", "jira_refs": ["ESCALA-39"]},
+    {"id": "C9", "capability": "Local, gitignored company folder", "queries": [".gitignore:78"], "hits": [".escala/my-company/ ignored (added by S82.3)"], "disposition": "reuse", "jira_refs": []},
+    {"id": "C10", "capability": "Web search available on Claude, Codex and ChatGPT Work for ESCALA", "queries": [], "hits": [], "disposition": "new", "unknown": true, "jira_refs": ["ESCALA-61"]}
+  ],
+  "gaps": [
+    "G1 no research module in coaching/ (no ResearchReport, no claim/source model)",
+    "G2 research-like requests without 'competencia' fall to welcome",
+    "G3 SWT has no external evidence input",
+    "G4 diagnosis has no documented way to consume external, dated claims",
+    "G5 web search availability per platform unverified",
+    "G6 E71 overlaps E83 and has no disposition"
+  ]
+}
