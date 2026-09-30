@@ -76,6 +76,7 @@ Thumbs.db
 .scaleup/my-company/exports/
 # === Company data written by ESCALA (E82: tracker link, OPSP, profile) ===
 .escala/my-company/
+.escala/agent/memory/
 # === Private course library and installable packs (E77) ===
 .scaleup/course-library/
 
