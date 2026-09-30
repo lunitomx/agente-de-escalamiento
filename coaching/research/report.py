@@ -18,7 +18,12 @@ import yaml
 from pydantic import ValidationError
 
 from coaching.research import messages
-from coaching.research.engine import grade_claim, grade_size, review_date
+from coaching.research.engine import (
+    grade_claim,
+    grade_size,
+    independent_dated_sources,
+    review_date,
+)
 from coaching.research.models import (
     DIMENSIONS,
     Comparable,
@@ -232,6 +237,41 @@ def comparables_message(
     return "\n\n".join(blocks)
 
 
+def _size_block(report: ResearchReport) -> str | None:
+    """The market size: range, how sure, how, what it assumes, and each source
+    side by side when they disagree (never averaged)."""
+    size = report.market_size
+    if size is None:
+        return None
+    if size.kind == "no_estimable" or size.low is None or size.high is None:
+        lines = [messages.size_not_estimable(size.missing_data or "")]
+    else:
+        frame = report.frame
+        by_id = {source.source_id: source for source in report.sources}
+        recent = independent_dated_sources(size.source_ids, by_id, report.researched_on)
+        status = messages.size_sources(size.status == "confirmado", recent)
+        lines = [
+            messages.size_line(
+                f"{frame.segment} en {frame.geography}",
+                size.low,
+                size.high,
+                size.unit or "",
+            ),
+            f"{status} (según {_cite(report, size.source_ids)}).",
+            f"Cómo lo calculé: {size.method}.",
+            f"Lo que supongo: {'; '.join(size.assumptions)}.",
+        ]
+        if size.sources_disagree:
+            lines.append(messages.SIZE_DISAGREE)
+            lines += [
+                f"- {_cite(report, [item.source_id])}: {messages.amount(item.value)}"
+                for item in size.figures
+            ]
+    if size.status == "por_confirmar" and size.next_source:
+        lines.append(f"Lo confirmaría: {size.next_source}.")
+    return "\n".join(lines)
+
+
 def _findings(report: ResearchReport) -> str:
     if report.claims:
         return "Lo que encontré:\n" + "\n".join(
@@ -264,6 +304,9 @@ def report_message(report: ResearchReport) -> str:
     table = _comparables_block(report)
     if table is not None:
         blocks.append(table)
+    size = _size_block(report)
+    if size is not None:
+        blocks.append(size)
     blocks.append(_findings(report))
     contrary = _contrary(report)
     blocks.append(

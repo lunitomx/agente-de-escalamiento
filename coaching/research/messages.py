@@ -8,6 +8,7 @@ research result ends in a question about the decision.
 from __future__ import annotations
 
 from datetime import date
+from decimal import Decimal
 
 _MONTHS = (
     "enero febrero marzo abril mayo junio julio agosto septiembre octubre "
@@ -58,6 +59,49 @@ def size_missing_data(segment_missing: bool, geography_missing: bool) -> str | N
     return " y ".join(parts) or None
 
 
+def missing_question(segment_missing: bool, geography_missing: bool) -> str | None:
+    """The question the owner answers before his market can be sized."""
+    if segment_missing and geography_missing:
+        return "¿A qué tipo de cliente le vendes y en qué ciudad o zona?"
+    if segment_missing:
+        return "¿A qué tipo de cliente le vendes?"
+    if geography_missing:
+        return "¿En qué ciudad o zona?"
+    return None
+
+
+def size_blocked(question: str) -> str:
+    return f"Sin saber esto no calculo el tamaño de tu mercado: {question}"
+
+
+def amount(value: Decimal) -> str:
+    """A figure with thousands separated by commas, never rounded."""
+    return f"{value:,}"
+
+
+def size_line(where: str, low: Decimal, high: Decimal, unit: str) -> str:
+    return (
+        f"Tamaño de tu mercado ({where}): entre {amount(low)} y {amount(high)} {unit}."
+    )
+
+
+def size_sources(confirmed: bool, recent: int) -> str:
+    fuentes = "fuente reciente" if recent == 1 else "fuentes recientes"
+    if confirmed:
+        return f"**Confirmado** con {recent} {fuentes}"
+    return f"**Por confirmar**: tengo {recent} {fuentes} y hacen falta 3"
+
+
+def size_not_estimable(missing: str) -> str:
+    return (
+        "Tamaño de tu mercado: no estimable todavía. Para estimarlo me falta: "
+        f"{missing}."
+    )
+
+
+SIZE_DISAGREE = "Lo que dice cada fuente (no coinciden; no las promedio):"
+
+
 def comparing_with(names: list[str]) -> str:
     return f"Voy a comparar con: {_join(names)}."
 
@@ -93,12 +137,18 @@ def join_names(names: list[str]) -> str:
     return _join(names)
 
 
-def frame_message(decision_informed: str, queries: list[str]) -> str:
-    """One message: the decision it informs, the searches, and the permission."""
+def frame_message(
+    decision_informed: str, queries: list[str], missing: str | None = None
+) -> str:
+    """One message: the decision it informs, the searches, and the permission.
+
+    ``missing`` is the question still open before the market can be sized.
+    """
     searches = _join([f"*{query}*" for query in queries])
+    ask = f"{size_blocked(missing)} " if missing else ""
     return (
         f"Quieres decidir: {decision_informed}. Voy a buscar: {searches}. "
-        "No llevo tu nombre ni tus cifras. ¿Va, o cambio algo?"
+        f"No llevo tu nombre ni tus cifras. {ask}¿Va, o cambio algo?"
     )
 
 

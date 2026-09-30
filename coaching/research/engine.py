@@ -33,6 +33,7 @@ from coaching.research.models import (
     ResearchClaim,
     ResearchFrame,
     SourceRecord,
+    has_segment_and_geography,
     normalize,
 )
 
@@ -406,8 +407,15 @@ def build_queries(frame: ResearchFrame) -> list[str]:
     offer = frame.offer_category
     if not offer:
         return []
-    where = f"en {frame.geography}" if frame.geography else None
-    segment, horizon = frame.segment, frame.horizon
+    geography = (frame.geography or "").strip()
+    where = f"en {geography}" if geography else None
+    segment, horizon = (frame.segment or "").strip() or None, frame.horizon
+    # No size is searched without a confirmed segment and geography (S83.3).
+    size = (
+        [_join(f"tamaño del mercado de {offer}", segment, where, horizon)]
+        if has_segment_and_geography(frame)
+        else []
+    )
     templates: dict[Mode, list[str]] = {
         "benchmark": [
             _join(f"precios de {offer}", where, horizon),
@@ -417,7 +425,7 @@ def build_queries(frame: ResearchFrame) -> list[str]:
         "mercado": [
             _join(f"demanda de {offer}", where, horizon),
             _join(f"clientes de {offer}", segment, where),
-            _join(f"tamaño del mercado de {offer}", where),
+            *size,
         ],
         "fortalezas-tendencias": [
             _join(f"tendencias de {offer}", where, horizon),
