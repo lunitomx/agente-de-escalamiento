@@ -45,6 +45,19 @@ ONLY_THE_TABLE = "Lo que encontré: lo que está en la tabla, con su fuente."
 TABLE_GAPS = "Lo que en la tabla dice «no encontrado»: no hallé una fuente que lo diga."
 
 
+def size_missing_data(segment_missing: bool, geography_missing: bool) -> str | None:
+    """What the owner still has to confirm before a size can be estimated."""
+    parts = [
+        text
+        for text, missing in (
+            ("tipo de cliente", segment_missing),
+            ("ciudad o zona", geography_missing),
+        )
+        if missing
+    ]
+    return " y ".join(parts) or None
+
+
 def comparing_with(names: list[str]) -> str:
     return f"Voy a comparar con: {_join(names)}."
 

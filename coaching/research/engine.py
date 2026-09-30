@@ -27,6 +27,7 @@ from pydantic import BaseModel, Field
 
 from coaching.research.models import (
     Confidence,
+    MarketSize,
     Mode,
     PrivateTerms,
     ResearchClaim,
@@ -79,6 +80,32 @@ def grade_claim(
     else:
         confidence = "baja"
     return claim.model_copy(
+        update={
+            "status": "confirmado" if confirmed else "por_confirmar",
+            "confidence": confidence,
+        }
+    )
+
+
+def grade_size(
+    size: MarketSize, sources: Mapping[str, SourceRecord], as_of: date
+) -> MarketSize:
+    """Grade a market size like a finding: "confirmado" only with three
+    independent dated sources of the last 90 days (owner decision: no
+    exception for sizes). Sources that disagree cap confidence at ``media``.
+    """
+    if size.kind == "no_estimable":
+        return size.model_copy(update={"status": "por_confirmar", "confidence": "baja"})
+    count = independent_dated_sources(size.source_ids, sources, as_of)
+    confirmed = count >= CONFIRMING_SOURCES
+    confidence: Confidence
+    if confirmed:
+        confidence = "media" if size.sources_disagree else "alta"
+    elif count >= CONFIRMING_SOURCES - 1:
+        confidence = "media"
+    else:
+        confidence = "baja"
+    return size.model_copy(
         update={
             "status": "confirmado" if confirmed else "por_confirmar",
             "confidence": confidence,
