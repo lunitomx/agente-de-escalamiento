@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import subprocess
+from datetime import date
 import sys
 from pathlib import Path
 
@@ -254,3 +255,43 @@ def test_explicit_null_never_masks_what_disk_remembers(tmp_path: Path) -> None:
     assert declined.decision is not None and declined.decision.reason == "N2"
     assert older.decision is not None and older.decision.reason == "N2"
     assert current.decision is not None and current.decision.reason == "N1"
+
+
+def _corrupt_asks(base: Path) -> Path:
+    path = asks_path(base)
+    path.parent.mkdir(parents=True)
+    path.write_text("asks: [roto", encoding="utf-8")
+    return path
+
+
+def test_a_corrupt_memory_never_turns_into_asking_again(tmp_path: Path) -> None:
+    _corrupt_asks(tmp_path)
+
+    result = run({**_check(tmp_path), "today": date.today().isoformat()})
+
+    assert result.decision is not None
+    assert (result.decision.ask, result.decision.reason) == (False, "N2")
+    assert asks_path(tmp_path).read_text(encoding="utf-8") == "asks: [roto"
+
+
+def test_recording_over_a_corrupt_memory_keeps_a_backup_and_says_so(
+    tmp_path: Path,
+) -> None:
+    _corrupt_asks(tmp_path)
+
+    result = run(
+        {
+            "action": "record",
+            "base_path": str(tmp_path),
+            "today": "2026-10-02",
+            "outcome": "no",
+            "reason": "T1",
+        }
+    )
+
+    assert result.errors == []
+    assert result.notes == [
+        "asks_corrupt_backed_up:.escala/my-company/journey/asks.yaml.bak"
+    ]
+    backup = asks_path(tmp_path).with_name("asks.yaml.bak")
+    assert backup.read_text(encoding="utf-8") == "asks: [roto"

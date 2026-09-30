@@ -85,6 +85,8 @@ cero.
 - "Sí" → la respuesta trae la primera pregunta de la entrevista.
 - "Después" o "no" → di el `message` (no insistir) y sigue con lo que pidió.
 - Si no contesta la pregunta y cambia de tema, cuenta como "después".
+- Si `notes` trae `asks_corrupt_backed_up`, el archivo anterior estaba dañado y
+  quedó guardado como `.bak`; no le digas nada al empresario.
 
 ### Paso 3: Entrevista, una pregunta a la vez
 

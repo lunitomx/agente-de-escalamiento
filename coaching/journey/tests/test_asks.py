@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 
 import pytest
@@ -14,8 +15,10 @@ from pydantic import ValidationError
 from coaching.journey.asks import (
     AskRecord,
     asks_path,
+    declined_on,
     last_declined_on,
     load_asks,
+    read_asks,
     record_ask,
 )
 
@@ -33,8 +36,10 @@ def test_asks_live_under_my_company_journey(tmp_path: Path) -> None:
 
 
 def test_record_appends_and_reloads(tmp_path: Path) -> None:
-    first = record_ask(tmp_path, _record(1, "despues"))
+    first, backup = record_ask(tmp_path, _record(1, "despues"))
     record_ask(tmp_path, _record(20, "si", "T2"))
+
+    assert backup is None
 
     assert first == asks_path(tmp_path)
     assert load_asks(tmp_path) == [_record(1, "despues"), _record(20, "si", "T2")]
@@ -48,14 +53,6 @@ def test_record_appends_and_reloads(tmp_path: Path) -> None:
 
 
 def test_no_file_means_never_asked(tmp_path: Path) -> None:
-    assert load_asks(tmp_path) == []
-
-
-def test_corrupt_file_is_treated_as_empty(tmp_path: Path) -> None:
-    path = asks_path(tmp_path)
-    path.parent.mkdir(parents=True)
-    path.write_text("asks: [roto", encoding="utf-8")
-
     assert load_asks(tmp_path) == []
 
 
@@ -89,3 +86,67 @@ def test_journey_folder_is_ignored_by_git() -> None:
     )
 
     assert result.returncode == 0
+
+
+def _corrupt(base: Path, on: date, text: str = "asks: [roto") -> Path:
+    path = asks_path(base)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+    stamp = datetime(on.year, on.month, on.day, 12).timestamp()
+    os.utime(path, (stamp, stamp))
+    return path
+
+
+@pytest.mark.parametrize("text", ["asks: [roto", "hola", "", "asks: [{x: 1}]"])
+def test_corrupt_file_counts_as_declined_on_its_last_change(
+    tmp_path: Path, text: str
+) -> None:
+    _corrupt(tmp_path, date(2026, 9, 10), text)
+
+    memory = read_asks(tmp_path)
+
+    assert memory.records == []
+    assert memory.corrupt_on == date(2026, 9, 10)
+    assert declined_on(tmp_path) == date(2026, 9, 10)
+
+
+def test_readable_file_is_not_corrupt(tmp_path: Path) -> None:
+    record_ask(tmp_path, _record(3, "no"))
+
+    assert read_asks(tmp_path).corrupt_on is None
+    assert declined_on(tmp_path) == date(2026, 9, 3)
+    assert declined_on(tmp_path / "otra") is None
+
+
+def test_recording_over_a_corrupt_file_keeps_a_backup(tmp_path: Path) -> None:
+    path = _corrupt(tmp_path, date(2026, 9, 10))
+
+    saved, backup = record_ask(tmp_path, _record(20, "si"))
+
+    assert saved == path
+    assert backup == path.with_name("asks.yaml.bak")
+    assert backup is not None and backup.read_text(encoding="utf-8") == "asks: [roto"
+    assert load_asks(tmp_path) == [_record(20, "si")]
+
+
+def test_a_second_corruption_never_overwrites_the_first_backup(
+    tmp_path: Path,
+) -> None:
+    _corrupt(tmp_path, date(2026, 9, 1), "primero: [")
+    record_ask(tmp_path, _record(2, "si"))
+    _corrupt(tmp_path, date(2026, 9, 5), "segundo: [")
+
+    _, backup = record_ask(tmp_path, _record(6, "no"))
+
+    assert backup == asks_path(tmp_path).with_name("asks.yaml.bak.2")
+    first = asks_path(tmp_path).with_name("asks.yaml.bak")
+    assert first.read_text(encoding="utf-8") == "primero: ["
+    assert backup is not None and backup.read_text(encoding="utf-8") == "segundo: ["
+
+
+def test_recording_over_a_good_file_makes_no_backup(tmp_path: Path) -> None:
+    record_ask(tmp_path, _record(1, "no"))
+
+    _, backup = record_ask(tmp_path, _record(2, "si"))
+
+    assert backup is None

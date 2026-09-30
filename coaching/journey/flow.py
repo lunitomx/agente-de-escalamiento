@@ -5,11 +5,13 @@ Actions (JSON on stdin, like ``coaching.research``):
 
 - ``check``: ``signals`` (see ``JourneySignals``; ``today`` defaults to the
   top-level ``today``). When not given, ``last_declined_on`` comes from
-  ``asks.yaml`` (the latest of both wins), ``journey_review_by`` from a saved ``journey.yaml`` and the
+  ``asks.yaml`` (the latest of both wins; a corrupt file counts as declined
+  on the day it last changed), ``journey_review_by`` from a saved ``journey.yaml`` and the
   funnel gaps from ``funnel`` (``FunnelMetrics``). Returns the decision and,
   only when asking, the one question. Never writes.
 - ``record``: the owner's answer to that question (``outcome`` si / despues /
-  no, ``reason`` = the trigger code). Writes one line to ``asks.yaml``. With
+  no, ``reason`` = the trigger code). Writes one line to ``asks.yaml``; a
+  corrupt one is first kept as ``asks.yaml.bak`` and reported in ``notes``. With
   "si" it also returns the interview's first question.
 - ``interview``: ``answers`` so far -> next single question and the draft.
   Never writes: the journey is decided and saved in S84.2.
@@ -32,8 +34,7 @@ from coaching.journey import messages
 from coaching.journey.asks import (
     JOURNEY_DIR,
     AskRecord,
-    last_declined_on,
-    load_asks,
+    declined_on,
     record_ask,
 )
 from coaching.journey.interview import Answer, InterviewStep, interview_step
@@ -56,6 +57,7 @@ class FlowResult(BaseModel):
     decision: AskDecision | None = None
     step: InterviewStep | None = None
     saved_to: str | None = None
+    notes: list[str] = Field(default_factory=list[str])
     errors: list[str] = Field(default_factory=list[str])
 
 
@@ -104,9 +106,7 @@ def _check(context: Mapping[str, object]) -> FlowResult:
     signals = JourneySignals.model_validate(given)
     # What the disk remembers is never masked by a missing or older value.
     declines = [
-        day
-        for day in (signals.last_declined_on, last_declined_on(load_asks(base)))
-        if day is not None
+        day for day in (signals.last_declined_on, declined_on(base)) if day is not None
     ]
     signals = signals.model_copy(
         update={
@@ -128,13 +128,24 @@ def _record(context: Mapping[str, object]) -> FlowResult:
         }
     )
     base = _base(context)
-    path = record_ask(base, record)
+    path, backup = record_ask(base, record)
     saved_to = path.relative_to(base).as_posix()
+    notes = (
+        []
+        if backup is None
+        else [f"asks_corrupt_backed_up:{backup.relative_to(base).as_posix()}"]
+    )
     if record.outcome != "si":
-        return FlowResult(action="record", saved_to=saved_to, message=messages.LATER)
+        return FlowResult(
+            action="record", saved_to=saved_to, notes=notes, message=messages.LATER
+        )
     step = interview_step([], today)
     return FlowResult(
-        action="record", saved_to=saved_to, step=step, message=step.message
+        action="record",
+        saved_to=saved_to,
+        notes=notes,
+        step=step,
+        message=step.message,
     )
 
 
