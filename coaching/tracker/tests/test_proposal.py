@@ -14,8 +14,11 @@ from coaching.tracker.models import TrackerItem, TrackerSheet
 from coaching.tracker.proposal import (
     ProposedRow,
     QuarterlyPlanInput,
+    check_quarter,
     month_name,
+    propose_rocks,
     propose_rows,
+    quarter_key,
     render_table,
     to_paste_block,
 )
@@ -223,3 +226,129 @@ def test_readable_table_uses_the_sheet_headers() -> None:
 def test_unknown_plan_fields_are_ignored_but_priority_is_required() -> None:
     with pytest.raises(ValidationError):
         QuarterlyPlanInput.model_validate({"priorities": [{"kpi": "1"}]})
+
+
+# --- S82.7: Rocks rows for the quarter the sheet declares -----------------------
+
+
+@pytest.mark.parametrize(
+    ("text", "key"),
+    [
+        ("Q4-2026", "Q4-2026"),
+        ("q4 2026", "Q4-2026"),
+        ("Q4", "Q4"),
+        ("2026-Q1", "Q1-2026"),
+        ("T3 2026", "Q3-2026"),
+        (" Q2/2027 ", "Q2-2027"),
+        ("Q5", None),
+        ("Cuarto trimestre", None),
+        ("", None),
+        (None, None),
+    ],
+)
+def test_quarter_key_reads_only_clear_quarter_labels(
+    text: str | None, key: str | None
+) -> None:
+    assert quarter_key(text) == key
+
+
+@pytest.mark.parametrize(
+    ("sheet_quarter", "plan_quarter", "answered", "status", "quarter"),
+    [
+        ("Q4-2026", "Q4-2026", None, "ok", "Q4-2026"),
+        ("Q4-2026", "Q4", None, "ok", "Q4-2026"),
+        ("Q4", "Q4-2026", None, "ok", "Q4"),
+        ("Q4-2026", None, None, "ok", "Q4-2026"),
+        ("Q4-2026", "Cuarto", None, "ok", "Q4-2026"),  # unreadable plan: no check
+        ("Q4-2025", "Q4-2026", None, "mismatch", "Q4-2025"),
+        ("Q3", "Q4-2026", None, "mismatch", "Q3"),
+        (None, "Q4-2026", None, "ask", None),
+        ("este trimestre", "Q4-2026", None, "ask", None),
+        (None, "Q4-2026", "Q4-2026", "ok", "Q4-2026"),
+        (None, None, "no sé", "ask", None),
+        ("Q4-2026", "Q4-2026", "Q1-2027", "ok", "Q4-2026"),  # the sheet rules
+    ],
+)
+def test_rocks_quarter_comes_from_the_sheet_or_is_asked(
+    sheet_quarter: str | None,
+    plan_quarter: str | None,
+    answered: str | None,
+    status: str,
+    quarter: str | None,
+) -> None:
+    check = check_quarter(
+        TrackerSheet(rocks_quarter=sheet_quarter),
+        _plan(quarter=plan_quarter),
+        answered,
+    )
+
+    assert check.status == status
+    assert check.quarter == quarter
+    assert check.sheet_quarter == sheet_quarter
+    assert check.plan_quarter == plan_quarter
+
+
+def test_rocks_rows_skip_existing_rocks_and_done_and_keep_areas() -> None:
+    sheet = TrackerSheet(
+        rocks_quarter="Q4-2026",
+        rocks=[
+            TrackerItem(
+                focus_area="Flujo", decision="cash", text="Cobrar CARTERA vencida."
+            )
+        ],
+        done=[TrackerItem(text="definir cliente ideal")],
+        commitments=[TrackerItem(text="Contratar vendedor")],  # not a Rock yet
+    )
+
+    proposal = propose_rocks(sheet, _plan(), "Q4-2026")
+
+    assert proposal.quarter == "Q4-2026"
+    assert proposal.skipped == ["Cobrar cartera vencida", "Definir cliente ideal"]
+    assert proposal.rows == [
+        ProposedRow(
+            focus_area=None, priority="Contratar vendedor", kpi="1 contratado", due=None
+        )
+    ]
+    assert proposal.missing_area == ["Contratar vendedor"]
+
+
+def test_rocks_rows_reuse_sheet_areas_and_never_invent_a_date() -> None:
+    sheet = TrackerSheet(
+        rocks_quarter="Q4-2026",
+        rocks=[TrackerItem(focus_area="Flujo de efectivo", decision="cash", text="X")],
+    )
+
+    rows = propose_rocks(sheet, _plan(), "Q4-2026").rows
+
+    assert [(r.focus_area, r.due) for r in rows] == [
+        ("Flujo de efectivo", None),
+        ("Strategy", "15/10/2026"),
+        (None, None),
+    ]
+
+
+def test_rocks_paste_block_only_fills_the_columns_the_rocks_table_has() -> None:
+    rows = propose_rocks(TrackerSheet(), _plan(), "Q4").rows
+
+    assert to_paste_block(rows, ["focus", "text"]).splitlines() == [
+        "Cash\tCobrar cartera vencida",
+        "Strategy\tDefinir cliente ideal",
+        "\tContratar vendedor",
+    ]
+    assert to_paste_block(rows[1:2], ["focus", "text", "kpi", "due"]) == (
+        "Strategy\tDefinir cliente ideal\t1 documento\t15/10/2026"
+    )
+
+
+def test_readable_table_follows_the_given_fields() -> None:
+    rows = propose_rocks(TrackerSheet(), _plan(), "Q4").rows[:1]
+
+    table = render_table(
+        rows, ["Focus Area", "Goals/Rock for this quarter"], ["focus", "text"]
+    )
+
+    assert table.splitlines() == [
+        "| Focus Area | Goals/Rock for this quarter |",
+        "|---|---|",
+        "| Cash | Cobrar cartera vencida |",
+    ]
