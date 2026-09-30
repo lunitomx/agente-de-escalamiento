@@ -20,6 +20,8 @@ from pydantic import ValidationError
 from coaching.research import messages
 from coaching.research.engine import grade_claim, review_date
 from coaching.research.models import (
+    DIMENSIONS,
+    Comparable,
     DecisionOption,
     IndexEntry,
     ResearchClaim,
@@ -44,6 +46,7 @@ def build_report(
     not_found: list[str] | None = None,
     limits: list[str] | None = None,
     chosen: str | None = None,
+    comparables: list[Comparable] | None = None,
 ) -> ResearchReport:
     """Grade every claim from its sources and assemble a validated report.
 
@@ -66,6 +69,7 @@ def build_report(
         researched_on=researched_on,
         sources=sources,
         claims=graded,
+        comparables=list(comparables or []),
         not_found=list(not_found or []),
         limits=all_limits,
         options=options,
@@ -77,7 +81,11 @@ def build_report(
 
 
 def _cite(report: ResearchReport, ids: list[str]) -> str:
-    by_id = {source.source_id: source for source in report.sources}
+    return _cite_sources(report.sources, ids)
+
+
+def _cite_sources(sources: list[SourceRecord], ids: list[str]) -> str:
+    by_id = {source.source_id: source for source in sources}
     parts: list[str] = []
     for source_id in ids:
         source = by_id[source_id]
@@ -121,17 +129,116 @@ def _contrary(report: ResearchReport) -> list[str]:
     ]
 
 
+_COLUMN = {
+    "precio": "Precio",
+    "paquetes": "Paquetes",
+    "canales": "Dónde vende",
+    "metricas": "Números que publica",
+}
+
+
+def _table_text(text: str) -> str:
+    """One table cell: no pipes or line breaks that would break the row."""
+    return " ".join(text.replace("|", "/").split())
+
+
+def _row(report: ResearchReport, item: Comparable) -> str:
+    cells = [_table_text(item.name)]
+    for dimension in DIMENSIONS:
+        cell = item.cells.get(dimension)
+        cells.append(
+            messages.NOT_FOUND_CELL
+            if cell is None
+            else _table_text(f"{cell.value} ({_cite(report, [cell.source_id or ''])})")
+        )
+    return "| " + " | ".join(cells) + " |"
+
+
+def _comparables_block(report: ResearchReport) -> str | None:
+    """The table of counted comparables; candidates are named, never tabled."""
+    if not report.comparables:
+        return None
+    counted = [item for item in report.comparables if item.counted]
+    candidates = [item.name for item in report.comparables if not item.counted]
+    frame = report.frame
+    if counted:
+        header = ["Negocio", *(_COLUMN[dimension] for dimension in DIMENSIONS)]
+        lines = [
+            messages.table_title(frame.offer_category or "", frame.geography or ""),
+            "",
+            "| " + " | ".join(header) + " |",
+            "|" + "---|" * len(header),
+            *(_row(report, item) for item in counted),
+        ]
+    else:
+        lines = [messages.NO_COUNTED_COMPARABLES]
+    if candidates:
+        lines += [
+            "",
+            f"También aparecieron {messages.join_names(candidates)}. "
+            f"{messages.NOT_COUNTED}",
+        ]
+    return "\n".join(lines)
+
+
+def comparables_message(
+    frame: ResearchFrame, sources: list[SourceRecord], comparables: list[Comparable]
+) -> str:
+    """Who is compared, and which candidates need the owner's yes."""
+    counted = [item.name for item in comparables if item.counted]
+    candidates = [item for item in comparables if not item.counted]
+    blocks: list[str] = []
+    if counted:
+        blocks.append(messages.comparing_with(counted))
+    if candidates:
+        lines = [
+            messages.candidates_intro(frame.offer_category or "", frame.geography or "")
+        ]
+        lines += [
+            f"- {item.name}: {item.why} "
+            f"({_cite_sources(sources, [item.found_in or ''])})"
+            for item in candidates
+        ]
+        blocks.append("\n".join(lines))
+        blocks.append(messages.WHICH_LOOK_ALIKE)
+    if not blocks:
+        blocks.append(messages.NO_COUNTED_COMPARABLES)
+    return "\n\n".join(blocks)
+
+
+def _findings(report: ResearchReport) -> str:
+    if report.claims:
+        return "Lo que encontré:\n" + "\n".join(
+            _finding(report, claim) for claim in report.claims
+        )
+    if any(item.counted for item in report.comparables):
+        return messages.ONLY_THE_TABLE
+    return "Lo que encontré: nada que pueda sostener con fuentes."
+
+
+def _missing(report: ResearchReport) -> list[str]:
+    """What was not found, including the gaps of the comparables table."""
+    lines = [f"- {item}" for item in report.not_found]
+    gaps = any(
+        dimension not in item.cells
+        for item in report.comparables
+        if item.counted
+        for dimension in DIMENSIONS
+    )
+    if gaps:
+        lines.append(f"- {messages.TABLE_GAPS}")
+    return lines
+
+
 def report_message(report: ResearchReport) -> str:
     """The short result shown to the owner; it always ends asking the decision."""
     blocks: list[str] = []
     if report.limits:
         blocks.append("\n".join(report.limits))
-    blocks.append(
-        "Lo que encontré:\n"
-        + "\n".join(_finding(report, claim) for claim in report.claims)
-        if report.claims
-        else "Lo que encontré: nada que pueda sostener con fuentes."
-    )
+    table = _comparables_block(report)
+    if table is not None:
+        blocks.append(table)
+    blocks.append(_findings(report))
     contrary = _contrary(report)
     blocks.append(
         "Lo que dice lo contrario:\n"
@@ -140,8 +247,8 @@ def report_message(report: ResearchReport) -> str:
     blocks.append(
         "Lo que no encontré:\n"
         + (
-            "\n".join(f"- {item}" for item in report.not_found)
-            if report.not_found
+            "\n".join(missing)
+            if (missing := _missing(report))
             else messages.NOTHING_MISSING
         )
     )

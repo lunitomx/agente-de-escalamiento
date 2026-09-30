@@ -8,6 +8,7 @@ may suggest what to search, never what is true.
 
 from __future__ import annotations
 
+import unicodedata
 from datetime import date
 from typing import Literal, Self
 
@@ -22,8 +23,20 @@ Confidence = Literal["alta", "media", "baja"]
 DecisionArea = Literal["cash", "strategy", "people", "execution"]
 OptionKind = Literal["decidir", "esperar"]
 
+Dimension = Literal["precio", "paquetes", "canales", "metricas"]
+DIMENSIONS: tuple[Dimension, ...] = ("precio", "paquetes", "canales", "metricas")
+
 EXCERPT_MAX = 300
 MAX_CLAIMS = 3
+MAX_COMPARABLES = 5
+
+
+def normalize(text: str) -> str:
+    """Lowercase, accents removed, single spaces."""
+    ascii_text = (
+        unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("ascii")
+    )
+    return " ".join(ascii_text.lower().split())
 
 
 def _required(value: str) -> str:
@@ -49,6 +62,7 @@ class ResearchFrame(_Strict):
     geography: str | None = None
     offer_category: str | None = None
     horizon: str | None = None
+    competitors: list[str] = Field(default_factory=list)
     queries: list[str] = Field(default_factory=list)
     search_mode: SearchMode = "web"
     confirmed: bool = False
@@ -95,6 +109,86 @@ class ResearchClaim(_Strict):
     _check_text = field_validator("text")(_required)
 
 
+class BenchmarkCell(_Strict):
+    """What one comparable does on one dimension, and where it says so."""
+
+    value: str
+    source_id: str | None = None
+
+    _check_text = field_validator("value")(_required)
+
+    @model_validator(mode="after")
+    def _never_an_estimate(self) -> Self:
+        if not (self.source_id and self.source_id.strip()):
+            raise ValueError("cell_without_source")
+        return self
+
+
+class Comparable(_Strict):
+    """A business with the same confirmed offer and geography."""
+
+    name: str
+    named_by_owner: bool = False
+    owner_confirmed: bool = False
+    found_in: str | None = None
+    why: str | None = None
+    cells: dict[Dimension, BenchmarkCell] = Field(
+        default_factory=dict[Dimension, BenchmarkCell]
+    )
+
+    _check_text = field_validator("name")(_required)
+
+    @property
+    def counted(self) -> bool:
+        """Only a business the owner named or said yes to enters the table."""
+        return self.named_by_owner or self.owner_confirmed
+
+    @model_validator(mode="after")
+    def _candidate_is_traceable(self) -> Self:
+        if not self.named_by_owner and not (
+            self.found_in and self.found_in.strip() and self.why and self.why.strip()
+        ):
+            raise ValueError("candidate_needs_source_and_reason")
+        return self
+
+
+def check_comparables(
+    frame: ResearchFrame, sources: list[SourceRecord], comparables: list[Comparable]
+) -> None:
+    """Rules a set of comparables must meet against its frame and sources.
+
+    Comparable means same confirmed offer and geography; "named by the owner"
+    means named in the frame; published numbers need a page with a link.
+    """
+    if not comparables:
+        return
+    if frame.mode != "benchmark":
+        raise ValueError("comparables_only_in_benchmark")
+    if not (
+        frame.offer_category
+        and frame.offer_category.strip()
+        and frame.geography
+        and frame.geography.strip()
+    ):
+        raise ValueError("comparables_need_offer_and_geography")
+    names = [normalize(item.name) for item in comparables]
+    if len(names) != len(set(names)):
+        raise ValueError("duplicate_comparable")
+    named = {normalize(name) for name in frame.competitors}
+    by_id = {source.source_id: source for source in sources}
+    for item in comparables:
+        if item.named_by_owner and normalize(item.name) not in named:
+            raise ValueError("not_named_by_owner")
+        cited = [cell.source_id for cell in item.cells.values()]
+        if item.found_in:
+            cited.append(item.found_in)
+        if not all(source_id in by_id for source_id in cited):
+            raise ValueError("unknown_source")
+        metric = item.cells.get("metricas")
+        if metric is not None and not by_id[metric.source_id or ""].url:
+            raise ValueError("metric_needs_published_source")
+
+
 class DecisionOption(_Strict):
     """One of the 2-3 options the research ends in."""
 
@@ -123,6 +217,9 @@ class ResearchReport(_Strict):
     sources: list[SourceRecord] = Field(default_factory=list[SourceRecord])
     claims: list[ResearchClaim] = Field(
         default_factory=list[ResearchClaim], max_length=MAX_CLAIMS
+    )
+    comparables: list[Comparable] = Field(
+        default_factory=list[Comparable], max_length=MAX_COMPARABLES
     )
     not_found: list[str] = Field(default_factory=list)
     limits: list[str] = Field(default_factory=list)
@@ -160,6 +257,7 @@ class ResearchReport(_Strict):
             raise ValueError("recommendation_not_an_option")
         if self.chosen is not None and self.chosen not in self.options:
             raise ValueError("chosen_not_an_option")
+        check_comparables(self.frame, self.sources, self.comparables)
         return self
 
 

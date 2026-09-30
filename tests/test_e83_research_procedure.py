@@ -74,3 +74,20 @@ def test_mvp_capability_catalog_is_unchanged_by_research() -> None:
     catalog = (ROOT / "capabilities/mvp/catalog.json").read_text(encoding="utf-8")
 
     assert "research" not in catalog
+
+
+def test_procedure_drives_the_comparables_step_of_the_benchmark() -> None:
+    """E83 S83.2: comparables confirmed by the owner, one source per cell."""
+    text = _procedure()
+
+    assert '"action": "comparables"' in text
+    assert '"competitors"' in text
+    assert '"named_by_owner"' in text
+    assert '"owner_confirmed"' in text
+    assert "hasta que diga que sí" in text
+    assert "nunca un estimado" in text
+    assert "no encontrado" in text
+    assert "Máximo cinco negocios" in text
+    assert "tipo de negocio" in text  # offer_category carries e.g. "tortillería"
+    for dimension in ("precio", "paquetes", "canales", "metricas"):
+        assert f'"{dimension}"' in text

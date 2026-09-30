@@ -32,18 +32,12 @@ from coaching.research.models import (
     ResearchClaim,
     ResearchFrame,
     SourceRecord,
+    normalize,
 )
 
 FRESHNESS_DAYS = 90
 CONFIRMING_SOURCES = 3
-
-
-def normalize(text: str) -> str:
-    """Lowercase, accents removed, single spaces."""
-    ascii_text = (
-        unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("ascii")
-    )
-    return " ".join(ascii_text.lower().split())
+NAMED_SEARCHES = 2
 
 
 def review_date(researched_on: date) -> date:
@@ -276,6 +270,35 @@ def _reject_reason(
     return None
 
 
+def _public_words(frame: ResearchFrame) -> set[str]:
+    return set(_words(frame.offer_category or "")) | set(_words(frame.geography or ""))
+
+
+def is_own_company(name: str, frame: ResearchFrame, private: PrivateTerms) -> bool:
+    """Whether a business listed as comparable is the owner's own company.
+
+    Unlike the search check (any distinctive word is refused, to never leak),
+    this local check needs the full name, every distinctive word of it that is
+    not a word of the confirmed offer or geography, or a name made only of the
+    company's own words ("Zorblax"), so "Tortillería El Sol" is not mistaken
+    for "Tortillería Zorblax".
+    """
+    public = _public_words(frame)
+    views = _word_views(sanitize_query(name))
+    listed = _distinctive(sanitize_query(name))
+    for company in private.company_names:
+        own = _distinctive(company)
+        wanted = own - public
+        if listed and listed <= own:
+            return True
+        if any(
+            _phrase_in(company, words) or (wanted and wanted <= set(words))
+            for words in views
+        ):
+            return True
+    return False
+
+
 def check_queries(frame: ResearchFrame, private: PrivateTerms) -> QueryCheck:
     """Split ``frame.queries`` into accepted and rejected (with the reason).
 
@@ -287,9 +310,7 @@ def check_queries(frame: ResearchFrame, private: PrivateTerms) -> QueryCheck:
     names, private figures (however grouped or scaled) and look-alike letters
     from other scripts never are.
     """
-    public_words = set(_words(frame.offer_category or "")) | set(
-        _words(frame.geography or "")
-    )
+    public_words = _public_words(frame)
     result = QueryCheck()
     for raw in frame.queries:
         query = sanitize_query(raw)
@@ -306,7 +327,8 @@ def _join(*parts: str | None) -> str:
 
 
 def build_queries(frame: ResearchFrame) -> list[str]:
-    """Two or three searches from the frame's public fields only.
+    """Two or three searches from the frame's public fields only, plus in
+    benchmark one per business the owner named (at most ``NAMED_SEARCHES``).
 
     The owner's concern and question are never used: they are his words and
     may carry names or figures. Without an offer category there is nothing to
@@ -334,4 +356,12 @@ def build_queries(frame: ResearchFrame) -> list[str]:
             _join(offer, where, "cambios y regulación", horizon),
         ],
     }
-    return templates[frame.mode]
+    queries = templates[frame.mode]
+    if frame.mode == "benchmark":
+        # Businesses the owner named are public names; each search still goes
+        # through ``check_queries`` like any other.
+        named = [name.strip() for name in frame.competitors if name.strip()]
+        queries += [
+            _join(f"precios de {name}", where) for name in named[:NAMED_SEARCHES]
+        ]
+    return queries
