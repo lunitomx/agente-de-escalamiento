@@ -1,5 +1,5 @@
 ---
-description: 'Encuentra la pestaña propia del empresario en la hoja compartida de su grupo de accountability, con su confirmación, sin mirar las de los demás.'
+description: 'Encuentra la pestaña propia del empresario en la hoja compartida de su grupo de accountability, con su confirmación, sin mirar las de los demás; propone filas y prepara la reunión sin mover nada.'
 name: escala-execution-tracker
 ---
 
@@ -33,6 +33,9 @@ escriba un comando ni le nombres este procedimiento.
   escribieron en el archivo del grupo.
 - Si su hoja ya tiene otro Critical Number, sólo se señala y se pregunta; nunca
   se cambia.
+- **Antes de la reunión sólo se sugiere.** Nunca muevas filas a Done, nunca
+  marques nada como terminado ni cambies fechas. Una fecha que el módulo no
+  pudo leer queda "por confirmar": pregúntala, no la adivines.
 - Un paso por mensaje, en español llano. Usa tal cual el `message` que devuelve
   el módulo.
 
@@ -109,6 +112,24 @@ el módulo pide insertar filas antes, dilo tal cual. Si pregunta por el
 Critical Number o por un área, espera su respuesta y vuelve a llamar con el
 plan corregido. Nada se mueve sin su sí.
 
+### Paso 7: Antes de tu reunión
+
+Cuando el empresario mencione su reunión del grupo (o pida revisar su hoja),
+con su pestaña confirmada:
+
+`{"action": "prepare", "base_path": ".", "connector_text": "<texto>", "file_title": "<título>", "file_id": "<id>", "today": "AAAA-MM-DD"}`
+
+(o `"pasted_text"` en lugar de `connector_text`). Manda `today` con la fecha de
+hoy. El módulo revisa sólo sus compromisos del mes: vencidos, terminados que
+puede pasar a Done (con el bloque para pegar y la celda exacta), filas sin KPI
+o sin fecha, y fechas "por confirmar". No guarda nada.
+
+Di el `message` completo ("Antes de tu reunión: 2 compromisos vencidos, 1
+terminado que puedes pasar a Done."). Termina con lo que tiene que decidir;
+espera su respuesta. Si da nuevas fechas o KPI, él los escribe en su hoja; si
+quieres, vuelve a llamar a `prepare` después para confirmar que quedó al día.
+Si la pestaña no tiene compromisos, ofrece el paso 6.
+
 ## Output
 
 | Item | Destination |
@@ -116,3 +137,4 @@ plan corregido. Nada se mueve sin su sí.
 | Referencia a su pestaña (archivo + nombre de pestaña) | `.escala/my-company/tracker.yaml` |
 | Su pestaña leída (sólo en la conversación) | `sheet` del módulo; no se guarda |
 | Filas propuestas + bloque para pegar | `proposal` / `paste_block` del módulo; las pega el empresario |
+| Preparación de la reunión + bloque para Done | `prep` / `paste_block` del módulo; nada se mueve sin él |
