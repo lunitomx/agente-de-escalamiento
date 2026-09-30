@@ -32,18 +32,11 @@ from coaching.research.models import (
     ResearchClaim,
     ResearchFrame,
     SourceRecord,
+    normalize,
 )
 
 FRESHNESS_DAYS = 90
 CONFIRMING_SOURCES = 3
-
-
-def normalize(text: str) -> str:
-    """Lowercase, accents removed, single spaces."""
-    ascii_text = (
-        unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("ascii")
-    )
-    return " ".join(ascii_text.lower().split())
 
 
 def review_date(researched_on: date) -> date:

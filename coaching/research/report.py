@@ -20,6 +20,7 @@ from pydantic import ValidationError
 from coaching.research import messages
 from coaching.research.engine import grade_claim, review_date
 from coaching.research.models import (
+    Comparable,
     DecisionOption,
     IndexEntry,
     ResearchClaim,
@@ -44,6 +45,7 @@ def build_report(
     not_found: list[str] | None = None,
     limits: list[str] | None = None,
     chosen: str | None = None,
+    comparables: list[Comparable] | None = None,
 ) -> ResearchReport:
     """Grade every claim from its sources and assemble a validated report.
 
@@ -66,6 +68,7 @@ def build_report(
         researched_on=researched_on,
         sources=sources,
         claims=graded,
+        comparables=list(comparables or []),
         not_found=list(not_found or []),
         limits=all_limits,
         options=options,
