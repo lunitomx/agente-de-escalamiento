@@ -47,7 +47,7 @@ Las áreas coinciden con Cash/People/Strategy/Execution de ESCALA; Critical Numb
 |---|---|:---:|---|
 | S82.1 | Spike: capacidades reales de edición de Sheets vía conectores Drive (Claude, ChatGPT) | S | complete — ver stories/s82.1-spike-drive-connectors.md |
 | S82.2 | Modelo del tracker: lectura/validación de una hoja de participante y sus variaciones | M | complete — `coaching/tracker/` |
-| S82.3 | Flujo guiado: identidad → conexión → selección de hoja propia con confirmación (`ESCALA-53`) | M | planned |
+| S82.3 | Flujo guiado: identidad → conexión → selección de hoja propia con confirmación (`ESCALA-53`) | M | complete — `coaching/tracker/identity.py`, `escala-execution-tracker` |
 | S82.6 | Spike: escritura en Sheets (MCP de Sheets, ChatGPT Work) (`ESCALA-56`) | S | planned — antes de S82.4 |
 | S82.4 | Llenado: proponer filas desde prioridades/rocks de ESCALA y escribir tras confirmación (`ESCALA-54`) | M | planned — tras S82.6 |
 | S82.5 | Mantenimiento previo a reunión: vencidos, `Done`, estado (`ESCALA-55`) | S | planned |
@@ -130,7 +130,7 @@ Checkpoint de integración: epic de un solo componente (Python + procedimiento +
 |---|:---:|---|---|---|
 | S82.1 | S | complete | - | - |
 | S82.2 | M | complete | - | - |
-| S82.3 | M | planned | - | ESCALA-53 |
+| S82.3 | M | complete | M | ESCALA-53 |
 | S82.6 | S | planned | - | ESCALA-56; límite 1 día |
 | S82.4 | M | planned | - | ESCALA-54; rama de escritura condicionada a S82.6 |
 | S82.5 | S | planned | - | ESCALA-55 |
