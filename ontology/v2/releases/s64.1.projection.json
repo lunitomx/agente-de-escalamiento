@@ -1,0 +1,1823 @@
+{
+  "authorization_scope": "e59-e63-reviewed",
+  "candidates": [
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.accelerator.coaching",
+      "candidate_receipt": "digest.sha256.221815cecc5e5599012fc95c8328a75d4e17daf73c92892e83f47f39387e8239",
+      "canonical_id": "accelerator.coaching",
+      "canonical_name": "accelerator.coaching",
+      "evidence_refs": [
+        "digest.sha256.84491126cba885c21deab98a7bcca0512436a4b486d00e42b10b831921576a29"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "framework",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.c905995079158be824eaf0c9663e33d7235440d69df7952e249f033d56f95219",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.accelerator.learning",
+      "candidate_receipt": "digest.sha256.35fab1780922e4619e9ac3cf42f868b7affcb7cb98583f83abc0ecaa19e1426c",
+      "canonical_id": "accelerator.learning",
+      "canonical_name": "accelerator.learning",
+      "evidence_refs": [
+        "digest.sha256.7a62dd61330e30ac2f600708838d663840cd6c740675659f90c99af277ccc5c9"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "framework",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.c79587a929bb228aaa6d6dcfabef5be730a9d8b626fe0ad77970837ca6970602",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.accelerator.technology",
+      "candidate_receipt": "digest.sha256.31b369f8dac494b05c5cafc1941a92d779b573d00190e9eced4c38fbff3150f3",
+      "canonical_id": "accelerator.technology",
+      "canonical_name": "accelerator.technology",
+      "evidence_refs": [
+        "digest.sha256.fdb78a5b5bfc5f82d6480a16da1457d61b7d5a076a9349d2811ee23e570accf3"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "framework",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.0e7f947bfd9cb0278381fe0d393c064293292738ad384c903a1dddb2318f4b48",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.barrier.leadership",
+      "candidate_receipt": "digest.sha256.ee52ad971959cb6ca53bccf5d43a21150cc68c5a89c1685f179ac28902d0d953",
+      "canonical_id": "barrier.leadership",
+      "canonical_name": "barrier.leadership",
+      "evidence_refs": [
+        "digest.sha256.b5b4c4b996c47f3724e4c27a93621ff68248f177b9f10f44706eeafc10a25be5"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "framework",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.fb6648175d961eb3c7dcc29fa3c86f904af7ea37a4f19ddb58ae7ce90e533531",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.barrier.marketing",
+      "candidate_receipt": "digest.sha256.33c255d3202e86207c759992192ac41b40c658e0954a42f103d02e5e0a9bd7d7",
+      "canonical_id": "barrier.marketing",
+      "canonical_name": "barrier.marketing",
+      "evidence_refs": [
+        "digest.sha256.c22001e9d0d41d16249128caa3dd79b3d85e14ba0a2280e705075567512986fb"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "framework",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.16ab68f5e908a3fc0b5e5e5d315ab975bcf4e2a58067ffef4f372a035bafabb7",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.barrier.scalable-infrastructure",
+      "candidate_receipt": "digest.sha256.2b01dcd8c0f70f5322c4ffedb96592e32e1308d8b728761292fcc136b491f60f",
+      "canonical_id": "barrier.scalable-infrastructure",
+      "canonical_name": "barrier.scalable-infrastructure",
+      "evidence_refs": [
+        "digest.sha256.3fbd5327156a388cc14cac51baf77a6c9ccfd7e10ae9b74df4d99a5241e0f837"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "framework",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.dea96fda61c3a4e628f34db26a0a3105d2d24b17e852897a668415b6ef111a15",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.cash.framework.financial-drivers",
+      "candidate_receipt": "digest.sha256.11c2561403da0bfe3088c47ca1c56908243ac031aa6aca2a85fca9036f11d940",
+      "canonical_id": "framework.four-financial-drivers",
+      "canonical_name": "Four Financial Drivers",
+      "evidence_refs": [
+        "digest.sha256.7aae7ae9e9b59f525a2940ce7a148df38e7b33c0b7bf0d4a140e6780e74e63cc"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "framework",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.2d7e565da6e54937b9536cfaca2438721527115e710f98340b5c84417462f5c4",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.cash.framework.financial-levers",
+      "candidate_receipt": "digest.sha256.a3f600a7da8c35582b91f262a034a96782597574ad3fa316fc132b2b3efaa1d1",
+      "canonical_id": "framework.financial-levers",
+      "canonical_name": "Seven Financial Levers",
+      "evidence_refs": [
+        "digest.sha256.7d64a9ffffae524e419413334ec958ea26acc3f908b1307d89dc556e0882e363"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "framework",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.c088f7122ee3f07aa7a206abd6885923d7bfb932f1ff4fb40642946ad47c3b9a",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.cash.framework.power-of-one",
+      "candidate_receipt": "digest.sha256.0e37912c219d2960c284b41dea917bba5f4517ebc0cf1f73fcdd2b1ff20c8297",
+      "canonical_id": "framework.power-of-one",
+      "canonical_name": "Power of One",
+      "evidence_refs": [
+        "digest.sha256.8053f4a115923ebe996170ec2ddd32b8845929022ec9470dca88e14652a3ddee"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "framework",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.7786d981e4eaead82f3c98ec4a13e97349e5c1bcf37fcafafd3f6234f9faa5c9",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.cash.metric.ccc",
+      "candidate_receipt": "digest.sha256.68315bf139becffc69818a3c4dd6ce3860abeffd39e65310ef86154cc04f0cd5",
+      "canonical_id": "metric.cash-conversion-cycle",
+      "canonical_name": "Cash Conversion Cycle",
+      "evidence_refs": [
+        "digest.sha256.70b6cfb6ff1f372fe9e4e0b6e70e81a526d3f7cbcb6c988922178c0af1c70e09"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "metric",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.83822b08244192cfe59b84e4b350891ed36a6a35b920ee067ec00673c50af69e",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.cash.metric.working-capital-days",
+      "candidate_receipt": "digest.sha256.cdded2e15ef1393fd42f49b4bc61063392d28b2ddad7553270102b080b80e8c5",
+      "canonical_id": "excluded.cash.metric.working-capital-days",
+      "canonical_name": "Cash Metric Working-Capital-Days",
+      "evidence_refs": [
+        "digest.sha256.0febcf289e29392f74b3ab364c1deba745c98151df1e053bb4e69d6249bf2888"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "framework",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "needs-revision",
+      "review_receipt": "digest.sha256.919df00accf466a2e464a1507191a4b42c86495f9884cbeb77b33e292307bc23",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.cash.procedure.cash-tool",
+      "candidate_receipt": "digest.sha256.565c6f3561116df0311a547442faedea584c915fbbacb59346edc78197728719",
+      "canonical_id": "excluded.cash.procedure.cash-tool",
+      "canonical_name": "Cash Procedure Cash-Tool",
+      "evidence_refs": [
+        "digest.sha256.1492d99361c0e4b2c3a0ba855a1cc592b784879f054a9ff3788e8ac46fae2fe7"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "framework",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "needs-revision",
+      "review_receipt": "digest.sha256.e56794f81ac36d18363400e00486d502980719a4a939a477c28489cbf78c0102",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.cash.rule.cash-initiative",
+      "candidate_receipt": "digest.sha256.328a97ee08a4e4ebef3bf7a1b0e9464da56c3c979a813261f47a5b200aa48926",
+      "canonical_id": "excluded.cash.rule.cash-initiative",
+      "canonical_name": "Cash Rule Cash-Initiative",
+      "evidence_refs": [
+        "digest.sha256.71fcda6829831c40a5f85382270aeae031d80603a7bc40aec09f1e4b9cf4fb08"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "framework",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "needs-revision",
+      "review_receipt": "digest.sha256.8de90b995627751ecd0b20833c4f56e7fb72e1a07358c0f981a02849f9cc6a13",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.cash.tool.cash",
+      "candidate_receipt": "digest.sha256.dbcc5ca1f56bb684fd9dcc8b183f88c423a8360df2af1f9bec7142773c335a65",
+      "canonical_id": "tool.cash-acceleration-strategies",
+      "canonical_name": "Cash Acceleration Strategies",
+      "evidence_refs": [
+        "digest.sha256.254cb8090dcc6c5e697ba8e4c991cbb2eb2b4b31ba3ab4936e3c1bbb099092df"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "tool",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.a565ab5d24321c27891e2a41f2f61fc7502247f7d89deda2343bc26431c6045b",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.decision.cash",
+      "candidate_receipt": "digest.sha256.64688eba9f765036ba7e4c5dedf9756bc05bf77c117f39b88ee0acfcf711e02e",
+      "canonical_id": "decision.cash",
+      "canonical_name": "decision.cash",
+      "evidence_refs": [
+        "digest.sha256.32ae7ac6dda5dd0736a65838ebffdda19361a16ad266b347f93b004f48ddff64"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "decision-area",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.1c3d66712ed9d6172d23181b7f92c93e1d9b6385b3124147e4db48f8f2060f9f",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.decision.execution",
+      "candidate_receipt": "digest.sha256.e14b7efd85386f9e18fc95479d8a9196ab31f7df880d387851ef69b11b126218",
+      "canonical_id": "decision.execution",
+      "canonical_name": "decision.execution",
+      "evidence_refs": [
+        "digest.sha256.904f0962d3fcfe50608fd17fc699edf7b71636f0d4b4f1db6b084728e70222c5"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "decision-area",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.e294faafed935442322966a3c9bc770897c53264e04f075225d40cd6a03b24e7",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.decision.people",
+      "candidate_receipt": "digest.sha256.927d6856037dce3956135721b9356264ec0b8b36a4a3c194b54ebabe2a748987",
+      "canonical_id": "decision.people",
+      "canonical_name": "decision.people",
+      "evidence_refs": [
+        "digest.sha256.b14ef604fed1c6ffb98adf0d7fc6b2e213a7ae5211918d06b6d3b576ed643653"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "decision-area",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.afbb0974ba323e38ba2ecb75f3462318e3bb0d9dd13f85396bf2003d81613883",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.decision.strategy",
+      "candidate_receipt": "digest.sha256.9b356deddfb16c5d8723f22275f4652b9aae1248ed067ab344df15ba9a34ad28",
+      "canonical_id": "decision.strategy",
+      "canonical_name": "decision.strategy",
+      "evidence_refs": [
+        "digest.sha256.8c1ef1cd1c2e1c13910cc53a49ab7e797f249edee50d3b32de006869519f6f3e"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "decision-area",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.a68781405b2a6ec1245120158dc3d0715f56776fffe0e3cfdefb94ff664f25d9",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.demand.people-reputation",
+      "candidate_receipt": "digest.sha256.1c8843834c1bde153054921a9f6ac519149fa2dccd5e6fa082a6d98089c3e5e8",
+      "canonical_id": "demand.people-reputation",
+      "canonical_name": "demand.people-reputation",
+      "evidence_refs": [
+        "digest.sha256.60862729c84c3d23895fbe726efa5119fdf8166273412baa638bc185bb3b577b"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "framework",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.ead820d9986924f8ea8969e9bf44b113e7758c428e4b26594cd8c1686d4443e8",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.demand.process-productivity",
+      "candidate_receipt": "digest.sha256.d87481b62a0fc54316e05c44a7e165ba6c876bc17a51af62583df8897ca7b495",
+      "canonical_id": "demand.process-productivity",
+      "canonical_name": "demand.process-productivity",
+      "evidence_refs": [
+        "digest.sha256.eb3d2d681d9a18571f3112cb1e86ceba73d137f6bf947cc060dda9f01c543ea3"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "framework",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.d488f519be817b327c21a51e0cb19914f775e5d381e5f515f6843e1f39595df0",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.discipline.data",
+      "candidate_receipt": "digest.sha256.c9d4eab9f65acd1f3447f2c1411b78feea853b3d2267adb605a550f125bb59eb",
+      "canonical_id": "discipline.data",
+      "canonical_name": "discipline.data",
+      "evidence_refs": [
+        "digest.sha256.9257904434875a1fb5d0f5c9838304bf274a8dfb32a600c8f62d3c8d0ff301f2"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "routine",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.6cabb6b85afb704f3a7d2ca897a0ad10dfbfbc0065e0338603f5d1cdda54574d",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.discipline.meeting-rhythm",
+      "candidate_receipt": "digest.sha256.ee610cc9085e48d7b6987efde8225005851ea8bab2f582a78d3de48cd58dbe54",
+      "canonical_id": "discipline.meeting-rhythm",
+      "canonical_name": "discipline.meeting-rhythm",
+      "evidence_refs": [
+        "digest.sha256.525f69f9a4b2c8047063fb39cce2615417f8da4a79f97b670c1fe6461ad2156a"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "routine",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.f176cec14c7dfc2f4f09a9f2282911822c1f544ce0034d03409bb1134743174e",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.discipline.priorities",
+      "candidate_receipt": "digest.sha256.6be55afbd52db73633d171f9aba1709cfc40b233343dd08364f922d8daf53837",
+      "canonical_id": "discipline.priorities",
+      "canonical_name": "discipline.priorities",
+      "evidence_refs": [
+        "digest.sha256.5019ed43bbbf065c2d2f0de06652b471c7b0bc5bf83813c1aaa2d44990d4db81"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "routine",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.33a6685f430dbdab4e0e2e7fbacebc8748d353c347584454d24e1d37c9ca3d97",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.execution.artifact.who-what-when",
+      "candidate_receipt": "digest.sha256.f87cad3fb214f9b5222c598c29953af669479e89b7103d8d6ac9ac9d273fadee",
+      "canonical_id": "artifact.who-what-when",
+      "canonical_name": "Who What When",
+      "evidence_refs": [
+        "digest.sha256.087f20a1c8f00a43ab1ce5ba66f6b66759b7bf716a12b4fa69cda0886ada5df8"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "artifact",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.2c364456ec8ab5f30fe7a07bd6ad8ebf5ef38e3cd38ff1fad36ab78c415c51d8",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.execution.framework.rockefeller-habits",
+      "candidate_receipt": "digest.sha256.72e04677234e28b6dfe5a996ffa1e2f79d176088dbd68d97be682d3b83b21c79",
+      "canonical_id": "framework.rockefeller-habits",
+      "canonical_name": "Rockefeller Habits",
+      "evidence_refs": [
+        "digest.sha256.d254c95daedd079ff81c29c553b436f62ef2ea4bc6c5d882021bc37167ff1027"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "framework",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.572e4f37b9df5ba6b5f03c5691455867b17a6965b159c5bd229020462cd8b17a",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.execution.routine.daily-huddle",
+      "candidate_receipt": "digest.sha256.4cb020e3c0b469cfc193aa3133399fe9a014b614f698363e1b46cf92deb7b7e0",
+      "canonical_id": "routine.daily-huddle",
+      "canonical_name": "Daily Huddle",
+      "evidence_refs": [
+        "digest.sha256.383901a20744923a4d2740bd67a2945d9f693f5f90d15db98be1906eda1e2907"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "routine",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.d1f3a367c4b589b22d38a0c385e71df370cd4a22ca6c4d28bcd486316c4e9ef4",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.execution.routine.monthly-management",
+      "candidate_receipt": "digest.sha256.49b573f460e062e7bd07f91fe9e3625533ea4040a2090a3a6bb97e45ec4cb1ee",
+      "canonical_id": "routine.monthly-management-meeting",
+      "canonical_name": "Monthly Management Meeting",
+      "evidence_refs": [
+        "digest.sha256.e2bdfa05e32a15f4add948bb79a67818514d939e43ffa1a3983baa263c2a0290"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "routine",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.0a9c6394136e7a27fddf23835d2975722e10701520ffd198b315ef066bf0bd2d",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.execution.routine.quarterly-annual",
+      "candidate_receipt": "digest.sha256.5fcdcb61d69e63f65af0abc2bfcc3b0617b6bb57329244cc600dff25350c659b",
+      "canonical_id": "routine.quarterly-and-annual-planning",
+      "canonical_name": "Quarterly and Annual Planning Meetings",
+      "evidence_refs": [
+        "digest.sha256.8667780c0ced760c1e7962f0b99acf9e9d36c3572753c52da2047e90a505bcce"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "routine",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.1489021f9cbc29d6b477793cbee1ba2011798c7871842b850d252663fd77c583",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.execution.routine.quarterly-theme",
+      "candidate_receipt": "digest.sha256.2315048bba0513a698924f573be950f05bd023ee9ce841ff98cdd165f9fff65b",
+      "canonical_id": "routine.quarterly-theme",
+      "canonical_name": "Quarterly Theme",
+      "evidence_refs": [
+        "digest.sha256.0363cf6b8cd7427f21401b4303261152bcfe75add8c4ead2064ea50c35954bd3"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "routine",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.91718f9ace758b84b1b4b8c7a3365f03020a6e059b6efdfb5dafa995c04e2215",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.execution.routine.weekly-meeting",
+      "candidate_receipt": "digest.sha256.fc711153b599b38dd6889f514953cad42f78912a670830eb1907d015d089c2f0",
+      "canonical_id": "routine.weekly-meeting",
+      "canonical_name": "Weekly Meeting",
+      "evidence_refs": [
+        "digest.sha256.156f02e76670c5eaf6f53af3797ee50c994f612367236d6697dc9d9e81d020c2"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "routine",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.9dbfe474e748f580c14127e8709d7d13b8686a3bcc8021bb696bb4ac361f265a",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.execution.rule.healthy-team-first",
+      "candidate_receipt": "digest.sha256.96befc68e606879265061efba4ace179c3cce27f78d4340c7d4d62dcd0f93b42",
+      "canonical_id": "rule.healthy-team-first",
+      "canonical_name": "Healthy team first",
+      "evidence_refs": [
+        "digest.sha256.bef937a6fe33ff9bd2b10decc9ec3d6c5a9cd4492293c13e9380d5ef779f2c02"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "rule",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.2f95698400ea2d7f0e1f2715724b59b607710c094d0f246278369afa968f7138",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.execution.tool.critical-number",
+      "candidate_receipt": "digest.sha256.db6dab8cf93862ecc989804fbd9d41be9c92e28a9a6a48a499b9d690d8c89cb2",
+      "canonical_id": "tool.critical-number",
+      "canonical_name": "Critical Number",
+      "evidence_refs": [
+        "digest.sha256.1a9138ec7a9f2c4559c82158cc1df6639b0ff0129d4d1b6724c831cb8b7f4195"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "tool",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.a257d2d3f39b2b9838d6e2947a9bbce329aaa83ef05801a4e85011bbd47e80b8",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.framework.4d",
+      "candidate_receipt": "digest.sha256.ddc7bc771b540614a2834e2d06a4889d36cd035b02218eb42a61af5aa8601ea1",
+      "canonical_id": "framework.4d",
+      "canonical_name": "framework.4d",
+      "evidence_refs": [
+        "digest.sha256.aa8c099c5ab29f0eaba97dde8b9b2ce6ac673af491d84fcf5f53ae01906eeb4c"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "framework",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.2baf63228e8023d5d0549554873056362476087e0c55376742da41bcf8cfe6ba",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.framework.demands",
+      "candidate_receipt": "digest.sha256.3b55d92e489dee067774cf717d0396743c0000156f309320f14f8e7e9fd38069",
+      "canonical_id": "framework.demands",
+      "canonical_name": "framework.demands",
+      "evidence_refs": [
+        "digest.sha256.7357ecaf2da26df22bb8d0240a31d4ce33654ad68e583d674826c996a1ddab1c"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "framework",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.1f13ca82e6940ea2abda017f5377e0035abec5bc2cfddec161a017c9f9dad7ba",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.framework.disciplines",
+      "candidate_receipt": "digest.sha256.dcd7c46c1843afe35d91dfc8a74b1b5179a086e634264d7bb5e4974a6d19f664",
+      "canonical_id": "framework.disciplines",
+      "canonical_name": "framework.disciplines",
+      "evidence_refs": [
+        "digest.sha256.d609ad989510fe9c69078bf80f4cedb132ce9b5147521bc9e5f3f86e5b1f02f0"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "framework",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.55a8f64b49ebcad8dd468469bd8c45239d1a7a164c96e8dbbb59135faf0d8cd3",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.framework.driver",
+      "candidate_receipt": "digest.sha256.ab1d09c18297d6d9bac7c64b0e1ac887d8ab38416451cc856c38263b6e53148a",
+      "canonical_id": "framework.driver",
+      "canonical_name": "framework.driver",
+      "evidence_refs": [
+        "digest.sha256.2b91d9c5b6a87ecfb831a557e01ca3aba16e72a94fb69970e38b96b933a20853"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "framework",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.4b2c125feb129814820c1e9373921cb39e1d339e482981f60cbb15c00e270168",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.framework.results",
+      "candidate_receipt": "digest.sha256.53a19559d4f6e07df80b5e635ac087b2e9e6ab26c0ebdf966cf97ab28aae3e1b",
+      "canonical_id": "framework.results",
+      "canonical_name": "framework.results",
+      "evidence_refs": [
+        "digest.sha256.18c0e78d4779b3550cec1049ca95e6fc0f734eddc34ed604a84c2a40acd6efc1"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "framework",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.58f1410857654bb5a726c5372ce63a5e247891dfb7a3b0cfd1c657e4132be550",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.people.face-gap-signals",
+      "candidate_receipt": "digest.sha256.2ce2ce71eaeef487b7222935d5fdc5a8540ba650489f5dfda18badbbf101be9e",
+      "canonical_id": "rule.face-gap-signals",
+      "canonical_name": "FACe leadership gap signals",
+      "evidence_refs": [
+        "digest.sha256.cf1a931e2bfd98f5ec4e4e03432f5d7d46f346d097175e42b658c0f2cde74d08"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "rule",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.a61dc4e42c784a6b0c1f5f09a74445eaaa3fdb5530712a37782355340d4cdf8d",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.people.face-single-accountable",
+      "candidate_receipt": "digest.sha256.758168f91e0bbc9f0c7cdd156785f5fa483cc7f8e6e7f8a3a0d8106c3640ecbb",
+      "canonical_id": "rule.face-single-accountable",
+      "canonical_name": "FACe single accountability",
+      "evidence_refs": [
+        "digest.sha256.87372a7938be853414c49e13a7e93c90f78d77d6beb9a48dd4257c7232b5a0b5"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "rule",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.3c12325e84055dd1a4e27eda31e7880f3344092f858946da2c7cb1b5c0446550",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.people.job-scorecard",
+      "candidate_receipt": "digest.sha256.245b0a910e36c2b6c7c5e891d2731f95a2bdb69f6d61932c1e92cacaea2ae3d8",
+      "canonical_id": "external.job-scorecard",
+      "canonical_name": "Job Scorecard",
+      "evidence_refs": [
+        "digest.sha256.bf76aefa43b9eac8ffc9b61d15b99fc24525348ee53c0601d902b6574bc201c7"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "external-reference",
+      "origin": "external-reference",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.33754968e9178f217661b90b4b66152e61476459d962fc57cab6a78dc95b4daa",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.people.manager-coaching-rhythm",
+      "candidate_receipt": "digest.sha256.95b54fbbde66376678443b2d9d8a8cb59756e07054db65b1bce9db90ded8d780",
+      "canonical_id": "routine.manager-coaching-rhythm",
+      "canonical_name": "Regular one-on-one coaching rhythm",
+      "evidence_refs": [
+        "digest.sha256.49bc50856e70810dfc92be9b7d572f8caaa6634cd5e0848576a5915d21134917"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "routine",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.c6cb8c36c5e9991133727b2c649957ada5f963150e9b4be2dfba812991c74241",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.people.pace-process-accountability",
+      "candidate_receipt": "digest.sha256.add1c0a0c2ca62a2352800a8b185795614787fcd2fac9e8bf18568a59a282fdb",
+      "canonical_id": "rule.pace-process-accountability",
+      "canonical_name": "PACe process accountability",
+      "evidence_refs": [
+        "digest.sha256.4a63b9f71eb1ff45ab8d2d73355044e4b8cc228ff8d30c7f3c0e0eab5a0230c2"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "rule",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.4ba97587975c404593c7b2e0d0795a04760bed40f7971ab9c37ce01518e07b3c",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.people.tool.face",
+      "candidate_receipt": "digest.sha256.ccbab2d6721c62a41554e857ee23218548b0d35300595b2721a34c9d2eaf2e29",
+      "canonical_id": "tool.face",
+      "canonical_name": "Function Accountability Chart (FACe)",
+      "evidence_refs": [
+        "digest.sha256.04a4a553f240a712c831cee697661ebe6e685fef16b9aece75e515ade87ad0c6"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "tool",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.61945232eeb2f14a538f45c50a0f9f78f3ce3a3c9a5450c35527923d382decdf",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.people.tool.oppp",
+      "candidate_receipt": "digest.sha256.9159923673c28697412332643413c0047ea18f5e40562e8c3ce462c62c29d3b3",
+      "canonical_id": "tool.oppp",
+      "canonical_name": "One-Page Personal Plan (OPPP)",
+      "evidence_refs": [
+        "digest.sha256.6b02fcf55679e0b779193d465d290bf1b408586de4bb7ac2dd2cbc2c4f93633c"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "tool",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.d35628811533e2a8b4656a48265a5b9432d802816d72a8711d963b7c771fbafb",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.people.tool.pace",
+      "candidate_receipt": "digest.sha256.ba48f453317637eb41c124ef4d8563586cec053bd7180f53a6e95119491183b7",
+      "canonical_id": "tool.pace",
+      "canonical_name": "Process Accountability Chart (PACe)",
+      "evidence_refs": [
+        "digest.sha256.c4548fb13397d2591a4a9b08e6198e5c775da6e3dbd7f5630c9117686959252c"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "tool",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.ae536422334f256bb81896af30ba93ae419cc069b2e67613c93d862af9d30152",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.personal-dimension.achievements",
+      "candidate_receipt": "digest.sha256.cc7c71b5941bec6778d5f5377740331982f984fb4516c9c1870dbfdac60e718b",
+      "canonical_id": "personal-dimension.achievements",
+      "canonical_name": "personal-dimension.achievements",
+      "evidence_refs": [
+        "digest.sha256.5d44a49ccca384c9fb093e2b0f16d05250f435f1e6c4271d0a6fa7525f640092"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "personal-dimension",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.57d57b3e724d69d8997735f1cf6b7ce61a189f80a766b18ed0b9fbba0b88dbc6",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.personal-dimension.relationships",
+      "candidate_receipt": "digest.sha256.2c5c5da833fe93671b0b93415439382450fa761ddbe1d478ca3ee1dbf4f6542a",
+      "canonical_id": "personal-dimension.relationships",
+      "canonical_name": "personal-dimension.relationships",
+      "evidence_refs": [
+        "digest.sha256.04fc65800170b623297310f4180dc00605d5b6048023713b289a363b287da046"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "personal-dimension",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.4ed69dabda0c38d87b89711a0fd7b168e691f3edae1303a5940691b3308f82b8",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.personal-dimension.rituals",
+      "candidate_receipt": "digest.sha256.cb76d9b62c30b2554bf9f566ea0f63169af45c42c84a18e48aab25a54db9ae32",
+      "canonical_id": "personal-dimension.rituals",
+      "canonical_name": "personal-dimension.rituals",
+      "evidence_refs": [
+        "digest.sha256.2a495ba4ca3d63f8af4374c114ed0520a8d6c0126bd90df7fa3fce2cbbd0b171"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "personal-dimension",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.000add906d7dfcdb846d35432d76fa999ed831430200cbe76dd4c559657e9787",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.personal-dimension.wealth",
+      "candidate_receipt": "digest.sha256.773b4bf9ae933a798c06f82ffe65f304b515cadd0e78c94c41a1b55933aa1901",
+      "canonical_id": "personal-dimension.wealth",
+      "canonical_name": "personal-dimension.wealth",
+      "evidence_refs": [
+        "digest.sha256.094789ffd7794af193b9ee92c3f63ae6da4ca885a4254d8f91a4380ba240db66"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "personal-dimension",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.da2dc53606bf9499e3ddc61ea40724646aed69a5315aecb70ec84ac2e607fbaf",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.principle.get-it-down-then-right",
+      "candidate_receipt": "digest.sha256.cd5c9259e653920f6452aebd67904b46ee6d668568e9cfde7e18ed4010150bcc",
+      "canonical_id": "principle.get-it-down-then-right",
+      "canonical_name": "principle.get-it-down-then-right",
+      "evidence_refs": [
+        "digest.sha256.e05201e99df261d9d7acc10d15011c88d1c2968796aa1ec455bf6952c03f051f"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "principle",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.38b2b964a70d8d26e3ce4302fedcc15108c0dfc7dbcf383e886ad4c0f8caa6ef",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.principle.iterative-adoption",
+      "candidate_receipt": "digest.sha256.e121fe8f9683ecd202dcebbe2d6f163a58621df38bcdd478fe4949fa1b4cbbc5",
+      "canonical_id": "principle.iterative-adoption",
+      "canonical_name": "principle.iterative-adoption",
+      "evidence_refs": [
+        "digest.sha256.3c6d2463373ee1b04a01c5bd942a7d18fa187b13182951dc305029f0d6f9980d"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "principle",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.3f48185e393e64566d9f4a2850f9a0d22eeeb8754618822d6cdd4f5c11f2a608",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.principle.right-questions",
+      "candidate_receipt": "digest.sha256.a0ea4f8395fda8f90e5df4195ece04a034fbda454a80e612e23a1622945561e7",
+      "canonical_id": "principle.right-questions",
+      "canonical_name": "principle.right-questions",
+      "evidence_refs": [
+        "digest.sha256.2bf797c7b2027ad118a2f6e05ab5af2ff5139da0ed922c70732f3abc69e5f7a6"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "principle",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.8b596fac80ec207492f3d2f259c0d53c034bf2d3a3611174a0660d78cc2fca63",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.principle.routine-sets-you-free",
+      "candidate_receipt": "digest.sha256.37931b3db68f536ce66d7faf4e6eb0a8044be2ca986e2065e343dfbc0fece64f",
+      "canonical_id": "principle.routine-sets-you-free",
+      "canonical_name": "principle.routine-sets-you-free",
+      "evidence_refs": [
+        "digest.sha256.8363fa22f4611fda17f9f6ce9ca9a18b1ff42fc83c968283e8bc3df6f744f827"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "principle",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.b40d1eec5959b7262470e909b6e36014cf1c5959894cba2d91611b3ea8e3af45",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.principle.simple-not-simpler",
+      "candidate_receipt": "digest.sha256.681e31980b57442ee2a8806922a8d4d089f28db8466e6cf1849a1eef999e504c",
+      "canonical_id": "principle.simple-not-simpler",
+      "canonical_name": "principle.simple-not-simpler",
+      "evidence_refs": [
+        "digest.sha256.a047daca2df2059cf55d12927a07b4fe7cc509c0e53e0e3de47621be3d821322"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "principle",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.c9f5ead38dcecdedc37deeac22ca85b55f2683198d8435928700bdd0ac5c8148",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.question.cash",
+      "candidate_receipt": "digest.sha256.0761f6c639250ff99506a08d299b0c1e3bd8cee62779ebc50834d77548e44fda",
+      "canonical_id": "question.cash",
+      "canonical_name": "question.cash",
+      "evidence_refs": [
+        "digest.sha256.4fd82896d22e5890be052e1f703d454c984d1527756a7259838b5b2cf942d977"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "diagnostic-question",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.1ed81e7bbbdbc9330d37d9e89f7197fe166aec13f3d4a0504263d86cb931ff20",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.question.execution",
+      "candidate_receipt": "digest.sha256.588adea95421200d7173004600ab0a0c56ec14535a1cac78961d6b0db20c4c3c",
+      "canonical_id": "question.execution",
+      "canonical_name": "question.execution",
+      "evidence_refs": [
+        "digest.sha256.cd1743c8395090531562bf2f0154a82b55c0fbc0b9e77c334fd0790b428af51d"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "diagnostic-question",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.8b0135c319bd0885f78233041e6a52d38d7160e8db1aa925759a437cd71d7ae1",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.question.people",
+      "candidate_receipt": "digest.sha256.e2f6ee656e35a40088ab68e15d74f4599804865dc2d6b8382df6f24b4f241a94",
+      "canonical_id": "question.people",
+      "canonical_name": "question.people",
+      "evidence_refs": [
+        "digest.sha256.a02de302404e78e89bd7eb77abcc77eee6252efa397bc106451138d57372ea23"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "diagnostic-question",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.787e0213295f5fc8c80bccee25f80f2ea17bf01eb8c54c9ec18d504b8ecf556d",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.question.select-primary-decision",
+      "candidate_receipt": "digest.sha256.c72752a07b63d6f2844d55766bbb87f25df4d8bff747f2352875bcb4930e5293",
+      "canonical_id": "question.select-primary-decision",
+      "canonical_name": "question.select-primary-decision",
+      "evidence_refs": [
+        "digest.sha256.3db24e9cc77b8cc5b91867099d36cd4f30673f3c3845b84953fb55909275a465"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "diagnostic-question",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.eb68b3b3e8b8b6630cb420eafc83b2596a73ffc3e9da679b404040fdc5367408",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.question.strategy",
+      "candidate_receipt": "digest.sha256.01f2ed9ae8dc148b966ce64f1713426626145c7b9dc6c89c5e899665054b315a",
+      "canonical_id": "question.strategy",
+      "canonical_name": "question.strategy",
+      "evidence_refs": [
+        "digest.sha256.80b1e1f2372f6db49e93628e3a39b07d393ee8e2126fe7d2513a4d2d04baa423"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "diagnostic-question",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.ce959d98ac817641ec25964a4de1c067c61551a33e77511042d64e158b5b8fbd",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.result.cash-flow",
+      "candidate_receipt": "digest.sha256.29b6464b77c37065f2aaec0ad9607423e0cb97567ed7d0555b1a00e9d66e259c",
+      "canonical_id": "result.cash-flow",
+      "canonical_name": "result.cash-flow",
+      "evidence_refs": [
+        "digest.sha256.5e707e8bf3d8d5f9726e9eb765ee5f171f07c6ab8e0eb57eab3569173581201a"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "result",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.55cb30701c4e6417d3aa42f2ca4e041072640ff5a32752094b893c680b41c8f5",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.result.profitability",
+      "candidate_receipt": "digest.sha256.54f338862e8bc7294ceb7a3ae80c57e5c8e5652bcc324af0aa37657fc9104842",
+      "canonical_id": "result.profitability",
+      "canonical_name": "result.profitability",
+      "evidence_refs": [
+        "digest.sha256.e050f66812dad8c3ab503ee34fe7c8ab0bbcfd228fb90355d57c16294085919e"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "result",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.42bce4f54a57513060ff7821c89d98444ce771f4620205367d54fd848d5387ee",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.result.time",
+      "candidate_receipt": "digest.sha256.e05a791e84d0d6c6c6953b146222f41680a0848aec7dc43c7a652c5263aa1f47",
+      "canonical_id": "result.time",
+      "canonical_name": "result.time",
+      "evidence_refs": [
+        "digest.sha256.74ef4da4bb5e86e85fedb1076b8f5864d51fd3b5a6829805ceb90d96d7e58b1c"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "result",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.b8a5f629be88db415b45971aae5e767aca9fc50753ee2f065b29c65ca62565cb",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.result.valuation",
+      "candidate_receipt": "digest.sha256.01c317c79512c3a44a2c019e2f976d25d1c109f7185d5eba8372466a1e60b59d",
+      "canonical_id": "result.valuation",
+      "canonical_name": "result.valuation",
+      "evidence_refs": [
+        "digest.sha256.576aeb67d2c1c53165d196e9636c60ae6614736b7633ce09d7d4bdb026c28697"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "result",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.6951d7dd38a1db9691b8fe2fa6a62411beb25c51ada3bdb838fd0d6d20ee3f58",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.rule.non-sequential-adoption",
+      "candidate_receipt": "digest.sha256.94d6b51a256dd454e3c1eeaf66a2d26abedf41056f7417be57ce3a9306345c83",
+      "canonical_id": "rule.non-sequential-adoption",
+      "canonical_name": "rule.non-sequential-adoption",
+      "evidence_refs": [
+        "digest.sha256.2f92b20686b59c9437816f5f81ceb9c958a9ebc6a11e6cd0f54af0eb89c9193a"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "rule",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.2ed40268e85e0fd76da07874daa5a7efff75e0c11238665ab98caa35bc404a86",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.strategy.framework.core",
+      "candidate_receipt": "digest.sha256.46bd37a025f01575976c36aafe78ac4cdbf061815ff30b5d8c8c411ae411b779",
+      "canonical_id": "framework.organizational-core",
+      "canonical_name": "Organizational Core",
+      "evidence_refs": [
+        "digest.sha256.ebf5f7f6c6cb35a393812df4643ab9b8bcef335841c8caa399c61c1dfa577e14"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "framework",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.f5ed7f4df995e11aa4482dbdae89cf1ad5f2f4bb2e746e40303b1aeb28e57f25",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.strategy.framework.seven-strata",
+      "candidate_receipt": "digest.sha256.4d7d6883eb35b656b6620a79ec0d9a5737bf2924ae509c6b86c398b13932765f",
+      "canonical_id": "framework.strategy-seven-strata",
+      "canonical_name": "Seven Strata of Strategy",
+      "evidence_refs": [
+        "digest.sha256.c01ac638cd696e02b93b01bd1cc8d01d576c763631d7356cd4abde1a1c8215a1"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "framework",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.4de047b34ad5643e55407034d55bfe59109062d28284708a9de88f87cb382ddf",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.strategy.rule.brand-promises",
+      "candidate_receipt": "digest.sha256.e830e48439ad10eb24340b0af96f6e95282d647750b60dff3f9bc25839cd545c",
+      "canonical_id": "rule.brand-promises-measurable",
+      "canonical_name": "Measurable Brand Promises",
+      "evidence_refs": [
+        "digest.sha256.04235128faa857c97a6f35c7f8466be591bfd448ee4fe076299af5d098d5b3cb"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "rule",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.b2d58630b9c86f5789dbb0b21c1e232f86ad7ee494e3d7d02a5fbe4b86cd5606",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.strategy.rule.opsp-actions",
+      "candidate_receipt": "digest.sha256.828595c83946f5b0cf31309a4f696f4f8e83183230276b97322e08bbc8d3f31d",
+      "canonical_id": "rule.opsp-quarterly-actions",
+      "canonical_name": "Quarterly Actions in OPSP",
+      "evidence_refs": [
+        "digest.sha256.3d3c3b955a9fd737bcb1e6013ceed2d27daa14c4ab8a738265cc686e6c59d5f3"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "rule",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.a259a49dcaff7cc5057c98e4840e565dd3aff331c6bcd813726424ada98775d1",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.strategy.stratum.brand-promise-guarantee",
+      "candidate_receipt": "digest.sha256.20fa3cbbf082f6117563d06e3a37a2e0e95cead80f2f2aa6a874bf968d58a9c0",
+      "canonical_id": "principle.strategy-brand-promise-guarantee",
+      "canonical_name": "Brand Promise Guarantee",
+      "evidence_refs": [
+        "digest.sha256.12a2993fd28cc3fa12cdd53256f5ecd19c15f4efd6396e136c642b853215c4d7"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "principle",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.744aa1c17285ee50a6a587bf10382c014ec1ee0c3effd73717d568de42fc8c62",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.strategy.stratum.differentiating-activities",
+      "candidate_receipt": "digest.sha256.e28f6a63e672ca650be03ab7d973c15ae7809e0c2faf98c7e54f83ae6baa5908",
+      "canonical_id": "principle.strategy-differentiating-activities",
+      "canonical_name": "Differentiating Activities",
+      "evidence_refs": [
+        "digest.sha256.8ed45e0b51160c4b8a2e2adbefe53dc9f412fd64379074005d51c5b7dc1561b9"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "principle",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.6aee3503870a965b003d8439ab277293a33f37e94cd3f6eef24a695be1b4ed47",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.strategy.stratum.mindshare",
+      "candidate_receipt": "digest.sha256.c9456045d2ed03524aeb7550ecce5bb42e05e297ff73164d33058093e9c222f9",
+      "canonical_id": "principle.strategy-mindshare",
+      "canonical_name": "Words You Own (Mindshare)",
+      "evidence_refs": [
+        "digest.sha256.7d7c8bcc1fff38c231568631760f09fb138ece48771653ce4d80a53fe11367a7"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "principle",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.7273bb2e5be1d8e00678a783924ff0c5f0c737f93fc9292f138c13cf9db485c2",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.strategy.stratum.one-phrase-strategy",
+      "candidate_receipt": "digest.sha256.ad83f43ad1ad3b55a0f3d446e1649134d03cc8c59063e840134bc7b58e9fdb0b",
+      "canonical_id": "principle.strategy-one-phrase-strategy",
+      "canonical_name": "One-PHRASE Strategy",
+      "evidence_refs": [
+        "digest.sha256.a161d588ac53ee675fc1300478bcc7a0d408f056a420beb30bf13a9e3e43fe6f"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "principle",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.5611734be54f51415772228521f044adeebbf91d07329366108ef3ee121e80a2",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.strategy.stratum.profit-per-x-bhag",
+      "candidate_receipt": "digest.sha256.65850b8bde4bbf3e73531941dca02b05eb2624b396cab36aba0ebd69953fe2e4",
+      "canonical_id": "principle.strategy-profit-per-x-bhag",
+      "canonical_name": "Profit per X and BHAG",
+      "evidence_refs": [
+        "digest.sha256.095e7ac508c5b05d75b1658dc1b9c0b9f7b74490cabbdc49b0e3fa56eaef3c6a"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "principle",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.e3b9d22766f16aedd01a9536547cb8568600790aa42d3a7d23d3411bbc7fa266",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.strategy.stratum.sandbox-brand-promises",
+      "candidate_receipt": "digest.sha256.b80cfab8801dd1e936dbb55b0c1005b46e2528360aa4402127be77ea3e3760fc",
+      "canonical_id": "principle.strategy-sandbox-brand-promises",
+      "canonical_name": "Sandbox and Brand Promises",
+      "evidence_refs": [
+        "digest.sha256.a6b1e465ac0f06d9c00482cde024148e8b9da57e104be58e37f9f13705b0c515"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "principle",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.ab3d43538785664fbba103ba250b720978923a32a1eb6bb632f96a359ca006b0",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.strategy.stratum.x-factor",
+      "candidate_receipt": "digest.sha256.1523a76d6d0a493638fbd89fa6f873dfeca18c1b57f2e7fcef6238989018f139",
+      "canonical_id": "principle.strategy-x-factor",
+      "canonical_name": "X-Factor",
+      "evidence_refs": [
+        "digest.sha256.504f7af72f9b27861d3cfcfc487f9ab7e25864fa189b546c6d3345fbb6bdd0f3"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "principle",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.eb97348e1df91fffd63045dfa35f645a889947910bd8092aef4cf275bb68c05e",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.strategy.tool.opsp",
+      "candidate_receipt": "digest.sha256.3bef384339554a5850b98cf58cbcd45775424974307b51b639fe3080fcde0d93",
+      "canonical_id": "tool.opsp",
+      "canonical_name": "One-Page Strategic Plan",
+      "evidence_refs": [
+        "digest.sha256.25722823e16df8925b6fa63ae3b3c63074abd77179233a2c9f20b91d46db2e5f"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "tool",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.3714af3939a474baeba5e473d59c19a1d4f2e7c2fe28b78ddbd22ab1067fc70d",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.strategy.tool.seven-strata",
+      "candidate_receipt": "digest.sha256.1a212be20c77af2d333dc557d42fe3ca0798d65c610a3114671a7dc6c0cc8032",
+      "canonical_id": "tool.strategy-seven-strata",
+      "canonical_name": "Strategy: 7 Strata",
+      "evidence_refs": [
+        "digest.sha256.ae37c29321574cb72a4be45d7ca8c676ebbf0bb6c05b38a26d450270d5c0dd99"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "tool",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.19c4aa679c7b5a13093f02de30fffb0080eb40701c39f9b8a46d64450ea48ae2",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.strategy.tool.swt",
+      "candidate_receipt": "digest.sha256.ead555ec8bc8705b6e05a494777f18be6682f28d8ea02feee35b52fd44958a35",
+      "canonical_id": "tool.swt",
+      "canonical_name": "Strengths, Weaknesses, Trends",
+      "evidence_refs": [
+        "digest.sha256.8e61ad0b79d9b0aa63501b5fbbc140d6abaa103cfa989d13286f801957f67ae3"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "tool",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.f3dcc3fcbb176a16413b74a6ce29720ea3d83cbeeaeee54a181220c177aaa008",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    },
+    {
+      "aliases": [],
+      "blocked": false,
+      "candidate_id": "candidate.strategy.tool.vision-summary",
+      "candidate_receipt": "digest.sha256.73bb57395b94d87f594a88fb43e09138e3563e68dc615eb2fb28e5ecdcda9c7a",
+      "canonical_id": "tool.vision-summary",
+      "canonical_name": "Vision Summary",
+      "evidence_refs": [
+        "digest.sha256.c5ba480fc53038a2520db8c13cf8e082521316f309fb7276f68751560597751b"
+      ],
+      "external_content": false,
+      "generic": false,
+      "kind": "tool",
+      "origin": "source-explicit",
+      "receipts_valid": true,
+      "review_outcome": "approve-candidate",
+      "review_receipt": "digest.sha256.561c9f304d16c321bfe6c683e14a49ed3bf6ee5e9861eeafefc0f8c3f1d943c6",
+      "reviewer_independent": true,
+      "source_bounded": true,
+      "source_ids": [
+        "scaling-up-llamaparse-2014"
+      ]
+    }
+  ],
+  "schema_version": 1
+}

@@ -1,0 +1,95 @@
+id: procedure.build-vision-summary
+version: 1.0.0
+provenance: source-synthesis
+trigger:
+- El equipo quiere resumir su visión estratégica.
+non_trigger:
+- No complete visión sin evidencia estratégica detallada.
+objective: Proponer una visión resumida o evidenciar vacíos.
+required_inputs:
+- id: input.organization-context
+  description: Contexto autorizado de organización o estado desconocido.
+  required: true
+  accepted_statuses:
+  - known
+  - unknown
+optional_inputs:
+- id: input.strategy-evidence
+  description: Evidencia estratégica autorizada disponible.
+  required: false
+  accepted_statuses:
+  - known
+  - unknown
+  - not-applicable
+interview_questions:
+- id: question.vision-outcome
+  prompt: ¿Qué dirección estratégica desea aclarar?
+  required: true
+steps:
+- id: step.collect-strategy-context
+  action: Recopile evidencia autorizada y declare vacíos.
+  produces:
+  - artifact.vision-summary
+decision_rules:
+- id: rule.no-invented-strategy
+  statement: No invente estrategia para llenar una plantilla.
+warnings:
+- id: warning.no-silent-inference
+  statement: No trate hipótesis como decisiones aprobadas.
+output_contract:
+  artifact:
+    status: unknown
+    value: null
+    origin: null
+    evidence_ids: []
+    consent_receipt: null
+    confirmed_by: null
+  assumptions: []
+  open_questions:
+  - ¿Qué evidencia estratégica falta confirmar?
+  owner:
+    status: unknown
+    value: null
+    origin: null
+    evidence_ids: []
+    consent_receipt: null
+    confirmed_by: null
+  kpi:
+    status: unknown
+    value: null
+    origin: null
+    evidence_ids: []
+    consent_receipt: null
+    confirmed_by: null
+  who_what_when:
+    status: unknown
+    value: null
+    origin: null
+    evidence_ids: []
+    consent_receipt: null
+    confirmed_by: null
+  review_cadence:
+    status: unknown
+    value: null
+    origin: null
+    evidence_ids: []
+    consent_receipt: null
+    confirmed_by: null
+acceptance_criteria:
+- id: criterion.strategy-gaps-visible
+  statement: Los vacíos estratégicos quedan visibles antes de aprobar.
+state_updates:
+- id: state.propose-vision-summary
+  path: state/company/strategy.yaml
+  mode: proposed
+  confirmation: null
+handoff:
+  next_procedure_id: procedure.set-quarterly-priority
+  condition: La dirección y sus vacíos son confirmados.
+evidence_refs:
+- digest.sha256.087f20a1c8f00a43ab1ce5ba66f6b66759b7bf716a12b4fa69cda0886ada5df8
+- digest.sha256.8e61ad0b79d9b0aa63501b5fbbc140d6abaa103cfa989d13286f801957f67ae3
+- digest.sha256.ae37c29321574cb72a4be45d7ca8c676ebbf0bb6c05b38a26d450270d5c0dd99
+- digest.sha256.c01ac638cd696e02b93b01bd1cc8d01d576c763631d7356cd4abde1a1c8215a1
+- digest.sha256.c5ba480fc53038a2520db8c13cf8e082521316f309fb7276f68751560597751b
+- digest.sha256.ebf5f7f6c6cb35a393812df4643ab9b8bcef335841c8caa399c61c1dfa577e14

@@ -1,0 +1,96 @@
+id: procedure.install-meeting-rhythm
+version: 1.0.0
+provenance: source-synthesis
+trigger:
+- El equipo quiere definir un ritmo de reuniones.
+non_trigger:
+- No imponga reuniones sin necesidad de seguimiento.
+objective: Proponer cuatro ritmos verificables sin ejecutarlos.
+required_inputs:
+- id: input.execution-context
+  description: Contexto de ejecución y prioridad propuesta o desconocida.
+  required: true
+  accepted_statuses:
+  - known
+  - unknown
+optional_inputs:
+- id: input.existing-rhythm
+  description: Cadencias existentes, propósito y responsables autorizados.
+  required: false
+  accepted_statuses:
+  - known
+  - unknown
+  - not-applicable
+interview_questions:
+- id: question.rhythm-gap
+  prompt: ¿Qué propósito, dueño y restricciones tiene cada ritmo propuesto?
+  required: true
+steps:
+- id: step.propose-meeting-rhythm
+  action: Proponga cuatro ritmos sin calendario ni automatización.
+  produces:
+  - artifact.meeting-rhythm
+decision_rules:
+- id: rule.purpose-before-meeting
+  statement: Cada ritmo requiere propósito, dueño y aceptación explícita.
+warnings:
+- id: warning.no-silent-inference
+  statement: No cree reuniones, calendarios ni automatizaciones.
+output_contract:
+  artifact:
+    status: unknown
+    value: null
+    origin: null
+    evidence_ids: []
+    consent_receipt: null
+    confirmed_by: null
+  assumptions: []
+  open_questions:
+  - ¿Qué propósito, dueño y aceptación falta confirmar?
+  owner:
+    status: unknown
+    value: null
+    origin: null
+    evidence_ids: []
+    consent_receipt: null
+    confirmed_by: null
+  kpi:
+    status: unknown
+    value: null
+    origin: null
+    evidence_ids: []
+    consent_receipt: null
+    confirmed_by: null
+  who_what_when:
+    status: unknown
+    value: null
+    origin: null
+    evidence_ids: []
+    consent_receipt: null
+    confirmed_by: null
+  review_cadence:
+    status: unknown
+    value: null
+    origin: null
+    evidence_ids: []
+    consent_receipt: null
+    confirmed_by: null
+acceptance_criteria:
+- id: criterion.cadence-visible
+  statement: Incluya daily, weekly, monthly y quarterly como propuestas.
+state_updates:
+- id: state.propose-meeting-rhythm
+  path: state/company/execution.yaml
+  mode: proposed
+  confirmation: null
+handoff:
+  next_procedure_id: procedure.quarterly-review
+  condition: El equipo acepta una cadencia de revisión.
+evidence_refs:
+- digest.sha256.087f20a1c8f00a43ab1ce5ba66f6b66759b7bf716a12b4fa69cda0886ada5df8
+- digest.sha256.156f02e76670c5eaf6f53af3797ee50c994f612367236d6697dc9d9e81d020c2
+- digest.sha256.383901a20744923a4d2740bd67a2945d9f693f5f90d15db98be1906eda1e2907
+- digest.sha256.525f69f9a4b2c8047063fb39cce2615417f8da4a79f97b670c1fe6461ad2156a
+- digest.sha256.8363fa22f4611fda17f9f6ce9ca9a18b1ff42fc83c968283e8bc3df6f744f827
+- digest.sha256.8667780c0ced760c1e7962f0b99acf9e9d36c3572753c52da2047e90a505bcce
+- digest.sha256.e2bdfa05e32a15f4add948bb79a67818514d939e43ffa1a3983baa263c2a0290

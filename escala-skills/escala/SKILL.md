@@ -18,8 +18,9 @@ la capacidad interna adecuada.
 
 ## Antes de responder
 
-1. Lee `../catalog.yaml` relativo a este skill. Es el registro canónico de
-   capacidades, aliases y rutas; no inventes otra taxonomía.
+1. Lee `../../capabilities/mvp/catalog.json` relativo a este skill. Es el
+   contrato canónico y aprobado de las seis capacidades MVP y su ciclo de
+   trabajo; no inventes otra taxonomía ni una ruta exclusiva del cliente.
 2. Carga únicamente el contexto local que el usuario autorizó. Si un dato es
    viejo, sin fuente o no confirmado, dilo y pregunta una sola cosa concreta.
 3. Si el usuario llegó desde un alias de una instalación anterior, resuélvelo con la capa interna de compatibilidad y
@@ -27,10 +28,11 @@ la capacidad interna adecuada.
 
 ## Ruta conversacional
 
-- Si expresa una preocupación de Cash, People, Strategy o Execution, carga la
-  capacidad interna indicada en `routes`, resume lo que entendiste y continúa.
-- Si pide un diagnóstico o no sabe por dónde empezar, usa `escala-welcome` o
-  `escala-diagnose` según la evidencia disponible.
+- Si expresa una preocupación de Cash, People, Strategy o Execution, selecciona
+  una capacidad interna del contrato aprobado, resume lo que entendiste y
+  continúa con la evidencia autorizada disponible.
+- Si pide un diagnóstico o no sabe por dónde empezar, usa la capacidad de
+  diagnóstico del contrato antes de recomendar una intervención.
 - Si pide retomar, verifica primero el último estado consentido y pregunta si
   sigue vigente antes de basarte en él.
 - Si la petición mezcla áreas, elige sólo el dolor más urgente y di por qué;
@@ -43,17 +45,8 @@ que lo sostiene, una acción inicial y una pregunta —sólo cuando haga falta�
 avanzar. Nunca inventes precisión, guardes datos delicados sin consentimiento ni
 envíes información fuera de la carpeta local.
 
-## Runtime Python portable
-
-Si una capacidad interna necesita ejecutar `coaching.*`, primero resuelve la
-raíz del bundle dos niveles arriba de este `SKILL.md` y ejecuta
-`<bundle-root>/scripts/escala-python -m coaching.<módulo> ...`. Ese lanzador
-fija el `PYTHONPATH` local y evita crear archivos fuera del manifiesto. No
-ejecutes `python3 -m coaching.*` directamente ni dependas del checkout de
-desarrollo.
-
 ## Capacidades internas
 
-Cuando el registro dirija a una capacidad, lee su `SKILL.md` dentro de
-`../<id>/SKILL.md` y ejecuta su contrato. Esas capacidades existen para conservar
-método, cálculo, evidencia o estado; no se presentan como comandos al empresario.
+Cuando el contrato dirija a una capacidad, ejecuta su procedimiento interno
+validado. Las capacidades existen para conservar método, cálculo, evidencia o
+estado; no se presentan como comandos al empresario.

@@ -214,6 +214,9 @@ def test_canonical_selection_is_explicit_and_excludes_internal_families() -> Non
     assert {
         "LICENSE",
         "README.md",
+        "adapters/claude",
+        "adapters/codex/agents",
+        "capabilities/mvp/catalog.json",
         "install.sh",
         "pyproject.toml",
         "scripts/escala-server",

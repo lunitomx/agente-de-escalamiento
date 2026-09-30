@@ -1,7 +1,7 @@
 ---
 epic_id: E65
 title: Compilador de procedimientos y MVP de seis intervenciones
-status: planned
+status: complete
 depends_on: [E64, E49, E52]
 related: [E55, E56, E44]
 ---
@@ -47,3 +47,7 @@ Convertir nodos aprobados en procedimientos internos que guían una conversació
 ## Handoff y riesgos
 
 Entrega capacidades internas a E67 y registros de decisión a E44. No permite que formularios o scoring reemplacen una entrevista de detalle.
+
+## Resultado de cierre
+
+Las seis historias quedaron integradas el 2026-08-31: contrato fail-closed, compilador de seis procedimientos y los flujos de diagnóstico, OPPP/Vision, prioridad/ritmo y revisión trimestral. La persistencia y automatizaciones permanecen explícitamente propuestas hasta que E52 exponga una autoridad de consentimiento verificable. El alcance sólo certifica la release autorizada E64; no agrega contenido fuente ni fórmulas Cash excluidas.

@@ -53,7 +53,7 @@ def _qualify_current_contract() -> None:
     _run([sys.executable, "-m", "pytest", "tests/test_workspace_authority.py", "-q"])
     _run([sys.executable, "-m", "pytest", "tests/test_workspace_ingestion.py", "-q"])
     _run([sys.executable, "-m", "pytest", "tests/test_workspace_inbox.py", "-q"])
-    _run([sys.executable, "-m", "pyright"])
+    _run([sys.executable, "-m", "pyright", "--pythonpath", sys.executable])
     quality_scope = ["coaching", "escala_server", "validators", "scripts", "tests"]
     _run([sys.executable, "-m", "ruff", "check", *quality_scope])
     _run([sys.executable, "-m", "ruff", "format", "--check", *quality_scope])

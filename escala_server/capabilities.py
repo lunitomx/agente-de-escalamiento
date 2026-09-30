@@ -19,7 +19,7 @@ from pydantic import BaseModel, ConfigDict, model_validator
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CATALOG_PATH = REPOSITORY_ROOT / "escala-skills" / "catalog.yaml"
 DEFAULT_LEGACY_ALIAS_PATH = (
-    REPOSITORY_ROOT / ".claude" / "skills" / "e56-legacy-aliases.yaml"
+    REPOSITORY_ROOT / ".claude" / "legacy-skills" / "e56-legacy-aliases.yaml"
 )
 LEGACY_PREFIX = "scale" + "up-"
 

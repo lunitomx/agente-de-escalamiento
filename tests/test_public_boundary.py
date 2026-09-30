@@ -172,6 +172,8 @@ def test_policy_rejects_ambiguous_same_disposition_overlaps(
     ("path", "expected"),
     [
         ("README.md", PublicPathDisposition.CANDIDATE_PUBLIC),
+        ("adapters/claude/adapter.json", PublicPathDisposition.CANDIDATE_PUBLIC),
+        ("capabilities/mvp/catalog.json", PublicPathDisposition.CANDIDATE_PUBLIC),
         ("coaching/strategy/session.py", PublicPathDisposition.CANDIDATE_PUBLIC),
         (
             "escala_server/data/book-knowledge.json",

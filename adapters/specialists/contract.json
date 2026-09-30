@@ -1,0 +1,108 @@
+{
+  "contract_id": "escala.private-specialists.v1",
+  "public_entrypoint": "escala",
+  "schema_version": 1,
+  "specialists": [
+    {
+      "agent_name": "escala-cash",
+      "capability_ids": [
+        "capability.diagnose-primary-constraint"
+      ],
+      "contract_ref": "e45.specialist.cash.v1",
+      "decision_area": "cash",
+      "id": "specialist.cash.v1",
+      "limits": [
+        "never persist unconfirmed figures",
+        "never give tax or legal advice"
+      ],
+      "minimum_context": [
+        "financial evidence",
+        "period",
+        "currency or unit"
+      ],
+      "non_trigger": "people evaluation or legal/tax advice",
+      "output": "cash risk, assumptions, and the next verifiable question",
+      "permissions": [
+        "identify missing financial comparability"
+      ],
+      "role": "cash-analyst",
+      "trigger": "cash, margins, forecasts, CCC, reconciliation, or financial risk"
+    },
+    {
+      "agent_name": "escala-execution",
+      "capability_ids": [
+        "capability.diagnose-primary-constraint",
+        "capability.set-quarterly-priority",
+        "capability.install-meeting-rhythm",
+        "capability.quarterly-review"
+      ],
+      "contract_ref": "e45.specialist.execution.v1",
+      "decision_area": "execution",
+      "id": "specialist.execution.v1",
+      "limits": [
+        "never infer individual performance"
+      ],
+      "minimum_context": [
+        "commitments",
+        "cadence",
+        "operational evidence"
+      ],
+      "non_trigger": "person scoring or strategy rewrite",
+      "output": "operational constraint and accountable next action",
+      "permissions": [
+        "identify blocked execution dependencies"
+      ],
+      "role": "execution-operator",
+      "trigger": "priorities, commitments, meetings, KPIs, or operating rhythm"
+    },
+    {
+      "agent_name": "escala-people",
+      "capability_ids": [
+        "capability.diagnose-primary-constraint",
+        "capability.build-leader-oppp"
+      ],
+      "contract_ref": "e45.specialist.people.v1",
+      "decision_area": "people",
+      "id": "specialist.people.v1",
+      "limits": [
+        "never make employment decisions",
+        "never infer personal traits"
+      ],
+      "minimum_context": [
+        "owner-provided role evidence",
+        "consent state"
+      ],
+      "non_trigger": "hiring, firing, compensation, or personality diagnosis",
+      "output": "role/accountability question and people risk",
+      "permissions": [
+        "ask for explicit accountability and consent"
+      ],
+      "role": "people-coach",
+      "trigger": "accountability, roles, capacity, development, or team tension"
+    },
+    {
+      "agent_name": "escala-strategy",
+      "capability_ids": [
+        "capability.diagnose-primary-constraint",
+        "capability.build-vision-summary"
+      ],
+      "contract_ref": "e45.specialist.strategy.v1",
+      "decision_area": "strategy",
+      "id": "specialist.strategy.v1",
+      "limits": [
+        "never present market claims without source and date"
+      ],
+      "minimum_context": [
+        "company evidence",
+        "dated market evidence when supplied"
+      ],
+      "non_trigger": "unverified market declaration or operational task assignment",
+      "output": "strategic trade-off and evidence gap",
+      "permissions": [
+        "mark external claims as unverified"
+      ],
+      "role": "strategy-analyst",
+      "trigger": "customer, market, competition, differentiation, vision, or journey"
+    }
+  ]
+}

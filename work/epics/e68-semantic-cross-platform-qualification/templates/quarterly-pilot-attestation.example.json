@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "pilot_id": "PILOT-OPAQUE-ID",
+  "authorization_reference": "authorization.sha256.<hash>",
+  "local_storage_consent": true,
+  "repository_content_free": true,
+  "stages": [
+    {"stage": "diagnosis", "artifact_sha256": "<hash>", "human_outcome": "approved", "reviewer_role": "company-leader"},
+    {"stage": "priority", "artifact_sha256": "<hash>", "human_outcome": "corrected", "reviewer_role": "functional-owner"},
+    {"stage": "execution", "artifact_sha256": "<hash>", "human_outcome": "approved", "reviewer_role": "facilitator"},
+    {"stage": "review", "artifact_sha256": "<hash>", "human_outcome": "approved", "reviewer_role": "company-leader"}
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "suite_id": "escala.mvp.activation.v1",
+  "cases": [
+    {
+      "case_id": "ACT-001",
+      "case_type": "should_trigger",
+      "user_message": "No sé dónde está el cuello de botella de mi empresa.",
+      "evidence_kinds": ["company-context"],
+      "expected_action": "route",
+      "expected_intent": "diagnose-primary-constraint",
+      "expected_procedure_id": "procedure.diagnose-primary-constraint"
+    },
+    {
+      "case_id": "ACT-002",
+      "case_type": "should_trigger",
+      "user_message": "Quiero convertir mis metas personales de liderazgo en un plan de una página.",
+      "evidence_kinds": ["leader-context"],
+      "expected_action": "route",
+      "expected_intent": "build-leader-oppp",
+      "expected_procedure_id": "procedure.build-leader-oppp"
+    },
+    {
+      "case_id": "ACT-003",
+      "case_type": "should_trigger",
+      "user_message": "Ayúdame a resumir nuestra visión y propuesta estratégica.",
+      "evidence_kinds": ["organization-context"],
+      "expected_action": "route",
+      "expected_intent": "build-vision-summary",
+      "expected_procedure_id": "procedure.build-vision-summary"
+    },
+    {
+      "case_id": "ACT-004",
+      "case_type": "should_trigger",
+      "user_message": "Ya validé el cuello de botella; definamos la prioridad trimestral.",
+      "evidence_kinds": ["primary-constraint"],
+      "expected_action": "route",
+      "expected_intent": "set-quarterly-priority",
+      "expected_procedure_id": "procedure.set-quarterly-priority"
+    },
+    {
+      "case_id": "ACT-005",
+      "case_type": "should_trigger",
+      "user_message": "Necesitamos un ritmo de reuniones y seguimiento operativo.",
+      "evidence_kinds": ["execution-context"],
+      "expected_action": "route",
+      "expected_intent": "install-meeting-rhythm",
+      "expected_procedure_id": "procedure.install-meeting-rhythm"
+    },
+    {
+      "case_id": "ACT-006",
+      "case_type": "should_trigger",
+      "user_message": "Quiero revisar el trimestre y decidir el siguiente ciclo.",
+      "evidence_kinds": ["current-quarter"],
+      "expected_action": "route",
+      "expected_intent": "run-quarterly-review",
+      "expected_procedure_id": "procedure.quarterly-review"
+    },
+    {
+      "case_id": "ACT-007",
+      "case_type": "should_not_trigger",
+      "user_message": "Despide a una persona del equipo ahora mismo.",
+      "evidence_kinds": [],
+      "expected_action": "clarify",
+      "expected_intent": null,
+      "expected_procedure_id": null
+    },
+    {
+      "case_id": "ACT-008",
+      "case_type": "ambiguous",
+      "user_message": "Quiero mejorar mi empresa.",
+      "evidence_kinds": [],
+      "expected_action": "clarify",
+      "expected_intent": null,
+      "expected_procedure_id": null
+    },
+    {
+      "case_id": "ACT-009",
+      "case_type": "sequence",
+      "prior_turns": ["El diagnóstico confirmó una restricción primaria."],
+      "user_message": "Con esa restricción, acordemos el foco de los próximos 90 días.",
+      "evidence_kinds": ["primary-constraint"],
+      "expected_action": "route",
+      "expected_intent": "quarterly-priority",
+      "expected_procedure_id": "procedure.set-quarterly-priority"
+    }
+  ]
+}

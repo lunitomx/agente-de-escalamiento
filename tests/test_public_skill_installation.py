@@ -84,6 +84,12 @@ def _portable_artifact(destination: Path) -> Path:
         inventory=load_third_party_inventory(ROOT / "governance/third-party.yaml"),
     )
     assert not (destination / ".git").exists()
+    assert (destination / "adapters" / "claude" / "adapter.json").is_file()
+    assert {
+        path.stem
+        for path in (destination / "adapters" / "codex" / "agents").glob("escala-*.toml")
+    } == {"escala-cash", "escala-execution", "escala-people", "escala-strategy"}
+    assert (destination / "capabilities" / "mvp" / "catalog.json").is_file()
     return destination
 
 
@@ -148,10 +154,19 @@ def test_portable_export_installs_without_source_checkout_and_rejects_tampering(
         for directory in (".claude", ".hermes", ".codex")
     )
 
+    claude_instructions = home / ".claude" / "CLAUDE.md"
+    claude_instructions.parent.mkdir(parents=True)
+    claude_instructions.write_text("# Mis instrucciones\n", encoding="utf-8")
+
     first = _portable_install(active, home)
     assert first.returncode == 0, first.stderr
     assert all(path.is_symlink() for path in installed)
     assert all(path.resolve() == active / "escala-skills/escala" for path in installed)
+    installed_claude = claude_instructions.read_text(encoding="utf-8")
+    assert "# Mis instrucciones" in installed_claude
+    assert installed_claude.count("<!-- ESCALA:BEGIN -->") == 1
+    assert str(active / "escala-skills" / "escala") in installed_claude
+    assert str(active / "capabilities" / "mvp" / "catalog.json") in installed_claude
 
     candidate = _portable_artifact(tmp_path / "tampered-candidate")
     catalog = candidate / "escala-skills/catalog.yaml"
@@ -173,6 +188,11 @@ def test_portable_export_installs_without_source_checkout_and_rejects_tampering(
     assert all(
         path.resolve() == replacement / "escala-skills/escala" for path in installed
     )
+    updated_claude = claude_instructions.read_text(encoding="utf-8")
+    assert "# Mis instrucciones" in updated_claude
+    assert updated_claude.count("<!-- ESCALA:BEGIN -->") == 1
+    assert str(replacement / "escala-skills" / "escala") in updated_claude
+    assert str(active / "escala-skills" / "escala") not in updated_claude
     assert not any(
         "tests" in path.relative_to(replacement).parts
         for path in replacement.rglob("*")

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import shutil
 import stat
 import subprocess
 from pathlib import Path
@@ -44,8 +45,15 @@ def _minimal_checkout(root: Path) -> Path:
     skill = checkout / "escala-skills" / "escala"
     skill.mkdir(parents=True)
     (skill / "SKILL.md").write_text(
-        "---\\nname: escala\\ndescription: test\\n---\\n", encoding="utf-8"
+        "---\nname: escala\ndescription: test\n---\n", encoding="utf-8"
     )
+    capability_catalog = checkout / "capabilities" / "mvp" / "catalog.json"
+    capability_catalog.parent.mkdir(parents=True)
+    shutil.copy2(ROOT / "capabilities" / "mvp" / "catalog.json", capability_catalog)
+    adapters = checkout / "adapters"
+    adapters.mkdir()
+    shutil.copytree(ROOT / "adapters" / "claude", adapters / "claude")
+    shutil.copytree(ROOT / "adapters" / "codex" / "agents", adapters / "codex" / "agents")
     (checkout / "install.sh").write_text(
         INSTALLER.read_text(encoding="utf-8"), encoding="utf-8"
     )
@@ -144,6 +152,12 @@ def test_complete_install_uses_local_uv_venv_not_system_pip(tmp_path: Path) -> N
     assert not pip_marker.exists()
     assert "Paquete Python instalado" in completed.stdout
     assert (tmp_path / "home" / ".claude" / "skills" / "escala").is_symlink()
+    assert {path.stem for path in (tmp_path / "home" / ".claude" / "agents").glob("escala-*.md")} == {
+        "escala-cash",
+        "escala-execution",
+        "escala-people",
+        "escala-strategy",
+    }
 
 
 def test_failed_local_runtime_never_reports_success_or_creates_skill_link(

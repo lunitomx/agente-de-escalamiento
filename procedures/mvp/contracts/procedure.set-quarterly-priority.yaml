@@ -1,0 +1,94 @@
+id: procedure.set-quarterly-priority
+version: 1.0.0
+provenance: source-synthesis
+trigger:
+- El equipo quiere definir una prioridad trimestral.
+non_trigger:
+- No priorice sin foco y evidencia confirmados.
+objective: Proponer un plan trimestral verificable.
+required_inputs:
+- id: input.primary-constraint
+  description: Diagnóstico confirmado o propuesto con restricción única.
+  required: true
+  accepted_statuses:
+  - known
+  - unknown
+optional_inputs:
+- id: input.priority-evidence
+  description: Baseline, unidad, dueño y compromisos autorizados.
+  required: false
+  accepted_statuses:
+  - known
+  - unknown
+  - not-applicable
+interview_questions:
+- id: question.quarterly-outcome
+  prompt: ¿Qué resultado único confirma baseline, unidad, dueño y fecha?
+  required: true
+steps:
+- id: step.propose-quarterly-priority
+  action: Proponga prioridad, Critical Number y compromisos sin ejecutar cambios.
+  produces:
+  - artifact.quarterly-priority
+decision_rules:
+- id: rule.one-priority
+  statement: Permita una prioridad o exija justificación explícita.
+warnings:
+- id: warning.no-silent-inference
+  statement: No acepte KPI sin unidad, baseline, dueño y fecha.
+output_contract:
+  artifact:
+    status: unknown
+    value: null
+    origin: null
+    evidence_ids: []
+    consent_receipt: null
+    confirmed_by: null
+  assumptions: []
+  open_questions:
+  - ¿Qué confirma prioridad, KPI, dueño, fecha y revisión?
+  owner:
+    status: unknown
+    value: null
+    origin: null
+    evidence_ids: []
+    consent_receipt: null
+    confirmed_by: null
+  kpi:
+    status: unknown
+    value: null
+    origin: null
+    evidence_ids: []
+    consent_receipt: null
+    confirmed_by: null
+  who_what_when:
+    status: unknown
+    value: null
+    origin: null
+    evidence_ids: []
+    consent_receipt: null
+    confirmed_by: null
+  review_cadence:
+    status: unknown
+    value: null
+    origin: null
+    evidence_ids: []
+    consent_receipt: null
+    confirmed_by: null
+acceptance_criteria:
+- id: criterion.actionable-priority
+  statement: Incluya prioridad, medida, baseline, dueño, compromiso y revisión.
+state_updates:
+- id: state.propose-quarterly-priority
+  path: state/current-quarter.yaml
+  mode: proposed
+  confirmation: null
+handoff:
+  next_procedure_id: procedure.install-meeting-rhythm
+  condition: La prioridad propuesta requiere cadencia de seguimiento.
+evidence_refs:
+- digest.sha256.0363cf6b8cd7427f21401b4303261152bcfe75add8c4ead2064ea50c35954bd3
+- digest.sha256.087f20a1c8f00a43ab1ce5ba66f6b66759b7bf716a12b4fa69cda0886ada5df8
+- digest.sha256.1a9138ec7a9f2c4559c82158cc1df6639b0ff0129d4d1b6724c831cb8b7f4195
+- digest.sha256.3d3c3b955a9fd737bcb1e6013ceed2d27daa14c4ab8a738265cc686e6c59d5f3
+- digest.sha256.5019ed43bbbf065c2d2f0de06652b471c7b0bc5bf83813c1aaa2d44990d4db81
