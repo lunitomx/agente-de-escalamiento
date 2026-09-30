@@ -120,3 +120,16 @@ def sources_checked(found: int, missing: int, unchecked: int) -> str:
     if missing:
         text += ". Las que no la tienen no cuentan hasta volver a confirmarlas"
     return text + "."
+
+
+FINDING_EXAMPLE = "El kilo de tortilla en Puebla cuesta 17 pesos"
+
+
+def finding_too_long(texts: list[str]) -> str:
+    listed = "; ".join(f"«{text}»" for text in texts)
+    return (
+        f"Esto no cabe entero en el siguiente diagnóstico: {listed}. Reescríbelo "
+        "en 10 palabras o menos, sin «/» ni links, y conserva la cifra; por "
+        f"ejemplo: «{FINDING_EXAMPLE}». No lo recorto yo: una cifra cortada "
+        "cambia el sentido."
+    )

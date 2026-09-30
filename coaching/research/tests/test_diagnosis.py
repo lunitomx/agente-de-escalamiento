@@ -274,39 +274,146 @@ def test_every_finding_is_an_assumption_with_status_and_date() -> None:
     inputs = to_diagnostic_inputs(_report(), REFERENCE, TODAY)
 
     confirmed, supposed = inputs.assumptions[:2]
-    assert confirmed.startswith("Externo confirmado, sep 2026:")
-    assert "El kilo cuesta entre 22 y 26 pesos" in confirmed
-    assert supposed.startswith("Supuesto por confirmar, sep 2026:")
+    # 10-word finding: the month goes, the finding stays whole
+    assert confirmed == "Ext. conf.: El kilo cuesta entre 22 y 26 pesos en Puebla."
+    assert (
+        supposed
+        == "Sup. pend. sep26: Los clientes aceptan subidas pequeñas si se avisan."
+    )
     assert "Los clientes aceptan subidas pequeñas" in supposed
     assert any(  # a finding some source contradicts is also a doubt
-        item.startswith("En duda, hay fuentes en contra") and "El kilo" in item
+        item == "En duda: El kilo cuesta entre 22 y 26 pesos en Puebla."
         for item in inputs.open_questions
     )
     assert all(item.value != "El kilo" for item in inputs.evidence)
     assert len(inputs.evidence) == 1
 
 
-def test_every_line_fits_the_diagnosis_output_contract() -> None:
-    long_text = (
-        "Según el reporte anual verbatim de la cámara 2025/2026 el kilo de "
-        "tortilla subió \\ mucho en todas las colonias de Puebla y alrededores"
+LONG_WITH_FIGURE = (
+    "Según datos del SNIIM, en Puebla el kilo de tortilla ronda los 17 pesos "
+    "en septiembre"
+)
+
+
+def _fits(line: str) -> bool:
+    return (
+        line == line.strip()
+        and len(line) <= 96
+        and len(line.split()) <= 12
+        and "/" not in line
+        and "\\" not in line
+        and "://" not in line
     )
+
+
+def test_a_finding_keeps_its_figure_by_shortening_the_prefix_not_the_text() -> None:
+    claim = ResearchClaim(
+        text="En Puebla el kilo de tortilla ronda 17 pesos.", kind="dato"
+    )
+
+    inputs = to_diagnostic_inputs(_report(claims=[claim]), REFERENCE, TODAY)
+
+    assert inputs.assumptions[0] == (
+        "Ext. pend. sep26: En Puebla el kilo de tortilla ronda 17 pesos."
+    )
+    stale = to_diagnostic_inputs(
+        _report(claims=[claim]), REFERENCE, TODAY + timedelta(days=91)
+    )
+    assert stale.assumptions[0].startswith(messages.STALE_MARK)
+    assert stale.assumptions[0].endswith("ronda 17 pesos.")
+
+
+def test_a_saved_finding_too_long_to_fit_is_never_cut() -> None:
+    """A report saved before the rule: the line is left out, never mutilated."""
     report = _report(
-        claims=[ResearchClaim(text=long_text, kind="dato", supporting=["s1"])],
-        not_found=[long_text],
+        claims=[ResearchClaim(text=LONG_WITH_FIGURE, kind="dato", supporting=["s1"])],
+        not_found=[LONG_WITH_FIGURE],
         chosen="C",
     )
 
     inputs = to_diagnostic_inputs(report, REFERENCE, TODAY + timedelta(days=91))
 
-    for line in [*inputs.assumptions, *inputs.open_questions]:
-        assert line == line.strip()
-        assert len(line) <= 96
-        assert len(line.split()) <= 12
-        assert "/" not in line
-        assert "\\" not in line
-        assert "verbatim" not in line.lower()
-    assert inputs.assumptions[0].endswith("…")
+    lines = [*inputs.assumptions, *inputs.open_questions]
+    assert all(_fits(line) for line in lines)
+    assert not any(line.endswith("…") for line in lines)
+    assert not any("ronda" in line and "17 pesos" not in line for line in lines)
+    assert inputs.assumptions == []
+    assert any("sólo en el reporte" in line for line in inputs.open_questions)
+
+
+def _grade(claims: list[ResearchClaim]) -> dict[str, object]:
+    return {
+        "action": "grade",
+        "today": TODAY.isoformat(),
+        "sources": [item.model_dump(mode="json") for item in SOURCES],
+        "claims": [item.model_dump(mode="json") for item in claims],
+    }
+
+
+def test_grade_rejects_a_finding_that_does_not_fit_and_asks_to_keep_the_figure() -> (
+    None
+):
+    long = ResearchClaim(text=LONG_WITH_FIGURE, kind="dato", supporting=["s1"])
+    slashed = ResearchClaim(text="El kilo cuesta 22/26 pesos.", kind="dato")
+
+    for claim in (long, slashed):
+        result = run(_grade([claim]))
+
+        assert result.errors == ["finding_too_long"]
+        assert claim.text in result.message
+        assert "cifra" in result.message
+        assert result.claims == []
+
+
+def test_save_rejects_what_does_not_fit_and_writes_nothing(tmp_path: Path) -> None:
+    report = _report()
+    context: dict[str, object] = {
+        "action": "save",
+        "base_path": str(tmp_path),
+        "user_confirmed": True,
+        "chosen": "A",
+        "today": TODAY.isoformat(),
+        "frame": report.frame.model_dump(mode="json"),
+        "sources": [item.model_dump(mode="json") for item in SOURCES],
+        "claims": [{"text": LONG_WITH_FIGURE, "kind": "dato", "supporting": ["s1"]}],
+        "options": [item.model_dump(mode="json") for item in OPTIONS],
+        "recommendation": "A",
+        "recommendation_reason": "tu precio está abajo del rango",
+        "not_found": [],
+    }
+
+    long_finding = run(context)
+    long_gap = run(
+        {
+            **context,
+            "claims": [{"text": "El kilo cuesta 24 pesos.", "kind": "dato"}],
+            "not_found": [LONG_WITH_FIGURE + " y en las colonias del sur"],
+        }
+    )
+    long_cell = run(
+        {
+            **context,
+            "claims": [],
+            "comparables": [
+                {
+                    "name": "Tortillería El Sol",
+                    "named_by_owner": True,
+                    "cells": {
+                        "precio": {
+                            "value": "24 pesos el kilo de lunes a viernes y 26 "
+                            "pesos el fin de semana",
+                            "source_id": "s1",
+                        }
+                    },
+                }
+            ],
+        }
+    )
+
+    assert long_finding.errors == ["finding_too_long"]
+    assert long_gap.errors == ["finding_too_long"]
+    assert long_cell.errors == ["finding_too_long"]
+    assert not (tmp_path / ".escala").exists()
 
 
 def test_counted_comparables_are_assumptions_and_candidates_are_not() -> None:
@@ -328,8 +435,10 @@ def test_counted_comparables_are_assumptions_and_candidates_are_not() -> None:
 
     lines = [item for item in inputs.assumptions if "Tortillería El Sol" in item]
     assert len(lines) == 1
-    assert "precio 24 pesos el kilo" in lines[0]
-    assert lines[0].startswith("Por confirmar, sep 2026: Tortillería El Sol")
+    assert "precio: 24 pesos el kilo" in lines[0]
+    assert lines[0].startswith("Comp.")
+    assert "Tortillería El Sol" in lines[0]
+    assert _fits(lines[0])
     assert not any("Molino La Luna" in item for item in inputs.assumptions)
     assert any("no encontrado" in item for item in inputs.open_questions)
 

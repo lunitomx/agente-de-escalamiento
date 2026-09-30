@@ -38,7 +38,11 @@ from typing import cast
 from pydantic import BaseModel, Field, TypeAdapter, ValidationError
 
 from coaching.research import messages
-from coaching.research.diagnosis import DiagnosticInputs, load_diagnostic_inputs
+from coaching.research.diagnosis import (
+    DiagnosticInputs,
+    load_diagnostic_inputs,
+    misfits,
+)
 from coaching.research.engine import (
     RejectedQuery,
     build_queries,
@@ -152,9 +156,30 @@ def _frame(context: Mapping[str, object]) -> FlowResult:
     )
 
 
+def _must_fit(
+    *,
+    as_of: date,
+    claims: list[ResearchClaim] | None = None,
+    comparables: list[Comparable] | None = None,
+    not_found: list[str] | None = None,
+    options: list[DecisionOption] | None = None,
+) -> None:
+    """Every text must reach the next diagnosis whole; none is ever cut."""
+    bad = misfits(
+        claims=claims or [],
+        comparables=comparables or [],
+        not_found=not_found or [],
+        options=options or [],
+        as_of=as_of,
+    )
+    if bad:
+        raise _Refusal("finding_too_long", messages.finding_too_long(bad))
+
+
 def _grade(context: Mapping[str, object]) -> FlowResult:
     sources = _SOURCES.validate_python(context.get("sources", []))
     claims = _CLAIMS.validate_python(context.get("claims", []))
+    _must_fit(as_of=_today(context), claims=claims)
     by_id = {source.source_id: source for source in sources}
     as_of = _today(context)
     return FlowResult(
@@ -180,6 +205,7 @@ def _comparables(context: Mapping[str, object]) -> FlowResult:
     comparables = _COMPARABLES.validate_python(context.get("comparables", []))
     check_comparables(frame, sources, comparables)
     _no_own_company(frame, comparables, private)
+    _must_fit(as_of=_today(context), comparables=comparables)
     return FlowResult(
         action="comparables",
         comparables=comparables,
@@ -197,15 +223,25 @@ def _build(context: Mapping[str, object], chosen: str | None) -> ResearchReport:
         if checked.rejected or checked.accepted != frame.queries:
             raise _Refusal("private_query", messages.NO_SAFE_QUERY)
         _no_own_company(frame, comparables, private)
+    claims = _CLAIMS.validate_python(context.get("claims", []))
+    options = _OPTIONS.validate_python(context.get("options", []))
+    not_found = _TEXTS.validate_python(context.get("not_found", []))
+    _must_fit(
+        as_of=_today(context),
+        claims=claims,
+        comparables=comparables,
+        not_found=not_found,
+        options=options,
+    )
     return build_report(
         frame=frame,
         researched_on=_today(context),
         sources=_SOURCES.validate_python(context.get("sources", [])),
-        claims=_CLAIMS.validate_python(context.get("claims", [])),
-        options=_OPTIONS.validate_python(context.get("options", [])),
+        claims=claims,
+        options=options,
         recommendation=_text(context, "recommendation") or "",
         recommendation_reason=_text(context, "recommendation_reason") or "",
-        not_found=_TEXTS.validate_python(context.get("not_found", [])),
+        not_found=not_found,
         limits=_TEXTS.validate_python(context.get("limits", [])),
         chosen=chosen,
         comparables=comparables,

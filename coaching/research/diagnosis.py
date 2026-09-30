@@ -30,6 +30,8 @@ from coaching.diagnose.models import DiagnosticEvidence
 from coaching.research import messages
 from coaching.research.models import (
     DIMENSIONS,
+    Comparable,
+    ResearchClaim,
     DecisionArea,
     DecisionOption,
     IndexEntry,
@@ -56,8 +58,17 @@ _RATIONALE = (
     "están en el reporte local."
 )
 _OPTION_LETTER = re.compile(r"^\s*\w{1,3}\)\s*")
-_STATUS_WORD = {"confirmado": "confirmado", "por_confirmar": "por confirmar"}
-_KIND_LABEL = {"dato": "Externo", "supuesto": "Supuesto", "inferencia": "Deducción"}
+# Long and short labels: a line first drops words from its prefix, never from
+# the finding.
+_STATUS = {
+    "confirmado": ("confirmado", "conf."),
+    "por_confirmar": ("por confirmar", "pend."),
+}
+_KIND = {
+    "dato": ("Externo", "Ext."),
+    "supuesto": ("Supuesto", "Sup."),
+    "inferencia": ("Deducción", "Ded."),
+}
 _MONTHS = (
     "ene",
     "feb",
@@ -143,53 +154,153 @@ def _day(value: date) -> str:
     return f"{value.day} {_MONTHS[value.month - 1]} {value.year}"
 
 
-def _fit(prefix: str, body: str) -> str:
-    """One line the diagnosis's output contract accepts as it is.
+def _short_month(value: date) -> str:
+    return f"{_MONTHS[value.month - 1]}{value.year % 100:02d}"
+
+
+def _line(prefixes: list[str], body: str) -> str | None:
+    """The first ``prefix + body`` the diagnosis's output contract accepts.
 
     The contract (``validators/procedure_contract.py``) takes at most 12 words
-    and 96 characters per line, without slashes, backslashes, URLs or source
-    locators; what does not fit stays in the report, which the fact points to.
+    and 96 characters per line, without slashes, backslashes, URLs, control
+    characters or source locators. Only the prefix gets shorter; the body is
+    never cut. ``None`` when not even the shortest prefix fits.
     """
-    clean = _UNSAFE_WORD.sub(
-        "", without_urls(body).replace("/", "-").replace("\\", "-")
-    )
-    words = "".join(char if char.isprintable() else " " for char in clean).split()
-    head = prefix.split()
-    kept = words[: _MAX_WORDS - len(head)]
-    while True:
-        cut = "…" if len(kept) < len(words) else ""
-        line = " ".join([*head, *kept]) + cut
-        if len(line) <= _MAX_CHARS or not kept:
-            return line[:_MAX_CHARS].rstrip()
-        kept = kept[:-1]
+    body = " ".join(without_urls(body).split())
+    if (
+        not body
+        or any(not char.isprintable() for char in body)
+        or any(mark in body for mark in ("/", "\\", "://"))
+        or body.lower().startswith("www.")
+        or _UNSAFE_WORD.search(body)
+    ):
+        return None
+    for prefix in prefixes:
+        line = f"{prefix} {body}".strip()
+        if len(line) <= _MAX_CHARS and len(line.split()) <= _MAX_WORDS:
+            return line
+    return None
 
 
-def _assumptions(report: ResearchReport, stale: bool) -> list[str]:
-    mark = messages.STALE_MARK.strip() if stale else ""
-    when = _month(report.researched_on)
-    lines: list[str] = []
-    for claim in report.claims:
-        prefix = (
-            f"{mark} {_KIND_LABEL[claim.kind]} {_STATUS_WORD[claim.status]}, {when}:"
+def _finding_prefixes(kind: str, status: str, when: date, stale: bool) -> list[str]:
+    long_kind, short_kind = _KIND[kind]
+    long_status, short_status = _STATUS[status]
+    if stale:
+        mark = messages.STALE_MARK.strip()
+        return [
+            f"{mark} {long_kind} {long_status}, {_month(when)}:",
+            f"{mark} {short_kind} {short_status}:",
+            f"{mark} {short_kind}:",
+        ]
+    return [
+        f"{long_kind} {long_status}, {_month(when)}:",
+        f"{short_kind} {short_status} {_short_month(when)}:",
+        f"{short_kind} {short_status}:",
+    ]
+
+
+def _comparable_prefixes(when: date, stale: bool) -> list[str]:
+    mark = f"{messages.STALE_MARK.strip()} " if stale else ""
+    return [
+        f"{mark}Comparable por confirmar, {_month(when)}:",
+        f"{mark}Comp. pend. {_short_month(when)}:",
+        f"{mark}Comp.:",
+    ]
+
+
+def _cell_body(name: str, dimension: str, value: str) -> str:
+    return f"{name}, {COLUMN_LABELS[dimension].lower()}: {value}"
+
+
+def _gap_prefixes(when: date) -> list[str]:
+    return [
+        f"Falta, investigación {_month(when)}:",
+        f"Falta {_short_month(when)}:",
+        "Falta:",
+    ]
+
+
+def _doubt_prefixes(when: date) -> list[str]:
+    return [f"En duda, hay fuentes en contra, {_month(when)}:", "En duda:"]
+
+
+def _wait_prefixes(by_date: date) -> list[str]:
+    return [f"Pendiente al {_day(by_date)}:", f"Para {_day(by_date)}:"]
+
+
+def _only_in_report(when: date) -> str:
+    return f"Investigación {_month(when)}: un hallazgo largo está sólo en el reporte"
+
+
+def misfits(
+    *,
+    claims: list[ResearchClaim],
+    comparables: list[Comparable],
+    not_found: list[str],
+    options: list[DecisionOption],
+    as_of: date,
+) -> list[str]:
+    """Texts that would not fit the diagnosis whole, even stale (checked on save)."""
+    bad = [
+        claim.text
+        for claim in claims
+        if _line(
+            _finding_prefixes(claim.kind, "por_confirmar", as_of, True)[-1:], claim.text
         )
-        lines.append(_fit(prefix, claim.text))
-    for item in report.comparables:
-        if not item.counted or not item.cells:
-            continue
-        cells = ", ".join(
-            f"{COLUMN_LABELS[dimension].lower()} {cell.value}"
-            for dimension in DIMENSIONS
-            if (cell := item.cells.get(dimension)) is not None
+        is None
+    ]
+    bad += [
+        cell.value
+        for item in comparables
+        for dimension, cell in item.cells.items()
+        if _line(
+            _comparable_prefixes(as_of, True)[-1:],
+            _cell_body(item.name, dimension, cell.value),
         )
-        lines.append(_fit(f"{mark} Por confirmar, {when}:", f"{item.name}, {cells}"))
-    return lines
+        is None
+    ]
+    bad += [
+        item for item in not_found if _line(_gap_prefixes(as_of)[-1:], item) is None
+    ]
+    bad += [
+        option.missing_data
+        for option in options
+        if option.kind == "esperar"
+        and option.missing_data
+        and option.by_date
+        and _line(_wait_prefixes(option.by_date)[-1:], option.missing_data) is None
+    ]
+    return list(dict.fromkeys(bad))
 
 
-def _open_questions(report: ResearchReport) -> list[str]:
-    when = _month(report.researched_on)
-    lines = [_fit(f"Falta, investigación {when}:", item) for item in report.not_found]
+def _assumptions(report: ResearchReport, stale: bool) -> tuple[list[str], bool]:
+    """Lines, and whether some text was left out because it did not fit whole."""
+    when = report.researched_on
+    lines: list[str | None] = [
+        _line(_finding_prefixes(claim.kind, claim.status, when, stale), claim.text)
+        for claim in report.claims
+    ]
     lines += [
-        _fit(f"En duda, hay fuentes en contra, {when}:", claim.text)
+        _line(
+            _comparable_prefixes(when, stale),
+            _cell_body(item.name, dimension, cell.value),
+        )
+        for item in report.comparables
+        if item.counted
+        for dimension in DIMENSIONS
+        if (cell := item.cells.get(dimension)) is not None
+    ]
+    kept = [line for line in lines if line is not None]
+    return kept, len(kept) < len(lines)
+
+
+def _open_questions(report: ResearchReport, left_out: bool) -> list[str]:
+    when = report.researched_on
+    lines: list[str | None] = [
+        _line(_gap_prefixes(when), item) for item in report.not_found
+    ]
+    lines += [
+        _line(_doubt_prefixes(when), claim.text)
         for claim in report.claims
         if claim.contrary
     ]
@@ -199,13 +310,14 @@ def _open_questions(report: ResearchReport) -> list[str]:
         if item.counted
         for dimension in DIMENSIONS
     ):
-        lines.append(f"Comparables con datos «no encontrado», {when}")
+        lines.append(f"Comparables con datos «no encontrado», {_month(when)}")
     chosen = report.chosen
     if chosen is not None and chosen.kind == "esperar" and chosen.by_date:
-        lines.append(
-            _fit(f"Pendiente al {_day(chosen.by_date)}:", chosen.missing_data or "")
-        )
-    return lines
+        lines.append(_line(_wait_prefixes(chosen.by_date), chosen.missing_data or ""))
+    kept = [line for line in lines if line is not None]
+    if left_out or len(kept) < len(lines):
+        kept.append(_only_in_report(when))
+    return kept
 
 
 def to_diagnostic_inputs(
@@ -216,6 +328,7 @@ def to_diagnostic_inputs(
     if chosen is None:
         raise ValueError("needs_chosen_option")
     stale = as_of > report.review_by
+    assumptions, left_out = _assumptions(report, stale)
     return DiagnosticInputs(
         evidence=[
             _fact(
@@ -226,8 +339,8 @@ def to_diagnostic_inputs(
                 stale=stale,
             )
         ],
-        assumptions=_distinct(_assumptions(report, stale), MAX_ASSUMPTIONS),
-        open_questions=_distinct(_open_questions(report), MAX_OPEN_QUESTIONS),
+        assumptions=_distinct(assumptions, MAX_ASSUMPTIONS),
+        open_questions=_distinct(_open_questions(report, left_out), MAX_OPEN_QUESTIONS),
         refresh_offers=(
             [
                 messages.stale_offer(
