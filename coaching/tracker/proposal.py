@@ -1,5 +1,6 @@
 # pyright: strict
-"""Propose the month's commitment rows from the quarter's priorities (S82.4).
+"""Propose the month's commitment rows from the quarter's priorities (S82.4),
+and the quarter's Rocks rows for the quarter the sheet declares (S82.7).
 
 ESCALA only proposes. The owner reviews the rows and pastes them himself:
 S82.6 found no verified way to write into the group's sheet, so there is no
@@ -123,14 +124,17 @@ class QuarterlyPlanInput(BaseModel):
 
 
 class ProposedRow(BaseModel):
-    """One row for Monthly Commitments: Focus Area · Priority · KPI · Due Date."""
+    """One row: Focus Area · Priority (or Rock) · KPI · Due Date.
+
+    ``due`` is ``None`` only for a Rock without a planned date (S82.7).
+    """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     focus_area: str | None
     priority: str
     kpi: str | None
-    due: str
+    due: str | None
 
 
 class RowProposal(BaseModel):
@@ -221,6 +225,109 @@ def propose_rows(
     )
 
 
+_QUARTER = re.compile(r"^[qt]\s*([1-4])(?:\s*[-/ ]\s*(\d{4}))?$")
+_YEAR_QUARTER = re.compile(r"^(\d{4})\s*[-/ ]\s*[qt]\s*([1-4])$")
+
+
+def quarter_key(text: str | None) -> str | None:
+    """``Q4-2026`` / ``Q4`` for a clear quarter label, else ``None`` (ask)."""
+    key = " ".join((text or "").lower().split())
+    if match := _QUARTER.match(key):
+        number, year = match.groups()
+    elif match := _YEAR_QUARTER.match(key):
+        year, number = match.groups()
+    else:
+        return None
+    return f"Q{number}-{year}" if year else f"Q{number}"
+
+
+def _same_quarter(left: str, right: str) -> bool:
+    """Same quarter number, and the same year when both say one."""
+    a, b = left.split("-"), right.split("-")
+    return a[0] == b[0] and (len(a) == 1 or len(b) == 1 or a[1] == b[1])
+
+
+QuarterStatus = Literal["ok", "ask", "mismatch"]
+
+
+class QuarterCheck(BaseModel):
+    """Which quarter the Rocks rows are for, or why ESCALA must ask first."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    status: QuarterStatus
+    quarter: str | None = None
+    sheet_quarter: str | None = None
+    plan_quarter: str | None = None
+
+
+class RockProposal(BaseModel):
+    """Rows for Quarterly Goals (Rocks); nothing here has been written anywhere."""
+
+    quarter: str
+    rows: list[ProposedRow] = Field(default_factory=list[ProposedRow])
+    skipped: list[str] = Field(default_factory=list)
+    missing_area: list[str] = Field(default_factory=list)
+
+
+def check_quarter(
+    sheet: TrackerSheet, plan: QuarterlyPlanInput, answered: str | None = None
+) -> QuarterCheck:
+    """The quarter the sheet declares for its Rocks; never guessed.
+
+    The sheet's heading rules. Only when it says no clear quarter does the
+    owner's answer (``answered``) count; otherwise ESCALA asks. A plan for a
+    different quarter is pointed out and asked about.
+    """
+    sheet_quarter, plan_quarter = sheet.rocks_quarter, plan.quarter
+
+    def check(status: QuarterStatus, quarter: str | None) -> QuarterCheck:
+        return QuarterCheck(
+            status=status,
+            quarter=quarter,
+            sheet_quarter=sheet_quarter,
+            plan_quarter=plan_quarter,
+        )
+
+    chosen = next((q for q in (sheet_quarter, answered) if quarter_key(q)), None)
+    if chosen is None:
+        return check("ask", None)
+    chosen_key, plan_key = quarter_key(chosen), quarter_key(plan_quarter)
+    if chosen_key and plan_key and not _same_quarter(chosen_key, plan_key):
+        return check("mismatch", chosen.strip())
+    return check("ok", chosen.strip())
+
+
+def propose_rocks(
+    sheet: TrackerSheet, plan: QuarterlyPlanInput, quarter: str
+) -> RockProposal:
+    """Rocks rows for ``quarter`` from the plan's priorities, consistent with the sheet.
+
+    Skips what is already a Rock or in Done; reuses the sheet's area labels;
+    a date only when the plan gives one (a Rock's date is never invented).
+    """
+    areas = _sheet_areas(sheet)
+    written = {_key(item.text) for item in [*sheet.rocks, *sheet.done] if item.text}
+    proposal = RockProposal(quarter=quarter)
+    for planned in plan.priorities:
+        if _key(planned.priority) in written:
+            proposal.skipped.append(planned.priority)
+            continue
+        area = areas[planned.decision] if planned.decision else None
+        if area is None:
+            proposal.missing_area.append(planned.priority)
+        proposal.rows.append(
+            ProposedRow(
+                focus_area=area,
+                priority=planned.priority,
+                kpi=planned.kpi,
+                due=(planned.due or "").strip() or None,
+            )
+        )
+        written.add(_key(planned.priority))
+    return proposal
+
+
 def paste_cell(value: str | None) -> str:
     """One pasted cell: no tab or line break inside, never a formula."""
     text = " ".join((value or "").split())
@@ -251,14 +358,19 @@ def _table_cell(value: str | None) -> str:
     return " ".join((value or "").split()).replace("|", "\\|")
 
 
-def render_table(rows: list[ProposedRow], headers: list[str] | None = None) -> str:
-    """Readable table: area, priority, KPI and date, with the sheet's labels."""
+def render_table(
+    rows: list[ProposedRow],
+    headers: list[str] | None = None,
+    fields: list[Column] | None = None,
+) -> str:
+    """Readable table with the sheet's labels (area, priority, KPI, date by default)."""
     labels = headers or DEFAULT_HEADERS
+    order = fields or DEFAULT_FIELDS
     lines = [
         "| " + " | ".join(labels) + " |",
         "|" + "---|" * len(labels),
     ]
     for row in rows:
-        cells = [_table_cell(_value(row, field)) for field in DEFAULT_FIELDS]
+        cells = [_table_cell(_value(row, field)) for field in order]
         lines.append("| " + " | ".join(cells) + " |")
     return "\n".join(lines)

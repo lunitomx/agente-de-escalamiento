@@ -178,7 +178,7 @@ def parse_sheet(rows: Grid) -> TrackerSheet:
 
 
 class TableLayout(BaseModel):
-    """Where a table (Monthly Commitments or Done) sits, to say where to paste.
+    """Where a table (Monthly Commitments, Rocks or Done) sits, to say where to paste.
 
     Rows and columns are 0-based grid positions; ``free_rows`` is ``None`` when
     nothing follows the table (the rows below are open).
@@ -266,6 +266,11 @@ def commitments_layout(rows: Grid) -> TableLayout | None:
 def done_layout(rows: Grid) -> TableLayout | None:
     """Where finished rows can be pasted in Done (S82.5)."""
     return _table_layout(rows, "done")
+
+
+def rocks_layout(rows: Grid) -> TableLayout | None:
+    """Where new Quarterly Goals (Rocks) rows can be pasted (S82.7)."""
+    return _table_layout(rows, "rocks")
 
 
 def cell_ref(row: int, col: int) -> str:

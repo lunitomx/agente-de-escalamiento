@@ -7,7 +7,12 @@ a cell that already holds something.
 
 from __future__ import annotations
 
-from coaching.tracker.parser import cell_ref, commitments_layout, done_layout
+from coaching.tracker.parser import (
+    cell_ref,
+    commitments_layout,
+    done_layout,
+    rocks_layout,
+)
 
 Row = list[str | None]
 
@@ -156,3 +161,41 @@ def test_done_layout_points_below_the_last_done_row() -> None:
 
 def test_done_layout_is_none_without_a_done_table() -> None:
     assert done_layout(_sheet()) is None
+
+
+# --- S82.7: where new Rocks rows can be pasted ----------------------------------
+
+
+def test_rocks_layout_uses_the_template_columns_and_the_status_column() -> None:
+    grid = _sheet(_row(None, "Cash", "Cobrar")) + [
+        _row(None, "Cash", "Duplicar ventas", "Vamos en 40%"),
+        _row(),
+        _row(),
+        _row("Done - record anything you want to keep track"),
+        _row(None, "Focus Area", "Goals/Rock/Action"),
+    ]
+
+    layout = rocks_layout(grid)
+
+    assert layout is not None
+    assert layout.headers == ["Focus Area", "Goals/Rock for this quarter"]
+    assert layout.fields == ["focus", "text"]
+    assert cell_ref(layout.first_free_row, layout.focus_col) == "B13"
+    assert layout.free_rows == 2
+
+
+def test_rocks_layout_keeps_kpi_and_due_columns_when_the_header_has_them() -> None:
+    grid: list[Row] = [
+        _row("Quarterly Goals (Rocks) - Q4-2026"),
+        _row(None, "Focus Area", "Goals/Rock for this quarter", "KPIs", "Due Dates"),
+    ]
+
+    layout = rocks_layout(grid)
+
+    assert layout is not None
+    assert layout.fields == ["focus", "text", "kpi", "due"]
+    assert layout.first_free_row == 2 and layout.free_rows is None
+
+
+def test_rocks_layout_is_none_without_a_rocks_table() -> None:
+    assert rocks_layout(_sheet(rocks=False)) is None

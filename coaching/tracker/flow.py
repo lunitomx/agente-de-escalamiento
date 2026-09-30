@@ -13,6 +13,10 @@ Actions (JSON on stdin, like ``coaching.strategy_opsp``):
 - ``propose`` (S82.4): rows for the month from the quarter's priorities, for
   the remembered tab only, plus the block to paste and where to paste it.
   Nothing is written: the owner pastes the rows himself after reviewing them.
+  With ``"table": "rocks"`` (S82.7) the rows go to Quarterly Goals (Rocks)
+  for the quarter the sheet declares; if it declares none, ESCALA asks (the
+  answer comes back in ``quarter``), and a plan for another quarter is asked
+  about before any block is given.
 - ``prepare`` (S82.5): before the group meeting, for the remembered tab only:
   overdue commitments, finished ones to move to Done (with the block and the
   cell to paste it), missing KPI or date, and dates "por confirmar". ``today``
@@ -51,10 +55,20 @@ from coaching.tracker.maintenance import (
     to_done_block,
 )
 from coaching.tracker.models import TrackerSheet
-from coaching.tracker.parser import Grid, commitments_layout, done_layout, parse_sheet
+from coaching.tracker.parser import (
+    Grid,
+    commitments_layout,
+    done_layout,
+    parse_sheet,
+    rocks_layout,
+)
 from coaching.tracker.proposal import (
+    QuarterCheck,
     QuarterlyPlanInput,
+    RockProposal,
     RowProposal,
+    check_quarter,
+    propose_rocks,
     propose_rows,
     to_paste_block,
 )
@@ -71,6 +85,8 @@ class FlowResult(BaseModel):
     sheet: TrackerSheet | None = None
     proposal: RowProposal | None = None
     prep: MeetingPrep | None = None
+    rock_proposal: RockProposal | None = None
+    quarter_check: QuarterCheck | None = None
     paste_block: str = ""
     errors: list[str] = Field(default_factory=list)
 
@@ -225,9 +241,14 @@ def _propose(context: Mapping[str, object], base: Path) -> FlowResult:
         return _propose_refusal(messages.LINK_MISMATCH, "link_mismatch")
     if isinstance(grid, str):
         return _propose_refusal(messages.tab_not_found_message(link.tab_name), grid)
+    table = _text(context, "table") or "commitments"
+    if table not in ("commitments", "rocks"):
+        return _propose_refusal(messages.ASK_TABLE, "bad_table")
     plan = _plan(context, base)
     if plan is None:
         return _propose_refusal(messages.NO_PLAN, "needs_plan")
+    if table == "rocks":
+        return _propose_rocks(context, grid, plan, link)
     month = _text(context, "month") or date.today().strftime("%Y-%m")
     try:
         proposal = propose_rows(parse_sheet(grid), plan, month)
@@ -240,6 +261,43 @@ def _propose(context: Mapping[str, object], base: Path) -> FlowResult:
         message=messages.proposal_message(proposal, layout, link.tab_name, block),
         link=link,
         proposal=proposal,
+        paste_block=block,
+    )
+
+
+def _propose_rocks(
+    context: Mapping[str, object],
+    grid: Grid,
+    plan: QuarterlyPlanInput,
+    link: TrackerLink,
+) -> FlowResult:
+    """Rocks rows for the quarter the sheet declares (S82.7); asks if unclear."""
+    layout = rocks_layout(grid)
+    if layout is None:
+        return _propose_refusal(messages.NO_ROCKS_TABLE, "no_rocks_table")
+    sheet = parse_sheet(grid)
+    check = check_quarter(sheet, plan, _text(context, "quarter"))
+    if check.status != "ok" or check.quarter is None:
+        ask = check.status == "mismatch"
+        return FlowResult(
+            action="propose",
+            message=(
+                messages.quarter_mismatch_message(check)
+                if ask
+                else messages.ask_quarter_message(check)
+            ),
+            link=link,
+            quarter_check=check,
+            errors=["quarter_mismatch" if ask else "needs_quarter"],
+        )
+    proposal = propose_rocks(sheet, plan, check.quarter)
+    block = to_paste_block(proposal.rows, layout.fields)
+    return FlowResult(
+        action="propose",
+        message=messages.rocks_proposal_message(proposal, layout, link.tab_name, block),
+        link=link,
+        rock_proposal=proposal,
+        quarter_check=check,
         paste_block=block,
     )
 
@@ -272,7 +330,10 @@ def _prepare(context: Mapping[str, object], base: Path) -> FlowResult:
     today = _today(context)
     if today is None:
         return _prepare_refusal(messages.ASK_TODAY, "bad_today")
-    prep = review_before_meeting(parse_sheet(grid), today)
+    rocks = rocks_layout(grid)
+    prep = review_before_meeting(
+        parse_sheet(grid), today, rocks.fields if rocks else None
+    )
     layout = done_layout(grid)
     block = to_done_block(prep.finished, layout.fields if layout else None)
     return FlowResult(

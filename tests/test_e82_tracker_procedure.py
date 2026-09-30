@@ -96,3 +96,22 @@ def test_procedure_prepares_the_meeting_without_moving_anything() -> None:
     assert "Antes de tu reunión" in text
     assert "por confirmar" in text
     assert "Nunca muevas" in text
+
+
+def test_procedure_fills_rocks_for_the_quarter_the_sheet_declares() -> None:
+    """S82.7: same propose action; the quarter is never guessed."""
+    text = _procedure()
+
+    assert '"table": "rocks"' in text
+    assert '"quarter"' in text
+    assert "Quarterly Goals" in text
+    assert "Nunca adivines el trimestre" in text
+
+
+def test_procedure_reviews_rocks_apart_and_reads_dates_by_the_sheet() -> None:
+    """S82.7: prepare also reviews Rocks; swappable dates follow the tab."""
+    text = _procedure()
+
+    assert "Rocks del trimestre" in text
+    assert "día/mes" in text
+    assert "no la adivines" in text
