@@ -1,6 +1,6 @@
 schema_version: 1
 baseline:
-  canonical_procedures: 64
+  canonical_procedures: 65
   legacy_aliases: 39
 public_entrypoint: escala
 capabilities:
@@ -279,6 +279,11 @@ capabilities:
   owner: strategy
   disposition: keep
   reason: Método estratégico especializado.
+- id: escala-strategy-journey
+  visibility: internal
+  owner: strategy
+  disposition: keep
+  reason: Pregunta por cómo llega un cliente hasta que compra sólo cuando hace falta, sin insistir (E84).
 - id: escala-strategy-opsp
   visibility: internal
   owner: strategy
@@ -360,6 +365,8 @@ routes:
   - competidor
   - tendencias
   - benchmark
+  - marketing
+  - prospecto
   target: escala-strategy
   message: Empecemos por aclarar tu rumbo y la evidencia que ya tienes sobre tu mercado.
 - id: execution
