@@ -49,6 +49,7 @@ Antes de definir cliente central, promesa de marca, posicionamiento o plan:
 | Core Values listos, sin Plan Estratégico de Una Página (OPSP) | `/escala-strategy-opsp` — Plan Estratégico de Una Página (OPSP) |
 | Plan Estratégico de Una Página (OPSP) básico listo | `/escala-strategy-7strata` — profundizar diferenciación |
 | Todo hecho | SWOT/SWT para refinar |
+| Pregunta por su competencia, su mercado o las tendencias de su sector (sin prerequisito) | `escala-strategy-research` — investigar afuera antes de decidir |
 
 El Plan Estratégico de Una Página (OPSP) es la pieza central de Strategy. Todo lo demás alimenta al Plan Estratégico de Una Página (OPSP).
 

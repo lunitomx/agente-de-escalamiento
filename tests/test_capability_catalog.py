@@ -23,8 +23,8 @@ def test_catalog_covers_every_canonical_skill_from_one_source() -> None:
     catalog = load_capability_catalog(CATALOG_PATH)
 
     assert validate_catalog_sources(catalog) == ()
-    assert catalog.baseline == {"canonical_procedures": 63, "legacy_aliases": 39}
-    assert len(catalog.capabilities) == 64  # 63 procedures plus public ESCALA.
+    assert catalog.baseline == {"canonical_procedures": 64, "legacy_aliases": 39}
+    assert len(catalog.capabilities) == 65  # 64 procedures plus public ESCALA.
 
 
 def test_default_installation_exposes_only_the_public_front_door() -> None:
@@ -51,6 +51,13 @@ def test_every_tracked_legacy_skill_has_one_explicit_alias() -> None:
         ("No tengo efectivo y me preocupa cobrar", "escala-cash"),
         ("Mi equipo no sabe quién decide", "escala-people"),
         ("La competencia nos está ganando", "escala-strategy"),
+        ("¿Cómo está mi mercado?", "escala-strategy"),
+        ("¿Cómo cobran mis competidores?", "escala-strategy"),
+        ("¿Qué tendencias vienen para mi sector?", "escala-strategy"),
+        ("¿Cuánto cobra mi competencia?", "escala-strategy"),
+        ("Quiero un benchmark de mi oferta", "escala-strategy"),
+        # Cash is evaluated first: "ventas" wins, and Cash can offer research.
+        ("benchmark de ventas", "escala-cash"),
         ("Sólo apagamos incendios en la operación", "escala-execution"),
         ("¿Cómo vamos?", "escala-diagnose"),
         ("Quiero retomar lo que dejamos pendiente", "escala-welcome"),

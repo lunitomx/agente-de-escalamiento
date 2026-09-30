@@ -1,0 +1,66 @@
+# pyright: strict
+"""What ESCALA tells the owner during a research (plain Spanish, E83 S83.1).
+
+Never the words "módulo", "triangulación", "TAM" or a procedure name. Every
+research result ends in a question about the decision.
+"""
+
+from __future__ import annotations
+
+from datetime import date
+
+_MONTHS = (
+    "enero febrero marzo abril mayo junio julio agosto septiembre octubre "
+    "noviembre diciembre"
+).split()
+
+# Owner decision (2026-09-30): web search is assumed; without it, one line
+# saying it is off and how to turn it on, then offer the owner's own sources.
+SEARCH_OFF = (
+    "Aquí la búsqueda en internet está apagada: puedes prenderla en el menú de "
+    "herramientas o en la configuración de este asistente, o pégame dos o tres "
+    "fuentes (el link de un competidor, una cotización que te llegó, lo que te "
+    "dicen tus clientes) y sigo con eso, diciéndote hasta dónde llega."
+)
+NEEDS_OFFER = (
+    "¿Qué vendes exactamente y en qué ciudad o zona? Con eso armo las búsquedas."
+)
+NO_SAFE_QUERY = (
+    "No armé búsquedas que no lleven datos de tu empresa. ¿Me dices con otras "
+    "palabras qué vendes y dónde?"
+)
+NEEDS_CHOICE = "Antes de guardar necesito que me digas cuál opción tomas."
+NOTHING_CONTRARY = "No encontré fuentes que digan lo contrario."
+NOTHING_MISSING = "Encontré algo para cada punto que buscamos."
+
+
+def spanish_date(value: date) -> str:
+    return f"{value.day} de {_MONTHS[value.month - 1]} de {value.year}"
+
+
+def no_search_limit(source_count: int) -> str:
+    fuentes = "fuente" if source_count == 1 else "fuentes"
+    return (
+        "En este asistente no hubo búsqueda en internet; usé "
+        f"{source_count} {fuentes} que tú diste."
+    )
+
+
+def _join(items: list[str]) -> str:
+    return items[0] if len(items) == 1 else ", ".join(items[:-1]) + " y " + items[-1]
+
+
+def frame_message(decision_informed: str, queries: list[str]) -> str:
+    """One message: the decision it informs, the searches, and the permission."""
+    searches = _join([f"*{query}*" for query in queries])
+    return (
+        f"Quieres decidir: {decision_informed}. Voy a buscar: {searches}. "
+        "No llevo tu nombre ni tus cifras. ¿Va, o cambio algo?"
+    )
+
+
+def saved_message(review_by: date) -> str:
+    return (
+        "Listo, quedó guardado en tu carpeta con tu decisión. Conviene "
+        f"revisarlo antes del {spanish_date(review_by)}."
+    )

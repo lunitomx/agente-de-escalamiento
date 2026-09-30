@@ -189,7 +189,7 @@ def validate_catalog_sources(
         errors.append(f"source_not_cataloged:{missing}")
     for orphan in sorted(catalog_ids - source_ids):
         errors.append(f"catalog_skill_missing:{orphan}")
-    if catalog.baseline.get("canonical_procedures") != 63:
+    if catalog.baseline.get("canonical_procedures") != 64:
         errors.append("baseline_canonical_procedures_mismatch")
     if catalog.baseline.get("legacy_aliases") != 39:
         errors.append("baseline_legacy_aliases_mismatch")
