@@ -31,6 +31,8 @@ la capacidad interna adecuada.
 - Si expresa una preocupación de Cash, People, Strategy o Execution, selecciona
   una capacidad interna del contrato aprobado, resume lo que entendiste y
   continúa con la evidencia autorizada disponible.
+- Si cuenta que le compran poco, que no vende o que sus clientes no regresan,
+  es Strategy; sólo es Cash si habla de dinero que no le alcanza o no le pagan.
 - Si pide un diagnóstico o no sabe por dónde empezar, usa la capacidad de
   diagnóstico del contrato antes de recomendar una intervención.
 - Si pide retomar, verifica primero el último estado consentido y pregunta si

@@ -23,8 +23,8 @@ def test_catalog_covers_every_canonical_skill_from_one_source() -> None:
     catalog = load_capability_catalog(CATALOG_PATH)
 
     assert validate_catalog_sources(catalog) == ()
-    assert catalog.baseline == {"canonical_procedures": 64, "legacy_aliases": 39}
-    assert len(catalog.capabilities) == 65  # 64 procedures plus public ESCALA.
+    assert catalog.baseline == {"canonical_procedures": 65, "legacy_aliases": 39}
+    assert len(catalog.capabilities) == 66  # 65 procedures plus public ESCALA.
 
 
 def test_default_installation_exposes_only_the_public_front_door() -> None:
@@ -58,6 +58,25 @@ def test_every_tracked_legacy_skill_has_one_explicit_alias() -> None:
         ("Quiero un benchmark de mi oferta", "escala-strategy"),
         # Cash is evaluated first: "ventas" wins, and Cash can offer research.
         ("benchmark de ventas", "escala-cash"),
+        ("Necesito ayuda con mi marketing", "escala-strategy"),
+        ("No me llegan prospectos", "escala-strategy"),
+        ("¿Cómo consigo más prospectos?", "escala-strategy"),
+        # Cash is still evaluated first: sales words stay in Cash.
+        ("marketing para subir mis ventas", "escala-cash"),
+        # E84: sales-pain phrases reach Strategy, where the journey check runs.
+        ("Mucha gente pregunta por WhatsApp pero pocos compran", "escala-strategy"),
+        ("Me preguntan mucho pero no me compran", "escala-strategy"),
+        ("Nadie me compra", "escala-strategy"),
+        ("Compran una vez y no regresan", "escala-strategy"),
+        ("No vuelven después de la primera compra", "escala-strategy"),
+        ("Se me van los clientes", "escala-strategy"),
+        ("No vendo nada este mes", "escala-strategy"),
+        ("Vendo poco", "escala-strategy"),
+        # ...and real cash phrases stay in Cash.
+        ("No me pagan a tiempo", "escala-cash"),
+        ("No me alcanza para la nómina", "escala-cash"),
+        ("No me alcanza el dinero", "escala-cash"),
+        ("No vendo y no me alcanza para pagar", "escala-cash"),
         ("Sólo apagamos incendios en la operación", "escala-execution"),
         ("¿Cómo vamos?", "escala-diagnose"),
         ("Quiero retomar lo que dejamos pendiente", "escala-welcome"),

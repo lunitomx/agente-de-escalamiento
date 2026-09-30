@@ -81,6 +81,6 @@ def test_e42_catalog_exposes_only_public_front_door() -> None:
 
     assert "`escala`" in catalog
     assert "`escala-board`" not in catalog
-    assert "64 capacidades internas" in catalog
+    assert "65 capacidades internas" in catalog
     assert receipt["public_skill_count"] == 1
-    assert receipt["internal_capability_count"] == 64
+    assert receipt["internal_capability_count"] == 65
