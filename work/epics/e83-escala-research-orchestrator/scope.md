@@ -44,7 +44,7 @@ Un orquestador de varios pasos que ayuda al empresario a investigar su entorno c
 | Historia | Entrega | Tamaño | Estado |
 |---|---|:---:|---|
 | S83.1 | Contrato del orquestador: encuadre, catálogo de evidencia, reporte, modo sin búsqueda (`ESCALA-57`) | M | complete — `coaching/research/`, `escala-strategy-research` |
-| S83.2 | Módulo benchmark (`ESCALA-58`) | M | planned |
+| S83.2 | Módulo benchmark (`ESCALA-58`) | M | in-progress |
 | S83.3 | Módulo mercado (`ESCALA-59`) | M | planned |
 | S83.4 | Módulo fortalezas/debilidades y tendencias, alimenta al SWT (`ESCALA-60`) | S | planned |
 | S83.5 | Integración con diagnóstico y verificación por plataforma con y sin búsqueda web (`ESCALA-61`) | S | planned |
