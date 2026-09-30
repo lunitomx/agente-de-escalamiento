@@ -1,7 +1,8 @@
 ---
 epic_id: E71
 title: Inteligencia de mercado, competencia y customer journey
-status: planned
+status: absorbed
+absorbed_by: E83
 jira_key: "ESCALA-35"
 depends_on: [E49, E55, E67]
 ---
@@ -72,3 +73,8 @@ aprobados para sugerir dashboards; E75 los usa para elegir un deep dive.
 | TAM irrelevante para el negocio real | confirmación de segmento/geografía/ICP antes de cálculo. |
 | Competidores “alucinados” | URL, razón de inclusión y estado candidato hasta confirmación. |
 | Fuga de datos de empresa | paquete mínimo de consulta y bloqueo de adjuntos sensibles. |
+
+
+## Disposición (2026-09-30)
+
+Absorbida por E83 (ESCALA-49) por decisión del dueño. El customer journey (S71.5) pasa a E84 (ESCALA-50).

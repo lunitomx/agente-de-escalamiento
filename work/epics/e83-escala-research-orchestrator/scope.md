@@ -51,7 +51,7 @@ Un orquestador de varios pasos que ayuda al empresario a investigar su entorno c
 
 Orden de ejecución: S83.1 → S83.2 → S83.5 → S83.3 → S83.4. Diseño detallado en `design.md`.
 
-Cambios frente al borrador (sin tocar Jira): las reglas del modo sin búsqueda pasan a S83.1 (es el caso común y no verificado; riesgo primero) y S83.5 queda con la integración y la matriz verificada por plataforma; S83.4 baja de M a S porque no produce documento propio (alimenta a `escala-strategy-swt`) y reusa los comparables de S83.2.
+Cambios frente al borrador (sin tocar Jira): el aviso sin búsqueda (una línea + fuentes pegadas; decisión del dueño 2026-09-30: se asume búsqueda disponible) va en S83.1 y S83.5 queda con la integración y la matriz verificada por plataforma; S83.4 baja de M a S porque no produce documento propio (alimenta a `escala-strategy-swt`) y reusa los comparables de S83.2.
 
 Detalle por historia (dependencia → entrega concreta):
 
@@ -153,3 +153,11 @@ Checkpoint de integración: S83.5 prueba la costura research → diagnóstico en
 1. **Pocas fuentes con fecha para negocios locales (U5):** casi todo queda "por confirmar" y la decisión se siente débil. Se ve en S83.2; mitigación: la opción "todavía no, primero consigo X para [fecha]" es una decisión válida y concreta.
 2. **La búsqueda y las citas ocurren en el cliente, fuera del módulo (U7):** los tests prueban reglas, no conducta del agente. Mitigación: muestreo de URLs/extractos en S83.5, antes de construir S83.3/S83.4.
 3. **E75 S75.3 no llega a tiempo o E71 sigue abierto:** la entrada desde el diagnóstico queda como sugerencia en texto y hay dos epics de research en el backlog. Mitigación: S83.5 no simula el hand-off; la disposición de E71 se pide al dueño al cerrar este plan.
+
+
+## Decisiones del dueño (2026-09-30)
+
+- U1: se asume búsqueda web (Claude y ChatGPT la traen); sin búsqueda, una línea de aviso y cómo prenderla, y se sigue con fuentes que pegue el dueño.
+- U2: ESCALA elige el modo según la restricción diagnosticada; el pedido del dueño gana.
+- E71 (ESCALA-35) queda absorbida por E83; su customer journey (S71.5) pasa a E84.
+- Matriz de verificación de S83.5: Claude Code, Codex, claude.ai/Desktop y ChatGPT Work (esta última queda como no verificada hasta E85).

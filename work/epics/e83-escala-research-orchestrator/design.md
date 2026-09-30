@@ -103,9 +103,9 @@ Posición frente al mercado (reusa los comparables de S83.2 si existen y siguen 
 
 ### U1. Comportamiento sin búsqueda web
 
-**Decisión propuesta — pendiente de confirmar por el dueño.** Modo "con tus fuentes" (D3): el dueño aporta 2-3 fuentes; las reglas de confirmación no se relajan (lo normal será "por confirmar"); el reporte abre con el límite y dice qué fuente subiría cada hallazgo; nunca se usa la memoria del modelo como evidencia. La presencia de búsqueda se decide por la herramienta disponible en la sesión, no por la plataforma.
+**Decisión del dueño (2026-09-30).** Claude y ChatGPT traen búsqueda web, así que **se asume búsqueda disponible** y el camino normal es investigar con ella. El caso sin búsqueda es la excepción (el usuario o su admin la apagó, o el cliente corre sin red). Ahí ESCALA no monta un modo aparte: dice en **una línea** que la búsqueda está apagada y cómo prenderla en ese cliente, y ofrece seguir con 2-3 fuentes que el dueño pegue. Las reglas de confirmación no se relajan en ningún caso, y la memoria del modelo nunca cuenta como evidencia. Si hay búsqueda o no, lo decide la herramienta que tenga la sesión, no el nombre de la plataforma.
 
-Por qué: (1) sigue siendo útil en cualquier cliente sin prometer lo que no está verificado; (2) mantiene la regla del especialista de strategy ("never present market claims without source and date"); (3) la memoria del modelo no tiene fecha ni fuente verificable, así que presentarla como investigación contradice el propio "Fuera" del scope. Alternativa descartada: negarse a investigar sin búsqueda (deja al dueño sin nada y lo manda a otra herramienta).
+Por qué: así se mantiene la sencillez para el dueño (un solo camino, nada que configurar) sin inventar datos cuando falta la búsqueda. Se descarta un modo "con tus fuentes" de primer nivel, porque añadía superficie para un caso raro.
 
 Estado por plataforma (nada de esto está verificado para un empresario; se verifica en S83.5):
 
@@ -118,7 +118,7 @@ Estado por plataforma (nada de esto está verificado para un empresario; se veri
 
 ### U2. Orden de módulos: fijo o elegido por la restricción
 
-**Decisión propuesta — pendiente de confirmar por el dueño.** Lo elige ESCALA según la restricción diagnosticada, uno por conversación, con una línea de por qué; el dueño puede cambiarlo (D2). Si el dueño pide un modo con sus palabras, gana su pedido.
+**Decisión del dueño (2026-09-30): confirmada.** Lo elige ESCALA según la restricción diagnosticada, uno por conversación, con una línea de por qué; el dueño puede cambiarlo (D2). Si el dueño pide un modo con sus palabras, gana su pedido.
 
 | Restricción o pedido | Modo que ESCALA propone |
 |---|---|
@@ -163,7 +163,7 @@ decisions:
     rationale: "Una sola puerta y el mínimo de superficie; las reglas de investigación viven en un sitio"
     constraint: "Ningún comando, alias, especialista ni capacidad MVP nueva"
   - id: D2
-    choice: "El modo lo propone ESCALA según la restricción diagnosticada (tabla U2), uno por conversación; el pedido explícito del dueño gana (decisión propuesta)"
+    choice: "El modo lo propone ESCALA según la restricción diagnosticada (tabla U2), uno por conversación; el pedido explícito del dueño gana (confirmada por el dueño 2026-09-30)"
     rationale: "E75: sin orden editorial, máximo dos rutas; llegar rápido a una decisión"
     constraint: "No proponer investigación para restricciones de People o Execution salvo pedido"
   - id: D3
@@ -187,9 +187,9 @@ decisions:
     rationale: "No cambia el contrato de E49/E75 y respeta require_local_ref"
     constraint: "Ninguna URL en facts ni en DiagnosticEvidence; coaching/diagnose/models.py no cambia"
   - id: D8
-    choice: "E83 absorbe el contrato, encuadre, mercado, competidores y brief de E71; el customer journey de E71 (S71.5) pasa a E84 (decisión propuesta)"
+    choice: "E83 absorbe el contrato, encuadre, mercado, competidores y brief de E71; el customer journey de E71 (S71.5) pasa a E84 (confirmada por el dueño 2026-09-30)"
     rationale: "Evitar dos contratos de research para lo mismo"
-    constraint: "E83 no edita archivos de E71; la disposición de E71 la aplica el dueño"
+    constraint: "E71 cerrada como absorbida (ESCALA-35); su journey S71.5 va a E84"
   - id: D9
     choice: "El modo fortalezas-tendencias alimenta a escala-strategy-swt en vez de producir su propio SWT"
     rationale: "Un solo SWT canónico"
