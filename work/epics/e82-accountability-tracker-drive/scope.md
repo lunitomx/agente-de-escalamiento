@@ -41,7 +41,7 @@ Las áreas coinciden con Cash/People/Strategy/Execution de ESCALA; Critical Numb
 2. ¿ESCALA corre hoy en ChatGPT? Hoy los adaptadores son Claude y Codex; ChatGPT depende de E85.
 3. Cómo identificar la hoja de forma inequívoca (nombre en `Participant Name`, a veces fórmula a `START HERE`).
 
-## Historias (borrador)
+## Historias
 
 | Historia | Entrega | Tamaño | Estado |
 |---|---|:---:|---|
@@ -54,12 +54,12 @@ Las áreas coinciden con Cash/People/Strategy/Execution de ESCALA; Critical Numb
 
 Orden de ejecución: S82.3 → S82.6 → S82.4 → S82.5. Diseño detallado en `design.md`.
 
-| Historia | Depende de | Entrega concreta |
-|---|---|---|
-| S82.3 | S82.2 | `identity.py` (candidatas, placeholder, `TrackerLink`, pestaña pegada) + procedimiento interno `escala-execution-tracker` al que se llega desde `escala` |
-| S82.6 | S82.1 | Tabla verificada GO/NO-GO por superficie (ChatGPT Work, MCP de Sheets en Claude y en Codex) sobre una copia sintética |
-| S82.4 | S82.3, S82.6 | `proposal.py`: filas desde `quarterly_plan`, bloque para pegar; escritura directa sólo con GO |
-| S82.5 | S82.3 | `maintenance.py`: vencidos, pasar a Done, faltantes; sólo propone |
+Detalle por historia (dependencia → entrega concreta):
+
+- S82.3 (depende de S82.2): `identity.py` (candidatas por nombre de pestaña, placeholder, `TrackerLink`, pestaña pegada) + procedimiento interno `escala-execution-tracker` (catálogo 62 → 63), alcanzado como sub-procedimiento de `procedure.set-quarterly-priority` + aviso de una línea al conectar Drive + `.escala/my-company/` en `.gitignore` + **test de privacidad**: con un workbook sintético multi-pestaña, ninguna celda de otra pestaña llega a un mensaje de ESCALA ni a un archivo local.
+- S82.6 (depende de S82.1): tabla verificada GO/NO-GO por superficie (ChatGPT Work, MCP de Sheets en Claude y en Codex) sobre una copia sintética.
+- S82.4 (depende de S82.3, S82.6): `proposal.py`: filas desde `quarterly_plan`, bloque para pegar; escritura directa sólo con GO.
+- S82.5 (depende de S82.3): `maintenance.py`: vencidos, pasar a Done, faltantes; sólo propone.
 
 ## Criterios de terminado
 
@@ -68,6 +68,7 @@ Orden de ejecución: S82.3 → S82.6 → S82.4 → S82.5. Diseño detallado en `
 - S82.4 entrega filas pegables y consistentes con la hoja; ninguna escritura sin GO de S82.6 y un sí explícito.
 - S82.5 entrega la preparación de la reunión sin mover nada.
 - Ningún dato de otros participantes se usa, se guarda ni se escribe; los tests usan sólo fixtures sintéticos.
+- Un test con workbook sintético multi-pestaña prueba que ninguna celda de otra pestaña llega a un mensaje o archivo local (S82.3).
 
 ### Machine
 ```yaml

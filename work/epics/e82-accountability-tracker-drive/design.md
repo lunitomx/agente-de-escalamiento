@@ -41,6 +41,7 @@ Todo en español llano, un paso por mensaje, y ESCALA propone el siguiente paso.
 - `is_placeholder_name` se aplica a la pestaña **ya confirmada** (para avisar), no para elegir.
 - `TrackerLink` (Pydantic): `file_title`, `file_id | None`, `tab_name`, `participant_confirmed`, `confirmed_at`. Guardado en `.escala/my-company/tracker.yaml` sólo tras la confirmación, por el procedimiento (no por el agente especialista, cuyo contrato dice "do not persist state"). Guarda la referencia, no el contenido. **Hoy `.escala/my-company/` no está en `.gitignore` y partes de `.escala/` sí están versionadas** (`git check-ignore` falla): S82.3 añade `.escala/my-company/` a `.gitignore` antes de escribir el primer archivo.
 - `parse_pasted_tab(text: str) -> Grid` — separa por `\t` y saltos de línea (formato que Sheets deja al copiar) → `parse_sheet`. Es el camino sin conector.
+- **Test de privacidad (obligatorio, del red-team):** con un workbook sintético de varias pestañas, cada una con un marcador único en sus celdas, se recorre el flujo completo (candidatas → confirmación → `TrackerSheet` → `TrackerLink` guardado → mensajes al usuario) y se afirma que ningún marcador de otra pestaña aparece en un mensaje de ESCALA ni en un archivo de `.escala/my-company/`; sólo sobrevive la cuadrícula de la pestaña confirmada.
 
 ### S82.6 — spike de escritura (sin código de producto)
 
@@ -73,7 +74,11 @@ Salida: tabla verificada (igual que S82.1) + GO/NO-GO por superficie + comando p
 - Entrada de lectura: texto del conector (`parse_connector_text`) o pestaña pegada (`parse_pasted_tab`). Ambos terminan en `TrackerSheet`.
 - De un workbook sólo se procesa y se retiene la pestaña confirmada. De las demás se usa el nombre de pestaña (para elegir) y nada más: no se resumen, no se citan, no se guardan.
 - Todo lo que se persiste va a `.escala/my-company/` (local). Hoy esa ruta **no** está ignorada por git; S82.3 la añade a `.gitignore` (ver S82.3). Tests: sólo fixtures sintéticos.
-- Privacidad del flujo: antes de la confirmación sólo circulan nombres de pestaña (ya visibles al usuario en Drive). Ningún mensaje de ESCALA, journal ni archivo local cita celdas de una pestaña no confirmada.
+- Privacidad del flujo: antes de la confirmación sólo circulan nombres de pestaña (ya visibles al usuario en Drive). Ningún mensaje de ESCALA, journal ni archivo local cita celdas de una pestaña no confirmada. Lo prueba el test de privacidad de S82.3.
+
+## Revisión adversarial
+
+`design.redteam.json` (sobre db6164c): los hallazgos `wrong`/`weak` ya están incorporados arriba (elegir sólo por nombre de pestaña, `.gitignore`, persistencia por el procedimiento, dos aserciones del catálogo, ruta vía `procedure.set-quarterly-priority`, aviso al conectar, `QuarterlyPlanInput` nuevo, `parse_due` sin `mm/dd`). El punto ciego (falta una prueba de que las celdas de otras pestañas nunca llegan a un mensaje o archivo) se cierra con el test de privacidad de S82.3.
 
 ## Incógnitas abiertas (no se afirman)
 
@@ -140,6 +145,7 @@ decisions:
     constraint: "No mover ni marcar filas sin confirmación"
 constraints:
   - "S82.6 se completa antes de S82.4"
+  - "S82.3 incluye un test con workbook sintético multi-pestaña: ningún contenido de otra pestaña llega a un mensaje ni a un archivo local"
   - "Tests sólo con fixtures sintéticos; nada de ~/Downloads, .escala/ ni .scaleup/ en el repo"
   - "Estado persistido sólo en .escala/my-company/ (local); S82.3 añade esa ruta a .gitignore antes del primer archivo"
   - "Aviso de una línea al conectar Drive: el asistente ve todo el archivo compartido; ESCALA sólo usa tu pestaña"
