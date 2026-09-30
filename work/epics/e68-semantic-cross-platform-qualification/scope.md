@@ -3,6 +3,7 @@ epic_id: E68
 title: Calificación semántica y cross-platform del MVP
 status: planned
 depends_on: [E67, E35]
+related: [E78, E79, E80, E81]
 ---
 
 # Scope E68
@@ -48,3 +49,13 @@ Calificar el MVP por activación correcta, comportamiento ante ambigüedad, cali
 ## Handoff y riesgos
 
 E69 sólo abre con este gate. Un score bajo devuelve el procedimiento a E65/E67; no se maquilla con prompts adicionales sin identificar la causa.
+
+## Casos recibidos del programa E78–E81 — 2026-09-12
+
+E80 entrega casos de placeholders, contexto ausente/contradictorio, PDF no
+interpretable y reanudación; E79 añade cambio de empresa/consentimiento. Se
+ejecutan con modelos reales y el artefacto reparado E78 en S68.2–S68.4.
+
+E81 reutiliza recibos de las combinaciones ofrecidas y aporta observaciones
+humanas de dos sesiones. No sustituye la paridad completa ni el piloto
+trimestral de S68.5, y E68 no espera el cierre E81 para generar esos recibos.

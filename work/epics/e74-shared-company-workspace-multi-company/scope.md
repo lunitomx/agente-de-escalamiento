@@ -2,10 +2,18 @@
 epic_id: E74
 title: Workspace compartido por empresa y colaboración multiempresa local
 status: planned
-depends_on: [E37, E52, E55, E67]
+depends_on: [E37, E52, E55, E67, E79]
 ---
 
 # Scope E74
+
+## Transferencia del mínimo correctivo — 2026-09-12
+
+El aislamiento local urgente, identidad/selector y migración del estado global
+son propiedad de [E79](../e79-company-isolation-privacy-local-security/scope.md).
+E74 consume ese resolver y sus pruebas en S74.1/S74.2 y añade únicamente lo
+necesario para colaboración/reconciliación. No se crean un segundo selector,
+registro de empresas o migración, ni se espera a E74 para corregir H03.
 
 ## Objetivo
 

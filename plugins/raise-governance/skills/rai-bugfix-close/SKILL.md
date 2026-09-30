@@ -139,9 +139,7 @@ fi
 ### 10. Bind result [I]
 
 ```python
-raise_session_bind(
-    key="RAISE_SESSION_JIRA_KEY", value="{bug_key}", cwd="{project_or_worktree_path}"
-)
+raise_session_bind(key="RAISE_SESSION_JIRA_KEY", value="{bug_key}", cwd="{project_or_worktree_path}")
 ```
 
 ### 11. Emitir outcome + señal de cierre

@@ -1,22 +1,29 @@
 # Plan de ejecución canónico — ESCALA
 
-> **Actualizado:** 2026-08-28
+> **Actualizado:** 2026-09-12
 > **Propósito:** cerrar la meta de producto con verdad verificable, sin convertir
 > herramientas internas ni aprobaciones rutinarias en bloqueos artificiales.
 
 ## Punto de partida verificado
 
+- La auditoría 2026-09-12 abre E78–E81 como reparación y calificación prioritaria
+  del piloto. [Programa y evidencia](pilot-readiness-2026-09-12.md). Son 24
+  historias planificadas; no hay implementación ni participantes ejecutados.
+- E41 se reabre por H05: `healthy` por marker no demuestra runtime vivo. E78
+  posee la implementación correctiva; E41 conserva su recualificación.
 - E43 está completa localmente: seis historias mergeadas y **135 pruebas
   focalizadas actuales** pasan. E42 es su gate externo de release, no una razón
   para rehacerla.
 - E49, E52, E55 y E56 están completas y son contratos que se pueden consumir.
 - E10 reparó S10.10 y S10.11 localmente: el export portable ya no depende
   del checkout y el instalador exige plataforma explícita, usa `.venv` mediante
-  `uv` y no configura MCPs por detección incidental. E42/E68 conservan la
+  `uv` y no configura MCPs por detección incidental. E78 repara ahora el
+  lanzador y update que no respetan ese contrato; E42/E68 conservan la
   aceptación externa en hardware limpio y con modelos reales.
-- E42 tiene 36/42 requisitos de aceptación maestra demostrados; los seis
-  faltantes requieren hardware limpio y aceptación humana real sobre el
-  artefacto portable corregido.
+- El conteo histórico de aceptación maestra era 36/42; E42 conserva sus seis
+  requisitos externos pendientes y E41 debe recualificar los requisitos
+  afectados por la regresión actual. No se presenta ese conteo como aceptación
+  vigente del runtime reparado.
 - E76 está completa: contrato RaiSE mínimo, grafo y retrospectiva reproducibles.
   Sus warnings opcionales no bloquean ninguna capacidad empresarial.
 - La propuesta arquitectónica entregada por el dueño permanece archivada en
@@ -53,8 +60,21 @@ fabrica estado RaiSE ni se bloquea producto.
 
 ## Carriles y orden real
 
+El siguiente carril de reparación tiene prioridad para la invitación del piloto:
+
 ```text
-Carril de distribución: E10 (S10.10/S10.11 ✓) → E42 (hardware/aceptación) ─────────┐
+E78 instalación/runtime/recuperación ──┐
+E79 aislamiento/seguridad/privacidad ──┼→ E80 integración → E81: 3–5 → 20
+E80 semántica/intake ─────────────────┘
+E42 y E68 aportan evidencia real por versión/plataforma; E70 decide distribución.
+```
+
+El [programa](pilot-readiness-2026-09-12.md) desglosa dependencias por historia;
+E80 puede iniciar semántica mientras espera contratos de datos para integrar.
+El resto de carriles permanece vigente y no autoriza saltar las reparaciones:
+
+```text
+Carril de distribución: E10/E41 → E78 reparación → E42 (hardware/aceptación) ────┐
 Carril de producto:     E43 ✓ → E44 (en curso) → E45 (en curso) ─────────────────────────────┤
 Carril de conocimiento:          E57 ✓ → E58 ✓ → E59 ✓ → E60..E63 (en curso) → E64 → E65 ──────┤
                                                                             ↓
@@ -72,6 +92,11 @@ E46 se alimenta de resultados reales de E44/E45; nunca cambia producto solo.
 
 | Carril | Épica | Scope de trabajo | Handoff / dependencia real | Gate de cierre honesto |
 |---|---|---|---|---|
+| Reparación | E78 | Intérprete único, bundle íntegro, actualización efectiva, proceso real y backup/restauración. | S78.1 es diseñable; contratos existentes E10/E41 son entrada, no bloqueos circulares. | Se ejecuta comportamiento de V1/V2/rollback y lectura/escritura reales. |
+| Reparación | E79 | Empresa activa, aislamiento completo, migración, HTTP y explicación de datos/modelo. | Contrato/HTTP diseñables; migración consume S78.5; E74 reutiliza el resultado. | Cero cruces y filtraciones; origen, archivos y consentimiento verificados. |
+| Reparación | E80 | Semántica de indicadores, contexto, PDF textual/fallback y continuidad. | Semántica diseñable; integración consume E78/E79; E73 reutiliza el contrato. | Placeholders no equivalen a salud; acción sustentada y reanudación coherentes. |
+| Piloto | E81 | Protocolo/soporte → 3–5 acompañados → 20 independientes → decisión. | Preparación posible; ejecución espera E78–E80 y evidencia real aplicable E42/E68. | Métricas con denominador/asistencia, cero incidentes críticos y decisión humana. |
+| Recualificación | E41 | Revalidar requisitos de runtime/lifecycle tras la regresión H05. | Implementación delegada exclusivamente a E78. | Recibos reales sustituyen la suficiencia del marker, sin borrar historia. |
 | Externo | E42 | Ejecutar la aceptación maestra que falta: macOS/Windows limpios, invocación de skills, inventario/PDF y aceptación de dueño. | Corre paralela a todas las épicas. | 42/42 requisitos con recibos reproducibles y aprobación humana; no se sustituyen por fixtures. |
 | Operación | E76 | Restaurar manifest/configuración/grafo de RaiSE sin tocar memoria de empresa. | Paralelo; requiere consentimiento explícito antes de una inicialización forzada. | `rai doctor` limpio en lo aplicable y entorno reproducible sin venv duplicado. |
 | Producto | E44 | Decisión → acción → seguimiento → resultado → aprendizaje confirmado → cockpit. | Consume E43 completa; E42 sólo para release. | Los cuatro pilares tienen ciclos calificados, el dueño confirma/corrige aprendizaje y no hay causalidad inventada. |
@@ -91,13 +116,17 @@ E46 se alimenta de resultados reales de E44/E45; nunca cambia producto solo.
 | Extensión | E75 | Diagnóstico narrativo y deep dive elegido por el empresario, nunca una batería 1–5. | S75.1/S75.2 consumen E49/E55; los handoffs S75.3–S75.5 esperan E65. | Handoff explicable hacia People/Strategy/Execution/Cash y preguntas que piden evidencia sólo cuando cambian la decisión. |
 | Extensión | E71 | Research de mercado, tamaño, competidores, prospectos e investigación fechada. | Requiere E49, E55 y E67. | Fuentes, fecha, nivel de confianza, confirmación del dueño y límites de investigación visibles. |
 | Extensión | E72 | Cash Learning Day y plantilla financiera: carga, reconciliación, facilitación y decisión de 90 días. | Requiere E38, E55, E63, E65 y E67. | Artefacto de Cash usable, cifras trazables, huecos explícitos y plan Who/What/When. |
-| Extensión | E73 | Asesor de dashboards que propone el panel correcto cuando existe evidencia. | Requiere E38, E40, E55, E65 y E67. | No recomienda ni grafica métricas inexistentes; entrega definición de dato, periodo y decisión soportada. |
-| Extensión | E74 | Workspace compartido/multiempresa: Markdown/YAML compartido, SQLite sólo caché local. | Requiere E37, E52, E55 y E67. | Aislamiento por empresa, conflictos explícitos y jamás sincronización de SQLite como autoridad. |
+| Extensión | E73 | Asesor de dashboards que propone el panel correcto cuando existe evidencia. | Requiere E38, E40, E55, E65, E67 y semántica E80. | No recomienda ni grafica métricas inexistentes; entrega definición de dato, periodo y decisión soportada. |
+| Extensión | E74 | Workspace compartido/multiempresa: Markdown/YAML compartido, SQLite sólo caché local. | Requiere E37, E52, E55, E67 y aislamiento E79; no duplica el resolver. | Aislamiento por empresa, conflictos explícitos y jamás sincronización de SQLite como autoridad. |
 | Extensión | E77 | Biblioteca privada de cursos: fuente autorizada → candidatos revisados → pack local bajo ESCALA. | Requiere E57/E58, E65, E67 y E68; coordina con E69/E71/E75. | Procedencia, derechos, privacidad, no-activación y retiro verificables; nunca contenido crudo en distribución. |
 | Aprendizaje | E46 | Mejora gobernada desde señales aprobadas de uso/resultados, no auto-mutación. | Tras E44/E45 y feedback suficiente. | Hipótesis, evaluación A/B o equivalente, aprobación y rollback; cambios nunca automáticos. |
-| Release | E70 | Validación, instalación y distribución completa y honesta. | Requiere E42, E68, E69 y E71–E75. | Instalación limpia, paridad cross-platform, límites de IP/privacidad claros y aceptación final. |
+| Release | E70 | Validación, instalación y distribución completa y honesta. | Requiere E42, E68, E69, E71–E75 y decisión/evidencia E81. | Instalación limpia, paridad cross-platform, límites de IP/privacidad claros y aceptación final. |
 
 ## Primeras ejecuciones sin espera
+
+**Prioridad del piloto desde 2026-09-12:** diseñar S78.1, S79.1/S79.4 y S80.1;
+preparar S81.1. La invitación espera los gates del programa. El orden siguiente
+describe los carriles anteriores, que pueden continuar sin sustituir esa prioridad.
 
 1. **E75** inicia S75.1/S75.2: assessment narrativo, evidencia y confirmación; los handoffs a procedimientos permanecen bloqueados por E65.
 2. **E44/E45** continúan únicamente hacia evidencia empresarial: retrospectiva,

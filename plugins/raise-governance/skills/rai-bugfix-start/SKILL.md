@@ -108,7 +108,7 @@ raise_docs_write(
     title="{issue_key}: scope",
     content="WHAT: {behavior}\nWHEN: {conditions}\nWHERE: {file:line}\nEXPECTED: {correct}\nDone when: {criteria}",
     output_path="work/bugs/{issue_key}/scope.md",
-    cwd="{cwd}",
+    cwd="{cwd}"
 )
 ```
 
@@ -129,9 +129,7 @@ Co-Authored-By: Rai <rai@humansys.ai>"
 ### 7. Bind session a Jira key [I]
 
 ```python
-raise_session_bind(
-    key="RAISE_SESSION_JIRA_KEY", value="{bug_key}", cwd="{project_or_worktree_path}"
-)
+raise_session_bind(key="RAISE_SESSION_JIRA_KEY", value="{bug_key}", cwd="{project_or_worktree_path}")
 ```
 
 ### 9. Emitir outcome + señal de cierre

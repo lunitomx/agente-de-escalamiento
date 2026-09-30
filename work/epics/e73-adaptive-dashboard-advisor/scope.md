@@ -2,10 +2,17 @@
 epic_id: E73
 title: Asesor adaptativo de dashboards de negocio
 status: planned
-depends_on: [E38, E40, E55, E65, E67]
+depends_on: [E38, E40, E55, E65, E67, E80]
 ---
 
 # Scope E73
+
+## Coordinación correctiva — 2026-09-12
+
+[E80](../e80-evidence-backed-diagnostics-document-intake/scope.md) posee la
+reparación del dashboard actual y el contrato que separa completitud, evidencia
+y desempeño. E73 consume ese contrato al recomendar/generar nuevos paneles;
+no vuelve a implementar scores ni retrasa la corrección de placeholders H04.
 
 ## Objetivo
 

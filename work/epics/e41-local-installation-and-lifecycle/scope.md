@@ -1,12 +1,36 @@
 ---
 epic_id: "E41"
 title: "Local Installation and Lifecycle"
-status: "complete"
+status: "active"
 created: "2026-07-22"
+updated: "2026-09-12"
+closure_disposition: "active"
+remediation_epic: E78
 mission: "escala-local-v2-plan-maestro-2607202112"
 ---
 
 # Epic Scope: E41 — Local Installation and Lifecycle
+
+## Reapertura por regresión reproducida — 2026-09-12
+
+H05 obtuvo `healthy` sin aplicación ni base existentes: `LifecycleRuntime`
+sólo escribe/lee un marker. Esto contradice la entrega de ejecución real.
+[E78](../e78-reliable-installation-runtime-recovery/scope.md) es el propietario
+único de la implementación correctiva de runtime, artefacto, actualización y
+recuperación; E41 recualifica los requisitos afectados con esos recibos.
+
+Los estados Done y checks de entrega siguientes son el registro histórico de
+calificación sintética, no aceptación vigente del runtime. Se conserva la
+historia sin usarla para cerrar la regresión. E42 sigue siendo el gate externo.
+
+### Condiciones actuales para volver a cerrar
+
+- [ ] S78.2/S78.4 prueban artefacto íntegro y proceso real con lectura/escritura.
+- [ ] S78.3/S78.5 prueban activación efectiva de código, snapshot consistente,
+  rollback y preservación de datos; no basta cambiar metadata.
+- [ ] S78.6 revalida comandos/schedules/diagnóstico y requisitos afectados de E41.
+- [ ] Se revisan recibos actuales y aceptación maestra sin reutilizar como prueba
+  suficiente el conteo histórico 36/42 anterior a esta regresión.
 
 ## Objective
 

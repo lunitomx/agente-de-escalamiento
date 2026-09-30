@@ -2,7 +2,7 @@
 epic_id: E70
 title: Calificación total y gate de distribución
 status: planned
-depends_on: [E36, E42, E68, E69, E71, E72, E73, E74, E75]
+depends_on: [E36, E42, E68, E69, E71, E72, E73, E74, E75, E81]
 ---
 
 # Scope E70
@@ -48,3 +48,9 @@ Tomar una decisión humana de distribución basada en evidencia de cobertura, fi
 ## Handoff y riesgos
 
 E70 es un gate de decisión, no una autorización automática. Cualquier hallazgo crítico devuelve el trabajo a la épica propietaria y conserva evidencia del bloqueo.
+
+Desde 2026-09-12, S70.1/S70.5 consumen el mapa de reparaciones E78–E80 y el
+informe/decisión E81. Una evaluación E81 cerrada con resultado `iterar` o
+`detener` no permite distribuir: deben resolverse los incidentes/objetivos
+pendientes y mantenerse los requisitos completos de E42/E68. La revisión de
+producto incluye costos de soporte y motivos de abandono, no sólo instalación.

@@ -81,7 +81,7 @@ raise_story_open(
     jira_key="{jira_key}",
     story_content=story_content,
     scope_content=scope_content,
-    cwd="{cwd}",
+    cwd="{cwd}"
 )
 ```
 

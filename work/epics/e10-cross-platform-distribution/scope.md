@@ -3,7 +3,8 @@ epic_id: E10
 title: Distribución portable cross-platform
 status: active
 closure_disposition: active
-updated: 2026-08-27
+updated: 2026-09-12
+remediation_epic: E78
 ---
 
 # E10: ScaleUp Cross-Platform Distribution
@@ -21,9 +22,11 @@ de coaching ejecutables; `scripts/escala-python` fija el runtime desde la raíz
 del bundle. Las regresiones prueban Codex, Claude y Hermes, actualización
 idempotente, rechazo de candidato corrupto e importación limpia del runtime.
 
-E10 conserva estado `active` únicamente hasta que E42/E68 registren la
-aceptación en hardware limpio y con modelos reales. Esa evidencia externa no
-se sustituye por esta reparación local.
+La auditoría 2026-09-12 reprodujo dos regresiones adicionales: el lanzador usa
+Python de sistema en vez de `.venv` y el actualizador omite la plataforma
+obligatoria. [E78](../e78-reliable-installation-runtime-recovery/scope.md) posee
+su reparación e integración. E10 conserva estado `active` hasta verificar E78
+y registrar aceptación E42/E68 en hardware limpio y con modelos reales.
 
 ## Objective
 
@@ -33,8 +36,8 @@ permitido y capacidades internas necesarios, sin depender del checkout, sin
 instalación global de Python y sin configurar plataformas o MCPs no elegidos.
 
 La construcción histórica de engines, adaptadores y bundle ya está realizada;
-la única parte activa de E10 es la evidencia externa que E42/E68 deben
-registrar. No se debe interpretar este scope como una autorización para volver
+el cierre ahora requiere la reparación E78 y la evidencia externa E42/E68.
+No se debe interpretar este scope como una autorización para volver
 a publicar múltiples skills públicos ni para instalar todas las plataformas por
 detección incidental.
 

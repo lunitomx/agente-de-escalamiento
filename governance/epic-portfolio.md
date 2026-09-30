@@ -1,4 +1,15 @@
-# Cartera de épicas — auditoría de verdad 2026-08-27
+# Cartera de épicas — actualización 2026-09-12
+
+## Reparación del piloto
+
+La auditoría del 2026-09-12 demuestra regresiones de instalación, actualización,
+aislamiento, scores y health, además de límites de privacidad/ingestión y
+calificación. Se registran E78–E81 con 24 historias planificadas y propietario
+único por reparación. E41 vuelve a `active` por la regresión reproducida H05;
+E78 implementa y E41 recualifica. [Hallazgos y mapa de propiedad](pilot-readiness-2026-09-12.md).
+
+El conteo 36/42 y los resultados del apartado siguiente son históricos de la
+auditoría de agosto; no certifican la versión actual ante los nuevos hallazgos.
 
 ## Resultado de la auditoría
 
@@ -30,7 +41,8 @@ se alteraron para aparentar cierre.
 
 | Épica | Estado | Próxima decisión verificable |
 |---|---|---|
-| E10 | active | S10.10 reparó el bundle y S10.11 eliminó instalación implícita/global-pip; E42/E68 aún deben confirmar hardware limpio y modelos reales. |
+| E10 | active | E78 repara lanzador/update actuales; E42/E68 aún deben confirmar hardware limpio y modelos reales. |
+| E41 | active | Recualificar runtime y lifecycle con las reparaciones E78; un marker no prueba ejecución real. |
 | E42 | active | Calificar producto en plataformas limpias y registrar aceptación humana, usando el artefacto portable reparado por E10. |
 | E44 | in_progress | Ejecutar retrospectiva y aceptación de empresario; la calificación técnica local ya cubre los cuatro pilares sin reclamar causalidad. |
 | E45 | in_progress | Comparar contra un coach único en piloto empresarial; el router y las rutas de seguridad ya están calificados localmente. |
@@ -40,6 +52,10 @@ se alteraron para aparentar cierre.
 | E63 | in_progress | Mantener CASh source-bounded y completar la revisión independiente de candidatos con evidencia autorizada. |
 | E75 | in_progress | S75.1/S75.2 sustituyen el cuestionario 1–5 por assessment narrativo confirmable; los handoffs profundos esperan E65. |
 | E76 | complete | Contrato RaiSE mínimo, grafo y retrospectiva ya son reproducibles; los warnings opcionales no pertenecen al producto. |
+| E78 | planned | Diseñar S78.1 y probar instalación, ejecución, actualización y recuperación reales. |
+| E79 | planned | Diseñar identidad/aislamiento y cerrar la frontera HTTP; migración consume backup E78. |
+| E80 | planned | Definir indicadores honestos y reparar intake/continuidad con contexto E79. |
+| E81 | planned | Preparar protocolo y soporte; observar humanos sólo tras reparaciones y evidencia aplicable. |
 
 ### Completas verificadas
 
@@ -53,7 +69,7 @@ se alteraron para aparentar cierre.
 
 ### Planificado, con dependencias explícitas
 
-E46, E64–E74, E67–E70, E77 y S75.3–S75.6 permanecen planificados según el orden
+E46, E64–E74, E67–E70, E77–E81 y S75.3–S75.6 permanecen planificados según el orden
 de `backlog.md`. No son deuda olvidada: su alcance existe, pero no se marcan
 como entregados por contener documentos de diseño. E64 espera que E60–E63
 cierren sus gates de fuente; E46 espera resultados reales de E44/E45. E75 está

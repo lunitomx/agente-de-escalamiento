@@ -72,14 +72,14 @@ raise_docs_write(
     title="{epic_id}: {epic-name} brief",
     content="[hipótesis, success metrics, appetite, rabbit holes]",
     output_path="work/epics/{epic_dir}/brief.md",
-    cwd="{cwd}",
+    cwd="{cwd}"
 )
 raise_docs_write(
     doc_type="epic-scope",
     title="{epic_id}: {epic-name} scope",
     content="[objetivo, in/out scope, historias planeadas, done criteria, jira_key si aplica]",
     output_path="work/epics/{epic_dir}/scope.md",
-    cwd="{cwd}",
+    cwd="{cwd}"
 )
 ```
 

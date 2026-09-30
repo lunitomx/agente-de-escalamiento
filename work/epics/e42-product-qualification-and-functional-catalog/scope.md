@@ -3,7 +3,8 @@ epic_id: "E42"
 title: "Product Qualification and Functional Catalog"
 status: "active"
 created: "2026-07-22"
-updated: "2026-08-27"
+updated: "2026-09-12"
+related: [E78, E79, E80, E81]
 closure_disposition: "active"
 release: "ESCALA Local V2"
 ---
@@ -171,7 +172,8 @@ S42.1 Viaje completo
             └── S42.4 Catálogo y aceptación
 ```
 
-- E37-E41 cerradas localmente con su evidencia.
+- E37–E40 conservan sus entregas locales; E41 se reabre por H05 y consume
+  reparación E78 antes de recualificar el runtime.
 - Acceso a una máquina macOS limpia.
 - Acceso a una máquina Windows limpia.
 - Participación de al menos un empresario para la aceptación.
@@ -222,3 +224,19 @@ después del primer recorrido, pero ambos deben cerrar antes del catálogo final
 - Equipos multi-agente → E45.
 - Auto-mejora gobernada → E46.
 - Publicación pública sin gate legal y autorización expresa.
+
+## Handoff del programa E78–E81 — 2026-09-12
+
+E78 repara instalación/lifecycle; E79 aporta aislamiento, seguridad y privacidad;
+E80 aporta indicadores, documentos y continuidad. Las correcciones tienen esas
+épicas como único propietario; E42 prueba el artefacto resultante.
+
+E81 organiza las cohortes de adopción y reutiliza recibos actuales de S42.1–S42.4
+por commit/hash/plataforma. Un primer piloto puede usar una combinación con
+evidencia real y límites declarados, pero no cierra E42 sin macOS/Windows y sus
+seis requisitos completos. E42 no depende del cierre E81 para ejecutar su
+calificación: evitar dependencia circular con la aceptación humana.
+
+El conteo 36/42 de agosto queda como línea base histórica; los requisitos E41
+afectados por la regresión deben recualificarse. Ningún conteo se modifica para
+simular prueba o aceptación del runtime futuro.
