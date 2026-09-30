@@ -10,6 +10,9 @@ Actions (JSON on stdin, like ``coaching.strategy_opsp``):
 - ``confirm``: requires ``user_confirmed: true``; keeps only the confirmed tab
   (connector text or pasted tab), parses it and saves the reference.
 - ``load``: the remembered reference, if any.
+- ``propose`` (S82.4): rows for the month from the quarter's priorities, for
+  the remembered tab only, plus the block to paste and where to paste it.
+  Nothing is written: the owner pastes the rows himself after reviewing them.
 
 The procedure persists the choice through this module; the private specialist
 never writes state.
@@ -18,11 +21,12 @@ never writes state.
 from __future__ import annotations
 
 from collections.abc import Mapping
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import cast
 
-from pydantic import BaseModel, Field
+import yaml
+from pydantic import BaseModel, Field, ValidationError
 
 from coaching.tracker import messages
 from coaching.tracker.identity import (
@@ -38,7 +42,13 @@ from coaching.tracker.identity import (
     save_link,
 )
 from coaching.tracker.models import TrackerSheet
-from coaching.tracker.parser import Grid, parse_sheet
+from coaching.tracker.parser import Grid, commitments_layout, parse_sheet
+from coaching.tracker.proposal import (
+    QuarterlyPlanInput,
+    RowProposal,
+    propose_rows,
+    to_paste_block,
+)
 
 
 class FlowResult(BaseModel):
@@ -50,6 +60,8 @@ class FlowResult(BaseModel):
     candidates: list[SheetCandidate] = Field(default_factory=list[SheetCandidate])
     link: TrackerLink | None = None
     sheet: TrackerSheet | None = None
+    proposal: RowProposal | None = None
+    paste_block: str = ""
     errors: list[str] = Field(default_factory=list)
 
 
@@ -132,6 +144,78 @@ def _confirm(context: Mapping[str, object], base: Path) -> FlowResult:
     )
 
 
+def _opsp_plan(base: Path) -> QuarterlyPlanInput | None:
+    path = base / ".escala" / "my-company" / "opsp.yaml"
+    try:
+        raw: object = yaml.safe_load(path.read_text(encoding="utf-8"))
+    except (OSError, yaml.YAMLError):
+        return None
+    if not isinstance(raw, dict):
+        return None
+    return QuarterlyPlanInput.from_opsp_state(cast(dict[str, object], raw))
+
+
+def _plan(context: Mapping[str, object], base: Path) -> QuarterlyPlanInput | None:
+    raw = context.get("plan")
+    try:
+        plan = (
+            QuarterlyPlanInput.from_opsp_state({"quarterly_plan": cast(object, raw)})
+            if isinstance(raw, dict)
+            else _opsp_plan(base)
+        )
+    except ValidationError:
+        return None
+    return plan if plan is not None and plan.priorities else None
+
+
+def _propose_refusal(message: str, error: str) -> FlowResult:
+    return FlowResult(action="propose", message=message, errors=[error])
+
+
+def _propose(context: Mapping[str, object], base: Path) -> FlowResult:
+    link = load_link(base)
+    if link is None:
+        return _propose_refusal(messages.NEEDS_CONFIRMED_TAB, "needs_confirmed_tab")
+    connector, pasted = _text(context, "connector_text"), _text(context, "pasted_text")
+    grid: Grid | None
+    if connector is not None:
+        same = link_matches(
+            link,
+            _text(context, "file_title"),
+            _text(context, "file_id"),
+            list_tab_names(connector),
+        )
+        if link.file_title is not None or link.file_id is not None:
+            if not same:
+                return _propose_refusal(messages.LINK_MISMATCH, "link_mismatch")
+        grid = confirmed_tab_grid(connector, link.tab_name)
+    elif pasted is not None:
+        grid = parse_pasted_tab(pasted)
+    else:
+        grid = None
+    if grid is None:
+        return _propose_refusal(
+            messages.tab_not_found_message(link.tab_name), "tab_not_found"
+        )
+    plan = _plan(context, base)
+    if plan is None:
+        return _propose_refusal(messages.NO_PLAN, "needs_plan")
+    month = _text(context, "month") or date.today().strftime("%Y-%m")
+    try:
+        proposal = propose_rows(parse_sheet(grid), plan, month)
+    except ValueError:
+        return _propose_refusal(messages.ASK_MONTH, "bad_month")
+    layout = commitments_layout(grid)
+    block = to_paste_block(proposal.rows, layout.fields if layout else None)
+    return FlowResult(
+        action="propose",
+        message=messages.proposal_message(proposal, layout, link.tab_name, block),
+        link=link,
+        proposal=proposal,
+        paste_block=block,
+    )
+
+
 def run(context: Mapping[str, object]) -> FlowResult:
     """Run one step of the guided flow."""
     action = _text(context, "action") or ""
@@ -146,6 +230,8 @@ def run(context: Mapping[str, object]) -> FlowResult:
         return _candidates(context, base)
     if action == "confirm":
         return _confirm(context, base)
+    if action == "propose":
+        return _propose(context, base)
     if action == "load":
         return FlowResult(action=action, link=load_link(base))
     return FlowResult(action=action, errors=["unknown_action"])

@@ -336,3 +336,222 @@ def test_module_runs_from_the_command_line(tmp_path: Path) -> None:
     result = json.loads(completed.stdout)
     assert result["tab_names"] == ["START HERE", "Ana", "Beto", "Name 6"]
     assert all(marker not in completed.stdout for marker in MARKERS.values())
+
+
+# --- S82.4: propose rows for the confirmed tab --------------------------------
+
+_PLAN: dict[str, object] = {
+    "quarter": "Q4-2026",
+    "critical_number": "10 clientes nuevos",
+    "priorities": [
+        {"priority": "Contratar vendedor", "kpi": "1 contratado", "decision": "people"},
+        {"priority": "Definir cliente ideal", "kpi": "1 documento"},
+    ],
+}
+
+
+def _confirm_ana(base: str) -> FlowResult:
+    return run(
+        {
+            "action": "confirm",
+            "base_path": base,
+            "user_confirmed": True,
+            "tab_name": "Ana",
+            "connector_text": _workbook(),
+            "file_title": "Tracker del grupo",
+            "file_id": "f-1",
+        }
+    )
+
+
+def _propose(base: str, **extra: object) -> FlowResult:
+    context: dict[str, object] = {
+        "action": "propose",
+        "base_path": base,
+        "connector_text": _workbook(),
+        "file_title": "Tracker del grupo",
+        "file_id": "f-1",
+        "plan": _PLAN,
+        "month": "2026-10",
+    }
+    context.update(extra)
+    return run(context)
+
+
+def _files_snapshot(base: Path) -> dict[str, str]:
+    folder = base / ".escala" / "my-company"
+    return {
+        str(path): path.read_text(encoding="utf-8")
+        for path in folder.rglob("*")
+        if path.is_file()
+    }
+
+
+def test_propose_needs_a_confirmed_tab_first(tmp_path: Path) -> None:
+    result = _propose(str(tmp_path))
+
+    assert result.errors == ["needs_confirmed_tab"]
+    assert result.proposal is None
+    assert all(marker not in _dump(result) for marker in MARKERS.values())
+
+
+def test_propose_without_a_plan_asks_to_define_priorities(tmp_path: Path) -> None:
+    _confirm_ana(str(tmp_path))
+
+    result = _propose(str(tmp_path), plan=None)
+
+    assert result.errors == ["needs_plan"]
+    assert "prioridades" in result.message
+
+
+def test_propose_reads_the_plan_saved_by_the_opsp(tmp_path: Path) -> None:
+    _confirm_ana(str(tmp_path))
+    opsp = tmp_path / ".escala" / "my-company" / "opsp.yaml"
+    opsp.write_text(
+        "quarterly_plan:\n  critical_number: 7 ventas\n"
+        "  priorities:\n    - priority: Abrir sucursal\n      kpi: '1'\n",
+        encoding="utf-8",
+    )
+
+    result = _propose(str(tmp_path), plan=None)
+
+    assert result.proposal is not None
+    assert [row.priority for row in result.proposal.rows] == ["Abrir sucursal"]
+
+
+def test_propose_says_where_to_paste_and_how_to_undo(tmp_path: Path) -> None:
+    _confirm_ana(str(tmp_path))
+
+    result = _propose(str(tmp_path))
+
+    assert result.errors == []
+    assert result.proposal is not None
+    assert len(result.proposal.rows) == 2
+    assert result.paste_block.splitlines() == [
+        "People\tContratar vendedor\t1 contratado\t2026-10-31",
+        "\tDefinir cliente ideal\t1 documento\t2026-10-31",
+    ]
+    message = result.message
+    assert "compromisos de octubre" in message
+    assert "**B8**" in message  # first empty row under Monthly Commitments
+    assert "Monthly Commitments" in message
+    assert result.paste_block in message
+    assert "START HERE" in message  # never paste over the linked name
+    assert "Ctrl+Z" in message
+    assert "Mostrar historial de ediciones" in message
+    assert "No uses «Restaurar esta versión»" in message
+
+
+def test_propose_points_out_a_different_critical_number(tmp_path: Path) -> None:
+    _confirm_ana(str(tmp_path))
+
+    result = _propose(str(tmp_path))
+
+    assert result.proposal is not None
+    assert result.proposal.critical_number == "different"
+    assert "10 clientes nuevos" in result.message
+    assert "10 clientes nuevos" not in result.paste_block
+    assert "¿Cuál" in result.message
+
+
+def test_propose_asks_to_make_room_when_rows_do_not_fit() -> None:
+    from coaching.tracker.messages import proposal_message
+    from coaching.tracker.parser import CommitmentsLayout
+    from coaching.tracker.proposal import ProposedRow, RowProposal
+
+    rows = [
+        ProposedRow(focus_area="Cash", priority=f"P{i}", kpi=None, due="2026-10-31")
+        for i in range(3)
+    ]
+    proposal = RowProposal(
+        month="2026-10", month_name="octubre", rows=rows, critical_number="same"
+    )
+    layout = CommitmentsLayout(
+        header_row=4,
+        focus_col=1,
+        headers=["Focus Area", "Priorities", "KPIs", "Due Dates"],
+        fields=["focus", "text", "kpi", "due"],
+        first_free_row=6,
+        free_rows=1,
+    )
+
+    message = proposal_message(proposal, layout, "Ana", "x")
+
+    assert "Insertar 1 fila arriba" in message
+    assert "fila 8" in message
+    assert "2 veces" in message
+
+
+def test_propose_with_nothing_new_says_so(tmp_path: Path) -> None:
+    _confirm_ana(str(tmp_path))
+    plan = {"priorities": [{"priority": f"Cobrar {MARKERS['Ana']}"}]}
+
+    result = _propose(str(tmp_path), plan=plan)
+
+    assert result.proposal is not None and result.proposal.rows == []
+    assert result.paste_block == ""
+    assert "nada nuevo" in result.message
+
+
+def test_propose_user_messages_have_no_internal_jargon(tmp_path: Path) -> None:
+    _confirm_ana(str(tmp_path))
+
+    message = _propose(str(tmp_path)).message
+
+    for word in ["tracker", "TSV", "MCP", "escala-", "skill", "yaml", "grid"]:
+        assert word.lower() not in message.lower(), word
+
+
+def test_privacy_propose_keeps_other_tabs_out_and_writes_nothing(
+    tmp_path: Path,
+) -> None:
+    _confirm_ana(str(tmp_path))
+    before = _files_snapshot(tmp_path)
+
+    result = _propose(str(tmp_path))
+
+    dump = _dump(result)
+    for marker in _foreign("Ana"):
+        assert marker not in dump, marker
+    assert _files_snapshot(tmp_path) == before  # ESCALA only proposes
+
+
+def test_propose_on_a_different_file_asks_for_the_tab_again(tmp_path: Path) -> None:
+    _confirm_ana(str(tmp_path))
+
+    result = _propose(str(tmp_path), file_title="Otro archivo", file_id="f-2")
+
+    assert result.errors == ["link_mismatch"]
+    assert result.proposal is None
+
+
+def test_propose_from_a_pasted_tab(tmp_path: Path) -> None:
+    pasted = (
+        "Participant Name\t\tAna Demo\n"
+        "Monthly Commitments\n"
+        "\tFocus Area\tPriorities\tKPIs\tDue Dates\n"
+    )
+    run(
+        {
+            "action": "confirm",
+            "base_path": str(tmp_path),
+            "user_confirmed": True,
+            "tab_name": "Ana",
+            "pasted_text": pasted,
+        }
+    )
+
+    result = run(
+        {
+            "action": "propose",
+            "base_path": str(tmp_path),
+            "pasted_text": pasted,
+            "plan": _PLAN,
+            "month": "2026-10",
+        }
+    )
+
+    assert result.errors == []
+    assert "**B4**" in result.message
+    assert result.proposal is not None
+    assert result.proposal.critical_number == "add"
