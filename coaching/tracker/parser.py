@@ -65,7 +65,8 @@ def _cell(row: list[Cell], index: int) -> str | None:
     return _clean(row[index]) if index < len(row) else None
 
 
-def _decision(focus: str | None) -> Decision | None:
+def decision_of(focus: str | None) -> Decision | None:
+    """Cash/People/Strategy/Execution for an unambiguous area label, else None."""
     return _DECISIONS.get(_key(focus)) if focus else None
 
 
@@ -124,7 +125,7 @@ def _item(row: list[Cell], columns: list[tuple[int, Column]]) -> TrackerItem | N
         return None
     return TrackerItem(
         focus_area=focus,
-        decision=_decision(focus),
+        decision=decision_of(focus),
         text=values.get("text"),
         kpi=values.get("kpi"),
         due=values.get("due"),
