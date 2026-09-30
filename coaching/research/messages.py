@@ -22,6 +22,9 @@ SEARCH_OFF = (
     "fuentes (el link de un competidor, una cotización que te llegó, lo que te "
     "dicen tus clientes) y sigo con eso, diciéndote hasta dónde llega."
 )
+LINK_IN_REPORT = "(enlace en el reporte)"
+STALE_MARK = "[vencida] "
+DETAIL_UNREADABLE = "no pude leer el detalle"
 NEEDS_OFFER = (
     "¿Qué vendes exactamente y en qué ciudad o zona? Con eso armo las búsquedas."
 )
@@ -88,6 +91,16 @@ def frame_message(decision_informed: str, queries: list[str]) -> str:
 
 def saved_message(review_by: date) -> str:
     return (
-        "Listo, quedó guardado en tu carpeta con tu decisión. Conviene "
-        f"revisarlo antes del {spanish_date(review_by)}."
+        "Listo, quedó guardado en tu carpeta con tu decisión. La próxima vez "
+        "que veamos tu empresa, parto de esta decisión. Conviene revisarlo "
+        f"antes del {spanish_date(review_by)}."
+    )
+
+
+def stale_offer(question: str, researched_on: date, review_by: date) -> str:
+    """A research past its review date is offered for refresh before use."""
+    return (
+        f"Tu investigación «{question}» es del {spanish_date(researched_on)} y ya "
+        f"pasó su fecha de revisión ({spanish_date(review_by)}). ¿La actualizamos "
+        "antes de usarla para ver tu empresa?"
     )

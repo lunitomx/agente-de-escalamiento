@@ -16,6 +16,10 @@ Actions (JSON on stdin, like ``coaching.tracker``):
   decision question. Nothing is saved. Needs ``frame.confirmed``.
 - ``save``: same input plus ``chosen`` (option label) and
   ``user_confirmed: true``; writes under ``.escala/my-company/research/``.
+- ``diagnosis``: the saved research as input for the next diagnosis (the
+  owner's decisions as local facts, outside findings as assumptions, gaps as
+  open questions) and, for a report past its review date, the offer to
+  refresh it. ``base_path`` and ``today``.
 
 The private specialist never writes state; this module does.
 """
@@ -30,6 +34,7 @@ from typing import cast
 from pydantic import BaseModel, Field, TypeAdapter, ValidationError
 
 from coaching.research import messages
+from coaching.research.diagnosis import DiagnosticInputs, load_diagnostic_inputs
 from coaching.research.engine import (
     RejectedQuery,
     build_queries,
@@ -72,6 +77,7 @@ class FlowResult(BaseModel):
     comparables: list[Comparable] = Field(default_factory=list[Comparable])
     report: ResearchReport | None = None
     saved_to: str | None = None
+    diagnostic_inputs: DiagnosticInputs | None = None
     errors: list[str] = Field(default_factory=list)
 
 
@@ -220,12 +226,24 @@ def _save(context: Mapping[str, object]) -> FlowResult:
     )
 
 
+def _diagnosis(context: Mapping[str, object]) -> FlowResult:
+    """Saved research as input for the next diagnosis (E83 S83.5)."""
+    base = Path(_text(context, "base_path") or ".")
+    inputs = load_diagnostic_inputs(base, _today(context))
+    return FlowResult(
+        action="diagnosis",
+        diagnostic_inputs=inputs,
+        message="\n\n".join(inputs.refresh_offers),
+    )
+
+
 _ACTIONS = {
     "frame": _frame,
     "grade": _grade,
     "comparables": _comparables,
     "report": _report,
     "save": _save,
+    "diagnosis": _diagnosis,
 }
 
 

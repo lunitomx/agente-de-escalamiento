@@ -15,6 +15,8 @@ from typing import Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from coaching.research.messages import LINK_IN_REPORT as URL_PLACEHOLDER
+
 Mode = Literal["benchmark", "mercado", "fortalezas-tendencias"]
 SearchMode = Literal["web", "sin_busqueda"]
 Origin = Literal["web", "dueño", "archivo_empresa"]
@@ -38,9 +40,6 @@ def normalize(text: str) -> str:
         unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("ascii")
     )
     return " ".join(ascii_text.lower().split())
-
-
-URL_PLACEHOLDER = "(enlace en el reporte)"
 
 
 _URL = re.compile(
