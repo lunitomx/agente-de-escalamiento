@@ -49,7 +49,7 @@ Las áreas coinciden con Cash/People/Strategy/Execution de ESCALA; Critical Numb
 | S82.2 | Modelo del tracker: lectura/validación de una hoja de participante y sus variaciones | M | complete — `coaching/tracker/` |
 | S82.3 | Flujo guiado: identidad → conexión → selección de hoja propia con confirmación (`ESCALA-53`) | M | complete — `coaching/tracker/identity.py`, `escala-execution-tracker` |
 | S82.6 | Spike: escritura en Sheets (MCP de Sheets, ChatGPT Work) (`ESCALA-56`) | S | complete — ver stories/s82.6-spike-sheets-write.md (ningún GO; S82.4 sigue con filas para pegar) |
-| S82.4 | Llenado: proponer filas desde prioridades/rocks de ESCALA y escribir tras confirmación (`ESCALA-54`) | M | planned — tras S82.6 |
+| S82.4 | Llenado: proponer filas desde prioridades/rocks de ESCALA y escribir tras confirmación (`ESCALA-54`) | M | complete — `coaching/tracker/proposal.py`, acción `propose` (sólo filas para pegar; sin escritura directa por S82.6) |
 | S82.5 | Mantenimiento previo a reunión: vencidos, `Done`, estado (`ESCALA-55`) | S | planned |
 
 Orden de ejecución: S82.3 → S82.6 → S82.4 → S82.5. Diseño detallado en `design.md`.
@@ -132,7 +132,7 @@ Checkpoint de integración: epic de un solo componente (Python + procedimiento +
 | S82.2 | M | complete | - | - |
 | S82.3 | M | complete | M | ESCALA-53 |
 | S82.6 | S | complete | S | ESCALA-56; ningún GO — MCP NO-GO, panel en vivo de Claude y ChatGPT Work no verificados (pruebas P1/P2 del dueño) |
-| S82.4 | M | planned | - | ESCALA-54; rama de escritura condicionada a S82.6 |
+| S82.4 | M | complete | M | ESCALA-54; sólo filas para pegar (S82.6 sin GO); U5 no verificada (sin tocar Drive) |
 | S82.5 | S | planned | - | ESCALA-55 |
 
 Velocidad: sin datos de calibración para este dominio; los tamaños son hipótesis y se recalibran tras S82.3.

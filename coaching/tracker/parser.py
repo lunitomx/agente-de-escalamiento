@@ -12,6 +12,8 @@ import re
 import unicodedata
 from typing import Literal
 
+from pydantic import BaseModel, ConfigDict
+
 from coaching.tracker.models import Decision, TrackerItem, TrackerSheet
 
 Cell = str | None
@@ -63,7 +65,8 @@ def _cell(row: list[Cell], index: int) -> str | None:
     return _clean(row[index]) if index < len(row) else None
 
 
-def _decision(focus: str | None) -> Decision | None:
+def decision_of(focus: str | None) -> Decision | None:
+    """Cash/People/Strategy/Execution for an unambiguous area label, else None."""
     return _DECISIONS.get(_key(focus)) if focus else None
 
 
@@ -122,7 +125,7 @@ def _item(row: list[Cell], columns: list[tuple[int, Column]]) -> TrackerItem | N
         return None
     return TrackerItem(
         focus_area=focus,
-        decision=_decision(focus),
+        decision=decision_of(focus),
         text=values.get("text"),
         kpi=values.get("kpi"),
         due=values.get("due"),
@@ -172,6 +175,93 @@ def parse_sheet(rows: Grid) -> TrackerSheet:
         if item is not None:
             getattr(sheet, section).append(item)
     return sheet
+
+
+class CommitmentsLayout(BaseModel):
+    """Where the Monthly Commitments table sits, to say where to paste.
+
+    Rows and columns are 0-based grid positions; ``free_rows`` is ``None`` when
+    nothing follows the table (the rows below are open).
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    header_row: int
+    focus_col: int
+    headers: list[str]
+    fields: list[Column]
+    first_free_row: int
+    free_rows: int | None
+
+
+def _ends_table(first: str | None, table_in_column_a: bool) -> bool:
+    if first is None:
+        return False
+    if not table_in_column_a:
+        return True
+    return _section_of(first) is not None or _key(first) in _IDENTITY
+
+
+def commitments_layout(rows: Grid) -> CommitmentsLayout | None:
+    """Locate the commitments table and its first run of empty rows.
+
+    A row counts as used when any table column (labeled or the unlabeled
+    status/note columns) holds something, so a paste never lands on a cell
+    that already has content.
+    """
+    start = next(
+        (
+            index
+            for index, row in enumerate(rows)
+            if _cell(row, 0) and _section_of(_cell(row, 0) or "") == "commitments"
+        ),
+        None,
+    )
+    if start is None:
+        return None
+    header_row = focus_col = None
+    for index in range(start + 1, len(rows)):
+        if _section_of(_cell(rows[index], 0) or "") is not None:
+            return None
+        focus = _focus_start(rows[index])
+        if focus is not None:
+            header_row, focus_col = index, focus
+            break
+    if header_row is None or focus_col is None:
+        return None
+    header = rows[header_row]
+    columns = _columns(header, focus_col)
+    labeled: list[tuple[int, Column]] = [
+        (i, f) for i, f in columns if _cell(header, i) is not None
+    ]
+    end: int | None = None
+    last_used = header_row
+    for index in range(header_row + 1, len(rows)):
+        row = rows[index]
+        if _ends_table(_cell(row, 0), focus_col == 0):
+            end = index
+            break
+        if any(_cell(row, i) is not None for i, _ in columns):
+            last_used = index
+    first_free = last_used + 1
+    return CommitmentsLayout(
+        header_row=header_row,
+        focus_col=focus_col,
+        headers=[_cell(header, i) or "" for i, _ in labeled],
+        fields=[field for _, field in labeled],
+        first_free_row=first_free,
+        free_rows=None if end is None else end - first_free,
+    )
+
+
+def cell_ref(row: int, col: int) -> str:
+    """Spreadsheet reference (``B7``) of a 0-based grid position."""
+    letters = ""
+    index = col + 1
+    while index:
+        index, rest = divmod(index - 1, 26)
+        letters = chr(ord("A") + rest) + letters
+    return f"{letters}{row + 1}"
 
 
 _RANGE = re.compile(r"^([A-Z]+)(\d+):([A-Z]+)(\d+)$")

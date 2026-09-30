@@ -8,6 +8,8 @@ user already sees in Drive. Cells are quoted only from the confirmed tab.
 from __future__ import annotations
 
 from coaching.tracker.identity import SheetCandidate, is_placeholder_name
+from coaching.tracker.parser import CommitmentsLayout, cell_ref
+from coaching.tracker.proposal import RowProposal, render_table
 
 ASK_NAME = "¿Cómo te llamas? Con tu nombre busco tu pestaña en la hoja del grupo."
 
@@ -97,3 +99,144 @@ def remembered_message(tab_name: str) -> str:
 
 def tab_not_found_message(tab_name: str) -> str:
     return f"No encuentro la pestaña **{tab_name}** en el archivo. ¿Me dices cuál es la tuya?"
+
+
+# --- S82.4: proposed rows, where to paste and how to undo ---------------------
+
+NEEDS_CONFIRMED_TAB = (
+    "Antes de proponerte filas necesito saber cuál es tu pestaña. "
+    "¿Me confirmas cuál es la tuya?"
+)
+NO_PLAN = (
+    "Todavía no tenemos tus prioridades del trimestre. ¿Las definimos primero? "
+    "Con eso te propongo las filas para tu hoja."
+)
+ASK_MONTH = "¿Para qué mes son estos compromisos?"
+LINK_MISMATCH = (
+    "Este archivo no es el que usamos la otra vez. Antes de proponerte filas, "
+    "¿me confirmas cuál es tu pestaña aquí?"
+)
+# S82.6: "restore this version" rolls back everyone's edits in the shared file.
+UNDO = (
+    "Si algo quedó mal, deshazlo con Ctrl+Z (Cmd+Z en Mac) justo después de "
+    "pegar, o con clic derecho en la celda → «Mostrar historial de ediciones». "
+    "No uses «Restaurar esta versión»: borraría lo que los demás escribieron en "
+    "el archivo del grupo."
+)
+
+
+def _focus_label(layout: CommitmentsLayout | None) -> str:
+    if layout is not None and "focus" in layout.fields:
+        return layout.headers[layout.fields.index("focus")]
+    return "Focus Area"
+
+
+def _table_headers(layout: CommitmentsLayout | None) -> list[str] | None:
+    if layout is None:
+        return None
+    by_field = dict(zip(layout.fields, layout.headers))
+    wanted = ("focus", "text", "kpi", "due")
+    if not all(field in by_field for field in wanted):
+        return None
+    return [by_field[field] for field in wanted]
+
+
+def _fits(free: int) -> str:
+    if free == 0:
+        return "no cabe ninguna fila"
+    return "sólo cabe 1 fila" if free == 1 else f"sólo caben {free} filas"
+
+
+def _where(layout: CommitmentsLayout | None, tab_name: str, count: int) -> list[str]:
+    focus = _focus_label(layout)
+    if layout is None:
+        return [
+            f"En tu pestaña **{tab_name}**, haz clic en la primera celda vacía de "
+            f"la columna {focus}, debajo de la última fila de tus compromisos del "
+            "mes (Monthly Commitments)."
+        ]
+    steps: list[str] = []
+    if layout.free_rows is not None and layout.free_rows < count:
+        missing = count - layout.free_rows
+        next_row = layout.first_free_row + layout.free_rows + 1
+        times = "1 vez" if missing == 1 else f"{missing} veces"
+        steps.append(
+            f"Primero haz espacio: ahí {_fits(layout.free_rows)} antes de la "
+            f"siguiente sección. Haz clic derecho en el número de la fila "
+            f"{next_row} y elige «Insertar 1 fila arriba», {times}."
+        )
+    cell = cell_ref(layout.first_free_row, layout.focus_col)
+    steps.append(
+        f"En tu pestaña **{tab_name}**, haz clic en la celda **{cell}**: es la "
+        "primera fila vacía debajo de tus compromisos del mes (Monthly "
+        f"Commitments), en la columna {focus}."
+    )
+    return steps
+
+
+def _critical_number(proposal: RowProposal) -> str:
+    if proposal.critical_number == "different":
+        return (
+            f"Ojo: tu hoja dice que tu Critical Number es "
+            f"**{proposal.sheet_critical_number}**, y en lo que trabajamos quedó "
+            f"**{proposal.plan_critical_number}**. ¿Cuál es el bueno? No lo toco "
+            "hasta que me digas."
+        )
+    if proposal.critical_number == "add":
+        return (
+            "Tu hoja todavía no tiene Critical Number. Si quieres, escribe "
+            f"**{proposal.plan_critical_number}** en la celda junto a "
+            "«Critical Number»."
+        )
+    return ""
+
+
+def proposal_message(
+    proposal: RowProposal,
+    layout: CommitmentsLayout | None,
+    tab_name: str,
+    paste_block: str,
+) -> str:
+    """Rows to review, the block to copy, exactly where to paste and how to undo."""
+    notes = [note for note in [_critical_number(proposal)] if note]
+    if proposal.skipped:
+        notes.append(f"Ya tenías escritas: {_join(proposal.skipped)}; no las repito.")
+    if not proposal.rows:
+        return "\n\n".join(
+            [
+                "Tu hoja ya tiene tus prioridades del trimestre: no hay nada nuevo "
+                "que pegar.",
+                *notes,
+            ]
+        )
+    count = len(proposal.rows)
+    intro = (
+        f"Te propongo {'esta fila' if count == 1 else f'estas {count} filas'} para "
+        f"tus compromisos de {proposal.month_name}:"
+    )
+    if proposal.missing_area:
+        notes.append(
+            f"No sé el área de: {_join(proposal.missing_area)}. Dime cuál es "
+            "(Cash, Strategy, Execution o People) o déjala vacía."
+        )
+    steps = _where(layout, tab_name, count)
+    steps.append(
+        f"Copia este bloque y pégalo ahí (Ctrl+V; Cmd+V en Mac):\n\n```\n"
+        f"{paste_block}\n```"
+    )
+    steps.append(
+        "Pega sólo ahí, sobre celdas vacías. No pegues arriba, donde está tu "
+        "nombre: viene de START HERE."
+    )
+    numbered = "\n".join(f"{i}. {step}" for i, step in enumerate(steps, 1))
+    return "\n\n".join(
+        [
+            intro,
+            render_table(proposal.rows, _table_headers(layout)),
+            *notes,
+            "Revísalas; si quieres cambiar algo, dímelo antes de pegar. "
+            "Para pasarlas a tu hoja:",
+            numbered,
+            UNDO,
+        ]
+    )
