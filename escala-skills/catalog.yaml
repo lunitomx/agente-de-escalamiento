@@ -1,6 +1,6 @@
 schema_version: 1
 baseline:
-  canonical_procedures: 63
+  canonical_procedures: 64
   legacy_aliases: 39
 public_entrypoint: escala
 capabilities:
@@ -284,6 +284,11 @@ capabilities:
   owner: strategy
   disposition: keep
   reason: OPSP con contrato reconocible.
+- id: escala-strategy-research
+  visibility: internal
+  owner: strategy
+  disposition: keep
+  reason: Investigación externa sin datos privados que termina en una decisión (E83).
 - id: escala-strategy-swot
   visibility: internal
   owner: strategy
@@ -351,6 +356,10 @@ routes:
   - cliente
   - competencia
   - rumbo
+  - mercado
+  - competidor
+  - tendencias
+  - benchmark
   target: escala-strategy
   message: Empecemos por aclarar tu rumbo y la evidencia que ya tienes sobre tu mercado.
 - id: execution
