@@ -32,7 +32,8 @@ cliente hasta que te compra".
   español llano.
 - **"No sé" es una respuesta válida.** Lo que falta se queda como falta: nunca
   estimes un número ni lo completes tú. Si da un número aproximado ("unos
-  100"), el módulo vuelve a pedir sólo el número.
+  100", "entre 80 y 120"), el módulo lo guarda como supuesto y no vuelve a
+  preguntar. Sólo si no dio ningún número, el módulo pide el número una vez.
 - **Nada de esto se guarda todavía:** el borrador de la entrevista no se guarda
   hasta que el empresario decida qué hacer con él. Lo único que se escribe es
   la fecha y la respuesta a la pregunta (sí / después / no), en
@@ -70,7 +71,7 @@ Arma las señales con lo que ya sabes (sin preguntar nada para llenarlas):
 - `"ask": false` → no digas nada del tema. `"ask": true` → al final de tu
   respuesta, pon el `message`. Para un journey nuevo es:
 
-> Para ver dónde se te van los clientes, ¿me cuentas cómo llega un cliente hasta que te compra? Son 5 pasos y unos 5 minutos. Si prefieres, lo vemos después.
+> Para ver dónde se te van los clientes, ¿me cuentas cómo llega un cliente hasta que te compra? Son 5 preguntas cortas. Si prefieres, lo vemos después.
 
 Si ya había uno vencido, el mensaje ofrece revisarlo en lugar de empezar de
 cero.
@@ -87,15 +88,17 @@ cero.
 
 ### Paso 3: Entrevista, una pregunta a la vez
 
-Son 5 pasos: se entera de ti, te pregunta, te compra, recibe lo que compró y
-regresa a comprar. En cada uno: qué necesita el cliente, dónde pasa, qué lo
-frena, cómo lo sabe, cuántos fueron el mes pasado y de dónde sale ese número.
+Son 5 preguntas, una por paso: se entera de ti, te pregunta, te compra,
+recibe lo que compró y regresa a comprar. Cada pregunta junta qué pasa ahí y
+más o menos cuántos fueron el mes pasado. Al final, a lo mucho una pregunta
+más: por qué se van donde más clientes se pierden. El número es lo que dijo el
+dueño; no preguntes de dónde sale.
 
 Manda todas las respuestas hasta ahora, con sus palabras:
 
 ```json
 {"action": "interview", "answers": [
-  {"stage": "se_entera", "field": "necesidad", "answer": "<lo que dijo>"}
+  {"stage": "se_entera", "field": "paso", "answer": "<lo que dijo>"}
 ]}
 ```
 
@@ -106,8 +109,8 @@ contestó se queda y lo que falta sale como falta.
 ### Paso 4: Cierre de la entrevista
 
 Cuando `step.done` es `true`, muéstrale el borrador en pocas líneas: por cada
-paso, lo que dijo y los números con su mes y de dónde salen; y la lista de lo
-que falta (`draft.missing`) tal cual, como "falta". Dile que todavía no se
+paso, lo que dijo y el número con su mes (di «aproximado» si fue supuesto); y
+la lista de lo que falta (`draft.missing`) tal cual, como "falta". Dile que todavía no se
 guarda nada. Cierra con una sola pregunta: "¿Así es como te compran?". La
 decisión de qué hacer con esto viene después.
 

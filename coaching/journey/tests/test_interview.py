@@ -1,4 +1,10 @@
-"""The journey interview: 5 stages, one question per message, "no sé" is valid."""
+"""The journey interview: one question per stage, at most one follow-up.
+
+Ultra simple: 5 questions (what happens + roughly how many last month), plus
+at most one follow-up where the biggest drop is. "No sé" is valid; an
+approximate count ("unos 100", "entre 80 y 120") is kept as a supuesto and
+never asked again. Only an answer with no number at all gets one short retry.
+"""
 
 from __future__ import annotations
 
@@ -6,10 +12,12 @@ from datetime import date
 
 import pytest
 
+from coaching.journey import messages
 from coaching.journey.interview import (
-    FIELDS,
+    OWNER_SOURCE,
     STAGES,
     Answer,
+    InterviewStep,
     interview_step,
     is_dont_know,
     last_month,
@@ -23,66 +31,98 @@ def _answer(stage: str, field: str, answer: str) -> Answer:
     return Answer.model_validate({"stage": stage, "field": field, "answer": answer})
 
 
-def _full_stage(stage: str, count: str = "120") -> list[Answer]:
-    return [
-        _answer(stage, "necesidad", "Saber si tengo pan de muerto"),
-        _answer(stage, "donde", "WhatsApp"),
-        _answer(stage, "friccion", "Tardo en contestar"),
-        _answer(stage, "como_lo_sabe", "Lo veo yo"),
-        _answer(stage, "conteo", count),
-        _answer(stage, "fuente_conteo", "Mi WhatsApp Business"),
-    ]
+def _run(
+    replies: dict[str, str], follow_up: str = "No les contesto rápido"
+) -> tuple[InterviewStep, list[InterviewStep]]:
+    """Answer every question until the end; returns the last step and all asked."""
+    answers: list[Answer] = []
+    asked: list[InterviewStep] = []
+    while True:
+        step = interview_step(answers, TODAY)
+        if step.done:
+            return step, asked
+        asked.append(step)
+        assert step.stage is not None and step.field is not None
+        if step.field == "friccion":
+            reply = follow_up
+        elif step.field == "conteo":
+            reply = "no sé"
+        else:
+            reply = replies[step.stage]
+        answers.append(_answer(step.stage, step.field, reply))
+
+
+PAN_RICO = {
+    "se_entera": "Por Instagram, unos 300",
+    "pregunta": "Me escriben por WhatsApp, como 120",
+    "compra": "Pasan al local, 18",
+    "recibe": "Se lo llevan ese día, 18",
+    "regresa": "Regresan pocos, entre 5 y 9",
+}
 
 
 def test_five_fixed_stages_in_order() -> None:
     assert STAGES == ("se_entera", "pregunta", "compra", "recibe", "regresa")
-    assert FIELDS == (
-        "necesidad",
-        "donde",
-        "friccion",
-        "como_lo_sabe",
-        "conteo",
-        "fuente_conteo",
-    )
 
 
-def test_first_question_opens_step_one_and_says_no_se_is_fine() -> None:
+def test_first_question_asks_what_happens_and_how_many_in_one_message() -> None:
     step = interview_step([], TODAY)
 
     assert step.done is False
-    assert (step.stage, step.field) == ("se_entera", "necesidad")
+    assert (step.stage, step.field) == ("se_entera", "paso")
     assert "1 de 5" in step.message
+    assert "cuántos" in step.message
+    assert "septiembre de 2026" in step.message
     assert "no sé" in step.message
     assert step.draft.saved is False
 
 
+def test_whole_interview_is_at_most_six_questions() -> None:
+    last, asked = _run(PAN_RICO)
+
+    assert last.done is True
+    assert len(asked) == 6
+    assert [s.field for s in asked] == ["paso"] * 5 + ["friccion"]
+
+
 def test_every_question_is_exactly_one_plain_question() -> None:
-    answers: list[Answer] = []
-    seen = 0
-    while True:
-        step = interview_step(answers, TODAY)
-        if step.done:
-            break
-        seen += 1
+    _, asked = _run(PAN_RICO)
+
+    for step in asked:
         assert step.message.count("?") == 1, step.message
         assert step.message.count("¿") == 1, step.message
         lowered = step.message.lower()
         for jargon in ("journey", "embudo", "funnel", "/escala", "módulo"):
             assert jargon not in lowered
-        assert step.stage is not None and step.field is not None
-        answers.append(
-            _answer(step.stage, step.field, "12" if step.field == "conteo" else "algo")
-        )
-    assert seen == 5 * 6
+        assert "de dónde sale" not in lowered
 
 
-def test_count_question_names_last_month() -> None:
-    answers = _full_stage("se_entera")[:4]
+def test_the_follow_up_names_the_biggest_drop_once() -> None:
+    last, asked = _run(PAN_RICO)
 
-    step = interview_step(answers, TODAY)
+    follow_up = asked[-1]
+    assert follow_up.stage == "compra"  # 120 -> 18 is the biggest drop
+    assert "«Te pregunta»" in follow_up.message
+    assert "«Te compra»" in follow_up.message
+    assert last.draft.biggest_drop is not None
+    assert last.draft.biggest_drop.from_stage == "pregunta"
+    assert last.draft.biggest_drop.to_stage == "compra"
+    assert last.draft.stages[2].friccion == "No les contesto rápido"
 
-    assert step.field == "conteo"
-    assert "septiembre de 2026" in step.message
+
+def test_no_follow_up_without_two_counts_to_compare() -> None:
+    replies = {stage: "no sé" for stage in STAGES}
+
+    last, asked = _run(replies)
+
+    assert len(asked) == 5
+    assert last.draft.biggest_drop is None
+
+
+def test_ask_message_promises_the_real_length() -> None:
+    for text in (messages.ASK_NEW, messages.ASK_UPDATE):
+        assert f"{len(STAGES)} preguntas cortas" in text
+        assert "minutos" not in text
 
 
 def test_last_month_handles_january() -> None:
@@ -104,82 +144,141 @@ def test_real_answers_are_not_dont_know(text: str) -> None:
 
 @pytest.mark.parametrize(
     ("text", "value"),
-    [("120", 120), ("1,200", 1200), ("1.200", 1200), (" 18 ", 18), ("0", 0)],
+    [
+        ("120", 120),
+        ("1,200", 1200),
+        ("1.200", 1200),
+        (" 18 ", 18),
+        ("0", 0),
+        ("Me escriben por WhatsApp, 45", 45),
+    ],
 )
-def test_count_accepts_only_a_plain_number(text: str, value: int) -> None:
-    assert parse_count(text) == value
+def test_a_plain_number_is_an_exact_count(text: str, value: int) -> None:
+    count = parse_count(text)
+
+    assert count is not None
+    assert (count.value, count.upper, count.supuesto) == (value, None, False)
 
 
 @pytest.mark.parametrize(
-    "text", ["unos 100", "como 50", "100-150", "muchos", "-3", "12.5", "1,20"]
+    ("text", "value", "upper"),
+    [
+        ("unos 100", 100, None),
+        ("como 100", 100, None),
+        ("Como 50 por WhatsApp", 50, None),
+        ("más o menos 30", 30, None),
+        ("casi 200", 200, None),
+        ("entre 80 y 120", 80, 120),
+        ("de 120 a 80", 80, 120),
+        ("100-150", 100, 150),
+    ],
 )
-def test_count_is_never_estimated(text: str) -> None:
+def test_an_approximation_is_kept_as_a_supuesto(
+    text: str, value: int, upper: int | None
+) -> None:
+    count = parse_count(text)
+
+    assert count is not None
+    assert (count.value, count.upper, count.supuesto) == (value, upper, True)
+
+
+@pytest.mark.parametrize(
+    "text", ["muchos", "Me escriben por WhatsApp", "12.5", "3 y 40"]
+)
+def test_no_single_number_is_not_a_count(text: str) -> None:
     assert parse_count(text) is None
 
 
-def test_dont_know_leaves_the_field_missing_and_skips_the_count_source() -> None:
-    answers = [*_full_stage("se_entera")[:4], _answer("se_entera", "conteo", "no sé")]
+def test_approximation_is_not_asked_again_and_is_flagged() -> None:
+    answers = [_answer("se_entera", "paso", "Por Instagram, unos 100")]
 
     step = interview_step(answers, TODAY)
     first = step.draft.stages[0]
 
-    assert first.conteo is None
-    assert first.fuente_conteo is None
-    assert (step.stage, step.field) == ("pregunta", "necesidad")
-    assert "Se entera de ti: cuántos en septiembre de 2026" in step.draft.missing
+    assert (step.stage, step.field) == ("pregunta", "paso")
+    assert (first.conteo, first.conteo_supuesto) == (100, True)
+    assert first.fuente_conteo == OWNER_SOURCE == "lo dijo el dueño"
+    assert first.que_pasa == "Por Instagram, unos 100"
 
 
-def test_unparseable_count_asks_again_for_the_number() -> None:
+def test_a_range_keeps_both_ends() -> None:
+    answers = [_answer("se_entera", "paso", "entre 80 y 120")]
+
+    first = interview_step(answers, TODAY).draft.stages[0]
+
+    assert (first.conteo, first.conteo_hasta, first.conteo_supuesto) == (80, 120, True)
+
+
+def test_no_number_at_all_gets_one_short_retry_then_moves_on() -> None:
+    answers = [_answer("se_entera", "paso", "Por Instagram")]
+
+    retry = interview_step(answers, TODAY)
+    assert (retry.stage, retry.field, retry.retry) == ("se_entera", "conteo", True)
+    assert "cuántos" in retry.message
+    assert "aproximado" in retry.message
+
+    answers.append(_answer("se_entera", "conteo", "muchos"))
+    after = interview_step(answers, TODAY)
+
+    assert (after.stage, after.field) == ("pregunta", "paso")
+    assert after.draft.stages[0].conteo is None
+    assert "Se entera de ti: cuántos en septiembre de 2026" in after.draft.missing
+
+
+def test_the_retry_accepts_an_approximation() -> None:
     answers = [
-        *_full_stage("se_entera")[:4],
-        _answer("se_entera", "conteo", "unos 100"),
+        _answer("se_entera", "paso", "Por Instagram"),
+        _answer("se_entera", "conteo", "unos 300"),
     ]
+
+    first = interview_step(answers, TODAY).draft.stages[0]
+
+    assert (first.conteo, first.conteo_supuesto) == (300, True)
+    assert first.que_pasa == "Por Instagram"
+
+
+def test_saying_no_se_about_the_count_needs_no_retry() -> None:
+    answers = [_answer("se_entera", "paso", "Por Instagram, pero no sé cuántos")]
 
     step = interview_step(answers, TODAY)
 
-    assert (step.stage, step.field, step.retry) == ("se_entera", "conteo", True)
-    assert "sólo el número" in step.message.lower()
+    assert (step.stage, step.field) == ("pregunta", "paso")
     assert step.draft.stages[0].conteo is None
+    assert step.draft.stages[0].fuente_conteo is None
 
 
-def test_a_count_without_source_keeps_the_gap_visible() -> None:
-    answers = [
-        *_full_stage("se_entera")[:5],
-        _answer("se_entera", "fuente_conteo", "no sé"),
-    ]
+def test_no_se_for_the_whole_stage_leaves_both_missing() -> None:
+    answers = [_answer("se_entera", "paso", "no sé")]
 
     step = interview_step(answers, TODAY)
 
-    assert step.draft.stages[0].conteo == 120
-    assert "Se entera de ti: de dónde sale el número" in step.draft.missing
+    assert (step.stage, step.field) == ("pregunta", "paso")
+    assert step.draft.missing[:2] == [
+        "Se entera de ti: qué pasa",
+        "Se entera de ti: cuántos en septiembre de 2026",
+    ]
 
 
 def test_complete_interview_returns_a_draft_that_is_not_saved() -> None:
-    answers = [
-        answer
-        for stage in STAGES
-        for answer in _full_stage(stage, "no sé" if stage == "regresa" else "18")
-    ]
+    last, _ = _run(PAN_RICO)
 
-    step = interview_step(answers, TODAY)
-
-    assert step.done is True
-    assert step.stage is None and step.field is None
-    assert step.draft.saved is False
-    assert step.draft.period == "2026-09"
-    assert [s.stage for s in step.draft.stages] == list(STAGES)
-    assert step.draft.stages[2].conteo == 18
-    assert step.draft.missing == ["Regresa a comprar: cuántos en septiembre de 2026"]
-    assert "todavía no se guarda" in step.message
+    assert last.stage is None and last.field is None
+    assert last.draft.saved is False
+    assert last.draft.period == "2026-09"
+    assert [s.stage for s in last.draft.stages] == list(STAGES)
+    assert last.draft.stages[2].conteo == 18
+    assert last.draft.stages[2].conteo_supuesto is False
+    assert last.draft.missing == []
+    assert "todavía no se guarda" in last.message
 
 
 def test_the_last_answer_for_a_field_wins() -> None:
     answers = [
-        _answer("se_entera", "necesidad", "primera"),
-        _answer("se_entera", "necesidad", "corregida"),
+        _answer("se_entera", "paso", "primera, 10"),
+        _answer("se_entera", "paso", "corregida, 20"),
     ]
 
     step = interview_step(answers, TODAY)
 
-    assert step.draft.stages[0].necesidad == "corregida"
-    assert step.field == "donde"
+    assert step.draft.stages[0].que_pasa == "corregida, 20"
+    assert step.draft.stages[0].conteo == 20

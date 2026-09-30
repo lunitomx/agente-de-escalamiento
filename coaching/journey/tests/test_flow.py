@@ -133,7 +133,7 @@ def test_record_yes_starts_the_interview(tmp_path: Path) -> None:
     assert result.errors == []
     assert result.saved_to == ".escala/my-company/journey/asks.yaml"
     assert result.step is not None
-    assert result.step.field == "necesidad"
+    assert (result.step.stage, result.step.field) == ("se_entera", "paso")
     assert result.message == result.step.message
 
 
@@ -174,14 +174,18 @@ def test_interview_returns_next_question_and_writes_nothing(tmp_path: Path) -> N
             "base_path": str(tmp_path),
             "today": "2026-10-02",
             "answers": [
-                {"stage": "se_entera", "field": "necesidad", "answer": "Pan fresco"},
+                {
+                    "stage": "se_entera",
+                    "field": "paso",
+                    "answer": "Por Instagram, unos 40",
+                },
             ],
         }
     )
 
     assert result.errors == []
     assert result.step is not None
-    assert result.step.field == "donde"
+    assert (result.step.stage, result.step.field) == ("pregunta", "paso")
     assert result.message == result.step.message
     assert _files(tmp_path) == []
 

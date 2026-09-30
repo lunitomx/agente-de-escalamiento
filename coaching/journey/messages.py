@@ -9,13 +9,13 @@ from __future__ import annotations
 
 ASK_NEW = (
     "Para ver dónde se te van los clientes, ¿me cuentas cómo llega un cliente "
-    "hasta que te compra? Son 5 pasos y unos 5 minutos. Si prefieres, lo vemos "
+    "hasta que te compra? Son 5 preguntas cortas. Si prefieres, lo vemos "
     "después."
 )
 
 ASK_UPDATE = (
     "Lo que me contaste de cómo llega un cliente hasta que te compra ya tiene "
-    "tiempo. ¿Lo revisamos para ver qué cambió? Son 5 pasos y unos 5 minutos. "
+    "tiempo. ¿Lo revisamos para ver qué cambió? Son 5 preguntas cortas. "
     "Si prefieres, lo vemos después."
 )
 
