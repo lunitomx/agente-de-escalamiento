@@ -7,21 +7,24 @@ and geography; one the owner did not name stays a candidate until he says yes.
 from __future__ import annotations
 
 from datetime import date, timedelta
+from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
 
 from coaching.research import messages
-from coaching.research.engine import build_queries, normalize
+from coaching.research.engine import build_queries, is_own_company, normalize
 from coaching.research.flow import run
 from coaching.research.models import (
     MAX_COMPARABLES,
     Comparable,
     DecisionOption,
+    PrivateTerms,
     ResearchFrame,
+    ResearchReport,
     SourceRecord,
 )
-from coaching.research.report import build_report
+from coaching.research.report import build_report, report_message, save_report
 
 TODAY = date(2026, 9, 30)
 
@@ -93,7 +96,7 @@ def _candidate(**fields: object) -> Comparable:
 
 def _report(
     comparables: list[Comparable], frame: ResearchFrame | None = None
-) -> object:
+) -> ResearchReport:
     return build_report(
         frame=frame or _frame(),
         researched_on=TODAY,
@@ -240,3 +243,184 @@ def test_benchmark_without_a_city_or_zone_asks_before_searching() -> None:
         assert result.errors == ["needs_geography"]
         assert result.message == messages.NEEDS_OFFER
         assert result.frame is None
+
+
+# --- what the owner sees: the table and the candidate question ---------------
+
+JARGON = ("triangul", "TAM", "módulo", "benchmark", "candidato", "metricas")
+
+
+def _counted_report() -> ResearchReport:
+    return _report([_owner_named(), _candidate()])
+
+
+def test_the_table_has_one_source_and_date_per_cell_or_says_not_found() -> None:
+    text = report_message(_counted_report())
+
+    assert "| Negocio | Precio | Paquetes | Dónde vende | Números que publica |" in text
+    row = next(line for line in text.splitlines() if "| Tortillería El Sol |" in line)
+    assert "24 pesos el kilo (Tortillería El Sol, 10 de septiembre de 2026)" in row
+    assert row.count("no encontrado") == 3
+    assert text.rstrip().endswith("¿Cuál tomas?")
+    for word in JARGON:
+        assert word not in text
+
+
+def test_a_candidate_is_named_but_never_enters_the_table() -> None:
+    text = report_message(_counted_report())
+
+    assert not any(line.startswith("| Molino La Luna") for line in text.splitlines())
+    assert "Molino La Luna" in text
+    assert messages.NOT_COUNTED in text
+
+
+def test_a_cell_from_an_undated_page_says_so() -> None:
+    undated = _source("s9", "Página sin fecha", dated=False)
+    report = build_report(
+        frame=_frame(),
+        researched_on=TODAY,
+        sources=[*SOURCES, undated],
+        claims=[],
+        options=OPTIONS,
+        recommendation="A",
+        recommendation_reason="estás abajo",
+        comparables=[
+            _owner_named(
+                cells={"paquetes": {"value": "Kilo y medio", "source_id": "s9"}}
+            )
+        ],
+    )
+
+    assert "Kilo y medio (Página sin fecha, sin fecha)" in report_message(report)
+
+
+def test_a_cell_cannot_break_the_table() -> None:
+    cells = {"precio": {"value": "24 | 26\npesos", "source_id": "s1"}}
+    row = next(
+        line
+        for line in report_message(_report([_owner_named(cells=cells)])).splitlines()
+        if "Tortillería El Sol |" in line
+    )
+
+    assert row.count("|") == 6
+    assert "24 / 26 pesos" in row
+
+
+def test_without_counted_businesses_it_says_so_instead_of_a_table() -> None:
+    text = report_message(_report([_candidate()]))
+
+    assert messages.NO_COUNTED_COMPARABLES in text
+    assert "| Negocio |" not in text
+
+
+def test_saved_report_keeps_the_table_and_the_index_keeps_no_urls(
+    tmp_path: Path,
+) -> None:
+    report = _counted_report().model_copy(update={"chosen": OPTIONS[0]})
+
+    path = save_report(report, tmp_path)
+
+    assert "| Tortillería El Sol |" in path.read_text(encoding="utf-8")
+    index = (tmp_path / ".escala/my-company/research/index.yaml").read_text(
+        encoding="utf-8"
+    )
+    assert "http" not in index
+    assert "Molino" not in index
+
+
+# --- the comparables step of the flow -----------------------------------------
+
+
+def _step(action: str, **extra: object) -> dict[str, object]:
+    context: dict[str, object] = {
+        "action": action,
+        "today": TODAY.isoformat(),
+        "frame": _frame(
+            concern="En Tortillería Zorblax vendemos $987,654; Ximena cree que cobramos poco"
+        ).model_dump(mode="json"),
+        "private": PRIVATE,
+        "sources": [source.model_dump(mode="json") for source in SOURCES],
+        "comparables": [
+            _owner_named().model_dump(mode="json"),
+            _candidate().model_dump(mode="json"),
+        ],
+        "options": [option.model_dump(mode="json") for option in OPTIONS],
+        "recommendation": "A",
+        "recommendation_reason": "estás abajo de los negocios parecidos",
+    }
+    context.update(extra)
+    return context
+
+
+def test_comparables_asks_which_candidates_look_like_his_business() -> None:
+    result = run(_step("comparables"))
+
+    assert result.errors == []
+    assert "Molino La Luna" in result.message
+    assert "Vende tortillas de maíz en Puebla" in result.message
+    assert "Directorio Puebla" in result.message
+    assert result.message.endswith(messages.WHICH_LOOK_ALIKE)
+    assert [item.name for item in result.comparables] == [
+        "Tortillería El Sol",
+        "Molino La Luna",
+    ]
+
+
+def test_comparables_without_candidates_just_says_who_is_compared() -> None:
+    result = run(_step("comparables", comparables=[_owner_named().model_dump()]))
+
+    assert result.errors == []
+    assert "Tortillería El Sol" in result.message
+    assert messages.WHICH_LOOK_ALIKE not in result.message
+
+
+def test_comparables_needs_a_confirmed_frame_and_the_private_terms() -> None:
+    unconfirmed = _frame(confirmed=False).model_dump(mode="json")
+
+    assert "frame_not_confirmed" in run(_step("comparables", frame=unconfirmed)).errors
+    assert run(_step("comparables", private=None)).errors == ["needs_private_terms"]
+
+
+def test_the_own_company_is_never_a_comparable() -> None:
+    own = _candidate(name="Tortillería Zorblax Centro").model_dump()
+
+    for action in ("comparables", "report"):
+        result = run(_step(action, comparables=[own]))
+        assert result.errors == ["own_company_as_comparable"]
+
+
+def test_the_owner_words_never_reach_what_he_is_shown() -> None:
+    for action in ("comparables", "report"):
+        result = run(_step(action))
+        assert result.errors == []
+        for marker in MARKERS:
+            assert marker not in _flat(result.message)
+
+
+def test_a_named_business_sharing_the_type_of_business_is_searched_when_the_offer_says_it() -> (
+    None
+):
+    """ "Tortillería El Sol" shares "tortillería" with the owner's company: it is
+    searched only when the confirmed offer carries that word; otherwise the
+    search is refused (reject rather than leak, S83.1)."""
+    typed = _frame_input(offer_category="tortillería de maíz")
+    untyped = _frame_input(offer_category="tortillas de maíz")
+
+    searched = run({"action": "frame", "frame": typed, "private": PRIVATE})
+    refused = run({"action": "frame", "frame": untyped, "private": PRIVATE})
+
+    assert searched.frame is not None
+    assert "precios de Tortillería El Sol en Puebla" in searched.frame.queries
+    assert refused.frame is not None
+    assert "precios de Tortillería El Sol en Puebla" not in refused.frame.queries
+    assert [item.reason for item in refused.rejected] == ["empresa"]
+
+
+def test_a_competitor_sharing_the_type_of_business_is_not_the_own_company() -> None:
+    result = run(_step("comparables"))
+
+    assert result.errors == []
+    assert is_own_company("Zorblax", _frame(), PrivateTerms.model_validate(PRIVATE))
+    assert not is_own_company(
+        "Tortillería El Sol", _frame(), PrivateTerms.model_validate(PRIVATE)
+    )

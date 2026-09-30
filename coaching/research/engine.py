@@ -270,6 +270,35 @@ def _reject_reason(
     return None
 
 
+def _public_words(frame: ResearchFrame) -> set[str]:
+    return set(_words(frame.offer_category or "")) | set(_words(frame.geography or ""))
+
+
+def is_own_company(name: str, frame: ResearchFrame, private: PrivateTerms) -> bool:
+    """Whether a business listed as comparable is the owner's own company.
+
+    Unlike the search check (any distinctive word is refused, to never leak),
+    this local check needs the full name, every distinctive word of it that is
+    not a word of the confirmed offer or geography, or a name made only of the
+    company's own words ("Zorblax"), so "Tortillería El Sol" is not mistaken
+    for "Tortillería Zorblax".
+    """
+    public = _public_words(frame)
+    views = _word_views(sanitize_query(name))
+    listed = _distinctive(sanitize_query(name))
+    for company in private.company_names:
+        own = _distinctive(company)
+        wanted = own - public
+        if listed and listed <= own:
+            return True
+        if any(
+            _phrase_in(company, words) or (wanted and wanted <= set(words))
+            for words in views
+        ):
+            return True
+    return False
+
+
 def check_queries(frame: ResearchFrame, private: PrivateTerms) -> QueryCheck:
     """Split ``frame.queries`` into accepted and rejected (with the reason).
 
@@ -281,9 +310,7 @@ def check_queries(frame: ResearchFrame, private: PrivateTerms) -> QueryCheck:
     names, private figures (however grouped or scaled) and look-alike letters
     from other scripts never are.
     """
-    public_words = set(_words(frame.offer_category or "")) | set(
-        _words(frame.geography or "")
-    )
+    public_words = _public_words(frame)
     result = QueryCheck()
     for raw in frame.queries:
         query = sanitize_query(raw)

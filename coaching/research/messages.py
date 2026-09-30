@@ -32,6 +32,27 @@ NO_SAFE_QUERY = (
 NEEDS_CHOICE = "Antes de guardar necesito que me digas cuál opción tomas."
 NOTHING_CONTRARY = "No encontré fuentes que digan lo contrario."
 NOTHING_MISSING = "Encontré algo para cada punto que buscamos."
+NOT_COUNTED = "No los cuento hasta que me digas que se parecen al tuyo."
+NO_COUNTED_COMPARABLES = (
+    "Todavía no hay negocios parecidos al tuyo que me hayas confirmado."
+)
+WHICH_LOOK_ALIKE = "¿Cuáles se parecen al tuyo? Sólo cuento los que me digas que sí."
+NOT_FOUND_CELL = "no encontrado"
+
+
+def comparing_with(names: list[str]) -> str:
+    return f"Voy a comparar con: {_join(names)}."
+
+
+def table_title(offer: str, geography: str) -> str:
+    return f"Cómo lo hacen negocios parecidos ({offer} en {geography}):"
+
+
+def candidates_intro(offer: str, geography: str) -> str:
+    return (
+        f"Encontré estos negocios que venden {offer} en {geography} y podrían "
+        "parecerse al tuyo:"
+    )
 
 
 def spanish_date(value: date) -> str:
@@ -48,6 +69,10 @@ def no_search_limit(source_count: int) -> str:
 
 def _join(items: list[str]) -> str:
     return items[0] if len(items) == 1 else ", ".join(items[:-1]) + " y " + items[-1]
+
+
+def join_names(names: list[str]) -> str:
+    return _join(names)
 
 
 def frame_message(decision_informed: str, queries: list[str]) -> str:

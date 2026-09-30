@@ -9,6 +9,9 @@ Actions (JSON on stdin, like ``coaching.tracker``):
   permission message. Without search (``search_mode: "sin_busqueda"``), the
   one-line notice and the ask for the owner's sources.
 - ``grade``: grade ``claims`` against ``sources`` (``today`` = reference date).
+- ``comparables`` (benchmark): the businesses found, checked against the frame
+  and ``sources`` (required ``private``: the own company is never one), and
+  the message asking which candidates look like the owner's business.
 - ``report``: the graded report and the short result that ends in the
   decision question. Nothing is saved. Needs ``frame.confirmed``.
 - ``save``: same input plus ``chosen`` (option label) and
@@ -32,20 +35,29 @@ from coaching.research.engine import (
     build_queries,
     check_queries,
     grade_claim,
+    is_own_company,
 )
 from coaching.research.models import (
+    Comparable,
     DecisionOption,
     PrivateTerms,
     ResearchClaim,
     ResearchFrame,
     ResearchReport,
     SourceRecord,
+    check_comparables,
 )
-from coaching.research.report import build_report, report_message, save_report
+from coaching.research.report import (
+    build_report,
+    comparables_message,
+    report_message,
+    save_report,
+)
 
 _SOURCES = TypeAdapter(list[SourceRecord])
 _CLAIMS = TypeAdapter(list[ResearchClaim])
 _OPTIONS = TypeAdapter(list[DecisionOption])
+_COMPARABLES = TypeAdapter(list[Comparable])
 _TEXTS = TypeAdapter(list[str])
 
 
@@ -57,6 +69,7 @@ class FlowResult(BaseModel):
     frame: ResearchFrame | None = None
     rejected: list[RejectedQuery] = Field(default_factory=list[RejectedQuery])
     claims: list[ResearchClaim] = Field(default_factory=list[ResearchClaim])
+    comparables: list[Comparable] = Field(default_factory=list[Comparable])
     report: ResearchReport | None = None
     saved_to: str | None = None
     errors: list[str] = Field(default_factory=list)
@@ -135,14 +148,41 @@ def _grade(context: Mapping[str, object]) -> FlowResult:
     )
 
 
+def _no_own_company(
+    frame: ResearchFrame, comparables: list[Comparable], private: PrivateTerms
+) -> None:
+    if any(is_own_company(item.name, frame, private) for item in comparables):
+        raise _Refusal("own_company_as_comparable")
+
+
+def _comparables(context: Mapping[str, object]) -> FlowResult:
+    frame = ResearchFrame.model_validate(context.get("frame"))
+    private = _private(context)
+    if private is None:
+        raise _Refusal("needs_private_terms")
+    if not frame.confirmed:
+        raise _Refusal("frame_not_confirmed")
+    sources = _SOURCES.validate_python(context.get("sources", []))
+    comparables = _COMPARABLES.validate_python(context.get("comparables", []))
+    check_comparables(frame, sources, comparables)
+    _no_own_company(frame, comparables, private)
+    return FlowResult(
+        action="comparables",
+        comparables=comparables,
+        message=comparables_message(frame, sources, comparables),
+    )
+
+
 def _build(context: Mapping[str, object], chosen: str | None) -> ResearchReport:
     frame = ResearchFrame.model_validate(context.get("frame"))
     private = _private(context)
+    comparables = _COMPARABLES.validate_python(context.get("comparables", []))
     if private is not None:
         # The recorded searches must be exactly the text the check accepted.
         checked = check_queries(frame, private)
         if checked.rejected or checked.accepted != frame.queries:
             raise _Refusal("private_query", messages.NO_SAFE_QUERY)
+        _no_own_company(frame, comparables, private)
     return build_report(
         frame=frame,
         researched_on=_today(context),
@@ -154,6 +194,7 @@ def _build(context: Mapping[str, object], chosen: str | None) -> ResearchReport:
         not_found=_TEXTS.validate_python(context.get("not_found", [])),
         limits=_TEXTS.validate_python(context.get("limits", [])),
         chosen=chosen,
+        comparables=comparables,
     )
 
 
@@ -179,7 +220,13 @@ def _save(context: Mapping[str, object]) -> FlowResult:
     )
 
 
-_ACTIONS = {"frame": _frame, "grade": _grade, "report": _report, "save": _save}
+_ACTIONS = {
+    "frame": _frame,
+    "grade": _grade,
+    "comparables": _comparables,
+    "report": _report,
+    "save": _save,
+}
 
 
 def _validation_codes(exc: ValidationError) -> list[str]:

@@ -24,6 +24,7 @@ DecisionArea = Literal["cash", "strategy", "people", "execution"]
 OptionKind = Literal["decidir", "esperar"]
 
 Dimension = Literal["precio", "paquetes", "canales", "metricas"]
+DIMENSIONS: tuple[Dimension, ...] = ("precio", "paquetes", "canales", "metricas")
 
 EXCERPT_MAX = 300
 MAX_CLAIMS = 3
