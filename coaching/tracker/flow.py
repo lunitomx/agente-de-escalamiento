@@ -13,6 +13,10 @@ Actions (JSON on stdin, like ``coaching.strategy_opsp``):
 - ``propose`` (S82.4): rows for the month from the quarter's priorities, for
   the remembered tab only, plus the block to paste and where to paste it.
   Nothing is written: the owner pastes the rows himself after reviewing them.
+- ``prepare`` (S82.5): before the group meeting, for the remembered tab only:
+  overdue commitments, finished ones to move to Done (with the block and the
+  cell to paste it), missing KPI or date, and dates "por confirmar". ``today``
+  (``YYYY-MM-DD``) sets the reference date. Suggestions only; nothing is written.
 
 The procedure persists the choice through this module; the private specialist
 never writes state.
@@ -41,8 +45,13 @@ from coaching.tracker.identity import (
     rank_candidates,
     save_link,
 )
+from coaching.tracker.maintenance import (
+    MeetingPrep,
+    review_before_meeting,
+    to_done_block,
+)
 from coaching.tracker.models import TrackerSheet
-from coaching.tracker.parser import Grid, commitments_layout, parse_sheet
+from coaching.tracker.parser import Grid, commitments_layout, done_layout, parse_sheet
 from coaching.tracker.proposal import (
     QuarterlyPlanInput,
     RowProposal,
@@ -61,6 +70,7 @@ class FlowResult(BaseModel):
     link: TrackerLink | None = None
     sheet: TrackerSheet | None = None
     proposal: RowProposal | None = None
+    prep: MeetingPrep | None = None
     paste_block: str = ""
     errors: list[str] = Field(default_factory=list)
 
@@ -184,10 +194,8 @@ def _propose_refusal(message: str, error: str) -> FlowResult:
     return FlowResult(action="propose", message=message, errors=[error])
 
 
-def _propose(context: Mapping[str, object], base: Path) -> FlowResult:
-    link = load_link(base)
-    if link is None:
-        return _propose_refusal(messages.NEEDS_CONFIRMED_TAB, "needs_confirmed_tab")
+def _own_grid(context: Mapping[str, object], link: TrackerLink) -> Grid | str:
+    """Only the remembered tab's grid, or the error code why it cannot be read."""
     connector, pasted = _text(context, "connector_text"), _text(context, "pasted_text")
     grid: Grid | None
     if connector is not None:
@@ -199,16 +207,24 @@ def _propose(context: Mapping[str, object], base: Path) -> FlowResult:
         )
         if link.file_title is not None or link.file_id is not None:
             if not same:
-                return _propose_refusal(messages.LINK_MISMATCH, "link_mismatch")
+                return "link_mismatch"
         grid = confirmed_tab_grid(connector, link.tab_name)
     elif pasted is not None:
         grid = parse_pasted_tab(pasted)
     else:
         grid = None
-    if grid is None:
-        return _propose_refusal(
-            messages.tab_not_found_message(link.tab_name), "tab_not_found"
-        )
+    return "tab_not_found" if grid is None else grid
+
+
+def _propose(context: Mapping[str, object], base: Path) -> FlowResult:
+    link = load_link(base)
+    if link is None:
+        return _propose_refusal(messages.NEEDS_CONFIRMED_TAB, "needs_confirmed_tab")
+    grid = _own_grid(context, link)
+    if grid == "link_mismatch":
+        return _propose_refusal(messages.LINK_MISMATCH, "link_mismatch")
+    if isinstance(grid, str):
+        return _propose_refusal(messages.tab_not_found_message(link.tab_name), grid)
     plan = _plan(context, base)
     if plan is None:
         return _propose_refusal(messages.NO_PLAN, "needs_plan")
@@ -224,6 +240,46 @@ def _propose(context: Mapping[str, object], base: Path) -> FlowResult:
         message=messages.proposal_message(proposal, layout, link.tab_name, block),
         link=link,
         proposal=proposal,
+        paste_block=block,
+    )
+
+
+def _prepare_refusal(message: str, error: str) -> FlowResult:
+    return FlowResult(action="prepare", message=message, errors=[error])
+
+
+def _today(context: Mapping[str, object]) -> date | None:
+    raw = _text(context, "today")
+    if raw is None:
+        return date.today()
+    try:
+        return date.fromisoformat(raw)
+    except ValueError:
+        return None
+
+
+def _prepare(context: Mapping[str, object], base: Path) -> FlowResult:
+    link = load_link(base)
+    if link is None:
+        return _prepare_refusal(
+            messages.PREP_NEEDS_CONFIRMED_TAB, "needs_confirmed_tab"
+        )
+    grid = _own_grid(context, link)
+    if grid == "link_mismatch":
+        return _prepare_refusal(messages.PREP_LINK_MISMATCH, "link_mismatch")
+    if isinstance(grid, str):
+        return _prepare_refusal(messages.tab_not_found_message(link.tab_name), grid)
+    today = _today(context)
+    if today is None:
+        return _prepare_refusal(messages.ASK_TODAY, "bad_today")
+    prep = review_before_meeting(parse_sheet(grid), today)
+    layout = done_layout(grid)
+    block = to_done_block(prep.finished, layout.fields if layout else None)
+    return FlowResult(
+        action="prepare",
+        message=messages.prep_message(prep, layout, link.tab_name, block),
+        link=link,
+        prep=prep,
         paste_block=block,
     )
 
@@ -244,6 +300,8 @@ def run(context: Mapping[str, object]) -> FlowResult:
         return _confirm(context, base)
     if action == "propose":
         return _propose(context, base)
+    if action == "prepare":
+        return _prepare(context, base)
     if action == "load":
         return FlowResult(action=action, link=load_link(base))
     return FlowResult(action=action, errors=["unknown_action"])

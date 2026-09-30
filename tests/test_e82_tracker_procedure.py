@@ -85,3 +85,14 @@ def test_procedure_proposes_rows_and_never_writes_them() -> None:
     assert "Restaurar esta versión" in text  # only as what never to suggest
     assert "Nunca escribas" in text
     assert "Critical Number" in text
+
+
+def test_procedure_prepares_the_meeting_without_moving_anything() -> None:
+    """S82.5: before the meeting ESCALA only suggests; the owner decides."""
+    text = _procedure()
+
+    assert '"action": "prepare"' in text
+    assert '"today"' in text
+    assert "Antes de tu reunión" in text
+    assert "por confirmar" in text
+    assert "Nunca muevas" in text

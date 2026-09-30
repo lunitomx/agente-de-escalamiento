@@ -8,6 +8,7 @@ user already sees in Drive. Cells are quoted only from the confirmed tab.
 from __future__ import annotations
 
 from coaching.tracker.identity import SheetCandidate, is_placeholder_name
+from coaching.tracker.maintenance import MeetingPrep, ReviewedItem
 from coaching.tracker.parser import CommitmentsLayout, cell_ref
 from coaching.tracker.proposal import RowProposal, render_table
 
@@ -116,6 +117,10 @@ LINK_MISMATCH = (
     "Este archivo no es el que usamos la otra vez. Antes de proponerte filas, "
     "¿me confirmas cuál es tu pestaña aquí?"
 )
+PASTE_ONLY_THERE = (
+    "Pega sólo ahí, sobre celdas vacías. No pegues arriba, donde está tu "
+    "nombre: viene de START HERE."
+)
 # S82.6: "restore this version" rolls back everyone's edits in the shared file.
 UNDO = (
     "Si algo quedó mal, deshazlo con Ctrl+Z (Cmd+Z en Mac) justo después de "
@@ -147,13 +152,21 @@ def _fits(free: int) -> str:
     return "sólo cabe 1 fila" if free == 1 else f"sólo caben {free} filas"
 
 
-def _where(layout: CommitmentsLayout | None, tab_name: str, count: int) -> list[str]:
+_BELOW_COMMITMENTS = "tus compromisos del mes (Monthly Commitments)"
+_BELOW_DONE = "lo que ya tienes en Done"
+
+
+def _where(
+    layout: CommitmentsLayout | None,
+    tab_name: str,
+    count: int,
+    below: str = _BELOW_COMMITMENTS,
+) -> list[str]:
     focus = _focus_label(layout)
     if layout is None:
         return [
             f"En tu pestaña **{tab_name}**, haz clic en la primera celda vacía de "
-            f"la columna {focus}, debajo de la última fila de tus compromisos del "
-            "mes (Monthly Commitments)."
+            f"la columna {focus}, debajo de la última fila de {below}."
         ]
     steps: list[str] = []
     if layout.free_rows is not None and layout.free_rows < count:
@@ -168,8 +181,7 @@ def _where(layout: CommitmentsLayout | None, tab_name: str, count: int) -> list[
     cell = cell_ref(layout.first_free_row, layout.focus_col)
     steps.append(
         f"En tu pestaña **{tab_name}**, haz clic en la celda **{cell}**: es la "
-        "primera fila vacía debajo de tus compromisos del mes (Monthly "
-        f"Commitments), en la columna {focus}."
+        f"primera fila vacía debajo de {below}, en la columna {focus}."
     )
     return steps
 
@@ -224,10 +236,7 @@ def proposal_message(
         f"Copia este bloque y pégalo ahí (Ctrl+V; Cmd+V en Mac):\n\n```\n"
         f"{paste_block}\n```"
     )
-    steps.append(
-        "Pega sólo ahí, sobre celdas vacías. No pegues arriba, donde está tu "
-        "nombre: viene de START HERE."
-    )
+    steps.append(PASTE_ONLY_THERE)
     numbered = "\n".join(f"{i}. {step}" for i, step in enumerate(steps, 1))
     return "\n\n".join(
         [
@@ -240,3 +249,143 @@ def proposal_message(
             UNDO,
         ]
     )
+
+
+# --- S82.5: before the group meeting (suggestions only) -----------------------
+
+PREP_NEEDS_CONFIRMED_TAB = (
+    "Antes de revisar tu hoja necesito saber cuál es tu pestaña. "
+    "¿Me confirmas cuál es la tuya?"
+)
+PREP_LINK_MISMATCH = (
+    "Este archivo no es el que usamos la otra vez. Antes de revisarlo, "
+    "¿me confirmas cuál es tu pestaña aquí?"
+)
+# Clear the cells only: deleting the whole row could break the tab's layout.
+CLEAR_MOVED = (
+    "Después, si quieres, borra esos compromisos de tu lista del mes: selecciona "
+    "sus celdas y presiona Supr (Delete en Mac). No elimines la fila completa."
+)
+ASK_TODAY = "¿Qué fecha es hoy? Con eso veo qué está vencido."
+NOTHING_MOVED = "No moví nada en tu hoja."
+PREP_EMPTY = (
+    "Tu pestaña todavía no tiene compromisos del mes que revisar. ¿Quieres que "
+    "te proponga filas con tus prioridades del trimestre?"
+)
+PREP_UP_TO_DATE = (
+    "Antes de tu reunión: tus compromisos del mes están al día. No veo nada "
+    "vencido, terminado por pasar a Done ni datos faltantes. ¿Quieres revisar "
+    "algo más antes de la reunión?"
+)
+
+
+def _count(items: list[ReviewedItem], one: str, many: str) -> str | None:
+    if not items:
+        return None
+    return f"1 {one}" if len(items) == 1 else f"{len(items)} {many}"
+
+
+def _headline(prep: MeetingPrep) -> str:
+    parts = [
+        _count(prep.overdue, "compromiso vencido", "compromisos vencidos"),
+        _count(
+            prep.finished,
+            "terminado que puedes pasar a Done",
+            "terminados que puedes pasar a Done",
+        ),
+        _count(prep.already_in_done, "que ya está en Done", "que ya están en Done"),
+        _count(prep.missing_kpi, "sin KPI", "sin KPI"),
+        _count(prep.missing_due, "sin fecha", "sin fecha"),
+        _count(prep.unclear_due, "con fecha por confirmar", "con fecha por confirmar"),
+    ]
+    return f"Antes de tu reunión: {_join([p for p in parts if p])}."
+
+
+def _section(title: str, items: list[ReviewedItem], detail: str = "") -> str:
+    lines = [f"- {item.text}{detail.format(due=item.due)}" for item in items]
+    return "\n".join([title, *lines])
+
+
+def _sections(prep: MeetingPrep) -> list[str]:
+    sections: list[str] = []
+    if prep.overdue:
+        sections.append(_section("**Vencidos:**", prep.overdue, " (era para el {due})"))
+    if prep.finished:
+        sections.append(_section("**Para pasar a Done:**", prep.finished))
+    if prep.already_in_done:
+        sections.append(
+            _section(
+                "**Ya están en Done** (si quieres, bórralos de tus compromisos "
+                "del mes):",
+                prep.already_in_done,
+            )
+        )
+    if prep.missing_kpi:
+        sections.append(_section("**Sin KPI:**", prep.missing_kpi))
+    if prep.missing_due:
+        sections.append(_section("**Sin fecha:**", prep.missing_due))
+    if prep.unclear_due:
+        sections.append(
+            _section(
+                "**Fecha por confirmar** (no la pude leer sin adivinar):",
+                prep.unclear_due,
+                " («{due}»)",
+            )
+        )
+    return sections
+
+
+def _done_steps(
+    prep: MeetingPrep, layout: CommitmentsLayout | None, tab_name: str, block: str
+) -> str:
+    steps = _where(layout, tab_name, len(prep.finished), _BELOW_DONE)
+    steps.append(
+        f"Copia este bloque y pégalo ahí (Ctrl+V; Cmd+V en Mac):\n\n```\n{block}\n```"
+    )
+    steps.append(PASTE_ONLY_THERE)
+    steps.append(CLEAR_MOVED)
+    numbered = "\n".join(f"{i}. {step}" for i, step in enumerate(steps, 1))
+    them = "pasarlo" if len(prep.finished) == 1 else "pasarlos"
+    return f"Si decides {them} a Done:\n\n{numbered}"
+
+
+def _decisions(prep: MeetingPrep) -> str:
+    asks: list[str] = []
+    if len(prep.finished) == 1:
+        asks.append(f"¿Pasas «{prep.finished[0].text}» a Done?")
+    elif prep.finished:
+        asks.append("¿Pasas los terminados a Done?")
+    if len(prep.overdue) == 1:
+        asks.append(
+            f"¿Qué hacemos con «{prep.overdue[0].text}»: nueva fecha o ya no va?"
+        )
+    elif prep.overdue:
+        asks.append("¿Qué hacemos con los vencidos: nueva fecha o ya no van?")
+    kpi, dates = bool(prep.missing_kpi), bool(prep.missing_due or prep.unclear_due)
+    if kpi and dates:
+        asks.append("¿Me dices los KPI y las fechas que faltan?")
+    elif kpi:
+        asks.append("¿Me dices los KPI que faltan?")
+    elif dates:
+        asks.append("¿Me dices las fechas que faltan?")
+    if not asks:
+        asks.append("¿Borras de tus compromisos del mes lo que ya está en Done?")
+    return " ".join(asks)
+
+
+def prep_message(
+    prep: MeetingPrep,
+    done_layout: CommitmentsLayout | None,
+    tab_name: str,
+    done_block: str,
+) -> str:
+    """Short summary for the meeting; says nothing was moved; ends with a decision."""
+    if prep.reviewed == 0:
+        return PREP_EMPTY
+    if not prep.has_findings:
+        return PREP_UP_TO_DATE
+    parts = [_headline(prep), *_sections(prep)]
+    if prep.finished:
+        parts += [_done_steps(prep, done_layout, tab_name, done_block), UNDO]
+    parts += [NOTHING_MOVED, _decisions(prep)]
+    return "\n\n".join(parts)
