@@ -37,6 +37,7 @@ from coaching.research.models import (
 
 FRESHNESS_DAYS = 90
 CONFIRMING_SOURCES = 3
+NAMED_SEARCHES = 2
 
 
 def review_date(researched_on: date) -> date:
@@ -299,7 +300,8 @@ def _join(*parts: str | None) -> str:
 
 
 def build_queries(frame: ResearchFrame) -> list[str]:
-    """Two or three searches from the frame's public fields only.
+    """Two or three searches from the frame's public fields only, plus in
+    benchmark one per business the owner named (at most ``NAMED_SEARCHES``).
 
     The owner's concern and question are never used: they are his words and
     may carry names or figures. Without an offer category there is nothing to
@@ -327,4 +329,12 @@ def build_queries(frame: ResearchFrame) -> list[str]:
             _join(offer, where, "cambios y regulación", horizon),
         ],
     }
-    return templates[frame.mode]
+    queries = templates[frame.mode]
+    if frame.mode == "benchmark":
+        # Businesses the owner named are public names; each search still goes
+        # through ``check_queries`` like any other.
+        named = [name.strip() for name in frame.competitors if name.strip()]
+        queries += [
+            _join(f"precios de {name}", where) for name in named[:NAMED_SEARCHES]
+        ]
+    return queries

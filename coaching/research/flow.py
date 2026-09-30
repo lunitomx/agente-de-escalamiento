@@ -89,6 +89,12 @@ def _frame(context: Mapping[str, object]) -> FlowResult:
     private = _private(context)
     if private is None:
         raise _Refusal("needs_private_terms")
+    if frame.mode == "benchmark":
+        # Comparable = same confirmed offer and geography (S83.2).
+        if not (frame.offer_category and frame.offer_category.strip()):
+            raise _Refusal("needs_offer_category", messages.NEEDS_OFFER)
+        if not (frame.geography and frame.geography.strip()):
+            raise _Refusal("needs_geography", messages.NEEDS_OFFER)
     if frame.search_mode == "sin_busqueda":
         return FlowResult(
             action="frame",

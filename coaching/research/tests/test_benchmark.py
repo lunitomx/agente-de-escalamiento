@@ -11,6 +11,9 @@ from datetime import date, timedelta
 import pytest
 from pydantic import ValidationError
 
+from coaching.research import messages
+from coaching.research.engine import build_queries, normalize
+from coaching.research.flow import run
 from coaching.research.models import (
     MAX_COMPARABLES,
     Comparable,
@@ -167,3 +170,73 @@ def test_comparables_need_a_confirmed_offer_and_geography() -> None:
         _report([_candidate()], frame=_frame(geography=None))
     with pytest.raises(ValidationError, match="comparables_need_offer_and_geography"):
         _report([_candidate()], frame=_frame(offer_category=" "))
+
+
+# --- searches for the businesses the owner named (privacy) -------------------
+
+PRIVATE: dict[str, object] = {
+    "company_names": ["Tortillería Zorblax"],
+    "people": ["Ximena Vrkalova"],
+    "figures": ["$987,654"],
+}
+MARKERS = ["zorblax", "ximena", "vrkalova", "987654"]
+
+
+def _flat(text: str) -> str:
+    return normalize(text).replace(" ", "").replace(",", "").replace(".", "")
+
+
+def _frame_input(**fields: object) -> dict[str, object]:
+    return _frame(confirmed=False, queries=[]).model_dump() | fields
+
+
+def test_one_search_per_business_the_owner_named_at_most_two() -> None:
+    frame = _frame(
+        queries=[],
+        competitors=["Tortillería El Sol", "Molino La Luna", "Maíz Tres"],
+    )
+
+    queries = build_queries(frame)
+
+    assert "precios de Tortillería El Sol en Puebla" in queries
+    assert "precios de Molino La Luna en Puebla" in queries
+    assert not any("Maíz Tres" in query for query in queries)
+    assert len(queries) == 5
+
+
+def test_other_modes_do_not_search_for_named_businesses() -> None:
+    queries = build_queries(_frame(mode="mercado", queries=[]))
+
+    assert not any("El Sol" in query for query in queries)
+
+
+def test_a_named_business_carrying_the_company_or_its_people_is_not_searched() -> None:
+    frame = _frame_input(competitors=["Zorblax Express", "Tacos de Ximena Vrkalova"])
+
+    result = run({"action": "frame", "frame": frame, "private": PRIVATE})
+
+    assert result.frame is not None
+    assert sorted(item.reason for item in result.rejected) == ["empresa", "persona"]
+    for query in result.frame.queries:
+        for marker in MARKERS:
+            assert marker not in _flat(query)
+    for marker in MARKERS:
+        assert marker not in _flat(result.message)
+
+
+def test_benchmark_without_a_city_or_zone_asks_before_searching() -> None:
+    web = run(
+        {"action": "frame", "frame": _frame_input(geography=None), "private": PRIVATE}
+    )
+    offline = run(
+        {
+            "action": "frame",
+            "frame": _frame_input(geography=" ", search_mode="sin_busqueda"),
+            "private": PRIVATE,
+        }
+    )
+
+    for result in (web, offline):
+        assert result.errors == ["needs_geography"]
+        assert result.message == messages.NEEDS_OFFER
+        assert result.frame is None
