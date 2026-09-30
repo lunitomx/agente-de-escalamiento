@@ -7,9 +7,9 @@ from pathlib import Path
 from typing import Any, Literal
 from uuid import uuid4
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
-from coaching.core import ensure_dir, read_yaml, write_yaml
+from coaching.core import ensure_dir, read_yaml, require_local_ref, write_yaml
 
 Confidence = Literal["high", "medium", "low"]
 Decision = Literal["people", "strategy", "execution", "cash"]
@@ -39,6 +39,12 @@ class Fact(BaseModel):
             tz=datetime.timezone.utc
         ).isoformat()
     )
+
+    @field_validator("source")
+    @classmethod
+    def _source_must_not_escape_local_boundary(cls, value: str) -> str:
+        """Same locality rule as DiagnosticEvidence.source_ref (E55 D4)."""
+        return require_local_ref(value, "source")
 
 
 def _facts_path(base_path: Path) -> Path:

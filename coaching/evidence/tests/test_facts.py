@@ -38,6 +38,45 @@ def test_fact_requires_source() -> None:
         )
 
 
+@pytest.mark.parametrize(
+    "source",
+    [
+        "https://example.com/export.csv",
+        "http://example.com/export.csv",
+        "file:///tmp/export.csv",
+        "/Users/someone/export.csv",
+        "\\\\server\\share\\export.csv",
+        "C:\\exports\\export.csv",
+        "../otra-empresa/export.csv",
+        "exports/../../export.csv",
+    ],
+)
+def test_fact_source_must_stay_inside_local_boundary(source: str) -> None:
+    with pytest.raises(ValidationError):
+        Fact(
+            metric_definition="Ingreso",
+            period="2026-07",
+            source=source,
+            confidence="high",
+            value=1,
+        )
+
+
+@pytest.mark.parametrize(
+    "source",
+    ["export_plataforma_julio.csv", "exports/erp-julio.csv", "conversacion_onboarding"],
+)
+def test_fact_accepts_local_relative_source(source: str) -> None:
+    fact = Fact(
+        metric_definition="Ingreso",
+        period="2026-07",
+        source=source,
+        confidence="high",
+        value=1,
+    )
+    assert fact.source == source
+
+
 def test_fact_requires_period() -> None:
     with pytest.raises(ValidationError):
         Fact(

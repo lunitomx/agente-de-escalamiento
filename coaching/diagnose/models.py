@@ -11,6 +11,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field, field_validator
 
+from coaching.core import require_local_ref
+
 Applicability = Literal["applicable", "not_applicable", "unknown"]
 AnswerStatus = Literal["fact", "estimate", "inference", "unanswered"]
 Freshness = Literal["current", "stale", "unknown"]
@@ -45,13 +47,7 @@ class DiagnosticEvidence(BaseModel):
     @classmethod
     def _source_ref_must_not_escape_local_boundary(cls, value: str) -> str:
         """Reject URLs, absolute paths, and parent traversal in evidence refs."""
-        if value.startswith(("http://", "https://", "file://")):
-            raise ValueError("source_ref must not be a URL")
-        if value.startswith(("/", "\\\\")) or ":\\" in value[:10]:
-            raise ValueError("source_ref must not be an absolute path")
-        if ".." in value:
-            raise ValueError("source_ref must not contain parent traversal")
-        return value
+        return require_local_ref(value, "source_ref")
 
     @property
     def included_in_score(self) -> bool:

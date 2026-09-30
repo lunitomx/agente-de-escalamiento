@@ -31,6 +31,17 @@ def ensure_dir(path: Path) -> Path:
     return path
 
 
+def require_local_ref(value: str, field_name: str) -> str:
+    """Reject URLs, absolute paths, and parent traversal in evidence refs."""
+    if value.startswith(("http://", "https://", "file://")):
+        raise ValueError(f"{field_name} must not be a URL")
+    if value.startswith(("/", "\\\\")) or ":\\" in value[:10]:
+        raise ValueError(f"{field_name} must not be an absolute path")
+    if ".." in value:
+        raise ValueError(f"{field_name} must not contain parent traversal")
+    return value
+
+
 def read_yaml(path: Path) -> dict:
     """Read a YAML file, returning empty dict on failure."""
     try:
