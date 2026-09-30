@@ -77,6 +77,10 @@ decisions:
     choice: "Conciliación conservadora: bloquear comparaciones incompatibles."
     rationale: "Mejor no calcular ROAS/escala que calcular con métricas distintas."
     constraint: "Nunca inferir equivalencia entre métricas de distinta naturaleza."
+  - id: D4
+    choice: "Fact (coaching/evidence/facts.py) es la observación de métrica cruda; DiagnosticEvidence (E49) sigue siendo la respuesta que soporta un score y puede citar un fact_id."
+    rationale: "Conceptos distintos: un export no tiene question_id; extender DiagnosticEvidence arriesga regresión en el diagnóstico de E49. Decidido 2026-09-30 tras AR de S55.1."
+    constraint: "S55.2 debe aplicar a Fact.source el mismo validador de localidad que DiagnosticEvidence.source_ref (sin URLs, rutas absolutas ni '..') antes de construir sobre Fact."
 constraints:
   - "Solo archivos locales; sin APIs ni OAuth de terceros."
   - "No inventar scores ni fusionar entidades agresivamente."
