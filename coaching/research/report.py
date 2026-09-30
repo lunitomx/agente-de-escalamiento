@@ -28,6 +28,7 @@ from coaching.research.models import (
     ResearchFrame,
     ResearchReport,
     SourceRecord,
+    without_urls,
 )
 
 RESEARCH_DIR = Path(".escala") / "my-company" / "research"
@@ -317,6 +318,19 @@ def load_index(base: Path) -> list[IndexEntry]:
         return []
 
 
+def load_saved_report(base: Path, entry: IndexEntry) -> ResearchReport | None:
+    """The structured report behind an index line, or None if unreadable.
+
+    Only a file inside the research folder is read, whatever the index says.
+    """
+    name = Path(entry.reference).with_suffix(".json").name
+    try:
+        raw = (base / RESEARCH_DIR / name).read_text(encoding="utf-8")
+        return ResearchReport.model_validate_json(raw)
+    except (OSError, ValidationError):
+        return None
+
+
 def _free_path(folder: Path, stem: str) -> Path:
     path = folder / f"{stem}.md"
     counter = 2
@@ -334,12 +348,15 @@ def save_report(report: ResearchReport, base: Path) -> Path:
     folder.mkdir(parents=True, exist_ok=True)
     path = _free_path(folder, f"{report.researched_on.isoformat()}-{report.frame.mode}")
     path.write_text(render_markdown(report), encoding="utf-8")
+    path.with_suffix(".json").write_text(
+        report.model_dump_json(indent=2), encoding="utf-8"
+    )
     entry = IndexEntry(
         reference=(RESEARCH_DIR / path.name).as_posix(),
         mode=report.frame.mode,
         question=report.frame.question,
         decision_area=report.frame.decision_area,
-        decision=_option(report.chosen),
+        decision=without_urls(_option(report.chosen)),
         researched_on=report.researched_on,
         review_by=report.review_by,
     )

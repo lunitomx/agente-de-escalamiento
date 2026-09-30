@@ -8,6 +8,7 @@ may suggest what to search, never what is true.
 
 from __future__ import annotations
 
+import re
 import unicodedata
 from datetime import date
 from typing import Literal, Self
@@ -37,6 +38,25 @@ def normalize(text: str) -> str:
         unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("ascii")
     )
     return " ".join(ascii_text.lower().split())
+
+
+URL_PLACEHOLDER = "(enlace en el reporte)"
+
+
+_URL = re.compile(
+    r"(?:\b(?:https?|file)://|\bwww\.|\b[\w-]+(?:\.[\w-]+)+/)"
+    r"\S*?(?=[.,;:!?)\]»\"']*(?:\s|$))",
+    re.IGNORECASE,
+)
+
+
+def without_urls(text: str) -> str:
+    """Text safe to leave the report: every link replaced (E83 S83.5).
+
+    URLs live only inside the local report; the index and the diagnosis keep
+    the report's local path instead.
+    """
+    return _URL.sub(URL_PLACEHOLDER, text)
 
 
 def _required(value: str) -> str:

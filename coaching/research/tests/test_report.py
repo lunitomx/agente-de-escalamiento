@@ -21,10 +21,12 @@ from coaching.research.models import (
     ResearchFrame,
     ResearchReport,
     SourceRecord,
+    without_urls,
 )
 from coaching.research.report import (
     build_report,
     load_index,
+    load_saved_report,
     render_markdown,
     report_message,
     save_report,
@@ -304,3 +306,65 @@ def test_research_folder_is_ignored_by_git() -> None:
     )
 
     assert result.returncode == 0
+
+
+def test_save_keeps_the_structured_report_next_to_the_markdown(
+    tmp_path: Path,
+) -> None:
+    """E83 S83.5: the next diagnosis reads the report without parsing Markdown."""
+    report = _report(chosen="A")
+
+    path = save_report(report, tmp_path)
+
+    structured = path.with_suffix(".json")
+    assert structured.exists()
+    assert load_saved_report(tmp_path, load_index(tmp_path)[0]) == report
+
+
+def test_saved_report_that_is_missing_or_broken_reads_as_none(
+    tmp_path: Path,
+) -> None:
+    save_report(_report(chosen="A"), tmp_path)
+    entry = load_index(tmp_path)[0]
+    structured = tmp_path / entry.reference.replace(".md", ".json")
+
+    structured.write_text("{roto", encoding="utf-8")
+    assert load_saved_report(tmp_path, entry) is None
+    structured.unlink()
+    assert load_saved_report(tmp_path, entry) is None
+
+
+def test_index_never_keeps_a_url_even_inside_the_decision_text(
+    tmp_path: Path,
+) -> None:
+    """E83 S83.5: URLs do not leave the report, whatever text they come in."""
+    options = [
+        DecisionOption(
+            label="A", text="Copiar el paquete de https://competidor.test/paquetes"
+        ),
+        DecisionOption(label="B", text="Ver www.otro.test/precios y decidir"),
+    ]
+
+    save_report(_report(options=options, chosen="A"), tmp_path)
+    save_report(_report(options=options, recommendation="B", chosen="B"), tmp_path)
+
+    index_text = (tmp_path / ".escala/my-company/research/index.yaml").read_text(
+        encoding="utf-8"
+    )
+    assert "http" not in index_text
+    assert "www." not in index_text
+    assert "competidor.test" not in index_text
+    assert "(enlace en el reporte)" in index_text
+    assert "Copiar el paquete de" in index_text
+
+
+def test_without_urls_leaves_plain_text_and_publishers_alone() -> None:
+    assert without_urls("Subir 8% en enero") == "Subir 8% en enero"
+    assert without_urls("según INEGI y Diario Uno") == "según INEGI y Diario Uno"
+    assert (
+        without_urls("ver HTTPS://X.test/a?b=1, luego decidir")
+        == "ver (enlace en el reporte), luego decidir"
+    )
+    assert without_urls("en ejemplo.test/precios hay más") == (
+        "en (enlace en el reporte) hay más"
+    )
