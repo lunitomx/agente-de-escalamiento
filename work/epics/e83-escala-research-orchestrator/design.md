@@ -31,13 +31,13 @@ Detalle y evidencia en `capability-map.md` y `evidence/predesign.json` (sobre `6
 - **El modo 3 no produce su propio documento**: entrega la parte externa (posición frente al mercado y tendencias) a `escala-strategy-swt`, que sigue siendo el único SWT.
 - **`capabilities/mvp/catalog.json` no cambia**: la investigación es un sub-procedimiento que se alcanza desde el especialista de strategy o como ruta propuesta por el diagnóstico (E75), igual que el tracker de E82 se alcanza desde las prioridades.
 - **El diagnóstico no cambia de contrato**: recibe la decisión confirmada y los supuestos por los campos que ya tiene.
-- Lo único que se toca fuera de lo nuevo: palabras clave de la ruta de Strategy, el `trigger` del especialista de strategy (añadir "benchmark o tendencias") y un paso final en `escala-strategy-swt`.
+- Lo único que se toca fuera de lo nuevo: palabras clave de la ruta de Strategy y un paso final en `escala-strategy-swt`. El `trigger` del especialista de strategy no cambia (ya cubre market y competition; tendencias de mercado caen ahí).
 
 ## Experiencia (lo que ve el empresario)
 
 Español llano, un paso por mensaje, ESCALA propone. Nunca aparecen las palabras "módulo", "triangulación", "TAM" ni el nombre del procedimiento.
 
-1. **Entrada.** O el empresario pregunta ("¿cuánto cobran los demás?", "¿cómo está mi mercado?", "¿qué viene para mi sector?"), o ESCALA lo propone al terminar el diagnóstico: "Tu freno parece ser el precio. Antes de decidir, ¿vemos cómo cobran negocios parecidos al tuyo? Son unos minutos."
+1. **Entrada.** O el empresario pregunta ("¿cuánto cobra mi competencia?", "¿cómo está mi mercado?", "¿qué tendencias vienen para mi sector?"), o ESCALA lo propone al terminar el diagnóstico: "Tu freno parece ser el precio. Antes de decidir, ¿vemos cómo cobran negocios parecidos al tuyo? Son unos minutos."
 2. **Encuadre y permiso en un solo mensaje.** "Quieres decidir si subes tus precios. Voy a buscar: *precios de [servicio] en [ciudad] 2026*, *[competidor público] tarifas*, *[sector] [país] márgenes*. No llevo tu nombre ni tus cifras. ¿Va, o cambio algo?" Un sí confirma la pregunta, la decisión que informa y las búsquedas.
 3. **Sin búsqueda web en ese asistente.** "Aquí no puedo buscar en internet. Si me pasas dos o tres cosas (el link de un competidor, una cotización que te llegó, lo que te dicen tus clientes), lo hago con eso y te digo hasta dónde llega." Nunca se rellena con lo que el modelo "recuerda".
 4. **Resultado corto.** Máximo tres hallazgos. Cada uno dice qué tan seguro es en palabras (**confirmado**: tres fuentes independientes con fecha; **por confirmar**: menos), de dónde sale y de cuándo es. Siempre: "lo que dice lo contrario" y "lo que no encontré".
@@ -67,9 +67,9 @@ Salida (`report.py`): `.escala/my-company/research/AAAA-MM-DD-<modo>.md` (legibl
 
 Entrada: `echo '<json>' | python3 -m coaching.research` con acciones `frame`, `grade`, `report`, `save`, como `coaching.tracker`.
 
-Procedimiento `escala-skills/escala-strategy-research/SKILL.md` (`visibility: internal`, `owner: strategy`): pasos 1-6 de la experiencia, reglas que no se rompen, y cómo detectar búsqueda: el agente usa búsqueda sólo si su sesión le ofrece una herramienta de búsqueda web; si no, pasa a `sin_busqueda`. No se deduce por el nombre de la plataforma.
+Procedimiento `escala-skills/escala-strategy-research/SKILL.md` (`visibility: internal`, `owner: strategy`): pasos 1-6 de la experiencia, reglas que no se rompen, y cómo detectar búsqueda: el agente usa búsqueda sólo si su sesión le ofrece una herramienta de búsqueda web; si no, pasa a `sin_busqueda`. No se deduce por el nombre de la plataforma. Reglas del procedimiento que el módulo no puede imponer (el agente ejecuta la búsqueda en el cliente): buscar **sólo** las búsquedas que devolvió `frame`; registrar una fuente web sólo si se abrió la página (no el fragmento del buscador), con la fecha que la página muestra o `published_on` vacío; `excerpt` es una cita literal. S83.5 muestrea reportes y comprueba que las URLs abren y el extracto aparece.
 
-Gobierno: entrada en `catalog.yaml` y en `tests/test_capability_catalog.py` cambian **dos** aserciones (63 → 64, 64 → 65); palabras `mercado`, `competidores`, `tendencias`, `benchmark`, `investigar` en la ruta de Strategy con casos nuevos en `test_natural_requests_choose_an_explainable_first_capability`; `trigger` del especialista de strategy + regeneración de `adapters/claude|codex/agents/escala-strategy.*` (la prueba de deriva de `tests/test_s67_5_specialist_agents.py` lo exige).
+Gobierno: entrada en `catalog.yaml` y en `tests/test_capability_catalog.py` cambian **dos** aserciones (63 → 64, 64 → 65); palabras `mercado`, `competidor` (cubre singular y plural; `competencia` no coincide con "competidores" porque la ruta compara subcadenas), `tendencias` y `benchmark` en la ruta de Strategy, con casos nuevos en `test_natural_requests_choose_an_explainable_first_capability`. No se añade `investigar` (demasiado amplio: "investigar por qué no cobro" es Cash); un pedido vago sigue en welcome, que pregunta. Las rutas se evalúan en orden y Cash va primero: un caso de prueba fija que "benchmark de ventas" hoy cae en Cash por `ventas` y se acepta así (Cash puede ofrecer la investigación).
 
 ### S83.2 — modo benchmark
 
@@ -87,7 +87,7 @@ Posición frente al mercado (reusa los comparables de S83.2 si existen y siguen 
 
 - `to_diagnostic_inputs(report) -> DiagnosticInputs`: la decisión confirmada → un `DiagnosticEvidence` con `source_kind="conversation"`, `answer_status="fact"`, `source_ref` = ruta local del reporte, `decision` = área de la decisión; cada afirmación externa → una línea en `assumptions` con estado, fuentes y fecha; lo no encontrado → `open_questions`. No se cambia `coaching/diagnose/models.py`. Por verificar en la historia: que el texto de la decisión pase `_is_detailed_narrative`.
 - Un reporte vencido (`review_by` pasado) entra con `freshness="stale"` y ESCALA ofrece actualizarlo antes de usarlo.
-- Ruta de entrada desde el diagnóstico: cuando la restricción principal es de Strategy o de Cash por precio/margen, la propuesta de ruta de E75 incluye el modo que corresponde (tabla D2). Si E75 S75.3 aún no existe, el procedimiento de diagnóstico sólo ofrece la investigación como siguiente paso en texto; no se simula el hand-off.
+- Ruta de entrada desde el diagnóstico: cuando la restricción principal es de Strategy o de Cash por precio/margen, la propuesta de ruta de E75 incluye el modo que corresponde (tabla D2). Quien ofrece la investigación es `escala`, no el especialista de cash (los especialistas no se invocan entre sí); el procedimiento corre con el especialista de strategy y la decisión se registra en el área del encuadre (p. ej. `cash` si es precio). Si E75 S75.3 aún no existe, el procedimiento de diagnóstico sólo ofrece la investigación como siguiente paso en texto; no se simula el hand-off.
 - Matriz verificada por plataforma: con búsqueda / sin búsqueda, cómo se detecta, comando o pasos para reproducir. Superficies: Claude Code, Codex, Claude (claude.ai / Desktop) si ESCALA corre ahí. ChatGPT Work queda como "no verificado" hasta E85.
 
 ## Contratos clave
@@ -132,14 +132,15 @@ Por qué: (1) E75 ya decidió que el usuario no sigue un orden editorial y que e
 
 ## Otras incógnitas abiertas (no se afirman)
 
-- U3: si `_is_detailed_narrative` acepta el texto de una decisión confirmada tal cual (S83.5 lo verifica; si no, se ajusta el texto, no el validador).
+- U3 (cerrada en el red-team): `_is_detailed_narrative` pide ≥ 20 caracteres y ≥ 4 palabras (`coaching/diagnose/primary_constraint.py:164`); una decisión redactada como frase la pasa. S83.5 sólo guarda la decisión con su porqué, nunca la letra de la opción.
+- U7: la búsqueda ocurre en el cliente, fuera del módulo: que el agente respete las búsquedas aprobadas y no invente fuentes o fechas es regla del procedimiento, no garantía técnica. Se mitiga con el muestreo de S83.5; no se afirma más.
 - U4: si E75 S75.3 (elegir ruta) llega antes que S83.5; si no, la entrada desde el diagnóstico es una sugerencia en texto.
 - U5: cuántas fuentes independientes con fecha se encuentran para negocios locales pequeños; puede que casi todo quede "por confirmar". Es honesto, pero hay que ver en S83.2 si la experiencia sigue siendo útil.
 - U6: ventana de frescura de 90 días para todo (D6); puede requerir una por modo si S83.3 lo muestra.
 
 ## Revisión adversarial
 
-`design.redteam.json`: los hallazgos `wrong`/`weak` se incorporan arriba.
+`design.redteam.json` (autorrevisión sobre `0ef9a9f`): los hallazgos `wrong`/`weak` ya están incorporados arriba (rutas por subcadena y `investigar` fuera, `trigger` sin cambio, quién ofrece la investigación desde Cash, U3 cerrada, límites de lo que el módulo puede imponer). El punto ciego (el agente busca y cita fuera del módulo) queda declarado en U7 y se mitiga con el muestreo de S83.5.
 
 ### Machine
 ```yaml
@@ -153,14 +154,6 @@ modules_affected:
   - path: escala-skills/catalog.yaml
     change: modify
   - path: tests/test_capability_catalog.py
-    change: modify
-  - path: escala_server/specialist_team.py
-    change: modify
-  - path: adapters/specialists/contract.json
-    change: modify
-  - path: adapters/claude/agents/escala-strategy.md
-    change: modify
-  - path: adapters/codex/agents/escala-strategy.toml
     change: modify
   - path: escala-skills/escala-strategy-swt/SKILL.md
     change: modify
