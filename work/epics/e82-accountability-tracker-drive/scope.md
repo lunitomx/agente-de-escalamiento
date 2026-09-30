@@ -46,7 +46,7 @@ Las áreas coinciden con Cash/People/Strategy/Execution de ESCALA; Critical Numb
 | Historia | Entrega | Tamaño | Estado |
 |---|---|:---:|---|
 | S82.1 | Spike: capacidades reales de edición de Sheets vía conectores Drive (Claude, ChatGPT) | S | complete — ver stories/s82.1-spike-drive-connectors.md |
-| S82.2 | Modelo del tracker: lectura/validación de una hoja de participante y sus variaciones | M | planned |
+| S82.2 | Modelo del tracker: lectura/validación de una hoja de participante y sus variaciones | M | complete — `coaching/tracker/` |
 | S82.3 | Flujo guiado: identidad → conexión → selección de hoja propia con confirmación | M | planned |
 | S82.4 | Llenado: proponer filas desde prioridades/rocks de ESCALA y escribir tras confirmación | M | planned |
 | S82.5 | Mantenimiento previo a reunión: vencidos, `Done`, estado | S | planned |
