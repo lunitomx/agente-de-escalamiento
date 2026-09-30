@@ -1,7 +1,7 @@
 ---
 epic_id: E67
 title: Capacidades internas y adaptadores portables
-status: in_progress
+status: complete
 depends_on: [E45, E65, E56]
 ---
 
