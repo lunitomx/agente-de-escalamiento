@@ -2,6 +2,7 @@
 epic_id: E72
 title: Learning Day de Cash e inteligencia financiera guiada
 status: planned
+jira_key: "ESCALA-36"
 depends_on: [E38, E55, E63, E65, E67]
 ---
 

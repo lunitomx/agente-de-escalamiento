@@ -2,6 +2,7 @@
 epic_id: "E45"
 title: "Equipo instalado de cuatro especialistas bajo demanda"
 status: "in_progress"
+jira_key: "ESCALA-46"
 depends_on: ["E44", "E49"]
 created: "2026-07-23"
 ---

@@ -2,6 +2,7 @@
 epic_id: E60
 title: Corpus People verificado
 status: in_progress
+jira_key: "ESCALA-28"
 depends_on: [E58]
 ---
 

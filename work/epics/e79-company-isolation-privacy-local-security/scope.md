@@ -2,6 +2,7 @@
 epic_id: E79
 title: Aislamiento por empresa, privacidad y seguridad local
 status: planned
+jira_key: "ESCALA-42"
 closure_disposition: active
 created: 2026-09-12
 updated: 2026-09-12

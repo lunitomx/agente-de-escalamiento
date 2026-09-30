@@ -2,6 +2,7 @@
 epic_id: E68
 title: Calificación semántica y cross-platform del MVP
 status: in_progress
+jira_key: "ESCALA-32"
 depends_on: [E67, E35]
 related: [E78, E79, E80, E81]
 ---

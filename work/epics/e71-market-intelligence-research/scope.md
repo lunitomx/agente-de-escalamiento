@@ -2,6 +2,7 @@
 epic_id: E71
 title: Inteligencia de mercado, competencia y customer journey
 status: planned
+jira_key: "ESCALA-35"
 depends_on: [E49, E55, E67]
 ---
 

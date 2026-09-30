@@ -2,6 +2,7 @@
 epic_id: E62
 title: Corpus Execution verificado
 status: in_progress
+jira_key: "ESCALA-30"
 depends_on: [E58]
 ---
 

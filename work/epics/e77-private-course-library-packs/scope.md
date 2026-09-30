@@ -2,6 +2,7 @@
 epic_id: E77
 title: Biblioteca privada de cursos y packs instalables
 status: planned
+jira_key: "ESCALA-40"
 depends_on: [E57, E58, E65, E67, E68]
 related: [E69, E71, E75]
 closure_disposition: active

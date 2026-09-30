@@ -2,6 +2,7 @@
 epic_id: E75
 title: Diagnóstico adaptativo, confirmación y routing a Deep Dives
 status: in_progress
+jira_key: "ESCALA-39"
 depends_on: [E49, E55]
 blocked_handoffs: [E65]
 related: [E71, E72, E73]

@@ -2,6 +2,7 @@
 epic_id: E63
 title: Corpus Cash verificado
 status: in_progress
+jira_key: "ESCALA-31"
 depends_on: [E58]
 related: [E55]
 ---

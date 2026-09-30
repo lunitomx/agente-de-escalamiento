@@ -2,6 +2,7 @@
 epic_id: E74
 title: Workspace compartido por empresa y colaboración multiempresa local
 status: planned
+jira_key: "ESCALA-38"
 depends_on: [E37, E52, E55, E67, E79]
 ---
 

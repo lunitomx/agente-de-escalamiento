@@ -4,7 +4,7 @@ title: "Onboarding multifuente y conciliación de métricas de negocio"
 status: "complete"
 closure_disposition: "completed"
 created: "2026-08-21"
-jira_key: "ESCALA-11"
+jira_key: "ESCALA-20"
 source_issue: "https://github.com/lunitomx/agente-de-escalamiento/issues/9"
 source_issue_closed: "2026-08-28"
 ---
@@ -21,13 +21,13 @@ Construir en ESCALA un flujo de onboarding que acepte múltiples fuentes de evid
 
 | ID | Historia | Tamaño | Estado | Termina cuando |
 |---|---|:---:|:---:|---|
-| S55.1 | Contrato de hechos con procedencia (`ESCALA-12`) | 5 | Complete | Un hecho se persiste con definición de métrica, periodo, base de fecha, fuente, nivel de confianza y flag de comparabilidad. |
-| S55.2 | Dashboard de evidencia previo al diagnóstico (`ESCALA-13`) | 5 | Complete | Se muestra información conocida, pendiente y no comparable sin inventar scores. |
-| S55.3 | Onboarding adaptativo de las cuatro decisiones (`ESCALA-14`) | 8 | Complete | El flujo lee hechos autorizados, omite preguntas respondidas, hace una pregunta a la vez y ramifica hacia vacíos reales. |
-| S55.4 | Modelo nativo de conciliación financiera (`ESCALA-15`) | 8 | Complete | Se separan gasto entregado, cobro facturado, liquidación, registro contable, compras, cobros e ingreso atribuible; se bloquea comparación de métricas incompatibles. |
-| S55.5 | Resolución conservadora de entidades (`ESCALA-16`) | 5 | Complete | Regla configurable: identificador primario + coincidencia exacta de nombre como respaldo; ambigüedades quedan sin fusionar. |
-| S55.6 | Mapa de decisión y parking lot (`ESCALA-17`) | 3 | Complete | Hallazgos y datos faltantes se convierten en tareas trazables por decisión, prioridad y evidencia requerida. |
-| S55.7 | Calificación, regresión y documentación (`ESCALA-18`) | 5 | Complete | Casos de multifuente, conciliación y boundary de privacidad pasan con evidencia; SKILL.md actualizado. |
+| S55.1 | Contrato de hechos con procedencia (`ESCALA-21`) | 5 | Complete | Un hecho se persiste con definición de métrica, periodo, base de fecha, fuente, nivel de confianza y flag de comparabilidad. |
+| S55.2 | Dashboard de evidencia previo al diagnóstico (`ESCALA-22`) | 5 | Complete | Se muestra información conocida, pendiente y no comparable sin inventar scores. |
+| S55.3 | Onboarding adaptativo de las cuatro decisiones (`ESCALA-23`) | 8 | Complete | El flujo lee hechos autorizados, omite preguntas respondidas, hace una pregunta a la vez y ramifica hacia vacíos reales. |
+| S55.4 | Modelo nativo de conciliación financiera (`ESCALA-24`) | 8 | Complete | Se separan gasto entregado, cobro facturado, liquidación, registro contable, compras, cobros e ingreso atribuible; se bloquea comparación de métricas incompatibles. |
+| S55.5 | Resolución conservadora de entidades (`ESCALA-25`) | 5 | Complete | Regla configurable: identificador primario + coincidencia exacta de nombre como respaldo; ambigüedades quedan sin fusionar. |
+| S55.6 | Mapa de decisión y parking lot (`ESCALA-26`) | 3 | Complete | Hallazgos y datos faltantes se convierten en tareas trazables por decisión, prioridad y evidencia requerida. |
+| S55.7 | Calificación, regresión y documentación (`ESCALA-27`) | 5 | Complete | Casos de multifuente, conciliación y boundary de privacidad pasan con evidencia; SKILL.md actualizado. |
 
 ## Criterios de terminación
 

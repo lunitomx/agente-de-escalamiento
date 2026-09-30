@@ -2,6 +2,7 @@
 epic_id: E70
 title: Calificación total y gate de distribución
 status: planned
+jira_key: "ESCALA-34"
 depends_on: [E36, E42, E68, E69, E71, E72, E73, E74, E75, E81]
 ---
 

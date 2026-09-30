@@ -2,6 +2,7 @@
 epic_id: "E46"
 title: "Governed Product Improvement"
 status: "planned"
+jira_key: "ESCALA-47"
 depends_on: ["E42", "E43", "E44", "E45"]
 supersedes: ["E24"]
 created: "2026-07-23"

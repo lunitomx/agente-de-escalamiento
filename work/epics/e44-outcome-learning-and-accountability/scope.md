@@ -2,6 +2,7 @@
 epic_id: "E44"
 title: "Outcome Learning and Accountability"
 status: "in_progress"
+jira_key: "ESCALA-45"
 depends_on: ["E43"]
 release_gate: ["E42"]
 created: "2026-07-23"

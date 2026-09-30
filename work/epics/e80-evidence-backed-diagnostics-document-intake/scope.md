@@ -2,6 +2,7 @@
 epic_id: E80
 title: Diagnósticos honestos e ingreso de información útil
 status: planned
+jira_key: "ESCALA-43"
 closure_disposition: active
 created: 2026-09-12
 updated: 2026-09-12

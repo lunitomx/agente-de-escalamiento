@@ -2,6 +2,7 @@
 epic_id: E69
 title: Biblioteca completa de procedimientos por olas
 status: planned
+jira_key: "ESCALA-33"
 depends_on: [E68]
 ---
 

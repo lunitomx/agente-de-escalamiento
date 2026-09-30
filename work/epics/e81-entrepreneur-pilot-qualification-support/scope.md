@@ -2,6 +2,7 @@
 epic_id: E81
 title: Piloto empresarial de 3–5 a 20 participantes y soporte medible
 status: planned
+jira_key: "ESCALA-44"
 closure_disposition: active
 created: 2026-09-12
 updated: 2026-09-12

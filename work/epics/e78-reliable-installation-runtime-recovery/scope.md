@@ -2,6 +2,7 @@
 epic_id: E78
 title: Instalación, runtime y recuperación verificables
 status: planned
+jira_key: "ESCALA-41"
 closure_disposition: active
 created: 2026-09-12
 updated: 2026-09-12

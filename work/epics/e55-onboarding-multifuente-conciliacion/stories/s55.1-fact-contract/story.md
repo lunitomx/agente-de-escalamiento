@@ -2,7 +2,7 @@
 story_id: "S55.1"
 epic_id: "E55"
 title: "Contrato de hechos con procedencia"
-jira_key: "ESCALA-12"
+jira_key: "ESCALA-21"
 status: "complete"
 created: "2026-08-21"
 ---

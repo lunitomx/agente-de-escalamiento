@@ -2,6 +2,7 @@
 epic_id: E73
 title: Asesor adaptativo de dashboards de negocio
 status: planned
+jira_key: "ESCALA-37"
 depends_on: [E38, E40, E55, E65, E67, E80]
 ---
 

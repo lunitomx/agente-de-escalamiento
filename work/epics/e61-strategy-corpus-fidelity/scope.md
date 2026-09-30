@@ -2,6 +2,7 @@
 epic_id: E61
 title: Corpus Strategy verificado
 status: in_progress
+jira_key: "ESCALA-29"
 depends_on: [E58]
 ---
 
