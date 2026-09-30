@@ -1,7 +1,8 @@
 ---
 epic_id: E73
 title: Asesor adaptativo de dashboards de negocio
-status: planned
+status: absorbed
+absorbed_by: E84
 jira_key: "ESCALA-37"
 depends_on: [E38, E40, E55, E65, E67, E80]
 ---
@@ -73,3 +74,8 @@ E75 puede recomendar cuál dashboard solicitar después de un deep dive.
 | Paneles decorativos | requerir decisión, owner y cadencia antes de generar. |
 | Exceso de recomendaciones | límite de dos y ranking por evidencia/impacto. |
 | Confundir dato débil con insight | gate de procedencia, freshness y comparabilidad. |
+
+
+## Disposición (2026-09-30)
+
+Absorbida por E84 (ESCALA-50) por decisión del dueño.
