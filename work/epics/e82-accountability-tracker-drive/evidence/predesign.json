@@ -1,0 +1,16 @@
+{
+  "schema_version": "2",
+  "epic": "ESCALA-48",
+  "registry_hash": null,
+  "graph_revision": null,
+  "source_commit": "5d3f217311bd3289d5c592bf0d031fb092f35178",
+  "note": "Evidence reused from delivered stories S82.1 and S82.2; no fresh graph queries (Python-module graph not relevant to Drive/Sheets domain).",
+  "claims": [
+    {"id": "C1", "capability": "Read participant sheet via Claude Drive connector", "queries": ["stories/s82.1-spike-drive-connectors.md"], "hits": ["claude.ai Google Drive connector: search_files, read_file_content (markdown tables, formulas resolved)"], "disposition": "reuse", "jira_refs": ["ESCALA-48"]},
+    {"id": "C2", "capability": "Write cells to shared Google Sheet via Claude Drive connector", "queries": ["stories/s82.1-spike-drive-connectors.md"], "hits": ["update_file changes only title/parent; no cell edit"], "disposition": "new", "rejected": ["update_file: cannot edit content", "create_file: would break the single shared group file"], "jira_refs": ["ESCALA-56", "ESCALA-54"]},
+    {"id": "C3", "capability": "Parse participant tracker sheet and variations", "queries": ["coaching/tracker/", "stories/s82.2-story.md", "stories/s82.2-retrospective.md"], "hits": ["coaching/tracker/parser.py parse_sheet, parse_connector_text", "coaching/tracker/models.py TrackerSheet, TrackerItem"], "disposition": "reuse", "jira_refs": []},
+    {"id": "C4", "capability": "Identify the user's own sheet unambiguously", "queries": ["stories/s82.2-retrospective.md"], "hits": ["parser reads name from sheet; 'Name 6' case shows formula may be unfilled"], "disposition": "extend", "jira_refs": ["ESCALA-53"]},
+    {"id": "C5", "capability": "Sheets write via Sheets MCP / ChatGPT Work / Codex MCP", "queries": [], "hits": [], "disposition": "new", "unknown": true, "jira_refs": ["ESCALA-56"]}
+  ],
+  "gaps": ["G1 write path unverified", "G2 ChatGPT/Codex capabilities unverified", "G3 identity confirmation not implemented", "G4 custom blocks (revenue) parsed only as unparsed_blocks"]
+}
