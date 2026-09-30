@@ -113,12 +113,15 @@ def _refusal(message: str, error: str) -> FlowResult:
 def _confirm(context: Mapping[str, object], base: Path) -> FlowResult:
     if context.get("user_confirmed") is not True:
         return _refusal(messages.NEEDS_YES, "needs_confirmation")
+    connector, pasted = _text(context, "connector_text"), _text(context, "pasted_text")
     tab_name = _text(context, "tab_name")
+    if tab_name is None and connector is None and pasted is not None:
+        # Owner default (S82.4): a pasted tab takes the name the user already gave.
+        tab_name = _text(context, "name")
     if tab_name is None:
         return _refusal(messages.ASK_TAB_NAME, "needs_tab_name")
     if " ".join(tab_name.lower().split()) == START_HERE:
         return _refusal(messages.START_HERE_IS_NOT_YOURS, "start_here")
-    connector, pasted = _text(context, "connector_text"), _text(context, "pasted_text")
     grid: Grid | None
     if connector is not None:
         grid = confirmed_tab_grid(connector, tab_name)
@@ -129,6 +132,14 @@ def _confirm(context: Mapping[str, object], base: Path) -> FlowResult:
     if grid is None:
         return _refusal(messages.tab_not_found_message(tab_name), "tab_not_found")
     sheet = parse_sheet(grid)
+    # Owner default (S82.4): the Drive notice is said once, on the first link
+    # through the connector, even if Drive was already connected.
+    first_link = load_link(base) is None
+    notice = (
+        connector is not None
+        and first_link
+        and context.get("drive_notice_shown") is not True
+    )
     link = TrackerLink(
         file_title=_text(context, "file_title") if connector is not None else None,
         file_id=_text(context, "file_id") if connector is not None else None,
@@ -136,9 +147,10 @@ def _confirm(context: Mapping[str, object], base: Path) -> FlowResult:
         confirmed_at=datetime.now(timezone.utc),
     )
     save_link(link, base)
+    message = messages.confirmed_message(tab_name, sheet.participant)
     return FlowResult(
         action="confirm",
-        message=messages.confirmed_message(tab_name, sheet.participant),
+        message=f"{message} {messages.DRIVE_NOTICE}" if notice else message,
         link=link,
         sheet=sheet,
     )

@@ -555,3 +555,93 @@ def test_propose_from_a_pasted_tab(tmp_path: Path) -> None:
     assert "**B4**" in result.message
     assert result.proposal is not None
     assert result.proposal.critical_number == "add"
+
+
+# --- S82.4 owner defaults -----------------------------------------------------
+
+
+def test_drive_notice_is_said_once_on_the_first_link_even_if_connected(
+    tmp_path: Path,
+) -> None:
+    first = _confirm_ana(str(tmp_path))
+    second = _confirm_ana(str(tmp_path))
+
+    assert DRIVE_NOTICE in first.message
+    assert first.message.startswith("Listo: tu pestaña es **Ana**.")
+    assert DRIVE_NOTICE not in second.message
+
+
+def test_drive_notice_is_not_repeated_if_the_connect_message_said_it(
+    tmp_path: Path,
+) -> None:
+    result = run(
+        {
+            "action": "confirm",
+            "base_path": str(tmp_path),
+            "user_confirmed": True,
+            "tab_name": "Ana",
+            "connector_text": _workbook(),
+            "drive_notice_shown": True,
+        }
+    )
+
+    assert result.errors == []
+    assert DRIVE_NOTICE not in result.message
+
+
+def test_pasted_tab_gets_no_drive_notice(tmp_path: Path) -> None:
+    result = run(
+        {
+            "action": "confirm",
+            "base_path": str(tmp_path),
+            "user_confirmed": True,
+            "tab_name": "Ana",
+            "pasted_text": "Participant Name\t\tAna Demo\n",
+        }
+    )
+
+    assert DRIVE_NOTICE not in result.message
+
+
+def test_pasted_tab_without_tab_name_uses_the_name_already_given(
+    tmp_path: Path,
+) -> None:
+    result = run(
+        {
+            "action": "confirm",
+            "base_path": str(tmp_path),
+            "user_confirmed": True,
+            "name": "Ana",
+            "pasted_text": "Participant Name\t\tAna Demo\n",
+        }
+    )
+
+    assert result.errors == []
+    assert result.link is not None and result.link.tab_name == "Ana"
+
+
+def test_pasted_tab_without_any_name_asks_for_the_tab(tmp_path: Path) -> None:
+    result = run(
+        {
+            "action": "confirm",
+            "base_path": str(tmp_path),
+            "user_confirmed": True,
+            "pasted_text": "Participant Name\t\tAna Demo\n",
+        }
+    )
+
+    assert result.errors == ["needs_tab_name"]
+
+
+def test_connector_path_still_needs_the_confirmed_tab_name(tmp_path: Path) -> None:
+    result = run(
+        {
+            "action": "confirm",
+            "base_path": str(tmp_path),
+            "user_confirmed": True,
+            "name": "Ana",
+            "connector_text": _workbook(),
+        }
+    )
+
+    assert result.errors == ["needs_tab_name"]
