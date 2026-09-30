@@ -25,9 +25,9 @@ created: 2026-09-30
 Todo en español llano, un paso por mensaje, y ESCALA propone el siguiente paso.
 
 1. El usuario menciona su tracker, su grupo o "mi hoja", o ESCALA termina de definir prioridades trimestrales y ofrece: "¿Las pasamos a tu hoja del grupo?".
-2. "¿Cómo te llamas y cómo se llama tu negocio?"
-3. Si no hay conector de Drive: "Para leer tu hoja, conecta Google Drive en tu Claude (Configuración → Conectores). Si no puedes, abre tu pestaña, selecciónala toda, cópiala y pégala aquí." No se prometen pasos para ChatGPT (E85).
-4. ESCALA busca el archivo y muestra **sólo nombres de pestaña** con su mejor candidata: "Creo que tu hoja es **Eduardo** (dice 'Eduardo · Mi negocio'). ¿Es la tuya?". Si la celda de nombre es un placeholder o está vacía: "Esta pestaña dice 'Name 6', no tu nombre. ¿Es la tuya?".
+2. "¿Cómo te llamas?" (sólo el nombre; el negocio se pregunta únicamente si dos pestañas empatan).
+3. Si no hay conector de Drive: "Para leer tu hoja, conecta Google Drive en tu Claude (Configuración → Conectores). Ojo: al conectarlo, el asistente puede ver todo el archivo compartido del grupo; ESCALA sólo usa tu pestaña. Si prefieres no conectarlo, abre tu pestaña, selecciónala toda, cópiala y pégala aquí." No se prometen pasos para ChatGPT (E85). La línea de aviso es obligatoria (decisión del dueño, AR-E82).
+4. ESCALA busca el archivo y muestra **sólo nombres de pestaña**, con la que coincide con el nombre del usuario como candidata: "Veo una pestaña que se llama **Eduardo**. ¿Es la tuya?". Si ninguna coincide, lista los nombres de pestaña y pregunta cuál es. Sólo después del sí lee las celdas de esa pestaña; si la celda de nombre es un placeholder o está vacía, lo dice entonces: "Tu pestaña dice 'Name 6' en vez de tu nombre; puedo trabajar igual, y conviene avisar al grupo para que llene START HERE". Nunca se cita el contenido de una pestaña antes de confirmarla.
 5. Con el sí, ESCALA recuerda la elección para la próxima vez (pregunta de nuevo si el archivo o la pestaña cambian).
 6. S82.4: "Te propongo estas 3 filas para tus compromisos de octubre" → tabla + bloque listo para pegar + dónde pegarlo ("debajo de la última fila de Monthly Commitments").
 7. S82.5: "Antes de tu reunión: 2 compromisos vencidos, 1 terminado que puedes pasar a Done." → propuesta concreta, nada se mueve sin su sí.
@@ -37,40 +37,43 @@ Todo en español llano, un paso por mensaje, y ESCALA propone el siguiente paso.
 ### S82.3 — identidad y hoja propia (`coaching/tracker/identity.py`)
 
 - `is_placeholder_name(name: str | None) -> bool` — vacío, `Name \d+`, `Participant Name`, `#REF!`/errores de fórmula.
-- `rank_candidates(sheets: dict[str, TrackerSheet], name: str, business: str | None) -> list[SheetCandidate]` — puntúa por coincidencia normalizada (acentos, mayúsculas) de nombre de pestaña, `participant` y `business`; excluye `START HERE`; marca `needs_confirmation=True` siempre y `placeholder=True` cuando aplica. Nunca devuelve una elección final.
-- `TrackerLink` (Pydantic): `file_title`, `file_id | None`, `tab_name`, `participant_confirmed`, `confirmed_at`. Guardado en `.escala/my-company/tracker.yaml` sólo tras la confirmación. Guarda la referencia, no el contenido.
+- `rank_candidates(tab_names: list[str], name: str, business: str | None = None) -> list[SheetCandidate]` — puntúa **sólo por el nombre de pestaña** (normalizado: acentos, mayúsculas) contra el nombre del usuario; `business` sólo desempata; excluye `START HERE`; marca `needs_confirmation=True` siempre. Nunca devuelve una elección final. No recibe `TrackerSheet`: las celdas de las otras pestañas no se parsean. Tras elegir, de `parse_connector_text` se conserva sólo la cuadrícula de `tab_name`; las demás se descartan antes de cualquier `parse_sheet`.
+- `is_placeholder_name` se aplica a la pestaña **ya confirmada** (para avisar), no para elegir.
+- `TrackerLink` (Pydantic): `file_title`, `file_id | None`, `tab_name`, `participant_confirmed`, `confirmed_at`. Guardado en `.escala/my-company/tracker.yaml` sólo tras la confirmación, por el procedimiento (no por el agente especialista, cuyo contrato dice "do not persist state"). Guarda la referencia, no el contenido. **Hoy `.escala/my-company/` no está en `.gitignore` y partes de `.escala/` sí están versionadas** (`git check-ignore` falla): S82.3 añade `.escala/my-company/` a `.gitignore` antes de escribir el primer archivo.
 - `parse_pasted_tab(text: str) -> Grid` — separa por `\t` y saltos de línea (formato que Sheets deja al copiar) → `parse_sheet`. Es el camino sin conector.
 
 ### S82.6 — spike de escritura (sin código de producto)
 
 Límite de tiempo: 1 día. Sólo sobre una copia sintética, que después se manda a la papelera. Candidatos: (a) conector de Drive de ChatGPT Work, (b) un MCP de Google Sheets con escritura por celda en Claude Desktop/Code, (c) el mismo MCP en Codex.
-Criterios GO (todos): el empresario lo instala sin terminal en ≤ 5 pasos; el permiso se puede limitar a ese archivo o, como mínimo, es auditable; escribe un rango de una pestaña concreta sin tocar fórmulas ni otras pestañas; el cambio se puede revertir (historial de versiones de Sheets).
+Criterios GO (todos): el empresario lo instala sin terminal en ≤ 5 pasos (aplica a claude.ai / Claude Desktop, que es donde está el empresario; Claude Code y Codex son superficies del dueño y no cuentan para este criterio); el permiso se puede limitar a ese archivo o, como mínimo, es auditable; escribe un rango de una pestaña concreta sin tocar fórmulas ni otras pestañas; el cambio se puede revertir (historial de versiones de Sheets).
 Salida: tabla verificada (igual que S82.1) + GO/NO-GO por superficie + comando para reproducir.
 
 ### S82.4 — proponer filas (`coaching/tracker/proposal.py`)
 
-- `propose_rows(sheet: TrackerSheet, plan: QuarterlyPlanInput, month: str) -> RowProposal` — mapea las prioridades de `quarterly_plan` a filas `Focus Area · Priority · KPI · Due Date`; usa las etiquetas de área que la hoja ya usa (variación 5 de S82.2), se salta las que ya están escritas (comparación normalizada) y no propone un Critical Number si la hoja ya tiene uno distinto: lo señala y pregunta.
+- `propose_rows(sheet: TrackerSheet, plan: QuarterlyPlanInput, month: str) -> RowProposal` — `QuarterlyPlanInput` es un modelo Pydantic **nuevo** construido desde la sección `quarterly_plan` del estado OPSP (hoy un `dict[str, Any]` en `coaching/strategy_opsp/engine.py`, no un tipo); mapea las prioridades de `quarterly_plan` a filas `Focus Area · Priority · KPI · Due Date`; usa las etiquetas de área que la hoja ya usa (variación 5 de S82.2), se salta las que ya están escritas (comparación normalizada) y no propone un Critical Number si la hoja ya tiene uno distinto: lo señala y pregunta.
 - `to_paste_block(rows) -> str` — TSV en el orden de columnas de la hoja, para pegar en Sheets. Más una tabla legible.
 - Escritura directa: sólo si S82.6 da GO en esa superficie, detrás de una confirmación explícita de filas + pestaña, y sólo sobre el `tab_name` de `TrackerLink`. Si da NO-GO, esta rama no se construye.
 
 ### S82.5 — mantenimiento previo a la reunión (`coaching/tracker/maintenance.py`)
 
 - `review_before_meeting(sheet: TrackerSheet, today: date) -> MeetingPrep` — vencidos (fecha < hoy y estado sin terminar), terminados que siguen en compromisos (proponer moverlos a `Done`), filas sin KPI o sin fecha.
-- `parse_due(text: str | None) -> date | None` — ISO, `dd/mm/yyyy`, `mm/dd/yyyy` sólo si no hay ambigüedad, nombres de mes en español/inglés. Lo que no se pueda leer queda como "fecha por confirmar"; no se adivina.
+- `parse_due(text: str | None) -> date | None` — ISO, `dd/mm/yyyy` y nombres de mes en español/inglés. Sin rama `mm/dd`: como el formato real no está catalogado (U4), cualquier fecha ambigua queda como "fecha por confirmar"; no se adivina. Se amplía sólo si un fixture real (sintetizado) lo exige.
 - Estado terminado: vocabulario cerrado (`done`, `hecho`, `terminado`, `completado`, `✅`, `100%`); lo demás es "sin terminar".
 - Salida: resumen en español + bloque para pegar en `Done`. Sin escrituras en el MVP.
 
 ### Superficie conversacional (sin comandos nuevos)
 
 - Un procedimiento interno `escala-execution-tracker` (`escala-skills/escala-execution-tracker/SKILL.md`), `visibility: internal`, `owner: execution`, al que se llega sólo desde `escala` vía el especialista de execution. El usuario nunca lo ve ni lo nombra.
-- Se añade `tracker de accountability / hoja del grupo` a los disparadores del especialista de execution y un paso final en `escala-execution-prioridad` / `escala-execution-priorities` que ofrece llevarlo al tracker.
-- Entrada del catálogo cerrado + baseline 62 → 63 en el test (cambio de gobierno; ver decisión para el humano).
+- Ruta real: `escala/SKILL.md` enruta por `capabilities/mvp/catalog.json` (seis capacidades MVP; `capability.set-quarterly-priority` → `procedure.set-quarterly-priority`, perfil `specialist.execution.v1`). El tracker **no es una capacidad MVP nueva**: es un sub-procedimiento alcanzado desde ese procedimiento (paso final de `escala-execution-prioridad` / `escala-execution-priorities`) o cuando el especialista de execution reconoce `tracker de accountability / hoja del grupo`. `capabilities/mvp/catalog.json` no cambia.
+- Se añade `tracker de accountability / hoja del grupo` al `trigger` del especialista de execution en `adapters/specialists/contract.json` y en `adapters/claude/agents/escala-execution.md` / `adapters/codex/agents/escala-execution.toml`, y un paso final en `escala-execution-prioridad` / `escala-execution-priorities` que ofrece llevarlo al tracker.
+- Entrada del catálogo cerrado + en `tests/test_capability_catalog.py` **dos** aserciones cambian: baseline `canonical_procedures` 62 → 63 y `len(catalog.capabilities)` 63 → 64 (cambio de gobierno; decisión del dueño ya tomada).
 
 ## Contratos clave
 
 - Entrada de lectura: texto del conector (`parse_connector_text`) o pestaña pegada (`parse_pasted_tab`). Ambos terminan en `TrackerSheet`.
 - De un workbook sólo se procesa y se retiene la pestaña confirmada. De las demás se usa el nombre de pestaña (para elegir) y nada más: no se resumen, no se citan, no se guardan.
-- Todo lo que se persiste va a `.escala/my-company/` (local, fuera del repo). Tests: sólo fixtures sintéticos.
+- Todo lo que se persiste va a `.escala/my-company/` (local). Hoy esa ruta **no** está ignorada por git; S82.3 la añade a `.gitignore` (ver S82.3). Tests: sólo fixtures sintéticos.
+- Privacidad del flujo: antes de la confirmación sólo circulan nombres de pestaña (ya visibles al usuario en Drive). Ningún mensaje de ESCALA, journal ni archivo local cita celdas de una pestaña no confirmada.
 
 ## Incógnitas abiertas (no se afirman)
 
@@ -100,6 +103,12 @@ modules_affected:
     change: modify
   - path: adapters/specialists/contract.json
     change: modify
+  - path: adapters/claude/agents/escala-execution.md
+    change: modify
+  - path: adapters/codex/agents/escala-execution.toml
+    change: modify
+  - path: .gitignore
+    change: modify
   - path: escala-skills/escala-execution-prioridad/SKILL.md
     change: modify
   - path: escala-skills/escala-execution-priorities/SKILL.md
@@ -110,9 +119,9 @@ decisions:
     rationale: "El usuario no aprende comandos; las reglas del tracker viven en un solo sitio"
     constraint: "Ningún comando ni alias público nuevo"
   - id: D2
-    choice: "La hoja propia se elige con rank_candidates más la confirmación explícita del usuario; la elección se persiste en TrackerLink"
-    rationale: "La celda de nombre puede ser un placeholder de fórmula ('Name 6')"
-    constraint: "Nunca elegir una pestaña sin el sí del usuario; nunca usar START HERE como hoja de participante"
+    choice: "La hoja propia se elige por nombre de pestaña (rank_candidates) más la confirmación explícita del usuario; la elección se persiste en TrackerLink"
+    rationale: "La celda de nombre puede ser un placeholder de fórmula ('Name 6'); leer celdas de otras pestañas para elegir viola D4"
+    constraint: "Nunca elegir una pestaña sin el sí del usuario; nunca citar celdas de una pestaña no confirmada; nunca usar START HERE como hoja de participante"
   - id: D3
     choice: "El MVP de S82.4 entrega un bloque TSV para pegar más una tabla legible; la escritura directa sólo si S82.6 da GO por superficie"
     rationale: "El conector verificado no escribe celdas (S82.1)"
@@ -132,7 +141,9 @@ decisions:
 constraints:
   - "S82.6 se completa antes de S82.4"
   - "Tests sólo con fixtures sintéticos; nada de ~/Downloads, .escala/ ni .scaleup/ en el repo"
-  - "Estado persistido sólo en .escala/my-company/ (local)"
+  - "Estado persistido sólo en .escala/my-company/ (local); S82.3 añade esa ruta a .gitignore antes del primer archivo"
+  - "Aviso de una línea al conectar Drive: el asistente ve todo el archivo compartido; ESCALA sólo usa tu pestaña"
+  - "El tracker no añade capacidad a capabilities/mvp/catalog.json; se alcanza desde procedure.set-quarterly-priority"
   - "Guía de conexión: sólo Claude verificado; no afirmar que ChatGPT Work funcione (E85)"
   - "Texto al usuario en español llano, sin jerga interna ni nombres de skills"
   - "Tipos completos, modelos Pydantic, pyright strict"
