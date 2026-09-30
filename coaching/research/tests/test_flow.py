@@ -252,3 +252,26 @@ def test_module_entry_point_speaks_json() -> None:
     assert out["frame"]["queries"]
     for marker in MARKERS:
         assert marker not in _flat(" ".join(out["frame"]["queries"]))
+
+
+def test_frame_hands_back_exactly_the_sanitized_searches() -> None:
+    proposed = ["precios de tortillas​ de maíz en Puebla 2026"]
+    result = run(
+        {"action": "frame", "frame": _frame(queries=proposed), "private": PRIVATE}
+    )
+
+    assert result.frame is not None
+    assert result.frame.queries == ["precios de tortillas de maíz en Puebla 2026"]
+    assert "*precios de tortillas de maíz en Puebla 2026*" in result.message
+
+
+def test_report_refuses_searches_that_differ_from_what_was_checked(
+    tmp_path: Path,
+) -> None:
+    frame = _frame(confirmed=True, queries=["precios Zor​blax"])
+    hidden = run(_report_context("report", tmp_path, frame=frame, private=PRIVATE))
+    frame = _frame(confirmed=True, queries=["precios de​ tortillas 2026"])
+    unsanitized = run(_report_context("report", tmp_path, frame=frame, private=PRIVATE))
+
+    assert hidden.errors == ["private_query"]
+    assert unsanitized.errors == ["private_query"]

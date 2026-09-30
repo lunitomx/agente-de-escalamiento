@@ -132,8 +132,11 @@ def _grade(context: Mapping[str, object]) -> FlowResult:
 def _build(context: Mapping[str, object], chosen: str | None) -> ResearchReport:
     frame = ResearchFrame.model_validate(context.get("frame"))
     private = _private(context)
-    if private is not None and check_queries(frame, private).rejected:
-        raise _Refusal("private_query", messages.NO_SAFE_QUERY)
+    if private is not None:
+        # The recorded searches must be exactly the text the check accepted.
+        checked = check_queries(frame, private)
+        if checked.rejected or checked.accepted != frame.queries:
+            raise _Refusal("private_query", messages.NO_SAFE_QUERY)
     return build_report(
         frame=frame,
         researched_on=_today(context),

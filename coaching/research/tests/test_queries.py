@@ -131,3 +131,113 @@ def test_years_are_allowed_unless_they_are_private_figures() -> None:
         update={"queries": ["tendencias tortillas 2026"]}
     )
     assert check_queries(frame, PrivateTerms(figures=["2026"])).accepted == []
+
+
+# Security review (S83.1): the check must run on exactly what is sent.
+
+
+@pytest.mark.parametrize(
+    ("query", "reason"),
+    [
+        ("precios Zor​blax Puebla", "empresa"),  # zero-width space
+        ("precios Zor⁠blax Puebla", "empresa"),  # word joiner
+        ("precios Zor­blax Puebla", "empresa"),  # soft hyphen
+        ("precios Ｚｏｒｂｌａｘ Puebla", "empresa"),  # fullwidth
+        ("precios Z.o.r.b.l.a.x Puebla", "empresa"),
+        ("precios Z o r b l a x Puebla", "empresa"),
+        ("Xi‍mena tortillas Puebla", "persona"),  # zero-width joiner
+        ("Ｘｉｍｅｎａ tortillas", "persona"),  # fullwidth
+        ("Okonkwo tortillas", "persona"),  # NBSP
+        ("precios Zоrblax Puebla", "caracteres"),  # Cyrillic o
+    ],
+)
+def test_hidden_or_disguised_names_are_rejected(query: str, reason: str) -> None:
+    result = _check([query])
+
+    assert result.accepted == []
+    assert [item.reason for item in result.rejected] == [reason]
+
+
+@pytest.mark.parametrize(
+    "query",
+    [
+        "tortillerías con 4 321 clientes",
+        "tortillerías con 4.321 clientes",
+        "tortillerías con 4'321 clientes",
+        "tortillerías con 4 321 clientes",
+        "tortillerías con 4 321 clientes",
+        "ventas de 987 654 al mes",
+        "tortillas 2026 4321",
+        "ventas de ９８７６５４",  # fullwidth digits
+        "ventas de 98​7654",
+    ],
+)
+def test_figures_with_any_digit_grouping_are_rejected(query: str) -> None:
+    result = _check([query])
+
+    assert result.accepted == []
+    assert [item.reason for item in result.rejected] == ["cifra"]
+
+
+@pytest.mark.parametrize(
+    ("figure", "query"),
+    [
+        ("1,200,000", "ventas de 1.2 millones"),
+        ("1,200,000", "ventas de 1,2 millones de pesos"),
+        ("1,234,567", "ventas de 1.2 millones"),
+        ("1,200,000", "ventas de 1.2M"),
+        ("987,654", "ventas de 987 mil"),
+        ("987,654", "ventas de 988k"),
+        ("1'200,000", "ventas de 1 200 000"),
+        ("1.2 millones", "ventas de 1,200,000"),
+    ],
+)
+def test_scaled_figures_are_rejected(figure: str, query: str) -> None:
+    frame = _frame("benchmark").model_copy(update={"queries": [query]})
+
+    result = check_queries(frame, PrivateTerms(figures=[figure]))
+
+    assert result.accepted == []
+    assert [item.reason for item in result.rejected] == ["cifra"]
+
+
+def test_accepted_queries_are_the_sanitized_form_that_was_checked() -> None:
+    raw = "precios de tortillas​ de maíz  en Puebla ¿2026?"
+
+    result = _check([raw])
+
+    assert result.accepted == ["precios de tortillas de maíz en Puebla ¿2026?"]
+
+
+def test_ordinary_spanish_punctuation_and_accents_pass() -> None:
+    query = "¿cuánto cuesta el kilo de tortilla en Puebla? ñandú $ 2026"
+
+    assert _check([query]).accepted == [query]
+
+
+def test_hidden_characters_in_the_private_terms_do_not_weaken_the_check() -> None:
+    private = PrivateTerms(
+        company_names=["Zor​blax"],
+        people=["Ｘimena Vrkalova"],
+        figures=["98​7,654"],
+    )
+    frame = _frame("benchmark").model_copy(
+        update={"queries": ["precios Zorblax", "Ximena tortillas", "ventas 987654"]}
+    )
+
+    result = check_queries(frame, private)
+
+    assert result.accepted == []
+    assert [item.reason for item in result.rejected] == ["empresa", "persona", "cifra"]
+
+
+def test_small_or_unrelated_numbers_still_pass() -> None:
+    frame = _frame("benchmark").model_copy(
+        update={
+            "queries": ["precios de tortillas 2026", "tortillerías con 987 sucursales"]
+        }
+    )
+
+    result = check_queries(frame, PrivateTerms(figures=["$987,654"]))
+
+    assert result.rejected == []
