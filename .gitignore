@@ -74,6 +74,8 @@ Thumbs.db
 
 # === Generated user data (exports, not source) ===
 .scaleup/my-company/exports/
+# === Company data written by ESCALA (E82: tracker link, OPSP, profile) ===
+.escala/my-company/
 # === Private course library and installable packs (E77) ===
 .scaleup/course-library/
 

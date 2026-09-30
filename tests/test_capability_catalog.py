@@ -23,8 +23,8 @@ def test_catalog_covers_every_canonical_skill_from_one_source() -> None:
     catalog = load_capability_catalog(CATALOG_PATH)
 
     assert validate_catalog_sources(catalog) == ()
-    assert catalog.baseline == {"canonical_procedures": 62, "legacy_aliases": 39}
-    assert len(catalog.capabilities) == 63  # 62 procedures plus public ESCALA.
+    assert catalog.baseline == {"canonical_procedures": 63, "legacy_aliases": 39}
+    assert len(catalog.capabilities) == 64  # 63 procedures plus public ESCALA.
 
 
 def test_default_installation_exposes_only_the_public_front_door() -> None:
