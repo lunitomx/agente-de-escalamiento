@@ -35,6 +35,10 @@ Cada líder define sus Top 5 individuales alineadas a las de la empresa.
 
 Guardar en `work/execution/q{N}-priorities.md`.
 
+### Step 7: Hoja del grupo (opcional)
+
+Si el empresario participa en un grupo de accountability, ofrece: "¿Las pasamos a tu hoja del grupo?". Con un sí, sigue con el procedimiento interno `escala-execution-tracker` (encuentra su pestaña con su confirmación). No le nombres el procedimiento.
+
 ## Output
 
 | Item | Destination |

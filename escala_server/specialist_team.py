@@ -39,7 +39,10 @@ SPECIALIST_CONTRACTS: dict[DecisionArea, SpecialistContract] = {
     ),
     "execution": SpecialistContract(
         role="execution-operator",
-        trigger="priorities, commitments, meetings, KPIs, or operating rhythm",
+        trigger=(
+            "priorities, commitments, meetings, KPIs, operating rhythm, "
+            "or tracker de accountability / hoja del grupo"
+        ),
         non_trigger="person scoring or strategy rewrite",
         minimum_context=("commitments", "cadence", "operational evidence"),
         permissions=("identify blocked execution dependencies",),

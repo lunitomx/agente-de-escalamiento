@@ -1,6 +1,6 @@
 schema_version: 1
 baseline:
-  canonical_procedures: 62
+  canonical_procedures: 63
   legacy_aliases: 39
 public_entrypoint: escala
 capabilities:
@@ -139,6 +139,11 @@ capabilities:
   owner: execution
   disposition: keep
   reason: Contrato de ritmos de reunión.
+- id: escala-execution-tracker
+  visibility: internal
+  owner: execution
+  disposition: keep
+  reason: Hoja propia del grupo de accountability, sólo con confirmación (E82).
 - id: escala-export
   visibility: internal
   owner: presentation

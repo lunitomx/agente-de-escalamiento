@@ -53,7 +53,7 @@
         "identify blocked execution dependencies"
       ],
       "role": "execution-operator",
-      "trigger": "priorities, commitments, meetings, KPIs, or operating rhythm"
+      "trigger": "priorities, commitments, meetings, KPIs, operating rhythm, or tracker de accountability / hoja del grupo"
     },
     {
       "agent_name": "escala-people",

@@ -61,6 +61,10 @@ Guardar en `work/execution/prioridad-{trimestre}.md`.
 
 "Este es el plan. En el próximo daily huddle, anuncia el Tema. En el próximo weekly, revisa el Critical Number."
 
+### Step 6: Hoja del grupo (opcional)
+
+Si el empresario participa en un grupo de accountability, ofrece: "¿Las pasamos a tu hoja del grupo?". Con un sí, sigue con el procedimiento interno `escala-execution-tracker` (encuentra su pestaña con su confirmación). No le nombres el procedimiento.
+
 ## Output
 
 - Prioridad #1 definida con justificación
