@@ -58,6 +58,7 @@ SALES_LEXICON: tuple[str, ...] = (
     "pocos compran",
     "no compran",
     "no me compran",
+    "nadie me compra",
     "no regresan",
     "no vuelven",
     "se me van",

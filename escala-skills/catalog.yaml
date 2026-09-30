@@ -343,6 +343,9 @@ routes:
   - cobrar
   - flujo de caja
   - ventas
+  - no me pagan
+  - no me alcanza
+  - nomina
   target: escala-cash
   message: Empecemos por entender tus números disponibles y qué parte del efectivo te preocupa.
 - id: people
@@ -367,6 +370,14 @@ routes:
   - benchmark
   - marketing
   - prospecto
+  - pocos compran
+  - no compran
+  - no me compran
+  - nadie me compra
+  - no regresan
+  - no vuelven
+  - no vendo
+  - vendo poco
   target: escala-strategy
   message: Empecemos por aclarar tu rumbo y la evidencia que ya tienes sobre tu mercado.
 - id: execution

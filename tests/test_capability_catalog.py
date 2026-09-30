@@ -63,6 +63,20 @@ def test_every_tracked_legacy_skill_has_one_explicit_alias() -> None:
         ("¿Cómo consigo más prospectos?", "escala-strategy"),
         # Cash is still evaluated first: sales words stay in Cash.
         ("marketing para subir mis ventas", "escala-cash"),
+        # E84: sales-pain phrases reach Strategy, where the journey check runs.
+        ("Mucha gente pregunta por WhatsApp pero pocos compran", "escala-strategy"),
+        ("Me preguntan mucho pero no me compran", "escala-strategy"),
+        ("Nadie me compra", "escala-strategy"),
+        ("Compran una vez y no regresan", "escala-strategy"),
+        ("No vuelven después de la primera compra", "escala-strategy"),
+        ("Se me van los clientes", "escala-strategy"),
+        ("No vendo nada este mes", "escala-strategy"),
+        ("Vendo poco", "escala-strategy"),
+        # ...and real cash phrases stay in Cash.
+        ("No me pagan a tiempo", "escala-cash"),
+        ("No me alcanza para la nómina", "escala-cash"),
+        ("No me alcanza el dinero", "escala-cash"),
+        ("No vendo y no me alcanza para pagar", "escala-cash"),
         ("Sólo apagamos incendios en la operación", "escala-execution"),
         ("¿Cómo vamos?", "escala-diagnose"),
         ("Quiero retomar lo que dejamos pendiente", "escala-welcome"),

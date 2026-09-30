@@ -3,10 +3,18 @@
 from __future__ import annotations
 
 import json
+from datetime import date
 from pathlib import Path
 
+import pytest
+
 from coaching.journey import messages
-from escala_server.capabilities import load_capability_catalog, public_install_skills
+from coaching.journey.triggers import JourneySignals, should_ask_journey
+from escala_server.capabilities import (
+    load_capability_catalog,
+    public_install_skills,
+    route_request,
+)
 from escala_server.specialist_team import SPECIALIST_CONTRACTS
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -73,3 +81,26 @@ def test_mvp_capability_catalog_is_unchanged_by_the_journey() -> None:
     catalog = (ROOT / "capabilities/mvp/catalog.json").read_text(encoding="utf-8")
 
     assert "escala-strategy-journey" not in catalog
+
+
+@pytest.mark.parametrize(
+    "phrase",
+    [
+        "Mucha gente pregunta por WhatsApp pero pocos compran",
+        "Me preguntan mucho pero no me compran",
+        "Nadie me compra",
+        "Compran una vez y no regresan",
+        "Se me van los clientes",
+        "No vendo nada este mes",
+        "Vendo poco",
+    ],
+)
+def test_a_sales_pain_phrase_reaches_strategy_and_fires_the_check(
+    phrase: str,
+) -> None:
+    """M1 demo: the front door routes it to Strategy, where check asks (T1)."""
+    assert route_request(phrase).capability_id == "escala-strategy"
+    decision = should_ask_journey(
+        JourneySignals(owner_text=phrase, today=date(2026, 9, 30))
+    )
+    assert (decision.ask, decision.reason) == (True, "T1")
