@@ -8,7 +8,7 @@ user already sees in Drive. Cells are quoted only from the confirmed tab.
 from __future__ import annotations
 
 from coaching.tracker.identity import SheetCandidate, is_placeholder_name
-from coaching.tracker.maintenance import MeetingPrep, ReviewedItem
+from coaching.tracker.maintenance import DateOrder, MeetingPrep, ReviewedItem
 from coaching.tracker.parser import CommitmentsLayout, cell_ref
 from coaching.tracker.proposal import RowProposal, render_table
 
@@ -279,6 +279,9 @@ PREP_UP_TO_DATE = (
 )
 
 
+_ORDER_NAMES: dict[DateOrder, str] = {"dd/mm": "día/mes", "mm/dd": "mes/día"}
+
+
 def _count(items: list[ReviewedItem], one: str, many: str) -> str | None:
     if not items:
         return None
@@ -385,6 +388,12 @@ def prep_message(
     if not prep.has_findings:
         return PREP_UP_TO_DATE
     parts = [_headline(prep), *_sections(prep)]
+    if prep.ordered_dates and prep.date_order is not None:
+        dates = _join([f"«{due}»" for due in prep.ordered_dates])
+        parts.append(
+            f"Leí {dates} como {_ORDER_NAMES[prep.date_order]}, igual que las "
+            "demás fechas de tu hoja."
+        )
     if prep.finished:
         parts += [_done_steps(prep, done_layout, tab_name, done_block), UNDO]
     parts += [NOTHING_MOVED, _decisions(prep)]

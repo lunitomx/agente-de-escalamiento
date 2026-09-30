@@ -7,6 +7,7 @@ from datetime import date
 import pytest
 
 from coaching.tracker.maintenance import (
+    infer_date_order,
     is_finished,
     parse_due,
     review_before_meeting,
@@ -150,7 +151,7 @@ def test_finished_rows_already_in_done_are_not_repeated() -> None:
 def test_missing_kpi_missing_due_and_unclear_due() -> None:
     sheet = TrackerSheet(
         commitments=[
-            _item("Sin KPI", kpi=None),
+            _item("Sin KPI", kpi=None, due="2026-11-30"),
             _item("Sin fecha", due=None),
             _item("Fecha rara", due="fin de mes"),
             _item("Fecha ambigua", due="03/04/2026"),
@@ -210,3 +211,98 @@ def test_done_block_never_starts_a_cell_with_a_formula() -> None:
     block = to_done_block(review_before_meeting(sheet, TODAY).finished, None)
 
     assert block == "Cash\tSUM(A1)"
+
+
+# --- S82.7: ambiguous dates follow the order the owner's own sheet shows --------
+
+
+@pytest.mark.parametrize(
+    ("texts", "expected"),
+    [
+        (["30/11/2026", "15/10/2026", "03/04/2026", "2026-10-01"], "dd/mm"),
+        (["11/30/2026", "10-15-2026", "03/04/2026"], "mm/dd"),
+        (["30/11/2026", "11/30/2026"], None),  # conflict
+        (["03/04/2026", "05/05/2026", "2026-10-01", "fin de mes", None], None),
+        ([], None),
+        (["31/02/2026"], None),  # not a real date: no evidence
+        (["30/11/26"], None),  # two-digit year: no evidence
+    ],
+)
+def test_infer_date_order_needs_unanimous_unambiguous_dates(
+    texts: list[str | None], expected: str | None
+) -> None:
+    assert infer_date_order(texts) == expected
+
+
+def test_parse_due_reads_ambiguous_dates_in_the_given_order() -> None:
+    assert parse_due("03/04/2026", "dd/mm") == date(2026, 4, 3)
+    assert parse_due("03/04/2026", "mm/dd") == date(2026, 3, 4)
+    assert parse_due("03/04/2026") is None
+
+
+def test_parse_due_reads_month_first_only_when_the_sheet_says_so() -> None:
+    assert parse_due("11/30/2025", "mm/dd") == date(2025, 11, 30)
+    assert parse_due("11/30/2025", "dd/mm") is None
+    assert parse_due("11/30/2025") is None
+    assert parse_due("30/11/2025", "dd/mm") == date(2025, 11, 30)
+
+
+def test_review_reads_ambiguous_dates_when_the_sheet_agrees() -> None:
+    sheet = TrackerSheet(
+        commitments=[
+            _item("Cobrar", due="30/10/2026"),
+            _item("Ambigua", due="03/04/2026"),
+        ],
+    )
+
+    prep = review_before_meeting(sheet, TODAY)
+
+    assert prep.date_order == "dd/mm"
+    assert prep.ordered_dates == ["03/04/2026"]
+    assert _texts(list(prep.overdue)) == ["Cobrar", "Ambigua"]
+    assert prep.overdue[1].due_date == date(2026, 4, 3)
+    assert prep.unclear_due == []
+
+
+def test_review_uses_evidence_from_rocks_and_done_of_the_same_tab() -> None:
+    sheet = TrackerSheet(
+        commitments=[_item("Ambigua", due="12/01/2026")],
+        rocks=[_item("Rock", due="12/31/2026")],
+        done=[_item("Hecho", due="10/15/2026")],
+    )
+
+    prep = review_before_meeting(sheet, TODAY)
+
+    assert prep.date_order == "mm/dd"
+    assert prep.overdue == []  # December 1st, 2026 is not overdue yet
+    assert prep.unclear_due == []
+
+
+def test_review_keeps_ambiguous_dates_unclear_on_conflict() -> None:
+    sheet = TrackerSheet(
+        commitments=[
+            _item("Día primero", due="30/10/2026"),
+            _item("Mes primero", due="10/30/2026"),
+            _item("Ambigua", due="03/04/2026"),
+        ],
+    )
+
+    prep = review_before_meeting(sheet, TODAY)
+
+    assert prep.date_order is None
+    assert prep.ordered_dates == []
+    assert _texts(list(prep.unclear_due)) == ["Mes primero", "Ambigua"]
+
+
+def test_review_keeps_ambiguous_dates_unclear_without_evidence() -> None:
+    sheet = TrackerSheet(
+        commitments=[
+            _item("Ambigua", due="03/04/2026"),
+            _item("ISO", due="2026-10-01"),
+        ],
+    )
+
+    prep = review_before_meeting(sheet, TODAY)
+
+    assert prep.date_order is None
+    assert _texts(list(prep.unclear_due)) == ["Ambigua"]

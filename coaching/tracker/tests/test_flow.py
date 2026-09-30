@@ -655,7 +655,7 @@ _PASTED_WITH_DONE = (
     "\tFocus Area\tPriorities\tKPIs\tDue Dates\n"
     "\tCash\tCobrar cartera\t90%\t30/10/2026\n"
     "\tPeople\tContratar gerente\t1\t15/10/2026\tHecho\n"
-    "\tExecution\tLanzar curso\t\t03/04/2026\n"
+    "\tExecution\tLanzar curso\t\tfin de mes\n"
     "\n"
     "Done - record anything you want to keep track\n"
     "\tFocus Area\tGoals/Rock/Action\n"
@@ -743,7 +743,7 @@ def test_prepare_suggests_done_with_block_cell_and_undo(tmp_path: Path) -> None:
     )
     assert "**B11**" in message  # first empty row of the Done table
     assert result.paste_block in message
-    assert "«03/04/2026»" in message  # ambiguous: asked, never guessed
+    assert "«fin de mes»" in message  # unreadable: asked, never guessed
     assert "Ctrl+Z" in message and "No uses «Restaurar esta versión»" in message
     assert "No moví nada en tu hoja." in message
     assert "No elimines la fila completa." in message
@@ -752,6 +752,41 @@ def test_prepare_suggests_done_with_block_cell_and_undo(tmp_path: Path) -> None:
         "nueva fecha o ya no va? ¿Me dices los KPI y las fechas que faltan?"
     )
     assert _files_snapshot(tmp_path) == before
+
+
+def test_prepare_reads_swappable_dates_in_the_order_the_tab_shows(
+    tmp_path: Path,
+) -> None:
+    """S82.7: 03/04/2026 follows the tab's own dd/mm dates, and says so."""
+    pasted = _PASTED_WITH_DONE.replace("fin de mes", "03/04/2026")
+    _confirm_pasted(str(tmp_path), pasted)
+
+    result = _prepare(str(tmp_path), connector_text=None, pasted_text=pasted)
+
+    assert result.prep is not None
+    assert [i.text for i in result.prep.overdue] == ["Cobrar cartera", "Lanzar curso"]
+    assert result.prep.unclear_due == []
+    assert (
+        "Leí «03/04/2026» como día/mes, igual que las demás fechas de tu hoja."
+        in result.message
+    )
+
+
+def test_prepare_keeps_swappable_dates_unclear_when_the_tab_mixes_orders(
+    tmp_path: Path,
+) -> None:
+    pasted = _PASTED_WITH_DONE.replace("fin de mes", "03/04/2026").replace(
+        "15/10/2026", "10/15/2026"
+    )
+    _confirm_pasted(str(tmp_path), pasted)
+
+    result = _prepare(str(tmp_path), connector_text=None, pasted_text=pasted)
+
+    assert result.prep is not None
+    assert result.prep.date_order is None
+    assert [i.text for i in result.prep.unclear_due] == ["Lanzar curso"]
+    assert "«03/04/2026»" in result.message
+    assert "Leí «" not in result.message
 
 
 def test_prepare_on_an_empty_sheet_offers_to_propose_rows(tmp_path: Path) -> None:
