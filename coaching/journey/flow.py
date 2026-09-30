@@ -5,7 +5,7 @@ Actions (JSON on stdin, like ``coaching.research``):
 
 - ``check``: ``signals`` (see ``JourneySignals``; ``today`` defaults to the
   top-level ``today``). When not given, ``last_declined_on`` comes from
-  ``asks.yaml``, ``journey_review_by`` from a saved ``journey.yaml`` and the
+  ``asks.yaml`` (the latest of both wins), ``journey_review_by`` from a saved ``journey.yaml`` and the
   funnel gaps from ``funnel`` (``FunnelMetrics``). Returns the decision and,
   only when asking, the one question. Never writes.
 - ``record``: the owner's answer to that question (``outcome`` si / despues /
@@ -98,14 +98,23 @@ def _check(context: Mapping[str, object]) -> FlowResult:
     )
     base = _base(context)
     given.setdefault("today", _today(context))
-    if "last_declined_on" not in given:
-        given["last_declined_on"] = last_declined_on(load_asks(base))
-    if "journey_review_by" not in given:
-        given["journey_review_by"] = _review_by(base)
     if "funnel" in context and not ({"funnel_known", "funnel_missing"} & given.keys()):
         known, missing = funnel_gaps(FunnelMetrics.model_validate(context["funnel"]))
         given["funnel_known"], given["funnel_missing"] = known, missing
-    decision = should_ask_journey(JourneySignals.model_validate(given))
+    signals = JourneySignals.model_validate(given)
+    # What the disk remembers is never masked by a missing or older value.
+    declines = [
+        day
+        for day in (signals.last_declined_on, last_declined_on(load_asks(base)))
+        if day is not None
+    ]
+    signals = signals.model_copy(
+        update={
+            "last_declined_on": max(declines, default=None),
+            "journey_review_by": signals.journey_review_by or _review_by(base),
+        }
+    )
+    decision = should_ask_journey(signals)
     return FlowResult(action="check", decision=decision, message=decision.message or "")
 
 

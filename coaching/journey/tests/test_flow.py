@@ -227,3 +227,26 @@ def test_module_runs_as_a_command(tmp_path: Path) -> None:
     assert result.returncode == 0, result.stderr
     out = json.loads(result.stdout)
     assert out["decision"]["reason"] == "T1"
+
+
+def test_explicit_null_never_masks_what_disk_remembers(tmp_path: Path) -> None:
+    run(
+        {
+            "action": "record",
+            "base_path": str(tmp_path),
+            "today": "2026-09-20",
+            "outcome": "no",
+            "reason": "T1",
+        }
+    )
+    folder = tmp_path / ".escala/my-company/journey"
+    (folder / "journey.yaml").write_text("review_by: 2026-12-01\n", encoding="utf-8")
+
+    declined = run(_check(tmp_path, last_declined_on=None))
+    older = run(_check(tmp_path, last_declined_on="2026-01-01"))
+    (folder / "asks.yaml").write_text("asks: []\n", encoding="utf-8")
+    current = run(_check(tmp_path, journey_review_by=None))
+
+    assert declined.decision is not None and declined.decision.reason == "N2"
+    assert older.decision is not None and older.decision.reason == "N2"
+    assert current.decision is not None and current.decision.reason == "N1"
