@@ -330,7 +330,10 @@ def _prepare(context: Mapping[str, object], base: Path) -> FlowResult:
     today = _today(context)
     if today is None:
         return _prepare_refusal(messages.ASK_TODAY, "bad_today")
-    prep = review_before_meeting(parse_sheet(grid), today)
+    rocks = rocks_layout(grid)
+    prep = review_before_meeting(
+        parse_sheet(grid), today, rocks.fields if rocks else None
+    )
     layout = done_layout(grid)
     block = to_done_block(prep.finished, layout.fields if layout else None)
     return FlowResult(

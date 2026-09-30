@@ -1077,3 +1077,162 @@ def test_privacy_propose_rocks_keeps_other_tabs_out_and_writes_nothing(
     for marker in _foreign("Ana"):
         assert marker not in dump, marker
     assert _files_snapshot(tmp_path) == before  # ESCALA only proposes
+
+
+# --- S82.7: prepare also reviews the Rocks, in their own block ----------------
+
+
+def _workbook_with_rock_dates() -> str:
+    """Every tab's Rocks table has a due column and an overdue Rock."""
+    return (
+        _workbook()
+        .replace(
+            "| | Focus Area | Goals/Rock for this quarter | |",
+            "| | Focus Area | Goals/Rock for this quarter | Due Dates |",
+        )
+        .replace("Vamos en 40%", "15/10/2026")
+    )
+
+
+_PASTED_ROCKS = (
+    "Participant Name\t\tAna Demo\n"
+    "Monthly Commitments\n"
+    "\tFocus Area\tPriorities\tKPIs\tDue Dates\n"
+    "\tCash\tCobrar cartera\t90%\t30/11/2026\n"
+    "\n"
+    "Quarterly Goals (Rocks) - Q4-2026\n"
+    "\tFocus Area\tGoals/Rock for this quarter\tKPIs\tDue Dates\n"
+    "\tCash\tAbrir sucursal\t1\t15/10/2026\n"
+    "\tPeople\tContratar gerente\t\t2026-12-15\n"
+    "\tExecution\tLanzar curso\t3\tfin de año\n"
+    "\tStrategy\tRock terminado\t1\t01/10/2026\tTerminado\n"
+    "\n"
+    "Done - record anything you want to keep track\n"
+    "\tFocus Area\tGoals/Rock/Action\n"
+)
+
+
+def test_prepare_reviews_rocks_in_their_own_block(tmp_path: Path) -> None:
+    _confirm_pasted(str(tmp_path), _PASTED_ROCKS)
+    before = _files_snapshot(tmp_path)
+
+    result = _prepare(str(tmp_path), connector_text=None, pasted_text=_PASTED_ROCKS)
+
+    assert result.errors == []
+    assert result.prep is not None
+    rocks = result.prep.rocks
+    assert [i.text for i in rocks.overdue] == ["Abrir sucursal"]
+    assert [i.text for i in rocks.missing_kpi] == ["Contratar gerente"]
+    assert [i.text for i in rocks.unclear_due] == ["Lanzar curso"]
+    message = result.message
+    assert message.startswith(
+        "Antes de tu reunión: tus compromisos del mes están al día."
+    )
+    assert (
+        "**Tus Rocks del Q4-2026:** 1 vencido, 1 sin KPI y 1 con fecha por "
+        "confirmar." in message
+    )
+    assert "- Vencido: Abrir sucursal (era para el 15/10/2026)" in message
+    assert "- Fecha por confirmar: Lanzar curso («fin de año»)" in message
+    assert "Rock terminado" not in message  # finished Rocks are left alone
+    assert "No moví nada en tu hoja." in message
+    assert result.paste_block == ""
+    assert message.endswith(
+        "¿Qué hacemos con el Rock «Abrir sucursal»: nueva fecha o ya no va este "
+        "trimestre? ¿Me dices los KPI y las fechas que faltan en tus Rocks?"
+    )
+    assert _files_snapshot(tmp_path) == before
+
+
+def test_prepare_keeps_commitments_and_rocks_visibly_apart(tmp_path: Path) -> None:
+    pasted = _PASTED_ROCKS.replace("30/11/2026", "30/10/2026")
+    _confirm_pasted(str(tmp_path), pasted)
+
+    message = _prepare(str(tmp_path), connector_text=None, pasted_text=pasted).message
+
+    commitments, rest = message.split("**Tus Rocks del Q4-2026:**")
+    rocks, decisions = rest.split("No moví nada en tu hoja.")
+    assert "Cobrar cartera" in commitments and "Cobrar cartera" not in rocks
+    assert "Abrir sucursal" in rocks and "Abrir sucursal" not in commitments
+    assert message.startswith("Antes de tu reunión: 1 compromiso vencido.")
+    assert "¿Qué hacemos con «Cobrar cartera»" in decisions  # decisions close it
+    assert message.endswith("¿Me dices los KPI y las fechas que faltan en tus Rocks?")
+
+
+def test_prepare_with_only_rocks_says_there_are_no_commitments_yet(
+    tmp_path: Path,
+) -> None:
+    pasted = _PASTED_ROCKS.replace("\tCash\tCobrar cartera\t90%\t30/11/2026\n", "")
+    _confirm_pasted(str(tmp_path), pasted)
+
+    message = _prepare(str(tmp_path), connector_text=None, pasted_text=pasted).message
+
+    assert message.startswith(
+        "Antes de tu reunión: todavía no tienes compromisos del mes."
+    )
+    assert "**Tus Rocks del Q4-2026:**" in message
+
+
+def test_prepare_template_rocks_are_not_asked_for_columns_they_lack(
+    tmp_path: Path,
+) -> None:
+    """The observed template has no KPI or date column for Rocks."""
+    _confirm_ana(str(tmp_path))
+
+    result = _prepare(str(tmp_path))
+
+    assert result.prep is not None
+    assert result.prep.rocks.reviewed == 1
+    assert not result.prep.rocks.has_findings
+    assert "**Tus Rocks" not in result.message  # only the commitments block
+
+
+def test_prepare_all_up_to_date_mentions_the_rocks(tmp_path: Path) -> None:
+    pasted = (
+        _PASTED_ROCKS.replace("15/10/2026", "15/12/2026")
+        .replace("\t\t2026-12-15", "\t2\t2026-12-15")
+        .replace("fin de año", "2026-12-20")
+    )
+    _confirm_pasted(str(tmp_path), pasted)
+
+    message = _prepare(str(tmp_path), connector_text=None, pasted_text=pasted).message
+
+    assert "compromisos del mes y tus Rocks están al día" in message
+    assert message.endswith("?")
+
+
+def test_prepare_rocks_user_messages_have_no_internal_jargon(tmp_path: Path) -> None:
+    _confirm_pasted(str(tmp_path), _PASTED_ROCKS)
+
+    message = _prepare(
+        str(tmp_path), connector_text=None, pasted_text=_PASTED_ROCKS
+    ).message
+
+    for word in ["tracker", "TSV", "MCP", "escala-", "skill", "yaml", "grid", "None"]:
+        assert word.lower() not in message.lower(), word
+
+
+def test_privacy_prepare_with_rocks_keeps_other_tabs_out(tmp_path: Path) -> None:
+    workbook = _workbook_with_rock_dates()
+    run(
+        {
+            "action": "confirm",
+            "base_path": str(tmp_path),
+            "user_confirmed": True,
+            "tab_name": "Ana",
+            "connector_text": workbook,
+            "file_title": "Tracker del grupo",
+            "file_id": "f-1",
+        }
+    )
+    before = _files_snapshot(tmp_path)
+
+    result = _prepare(str(tmp_path), connector_text=workbook)
+
+    assert result.prep is not None
+    assert [i.text for i in result.prep.rocks.overdue] == [f"Rock {MARKERS['Ana']}"]
+    assert f"Rock {MARKERS['Ana']}" in result.message
+    dump = _dump(result)
+    for marker in _foreign("Ana"):
+        assert marker not in dump, marker
+    assert _files_snapshot(tmp_path) == before

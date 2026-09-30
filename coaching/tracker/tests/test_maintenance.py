@@ -166,10 +166,10 @@ def test_missing_kpi_missing_due_and_unclear_due() -> None:
     assert prep.overdue == []  # an unread date is never counted as overdue
 
 
-def test_rows_without_text_and_other_tables_are_not_reviewed() -> None:
+def test_rows_without_text_and_the_done_table_are_not_reviewed() -> None:
     sheet = TrackerSheet(
         commitments=[_item(None, kpi=None, due=None)],  # template row: area only
-        rocks=[_item("Rock vencido", due="01/01/2026")],
+        rocks=[_item(None, kpi=None, due=None)],
         done=[_item("Hecho antes", due="01/01/2026")],
     )
 
@@ -177,6 +177,59 @@ def test_rows_without_text_and_other_tables_are_not_reviewed() -> None:
 
     assert not prep.has_findings
     assert prep.reviewed == 0
+    assert prep.rocks.reviewed == 0
+
+
+def test_rocks_are_reviewed_apart_from_commitments() -> None:
+    sheet = TrackerSheet(
+        commitments=[_item("Cobrar cartera", due="30/10/2026")],
+        rocks_quarter="Q4-2026",
+        rocks=[
+            _item("Rock vencido", due="15/10/2026", status="Vamos en 40%"),
+            _item("Rock terminado", due="15/10/2026", status="Terminado"),
+            _item("Rock a tiempo", due="2026-12-31"),
+            _item("Rock fecha rara", due="fin de año"),
+        ],
+    )
+
+    prep = review_before_meeting(sheet, TODAY)
+
+    assert _texts(list(prep.overdue)) == ["Cobrar cartera"]
+    assert prep.rocks.quarter == "Q4-2026"
+    assert prep.rocks.reviewed == 4
+    assert _texts(list(prep.rocks.overdue)) == ["Rock vencido"]
+    assert _texts(list(prep.rocks.unclear_due)) == ["Rock fecha rara"]
+    assert prep.rocks.has_findings and prep.has_findings
+    # a finished Rock is left alone: moving Rocks to Done is not suggested
+    assert prep.finished == []
+
+
+def test_rocks_missing_kpi_or_date_only_when_their_table_has_the_column() -> None:
+    sheet = TrackerSheet(
+        rocks=[_item("Sin KPI", kpi=None), _item("Sin fecha", due=None)],
+    )
+
+    template = review_before_meeting(sheet, TODAY, rock_fields=["focus", "text"])
+    full = review_before_meeting(
+        sheet, TODAY, rock_fields=["focus", "text", "kpi", "due"]
+    )
+
+    assert not template.rocks.has_findings  # the template has no KPI/date column
+    assert _texts(list(full.rocks.missing_kpi)) == ["Sin KPI"]
+    assert _texts(list(full.rocks.missing_due)) == ["Sin fecha"]
+    assert not full.has_commitment_findings
+
+
+def test_rock_dates_follow_the_order_of_the_tab() -> None:
+    sheet = TrackerSheet(
+        commitments=[_item("Cobrar", due="30/12/2026")],
+        rocks=[_item("Rock ambiguo", due="03/04/2026")],
+    )
+
+    prep = review_before_meeting(sheet, TODAY)
+
+    assert _texts(list(prep.rocks.overdue)) == ["Rock ambiguo"]
+    assert prep.ordered_dates == ["03/04/2026"]
 
 
 def test_review_never_changes_the_sheet() -> None:

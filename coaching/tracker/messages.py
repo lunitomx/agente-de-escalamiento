@@ -8,7 +8,12 @@ user already sees in Drive. Cells are quoted only from the confirmed tab.
 from __future__ import annotations
 
 from coaching.tracker.identity import SheetCandidate, is_placeholder_name
-from coaching.tracker.maintenance import DateOrder, MeetingPrep, ReviewedItem
+from coaching.tracker.maintenance import (
+    DateOrder,
+    MeetingPrep,
+    ReviewedItem,
+    RocksPrep,
+)
 from coaching.tracker.parser import CommitmentsLayout, Column, cell_ref
 from coaching.tracker.proposal import (
     ProposedRow,
@@ -412,6 +417,18 @@ PREP_UP_TO_DATE = (
     "vencido, terminado por pasar a Done ni datos faltantes. ¿Quieres revisar "
     "algo más antes de la reunión?"
 )
+PREP_ALL_UP_TO_DATE = (
+    "Antes de tu reunión: tus compromisos del mes y tus Rocks están al día. No "
+    "veo nada vencido, terminado por pasar a Done ni datos faltantes. ¿Quieres "
+    "revisar algo más antes de la reunión?"
+)
+PREP_ROCKS_ONLY_UP_TO_DATE = (
+    "Antes de tu reunión: todavía no tienes compromisos del mes, y tus Rocks "
+    "están al día. ¿Quieres que te proponga filas con tus prioridades del "
+    "trimestre?"
+)
+_COMMITMENTS_FINE = "Antes de tu reunión: tus compromisos del mes están al día."
+_NO_COMMITMENTS = "Antes de tu reunión: todavía no tienes compromisos del mes."
 
 
 _ORDER_NAMES: dict[DateOrder, str] = {"dd/mm": "día/mes", "mm/dd": "mes/día"}
@@ -482,7 +499,19 @@ def _done_steps(
     return f"Si decides {them} a Done:\n\n{numbered}"
 
 
-def _decisions(prep: MeetingPrep) -> str:
+def _missing_ask(kpi: bool, dates: bool, where: str = "") -> str | None:
+    if kpi and dates:
+        return f"¿Me dices los KPI y las fechas que faltan{where}?"
+    if kpi:
+        return f"¿Me dices los KPI que faltan{where}?"
+    if dates:
+        return f"¿Me dices las fechas que faltan{where}?"
+    return None
+
+
+def _decisions(prep: MeetingPrep) -> list[str]:
+    if not prep.has_commitment_findings:
+        return []
     asks: list[str] = []
     if len(prep.finished) == 1:
         asks.append(f"¿Pasas «{prep.finished[0].text}» a Done?")
@@ -494,16 +523,61 @@ def _decisions(prep: MeetingPrep) -> str:
         )
     elif prep.overdue:
         asks.append("¿Qué hacemos con los vencidos: nueva fecha o ya no van?")
-    kpi, dates = bool(prep.missing_kpi), bool(prep.missing_due or prep.unclear_due)
-    if kpi and dates:
-        asks.append("¿Me dices los KPI y las fechas que faltan?")
-    elif kpi:
-        asks.append("¿Me dices los KPI que faltan?")
-    elif dates:
-        asks.append("¿Me dices las fechas que faltan?")
+    missing = _missing_ask(
+        bool(prep.missing_kpi), bool(prep.missing_due or prep.unclear_due)
+    )
+    asks += [missing] if missing else []
     if not asks:
         asks.append("¿Borras de tus compromisos del mes lo que ya está en Done?")
-    return " ".join(asks)
+    return asks
+
+
+def _rocks_title(rocks: RocksPrep) -> str:
+    return f"del {rocks.quarter}" if rocks.quarter else "del trimestre"
+
+
+def _rocks_block(rocks: RocksPrep) -> str:
+    """The Rocks findings, apart from the commitments (S82.7)."""
+    parts = [
+        _count(rocks.overdue, "vencido", "vencidos"),
+        _count(rocks.missing_kpi, "sin KPI", "sin KPI"),
+        _count(rocks.missing_due, "sin fecha", "sin fecha"),
+        _count(rocks.unclear_due, "con fecha por confirmar", "con fecha por confirmar"),
+    ]
+    lines = [
+        f"**Tus Rocks {_rocks_title(rocks)}:** {_join([p for p in parts if p])}.",
+        *(f"- Vencido: {i.text} (era para el {i.due})" for i in rocks.overdue),
+        *(f"- Sin KPI: {i.text}" for i in rocks.missing_kpi),
+        *(f"- Sin fecha: {i.text}" for i in rocks.missing_due),
+        *(f"- Fecha por confirmar: {i.text} («{i.due}»)" for i in rocks.unclear_due),
+    ]
+    return "\n".join(lines)
+
+
+def _rock_decisions(rocks: RocksPrep) -> list[str]:
+    asks: list[str] = []
+    if len(rocks.overdue) == 1:
+        asks.append(
+            f"¿Qué hacemos con el Rock «{rocks.overdue[0].text}»: nueva fecha o "
+            "ya no va este trimestre?"
+        )
+    elif rocks.overdue:
+        asks.append(
+            "¿Qué hacemos con los Rocks vencidos: nueva fecha o ya no van este "
+            "trimestre?"
+        )
+    missing = _missing_ask(
+        bool(rocks.missing_kpi),
+        bool(rocks.missing_due or rocks.unclear_due),
+        " en tus Rocks",
+    )
+    return [*asks, missing] if missing else asks
+
+
+def _up_to_date(prep: MeetingPrep) -> str:
+    if prep.rocks.reviewed == 0:
+        return PREP_UP_TO_DATE
+    return PREP_ALL_UP_TO_DATE if prep.reviewed else PREP_ROCKS_ONLY_UP_TO_DATE
 
 
 def prep_message(
@@ -512,19 +586,28 @@ def prep_message(
     tab_name: str,
     done_block: str,
 ) -> str:
-    """Short summary for the meeting; says nothing was moved; ends with a decision."""
-    if prep.reviewed == 0:
+    """Short summary for the meeting; says nothing was moved; ends with a decision.
+
+    Commitments come first; the Rocks follow in their own block (S82.7).
+    """
+    if prep.reviewed == 0 and prep.rocks.reviewed == 0:
         return PREP_EMPTY
     if not prep.has_findings:
-        return PREP_UP_TO_DATE
-    parts = [_headline(prep), *_sections(prep)]
+        return _up_to_date(prep)
+    if prep.has_commitment_findings:
+        parts = [_headline(prep), *_sections(prep)]
+    else:
+        parts = [_COMMITMENTS_FINE if prep.reviewed else _NO_COMMITMENTS]
+    if prep.finished:
+        parts += [_done_steps(prep, done_layout, tab_name, done_block), UNDO]
+    if prep.rocks.has_findings:
+        parts.append(_rocks_block(prep.rocks))
     if prep.ordered_dates and prep.date_order is not None:
         dates = _join([f"«{due}»" for due in prep.ordered_dates])
         parts.append(
             f"Leí {dates} como {_ORDER_NAMES[prep.date_order]}, igual que las "
             "demás fechas de tu hoja."
         )
-    if prep.finished:
-        parts += [_done_steps(prep, done_layout, tab_name, done_block), UNDO]
-    parts += [NOTHING_MOVED, _decisions(prep)]
+    decisions = [*_decisions(prep), *_rock_decisions(prep.rocks)]
+    parts += [NOTHING_MOVED, " ".join(decisions)]
     return "\n\n".join(parts)

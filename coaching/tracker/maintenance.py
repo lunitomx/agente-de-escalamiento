@@ -166,6 +166,25 @@ class ReviewedItem(BaseModel):
     status: str | None
 
 
+class RocksPrep(BaseModel):
+    """The quarter's Rocks, reviewed apart from the monthly commitments (S82.7).
+
+    Missing KPI or date is only reported when the Rocks table has that column;
+    a finished Rock is left alone (moving Rocks to Done is not suggested).
+    """
+
+    quarter: str | None = None
+    reviewed: int = 0
+    overdue: list[ReviewedItem] = Field(default_factory=list[ReviewedItem])
+    missing_kpi: list[ReviewedItem] = Field(default_factory=list[ReviewedItem])
+    missing_due: list[ReviewedItem] = Field(default_factory=list[ReviewedItem])
+    unclear_due: list[ReviewedItem] = Field(default_factory=list[ReviewedItem])
+
+    @property
+    def has_findings(self) -> bool:
+        return any([self.overdue, self.missing_kpi, self.missing_due, self.unclear_due])
+
+
 class MeetingPrep(BaseModel):
     """Suggestions for the group meeting; nothing here was moved or written."""
 
@@ -181,9 +200,14 @@ class MeetingPrep(BaseModel):
     # swappable dates that were read with it.
     date_order: DateOrder | None = None
     ordered_dates: list[str] = Field(default_factory=list)
+    rocks: RocksPrep = Field(default_factory=RocksPrep)
 
     @property
     def has_findings(self) -> bool:
+        return self.has_commitment_findings or self.rocks.has_findings
+
+    @property
+    def has_commitment_findings(self) -> bool:
         return any(
             [
                 self.overdue,
@@ -217,22 +241,62 @@ def sheet_date_order(sheet: TrackerSheet) -> DateOrder | None:
     return infer_date_order(item.due for item in items)
 
 
-def review_before_meeting(sheet: TrackerSheet, today: date) -> MeetingPrep:
-    """Overdue, finished (to move to Done) and incomplete monthly commitments.
+def _review_rocks(
+    sheet: TrackerSheet,
+    today: date,
+    order: DateOrder | None,
+    fields: list[Column] | None,
+) -> RocksPrep:
+    columns = fields or []
+    rocks = RocksPrep(quarter=sheet.rocks_quarter)
+    for item in sheet.rocks:
+        if item.text is None:
+            continue
+        row = _reviewed(item, item.text, order)
+        rocks.reviewed += 1
+        if is_finished(item.status):
+            continue
+        if row.kpi is None and "kpi" in columns:
+            rocks.missing_kpi.append(row)
+        if row.due is None:
+            if "due" in columns:
+                rocks.missing_due.append(row)
+        elif row.due_date is None:
+            rocks.unclear_due.append(row)
+        elif row.due_date < today:
+            rocks.overdue.append(row)
+    return rocks
 
-    Only rows with a written commitment are reviewed; Rocks and Done are left
-    alone. A date that cannot be read is "por confirmar", never overdue.
+
+def _resolved(items: list[TrackerItem], order: DateOrder | None) -> list[str]:
+    if order is None:
+        return []
+    return [i.due for i in items if i.text and i.due and is_ambiguous(i.due)]
+
+
+def review_before_meeting(
+    sheet: TrackerSheet, today: date, rock_fields: list[Column] | None = None
+) -> MeetingPrep:
+    """Overdue, finished (to move to Done) and incomplete commitments and Rocks.
+
+    Only rows with written text are reviewed; Done is left alone. Rocks are
+    reviewed apart (``prep.rocks``); ``rock_fields`` are the columns of the
+    Rocks table, so a Rock is only asked for a KPI or date its table has room
+    for. A date that cannot be read is "por confirmar", never overdue.
     """
     in_done = {_same_text(item.text) for item in sheet.done if item.text}
     order = sheet_date_order(sheet)
-    prep = MeetingPrep(today=today, date_order=order)
+    prep = MeetingPrep(
+        today=today,
+        date_order=order,
+        ordered_dates=_resolved([*sheet.commitments, *sheet.rocks], order),
+        rocks=_review_rocks(sheet, today, order, rock_fields),
+    )
     for item in sheet.commitments:
         if item.text is None:
             continue  # a template row with only the area filled in
         row = _reviewed(item, item.text, order)
         prep.reviewed += 1
-        if order is not None and is_ambiguous(item.due) and item.due:
-            prep.ordered_dates.append(item.due)
         if is_finished(item.status):
             done_already = _same_text(row.text) in in_done
             (prep.already_in_done if done_already else prep.finished).append(row)
