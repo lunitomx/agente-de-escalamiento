@@ -47,7 +47,19 @@ _NUMERIC = re.compile(r"^(\d{1,2})([/.-])(\d{1,2})\2(\d{4})$")
 _DAY_FIRST = re.compile(r"^(\d{1,2}) (?:de )?([a-z]+)\.?,? (?:de |del )?(\d{4})$")
 _MONTH_FIRST = re.compile(r"^([a-z]+)\.? (\d{1,2}),? (\d{4})$")
 # Design § S82.5: closed vocabulary, compared without accents or case.
-FINISHED = frozenset({"done", "hecho", "terminado", "completado", "✅", "100%"})
+FINISHED = frozenset(
+    {
+        "done",
+        "hecho",
+        "hecha",
+        "terminado",
+        "terminada",
+        "completado",
+        "completada",
+        "✅",
+        "100%",
+    }
+)
 
 
 def _fold(text: str) -> str:

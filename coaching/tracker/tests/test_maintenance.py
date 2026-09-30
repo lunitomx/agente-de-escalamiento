@@ -56,7 +56,19 @@ def test_parse_due_leaves_unclear_dates_unread(text: str | None) -> None:
 
 
 @pytest.mark.parametrize(
-    "status", ["Done", "hecho", "Terminado", "COMPLETADO", "✅", "100%", " done. "]
+    "status",
+    [
+        "Done",
+        "hecho",
+        "Hecha",
+        "Terminado",
+        "terminada",
+        "COMPLETADO",
+        "completada",
+        "✅",
+        "100%",
+        " done. ",
+    ],
 )
 def test_closed_vocabulary_counts_as_finished(status: str) -> None:
     assert is_finished(status)
