@@ -110,7 +110,9 @@ def test_generated_platform_agents_are_complete_private_and_drift_free() -> None
         assert "credential" not in claude.lower()
 
 
-def test_codex_adapter_packages_private_agents_but_one_public_skill(tmp_path: Path) -> None:
+def test_codex_adapter_packages_private_agents_but_one_public_skill(
+    tmp_path: Path,
+) -> None:
     destination = tmp_path / "install" / "codex"
     destination.parent.mkdir()
 
@@ -120,15 +122,17 @@ def test_codex_adapter_packages_private_agents_but_one_public_skill(tmp_path: Pa
         allowed_root=destination.parent,
     )
 
-    manifest = json.loads((destination / "codex-adapter.json").read_text(encoding="utf-8"))
+    manifest = json.loads(
+        (destination / "codex-adapter.json").read_text(encoding="utf-8")
+    )
     assert manifest["public_skills"] == ["escala"]
     assert manifest["private_agents"] == [f"escala-{area}" for area in SPECIALIST_AREAS]
     assert {path.stem for path in (destination / "agents").glob("*.toml")} == {
         f"escala-{area}" for area in SPECIALIST_AREAS
     }
-    assert [path.parent.name for path in (destination / "skills").glob("*/SKILL.md")] == [
-        "escala"
-    ]
+    assert [
+        path.parent.name for path in (destination / "skills").glob("*/SKILL.md")
+    ] == ["escala"]
 
 
 def test_explicit_specialist_install_preserves_foreign_agents(tmp_path: Path) -> None:
@@ -160,12 +164,12 @@ def test_explicit_specialist_install_preserves_foreign_agents(tmp_path: Path) ->
     assert completed.returncode == 0, completed.stderr
     assert foreign_claude.read_text(encoding="utf-8") == "preserve claude"
     assert foreign_codex.read_text(encoding="utf-8") == "preserve codex"
-    assert {path.stem for path in (home / ".claude" / "agents").glob("escala-*.md")} == {
-        f"escala-{area}" for area in SPECIALIST_AREAS
-    }
-    assert {path.stem for path in (home / ".codex" / "agents").glob("escala-*.toml")} == {
-        f"escala-{area}" for area in SPECIALIST_AREAS
-    }
+    assert {
+        path.stem for path in (home / ".claude" / "agents").glob("escala-*.md")
+    } == {f"escala-{area}" for area in SPECIALIST_AREAS}
+    assert {
+        path.stem for path in (home / ".codex" / "agents").glob("escala-*.toml")
+    } == {f"escala-{area}" for area in SPECIALIST_AREAS}
     assert sorted(path.name for path in (home / ".claude" / "skills").iterdir()) == [
         "escala"
     ]

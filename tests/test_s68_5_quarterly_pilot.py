@@ -51,6 +51,6 @@ def test_flags_duplicate_artifact_proof() -> None:
     raw = _attestation().model_dump()
     raw["stages"][1]["artifact_sha256"] = raw["stages"][0]["artifact_sha256"]
 
-    assert validate_pilot_attestation(QuarterlyPilotAttestation.model_validate(raw)) == (
-        "pilot_artifact_hashes_must_be_distinct",
-    )
+    assert validate_pilot_attestation(
+        QuarterlyPilotAttestation.model_validate(raw)
+    ) == ("pilot_artifact_hashes_must_be_distinct",)

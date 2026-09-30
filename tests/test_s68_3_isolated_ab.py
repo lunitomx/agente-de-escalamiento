@@ -11,7 +11,9 @@ from validators.isolated_ab import (
 )
 
 
-def _receipt(*, condition: str, intent: str = "diagnose-primary-constraint") -> SessionReceipt:
+def _receipt(
+    *, condition: str, intent: str = "diagnose-primary-constraint"
+) -> SessionReceipt:
     return SessionReceipt.model_validate(
         {
             "schema_version": 1,

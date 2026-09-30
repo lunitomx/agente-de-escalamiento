@@ -32,7 +32,9 @@ class QuarterlyPilotAttestation(_StrictModel):
 
     schema_version: Literal[1]
     pilot_id: str = Field(pattern=r"^PILOT-[A-Z0-9-]+$")
-    authorization_reference: str = Field(pattern=r"^authorization\.sha256\.[a-f0-9]{64}$")
+    authorization_reference: str = Field(
+        pattern=r"^authorization\.sha256\.[a-f0-9]{64}$"
+    )
     local_storage_consent: Literal[True]
     repository_content_free: Literal[True]
     stages: tuple[StageAttestation, ...] = Field(min_length=4, max_length=4)

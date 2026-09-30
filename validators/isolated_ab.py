@@ -31,11 +31,15 @@ class SessionReceipt(_StrictModel):
     case_ids: tuple[str, ...] = Field(min_length=1, max_length=128)
     prompt_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
     response_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
-    observations: tuple[ActivationObservation, ...] = Field(min_length=1, max_length=128)
+    observations: tuple[ActivationObservation, ...] = Field(
+        min_length=1, max_length=128
+    )
 
     @model_validator(mode="after")
     def validate_coverage(self) -> "SessionReceipt":
-        observation_ids = tuple(observation.case_id for observation in self.observations)
+        observation_ids = tuple(
+            observation.case_id for observation in self.observations
+        )
         if len(self.case_ids) != len(set(self.case_ids)):
             raise ValueError("receipt_case_ids_duplicate")
         if len(observation_ids) != len(set(observation_ids)):

@@ -11,7 +11,9 @@ from validators.capability_map import load_capability_map, validate_capability_m
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
-SPECIALIST_CONTRACT_PATH = REPOSITORY_ROOT / "adapters" / "specialists" / "contract.json"
+SPECIALIST_CONTRACT_PATH = (
+    REPOSITORY_ROOT / "adapters" / "specialists" / "contract.json"
+)
 CODEX_AGENT_DIRECTORY = REPOSITORY_ROOT / "adapters" / "codex" / "agents"
 CLAUDE_AGENT_DIRECTORY = REPOSITORY_ROOT / "adapters" / "claude" / "agents"
 SPECIALIST_AREAS = ("cash", "execution", "people", "strategy")
@@ -169,7 +171,9 @@ def write_specialist_artifacts() -> tuple[Path, ...]:
 def _actual_files(directory: Path, suffix: str) -> set[Path]:
     if not directory.exists():
         return set()
-    return {path for path in directory.iterdir() if path.is_file() and path.suffix == suffix}
+    return {
+        path for path in directory.iterdir() if path.is_file() and path.suffix == suffix
+    }
 
 
 def validate_specialist_artifacts() -> tuple[str, ...]:
@@ -182,11 +186,17 @@ def validate_specialist_artifacts() -> tuple[str, ...]:
     for path, content in expected.items():
         try:
             if path.read_text(encoding="utf-8") != content:
-                errors.append(f"specialist_artifact_drift:{path.relative_to(REPOSITORY_ROOT)}")
+                errors.append(
+                    f"specialist_artifact_drift:{path.relative_to(REPOSITORY_ROOT)}"
+                )
         except OSError:
-            errors.append(f"specialist_artifact_missing:{path.relative_to(REPOSITORY_ROOT)}")
+            errors.append(
+                f"specialist_artifact_missing:{path.relative_to(REPOSITORY_ROOT)}"
+            )
     expected_codex = {path for path in expected if path.parent == CODEX_AGENT_DIRECTORY}
-    expected_claude = {path for path in expected if path.parent == CLAUDE_AGENT_DIRECTORY}
+    expected_claude = {
+        path for path in expected if path.parent == CLAUDE_AGENT_DIRECTORY
+    }
     if _actual_files(CODEX_AGENT_DIRECTORY, ".toml") != expected_codex:
         errors.append("codex_specialist_surface_drift")
     if _actual_files(CLAUDE_AGENT_DIRECTORY, ".md") != expected_claude:

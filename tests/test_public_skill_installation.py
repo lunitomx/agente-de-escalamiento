@@ -87,7 +87,9 @@ def _portable_artifact(destination: Path) -> Path:
     assert (destination / "adapters" / "claude" / "adapter.json").is_file()
     assert {
         path.stem
-        for path in (destination / "adapters" / "codex" / "agents").glob("escala-*.toml")
+        for path in (destination / "adapters" / "codex" / "agents").glob(
+            "escala-*.toml"
+        )
     } == {"escala-cash", "escala-execution", "escala-people", "escala-strategy"}
     assert (destination / "capabilities" / "mvp" / "catalog.json").is_file()
     return destination
