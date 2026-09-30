@@ -24,6 +24,15 @@ escriba un comando ni le nombres este procedimiento.
 - El módulo guarda la elección (sólo la referencia, nunca el contenido) en
   `.escala/my-company/tracker.yaml`. Tú no escribes archivos.
 - No prometas pasos para ChatGPT: hoy sólo está verificado Claude (E85).
+- **ESCALA sólo propone filas; las pega el empresario.** Nunca escribas en su
+  hoja ni en el archivo del grupo, aunque tengas una herramienta que lo permita
+  (hoy no hay ninguna verificada). Nunca propongas pegar sobre celdas con algo,
+  ni arriba donde su nombre viene de `START HERE`.
+- Para deshacer, sólo Ctrl+Z (Cmd+Z en Mac) o el historial de ediciones de la
+  celda. Nunca sugieras "Restaurar esta versión": borra lo que los demás
+  escribieron en el archivo del grupo.
+- Si su hoja ya tiene otro Critical Number, sólo se señala y se pregunta; nunca
+  se cambia.
 - Un paso por mensaje, en español llano. Usa tal cual el `message` que devuelve
   el módulo.
 
@@ -50,9 +59,14 @@ completo, que incluye esta línea obligatoria:
 
 > Ojo: al conectarlo, el asistente puede ver todo el archivo compartido del grupo; ESCALA sólo usa tu pestaña.
 
+Si ya dijiste este mensaje en la conversación, en el paso 5 manda
+`"drive_notice_shown": true`. Si Drive ya estaba conectado, no lo digas aquí:
+el módulo añade la línea de aviso una sola vez, la primera vez que se enlaza
+su pestaña.
+
 Si el empresario prefiere pegar su pestaña, salta al paso 5 con `pasted_text`
-(si no sabes cómo se llama su pestaña, pregunta: "¿Cómo se llama tu pestaña en
-la hoja? Casi siempre es tu nombre.").
+y `"name": "<nombre>"`: si no sabes cómo se llama su pestaña, el módulo usa el
+nombre que ya te dio. Sólo pregunta si no tienes ninguno.
 
 ### Paso 4: Proponer por nombre de pestaña
 
@@ -76,10 +90,24 @@ descarta las demás pestañas antes de leer, guarda la elección y devuelve
 `sheet` (sólo su pestaña) y el `message`, que avisa si su pestaña dice "Name 6"
 en vez de su nombre. Si dice que no, vuelve al paso 4 con otra pestaña.
 
-### Paso 6: Siguiente paso
+### Paso 6: Proponer filas para el mes
 
-Con su pestaña confirmada, ofrece el siguiente paso (proponer filas para sus
-compromisos del mes) sin mover nada todavía.
+Con su pestaña confirmada, pregunta si quiere que le propongas las filas de
+sus compromisos del mes. Con un sí:
+
+`{"action": "propose", "base_path": ".", "connector_text": "<texto>", "file_title": "<título>", "file_id": "<id>", "month": "AAAA-MM", "plan": {"critical_number": "...", "priorities": [{"priority": "...", "kpi": "...", "decision": "cash|strategy|execution|people", "due": "..."}]}}`
+
+(o `"pasted_text"` en lugar de `connector_text`). Manda `plan` con las
+prioridades que acaban de definir; si no lo mandas, el módulo usa el plan
+trimestral guardado. Pon `decision` sólo si el área es clara; si no, déjala
+fuera. El módulo usa sólo la pestaña confirmada, usa las áreas que su hoja ya
+tiene, se salta lo que ya está escrito y no guarda nada.
+
+Di el `message` completo: la tabla, el bloque para copiar, la celda exacta
+donde pegar (primera fila vacía de Monthly Commitments) y cómo deshacer. Si
+el módulo pide insertar filas antes, dilo tal cual. Si pregunta por el
+Critical Number o por un área, espera su respuesta y vuelve a llamar con el
+plan corregido. Nada se mueve sin su sí.
 
 ## Output
 
@@ -87,3 +115,4 @@ compromisos del mes) sin mover nada todavía.
 |------|-------------|
 | Referencia a su pestaña (archivo + nombre de pestaña) | `.escala/my-company/tracker.yaml` |
 | Su pestaña leída (sólo en la conversación) | `sheet` del módulo; no se guarda |
+| Filas propuestas + bloque para pegar | `proposal` / `paste_block` del módulo; las pega el empresario |

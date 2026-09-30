@@ -73,3 +73,15 @@ def test_mvp_capability_catalog_is_unchanged_by_the_tracker() -> None:
     catalog = (ROOT / "capabilities/mvp/catalog.json").read_text(encoding="utf-8")
 
     assert "tracker" not in catalog
+
+
+def test_procedure_proposes_rows_and_never_writes_them() -> None:
+    """S82.4: paste-ready rows only (S82.6 found no verified write path)."""
+    text = _procedure()
+
+    assert '"action": "propose"' in text
+    assert "drive_notice_shown" in text
+    assert "Ctrl+Z" in text
+    assert "Restaurar esta versión" in text  # only as what never to suggest
+    assert "Nunca escribas" in text
+    assert "Critical Number" in text
