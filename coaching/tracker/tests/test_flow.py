@@ -824,3 +824,58 @@ def test_prep_message_plural_and_up_to_date() -> None:
     assert "Si decides pasarlos a Done:" in many
     assert many.endswith("¿Pasas los terminados a Done?")
     assert fine == PREP_UP_TO_DATE
+
+
+def test_seams_confirm_then_propose_then_paste_then_prepare(tmp_path: Path) -> None:
+    """Epic checkpoint: S82.3 -> S82.4 -> S82.5 on one synthetic tab."""
+    base = str(tmp_path)
+    header = (
+        "Participant Name\t\tAna Demo\n"
+        "Monthly Commitments\n"
+        "\tFocus Area\tPriorities\tKPIs\tDue Dates\n"
+    )
+    done = "\nDone - record anything you want to keep track\n\tFocus Area\tGoals\n"
+    confirmed = run(
+        {
+            "action": "confirm",
+            "base_path": base,
+            "user_confirmed": True,
+            "name": "Ana",
+            "pasted_text": header + done,
+        }
+    )
+    assert confirmed.errors == []
+
+    proposed = run(
+        {
+            "action": "propose",
+            "base_path": base,
+            "pasted_text": header + done,
+            "plan": _PLAN,
+            "month": "2026-10",
+        }
+    )
+    assert proposed.errors == [] and "**B4**" in proposed.message
+
+    # The owner pastes the block at B4, then marks the first row as done.
+    pasted_rows = [f"\t{line}" for line in proposed.paste_block.splitlines()]
+    pasted_rows[0] += "\tHecho"
+    after_paste = header + "\n".join(pasted_rows) + "\n" + done
+    before = _files_snapshot(tmp_path)
+
+    prepared = run(
+        {
+            "action": "prepare",
+            "base_path": base,
+            "pasted_text": after_paste,
+            "today": "2026-11-02",
+        }
+    )
+
+    assert prepared.errors == []
+    assert prepared.prep is not None
+    assert [i.text for i in prepared.prep.finished] == ["Contratar vendedor"]
+    assert [i.text for i in prepared.prep.overdue] == ["Definir cliente ideal"]
+    assert prepared.paste_block == "People\tContratar vendedor"
+    assert "**B9**" in prepared.message  # first empty row of Done (row 9)
+    assert _files_snapshot(tmp_path) == before
