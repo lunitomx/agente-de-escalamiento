@@ -180,7 +180,7 @@ class BoardProposal(BaseModel):
 
 ## Incógnitas: decisiones propuestas (pendientes de confirmar por el dueño)
 
-| # | Incógnita | Decisión propuesta — pendiente de confirmar por el dueño |
+| # | Incógnita | Decisión propuesta — confirmada por el dueño 2026-09-30 |
 |---|---|---|
 | U1 | Extender o reemplazar `coaching/dashboard` | Extender con el submódulo `boards/`; el progreso actual queda intacto |
 | U2 | Formato local común | Un HTML autocontenido (sin JS ni red) más su gemelo Markdown; el Markdown en el chat es el piso |

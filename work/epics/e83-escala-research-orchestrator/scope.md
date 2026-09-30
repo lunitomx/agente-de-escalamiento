@@ -161,3 +161,7 @@ Checkpoint de integración: S83.5 prueba la costura research → diagnóstico en
 - U2: ESCALA elige el modo según la restricción diagnosticada; el pedido del dueño gana.
 - E71 (ESCALA-35) queda absorbida por E83; su customer journey (S71.5) pasa a E84.
 - Matriz de verificación de S83.5: Claude Code, Codex, claude.ai/Desktop y ChatGPT Work (esta última queda como no verificada hasta E85).
+- (2026-09-30, segunda ronda) Cifras: bloqueo estricto de números redondos que se parezcan a una cifra privada (se prefiere rechazar a filtrar).
+- Antigüedad: máximo 90 días para todos los modos, sin excepción para tamaño de mercado.
+- Tamaño de mercado (S83.3): el INEGI no es fuente principal (el dueño no lo usa); buscar varias fuentes recientes — cámaras y asociaciones del giro, prensa, reportes de industria, datos publicados por competidores. Sin 3 fuentes de ≤90 días queda "por confirmar" con lo encontrado.
+- Palabras de giro permitidas (S83.3): lista de tipos de negocio (tortillería, panadería, taller, consultorio, restaurante, …) que nunca cuentan como nombre privado, para poder buscar competidores que las comparten con el nombre de la empresa.

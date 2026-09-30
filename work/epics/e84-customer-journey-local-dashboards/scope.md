@@ -142,3 +142,8 @@ Checkpoint de integración: S84.2 prueba la costura journey → diagnóstico en 
 3. **Privacidad de conteos.** `.escala/agent/memory/` no está ignorado por git. Mitigación: E84 escribe sólo en `my-company/`; el hallazgo pasa a E79.
 4. **Plataformas no verificadas.** Puede que ningún cliente abra el HTML. Mitigación: el Markdown en el chat es el piso, y la matriz se llena en S84.4 antes de afirmar nada.
 5. **Rutas.** Poner la ruta `dashboard` primera saca de cash los pedidos visuales de caja. Mitigación: la regla de no redundancia señala el reporte de caja, con el caso fijado en un test.
+
+
+## Decisiones del dueño (2026-09-30)
+
+Confirmadas todas las decisiones propuestas del diseño (U1–U7): extender `coaching/dashboard` con `boards/`; HTML autocontenido + Markdown; E84 absorbe E73 (ESCALA-37); rutas propuestas con la ruta dashboard primero; 30 días sin volver a preguntar tras "no"/"después" y máximo una pregunta por conversación; conteos del journey en `.escala/my-company/journey/`; E80 corrige el inglés y los comandos del tablero de progreso. `.escala/agent/memory/` ya se ignora en git (ded54cb).
