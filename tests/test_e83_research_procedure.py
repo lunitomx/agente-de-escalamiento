@@ -91,3 +91,37 @@ def test_procedure_drives_the_comparables_step_of_the_benchmark() -> None:
     assert "tipo de negocio" in text  # offer_category carries e.g. "tortillería"
     for dimension in ("precio", "paquetes", "canales", "metricas"):
         assert f'"{dimension}"' in text
+
+
+DIAGNOSE = ROOT / "escala-skills" / "escala-diagnose" / "SKILL.md"
+
+
+def test_diagnose_reads_saved_research_through_the_existing_fields() -> None:
+    """E83 S83.5: a saved decision enters the next diagnosis as a local fact."""
+    text = DIAGNOSE.read_text(encoding="utf-8")
+
+    assert '"action": "diagnosis"' in text
+    assert "python3 -m coaching.research" in text
+    assert "diagnostic_inputs" in text
+    assert "refresh_offers" in text
+    for field in ("evidence", "assumptions", "open_questions"):
+        assert f"`{field}`" in text
+    assert "nunca como hecho" in text  # outside findings stay assumptions
+
+
+def test_diagnose_offers_research_as_a_text_next_step_without_a_handoff() -> None:
+    text = DIAGNOSE.read_text(encoding="utf-8")
+
+    assert "Strategy" in text and "precio o margen" in text
+    assert "S75.3" in text  # route choice not built: no simulated hand-off
+    assert "escala-strategy-research" not in text  # never named to the owner
+
+
+def test_research_procedure_says_the_diagnosis_starts_from_the_decision() -> None:
+    text = _procedure()
+
+    assert "parto de esta decisión" in text or "siguiente diagnóstico" in text
+    assert '"action": "check_sources"' in text
+    assert '"pages"' in text
+    assert "sin_revisar" in text  # a page not opened is never "verified"
+    assert "Claude Desktop tampoco está verificado" in text

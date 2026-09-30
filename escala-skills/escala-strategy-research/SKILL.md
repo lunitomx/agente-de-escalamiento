@@ -36,7 +36,10 @@ procedimiento. Nunca digas "módulo", "triangulación", "TAM" ni "benchmark".
   fuente; si no hay fuente, la celda dice "no encontrado", nunca un estimado.
   Los números de otro negocio (ventas, clientes) sólo si los publicó en una
   página con link.
-- No prometas pasos para ChatGPT: hoy no está verificado (E85).
+- No prometas pasos para ChatGPT: hoy no está verificado (E85). En Claude.ai
+  / Claude Desktop tampoco está verificado de punta a punta: no digas al
+  empresario que ahí ya funciona; usa la regla de "¿Hay búsqueda en
+  internet?".
 - Un paso por mensaje, en español llano. Usa tal cual el `message` que devuelve
   el módulo.
 
@@ -173,7 +176,30 @@ Sólo cuando elija una opción y diga que sí:
  "...": "lo mismo que en el paso 4"}
 ```
 
-Di el `message` (dónde quedó y cuándo conviene revisarlo).
+Di el `message` (dónde quedó, que el siguiente diagnóstico parte de esta
+decisión y cuándo conviene revisarlo). Lo que dicen las fuentes entra a ese
+diagnóstico sólo como supuesto; la decisión del empresario, como hecho.
+
+### Paso 5b: Revisar citas (si lo pide, o antes de apoyarse en el reporte)
+
+Toma una muestra de las fuentes web del reporte guardado (`reference` es la
+ruta que devolvió `save`):
+
+```json
+{"action": "check_sources", "base_path": ".", "reference": "<saved_to>", "limit": 3}
+```
+
+Abre cada link de `source_checks` y vuelve a llamar con el texto de cada
+página:
+
+```json
+{"action": "check_sources", "base_path": ".", "reference": "<saved_to>",
+ "pages": {"s1": "<texto de la página que abriste>"}}
+```
+
+Di el `message`. Una fuente con `no_aparece` no cuenta hasta volver a
+confirmarla. Si no pudiste abrir una página, no la pases en `pages`: queda
+`sin_revisar`, nunca "verificada".
 
 ### Paso 6: Qué sigue
 
