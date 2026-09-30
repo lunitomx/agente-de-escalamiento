@@ -50,6 +50,13 @@ def _tab(name: str, participant: str, marker: str) -> str:
 | Monthly Commitments | | | | |
 | | Focus Area | Priorities | KPIs | Due Dates |
 | | Cash | Cobrar {marker} | 90% {marker} | 30/10/2026 |
+
+### Table Range: A10:D12
+| | | | |
+|---|---|---|---|
+| Quarterly Goals (Rocks) - Q4-2026 | | | |
+| | Focus Area | Goals/Rock for this quarter | |
+| | Cash | Rock {marker} | Vamos en 40% |
 """
 
 
@@ -914,3 +921,159 @@ def test_seams_confirm_then_propose_then_paste_then_prepare(tmp_path: Path) -> N
     assert prepared.paste_block == "People\tContratar vendedor"
     assert "**B9**" in prepared.message  # first empty row of Done (row 9)
     assert _files_snapshot(tmp_path) == before
+
+
+# --- S82.7: Rocks rows through the same propose action ------------------------
+
+
+def _rocks_tab(heading: str, *rocks: str) -> str:
+    return (
+        "Participant Name\t\tAna Demo\n"
+        "Monthly Commitments\n"
+        "\tFocus Area\tPriorities\tKPIs\tDue Dates\n"
+        "\n"
+        f"{heading}\n"
+        "\tFocus Area\tGoals/Rock for this quarter\n"
+        + "".join(f"\t{rock}\n" for rock in rocks)
+        + "\nDone - record anything you want to keep track\n"
+        "\tFocus Area\tGoals/Rock/Action\n"
+    )
+
+
+def _propose_pasted(base: str, pasted: str, **extra: object) -> FlowResult:
+    _confirm_pasted(base, pasted)
+    return _propose(
+        base, connector_text=None, pasted_text=pasted, table="rocks", **extra
+    )
+
+
+def test_propose_rocks_says_where_to_paste_and_how_to_undo(tmp_path: Path) -> None:
+    _confirm_ana(str(tmp_path))
+
+    result = _propose(str(tmp_path), table="rocks")
+
+    assert result.errors == []
+    assert result.proposal is None
+    assert result.rock_proposal is not None
+    assert result.rock_proposal.quarter == "Q4-2026"
+    assert result.paste_block.splitlines() == [
+        "People\tContratar vendedor",
+        "\tDefinir cliente ideal",
+    ]
+    message = result.message
+    assert message.startswith(
+        "Te propongo estas 2 filas para tus Rocks del **Q4-2026**:"
+    )
+    assert "| Focus Area | Goals/Rock for this quarter |" in message
+    assert "**B13**" in message  # first empty row under the Rocks table
+    assert "Quarterly Goals" in message
+    assert result.paste_block in message
+    assert "no tiene columna de KPI" in message  # the plan's KPI is not pasted
+    assert "Ctrl+Z" in message and "No uses «Restaurar esta versión»" in message
+
+
+def test_propose_rocks_without_a_quarter_asks_and_gives_no_block(
+    tmp_path: Path,
+) -> None:
+    pasted = _rocks_tab("Quarterly Goals (Rocks)")
+
+    asked = _propose_pasted(str(tmp_path), pasted)
+
+    assert asked.errors == ["needs_quarter"]
+    assert asked.paste_block == "" and asked.rock_proposal is None
+    assert asked.quarter_check is not None
+    assert "no dice de qué trimestre" in asked.message
+    assert asked.message.endswith("¿Son del **Q4-2026**?")
+
+    answered = _propose(
+        str(tmp_path),
+        connector_text=None,
+        pasted_text=pasted,
+        table="rocks",
+        quarter="Q4-2026",
+    )
+
+    assert answered.errors == []
+    assert answered.rock_proposal is not None
+    assert answered.rock_proposal.quarter == "Q4-2026"
+    assert "**B7**" in answered.message
+
+
+def test_propose_rocks_with_an_unclear_quarter_asks_which_one(tmp_path: Path) -> None:
+    pasted = _rocks_tab("Quarterly Goals (Rocks) - este trimestre")
+
+    result = _propose_pasted(str(tmp_path), pasted, plan={"priorities": ["Vender"]})
+
+    assert result.errors == ["needs_quarter"]
+    assert "«este trimestre»" in result.message
+    assert result.message.endswith("¿De qué trimestre son? (por ejemplo, Q4-2026)")
+
+
+def test_propose_rocks_for_another_quarter_asks_first(tmp_path: Path) -> None:
+    pasted = _rocks_tab("Quarterly Goals (Rocks) - Q3-2026", "Cash\tRock viejo")
+
+    result = _propose_pasted(str(tmp_path), pasted)
+
+    assert result.errors == ["quarter_mismatch"]
+    assert result.paste_block == ""
+    assert "**Q3-2026**" in result.message and "**Q4-2026**" in result.message
+    assert result.message.endswith("?")
+
+
+def test_propose_rocks_skips_rocks_already_written(tmp_path: Path) -> None:
+    pasted = _rocks_tab(
+        "Quarterly Goals (Rocks) - Q4-2026",
+        "People\tContratar vendedor",
+        "Strategy\tdefinir cliente IDEAL",
+    )
+
+    result = _propose_pasted(str(tmp_path), pasted)
+
+    assert result.rock_proposal is not None and result.rock_proposal.rows == []
+    assert result.paste_block == ""
+    assert "nada nuevo" in result.message
+
+
+def test_propose_rocks_without_a_rocks_table_says_so(tmp_path: Path) -> None:
+    pasted = "Participant Name\t\tAna Demo\nMonthly Commitments\n"
+
+    result = _propose_pasted(str(tmp_path), pasted)
+
+    assert result.errors == ["no_rocks_table"]
+    assert "Quarterly Goals" in result.message
+
+
+def test_propose_with_an_unknown_table_asks_which_one(tmp_path: Path) -> None:
+    _confirm_ana(str(tmp_path))
+
+    result = _propose(str(tmp_path), table="ventas")
+
+    assert result.errors == ["bad_table"]
+    assert "Rocks" in result.message
+
+
+def test_propose_rocks_user_messages_have_no_internal_jargon(tmp_path: Path) -> None:
+    _confirm_ana(str(tmp_path))
+    pasted = _rocks_tab("Quarterly Goals (Rocks)")
+    messages_seen = [
+        _propose(str(tmp_path), table="rocks").message,
+        _propose_pasted(str(tmp_path / "b"), pasted).message,
+    ]
+
+    for message in messages_seen:
+        for word in ["tracker", "TSV", "MCP", "escala-", "skill", "yaml", "grid"]:
+            assert word.lower() not in message.lower(), word
+
+
+def test_privacy_propose_rocks_keeps_other_tabs_out_and_writes_nothing(
+    tmp_path: Path,
+) -> None:
+    _confirm_ana(str(tmp_path))
+    before = _files_snapshot(tmp_path)
+
+    result = _propose(str(tmp_path), table="rocks")
+
+    dump = _dump(result)
+    for marker in _foreign("Ana"):
+        assert marker not in dump, marker
+    assert _files_snapshot(tmp_path) == before  # ESCALA only proposes

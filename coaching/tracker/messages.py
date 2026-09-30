@@ -9,8 +9,15 @@ from __future__ import annotations
 
 from coaching.tracker.identity import SheetCandidate, is_placeholder_name
 from coaching.tracker.maintenance import DateOrder, MeetingPrep, ReviewedItem
-from coaching.tracker.parser import CommitmentsLayout, cell_ref
-from coaching.tracker.proposal import RowProposal, render_table
+from coaching.tracker.parser import CommitmentsLayout, Column, cell_ref
+from coaching.tracker.proposal import (
+    ProposedRow,
+    QuarterCheck,
+    RockProposal,
+    RowProposal,
+    quarter_key,
+    render_table,
+)
 
 ASK_NAME = "¿Cómo te llamas? Con tu nombre busco tu pestaña en la hoja del grupo."
 
@@ -116,6 +123,10 @@ ASK_MONTH = "¿Para qué mes son estos compromisos?"
 LINK_MISMATCH = (
     "Este archivo no es el que usamos la otra vez. Antes de proponerte filas, "
     "¿me confirmas cuál es tu pestaña aquí?"
+)
+REVIEW_BEFORE_PASTING = (
+    "Revísalas; si quieres cambiar algo, dímelo antes de pegar. "
+    "Para pasarlas a tu hoja:"
 )
 PASTE_ONLY_THERE = (
     "Pega sólo ahí, sobre celdas vacías. No pegues arriba, donde está tu "
@@ -231,21 +242,145 @@ def proposal_message(
             f"No sé el área de: {_join(proposal.missing_area)}. Dime cuál es "
             "(Cash, Strategy, Execution o People) o déjala vacía."
         )
-    steps = _where(layout, tab_name, count)
-    steps.append(
-        f"Copia este bloque y pégalo ahí (Ctrl+V; Cmd+V en Mac):\n\n```\n"
-        f"{paste_block}\n```"
-    )
-    steps.append(PASTE_ONLY_THERE)
-    numbered = "\n".join(f"{i}. {step}" for i, step in enumerate(steps, 1))
     return "\n\n".join(
         [
             intro,
             render_table(proposal.rows, _table_headers(layout)),
             *notes,
-            "Revísalas; si quieres cambiar algo, dímelo antes de pegar. "
-            "Para pasarlas a tu hoja:",
-            numbered,
+            REVIEW_BEFORE_PASTING,
+            _paste_steps(layout, tab_name, count, paste_block, _BELOW_COMMITMENTS),
+            UNDO,
+        ]
+    )
+
+
+def _paste_steps(
+    layout: CommitmentsLayout | None,
+    tab_name: str,
+    count: int,
+    paste_block: str,
+    below: str,
+    *extra: str,
+) -> str:
+    steps = _where(layout, tab_name, count, below)
+    steps.append(
+        f"Copia este bloque y pégalo ahí (Ctrl+V; Cmd+V en Mac):\n\n```\n"
+        f"{paste_block}\n```"
+    )
+    steps += [PASTE_ONLY_THERE, *extra]
+    return "\n".join(f"{i}. {step}" for i, step in enumerate(steps, 1))
+
+
+# --- S82.7: Rocks rows for the quarter the sheet declares ---------------------
+
+ASK_TABLE = (
+    "¿Las filas son para tus compromisos del mes o para tus Rocks del trimestre?"
+)
+NO_ROCKS_TABLE = (
+    "No encuentro la tabla de Rocks (Quarterly Goals) en tu pestaña, así que no "
+    "sé dónde irían. ¿Tu hoja tiene esa sección con otro nombre?"
+)
+_BELOW_ROCKS = "tus Rocks del trimestre (Quarterly Goals)"
+_ROCK_FIELDS: tuple[Column, ...] = ("focus", "text", "kpi", "due")
+
+
+def _plan_quarter(check: QuarterCheck) -> str | None:
+    planned = check.plan_quarter
+    return planned.strip() if planned is not None and quarter_key(planned) else None
+
+
+def ask_quarter_message(check: QuarterCheck) -> str:
+    """The sheet does not say which quarter its Rocks are for: ask, never guess."""
+    if check.sheet_quarter is None or not check.sheet_quarter.strip():
+        said = "Tu tabla de Rocks no dice de qué trimestre es."
+    else:
+        said = (
+            f"Tu tabla de Rocks dice «{check.sheet_quarter.strip()}» y no sé a qué "
+            "trimestre se refiere."
+        )
+    planned = _plan_quarter(check)
+    ask = (
+        f"¿Son del **{planned}**?"
+        if planned
+        else "¿De qué trimestre son? (por ejemplo, Q4-2026)"
+    )
+    return f"{said} {ask}"
+
+
+def quarter_mismatch_message(check: QuarterCheck) -> str:
+    planned = _plan_quarter(check) or check.plan_quarter or ""
+    return (
+        f"Tu tabla de Rocks es del **{check.quarter}** y tus prioridades son del "
+        f"**{planned}**. Para no mezclar trimestres no te propongo filas ahí "
+        "todavía. Si esa tabla ya es para el trimestre nuevo, cambia su título a "
+        f"«Quarterly Goals (Rocks) - {planned}» y te las propongo. ¿Cómo lo "
+        "quieres hacer?"
+    )
+
+
+def _rock_columns(layout: CommitmentsLayout) -> tuple[list[str], list[Column]]:
+    headers: list[str] = []
+    fields: list[Column] = []
+    for header, field in zip(layout.headers, layout.fields):
+        if field in _ROCK_FIELDS:
+            headers.append(header)
+            fields.append(field)
+    return headers, fields
+
+
+def _left_out(rows: list[ProposedRow], fields: list[Column]) -> str:
+    missing: list[str] = []
+    if "kpi" not in fields and any(row.kpi for row in rows):
+        missing.append("KPI")
+    if "due" not in fields and any(row.due for row in rows):
+        missing.append("fecha")
+    if not missing:
+        return ""
+    return (
+        f"Tu tabla de Rocks no tiene columna de {' ni de '.join(missing)}: "
+        "sólo van el área y el Rock."
+    )
+
+
+def rocks_proposal_message(
+    proposal: RockProposal,
+    layout: CommitmentsLayout,
+    tab_name: str,
+    paste_block: str,
+) -> str:
+    """Rocks rows to review, the block, exactly where to paste and how to undo."""
+    quarter = f"**{proposal.quarter}**"
+    notes: list[str] = []
+    if proposal.skipped:
+        notes.append(f"Ya tenías escritos: {_join(proposal.skipped)}; no los repito.")
+    if not proposal.rows:
+        return "\n\n".join(
+            [
+                f"Tus Rocks del {quarter} ya tienen tus prioridades del trimestre: "
+                "no hay nada nuevo que pegar.",
+                *notes,
+            ]
+        )
+    count = len(proposal.rows)
+    headers, fields = _rock_columns(layout)
+    if left_out := _left_out(proposal.rows, fields):
+        notes.append(left_out)
+    if proposal.missing_area:
+        notes.append(
+            f"No sé el área de: {_join(proposal.missing_area)}. Dime cuál es "
+            "(Cash, Strategy, Execution o People) o déjala vacía."
+        )
+    intro = (
+        f"Te propongo {'esta fila' if count == 1 else f'estas {count} filas'} para "
+        f"tus Rocks del {quarter}:"
+    )
+    return "\n\n".join(
+        [
+            intro,
+            render_table(proposal.rows, headers, fields),
+            *notes,
+            REVIEW_BEFORE_PASTING,
+            _paste_steps(layout, tab_name, count, paste_block, _BELOW_ROCKS),
             UNDO,
         ]
     )
@@ -341,13 +476,8 @@ def _sections(prep: MeetingPrep) -> list[str]:
 def _done_steps(
     prep: MeetingPrep, layout: CommitmentsLayout | None, tab_name: str, block: str
 ) -> str:
-    steps = _where(layout, tab_name, len(prep.finished), _BELOW_DONE)
-    steps.append(
-        f"Copia este bloque y pégalo ahí (Ctrl+V; Cmd+V en Mac):\n\n```\n{block}\n```"
-    )
-    steps.append(PASTE_ONLY_THERE)
-    steps.append(CLEAR_MOVED)
-    numbered = "\n".join(f"{i}. {step}" for i, step in enumerate(steps, 1))
+    count = len(prep.finished)
+    numbered = _paste_steps(layout, tab_name, count, block, _BELOW_DONE, CLEAR_MOVED)
     them = "pasarlo" if len(prep.finished) == 1 else "pasarlos"
     return f"Si decides {them} a Done:\n\n{numbered}"
 
