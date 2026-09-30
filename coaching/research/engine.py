@@ -185,8 +185,45 @@ def _word_views(text: str) -> list[list[str]]:
     return [split, glued, _merge_letters(split)]
 
 
+# Owner decision (2026-09-30, S83.3): words naming a common type of Mexican
+# small business never count as private company words, so a competitor that
+# shares them ("Tortillería El Sol" next to "Tortillería Zorblax") can be
+# searched. The full company name and its other words stay blocked. Closed
+# list, normalized (lowercase, no accents); plurals are accepted by rule.
+BUSINESS_TYPE_WORDS = frozenset(
+    """
+    abarrotes academia agencia autolavado bar barberia boutique cafe cafeteria
+    cantina carniceria carpinteria cerveceria clinica cocina colegio
+    comercializadora consultora consultorio constructora cremeria dental
+    despacho distribuidora dulceria escuela estetica farmacia ferreteria
+    floreria fonda fruteria gimnasio guarderia heladeria herreria hospital
+    hotel imprenta inmobiliaria jarceria joyeria laboratorio lavanderia
+    loncheria marisqueria mecanico merceria minisuper miscelanea
+    molino muebleria optica paleteria panaderia papeleria pasteleria
+    peluqueria pizzeria polleria posada purificadora recauderia refaccionaria
+    restaurante salon spa taller tapiceria taqueria tienda tintoreria
+    tlapaleria tortilleria torteria veterinaria verduleria vidrieria
+    vinateria vulcanizadora zapateria
+    """.split()
+)
+
+
+def is_business_type_word(word: str) -> bool:
+    """Whether a normalized word names a type of business ("talleres" too)."""
+    return (
+        word in BUSINESS_TYPE_WORDS
+        or (word.endswith("s") and word[:-1] in BUSINESS_TYPE_WORDS)
+        or (word.endswith("es") and word[:-2] in BUSINESS_TYPE_WORDS)
+    )
+
+
 def _distinctive(name: str) -> set[str]:
     return {word for word in _words(name) if len(word) >= 3 and word not in _GENERIC}
+
+
+def _company_words(name: str) -> set[str]:
+    """Words of a company name that identify it: not a type of business."""
+    return {word for word in _distinctive(name) if not is_business_type_word(word)}
 
 
 def _phrase_in(phrase: str, words: list[str]) -> bool:
@@ -194,8 +231,8 @@ def _phrase_in(phrase: str, words: list[str]) -> bool:
     return bool(wanted) and f" {' '.join(wanted)} " in f" {' '.join(words)} "
 
 
-def _name_in(name: str, views: list[list[str]], allowed: set[str]) -> bool:
-    wanted = _distinctive(name) - allowed
+def _name_in(name: str, views: list[list[str]], wanted: set[str]) -> bool:
+    """The full name as a phrase, or any of its ``wanted`` words."""
     return any(_phrase_in(name, words) or wanted & set(words) for words in views)
 
 
@@ -257,9 +294,12 @@ def _reject_reason(
     if _foreign_characters(query):
         return "caracteres"
     views = _word_views(query)
-    if any(_name_in(company, views, public_words) for company in private.company_names):
+    if any(
+        _name_in(company, views, _company_words(company) - public_words)
+        for company in private.company_names
+    ):
         return "empresa"
-    if any(_name_in(person, views, set()) for person in private.people):
+    if any(_name_in(person, views, _distinctive(person)) for person in private.people):
         return "persona"
     figures = [
         amount for figure in private.figures for amount in _private_amounts(figure)
@@ -279,16 +319,17 @@ def is_own_company(name: str, frame: ResearchFrame, private: PrivateTerms) -> bo
 
     Unlike the search check (any distinctive word is refused, to never leak),
     this local check needs the full name, every distinctive word of it that is
-    not a word of the confirmed offer or geography, or a name made only of the
-    company's own words ("Zorblax"), so "Tortillería El Sol" is not mistaken
-    for "Tortillería Zorblax".
+    neither a type of business nor a word of the confirmed offer or geography
+    ("Zorblax Centro" is a branch), or a name made only of the company's own
+    words ("Zorblax"), so "Tortillería El Sol" is not mistaken for
+    "Tortillería Zorblax".
     """
     public = _public_words(frame)
     views = _word_views(sanitize_query(name))
     listed = _distinctive(sanitize_query(name))
     for company in private.company_names:
         own = _distinctive(company)
-        wanted = own - public
+        wanted = _company_words(company) - public
         if listed and listed <= own:
             return True
         if any(
@@ -304,9 +345,10 @@ def check_queries(frame: ResearchFrame, private: PrivateTerms) -> QueryCheck:
 
     Each query is first sanitized (``sanitize_query``); the check runs on that
     text and the accepted list holds exactly that text, so what is checked is
-    what is searched. A word of the company name is allowed only when it is
-    also a word of the confirmed offer category or geography (e.g.
-    "tortillería" in "Tortillería Zorblax"); the full company name, people's
+    what is searched. A word of the company name is allowed only when it
+    names a type of business (``BUSINESS_TYPE_WORDS``, e.g. "tortillería" in
+    "Tortillería Zorblax") or is a word of the confirmed offer category or
+    geography; the full company name, its other words, people's
     names, private figures (however grouped or scaled) and look-alike letters
     from other scripts never are.
     """
