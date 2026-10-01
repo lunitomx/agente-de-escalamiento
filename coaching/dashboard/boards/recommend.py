@@ -132,7 +132,7 @@ def _feasibility(metrics: Sequence[BoardMetric]) -> Feasibility:
     return "necesita_datos" if known else "no_ahora"
 
 
-def _proposal(pattern: BoardPattern, facts: Sequence[Fact]) -> BoardProposal:
+def build_proposal(pattern: BoardPattern, facts: Sequence[Fact]) -> BoardProposal:
     metrics = _metric_states(pattern.metrics, facts)
     return BoardProposal(
         board_id=pattern.board_id,
@@ -186,7 +186,7 @@ def recommend_boards(
         return Recommendation(
             outcome="pospuesto", area=area, message=messages.POSTPONED
         )
-    proposals = [_proposal(p, facts) for p in open_patterns]
+    proposals = [build_proposal(p, facts) for p in open_patterns]
     needs_stages = any(
         pattern.needs_journey_stages and proposal.missing
         for pattern, proposal in zip(open_patterns, proposals, strict=True)
