@@ -81,6 +81,15 @@ def test_every_tracked_legacy_skill_has_one_explicit_alias() -> None:
         ("¿Cómo vamos?", "escala-diagnose"),
         ("Quiero retomar lo que dejamos pendiente", "escala-welcome"),
         ("No sé por dónde empezar", "escala-welcome"),
+        # E84 S84.3: the dashboard route goes first; every board request lands
+        # in one place, and the recommender points cash to the cash report.
+        ("Tablero de mis ventas", "escala-dashboard"),
+        ("Muéstrame un dashboard", "escala-dashboard"),
+        ("¿Qué indicadores debo ver?", "escala-dashboard"),
+        ("Quiero ver mi flujo de caja en una gráfica", "escala-dashboard"),
+        ("Tablero de mis prioridades", "escala-dashboard"),
+        ("Indicadores del equipo", "escala-dashboard"),
+        ("Quiero cobrar más rápido", "escala-cash"),
     ],
 )
 def test_natural_requests_choose_an_explainable_first_capability(

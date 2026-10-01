@@ -335,6 +335,14 @@ capabilities:
   disposition: keep
   reason: Plantillas de trabajo con contrato.
 routes:
+- id: dashboard
+  keywords:
+  - tablero
+  - dashboard
+  - grafica
+  - indicador
+  target: escala-dashboard
+  message: Veamos primero qué quieres decidir con ese tablero y si ya tienes algo que lo responda.
 - id: cash
   keywords:
   - cash
