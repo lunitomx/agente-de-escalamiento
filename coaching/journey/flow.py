@@ -14,7 +14,14 @@ Actions (JSON on stdin, like ``coaching.research``):
   corrupt one is first kept as ``asks.yaml.bak`` and reported in ``notes``. With
   "si" it also returns the interview's first question.
 - ``interview``: ``answers`` so far -> next single question and the draft.
-  Never writes: the journey is decided and saved in S84.2.
+  Never writes.
+- ``build`` (S84.2): ``answers`` plus what the agent knows from the
+  conversation (``counts`` per stage with period and local source,
+  ``evidence`` per stage with its origin, ``experiment``) -> the journey, its
+  plain summary and 2-3 options with one recommended. Never writes.
+- ``save``: the same plus ``chosen`` (the owner's option). Refused without
+  it. Writes ``journey.yaml`` and ``AAAA-MM-DD-journey.md``.
+- ``diagnosis``: the saved decision as input for the next diagnosis.
 
 Everything is written under ``<base_path>/.escala/my-company/journey/``.
 """
@@ -31,6 +38,17 @@ from pydantic import BaseModel, Field, TypeAdapter, ValidationError
 
 from coaching.diagnose.models import FunnelMetrics
 from coaching.journey import messages
+from coaching.journey.decision import (
+    JourneyDecision,
+    choose,
+    decision_lines,
+    propose,
+    save_journey,
+)
+from coaching.journey.diagnosis import load_diagnostic_inputs
+from coaching.journey.models import Journey, JourneyEvidence, StageCount, from_draft
+from coaching.journey.view import summary
+from coaching.research.diagnosis import DiagnosticInputs
 from coaching.journey.asks import (
     JOURNEY_DIR,
     AskRecord,
@@ -56,6 +74,9 @@ class FlowResult(BaseModel):
     message: str = ""
     decision: AskDecision | None = None
     step: InterviewStep | None = None
+    journey: Journey | None = None
+    options: JourneyDecision | None = None
+    diagnostic_inputs: DiagnosticInputs | None = None
     saved_to: str | None = None
     notes: list[str] = Field(default_factory=list[str])
     errors: list[str] = Field(default_factory=list[str])
@@ -155,7 +176,101 @@ def _interview(context: Mapping[str, object]) -> FlowResult:
     return FlowResult(action="interview", step=step, message=step.message)
 
 
-_ACTIONS = {"check": _check, "record": _record, "interview": _interview}
+_COUNTS = TypeAdapter(dict[str, StageCount])
+_EVIDENCE = TypeAdapter(list[dict[str, object]])
+
+
+def _journey(context: Mapping[str, object], today: date) -> Journey:
+    """The interview's draft plus what the agent knows, as a journey."""
+    answers = _ANSWERS.validate_python(context.get("answers", []))
+    journey = from_draft(interview_step(answers, today).draft, today)
+    counts = _COUNTS.validate_python(context.get("counts", {}))
+    extra: dict[str, list[JourneyEvidence]] = {}
+    for item in _EVIDENCE.validate_python(context.get("evidence", [])):
+        fields = {key: value for key, value in item.items() if key != "stage"}
+        extra.setdefault(str(item.get("stage")), []).append(
+            JourneyEvidence.model_validate(fields)
+        )
+    known = {stage.stage for stage in journey.stages}
+    if unknown := (set(counts) | set(extra)) - known:
+        raise ValueError(f"unknown_stage:{','.join(sorted(unknown))}")
+    stages = [
+        stage.model_copy(
+            update={
+                "count": counts.get(stage.stage, stage.count),
+                "evidence": [*stage.evidence, *extra.get(stage.stage, [])],
+            }
+        )
+        for stage in journey.stages
+    ]
+    return Journey.model_validate(
+        {"built_on": today, "stages": [s.model_dump() for s in stages]}
+    )
+
+
+def _decision(
+    context: Mapping[str, object], journey: Journey, today: date
+) -> JourneyDecision:
+    days = context.get("days", 14)
+    by_date = _text(context, "by_date")
+    return propose(
+        journey,
+        today,
+        experiment=_text(context, "experiment"),
+        days=days if isinstance(days, int) else 14,
+        by_date=date.fromisoformat(by_date) if by_date else None,
+    )
+
+
+def _build(context: Mapping[str, object]) -> FlowResult:
+    today = _today(context)
+    journey = _journey(context, today)
+    decision = _decision(context, journey, today)
+    message = "\n".join(
+        [
+            summary(journey),
+            "",
+            messages.DECIDE,
+            *[f"- {line}" for line in decision_lines(decision)],
+            messages.NOT_SAVED_YET,
+        ]
+    )
+    return FlowResult(
+        action="build", journey=journey, options=decision, message=message
+    )
+
+
+def _save(context: Mapping[str, object]) -> FlowResult:
+    today = _today(context)
+    chosen = _text(context, "chosen")
+    if chosen is None:
+        raise ValueError("needs_chosen_option")
+    journey = _journey(context, today)
+    decision = choose(_decision(context, journey, today), chosen)
+    base = _base(context)
+    markdown, _ = save_journey(base, journey, decision, today)
+    return FlowResult(
+        action="save",
+        journey=journey,
+        options=decision,
+        saved_to=markdown.relative_to(base).as_posix(),
+        message=messages.SAVED,
+    )
+
+
+def _diagnosis(context: Mapping[str, object]) -> FlowResult:
+    inputs = load_diagnostic_inputs(_base(context), _today(context))
+    return FlowResult(action="diagnosis", diagnostic_inputs=inputs)
+
+
+_ACTIONS = {
+    "check": _check,
+    "record": _record,
+    "interview": _interview,
+    "build": _build,
+    "save": _save,
+    "diagnosis": _diagnosis,
+}
 
 
 def _validation_codes(exc: ValidationError) -> list[str]:
