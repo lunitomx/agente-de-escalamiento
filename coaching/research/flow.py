@@ -28,6 +28,14 @@ Actions (JSON on stdin, like ``coaching.tracker``):
   = its local path, as in ``index.yaml``; ``limit``, default 3). Without
   ``pages`` it returns the links to open; with ``pages`` ({source_id: page
   text}) it says, per source, whether the quoted excerpt is on the page.
+- ``swt``: the newest saved ``fortalezas-tendencias`` research, still
+  current, as outside evidence for the one SWT (marked, graded, no URLs,
+  ``saved_to`` = its local report). Writes nothing. ``base_path`` and
+  ``today`` (S83.4).
+
+In ``fortalezas-tendencias``, ``frame`` with an explicit ``base_path`` also
+returns the comparables of the newest current benchmark for the same offer
+and zone, with their ``sources`` (S83.4).
 
 The private specialist never writes state; this module does.
 """
@@ -54,6 +62,7 @@ from coaching.research.engine import (
     grade_claim,
     is_own_company,
 )
+from coaching.research.swt import SwtEvidence, load_swt_evidence, swt_message
 from coaching.research.sampling import SAMPLE_SIZE, SourceCheck, check_sources
 from coaching.research.models import (
     Comparable,
@@ -99,6 +108,7 @@ class FlowResult(BaseModel):
     missing_question: str | None = None
     diagnostic_inputs: DiagnosticInputs | None = None
     source_checks: list[SourceCheck] = Field(default_factory=list[SourceCheck])
+    swt_evidence: list[SwtEvidence] = Field(default_factory=list[SwtEvidence])
     errors: list[str] = Field(default_factory=list)
 
 
@@ -359,6 +369,18 @@ def _diagnosis(context: Mapping[str, object]) -> FlowResult:
     )
 
 
+def _swt(context: Mapping[str, object]) -> FlowResult:
+    """Saved outside findings for the one SWT (E83 S83.4); writes nothing."""
+    base = Path(_text(context, "base_path") or ".")
+    inputs = load_swt_evidence(base, _today(context))
+    return FlowResult(
+        action="swt",
+        swt_evidence=inputs.evidence,
+        saved_to=inputs.reference,
+        message=swt_message(inputs),
+    )
+
+
 _PAGES = TypeAdapter(dict[str, str])
 
 
@@ -400,6 +422,7 @@ _ACTIONS = {
     "save": _save,
     "diagnosis": _diagnosis,
     "check_sources": _check_sources,
+    "swt": _swt,
 }
 
 
