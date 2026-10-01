@@ -279,6 +279,8 @@ def _findings(report: ResearchReport) -> str:
         )
     if any(item.counted for item in report.comparables):
         return messages.ONLY_THE_TABLE
+    if report.market_size is not None and report.market_size.kind == "estimado":
+        return messages.ONLY_THE_SIZE
     return "Lo que encontré: nada que pueda sostener con fuentes."
 
 

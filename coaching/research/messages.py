@@ -43,6 +43,7 @@ NO_COUNTED_COMPARABLES = (
 WHICH_LOOK_ALIKE = "¿Cuáles se parecen al tuyo? Sólo cuento los que me digas que sí."
 NOT_FOUND_CELL = "no encontrado"
 ONLY_THE_TABLE = "Lo que encontré: lo que está en la tabla, con su fuente."
+ONLY_THE_SIZE = "Lo que encontré: el tamaño de arriba, con sus fuentes."
 TABLE_GAPS = "Lo que en la tabla dice «no encontrado»: no hallé una fuente que lo diga."
 
 

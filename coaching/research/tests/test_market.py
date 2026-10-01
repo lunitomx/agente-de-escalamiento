@@ -538,3 +538,10 @@ def test_a_size_that_would_not_fit_is_refused_never_cut() -> None:
     assert result.errors == ["finding_too_long"]
     assert "conserva la cifra" in result.message
     assert run(_step("report", None, segment=None)).errors == []
+
+
+def test_a_size_without_other_findings_is_not_called_nothing() -> None:
+    text = run(_step("report", _size_input())).message
+
+    assert "nada que pueda sostener con fuentes" not in text
+    assert "Lo que encontré: el tamaño de arriba, con sus fuentes." in text
