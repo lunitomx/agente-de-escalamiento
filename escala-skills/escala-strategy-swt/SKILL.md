@@ -48,7 +48,7 @@ El CEO puede ajustar — pero el punto de partida ya no es una hoja en blanco.
 
 ### Step 4: Qué dicen fuera de tu empresa (Evidencia externa)
 
-Pregunta: "¿Quieres que revise qué dicen fuera de tu empresa antes de cerrar el SWT?"
+Pregunta: "¿Quieres que revise qué dicen fuera de tu empresa antes de cerrar tu análisis de fortalezas, debilidades y tendencias (SWT)?"
 
 Si dice que sí, trae lo guardado:
 

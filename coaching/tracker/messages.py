@@ -7,6 +7,7 @@ user already sees in Drive. Cells are quoted only from the confirmed tab.
 
 from __future__ import annotations
 
+from coaching.core import owner_area_choice
 from coaching.tracker.identity import SheetCandidate, is_placeholder_name
 from coaching.tracker.maintenance import (
     DateOrder,
@@ -243,10 +244,7 @@ def proposal_message(
         f"tus compromisos de {proposal.month_name}:"
     )
     if proposal.missing_area:
-        notes.append(
-            f"No sé el área de: {_join(proposal.missing_area)}. Dime cuál es "
-            "(Cash, Strategy, Execution o People) o déjala vacía."
-        )
+        notes.append(missing_area_note(proposal.missing_area))
     return "\n\n".join(
         [
             intro,
@@ -256,6 +254,14 @@ def proposal_message(
             _paste_steps(layout, tab_name, count, paste_block, _BELOW_COMMITMENTS),
             UNDO,
         ]
+    )
+
+
+def missing_area_note(items: list[str]) -> str:
+    """Ask the area of rows that have none, in the owner's words (S86.2)."""
+    return (
+        f"No sé de qué parte de tu negocio es: {_join(items)}. ¿Es de "
+        f"{owner_area_choice()}? Si no sabes, la dejo vacía."
     )
 
 
@@ -371,10 +377,7 @@ def rocks_proposal_message(
     if left_out := _left_out(proposal.rows, fields):
         notes.append(left_out)
     if proposal.missing_area:
-        notes.append(
-            f"No sé el área de: {_join(proposal.missing_area)}. Dime cuál es "
-            "(Cash, Strategy, Execution o People) o déjala vacía."
-        )
+        notes.append(missing_area_note(proposal.missing_area))
     intro = (
         f"Te propongo {'esta fila' if count == 1 else f'estas {count} filas'} para "
         f"tus Rocks del {quarter}:"

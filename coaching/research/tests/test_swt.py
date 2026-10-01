@@ -129,7 +129,8 @@ def test_action_with_nothing_saved_asks_the_design_question(tmp_path: Path) -> N
     assert result.swt_evidence == []
     assert result.message == messages.SWT_ASK
     assert messages.SWT_ASK == (
-        "¿Quieres que revise qué dicen fuera de tu empresa antes de cerrar el SWT?"
+        "¿Quieres que revise qué dicen fuera de tu empresa antes de cerrar tu "
+        "análisis de fortalezas, debilidades y tendencias (SWT)?"
     )
 
 
