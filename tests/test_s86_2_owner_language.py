@@ -396,3 +396,68 @@ def test_tracker_explains_template_names_the_first_time() -> None:
 
     assert offenders == {}
     assert "tu número clave (Critical Number)" in texts["cn add"]
+
+
+# --- documents the owner reads ----------------------------------------------
+
+QUOTED = re.compile(r'"([^"\n]+)"|“([^”\n]+)”')
+OWNER_SAYS_PREFIX = re.compile(r"^\s*[-*]?\s*Señales:")
+
+
+def _prose_lines(text: str) -> list[tuple[int, str]]:
+    """Lines outside the frontmatter and fenced code blocks."""
+    lines = text.splitlines()
+    start = 0
+    if lines and lines[0].strip() == "---":
+        start = next(
+            (i + 1 for i in range(1, len(lines)) if lines[i].strip() == "---"), 0
+        )
+    prose: list[tuple[int, str]] = []
+    fenced = False
+    for number, line in enumerate(lines[start:], start=start + 1):
+        if line.lstrip().startswith("```"):
+            fenced = not fenced
+            continue
+        if not fenced:
+            prose.append((number, line))
+    return prose
+
+
+def _skill_owner_quotes() -> dict[str, str]:
+    quotes: dict[str, str] = {}
+    for path in sorted((ROOT / "escala-skills").glob("*/SKILL.md")):
+        for number, line in _prose_lines(path.read_text(encoding="utf-8")):
+            if OWNER_SAYS_PREFIX.match(line):
+                continue
+            for index, match in enumerate(QUOTED.finditer(line)):
+                where = f"{path.relative_to(ROOT)}:{number}#{index}"
+                quotes[where] = match.group(1) or match.group(2)
+    return quotes
+
+
+def test_pilot_guide_speaks_spanish_and_does_not_ask_to_pick_an_area() -> None:
+    path = ROOT / "PILOTO-EMPRESARIOS.md"
+    text = path.read_text(encoding="utf-8")
+    prose = {f"{path.name}:{n}": line for n, line in _prose_lines(text)}
+
+    assert _offenders(prose) == []
+    assert "Elige un foco" not in text
+    assert "cuéntale a ESCALA lo que más te preocupa" in text
+
+
+def test_skill_lines_said_to_the_owner_have_no_bare_english_terms() -> None:
+    quotes = _skill_owner_quotes()
+
+    assert len(quotes) > 100, "the quote scan found too little; check the rule"
+    assert _offenders(quotes) == []
+
+
+def test_welcome_first_sentence_names_the_areas_in_spanish() -> None:
+    from coaching.core import OWNER_AREA_NAMES
+
+    text = (ROOT / "escala-skills/escala-welcome/SKILL.md").read_text(
+        encoding="utf-8"
+    )
+
+    assert "People, Strategy, Execution y Cash" not in text
+    assert all(name in text for name in OWNER_AREA_NAMES.values())

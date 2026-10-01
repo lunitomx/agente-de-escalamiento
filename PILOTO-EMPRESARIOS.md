@@ -1,7 +1,8 @@
 # ESCALA — piloto privado para empresarios
 
-ESCALA es un asesor local para ordenar People, Strategy, Execution y Cash a
-partir de la información que tú decides compartir. Esta es una beta privada:
+ESCALA es un asesor local que te ayuda a ordenar tu negocio —tu equipo, tus
+clientes y tu estrategia, tu día a día y tu dinero— a partir de la información
+que tú decides compartir. Esta es una beta privada:
 te ayuda a trabajar, aprender y dar feedback; no sustituye asesoría legal,
 fiscal o financiera profesional ni se presenta como producto oficial de una
 metodología externa.
@@ -40,7 +41,7 @@ Después abre tu agente en esa carpeta y escribe, con tus propias palabras:
 
 1. Describe qué vendes, a quién y qué te preocupa hoy.
 2. Confirma o corrige el resumen que ESCALA entendió.
-3. Elige un foco: Cash, People, Strategy o Execution.
+3. No tienes que elegir un área: cuéntale a ESCALA lo que más te preocupa.
 4. Pide que lo convierta en una decisión, una acción, un responsable y una
    fecha de revisión.
 5. En la siguiente conversación, pídele revisar qué ocurrió y corrige cualquier

@@ -30,9 +30,9 @@ Basado en el análisis, proponer:
 3. Si no lo resuelves este trimestre, [consecuencia concreta]"
 
 Ejemplos de propuestas:
-- "Cash: reducir CCC de 67 a 50 días. Si lo logras, liberas $180,000."
-- "People: contratar VP de Ventas. Sin esa persona, tu meta de crecer 20% es imposible."
-- "Strategy: decidir quién es tu Core Customer. Llevas 3 trimestres sin definirlo y todas tus decisiones estratégicas son inconsistentes."
+- "Tu dinero: bajar de 67 a 50 los días que tarda en regresar tu dinero (CCC). Si lo logras, liberas $180,000."
+- "Tu equipo: contratar a un director de ventas. Sin esa persona, tu meta de crecer 20% es imposible."
+- "Tus clientes y tu estrategia: decidir quién es tu cliente ideal (Core Customer). Llevas 3 trimestres sin definirlo y todas tus decisiones estratégicas son inconsistentes."
 
 ### Step 3: Definir el Critical Number
 
@@ -51,9 +51,9 @@ El Tema debe ser:
 - Conectado a la Prioridad #1
 
 Ejemplos:
-- Prioridad: Reducir CCC → Tema: "Cash is King"
-- Prioridad: Contratar VP Ventas → Tema: "The Right Seat"
-- Prioridad: Definir Core Customer → Tema: "Who Matters Most"
+- Prioridad: Reducir CCC → Tema: "El efectivo manda (Cash is King)"
+- Prioridad: Contratar VP Ventas → Tema: "La persona correcta en su lugar (The Right Seat)"
+- Prioridad: Definir Core Customer → Tema: "Quién importa más (Who Matters Most)"
 
 ### Step 5: Guardar y compartir
 
@@ -75,4 +75,4 @@ Si el empresario participa en un grupo de accountability, ofrece: "¿Las pasamos
 ## Notas
 
 - Si el CEO ya tiene una Prioridad #1 que sigue siendo válida, el skill la refuerza con datos frescos.
-- Si los datos no justifican un cambio de prioridad, lo dice: "Tu Prioridad #1 actual (Reducir CCC) sigue siendo la correcta. Aquí está el progreso."
+- Si los datos no justifican un cambio de prioridad, lo dice: "Tu Prioridad #1 actual (cobrar más rápido) sigue siendo la correcta. Aquí está el progreso."

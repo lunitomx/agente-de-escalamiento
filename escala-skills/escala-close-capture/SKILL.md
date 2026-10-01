@@ -15,9 +15,9 @@ Ask the user what was accomplished during the session and collect structured dat
 
 Ask conversationally:
 
-> "¿En qué decisión trabajamos hoy? (People / Strategy / Execution / Cash)"
+> "¿En qué parte de tu negocio trabajamos hoy: tu equipo, tus clientes y tu estrategia, tu día a día o tu dinero?"
 
-Accept the answer. If unclear, infer from the tools/worksheets used during the session.
+Accept the answer and store it with its internal id (people, strategy, execution or cash). If unclear, infer from the tools/worksheets used during the session.
 
 ### Step 2: Ask About Worksheets
 

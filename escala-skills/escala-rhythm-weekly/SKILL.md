@@ -40,7 +40,7 @@ De cada daily extraer:
 
 **Prioridad #1:**
 - ¿Se mencionó en los dailies?
-- Si no: "Tu Prioridad #1 (reducir CCC) no se mencionó en NINGÚN daily esta semana. Eso explica por qué no avanza."
+- Si no: "Tu Prioridad #1 (cobrar más rápido) no se mencionó en NINGUNA junta diaria esta semana. Eso explica por qué no avanza."
 
 ### Step 3: Preparar agenda del weekly
 

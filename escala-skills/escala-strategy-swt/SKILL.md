@@ -32,7 +32,7 @@ De las sesiones pasadas extraer:
 - KPIs que empeoraron
 - Obstáculos recurrentes (3+ menciones sin resolver)
 - Funciones del FACe vacías
-- "Tu CCC subió 17 días. La causa: cuentas por cobrar pasaron de 45 a 67 días."
+- "Los días que tarda en regresar tu dinero (CCC) subieron 17. La causa: cuentas por cobrar pasaron de 45 a 67 días."
 
 **Trends (Tendencias) — Lo que viene:**
 - Patrones estacionales (siempre hay problemas de cash en Q3)

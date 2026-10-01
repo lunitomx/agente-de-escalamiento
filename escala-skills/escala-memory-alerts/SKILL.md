@@ -18,7 +18,7 @@ Leer el timeline longitudinal (escala-memory) y todas las sesiones pasadas.
 ### Step 2: Detectar patrones por categoría
 
 **Patrones de Cash:**
-- CCC subiendo 2+ trimestres → "Tu CCC subió Q2→Q3→Q4. Si no actúas, en 2 trimestres llegas a 90 días."
+- CCC subiendo 2+ trimestres → "Los días que tarda en regresar tu dinero (CCC) subieron Q2→Q3→Q4. Si no actúas, en 2 trimestres llegas a 90 días."
 - Crisis de efectivo en meses específicos → "Diciembre y enero siempre son meses críticos. Estamos en octubre — ¿empezamos a preparar?"
 - Margen bajando → "Tu margen bruto bajó 3 trimestres seguidos. 32% → 30% → 28% → 26%."
 
@@ -29,7 +29,7 @@ Leer el timeline longitudinal (escala-memory) y todas las sesiones pasadas.
 
 **Patrones de Strategy:**
 - Core Customer no definido por 3+ trimestres → "Llevas un año sin decidir quién es tu Core Customer. Cada trimestre que pasa, tu estrategia es más difusa."
-- BHAG cambiado 2+ veces → "Cambiaste el BHAG 3 veces en 18 meses. ¿Es ajuste o indecisión?"
+- BHAG cambiado 2+ veces → "Cambiaste tu gran meta de largo plazo (BHAG) 3 veces en 18 meses. ¿Es ajuste o indecisión?"
 
 **Patrones de Execution:**
 - Prioridad #1 cambiada a mitad de trimestre → "En 3 de los últimos 4 trimestres cambiaste la Prioridad #1 a los 45 días. El problema no es la prioridad — es mantener el foco."
