@@ -26,6 +26,7 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 from coaching.research.models import (
+    FRESHNESS_DAYS,
     Confidence,
     MarketSize,
     Mode,
@@ -34,25 +35,16 @@ from coaching.research.models import (
     ResearchFrame,
     SourceRecord,
     has_segment_and_geography,
+    is_recent,
     normalize,
 )
 
-FRESHNESS_DAYS = 90
 CONFIRMING_SOURCES = 3
 NAMED_SEARCHES = 2
 
 
 def review_date(researched_on: date) -> date:
     return researched_on + timedelta(days=FRESHNESS_DAYS)
-
-
-def _counts(source: SourceRecord, as_of: date) -> bool:
-    published = source.published_on
-    return (
-        published is not None
-        and published <= as_of
-        and (as_of - published).days <= FRESHNESS_DAYS
-    )
 
 
 def independent_dated_sources(
@@ -62,7 +54,7 @@ def independent_dated_sources(
     publishers = {
         normalize(sources[source_id].publisher)
         for source_id in ids
-        if source_id in sources and _counts(sources[source_id], as_of)
+        if source_id in sources and is_recent(sources[source_id], as_of)
     }
     return len(publishers)
 

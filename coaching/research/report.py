@@ -128,8 +128,21 @@ _KIND_LABEL = {"dato": "", "supuesto": "Supuesto: ", "inferencia": "Deducción: 
 _STATUS_LABEL = {"confirmado": "**Confirmado**", "por_confirmar": "**Por confirmar**"}
 
 
+def side_label(claim: ResearchClaim) -> str:
+    """The side prefix, e.g. «Fortaleza frente a X: », only in this mode."""
+    if claim.side is None:
+        return ""
+    label = messages.SIDE_LABELS[claim.side]
+    if claim.against:
+        label += f" frente a {messages.join_names(claim.against)}"
+    return f"{label}: "
+
+
 def _finding(report: ResearchReport, claim: ResearchClaim) -> str:
-    line = f"- {_STATUS_LABEL[claim.status]} — {_KIND_LABEL[claim.kind]}{claim.text}"
+    line = (
+        f"- {_STATUS_LABEL[claim.status]} — {side_label(claim)}"
+        f"{_KIND_LABEL[claim.kind]}{claim.text}"
+    )
     if claim.supporting:
         line += f" (según {_cite(report, claim.supporting)})"
     if claim.status == "por_confirmar" and claim.next_source:
