@@ -39,7 +39,7 @@ para no invertir a ciegas en instalación y paridad).
 | S86.7 | ESCALA-75 | Hoja con menos pegado (Q3 + S3) | 5 | ≤1 pegado por sección; cero preguntas de fecha | planned |
 | S86.8 | ESCALA-76 | Reunión proactiva (A3) | 3 | Con reunión en ≤3 días se ofrece una vez; "después" no se repite | done |
 | S86.9 | ESCALA-77 | Instalación de un paso (S1 corto plazo) | 5 | Máquina limpia: ≤3 pasos, 0 decisiones técnicas | done |
-| S86.10 | ESCALA-78 | Paridad y consentimiento (A4 + M2/M7 del spike) | 3 | Misma entrada y cierre en Claude y Codex, transcripciones guardadas | planned |
+| S86.10 | ESCALA-78 | Paridad y consentimiento (A4 + M2/M7 del spike) | 3 | Misma entrada y cierre en Claude y Codex, transcripciones guardadas | done (código; transcripciones reales pendientes, guion M7 en s86.10-story.md) |
 
 ## Fuera de alcance
 
