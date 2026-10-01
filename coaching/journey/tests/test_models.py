@@ -50,7 +50,10 @@ def test_data_needs_local_source_and_period() -> None:
             period="2026-09",
         )
     ok = JourneyEvidence(
-        origin="dato_con_periodo", text="120", source="WhatsApp Business", period="2026-09"
+        origin="dato_con_periodo",
+        text="120",
+        source="WhatsApp Business",
+        period="2026-09",
     )
     assert ok.period == "2026-09"
 
