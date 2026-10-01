@@ -343,7 +343,7 @@ marker_count() {
     grep -Fxc -- "$marker" "$file" || true
 }
 
-validate_claude_block() {
+validate_escala_block() {
     local file="$1"
     local begin="$2"
     local end="$3"
@@ -374,13 +374,15 @@ validate_claude_block() {
     done < "$file"
     [[ "$state" == "outside" ]]
 }
-render_claude_block() {
-    local skill_dir="$1"
-    local catalog_path="$2"
-    local template="$SCRIPT_DIR/adapters/claude/CLAUDE.template.md"
+# El bloque ESCALA es el mismo contrato para Claude (CLAUDE.md) y Codex
+# (AGENTS.md); sólo cambia la plantilla, que difiere en el título.
+render_escala_block() {
+    local template="$1"
+    local skill_dir="$2"
+    local catalog_path="$3"
     local line
     if [[ ! -f "$template" ]]; then
-        echo "No está disponible el contrato Claude de ESCALA." >&2
+        echo "No está disponible el contrato de ESCALA: $template" >&2
         return 1
     fi
     while IFS= read -r line || [[ -n "$line" ]]; do
@@ -399,9 +401,10 @@ render_claude_block() {
     done < "$template"
 }
 
-prepare_claude_instructions() {
-    local claude_root="$1"
-    local target="$claude_root/CLAUDE.md"
+prepare_escala_instructions() {
+    local agent_root="$1"
+    local target="$agent_root/$2"
+    local template="$3"
     local skill_dir="$SCRIPT_DIR/escala-skills/escala"
     local catalog_path="$SCRIPT_DIR/capabilities/mvp/catalog.json"
     local begin="<!-- ESCALA:BEGIN -->"
@@ -412,17 +415,17 @@ prepare_claude_instructions() {
     local replacing=false
 
     if [[ ! -f "$skill_dir/SKILL.md" || ! -f "$catalog_path" ]]; then
-        echo "Faltan los artefactos portables de ESCALA para Claude." >&2
+        echo "Faltan los artefactos portables de ESCALA." >&2
         return 1
     fi
-    mkdir -p "$claude_root"
-    if ! validate_claude_block "$target" "$begin" "$end"; then
-        echo "El bloque ESCALA existente en CLAUDE.md está incompleto o malformado; no se modificó." >&2
+    mkdir -p "$agent_root"
+    if ! validate_escala_block "$target" "$begin" "$end"; then
+        echo "El bloque ESCALA existente en $target está incompleto o malformado; no se modificó." >&2
         return 1
     fi
     begin_count="$(marker_count "$target" "$begin")"
-    prepared="$(mktemp "$claude_root/.escala-claude.XXXXXX")" || {
-        echo "No se pudo preparar el contrato Claude de ESCALA." >&2
+    prepared="$(mktemp "$agent_root/.escala-contract.XXXXXX")" || {
+        echo "No se pudo preparar el contrato de ESCALA." >&2
         return 1
     }
     if [[ "$begin_count" == "0" ]]; then
@@ -431,7 +434,7 @@ prepare_claude_instructions() {
                 cat "$target"
                 printf "\n\n"
             fi
-            render_claude_block "$skill_dir" "$catalog_path"
+            render_escala_block "$template" "$skill_dir" "$catalog_path"
         } > "$prepared" || {
             rm -f "$prepared"
             return 1
@@ -439,7 +442,7 @@ prepare_claude_instructions() {
     else
         while IFS= read -r line || [[ -n "$line" ]]; do
             if [[ "$line" == "$begin" ]]; then
-                render_claude_block "$skill_dir" "$catalog_path"
+                render_escala_block "$template" "$skill_dir" "$catalog_path"
                 replacing=true
                 continue
             fi
@@ -461,7 +464,8 @@ prepare_claude_instructions() {
 install_claude() {
     local claude_root="$HOME/.claude"
     local prepared
-    if ! prepared="$(prepare_claude_instructions "$claude_root")"; then
+    if ! prepared="$(prepare_escala_instructions "$claude_root" "CLAUDE.md" \
+        "$SCRIPT_DIR/adapters/claude/CLAUDE.template.md")"; then
         return 1
     fi
     if [[ "$SPECIALISTS_ENABLED" == true ]] && ! validate_specialist_sources "claude" "md"; then
@@ -485,13 +489,28 @@ install_claude() {
 
 install_codex() {
     local codex_root="$HOME/.codex"
+    local prepared
+    if ! prepared="$(prepare_escala_instructions "$codex_root" "AGENTS.md" \
+        "$SCRIPT_DIR/adapters/codex/AGENTS.template.md")"; then
+        return 1
+    fi
     if [[ "$SPECIALISTS_ENABLED" == true ]] && ! validate_specialist_sources "codex" "toml"; then
+        rm -f "$prepared"
         return 1
     fi
     if ! install_on "Codex CLI" "$codex_root/skills"; then
+        rm -f "$prepared"
         return 1
     fi
-    install_specialists_on "Codex CLI" "$SCRIPT_DIR/adapters/codex/agents" "$codex_root/agents" "toml"
+    if ! mv -f -- "$prepared" "$codex_root/AGENTS.md"; then
+        rm -f "$prepared"
+        echo "No se pudo activar el contrato Codex de ESCALA." >&2
+        return 1
+    fi
+    if ! install_specialists_on "Codex CLI" "$SCRIPT_DIR/adapters/codex/agents" "$codex_root/agents" "toml"; then
+        return 1
+    fi
+    echo -e "    ${VERDE}✓${NC} Contrato ESCALA actualizado en ${codex_root}/AGENTS.md"
 }
 for platform in "${TARGET_PLATFORMS[@]}"; do
     case "$platform" in
