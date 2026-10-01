@@ -1,13 +1,13 @@
 ---
 name: escala-start-present
-description: 'Present session context summary to user. Sub-skill of /escala-start.'
+description: 'Present session context summary to user. Sub-skill del procedimiento interno `escala-start`.'
 ---
 
 # Present Session Context
 
 ## Purpose
 
-Format and present the loaded context to the user. Sub-skill of `/escala-start`.
+Format and present the loaded context to the user. Sub-skill del procedimiento interno `escala-start`.
 
 ## Steps
 

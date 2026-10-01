@@ -13,7 +13,7 @@ Actualizar los skills del Agente de Escalamiento desde GitHub. Lee la ruta del r
 
 - El usuario quiere la versión más reciente de los skills
 - Aparecen nuevos skills o fixes en el repo
-- El usuario ejecuta `/escala-update`
+- El usuario pide actualizar ESCALA ("actualízate", "¿hay versión nueva?")
 
 ## Pasos
 

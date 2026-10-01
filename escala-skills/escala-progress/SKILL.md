@@ -33,7 +33,7 @@ python3 .escala/agent/validators/progress.py
 
 ### Step 3: Present Dashboard
 
-Mostrar el `output` del core module al usuario. Si hay un siguiente worksheet sugerido, ofrecer `/escala-worksheet {id}`.
+Mostrar el `output` del core module al usuario. Si hay un siguiente worksheet sugerido, ofrécelo como pregunta sin nombrar el comando ("¿Llenamos la siguiente hoja de trabajo?") y, si acepta, ejecuta el procedimiento interno `escala-worksheet` con ese `{id}`.
 
 ## Output
 

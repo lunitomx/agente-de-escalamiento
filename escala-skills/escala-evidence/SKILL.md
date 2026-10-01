@@ -21,7 +21,7 @@ vive en `coaching.evidence`.
 
 ### Step 1: Confirmar que existe una decisión
 
-El skill se invoca automáticamente después de `/escala-decision` o cuando el
+El skill se invoca automáticamente después del procedimiento interno `escala-decision` o cuando el
 empresario pide "arma el paquete de evidencia". Requiere que
 `.escala/agent/memory/company-profile.yaml` contenga `focus.current_decision`.
 
@@ -58,7 +58,7 @@ print(json.dumps(result, indent=2, ensure_ascii=False))
 | `artifacts.action` | Significado | Próximo paso |
 |--------------------|-------------|--------------|
 | `evidence_package` | Paquete generado correctamente | Mostrar el markdown al empresario y pasar a S43.3 |
-| (error) | No hay decisión confirmada | Pedir ejecutar `/escala-decision` primero |
+| (error) | No hay decisión confirmada | Ejecuta antes el procedimiento interno `escala-decision`. Al dueño: "¿Qué decisión quieres tomar primero?" |
 
 Ejemplo de paquete generado:
 

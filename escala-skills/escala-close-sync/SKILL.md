@@ -1,13 +1,13 @@
 ---
 name: escala-close-sync
-description: 'Sync YAML to markdown views on session close. Sub-skill of /escala-close.'
+description: 'Sync YAML to markdown views on session close. Sub-skill del procedimiento interno `escala-close`.'
 ---
 
 # Sync State to Markdown Views
 
 ## Purpose
 
-Generate human-readable markdown files from YAML source of truth. Sub-skill of `/escala-close`.
+Generate human-readable markdown files from YAML source of truth. Sub-skill del procedimiento interno `escala-close`.
 
 ## Steps
 

@@ -22,7 +22,7 @@ Verificar que el Agente de Escalamiento está correctamente instalado y todos lo
 ```bash
 for dir in "$HOME/.claude/skills" "$HOME/.hermes/skills" "$HOME/.codex/skills"; do
     if [ -d "$dir" ]; then
-        count=$(ls -d "$dir"/escala-* 2>/dev/null | wc -l | tr -d ' ')
+        count=$(find "$dir" -maxdepth 1 -name 'escala*' 2>/dev/null | wc -l | tr -d ' ')
         echo "  $dir: $count skills"
     fi
 done

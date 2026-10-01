@@ -39,6 +39,6 @@ Crear plan con timeline y responsable. Guardar en `work/cash/acceleration-strate
 | Item | Destination |
 |------|-------------|
 | Acceleration strategies | `work/cash/acceleration-strategies.md` |
-| Next | `/escala-progress` |
+| Next | procedimiento interno `escala-progress`. Ofrécelo sin nombrarlo: "¿Vemos cómo vas en general ahora que tienes tu plan de cobro?" |
 
 ---

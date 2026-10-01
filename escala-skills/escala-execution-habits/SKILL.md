@@ -38,6 +38,6 @@ Guardar en `work/execution/ejecucion-habits.md`.
 | Item | Destination |
 |------|-------------|
 | Hábitos de Ejecución evaluation | `work/execution/ejecucion-habits.md` |
-| Next | `/escala-execution-rhythms` |
+| Next | procedimiento interno `escala-execution-rhythms`. Ofrécelo sin nombrarlo: "¿Armamos juntos tus juntas: cuáles, cada cuándo y cuánto duran?" |
 
 ---

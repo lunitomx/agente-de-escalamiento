@@ -151,7 +151,7 @@ If `result["errors"]` is non-empty:
 
 | Section | Data Source | Behavior When Empty |
 |---------|-------------|---------------------|
-| Current Scores | `company-profile.yaml` → `scores` | "No diagnosis yet. Run /escala-diagnose first." |
-| Pulse History | `pulse-history.yaml` → `pulses` | "No pulse data yet. Run /escala-pulse to start tracking." |
+| Current Scores | `company-profile.yaml` → `scores` | "Todavía no tienes diagnóstico. ¿Lo hacemos ahora? Son unas preguntas." (si acepta: procedimiento interno `escala-diagnose`) |
+| Pulse History | `pulse-history.yaml` → `pulses` | "Todavía no hay registros semanales. ¿Anotamos cómo te fue esta semana?" (si acepta: procedimiento interno `escala-pulse`) |
 | Wins | Last pulse `trends` where improving | "No improving trends in the latest pulse." |
 | Attention Areas | Last pulse `trends` where regressing or 2+ stalling | "No attention areas detected. Keep up the momentum!" |

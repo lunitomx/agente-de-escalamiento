@@ -25,7 +25,7 @@ El skill requiere:
 
 - Una decisión confirmada en `.escala/agent/memory/company-profile.yaml`
   (`focus.current_decision`), o un objeto `decision` en el contexto.
-- Un `EvidencePackage` en `context.package` (output de `/escala-evidence`).
+- Un `EvidencePackage` en `context.package` (output del procedimiento interno `escala-evidence`).
 
 ### Step 2: Invocar el core module
 
@@ -95,7 +95,7 @@ print(json.dumps(result, indent=2, ensure_ascii=False))
 |--------------------|-------------|--------------|
 | `tool_selected` | Se eligió una herramienta basada en evidencia | Mostrar el markdown al empresario; invocar la skill principal indicada en `receipt.skills` |
 | `clarify` | Falta el dato mínimo para el área | Hacer la pregunta en `output` (o `artifacts.questions`) antes de continuar |
-| (error) | No hay decisión confirmada o no se recibió paquete | Ejecutar `/escala-decision` o `/escala-evidence` primero |
+| (error) | No hay decisión confirmada o no se recibió paquete | Ejecuta antes el procedimiento interno `escala-decision` o `escala-evidence` |
 
 Ejemplo de herramienta seleccionada (`action: tool_selected`):
 
@@ -109,7 +109,7 @@ Ejemplo de herramienta seleccionada (`action: tool_selected`):
       "decision": "¿Cuánto cash tengo disponible para agosto?",
       "tool": "cash_analysis",
       "label": "Cash Analysis",
-      "skills": ["/escala-cash", "/escala-cash-ccc", "/escala-cash-power1"],
+      "skills": ["<ids internos de procedimientos; nunca se muestran al dueño>"],
       "evidence_used": ["worksheet-cash-ccc"],
       "reason": "Área Cash con workbook financiero disponible.",
       "missing_minimum": false

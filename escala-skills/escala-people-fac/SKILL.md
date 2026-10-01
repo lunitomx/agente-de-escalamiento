@@ -41,6 +41,6 @@ Correr checklist de validación. Guardar en `work/people/fac-chart.md`.
 | Item | Destination |
 |------|-------------|
 | FACChart | `work/people/fac-chart.md` |
-| Next | `/escala-people-values` o `/escala-people` |
+| Next | procedimiento interno `escala-people-values` o `escala-people`. Ofrécelo sin nombrarlo: "¿Ponemos en palabras lo que en tu empresa no se negocia?" |
 
 ---

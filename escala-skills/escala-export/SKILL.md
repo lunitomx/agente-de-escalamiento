@@ -24,7 +24,7 @@ test -f .escala/agent/memory/company-profile.yaml && echo "EXISTS" || echo "NO_P
 
 | Result | Action |
 |--------|--------|
-| NO_PROFILE | Redirect to `/escala-welcome` — company must be initialized first |
+| NO_PROFILE | Ejecuta el procedimiento interno `escala-welcome` — la empresa debe existir primero. Al dueño: "Antes de exportar necesito conocer tu empresa. ¿Empezamos?" |
 | EXISTS | Continue |
 
 ### Step 2: Invoke Core Module
@@ -65,7 +65,7 @@ Where `<export_path>` is `result["artifacts"]["export_path"]` from Step 2.
 
 If `result["errors"]` is non-empty:
 1. Show each error
-2. Suggest running `/escala-diagnose` or `/escala-welcome` as appropriate
+2. Ofrece el paso que falte sin nombrar comandos: "¿Hacemos tu diagnóstico primero?" (procedimiento interno `escala-diagnose`) o "¿Empezamos por conocer tu empresa?" (procedimiento interno `escala-welcome`)
 
 ## Output
 

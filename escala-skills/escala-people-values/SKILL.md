@@ -41,6 +41,6 @@ Guardar en `work/people/core-values.md`.
 | Item | Destination |
 |------|-------------|
 | Core Values | `work/people/core-values.md` |
-| Next | `/escala-strategy` (los values alimentan al Plan Estratégico de Una Página (OPSP)) |
+| Next | procedimiento interno `escala-strategy` (los values alimentan al Plan Estratégico de Una Página (OPSP)). Ofrécelo sin nombrarlo: "¿Usamos estos valores para armar tu plan del negocio en una sola página?" |
 
 ---

@@ -1,13 +1,13 @@
 ---
 name: escala-start-load-profile
-description: 'Load company profile from YAML. Sub-skill of /escala-start.'
+description: 'Load company profile from YAML. Sub-skill del procedimiento interno `escala-start`.'
 ---
 
 # Load Company Profile
 
 ## Purpose
 
-Read the company profile YAML and extract context for the session. Sub-skill of `/escala-start`.
+Read the company profile YAML and extract context for the session. Sub-skill del procedimiento interno `escala-start`.
 
 ## Steps
 

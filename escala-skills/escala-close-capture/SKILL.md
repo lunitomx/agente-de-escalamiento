@@ -1,13 +1,13 @@
 ---
 name: escala-close-capture
-description: 'Collect session activity data from user. Sub-skill of /escala-close.'
+description: 'Collect session activity data from user. Sub-skill del procedimiento interno `escala-close`.'
 ---
 
 # Capture Session Activity
 
 ## Purpose
 
-Ask the user what was accomplished during the session and collect structured data. Sub-skill of `/escala-close`.
+Ask the user what was accomplished during the session and collect structured data. Sub-skill del procedimiento interno `escala-close`.
 
 ## Steps
 

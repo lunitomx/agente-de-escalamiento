@@ -29,9 +29,9 @@ carpeta de Google Drive u OneDrive que el equipo haya elegido.
 
 ## Context
 
-**Activación:** `/escala-bugreport` o la frase "quiero reportar un bug/mejora".
-`/bugreport` puede entenderse como alias conversacional, pero el nombre
-instalable canónico es `/escala-bugreport`.
+**Activación:** la frase "quiero reportar un bug/mejora" o algo parecido.
+Es el procedimiento interno `escala-bugreport`; no se presenta al dueño como
+comando ni se le pide escribirlo.
 
 **No leer ni recolectar:** `~/.escala/memoria/`, `.escala/my-company/`,
 transcripts, hojas de cálculo, adjuntos, variables de entorno, rutas
