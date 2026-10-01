@@ -10,6 +10,11 @@ import re
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
+from validators.door_bundle import (
+    DoorBundleError,
+    door_bundle_paths,
+    validate_door_bundle,
+)
 from validators.capability_map import (
     CapabilityMapError,
     load_capability_map,
@@ -32,6 +37,14 @@ PACKAGE_PATHS = frozenset(
         f"skills/{PUBLIC_SKILL_NAME}/{SKILL_CATALOG_REFERENCE}",
     }
 )
+
+
+def package_paths() -> frozenset[str]:
+    """The exact package: the door, its catalog.json and its bundle (S86.10)."""
+    door = f"skills/{PUBLIC_SKILL_NAME}"
+    return PACKAGE_PATHS | {f"{door}/{path}" for path in door_bundle_paths()}
+
+
 _PLUGIN_NAME = re.compile(r"^(?!.*(?:--|\.\.))[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?$")
 _PRIVATE_MARKERS = (
     ".scale" + "up/",
@@ -128,7 +141,9 @@ def _validate_no_symlinks(root: Path) -> None:
 
 def _validate_surface(root: Path) -> None:
     actual = {path.relative_to(root).as_posix() for path in root.rglob("*")}
-    if actual != PACKAGE_PATHS:
+    if actual != package_paths():
+        raise AgentPluginError("package_surface_invalid")
+    if len(list(root.rglob("SKILL.md"))) != 1:
         raise AgentPluginError("package_surface_invalid")
     if discover_public_skills(root) != (PUBLIC_SKILL_NAME,):
         raise AgentPluginError("public_skill_discovery_invalid")
@@ -189,6 +204,10 @@ def load_agent_plugin(path: Path) -> AgentPluginPackage:
     _validate_surface(root)
     _load_manifest(root)
     _validate_skill(root)
+    try:
+        validate_door_bundle(root / "skills" / PUBLIC_SKILL_NAME)
+    except DoorBundleError as exc:
+        raise AgentPluginError(str(exc)) from exc
     return AgentPluginPackage(
         root=root,
         skill_name=PUBLIC_SKILL_NAME,
