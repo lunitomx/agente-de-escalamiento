@@ -402,3 +402,41 @@ def test_bootstrap_is_posix_sh() -> None:
                 env={"PATH": os.environ.get("PATH", "")},
             )
             assert completed.returncode == 0, completed.stderr
+
+
+# --- the procedures run with the product's Python -----------------------------
+
+
+def test_claude_contract_points_procedures_to_the_product_python(
+    tmp_path: Path,
+) -> None:
+    """The door runs ``python3 -m coaching…``; a clean machine's ``python3``
+    has no pydantic/pyyaml, the ``.venv`` that ``install.sh`` builds does."""
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    _write_executable(bin_dir / "claude", "#!/bin/sh\nexit 0\n")
+    home = tmp_path / "home"
+    home.mkdir()
+    checkout = tmp_path / "checkout"
+    (checkout / ".git").mkdir(parents=True)
+    shutil.copy2(ROOT / "install.sh", checkout / "install.sh")
+    shutil.copytree(
+        ROOT / "escala-skills" / "escala", checkout / "escala-skills" / "escala"
+    )
+    shutil.copytree(ROOT / "capabilities" / "mvp", checkout / "capabilities" / "mvp")
+    shutil.copytree(ROOT / "adapters" / "claude", checkout / "adapters" / "claude")
+
+    completed = subprocess.run(
+        ["bash", str(checkout / "install.sh"), "--skills-only", "--platform", "claude"],
+        cwd=checkout,
+        env={"HOME": str(home), "PATH": f"{bin_dir}:{os.environ['PATH']}"},
+        stdin=subprocess.DEVNULL,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    contract = (home / ".claude" / "CLAUDE.md").read_text(encoding="utf-8")
+    assert f"use `{checkout}/.venv/bin/python`" in contract
+    assert "{{" not in contract

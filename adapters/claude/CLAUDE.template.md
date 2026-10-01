@@ -8,6 +8,10 @@ capability contract is `{{ESCALA_CAPABILITY_CATALOG}}`. Do not turn internal
 material into additional public commands or add a separate interpretation
 layer here.
 
+## Local runtime
+
+{{ESCALA_PYTHON}}
+
 ## Local operation
 
 Load only local context the business explicitly consents to use. Preserve

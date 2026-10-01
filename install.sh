@@ -391,6 +391,9 @@ render_claude_block() {
             *"{{ESCALA_CAPABILITY_CATALOG}}"*)
                 printf "El contrato portable de capacidades está en %s.\n" "$catalog_path"
                 ;;
+            *"{{ESCALA_PYTHON}}"*)
+                printf "Where an ESCALA instruction runs \`python3\`, use \`%s/.venv/bin/python\` when it exists: it has the libraries ESCALA needs. Run it from the folder the business opened.\n" "$SCRIPT_DIR"
+                ;;
             *) printf "%s\n" "$line" ;;
         esac
     done < "$template"
