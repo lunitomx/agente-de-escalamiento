@@ -7,7 +7,9 @@ required to understand a company or to choose a topic for confirmation.
 
 from __future__ import annotations
 
+import re
 from collections.abc import Mapping, Sequence
+from datetime import date, timedelta
 from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator, model_validator
@@ -101,6 +103,64 @@ class FocusProposal(BaseModel):
         return value
 
 
+_NUMBER = re.compile(r"\d+(?:[.,]\d+)?")
+_SENTENCE_END = re.compile(r"[.!?]\s+\S")
+WEEK_DAYS = 7
+
+
+class WeeklyAction(BaseModel):
+    """S86.5: the one action for this week that closes the diagnosis.
+
+    ``due`` stays ISO in the data; the owner reads it in plain Spanish.
+    """
+
+    decision: Decision
+    constraint: str = Field(min_length=3, max_length=300)
+    action: str = Field(min_length=3, max_length=300)
+    responsible: str = Field(default="tú", min_length=1, max_length=120)
+    due: date
+    evidence_ids: list[str] = Field(min_length=1, max_length=12)
+
+    @field_validator("constraint")
+    @classmethod
+    def constraint_is_one_sentence(cls, value: str) -> str:
+        if _SENTENCE_END.search(value.strip()):
+            raise ValueError("the main constraint must be one sentence")
+        return value.strip()
+
+    @field_validator("action", "responsible")
+    @classmethod
+    def strip_text(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("weekly action text must not be blank")
+        return value.strip()
+
+    @field_validator("evidence_ids")
+    @classmethod
+    def evidence_ids_are_unique(cls, value: list[str]) -> list[str]:
+        if len(value) != len(set(value)):
+            raise ValueError("weekly action evidence_ids must be unique")
+        return value
+
+
+def _numbers(text: str) -> set[str]:
+    return {match.replace(",", ".") for match in _NUMBER.findall(text)}
+
+
+def check_weekly_action(action: WeeklyAction, evidence_text: str, today: date) -> None:
+    """Honesty rules: no invented number, and a date within this week."""
+    invented = _numbers(f"{action.constraint} {action.action}") - _numbers(
+        evidence_text
+    )
+    if invented:
+        raise ValueError(
+            "la acción usa un número que no está en la evidencia: "
+            f"{', '.join(sorted(invented))}; pide el dato o propón juntarlo"
+        )
+    if not today <= action.due <= today + timedelta(days=WEEK_DAYS):
+        raise ValueError("la fecha de la acción debe caer esta semana")
+
+
 class NarrativeAssessment(BaseModel):
     """A confirmable diagnosis that makes uncertainty visible before any score."""
 
@@ -118,6 +178,7 @@ class NarrativeAssessment(BaseModel):
         min_length=3,
         max_length=1_000,
     )
+    weekly_action: WeeklyAction | None = None
 
     @model_validator(mode="after")
     def unknown_only_decisions_cannot_be_focuses(self) -> "NarrativeAssessment":
@@ -129,6 +190,14 @@ class NarrativeAssessment(BaseModel):
         for focus in self.proposed_focuses:
             if focus.decision not in supported_decisions:
                 raise ValueError("an unknown-only decision cannot be proposed as focus")
+        action = self.weekly_action
+        if action is not None:
+            if self.confirmation_status == "pending":
+                raise ValueError(
+                    "the weekly action comes after the owner confirms the reading"
+                )
+            if action.decision not in supported_decisions:
+                raise ValueError("the weekly action needs a finding in its area")
         return self
 
 
@@ -141,6 +210,8 @@ def build_narrative_assessment(
     proposed_focuses: Sequence[FocusProposal | Mapping[str, object]] = (),
     open_questions: Sequence[str] = (),
     confirmation_status: ConfirmationStatus = "pending",
+    weekly_action: WeeklyAction | Mapping[str, object] | None = None,
+    today: date | None = None,
 ) -> NarrativeAssessment:
     """Validate a narrative assessment against its local evidence pack."""
     evidence_by_id = {item.evidence_id: item for item in intake.evidence}
@@ -154,7 +225,19 @@ def build_narrative_assessment(
         item if isinstance(item, FocusProposal) else FocusProposal.model_validate(item)
         for item in proposed_focuses
     ]
-    for item in [*normalized_findings, *normalized_focuses]:
+    action = (
+        None
+        if weekly_action is None
+        else weekly_action
+        if isinstance(weekly_action, WeeklyAction)
+        else WeeklyAction.model_validate(weekly_action)
+    )
+    traced: list[NarrativeFinding | FocusProposal | WeeklyAction] = [
+        *normalized_findings,
+        *normalized_focuses,
+        *([action] if action is not None else []),
+    ]
+    for item in traced:
         if set(item.evidence_ids) - set(evidence_by_id):
             raise ValueError("narrative assessment references unknown evidence")
         if any(
@@ -162,6 +245,12 @@ def build_narrative_assessment(
             for evidence_id in item.evidence_ids
         ):
             raise ValueError("narrative assessment crosses decision evidence")
+    if action is not None:
+        cited = " ".join(
+            str(evidence_by_id[evidence_id].value)
+            for evidence_id in action.evidence_ids
+        )
+        check_weekly_action(action, cited, today or date.today())
     return NarrativeAssessment(
         company_summary=company_summary,
         company_understanding=(
@@ -173,6 +262,7 @@ def build_narrative_assessment(
         proposed_focuses=normalized_focuses,
         open_questions=list(open_questions),
         confirmation_status=confirmation_status,
+        weekly_action=action,
     )
 
 

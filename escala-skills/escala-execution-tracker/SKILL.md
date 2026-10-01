@@ -8,8 +8,11 @@ name: escala-execution-tracker
 Procedimiento interno. Se llega aquí sólo desde `escala`, por el especialista
 de execution: al terminar las prioridades del trimestre
 (`escala-execution-prioridad` / `escala-execution-priorities`) o cuando el
-empresario habla de su tracker, su grupo o "mi hoja". Nunca le pidas que
-escriba un comando ni le nombres este procedimiento.
+empresario habla de su tracker, su grupo o "mi hoja". También al cerrar un
+diagnóstico, si dijo que sí a anotar su acción de la semana: el diagnóstico
+trae `tracker_request`, que es la llamada del paso 6 con esa fila (sigue los
+pasos 1 a 5 si su pestaña no está confirmada). Nunca le pidas que escriba un
+comando ni le nombres este procedimiento.
 
 ## Reglas que no se rompen
 
