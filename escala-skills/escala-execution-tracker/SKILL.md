@@ -169,8 +169,9 @@ Si la pestaña no tiene compromisos, ofrece el paso 6.
 Para que ESCALA le ofrezca revisar su hoja antes de cada reunión sin que la
 mencione, necesita saber qué día es. Pregúntalo sólo cuando importa por
 primera vez — al terminar el paso 7, o cuando hable de su reunión — y sólo si
-`load` no trajo `meeting_schedule`; nunca al empezar la conversación ni en
-otro momento.
+`load` no trajo `meeting_schedule` (manda `"today"` en `load`: una fecha
+suelta que ya pasó cuenta como sin día); nunca al empezar la conversación ni
+en otro momento.
 
 `{"action": "meeting_ask"}` → "¿Qué día es tu reunión del grupo? …". Con su
 respuesta:

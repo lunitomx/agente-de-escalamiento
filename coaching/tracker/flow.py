@@ -69,6 +69,7 @@ from coaching.tracker.maintenance import (
 from coaching.tracker.meeting import (
     MeetingAnswer,
     MeetingSchedule,
+    next_meeting,
     opening_nudge,
     parse_weekday,
     read_memory,
@@ -438,9 +439,15 @@ def _meeting_answer(context: Mapping[str, object], base: Path) -> FlowResult:
     return FlowResult(action="meeting_answer", meeting=answer.meeting)
 
 
-def _meeting_schedule(base: Path) -> MeetingSchedule | None:
+def _meeting_schedule(
+    context: Mapping[str, object], base: Path
+) -> MeetingSchedule | None:
+    """The schedule, or ``None`` if unknown (a single date that passed is unknown)."""
     memory = read_memory(base)
-    return memory.schedule if memory is not None else None
+    today = _today(context) or date.today()
+    if memory is None or memory.schedule is None:
+        return None
+    return memory.schedule if next_meeting(memory.schedule, today) else None
 
 
 def run(context: Mapping[str, object]) -> FlowResult:
@@ -469,7 +476,7 @@ def run(context: Mapping[str, object]) -> FlowResult:
         return FlowResult(
             action=action,
             link=load_link(base),
-            meeting_schedule=_meeting_schedule(base),
+            meeting_schedule=_meeting_schedule(context, base),
         )
     if action == "opening":
         return _opening(context, base)

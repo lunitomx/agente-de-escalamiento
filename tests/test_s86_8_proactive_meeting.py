@@ -482,3 +482,12 @@ def test_tracker_procedure_asks_the_meeting_day_only_when_it_matters() -> None:
     assert "meeting_schedule" in skill
     assert "¿Qué día es tu reunión del grupo?" in skill
     assert "nunca al empezar" in skill
+
+
+def test_a_passed_single_date_counts_as_unknown_so_the_day_is_asked_again(
+    tmp_path: Path,
+) -> None:
+    save_schedule(tmp_path, MeetingSchedule(next_date=date(2026, 10, 1)))
+
+    assert _run(tmp_path, action="load", today="2026-10-01").meeting_schedule
+    assert _run(tmp_path, action="load", today="2026-10-02").meeting_schedule is None
