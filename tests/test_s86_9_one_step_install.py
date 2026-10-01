@@ -389,6 +389,17 @@ def test_owner_data_in_the_copy_is_ignored_by_git() -> None:
     assert len(completed.stdout.splitlines()) == 3
 
 
+def test_pilot_guide_installs_in_three_steps_or_fewer() -> None:
+    text = PILOT_GUIDE.read_text(encoding="utf-8")
+    section = text.split("## Instalación", 1)[1].split("\n## ", 1)[0]
+    steps = re.findall(r"^\d+\. ", section, flags=re.MULTILINE)
+
+    assert 1 <= len(steps) <= 3
+    assert "instalar.sh | sh" in section
+    for technical in ("--platform", "git clone", "uv", "Python"):
+        assert technical not in section, technical
+
+
 def test_bootstrap_is_posix_sh() -> None:
     assert BOOTSTRAP.read_text(encoding="utf-8").startswith("#!/bin/sh\n")
     for parser in ("sh", "bash"):

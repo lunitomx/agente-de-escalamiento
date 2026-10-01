@@ -18,34 +18,42 @@ afiliado, patrocinado, aprobado o respaldado por ninguna persona u organización
 externa. Las metodologías, conceptos o materiales que decidas aportar no crean
 una relación oficial ni autorizan su distribución.
 
-## Quick Start (con agente de IA)
+## Para el dueño: instalación en 3 pasos
 
-1. **Abre una terminal** en la carpeta local del producto.
-
-2. **Instala** ESCALA sólo en el agente que elegiste. Por ejemplo, para Claude Code:
+1. Abre la app Terminal (en Mac: Cmd + Espacio, escribe "Terminal").
+2. Pega esta línea y presiona Enter:
 
    ```bash
-   ./install.sh --platform claude
+   curl -fsSL https://raw.githubusercontent.com/lunitomx/agente-de-escalamiento/main/instalar.sh | sh
    ```
 
-   Para instalar la puerta conversacional en todos los agentes detectados usa
-   `./install.sh --all-platforms`. Si únicamente quieres el skill, sin runtime
-   Python standalone, agrega `--skills-only`.
+3. Cuando diga "Listo", pega `cd ~/ESCALA && claude` y cuéntale a ESCALA qué te
+   preocupa hoy.
 
-3. **Abre** tu agente de terminal compatible en esa carpeta y cuéntale a ESCALA qué te preocupa hoy.
-
-El agente te guiará para crear o actualizar tu perfil de empresa y hacer tu
-primer diagnóstico.
-
+No hay que elegir nada: el instalador prepara lo que falte (uv y su Python,
+Claude Code), deja ESCALA en `~/ESCALA` y lo conecta con Claude junto con sus
+especialistas internos. Para actualizar, pega otra vez la misma línea.
 Si vas a invitar empresarios a probarlo, comparte la guía de
 [Piloto privado](PILOTO-EMPRESARIOS.md).
 
+## Instalación manual (equipo técnico)
+
+Desde una copia del repositorio, instala ESCALA sólo en el agente que elijas:
+
+```bash
+./install.sh --platform claude
+```
+
+Para instalar la puerta conversacional en todos los agentes detectados usa
+`./install.sh --all-platforms`. Si únicamente quieres el skill, sin runtime
+Python standalone, agrega `--skills-only`. Abre el agente en esa carpeta.
+
 ## Requisitos
 
-- Python 3, Git y `uv` instalados para la instalación completa y el modo
-  standalone. `--skills-only` no requiere `uv`.
-- **Claude Code, Hermes Agent o Codex CLI** instalado localmente para la
-  experiencia conversacional con ESCALA.
+- Una Mac o Linux (en Windows, WSL2) y una cuenta de Claude para usar Claude
+  Code. `instalar.sh` instala lo demás.
+- Para la instalación manual: Python 3, Git y `uv`; `--skills-only` no requiere
+  `uv`. Claude Code, Hermes Agent o Codex CLI instalado localmente.
 - Acceso de lectura y escritura a la carpeta donde guardarás tu empresa.
 
 ## Modo sin agente de IA

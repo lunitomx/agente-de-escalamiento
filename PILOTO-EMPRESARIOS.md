@@ -9,33 +9,35 @@ metodología externa.
 
 ## Antes de instalar
 
-- Usa una computadora de trabajo que controles y una carpeta donde puedas
-  guardar la información de tu empresa.
+- Usa una computadora de trabajo que controles: una Mac (o Linux). En Windows,
+  por ahora necesitas WSL2; pide ayuda a quien te invitó.
+- Ten a la mano tu cuenta de Claude (de pago, por ejemplo Pro). Con ella entras
+  a Claude Code, el programa donde vive ESCALA.
 - Para el primer recorrido usa datos de ejemplo o información no sensible.
   ESCALA debe pedir tu confirmación antes de guardar o indexar material
   delicado.
-- Necesitas Git, Python 3, `uv` y uno de estos agentes locales: Claude Code,
-  Codex CLI o Hermes Agent.
-- La ruta recomendada y observada en un entorno real es Claude Code.
-  En Windows, usa WSL2 hasta que concluya la calificación nativa de Windows.
+- No tienes que instalar nada más antes: el instalador prepara lo que falte.
 
-## Instalación (10 minutos)
+## Instalación (3 pasos, unos minutos)
 
-Abre una terminal y ejecuta:
+1. Abre la app Terminal. En Mac: presiona Cmd + Espacio, escribe "Terminal" y
+   presiona Enter.
+2. Copia esta línea, pégala en la Terminal, presiona Enter y espera a que diga
+   "Listo":
 
-```bash
-git clone https://github.com/lunitomx/agente-de-escalamiento.git
-cd agente-de-escalamiento
-./install.sh --platform claude
-```
+   ```
+   curl -fsSL https://raw.githubusercontent.com/lunitomx/agente-de-escalamiento/main/instalar.sh | sh
+   ```
 
-Para Codex o Hermes, sustituye `claude` por `codex` o `hermes`. Cada
-instalación elige explícitamente una plataforma; no configura las demás.
+3. Pega la línea que te muestra al final, `cd ~/ESCALA && claude`, y presiona
+   Enter. Si te pide entrar con tu cuenta de Claude o confiar en la carpeta
+   ESCALA, acepta. Luego escribe con tus propias palabras, por ejemplo:
 
-Después abre tu agente en esa carpeta y escribe, con tus propias palabras:
+   > Quiero empezar. Te voy a contar de mi empresa y el reto más importante que
+   > tengo hoy.
 
-> Quiero empezar. Te voy a contar de mi empresa y el reto más importante que
-> tengo hoy.
+Si algo falla, el mensaje te dice qué hacer; casi siempre basta con volver a
+pegar la misma línea. No se borra nada.
 
 ## Tu primera sesión
 
@@ -53,7 +55,8 @@ solo cuando haya contexto suficiente y te explique qué significa.
 
 ## Cómo protege tu información
 
-- Tu información vive en la carpeta local que eliges.
+- Tu información vive en tu computadora, dentro de la carpeta ESCALA.
+  Actualizar ESCALA no la toca.
 - Puedes compartir documentos de trabajo con tu equipo mediante Drive u
   OneDrive, pero no debes sincronizar SQLite: cada instalación conserva su
   propia caché local.
@@ -78,11 +81,18 @@ resultados del piloto permanecen en tu instalación local.
 
 ## Actualizar
 
-Desde la carpeta del repositorio:
+Pega otra vez la línea del paso 2. Trae la versión nueva de ESCALA y no toca tu
+información.
 
-```bash
-git pull --ff-only
-./install.sh --platform claude
-```
+## Para quien te ayuda con la computadora
 
-El instalador reutiliza el entorno local `.venv`; no usa `pip` global.
+- `instalar.sh` prepara `uv` y su Python, Claude Code (con sus instaladores
+  oficiales) y la copia de ESCALA en `~/ESCALA`; luego corre
+  `./install.sh --platform claude --with-specialists`. Volver a correrlo hace
+  `git pull --ff-only`: nunca borra ni descarta cambios.
+- El detalle técnico de cada corrida queda en
+  `~/.config/agente-de-escalamiento/instalacion.log`.
+- La información de la empresa queda en `~/ESCALA/.escala/my-company/` y
+  `~/ESCALA/.escala/agent/memory/`, fuera de lo que trae Git.
+- Para Codex o Hermes, desde `~/ESCALA`: `./install.sh --platform codex` o
+  `./install.sh --platform hermes`.
