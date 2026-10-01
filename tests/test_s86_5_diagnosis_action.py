@@ -302,3 +302,40 @@ def test_without_a_confirmed_tab_the_tracker_asks_for_it_first(tmp_path: Path) -
     result = tracker_run(request)
 
     assert result.errors == ["needs_confirmed_tab"]
+
+
+# --- T3: the procedure tells the agent to close this way ---------------------
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def _closing_section() -> str:
+    text = (ROOT / "escala-skills/escala-diagnose/SKILL.md").read_text(encoding="utf-8")
+    start = text.index("### 4.")
+    end = text.find("\n## ", start)
+    return text[start : end if end != -1 else None]
+
+
+def test_diagnose_procedure_closes_with_one_action() -> None:
+    section = _closing_section()
+
+    assert "prepare la revisión a fondo" not in section
+    assert "uno o dos focos" not in section
+    for needed in (
+        "weekly_action",
+        "Responsable",
+        "today",
+        "sheet_offer_made",
+        "tracker_request",
+        "Tu freno principal es que cobras a 60 días.",
+    ):
+        assert needed in section, needed
+    assert "/escala-" not in section
+
+
+def test_tracker_procedure_knows_it_can_come_from_the_diagnosis() -> None:
+    text = (ROOT / "escala-skills/escala-execution-tracker/SKILL.md").read_text(
+        encoding="utf-8"
+    )
+
+    assert "tracker_request" in text

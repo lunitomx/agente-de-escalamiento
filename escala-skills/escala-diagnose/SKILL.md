@@ -9,8 +9,9 @@ name: escala-diagnose
 
 Entender cómo opera realmente la empresa antes de recomendar una herramienta.
 Este skill produce un assessment narrativo y confirmable: lo que Escala
-entendió, qué evidencia lo sostiene, qué aún no sabe y como máximo dos focos
-posibles para que el empresario elija. No es un cuestionario de madurez.
+entendió, qué evidencia lo sostiene, qué aún no sabe y, ya confirmado, una
+acción para esta semana con responsable y fecha. No es un cuestionario de
+madurez.
 
 ## Reglas no negociables
 
@@ -151,21 +152,60 @@ local **Markdown + JSON** bajo la autoridad existente. Un número sólo puede
 añadirse más adelante si la persona lo pide y existe evidencia suficiente;
 siempre explica denominador, cobertura y límites.
 
-### 4. Elegir el siguiente paso
+### 4. Cerrar con una acción de esta semana
 
-Propón uno o dos focos con su razón. Espera elección o corrección humana. Hasta
-que E65 entregue procedimientos verificados, termina con una pregunta concreta
-que prepare la revisión a fondo (Deep Dive); no aparentes ejecutar Cash, People, Strategy o
-Execution en profundidad.
+El diagnóstico no termina preparando otra sesión: termina con **una** acción
+que el empresario puede hacer esta semana. Primero presenta la lectura y espera
+su "sí" o su corrección (`confirmation_status: "pending"`). Con la lectura
+confirmada o corregida, elige **un** foco (el freno principal) y vuelve a
+llamar al core con `confirmation_status` en `confirmed` o `corrected`, `today`
+(la fecha de hoy, `AAAA-MM-DD`) y `weekly_action`:
+
+```python
+"weekly_action": {
+    "decision": "cash",
+    "constraint": "Tu freno principal es que cobras a 60 días.",
+    "action": "llama a tus 3 clientes más grandes y pide pago a 30 días.",
+    "responsible": "tú",
+    "due": "2026-10-09",
+    "evidence_ids": ["welcome.cash.1"],
+},
+"sheet_offer_made": False,
+```
+
+- `constraint` es una sola oración. `responsible` es "tú" salvo que el
+  empresario diga quién lo hará. `due` va en `AAAA-MM-DD` y cae entre hoy y
+  7 días; al empresario el core se la dice en palabras.
+- **Nunca inventes números.** Cada número de la acción tiene que estar en la
+  evidencia que cita; si no, el core la rechaza. Si falta el dato, la acción es
+  conseguirlo ("junta cuánto te debe cada cliente y desde cuándo").
+- Di el `output` tal cual; es el último mensaje del diagnóstico. Por ejemplo:
+
+> Tu freno principal es que cobras a 60 días. Esta semana: llama a tus 3
+> clientes más grandes y pide pago a 30 días. Responsable: tú. Fecha: viernes 9
+> de octubre. ¿Lo anoto como compromiso en tu hoja?
+
+- La oferta de la hoja va **una sola vez** por conversación. Si ya la hiciste,
+  o dijo "después" o "no", manda `"sheet_offer_made": True`: el cierre queda
+  con la acción, el responsable y la fecha, sin volver a preguntar. Si cambia
+  de tema sin contestar, cuenta como "después".
+- **Si dice que sí**, lo lleva `escala` con el especialista de execution a la
+  hoja del grupo, con `artifacts.tracker_request`: es la llamada `propose` del
+  tracker con la acción como fila de sus compromisos del mes. Si su pestaña aún
+  no está confirmada, el tracker la busca primero. ESCALA no escribe en la
+  hoja: propone la fila y el empresario la pega.
+
+No aparentes ejecutar en profundidad dinero, equipo, estrategia o día a día:
+la acción es un primer paso concreto, no la revisión a fondo.
 
 Si el reto parece de Strategy (demanda, clientes, zona nueva) o de Cash por
-precio o margen, y no hay una investigación vigente sobre eso, ofrece en texto
-como siguiente paso posible: "Si quieres, antes de decidir vemos cómo cobran
-negocios parecidos / cómo está tu mercado, sin usar datos de tu empresa en las
-búsquedas". Si dice que sí, lo lleva `escala` con el especialista de strategy.
-La elección de ruta automática (E75 S75.3) aún no existe: no simules el
-traspaso ni digas que ya empezó la investigación. En People o Execution no lo
-ofrezcas (el freno es interno).
+precio o margen, y no hay una investigación vigente sobre eso, ofrécela al
+presentar la lectura, antes del cierre (el cierre siempre es la acción):
+"Si quieres, antes de decidir vemos cómo cobran negocios parecidos / cómo está
+tu mercado, sin usar datos de tu empresa en las búsquedas". Si dice que sí, lo
+lleva `escala` con el especialista de strategy. La elección de ruta automática
+(E75 S75.3) aún no existe: no simules el traspaso ni digas que ya empezó la
+investigación. En People o Execution no lo ofrezcas (el freno es interno).
 
 ## Compatibilidad heredada
 
