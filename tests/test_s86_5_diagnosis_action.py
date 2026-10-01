@@ -192,3 +192,113 @@ def test_without_weekly_action_the_old_closing_stays(tmp_path: Path) -> None:
 @pytest.mark.parametrize("bad", ["", "9 de octubre", "2026-13-01"])
 def test_due_must_be_an_iso_date(tmp_path: Path, bad: str) -> None:
     assert run(_context(tmp_path, weekly_action=_action(due=bad)))["errors"]
+
+
+# --- T2: the sheet offer, once, and the hand-off to the tracker -------------
+
+PAN_RICO_TAB = (
+    "Participant Name\t\tRosa Demo\n"
+    "Monthly Commitments\n"
+    "\tFocus Area\tPriorities\tKPIs\tDue Dates\n"
+    "\tCash\tPagar al proveedor de harina\t1 pago\t15/10/2026\n"
+)
+
+
+def _confirm_tab(base: Path) -> None:
+    from coaching.tracker.flow import run as tracker_run
+
+    result = tracker_run(
+        {
+            "action": "confirm",
+            "base_path": str(base),
+            "user_confirmed": True,
+            "tab_name": "Rosa",
+            "pasted_text": PAN_RICO_TAB,
+        }
+    )
+    assert result.errors == []
+
+
+def test_with_a_confirmed_tab_the_offer_is_one_short_question(tmp_path: Path) -> None:
+    _confirm_tab(tmp_path)
+
+    last = run(_context(tmp_path))["output"]
+
+    assert last.endswith(messages.SHEET_OFFER)
+
+
+def test_without_a_confirmed_tab_the_offer_appears_once(tmp_path: Path) -> None:
+    first = run(_context(tmp_path))
+    again = run(_context(tmp_path, sheet_offer_made=True))
+
+    assert first["output"].endswith(messages.SHEET_OFFER_NO_TAB)
+    assert first["output"].count("¿Lo anoto") == 1
+    assert first["artifacts"]["sheet_offer"] is True
+    # already offered (or the owner said "después"): never again
+    assert "¿Lo anoto" not in again["output"]
+    assert "después" not in again["output"]
+    assert again["artifacts"]["sheet_offer"] is False
+    # the closing still has the action, who and when
+    assert "Esta semana:" in again["output"]
+    assert "Responsable: tú." in again["output"]
+    assert "Fecha: viernes 9 de octubre." in again["output"]
+
+
+def test_tracker_request_is_a_commitment_row_for_the_month(tmp_path: Path) -> None:
+    request = run(_context(tmp_path))["artifacts"]["tracker_request"]
+
+    assert request == {
+        "action": "propose",
+        "base_path": str(tmp_path),
+        "table": "commitments",
+        "month": "2026-10",
+        "plan": {
+            "priorities": [
+                {
+                    "priority": (
+                        "Llama a tus 3 clientes más grandes y pide pago a 30 días."
+                    ),
+                    "decision": "cash",
+                    "due": DUE,
+                }
+            ]
+        },
+    }
+
+
+def test_after_yes_the_tracker_proposes_the_commitment(tmp_path: Path) -> None:
+    from coaching.tracker.flow import run as tracker_run
+
+    _confirm_tab(tmp_path)
+    request = dict(run(_context(tmp_path))["artifacts"]["tracker_request"])
+    request["pasted_text"] = PAN_RICO_TAB  # the agent adds the tab it reads
+
+    result = tracker_run(request)
+
+    assert result.errors == []
+    assert result.proposal is not None
+    row = result.proposal.rows[0]
+    assert row.priority.startswith("Llama a tus 3 clientes más grandes")
+    assert row.due == DUE
+    assert row.focus_area == "Cash"  # the label the sheet already uses
+    assert DUE in result.paste_block
+    assert "compromisos de octubre" in result.message
+
+
+def test_another_responsible_goes_into_the_row(tmp_path: Path) -> None:
+    result = run(
+        _context(tmp_path, weekly_action=_action(responsible="Laura, tu encargada"))
+    )
+
+    priority = result["artifacts"]["tracker_request"]["plan"]["priorities"][0]
+    assert priority["priority"].endswith("(responsable: Laura, tu encargada)")
+
+
+def test_without_a_confirmed_tab_the_tracker_asks_for_it_first(tmp_path: Path) -> None:
+    from coaching.tracker.flow import run as tracker_run
+
+    request = run(_context(tmp_path))["artifacts"]["tracker_request"]
+
+    result = tracker_run(request)
+
+    assert result.errors == ["needs_confirmed_tab"]

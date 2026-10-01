@@ -436,11 +436,20 @@ def _today(context: dict) -> date:
 
 
 def _sheet_offer(context: dict, base: Path) -> str | None:
-    """S86.5: offer to note the action in the group sheet."""
+    """S86.5: offer to note the action in the group sheet, once.
+
+    ``sheet_offer_made`` is the agent's flag: already offered in this
+    conversation, or the owner said "después" / "no" (E84 rule).
+    """
+    from coaching.tracker.identity import load_link
+
     from . import messages
 
-    del context, base
-    return messages.SHEET_OFFER
+    if context.get("sheet_offer_made") is True:
+        return None
+    if load_link(base) is not None:
+        return messages.SHEET_OFFER
+    return messages.SHEET_OFFER_NO_TAB
 
 
 def _closing(
@@ -448,6 +457,7 @@ def _closing(
 ) -> str:
     """S86.5: the last message — constraint, one action, who, when, the offer."""
     from . import messages
+    from .handoff import tracker_request
 
     offer = _sheet_offer(context, base)
     message = messages.closing_message(
@@ -456,6 +466,7 @@ def _closing(
     artifacts["weekly_action"] = action.model_dump(mode="json")
     artifacts["closing_message"] = message
     artifacts["sheet_offer"] = offer is not None
+    artifacts["tracker_request"] = tracker_request(action, str(base))
     return message
 
 
