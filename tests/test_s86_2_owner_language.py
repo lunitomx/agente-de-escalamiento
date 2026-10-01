@@ -280,3 +280,119 @@ def test_welcome_profile_names_areas_in_spanish_without_commands() -> None:
     assert _offenders({"scores": text, "empty": empty}) == []
     assert "**Tu dinero:** 3/5" in text
     assert "/escala-" not in empty
+
+
+# --- A5: template names keep the sheet word, after a Spanish explanation ----
+
+# The sheet of the group uses these names; the owner needs them to find the
+# cell, so they stay, but the first mention in each message explains them.
+GLOSSARY = {
+    "Critical Number": "tu número clave (Critical Number",
+    "Rocks": "metas del trimestre (Rocks",
+    "Done": "terminados (Done",
+}
+
+
+def first_mention_unexplained(text: str) -> list[str]:
+    """Glossary terms whose first mention in ``text`` is not explained."""
+    missing: list[str] = []
+    for term, explained in GLOSSARY.items():
+        first = re.search(rf"\b{term}\b", text)
+        if first and not text[: first.end()].endswith(explained):
+            missing.append(term)
+    return missing
+
+
+def _item(text: str, due: str | None = "2026-09-01") -> object:
+    from coaching.tracker.maintenance import ReviewedItem
+
+    return ReviewedItem(
+        focus_area=None, text=text, kpi=None, due=due, due_date=None, status=None
+    )
+
+
+def _tracker_texts() -> dict[str, str]:
+    from datetime import date
+
+    from coaching.tracker import messages as m
+    from coaching.tracker.maintenance import MeetingPrep, ReviewedItem, RocksPrep
+    from coaching.tracker.proposal import ProposedRow, QuarterCheck, RowProposal
+
+    done = _item("Abrir sucursal")
+    late = _item("Cobrar a Juan")
+    assert isinstance(done, ReviewedItem) and isinstance(late, ReviewedItem)
+    row = ProposedRow(focus_area="Cash", priority="Cobrar antes", kpi="días", due="")
+    rocks = RocksPrep(quarter="Q4-2026", reviewed=1, overdue=[late])
+    check = QuarterCheck(status="ask", sheet_quarter=None, plan_quarter="Q4-2026")
+    texts = {
+        name: value
+        for name, value in vars(m).items()
+        if name.isupper() and isinstance(value, str)
+    }
+    texts.update(
+        {
+            "cn different": m.proposal_message(
+                RowProposal(
+                    month="2026-10",
+                    month_name="octubre",
+                    rows=[row],
+                    critical_number="different",
+                    plan_critical_number="10 clientes",
+                    sheet_critical_number="5 clientes",
+                ),
+                None,
+                "Ana",
+                "x",
+            ),
+            "cn add": m.proposal_message(
+                RowProposal(
+                    month="2026-10",
+                    month_name="octubre",
+                    rows=[row],
+                    critical_number="add",
+                    plan_critical_number="10 clientes",
+                ),
+                None,
+                "Ana",
+                "x",
+            ),
+            "ask quarter": m.ask_quarter_message(check),
+            "quarter mismatch": m.quarter_mismatch_message(
+                QuarterCheck(
+                    status="mismatch", quarter="Q3-2026", plan_quarter="Q4-2026"
+                )
+            ),
+            "prep": m.prep_message(
+                MeetingPrep(
+                    today=date(2026, 10, 1), reviewed=2, finished=[done], rocks=rocks
+                ),
+                None,
+                "Ana",
+                "x",
+            ),
+            "prep only rocks": m.prep_message(
+                MeetingPrep(today=date(2026, 10, 1), rocks=rocks), None, "Ana", "x"
+            ),
+        }
+    )
+    return texts
+
+
+def test_rule_wants_the_first_mention_explained() -> None:
+    assert first_mention_unexplained("tu número clave (Critical Number) y Rocks") == [
+        "Rocks"
+    ]
+    assert first_mention_unexplained("tus metas del trimestre (Rocks): Rocks") == []
+
+
+def test_tracker_explains_template_names_the_first_time() -> None:
+    texts = _tracker_texts()
+
+    offenders = {
+        where: missing
+        for where, text in texts.items()
+        if (missing := first_mention_unexplained(text))
+    }
+
+    assert offenders == {}
+    assert "tu número clave (Critical Number)" in texts["cn add"]

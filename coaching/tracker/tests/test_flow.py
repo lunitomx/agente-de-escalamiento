@@ -745,8 +745,8 @@ def test_prepare_suggests_done_with_block_cell_and_undo(tmp_path: Path) -> None:
     assert result.paste_block == "People\tContratar gerente"
     message = result.message
     assert message.startswith(
-        "Antes de tu reunión: 1 compromiso vencido, 1 terminado que puedes pasar "
-        "a Done, 1 sin KPI y 1 con fecha por confirmar."
+        "Antes de tu reunión: 1 compromiso vencido, 1 cumplido que puedes pasar "
+        "a terminados (Done), 1 sin KPI y 1 con fecha por confirmar."
     )
     assert "**B11**" in message  # first empty row of the Done table
     assert result.paste_block in message
@@ -862,7 +862,9 @@ def test_prep_message_plural_and_up_to_date() -> None:
     many = prep_message(review_before_meeting(finished, today), None, "Ana", "x")
     fine = prep_message(review_before_meeting(on_track, today), None, "Ana", "")
 
-    assert many.startswith("Antes de tu reunión: 2 terminados que puedes pasar")
+    assert many.startswith(
+        "Antes de tu reunión: 2 cumplidos que puedes pasar a terminados (Done)"
+    )
     assert "Si decides pasarlos a Done:" in many
     assert many.endswith("¿Pasas los terminados a Done?")
     assert fine == PREP_UP_TO_DATE
@@ -962,7 +964,7 @@ def test_propose_rocks_says_where_to_paste_and_how_to_undo(tmp_path: Path) -> No
     ]
     message = result.message
     assert message.startswith(
-        "Te propongo estas 2 filas para tus Rocks del **Q4-2026**:"
+        "Te propongo estas 2 filas para tus metas del trimestre (Rocks) del **Q4-2026**:"
     )
     assert "| Focus Area | Goals/Rock for this quarter |" in message
     assert "**B13**" in message  # first empty row under the Rocks table
@@ -1129,7 +1131,7 @@ def test_prepare_reviews_rocks_in_their_own_block(tmp_path: Path) -> None:
         "Antes de tu reunión: tus compromisos del mes están al día."
     )
     assert (
-        "**Tus Rocks del Q4-2026:** 1 vencido, 1 sin KPI y 1 con fecha por "
+        "**Tus metas del trimestre (Rocks) del Q4-2026:** 1 vencido, 1 sin KPI y 1 con fecha por "
         "confirmar." in message
     )
     assert "- Vencido: Abrir sucursal (era para el 15/10/2026)" in message
@@ -1150,7 +1152,9 @@ def test_prepare_keeps_commitments_and_rocks_visibly_apart(tmp_path: Path) -> No
 
     message = _prepare(str(tmp_path), connector_text=None, pasted_text=pasted).message
 
-    commitments, rest = message.split("**Tus Rocks del Q4-2026:**")
+    commitments, rest = message.split(
+        "**Tus metas del trimestre (Rocks) del Q4-2026:**"
+    )
     rocks, decisions = rest.split("No moví nada en tu hoja.")
     assert "Cobrar cartera" in commitments and "Cobrar cartera" not in rocks
     assert "Abrir sucursal" in rocks and "Abrir sucursal" not in commitments
@@ -1170,7 +1174,7 @@ def test_prepare_with_only_rocks_says_there_are_no_commitments_yet(
     assert message.startswith(
         "Antes de tu reunión: todavía no tienes compromisos del mes."
     )
-    assert "**Tus Rocks del Q4-2026:**" in message
+    assert "**Tus metas del trimestre (Rocks) del Q4-2026:**" in message
 
 
 def test_prepare_template_rocks_are_not_asked_for_columns_they_lack(
@@ -1197,7 +1201,9 @@ def test_prepare_all_up_to_date_mentions_the_rocks(tmp_path: Path) -> None:
 
     message = _prepare(str(tmp_path), connector_text=None, pasted_text=pasted).message
 
-    assert "compromisos del mes y tus Rocks están al día" in message
+    assert (
+        "compromisos del mes y tus metas del trimestre (Rocks) están al día" in message
+    )
     assert message.endswith("?")
 
 

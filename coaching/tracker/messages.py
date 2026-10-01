@@ -169,8 +169,13 @@ def _fits(free: int) -> str:
     return "sólo cabe 1 fila" if free == 1 else f"sólo caben {free} filas"
 
 
+# S86.2 (A5): the sheet's own names stay, after a Spanish explanation, so the
+# owner can find the cell; later mentions in the same message use the name.
+_DONE = "terminados (Done)"
+_ROCKS = "metas del trimestre (Rocks)"
+_CRITICAL_NUMBER = "tu número clave (Critical Number)"
 _BELOW_COMMITMENTS = "tus compromisos del mes (Monthly Commitments)"
-_BELOW_DONE = "lo que ya tienes en Done"
+_BELOW_DONE = f"lo que ya tienes en {_DONE}"
 
 
 def _where(
@@ -206,14 +211,14 @@ def _where(
 def _critical_number(proposal: RowProposal) -> str:
     if proposal.critical_number == "different":
         return (
-            f"Ojo: tu hoja dice que tu Critical Number es "
+            f"Ojo: tu hoja dice que {_CRITICAL_NUMBER} es "
             f"**{proposal.sheet_critical_number}**, y en lo que trabajamos quedó "
             f"**{proposal.plan_critical_number}**. ¿Cuál es el bueno? No lo toco "
             "hasta que me digas."
         )
     if proposal.critical_number == "add":
         return (
-            "Tu hoja todavía no tiene Critical Number. Si quieres, escribe "
+            f"Tu hoja todavía no tiene {_CRITICAL_NUMBER}. Si quieres, escribe "
             f"**{proposal.plan_critical_number}** en la celda junto a "
             "«Critical Number»."
         )
@@ -284,14 +289,13 @@ def _paste_steps(
 
 # --- S82.7: Rocks rows for the quarter the sheet declares ---------------------
 
-ASK_TABLE = (
-    "¿Las filas son para tus compromisos del mes o para tus Rocks del trimestre?"
-)
+ASK_TABLE = f"¿Las filas son para tus compromisos del mes o para tus {_ROCKS}?"
 NO_ROCKS_TABLE = (
-    "No encuentro la tabla de Rocks (Quarterly Goals) en tu pestaña, así que no "
-    "sé dónde irían. ¿Tu hoja tiene esa sección con otro nombre?"
+    f"No encuentro la tabla de tus {_ROCKS} en tu pestaña (se llama Quarterly "
+    "Goals), así que no sé dónde irían. ¿Tu hoja tiene esa sección con otro "
+    "nombre?"
 )
-_BELOW_ROCKS = "tus Rocks del trimestre (Quarterly Goals)"
+_BELOW_ROCKS = f"tus {_ROCKS}, en Quarterly Goals"
 _ROCK_FIELDS: tuple[Column, ...] = ("focus", "text", "kpi", "due")
 
 
@@ -303,10 +307,10 @@ def _plan_quarter(check: QuarterCheck) -> str | None:
 def ask_quarter_message(check: QuarterCheck) -> str:
     """The sheet does not say which quarter its Rocks are for: ask, never guess."""
     if check.sheet_quarter is None or not check.sheet_quarter.strip():
-        said = "Tu tabla de Rocks no dice de qué trimestre es."
+        said = f"Tu tabla de {_ROCKS} no dice de qué trimestre es."
     else:
         said = (
-            f"Tu tabla de Rocks dice «{check.sheet_quarter.strip()}» y no sé a qué "
+            f"Tu tabla de {_ROCKS} dice «{check.sheet_quarter.strip()}» y no sé a qué "
             "trimestre se refiere."
         )
     planned = _plan_quarter(check)
@@ -321,7 +325,7 @@ def ask_quarter_message(check: QuarterCheck) -> str:
 def quarter_mismatch_message(check: QuarterCheck) -> str:
     planned = _plan_quarter(check) or check.plan_quarter or ""
     return (
-        f"Tu tabla de Rocks es del **{check.quarter}** y tus prioridades son del "
+        f"Tu tabla de {_ROCKS} es del **{check.quarter}** y tus prioridades son del "
         f"**{planned}**. Para no mezclar trimestres no te propongo filas ahí "
         "todavía. Si esa tabla ya es para el trimestre nuevo, cambia su título a "
         f"«Quarterly Goals (Rocks) - {planned}» y te las propongo. ¿Cómo lo "
@@ -367,7 +371,7 @@ def rocks_proposal_message(
     if not proposal.rows:
         return "\n\n".join(
             [
-                f"Tus Rocks del {quarter} ya tienen tus prioridades del trimestre: "
+                f"Tus {_ROCKS} del {quarter} ya tienen tus prioridades: "
                 "no hay nada nuevo que pegar.",
                 *notes,
             ]
@@ -380,7 +384,7 @@ def rocks_proposal_message(
         notes.append(missing_area_note(proposal.missing_area))
     intro = (
         f"Te propongo {'esta fila' if count == 1 else f'estas {count} filas'} para "
-        f"tus Rocks del {quarter}:"
+        f"tus {_ROCKS} del {quarter}:"
     )
     return "\n\n".join(
         [
@@ -417,18 +421,18 @@ PREP_EMPTY = (
 )
 PREP_UP_TO_DATE = (
     "Antes de tu reunión: tus compromisos del mes están al día. No veo nada "
-    "vencido, terminado por pasar a Done ni datos faltantes. ¿Quieres revisar "
-    "algo más antes de la reunión?"
-)
-PREP_ALL_UP_TO_DATE = (
-    "Antes de tu reunión: tus compromisos del mes y tus Rocks están al día. No "
-    "veo nada vencido, terminado por pasar a Done ni datos faltantes. ¿Quieres "
+    f"vencido, nada cumplido por pasar a {_DONE} ni datos faltantes. ¿Quieres "
     "revisar algo más antes de la reunión?"
 )
+PREP_ALL_UP_TO_DATE = (
+    f"Antes de tu reunión: tus compromisos del mes y tus {_ROCKS} están al "
+    f"día. No veo nada vencido, nada cumplido por pasar a {_DONE} ni datos "
+    "faltantes. ¿Quieres revisar algo más antes de la reunión?"
+)
 PREP_ROCKS_ONLY_UP_TO_DATE = (
-    "Antes de tu reunión: todavía no tienes compromisos del mes, y tus Rocks "
-    "están al día. ¿Quieres que te proponga filas con tus prioridades del "
-    "trimestre?"
+    "Antes de tu reunión: todavía no tienes compromisos del mes, y tus "
+    f"{_ROCKS} están al día. ¿Quieres que te proponga filas con tus prioridades "
+    "del trimestre?"
 )
 _COMMITMENTS_FINE = "Antes de tu reunión: tus compromisos del mes están al día."
 _NO_COMMITMENTS = "Antes de tu reunión: todavía no tienes compromisos del mes."
@@ -448,8 +452,8 @@ def _headline(prep: MeetingPrep) -> str:
         _count(prep.overdue, "compromiso vencido", "compromisos vencidos"),
         _count(
             prep.finished,
-            "terminado que puedes pasar a Done",
-            "terminados que puedes pasar a Done",
+            f"cumplido que puedes pasar a {_DONE}",
+            f"cumplidos que puedes pasar a {_DONE}",
         ),
         _count(prep.already_in_done, "que ya está en Done", "que ya están en Done"),
         _count(prep.missing_kpi, "sin KPI", "sin KPI"),
@@ -548,7 +552,7 @@ def _rocks_block(rocks: RocksPrep) -> str:
         _count(rocks.unclear_due, "con fecha por confirmar", "con fecha por confirmar"),
     ]
     lines = [
-        f"**Tus Rocks {_rocks_title(rocks)}:** {_join([p for p in parts if p])}.",
+        f"**Tus {_ROCKS} {_rocks_title(rocks)}:** {_join([p for p in parts if p])}.",
         *(f"- Vencido: {i.text} (era para el {i.due})" for i in rocks.overdue),
         *(f"- Sin KPI: {i.text}" for i in rocks.missing_kpi),
         *(f"- Sin fecha: {i.text}" for i in rocks.missing_due),
