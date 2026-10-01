@@ -32,6 +32,12 @@ from validators.capability_map import (  # noqa: E402
     load_capability_map,
     validate_capability_map,
 )
+from validators.door_bundle import (  # noqa: E402
+    DoorBundleError,
+    copy_door_bundle,
+    door_bundle,
+    validate_door_bundle,
+)
 from validators.specialist_agents import (  # noqa: E402
     SPECIALIST_AREAS,
     validate_specialist_artifacts,
@@ -150,6 +156,7 @@ def _assert_complete(directory: Path, catalog: dict[str, Any]) -> None:
         "codex-adapter.json",
         "core/escala-capability-contract.json",
         "skills/escala/SKILL.md",
+        *(f"skills/escala/{path}" for path in door_bundle()),
         *(f"agents/escala-{area}.toml" for area in SPECIALIST_AREAS),
     }
     actual = {
@@ -171,6 +178,10 @@ def _assert_complete(directory: Path, catalog: dict[str, Any]) -> None:
     )
     if manifest != _build_manifest(catalog):
         raise CodexAdapterError("adapter manifest is invalid")
+    try:
+        validate_door_bundle(directory / "skills" / "escala")
+    except DoorBundleError as exc:
+        raise CodexAdapterError("adapter door bundle is invalid") from exc
     for area in SPECIALIST_AREAS:
         source = CANONICAL_AGENT_DIRECTORY / f"escala-{area}.toml"
         generated = directory / "agents" / source.name
@@ -211,6 +222,7 @@ def build_codex_adapter(
         (temporary / "skills" / "escala" / "SKILL.md").write_text(
             _portable_skill(), encoding="utf-8"
         )
+        copy_door_bundle(temporary / "skills" / "escala")
         for area in SPECIALIST_AREAS:
             source = CANONICAL_AGENT_DIRECTORY / f"escala-{area}.toml"
             shutil.copyfile(source, temporary / "agents" / source.name)

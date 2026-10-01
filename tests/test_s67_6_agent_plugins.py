@@ -11,6 +11,7 @@ from adapters.agent_plugins.build_plugin import (
     AgentPluginBuildError,
     build_agent_plugin,
 )
+from validators.door_bundle import door_bundle
 from validators.agent_plugin import (
     AGENT_PLUGIN_SCHEMA_URL,
     AgentPluginError,
@@ -40,6 +41,8 @@ def test_builds_the_minimum_self_contained_agent_plugin_v1(tmp_path: Path) -> No
         "plugin.json",
         "skills/escala/SKILL.md",
         "skills/escala/references/capability-catalog.json",
+        # S86.10: the list and procedures the door follows, still exact.
+        *(f"skills/escala/{path}" for path in door_bundle()),
     }
     manifest = json.loads((package / "plugin.json").read_text(encoding="utf-8"))
     assert manifest["$schema"] == AGENT_PLUGIN_SCHEMA_URL

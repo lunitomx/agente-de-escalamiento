@@ -13,6 +13,15 @@ import re
 import subprocess
 from pathlib import Path
 
+import pytest
+
+from adapters.agent_plugins.build_plugin import build_agent_plugin
+from adapters.codex.build_adapter import build_codex_adapter
+from escala_server.capabilities import load_capability_catalog, route_request
+from tests.test_public_skill_installation import _portable_artifact
+from tests.test_s86_4_front_door import AREA_ENTRIES, PHRASES, _plain
+from validators.agent_plugin import AgentPluginError, load_agent_plugin
+
 ROOT = Path(__file__).resolve().parents[1]
 DOOR = ROOT / "escala-skills" / "escala" / "SKILL.md"
 INSTALLER = ROOT / "install.sh"
@@ -175,8 +184,6 @@ def test_codex_reuses_the_claude_template_without_a_second_copy() -> None:
 
 def test_portable_export_carries_the_codex_contract(tmp_path: Path) -> None:
     """The owner's portable copy must install Codex the same way (no git)."""
-    from tests.test_public_skill_installation import _portable_artifact
-
     artifact = _portable_artifact(tmp_path / "escala")
 
     home = tmp_path / "home"
@@ -194,3 +201,110 @@ def test_portable_export_carries_the_codex_contract(tmp_path: Path) -> None:
     assert f"`{artifact}/.venv/bin/python`" in (home / ".codex" / "AGENTS.md").read_text(
         encoding="utf-8"
     )
+
+
+# --- T3: each package carries the list and the procedures the door needs -----
+
+CATALOG_JSON = ROOT / "capabilities" / "mvp" / "catalog.json"
+
+
+def _plugin_door(tmp_path: Path) -> Path:
+    root = tmp_path / "plugin"
+    root.mkdir(parents=True)
+    package = build_agent_plugin(output=root / "escala", allowed_root=root)
+    return package / "skills" / "escala"
+
+
+def _codex_door(tmp_path: Path) -> Path:
+    root = tmp_path / "codex-package"
+    root.mkdir(parents=True)
+    package = build_codex_adapter(
+        catalog_path=CATALOG_JSON, output=root / "escala", allowed_root=root
+    )
+    return package / "skills" / "escala"
+
+
+PACKAGES = {"plugin": _plugin_door, "codex": _codex_door}
+
+
+def _package_reaches(door_dir: Path, phrase: str, procedure: str, hint: str | None) -> bool:
+    """S86.4's reachability, read only from files inside the package."""
+    procedures = door_dir / "references" / "procedures"
+    catalog = load_capability_catalog(door_dir / "references" / "catalog.yaml")
+    target = route_request(phrase, catalog=catalog).capability_id
+    if not (procedures / f"{target}.md").is_file():
+        return False
+    if hint is None:
+        return target == procedure
+    if target not in AREA_ENTRIES or not (procedures / f"{procedure}.md").is_file():
+        return False
+    rows = [
+        line
+        for line in (procedures / f"{target}.md").read_text(encoding="utf-8").splitlines()
+        if line.startswith("|")
+    ]
+    return any(f"`{procedure}`" in row and _plain(hint) in _plain(row) for row in rows)
+
+
+@pytest.mark.parametrize("package", sorted(PACKAGES))
+def test_owner_phrases_reach_procedures_inside_each_package(
+    package: str, tmp_path: Path
+) -> None:
+    door_dir = PACKAGES[package](tmp_path)
+
+    missing = [
+        procedure
+        for procedure, (phrase, hint) in sorted(PHRASES.items())
+        if not _package_reaches(door_dir, phrase, procedure, hint)
+    ]
+    assert not missing
+
+
+@pytest.mark.parametrize("package", sorted(PACKAGES))
+def test_package_bundle_is_the_repo_byte_for_byte_and_hides_procedures(
+    package: str, tmp_path: Path
+) -> None:
+    door_dir = PACKAGES[package](tmp_path)
+    catalog = load_capability_catalog(ROOT / "escala-skills" / "catalog.yaml")
+    ids = {c.id for c in catalog.capabilities} - {catalog.public_entrypoint}
+
+    assert (door_dir / "references" / "catalog.yaml").read_bytes() == (
+        ROOT / "escala-skills" / "catalog.yaml"
+    ).read_bytes()
+    shipped = {p.stem for p in (door_dir / "references" / "procedures").iterdir()}
+    assert shipped == ids
+    for procedure in ids:
+        assert (door_dir / "references" / "procedures" / f"{procedure}.md").read_bytes() == (
+            ROOT / "escala-skills" / procedure / "SKILL.md"
+        ).read_bytes()
+    # Only the door is a skill: no platform discovers a procedure as a command.
+    package_root = door_dir.parents[1]
+    assert [p.relative_to(package_root).as_posix() for p in package_root.rglob("SKILL.md")] == [
+        "skills/escala/SKILL.md"
+    ]
+
+
+def test_door_says_where_the_list_and_procedures_live_in_a_package() -> None:
+    door = DOOR.read_text(encoding="utf-8")
+
+    assert "`references/catalog.yaml`" in door
+    assert "`references/procedures/escala-*.md`" in door
+
+
+def test_door_carries_the_product_python_rule_for_every_platform() -> None:
+    door = re.sub(r"\s+", " ", DOOR.read_text(encoding="utf-8"))
+
+    assert "`python3`" in door and "`.venv/bin/python`" in door
+
+
+def test_plugin_rejects_a_tampered_or_extra_procedure(tmp_path: Path) -> None:
+    door_dir = _plugin_door(tmp_path / "a")
+    tampered = door_dir / "references" / "procedures" / "escala-diagnose.md"
+    tampered.write_text(tampered.read_text(encoding="utf-8") + "\nOtra cosa.\n", encoding="utf-8")
+    with pytest.raises(AgentPluginError, match="door_bundle_drift"):
+        load_agent_plugin(door_dir.parents[1])
+
+    door_dir = _plugin_door(tmp_path / "b")
+    (door_dir / "references" / "procedures" / "escala-extra.md").write_text("x", encoding="utf-8")
+    with pytest.raises(AgentPluginError, match="package_surface_invalid"):
+        load_agent_plugin(door_dir.parents[1])

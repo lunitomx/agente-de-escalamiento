@@ -22,6 +22,7 @@ from validators.agent_plugin import (  # noqa: E402
     SKILL_CATALOG_REFERENCE,
     load_agent_plugin,
 )
+from validators.door_bundle import copy_door_bundle  # noqa: E402
 
 
 CANONICAL_SKILL_PATH = REPOSITORY_ROOT / "escala-skills" / "escala" / "SKILL.md"
@@ -98,6 +99,7 @@ def build_agent_plugin(*, output: Path, allowed_root: Path) -> Path:
         _write_json(temporary / "plugin.json", _manifest())
         (skill_root / "SKILL.md").write_text(_portable_skill(), encoding="utf-8")
         shutil.copyfile(AUTHORIZED_CATALOG_PATH, references / "capability-catalog.json")
+        copy_door_bundle(skill_root)
         load_agent_plugin(temporary)
         os.replace(temporary, destination)
         temporary = None

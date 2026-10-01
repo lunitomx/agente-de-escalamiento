@@ -18,13 +18,17 @@ la capacidad interna adecuada.
 
 ## Antes de responder
 
-1. Lee `catalog.yaml` en la carpeta que contiene a este skill
-   (`escala-skills/catalog.yaml` en la copia de ESCALA). Es la única lista de lo que
+1. Lee `catalog.yaml`: `escala-skills/catalog.yaml` en la copia de ESCALA, o
+   `references/catalog.yaml` junto a este archivo si ESCALA llegó en un paquete.
+   Es la única lista de lo que
    ESCALA sabe hacer: `routes` dice qué frases del empresario llevan a qué
    procedimiento interno (en orden; gana la primera que coincide) y
    `capabilities` lista cada procedimiento (`keep` = vigente). No inventes otra
    taxonomía ni una ruta exclusiva del cliente.
-   Los procedimientos internos viven junto a este skill, en `escala-skills/escala-*/SKILL.md`.
+   Cada procedimiento interno vive en `escala-skills/escala-*/SKILL.md` en la
+   copia, o en `references/procedures/escala-*.md` en un paquete (mismo nombre).
+   Donde una instrucción de ESCALA corra `python3`, usa `.venv/bin/python` de la
+   copia de ESCALA si existe: tiene las bibliotecas que ESCALA necesita.
    `../../capabilities/mvp/catalog.json` es el contrato del ciclo de trabajo de
    las seis capacidades MVP para los adaptadores; no lo uses para elegir ruta.
 2. Carga únicamente el contexto local que el usuario autorizó. Si un dato es
