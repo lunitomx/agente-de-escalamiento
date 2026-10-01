@@ -95,7 +95,7 @@ def test_connect_message_carries_the_owner_notice_verbatim() -> None:
         "grupo; ESCALA sólo usa tu pestaña." in message
     )
     assert DRIVE_NOTICE in message
-    assert "Configuración → Conectores" in message
+    assert "en la configuración de este asistente, en Conectores o Apps" in message
     assert "cópiala y pégala aquí" in message
     assert "ChatGPT" not in message
 

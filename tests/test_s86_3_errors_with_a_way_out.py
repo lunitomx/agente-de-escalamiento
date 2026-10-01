@@ -16,6 +16,7 @@ No owner-facing text says "tu Claude".
 
 from __future__ import annotations
 
+import ast
 import io
 import json
 import runpy
@@ -197,3 +198,74 @@ def test_skills_that_explain_errors_use_the_message_on_internal_error(
 
 def test_reportar_problema_opens_the_bug_report() -> None:
     assert "reportar problema" in _skill("escala-bugreport")
+
+
+# --- A2: Drive ------------------------------------------------------------
+
+
+def test_drive_file_not_found_asks_for_the_link() -> None:
+    from coaching.tracker.flow import run
+
+    result = run({"action": "drive_not_found"})
+
+    assert result.message == (
+        "Conecté Drive pero no veo tu archivo. ¿Me pegas el link de la hoja?"
+    )
+    assert result.errors == []
+
+
+def test_drive_without_permission_offers_two_ways_out() -> None:
+    from coaching.tracker.flow import run
+
+    result = run({"action": "drive_no_access"})
+
+    assert result.message == (
+        "No tengo permiso para abrir ese archivo; pídele acceso a quien lo "
+        "compartió o pega tu pestaña aquí."
+    )
+    assert result.errors == []
+
+
+def test_connect_text_is_platform_neutral() -> None:
+    from coaching.tracker.flow import run
+
+    message = run({"action": "connect"}).message
+
+    assert "en la configuración de este asistente, en Conectores o Apps" in message
+    assert "Claude" not in message
+    assert "ChatGPT" not in message
+
+
+def test_tracker_skill_says_when_to_use_each_drive_case() -> None:
+    skill = _skill("escala-execution-tracker")
+    assert '"action": "drive_not_found"' in skill
+    assert '"action": "drive_no_access"' in skill
+
+
+def _python_literals(path: Path) -> list[str]:
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    return [
+        node.value
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Constant) and isinstance(node.value, str)
+    ]
+
+
+def _owner_sources() -> dict[str, list[str]]:
+    sources: dict[str, list[str]] = {}
+    for path in (ROOT / "coaching").rglob("*.py"):
+        if "tests" in path.parts or path.name.startswith("test_"):
+            continue
+        sources[str(path.relative_to(ROOT))] = _python_literals(path)
+    for path in (ROOT / "escala-skills").rglob("*.md"):
+        sources[str(path.relative_to(ROOT))] = [path.read_text(encoding="utf-8")]
+    return sources
+
+
+def test_no_owner_text_says_tu_claude() -> None:
+    offenders = [
+        where
+        for where, texts in _owner_sources().items()
+        if any("tu claude" in text.lower() for text in texts)
+    ]
+    assert offenders == []

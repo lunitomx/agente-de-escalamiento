@@ -84,6 +84,13 @@ Di el `message` ("Veo una pestaña que se llama **Ana**. ¿Es la tuya?"). Si
 pide el negocio, repite la llamada con `"business"`. No digas nada más sobre
 el archivo.
 
+Si Drive está conectado pero no encuentras el archivo del grupo, llama
+`{"action": "drive_not_found"}` y di su `message` ("Conecté Drive pero no veo
+tu archivo. ¿Me pegas el link de la hoja?"); con el link, ábrelo y sigue en
+este paso. Si el conector dice que no tienes permiso para abrirlo, llama
+`{"action": "drive_no_access"}` y di su `message`; si pega su pestaña, salta
+al paso 5 con `pasted_text`. No le expliques el error del conector.
+
 ### Paso 5: Confirmar
 
 Sólo después de un "sí" explícito:

@@ -45,12 +45,24 @@ _FIX_START_HERE = (
 )
 
 
+# S86.3 (A2): platform-neutral, like research's SEARCH_OFF; never "tu Claude".
 def connect_message() -> str:
     return (
-        "Para leer tu hoja, conecta Google Drive en tu Claude (Configuración → "
-        f"Conectores). {DRIVE_NOTICE} Si prefieres no conectarlo, abre tu "
-        "pestaña, selecciónala toda, cópiala y pégala aquí."
+        "Para leer tu hoja, conecta Google Drive en la configuración de este "
+        f"asistente, en Conectores o Apps. {DRIVE_NOTICE} Si prefieres no "
+        "conectarlo, abre tu pestaña, selecciónala toda, cópiala y pégala aquí."
     )
+
+
+# S86.3 (A2): only the agent sees these through its connector; it asks the
+# module for the fixed sentence (actions ``drive_not_found`` / ``drive_no_access``).
+DRIVE_FILE_NOT_FOUND = (
+    "Conecté Drive pero no veo tu archivo. ¿Me pegas el link de la hoja?"
+)
+DRIVE_NO_ACCESS = (
+    "No tengo permiso para abrir ese archivo; pídele acceso a quien lo "
+    "compartió o pega tu pestaña aquí."
+)
 
 
 def _join(labels: list[str]) -> str:
