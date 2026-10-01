@@ -69,8 +69,8 @@ Analizar el timeline y detectar:
 - "Cada vez que contratas un VP Ventas, renuncia en menos de 6 meses. Van 3 en 2 años."
 
 **Patrones de decisión:**
-- "En Q2 de cada año revisas el BHAG. Es tu ritual."
-- "Siempre postergas las decisiones de People hasta que hay crisis."
+- "En Q2 de cada año revisas tu gran meta de largo plazo (BHAG). Es tu ritual."
+- "Siempre postergas las decisiones de tu equipo hasta que hay crisis."
 
 **Patrones de mejora:**
 - "Tu daily huddle mejoró de 60% a 90% en 2 trimestres. Eso es disciplina."

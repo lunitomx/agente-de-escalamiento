@@ -7,12 +7,12 @@ from __future__ import annotations
 
 from typing import Any
 
-from coaching.core import DECISION_LABELS
+from coaching.core import owner_area_name
 
 
 def format_draft(draft: dict[str, Any]) -> str:
     """Render a proposed decision sheet for user confirmation."""
-    area_label = DECISION_LABELS.get(draft.get("area", ""), draft.get("area", "—"))
+    area_label = owner_area_name(draft.get("area"), capital=True)
     lines = [
         "## Ficha de decisión propuesta",
         "",
@@ -35,7 +35,7 @@ def format_clarification(question: str) -> str:
 
 def format_confirmed(draft: dict[str, Any]) -> str:
     """Render confirmation after persisting a decision sheet."""
-    area_label = DECISION_LABELS.get(draft.get("area", ""), draft.get("area", "—"))
+    area_label = owner_area_name(draft.get("area"))
     lines = [
         "## Decisión confirmada",
         "",

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from coaching.core import DECISION_LABELS
+from coaching.core import owner_area_name
 
 from .models import EvidencePackage, EvidenceSource
 
@@ -28,9 +28,7 @@ def _format_source(source: EvidenceSource) -> str:
 
 def format_package(package: EvidencePackage) -> str:
     """Render an evidence package as user-facing markdown."""
-    area_label = DECISION_LABELS.get(
-        package.decision_ref.area, package.decision_ref.area.title()
-    )
+    area_label = owner_area_name(package.decision_ref.area, capital=True)
     lines = [
         f"## Paquete de evidencia para: {package.decision_ref.decision}",
         "",

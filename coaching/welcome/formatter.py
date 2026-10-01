@@ -5,6 +5,8 @@ No I/O. Accepts structured profile dict, returns YAML string.
 
 from __future__ import annotations
 
+from coaching.core import OWNER_AREA_NAMES, owner_area_name
+
 try:
     import yaml
 except ImportError as e:
@@ -47,19 +49,20 @@ def format_summary(profile: dict) -> str:
     if scored:
         lines.extend(["", "### Calificación cuantitativa opcional"])
         for decision, score in scored.items():
-            lines.append(f"- **{decision.capitalize()}:** {score}/5")
+            lines.append(f"- **{owner_area_name(decision, capital=True)}:** {score}/5")
     elif not isinstance(assessment, dict):
         lines.extend(
             [
                 "",
-                "*Aún no hay assessment. Ejecuta `/escala-diagnose` para explicar "
-                "el contexto antes de elegir un foco.*",
+                "*Todavía no revisamos tu negocio. Cuéntale a ESCALA lo que más "
+                "te preocupa y empezamos por ahí.*",
             ]
         )
 
     focus = profile.get("focus")
     if focus:
-        lines.extend(["", f"**Current Focus:** {focus}"])
+        name = owner_area_name(focus) if focus in OWNER_AREA_NAMES else focus
+        lines.extend(["", f"**Current Focus:** {name}"])
 
     lines.append("")
     return "\n".join(lines)

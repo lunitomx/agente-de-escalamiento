@@ -221,7 +221,7 @@ class TestFormatter:
         }
         text = format_draft(draft)
         assert "contratar a María en ventas" in text
-        assert "People" in text
+        assert "Tu equipo" in text  # S86.2: área en español
         assert "inmediato" in text
 
     def test_format_clarification(self):

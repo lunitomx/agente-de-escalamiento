@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from coaching.evidence.models import EvidencePackage, EvidenceSource
 
+from coaching.core import owner_area_name
+
 from .formatter import format_clarify, format_selection
 from .models import SelectionReceipt, SelectionResult, ToolSelection
 
@@ -99,10 +101,10 @@ EVIDENCE_PATTERNS: dict[str, dict[str, list[str]]] = {
 }
 
 _AREA_EVIDENCE_LABEL: dict[str, str] = {
-    "cash": "workbook financiero",
-    "execution": "registros de reuniones/prioridades",
-    "people": "worksheets de People",
-    "strategy": "worksheets de Strategy",
+    "cash": "tus números",
+    "execution": "notas de reuniones o prioridades",
+    "people": "información de tu equipo",
+    "strategy": "información de tus clientes",
 }
 
 
@@ -139,12 +141,12 @@ def _source_matches_area_evidence(source: EvidenceSource, area: str) -> bool:
 
 
 def _selection_reason(area: str) -> str:
-    label = _AREA_EVIDENCE_LABEL.get(area, f"evidencia para {area}")
-    return f"Área {area.title()} con {label} disponible."
+    label = _AREA_EVIDENCE_LABEL.get(area, "información")
+    return f"Para revisar {owner_area_name(area)} ya tienes {label}."
 
 
 def _clarify_reason(area: str) -> str:
-    return f"No hay evidencia mínima disponible para el área {area.title()}."
+    return f"Todavía no tengo información para revisar {owner_area_name(area)}."
 
 
 def select_tool(package: EvidencePackage) -> SelectionResult:
@@ -181,7 +183,7 @@ def select_tool(package: EvidencePackage) -> SelectionResult:
     questions = list(package.questions)
     if not questions:
         questions.append(
-            f"¿Tienes disponible la evidencia mínima para analizar una decisión de {area.title()}?"
+            f"¿Tienes a la mano algún dato para revisar {owner_area_name(area)}?"
         )
 
     receipt = SelectionReceipt(

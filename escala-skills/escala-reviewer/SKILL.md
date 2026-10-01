@@ -55,7 +55,7 @@ echo '{
       "label": "Cash Analysis",
       "skills": ["<ids internos de procedimientos; nunca se muestran al dueño>"],
       "evidence_used": ["worksheet-cash-ccc"],
-      "reason": "Área Cash con workbook financiero disponible.",
+      "reason": "Para revisar tu dinero ya tienes tus números.",
       "missing_minimum": false
     }
   }

@@ -6,23 +6,25 @@ user-facing markdown matching the design examples.
 
 from __future__ import annotations
 
-from coaching.core import DECISION_LABELS
+from coaching.core import owner_area_name
 from coaching.evidence.models import EvidencePackage, EvidenceSource
 
 from .models import SelectionReceipt
 
 _AREA_HINTS: dict[str, str] = {
-    "cash": "una fuente financiera reciente (por ejemplo, el *Cash Conversion Cycle Worksheet*)",
-    "execution": "registros de reuniones o prioridades recientes",
-    "people": "worksheets de People completados",
-    "strategy": "worksheets de Strategy como OPSP o 7 Strata",
+    "cash": "tus números recientes (ventas, cobros y pagos de un mes)",
+    "execution": "notas de tus reuniones o tus prioridades recientes",
+    "people": "quién hace qué en tu equipo",
+    "strategy": "a quién le vendes y por qué te eligen",
 }
 
+# S86.2: the next step is a plain question; the procedure ids stay internal
+# in ``receipt.skills`` and are never shown to the owner.
 _AREA_NEXT_STEP: dict[str, str] = {
-    "cash": "profundizar en CCC, Power of One y aceleración de cash",
-    "execution": "revisar ritmos, prioridades y disciplinas de ejecución",
-    "people": "revisar estructura, valores y talento",
-    "strategy": "revisar OPSP, diferenciación y los 7 Strata",
+    "cash": "¿Vemos cuántos días tardas en cobrar y cuánto dinero liberas si cobras antes?",
+    "execution": "¿Revisamos tus prioridades y cómo las sigues cada semana?",
+    "people": "¿Revisamos quién es responsable de cada tarea clave en tu equipo?",
+    "strategy": "¿Revisamos quiénes son tus mejores clientes y por qué te eligen?",
 }
 
 
@@ -42,12 +44,12 @@ def _used_sources(
 
 def format_selection(receipt: SelectionReceipt, package: EvidencePackage) -> str:
     """Render a tool-selected receipt as markdown."""
-    area_label = DECISION_LABELS.get(receipt.area, receipt.area.title())
+    area_label = owner_area_name(receipt.area, capital=True)
     used = _used_sources(receipt, package)
     evidence_line = ", ".join(_source_display(source) for source in used) or "—"
 
     lines = [
-        f"## Herramienta seleccionada: {receipt.label}",
+        f"## Lo que vamos a revisar: {owner_area_name(receipt.area)}",
         "",
         f"**Área:** {area_label}  ",
         f"**Decisión:** {receipt.decision}  ",
@@ -57,9 +59,8 @@ def format_selection(receipt: SelectionReceipt, package: EvidencePackage) -> str
     ]
 
     if receipt.skills:
-        primary_skill = receipt.skills[0]
-        detail = _AREA_NEXT_STEP.get(receipt.area, "continuar el análisis")
-        lines.append(f"Próximo paso: ejecutar `{primary_skill}` para {detail}.")
+        detail = _AREA_NEXT_STEP.get(receipt.area, "¿Seguimos con el análisis?")
+        lines.append(f"Próximo paso: {detail}")
         lines.append("")
 
     return "\n".join(lines)
@@ -71,13 +72,13 @@ def format_clarify(
     package: EvidencePackage,  # noqa: ARG001 — kept for API symmetry
 ) -> str:
     """Render a clarify request when minimum evidence is missing."""
-    area_label = DECISION_LABELS.get(receipt.area, receipt.area.title())
-    hint = _AREA_HINTS.get(receipt.area, "evidencia relevante")
+    area_label = owner_area_name(receipt.area)
+    hint = _AREA_HINTS.get(receipt.area, "un dato reciente de tu negocio")
 
     lines = [
-        "## Falta información para elegir una herramienta",
+        "## Falta información",
         "",
-        f"Para analizar una decisión de **{area_label}** necesito al menos {hint}.",
+        f"Para revisar **{area_label}** necesito al menos {hint}.",
         "",
     ]
 

@@ -54,9 +54,14 @@ NEEDS_COMPARABLES = (
     "parecidos que me confirmes; mientras, veo las tendencias."
 )
 # Design (S83.4): the new last step of the SWT.
-SWT_ASK = "¿Quieres que revise qué dicen fuera de tu empresa antes de cerrar el SWT?"
+# S86.2: the acronym goes after its Spanish meaning, once per message.
+SWT_NAME = "tu análisis de fortalezas, debilidades y tendencias (SWT)"
+SWT_ASK = (
+    f"¿Quieres que revise qué dicen fuera de tu empresa antes de cerrar {SWT_NAME}?"
+)
 SWT_ADD = (
-    "¿Lo agrego a tu SWT como evidencia externa, aparte de lo que sale de tu empresa?"
+    f"¿Lo agrego a {SWT_NAME} como evidencia externa, aparte de lo que sale de "
+    "tu empresa?"
 )
 SWT_TITLES = {
     "fortaleza": "Fortalezas",

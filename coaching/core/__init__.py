@@ -78,6 +78,29 @@ DECISION_LABELS = {
     "overall": "Overall",
 }
 
+# S86.2: the only names the owner reads for the four areas. Ids, routing keys
+# and catalog values stay in English; every Spanish text uses these.
+OWNER_AREA_NAMES: dict[str, str] = {
+    "people": "tu equipo",
+    "strategy": "tus clientes y tu estrategia",
+    "execution": "tu día a día",
+    "cash": "tu dinero",
+}
+_OWNER_WHOLE_BUSINESS = "tu negocio"
+
+
+def owner_area_name(area: str | None, capital: bool = False) -> str:
+    """Spanish name of an area for the owner; unknown or overall → 'tu negocio'."""
+    name = OWNER_AREA_NAMES.get(area or "", _OWNER_WHOLE_BUSINESS)
+    return name[0].upper() + name[1:] if capital else name
+
+
+def owner_area_choice() -> str:
+    """The four areas as one Spanish choice: 'tu equipo, …, tu día a día o tu dinero'."""
+    names = [OWNER_AREA_NAMES[area] for area in PRIORITY_ORDER]
+    return ", ".join(names[:-1]) + " o " + names[-1]
+
+
 ROUTING_RULES = {
     "people": "/escala-people",
     "strategy": "/escala-strategy",

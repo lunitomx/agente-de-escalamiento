@@ -32,7 +32,7 @@ De las sesiones pasadas extraer:
 - KPIs que empeoraron
 - Obstáculos recurrentes (3+ menciones sin resolver)
 - Funciones del FACe vacías
-- "Tu CCC subió 17 días. La causa: cuentas por cobrar pasaron de 45 a 67 días."
+- "Los días que tarda en regresar tu dinero (CCC) subieron 17. La causa: cuentas por cobrar pasaron de 45 a 67 días."
 
 **Trends (Tendencias) — Lo que viene:**
 - Patrones estacionales (siempre hay problemas de cash en Q3)
@@ -48,7 +48,7 @@ El CEO puede ajustar — pero el punto de partida ya no es una hoja en blanco.
 
 ### Step 4: Qué dicen fuera de tu empresa (Evidencia externa)
 
-Pregunta: "¿Quieres que revise qué dicen fuera de tu empresa antes de cerrar el SWT?"
+Pregunta: "¿Quieres que revise qué dicen fuera de tu empresa antes de cerrar tu análisis de fortalezas, debilidades y tendencias (SWT)?"
 
 Si dice que sí, trae lo guardado:
 

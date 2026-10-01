@@ -155,7 +155,7 @@ siempre explica denominador, cobertura y límites.
 
 Propón uno o dos focos con su razón. Espera elección o corrección humana. Hasta
 que E65 entregue procedimientos verificados, termina con una pregunta concreta
-que prepare el Deep Dive; no aparentes ejecutar Cash, People, Strategy o
+que prepare la revisión a fondo (Deep Dive); no aparentes ejecutar Cash, People, Strategy o
 Execution en profundidad.
 
 Si el reto parece de Strategy (demanda, clientes, zona nueva) o de Cash por

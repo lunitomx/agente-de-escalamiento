@@ -85,7 +85,7 @@ Endpoints disponibles: `POST /api/cash/power-of-one`, `POST /api/advisor/ask`,
 
 La instalación distribuye una sola puerta pública: **ESCALA**. Háblale con tus
 palabras: “no tengo cash”, “mi equipo no se hace responsable”, “necesito mi
-OPSP”, “¿cómo vamos?” o “quiero retomar lo anterior”. No necesitas conocer
+plan de una página”, “¿cómo vamos?” o “quiero retomar lo anterior”. No necesitas conocer
 comandos ni carpetas.
 
 ESCALA consulta un catálogo canónico y carga internamente la capacidad que

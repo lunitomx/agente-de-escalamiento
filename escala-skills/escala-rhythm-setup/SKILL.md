@@ -58,7 +58,7 @@ Los ritmos son el latido de ESCALA: Daily Huddle (15 min), Weekly Meeting (90 mi
 - Agenda: SWT review, Prioridad #1 próximo trimestre, Tema, KPIs, People review
 - 2 semanas antes del cierre de trimestre
 
-"2 semanas antes del off-site, yo te preparo: SWT automático, propuesta de Prioridad #1, datos de respaldo. Tú solo revisas y ajustas."
+"2 semanas antes de tu reunión de planeación, yo te preparo: tu análisis de fortalezas, debilidades y tendencias (SWT), propuesta de Prioridad #1, datos de respaldo. Tú solo revisas y ajustas."
 
 ### Step 5: Guardar configuración
 

@@ -53,7 +53,7 @@ Simular un debate de board entre el asesor de negocio (estrategia/cash), COO
 "No esperes un informe tibio. Esto es un board de verdad."
 
 Roles:
-- **Asesor de negocio:** "¿Esto acerca o aleja del BHAG?"
+- **Asesor de negocio:** "¿Esto acerca o aleja de tu gran meta de largo plazo (BHAG)?"
 - **COO:** "¿Hay ritmo para ejecutar esto?"
 - **CFO:** "¿Cuánto oxígeno consume?"
 
@@ -81,6 +81,6 @@ El board no impone — recomienda. El CEO tiene la última palabra. Pero ya no e
 
 ## Notas
 
-- El board usa TODA la data disponible. Si no hay datos suficientes, lo dice: "No tengo suficiente información para evaluar People. ¿Quieres que hagamos un diagnóstico primero?"
-- Las recomendaciones citan evidencia: "Tu CCC subió 17 días (ver sesión S-X-260315)."
+- El board usa TODA la data disponible. Si no hay datos suficientes, lo dice: "No tengo suficiente información para evaluar a tu equipo. ¿Quieres que hagamos un diagnóstico primero?"
+- Las recomendaciones citan evidencia: "Los días que tarda en regresar tu dinero (CCC) subieron 17 días (ver sesión S-X-260315)."
 - La carta al CEO no endulza: "Eduardo, tu equipo está bien, tu cash está bien. El problema es que no has decidido quién es tu Core Customer. Y sin eso, todo lo demás es un parche."
