@@ -1,7 +1,7 @@
 ---
 description: >-
   Power of One: impacto de mejorar 1% (o 1 día) en cada una de las 7 palancas de
-  cash flow. Basado en Alan Miltz, implementado por Humberto Martínez Barón.
+  cash flow. Basado en Alan Miltz, implementado por Humberto Martínez Barrón.
 name: escala-cash-power1
 ---
 
@@ -15,7 +15,7 @@ financieras. Identificar las de mayor impacto y generar recomendaciones accionab
 ## Créditos
 
 - **Metodología:** Alan Miltz
-- **Implementación original:** Humberto Martínez Barón
+- **Implementación original:** Humberto Martínez Barrón
 - **Motor backend:** `escala_server/cash/__init__.py`
 
 ## ⚠️ Reglas de Cálculo (NO improvisar)
@@ -82,4 +82,4 @@ Decir prioridad #1, por qué, y "¿Qué vas a hacer al respecto?"
 
 ---
 
-*Metodología: Alan Miltz. Implementación original: Humberto Martínez Barón. Adaptación: Kokoro.*
+*Metodología: Alan Miltz. Implementación original: Humberto Martínez Barrón. Adaptación: Kokoro.*

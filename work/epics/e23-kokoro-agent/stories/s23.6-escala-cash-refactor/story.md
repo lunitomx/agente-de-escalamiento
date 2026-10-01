@@ -15,5 +15,5 @@ created: 2026-05-30
 - [ ] Skill tells agent to save analysis to `memoria/analisis/cash/` with YAML frontmatter
 - [ ] Skill tells agent to generate HTML dashboard on user request
 - [ ] Skill includes industry benchmarks
-- [ ] Skill credits Alan Miltz and Humberto Martínez Barón
+- [ ] Skill credits Alan Miltz and Humberto Martínez Barrón
 - [ ] Skill works in Claude, Codex, and Hermes (AGENTS.md compatible)

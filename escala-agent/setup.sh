@@ -2,7 +2,7 @@
 # ESCALA — Agente de Escalamiento
 # Instalación: curl -s https://escala.sh | bash
 # Repo: github.com/lunitomx/agente-de-escalamiento
-# Créditos: Eduardo Muñoz Luna · Verne Harnish · Humberto Martínez Barón
+# Créditos: Eduardo Muñoz Luna · Verne Harnish · Humberto Martínez Barrón
 
 set -e
 
@@ -21,7 +21,7 @@ echo -e "${BOLD}${BLUE}  ██      ██      ██   ██ ██      █
 echo -e "${BOLD}${BLUE}  ███████  ██████ ██   ██ ███████ ██   ██     ███████    ██    ██  ██████  ██   ████${NC}"
 echo ""
 echo -e "${BOLD}Agente de Escalamiento — Metodología Scaling Up${NC}"
-echo -e "${YELLOW}Verne Harnish · Alan Miltz · Humberto Martínez Barón${NC}"
+echo -e "${YELLOW}Verne Harnish · Alan Miltz · Humberto Martínez Barrón${NC}"
 echo ""
 
 # ── Config ──────────────────────────────────────────────────────────

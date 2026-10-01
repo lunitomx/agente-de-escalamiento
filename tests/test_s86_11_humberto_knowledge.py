@@ -135,20 +135,20 @@ def test_the_author_card_names_him_right() -> None:
     assert "Club de Industriales" in author
 
 
-def test_his_surname_is_written_barron_everywhere_escala_ships() -> None:
+def test_his_surname_is_written_barron_everywhere() -> None:
     wrong = "Martínez Bar" + "ón"
-    shipped = ("escala-skills", "adapters", ".escala/knowledge", "coaching")
     listed = subprocess.run(
-        ["git", "ls-files", *shipped],
+        ["git", "ls-files"],
         cwd=ROOT,
         check=True,
         capture_output=True,
         text=True,
-    ).stdout.split()
+    ).stdout.splitlines()
     offenders = [
         name
         for name in listed
-        if name.endswith((".md", ".py", ".yaml", ".json"))
+        if name.endswith((".md", ".py", ".yaml", ".json", ".sh"))
+        and (ROOT / name).is_file()
         and wrong in (ROOT / name).read_text(encoding="utf-8", errors="ignore")
     ]
     assert offenders == []

@@ -27,6 +27,13 @@ la capacidad interna adecuada.
    taxonomía ni una ruta exclusiva del cliente.
    Cada procedimiento interno vive en `escala-skills/escala-*/SKILL.md` en la
    copia, o en `references/procedures/escala-*.md` en un paquete (mismo nombre).
+   Lo que enseñó el Maestro Humberto Martínez Barrón sobre el dinero vive en
+   `.escala/knowledge/cash/` en la copia, o en `references/knowledge/cash/` en
+   un paquete: lee su `overview.md` y la ficha del tema.
+   Cuando una ficha aplique, explica la idea en palabras del dueño y cita su
+   frase una vez por tema: "Como dice el Maestro Humberto, recuerda: …". Usa
+   sólo la frase de la ficha; nunca le atribuyas algo que no esté en ella.
+   Temas fiscales: al contador del dueño.
    Donde una instrucción de ESCALA corra `python3`, usa `.venv/bin/python` de la
    copia de ESCALA si existe: tiene las bibliotecas que ESCALA necesita.
    `../../capabilities/mvp/catalog.json` es el contrato del ciclo de trabajo de
