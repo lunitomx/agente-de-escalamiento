@@ -258,12 +258,13 @@ class TestFormatter:
             missing_minimum=False,
         )
         output = format_selection(receipt, package)
-        assert "## Herramienta seleccionada: Cash Analysis" in output
-        assert "**Área:** Cash" in output
+        assert "## Lo que vamos a revisar: tu dinero" in output  # S86.2
+        assert "**Área:** Tu dinero" in output
         assert "¿Cuánto cash tengo disponible para agosto?" in output
         assert "Cash Conversion Cycle Worksheet (2026-07)" in output
         assert "Área Cash con workbook financiero disponible." in output
-        assert "`/escala-cash`" in output
+        assert "/escala-" not in output  # S86.2: el paso siguiente es una pregunta
+        assert "Próximo paso: ¿Vemos cuántos días tardas en cobrar" in output
 
     def test_format_selection_execution(self):
         package = _build_package(
@@ -294,10 +295,10 @@ class TestFormatter:
             missing_minimum=False,
         )
         output = format_selection(receipt, package)
-        assert "## Herramienta seleccionada: Execution Rhythms" in output
-        assert "**Área:** Execution" in output
+        assert "## Lo que vamos a revisar: tu día a día" in output
+        assert "**Área:** Tu día a día" in output
         assert "Sesión 2026-07-15 — Execution" in output
-        assert "`/escala-execution`" in output
+        assert "/escala-" not in output
 
     def test_format_clarify_cash(self):
         receipt = SelectionReceipt(
@@ -308,9 +309,9 @@ class TestFormatter:
         )
         questions = ["¿Tienes disponible 'Cash Conversion Cycle Worksheet'?"]
         output = format_clarify(receipt, questions, _build_package("cash", []))
-        assert "## Falta información para elegir una herramienta" in output
-        assert "**Cash**" in output
-        assert "una fuente financiera reciente" in output
+        assert "## Falta información" in output
+        assert "**tu dinero**" in output
+        assert "tus números recientes" in output
         assert questions[0] in output
 
 
@@ -343,7 +344,7 @@ class TestRun:
         assert result["errors"] == []
         assert result["artifacts"]["action"] == "tool_selected"
         assert result["artifacts"]["receipt"]["tool"] == "cash_analysis"
-        assert "## Herramienta seleccionada" in result["output"]
+        assert "## Lo que vamos a revisar" in result["output"]
 
     def test_run_with_execution_package_returns_execution_rhythms(self):
         package = _build_package(

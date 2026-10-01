@@ -6,7 +6,7 @@ the executive tone of the coaching loop.
 
 from __future__ import annotations
 
-from coaching.core import DECISION_LABELS
+from coaching.core import owner_area_name
 
 from .models import ReviewFinding, ReviewReport
 
@@ -35,7 +35,7 @@ def format_report(report: ReviewReport) -> str:
 
 
 def _header_lines(report: ReviewReport) -> list[str]:
-    area_label = DECISION_LABELS.get(report.area, report.area.title())
+    area_label = owner_area_name(report.area, capital=True)
     tool_label = report.tool or "Ninguna"
     return [
         f"**Decisión:** {report.decision}  ",

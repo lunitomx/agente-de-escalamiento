@@ -11,7 +11,14 @@ from pydantic import BaseModel, Field
 
 from coaching.evidence.dashboard import MetricRequirement
 from coaching.evidence.facts import Fact
-from coaching.core import ensure_dir, read_yaml, write_yaml
+from coaching.core import (
+    OWNER_AREA_NAMES,
+    ensure_dir,
+    owner_area_choice,
+    owner_area_name,
+    read_yaml,
+    write_yaml,
+)
 from coaching.decision.engine import classify_area
 
 
@@ -179,7 +186,7 @@ def begin_welcome(
         )
         return WelcomeTurn(
             question=(
-                f"La última vez trabajamos en {previous_focus}. "
+                f"La última vez trabajamos en {_owner_focus(previous_focus)}. "
                 "¿Quieres continuar con eso o hay algo nuevo que te preocupe?"
             ),
             state=state,
@@ -189,6 +196,14 @@ def begin_welcome(
         question="¿Cómo está tu empresa hoy? Cuéntame en una frase lo que más te preocupa.",
         state=WelcomeState(phase="concern"),
     )
+
+
+_NARROW_QUESTION = f"¿Qué te preocupa más hoy: {owner_area_choice()}?"
+
+
+def _owner_focus(focus: str) -> str:
+    """An area id becomes its Spanish name; free text stays as the owner said it."""
+    return owner_area_name(focus) if focus in OWNER_AREA_NAMES else focus
 
 
 def _is_directed(text: str) -> bool:
@@ -208,7 +223,7 @@ def _is_directed(text: str) -> bool:
 def _source_question(area: str | None) -> str:
     if area:
         return (
-            f"Para trabajar en {area}, ¿dónde están tus datos: en un archivo, "
+            f"Para trabajar en {_owner_focus(area)}, ¿dónde están tus datos: en un archivo, "
             "un sistema o en tu cabeza?"
         )
     return "¿Dónde están tus datos: en un archivo, un sistema o en tu cabeza?"
@@ -235,7 +250,7 @@ def respond_to_welcome(state: WelcomeState, message: str) -> WelcomeTurn:
     concern = message.strip()
     if not concern:
         return WelcomeTurn(
-            question="¿Qué te preocupa más hoy: tu equipo, tus números, tu estrategia o tu operación diaria?",
+            question=_NARROW_QUESTION,
             state=WelcomeState(phase="narrow", profile=MaturityProfile.EXPLORER),
         )
 
@@ -271,7 +286,7 @@ def respond_to_welcome(state: WelcomeState, message: str) -> WelcomeTurn:
 
     if area is None:
         return WelcomeTurn(
-            question="¿Qué te preocupa más hoy: tu equipo, tus números, tu estrategia o tu operación diaria?",
+            question=_NARROW_QUESTION,
             state=WelcomeState(
                 phase="narrow",
                 profile=MaturityProfile.EXPLORER,

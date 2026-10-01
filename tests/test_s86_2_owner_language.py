@@ -158,3 +158,125 @@ def test_missing_area_question_uses_the_spanish_areas() -> None:
 
     assert "Cash, Strategy" not in source
     assert owner_area_choice() in messages.missing_area_note(["Abrir sucursal"])
+
+
+# --- rendered Spanish formatters --------------------------------------------
+
+AREAS = ("people", "strategy", "execution", "cash")
+
+
+def _package(area: str, available: bool) -> object:
+    from coaching.evidence.models import DecisionRef, EvidencePackage, EvidenceSource
+
+    source = EvidenceSource(
+        source_id="hoja-1",
+        source_type="worksheet",
+        title="Hoja de ejemplo",
+        decision=area,
+        status="available" if available else "missing",
+        period="2026-07",
+        confidence="high",
+        reason="ejemplo sintético",
+    )
+    return EvidencePackage(
+        decision_ref=DecisionRef(
+            decision="¿Qué hago primero?",
+            area=area,
+            horizon="inmediato",
+            outcome="mejorar",
+        ),
+        sources=[source] if available else [],
+        missing=[] if available else [source],
+        not_trustworthy=[],
+        questions=[],
+    )
+
+
+def _selector_outputs() -> dict[str, str]:
+    from coaching.evidence.models import EvidencePackage
+    from coaching.selector.engine import select_tool
+
+    outputs: dict[str, str] = {}
+    for area in AREAS:
+        for available in (True, False):
+            package = _package(area, available)
+            assert isinstance(package, EvidencePackage)
+            result = select_tool(package)
+            outputs[f"selector {area} {result.action}"] = "\n".join(
+                [result.output, result.receipt.reason]
+            )
+    return outputs
+
+
+def test_selector_output_speaks_spanish() -> None:
+    outputs = _selector_outputs()
+
+    assert _offenders(outputs) == []
+    assert "**Área:** Tu dinero" in outputs["selector cash tool_selected"]
+
+
+def test_selector_next_step_is_plain_spanish_not_a_command() -> None:
+    for where, text in _selector_outputs().items():
+        assert "/escala-" not in text, where
+        assert "ejecutar" not in text, where
+        assert "`" not in text, where
+    assert "Próximo paso: ¿" in _selector_outputs()["selector cash tool_selected"]
+
+
+def test_decision_evidence_and_reviewer_name_the_area_in_spanish() -> None:
+    from coaching.decision.formatter import format_confirmed, format_draft
+    from coaching.evidence.formatter import format_package
+    from coaching.evidence.models import EvidencePackage
+    from coaching.reviewer.formatter import format_report
+    from coaching.reviewer.models import ReviewReport
+
+    outputs: dict[str, str] = {}
+    for area in AREAS:
+        draft = {"decision": "Cobrar antes", "area": area, "horizon": "mes"}
+        package = _package(area, True)
+        assert isinstance(package, EvidencePackage)
+        outputs[f"draft {area}"] = format_draft(draft)
+        outputs[f"confirmed {area}"] = format_confirmed(draft)
+        outputs[f"evidence {area}"] = format_package(package)
+        outputs[f"reviewer {area}"] = format_report(
+            ReviewReport(decision="Cobrar antes", area=area)
+        )
+
+    assert _offenders(outputs) == []
+    assert "**Área:** Tu equipo" in outputs["draft people"]
+
+
+# --- welcome ----------------------------------------------------------------
+
+
+def test_welcome_questions_use_the_spanish_areas() -> None:
+    from coaching.core import owner_area_choice
+    from coaching.welcome.conversation import (
+        WelcomeState,
+        begin_welcome,
+        respond_to_welcome,
+    )
+
+    texts = {
+        "narrow": respond_to_welcome(WelcomeState(phase="concern"), "").question,
+        "source": respond_to_welcome(
+            WelcomeState(phase="concern"), "No me alcanza el efectivo"
+        ).question,
+        "returning": begin_welcome(returning=True, previous_focus="cash").question,
+    }
+
+    assert _offenders(texts) == []
+    assert owner_area_choice() in texts["narrow"]
+    assert "Para trabajar en tu dinero" in texts["source"]
+    assert "La última vez trabajamos en tu dinero" in texts["returning"]
+
+
+def test_welcome_profile_names_areas_in_spanish_without_commands() -> None:
+    from coaching.welcome.formatter import format_summary
+
+    text = format_summary({"company": {"name": "Ejemplo"}, "scores": {"cash": 3}})
+    empty = format_summary({"company": {"name": "Ejemplo"}})
+
+    assert _offenders({"scores": text, "empty": empty}) == []
+    assert "**Tu dinero:** 3/5" in text
+    assert "/escala-" not in empty

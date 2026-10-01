@@ -241,7 +241,7 @@ class TestFormatter:
         output = format_report(report)
         assert "## Revisión de calidad" in output
         assert "La recomendación puede avanzar" in output
-        assert "Cash" in output
+        assert "**Área:** Tu dinero" in output  # S86.2
 
     def test_format_clarify(self):
         report = ReviewReport(

@@ -74,7 +74,7 @@ def test_returning_user_gets_continuity_prompt() -> None:
     turn = begin_welcome(returning=True, previous_focus="execution")
 
     assert turn.state.phase == "continuity"
-    assert "execution" in turn.question.lower()
+    assert "tu día a día" in turn.question.lower()  # S86.2: área en español
     assert turn.question.count("?") == 1
 
 

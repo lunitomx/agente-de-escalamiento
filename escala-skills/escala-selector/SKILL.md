@@ -101,7 +101,7 @@ Ejemplo de herramienta seleccionada (`action: tool_selected`):
 
 ```json
 {
-  "output": "## Herramienta seleccionada: Cash Analysis\n\n**Área:** Cash...",
+  "output": "## Lo que vamos a revisar: tu dinero\n\n**Área:** Tu dinero...",
   "artifacts": {
     "action": "tool_selected",
     "receipt": {
@@ -111,7 +111,7 @@ Ejemplo de herramienta seleccionada (`action: tool_selected`):
       "label": "Cash Analysis",
       "skills": ["<ids internos de procedimientos; nunca se muestran al dueño>"],
       "evidence_used": ["worksheet-cash-ccc"],
-      "reason": "Área Cash con workbook financiero disponible.",
+      "reason": "Para revisar tu dinero ya tienes tus números.",
       "missing_minimum": false
     },
     "questions": []
@@ -134,7 +134,7 @@ Ejemplo de clarificación (`action: clarify`):
       "label": null,
       "skills": [],
       "evidence_used": [],
-      "reason": "No hay evidencia mínima disponible para el área Cash.",
+      "reason": "Todavía no tengo información para revisar tu dinero.",
       "missing_minimum": true
     },
     "questions": ["¿Tienes disponible 'Cash Conversion Cycle Worksheet'?"]

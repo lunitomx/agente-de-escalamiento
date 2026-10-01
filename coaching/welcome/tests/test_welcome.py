@@ -190,7 +190,7 @@ def test_adaptive_welcome_offers_continuity_from_fresh_authorized_state(tmp_path
     result = run({"action": "adaptive_conversation", "base_path": str(tmp_path)})
 
     assert result["errors"] == []
-    assert "La última vez trabajamos en cash" in result["output"]
+    assert "La última vez trabajamos en tu dinero" in result["output"]
     assert result["artifacts"]["resumed_from_local_state"] is True
 
 
