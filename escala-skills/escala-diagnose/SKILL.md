@@ -53,6 +53,16 @@ echo '{"action": "diagnosis", "base_path": ".", "today": "2026-09-30"}' | python
 - `open_questions`: lo que la investigación no encontró y el dato que el
   empresario quedó en conseguir. Pásalo a `open_questions`.
 
+Haz lo mismo con lo que decidió sobre cómo llega un cliente hasta que le
+compra:
+
+```bash
+echo '{"action": "diagnosis", "base_path": ".", "today": "2026-09-30"}' | python3 -m coaching.journey
+```
+
+Trae los mismos tres campos y se usa igual: su decisión como hecho local,
+los supuestos en `assumptions` y lo que falta en `open_questions`.
+
 Si `refresh_offers` no viene vacío (una investigación pasó su fecha de
 revisión), di primero ese `message` y espera su respuesta: la evidencia vencida
 entra `stale` y con confianza baja. Si no hay nada guardado, sigue sin
