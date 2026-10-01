@@ -7,13 +7,17 @@ Actions (JSON on stdin, like ``coaching.tracker``):
   from the frame's public fields (or the agent's proposals), checked against
   ``private`` (company names, people, figures; required), plus the one
   permission message. Without search (``search_mode: "sin_busqueda"``), the
-  one-line notice and the ask for the owner's sources.
+  one-line notice and the ask for the owner's sources. In ``mercado``
+  without a segment or geography no size is searched and
+  ``missing_question`` says what to ask (S83.3).
 - ``grade``: grade ``claims`` against ``sources`` (``today`` = reference date).
 - ``comparables`` (benchmark): the businesses found, checked against the frame
   and ``sources`` (required ``private``: the own company is never one), and
   the message asking which candidates look like the owner's business.
 - ``report``: the graded report and the short result that ends in the
-  decision question. Nothing is saved. Needs ``frame.confirmed``.
+  decision question. Nothing is saved. Needs ``frame.confirmed``. In
+  ``mercado`` it takes ``market_size`` (a range with method, assumptions and
+  sources, or "not estimable yet" with what is missing).
 - ``save``: same input plus ``chosen`` (option label) and
   ``user_confirmed: true``; writes under ``.escala/my-company/research/``.
 - ``diagnosis``: the saved research as input for the next diagnosis (the
@@ -54,6 +58,7 @@ from coaching.research.sampling import SAMPLE_SIZE, SourceCheck, check_sources
 from coaching.research.models import (
     Comparable,
     DecisionOption,
+    MarketSize,
     PrivateTerms,
     ResearchClaim,
     ResearchFrame,
@@ -75,6 +80,7 @@ _CLAIMS = TypeAdapter(list[ResearchClaim])
 _OPTIONS = TypeAdapter(list[DecisionOption])
 _COMPARABLES = TypeAdapter(list[Comparable])
 _TEXTS = TypeAdapter(list[str])
+_SIZE: TypeAdapter[MarketSize | None] = TypeAdapter(MarketSize | None)
 
 
 class FlowResult(BaseModel):
@@ -88,6 +94,7 @@ class FlowResult(BaseModel):
     comparables: list[Comparable] = Field(default_factory=list[Comparable])
     report: ResearchReport | None = None
     saved_to: str | None = None
+    missing_question: str | None = None
     diagnostic_inputs: DiagnosticInputs | None = None
     source_checks: list[SourceCheck] = Field(default_factory=list[SourceCheck])
     errors: list[str] = Field(default_factory=list)
@@ -115,8 +122,19 @@ def _private(context: Mapping[str, object]) -> PrivateTerms | None:
     return None if raw is None else PrivateTerms.model_validate(raw)
 
 
+def _missing_question(frame: ResearchFrame) -> str | None:
+    """In ``mercado``, what the owner must say before his market is sized."""
+    if frame.mode != "mercado":
+        return None
+    return messages.missing_question(
+        not (frame.segment and frame.segment.strip()),
+        not (frame.geography and frame.geography.strip()),
+    )
+
+
 def _frame(context: Mapping[str, object]) -> FlowResult:
     frame = ResearchFrame.model_validate(context.get("frame"))
+    missing = _missing_question(frame)
     private = _private(context)
     if private is None:
         raise _Refusal("needs_private_terms")
@@ -127,11 +145,13 @@ def _frame(context: Mapping[str, object]) -> FlowResult:
         if not (frame.geography and frame.geography.strip()):
             raise _Refusal("needs_geography", messages.NEEDS_OFFER)
     if frame.search_mode == "sin_busqueda":
+        ask = f"\n\n{messages.size_blocked(missing)}" if missing else ""
         return FlowResult(
             action="frame",
             frame=frame.model_copy(update={"queries": [], "confirmed": False}),
+            missing_question=missing,
             message=(
-                f"{messages.SEARCH_OFF}\n\nLo que quieres decidir: "
+                f"{messages.SEARCH_OFF}{ask}\n\nLo que quieres decidir: "
                 f"{frame.decision_informed}. ¿Es eso?"
             ),
         )
@@ -152,7 +172,10 @@ def _frame(context: Mapping[str, object]) -> FlowResult:
             update={"queries": checked.accepted, "confirmed": False}
         ),
         rejected=checked.rejected,
-        message=messages.frame_message(frame.decision_informed, checked.accepted),
+        missing_question=missing,
+        message=messages.frame_message(
+            frame.decision_informed, checked.accepted, missing
+        ),
     )
 
 
@@ -163,6 +186,7 @@ def _must_fit(
     comparables: list[Comparable] | None = None,
     not_found: list[str] | None = None,
     options: list[DecisionOption] | None = None,
+    market_size: MarketSize | None = None,
 ) -> None:
     """Every text must reach the next diagnosis whole; none is ever cut."""
     bad = misfits(
@@ -171,6 +195,7 @@ def _must_fit(
         not_found=not_found or [],
         options=options or [],
         as_of=as_of,
+        market_size=market_size,
     )
     if bad:
         raise _Refusal("finding_too_long", messages.finding_too_long(bad))
@@ -233,7 +258,7 @@ def _build(context: Mapping[str, object], chosen: str | None) -> ResearchReport:
         not_found=not_found,
         options=options,
     )
-    return build_report(
+    report = build_report(
         frame=frame,
         researched_on=_today(context),
         sources=_SOURCES.validate_python(context.get("sources", [])),
@@ -245,7 +270,11 @@ def _build(context: Mapping[str, object], chosen: str | None) -> ResearchReport:
         limits=_TEXTS.validate_python(context.get("limits", [])),
         chosen=chosen,
         comparables=comparables,
+        market_size=_SIZE.validate_python(context.get("market_size")),
     )
+    # The size as graded (or "not estimable yet") must also reach it whole.
+    _must_fit(as_of=_today(context), market_size=report.market_size)
+    return report
 
 
 def _report(context: Mapping[str, object]) -> FlowResult:

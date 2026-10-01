@@ -397,23 +397,23 @@ def test_the_owner_words_never_reach_what_he_is_shown() -> None:
             assert marker not in _flat(result.message)
 
 
-def test_a_named_business_sharing_the_type_of_business_is_searched_when_the_offer_says_it() -> (
-    None
-):
-    """ "Tortillería El Sol" shares "tortillería" with the owner's company: it is
-    searched only when the confirmed offer carries that word; otherwise the
-    search is refused (reject rather than leak, S83.1)."""
+def test_a_named_business_sharing_the_type_of_business_is_searched() -> None:
+    """ "Tortillería El Sol" shares "tortillería" with the owner's company; a
+    type of business is never a private word (owner decision, S83.3), so it is
+    searched whatever the offer says, while "Zorblax" stays refused."""
     typed = _frame_input(offer_category="tortillería de maíz")
-    untyped = _frame_input(offer_category="tortillas de maíz")
+    untyped = _frame_input(
+        offer_category="tortillas de maíz",
+        competitors=["Tortillería El Sol", "Tortillería Zorblax Centro"],
+    )
 
     searched = run({"action": "frame", "frame": typed, "private": PRIVATE})
-    refused = run({"action": "frame", "frame": untyped, "private": PRIVATE})
+    also = run({"action": "frame", "frame": untyped, "private": PRIVATE})
 
-    assert searched.frame is not None
-    assert "precios de Tortillería El Sol en Puebla" in searched.frame.queries
-    assert refused.frame is not None
-    assert "precios de Tortillería El Sol en Puebla" not in refused.frame.queries
-    assert [item.reason for item in refused.rejected] == ["empresa"]
+    for result in (searched, also):
+        assert result.frame is not None
+        assert "precios de Tortillería El Sol en Puebla" in result.frame.queries
+    assert [item.reason for item in also.rejected] == ["empresa"]
 
 
 def test_a_competitor_sharing_the_type_of_business_is_not_the_own_company() -> None:

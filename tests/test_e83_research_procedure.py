@@ -144,3 +144,30 @@ def test_procedure_asks_for_short_findings_that_keep_their_figure() -> None:
     assert "finding_too_long" in text
     assert "El kilo de tortilla en Puebla cuesta 17 pesos" in text  # good
     assert "ronda los 17 pesos en septiembre" in text  # bad: too long
+
+
+def test_procedure_drives_the_market_mode() -> None:
+    """E83 S83.3: size as a range with method, or not estimable yet."""
+    text = _procedure()
+
+    assert "### Paso 3c: Tamaño del mercado" in text
+    assert '"market_size"' in text
+    for field in ('"low"', '"high"', '"unit"', '"method"', '"assumptions"'):
+        assert field in text
+    assert '"kind": "no_estimable"' in text and '"missing_data"' in text
+    assert '"figures"' in text and "nunca las promedies" in text
+    assert "missing_question" in text
+    # Where a size comes from (owner decision 2026-09-30): INEGI is not first.
+    for where in ("cámaras", "asociaciones", "prensa", "reportes de industria"):
+        assert where in text
+    assert "INEGI no es la fuente principal" in text
+    assert "por confirmar" in text and "tres fuentes" in text
+    assert "entrar o crecer" in text  # the decision it ends in
+
+
+def test_procedure_says_a_type_of_business_is_never_private() -> None:
+    text = _procedure()
+
+    assert "tipo de negocio" in text
+    assert "nunca cuenta como dato de su empresa" in text
+    assert "sólo pasa si esa palabra está en lo que vende" not in text  # pre-S83.3

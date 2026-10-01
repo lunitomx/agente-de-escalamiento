@@ -18,12 +18,18 @@ import yaml
 from pydantic import ValidationError
 
 from coaching.research import messages
-from coaching.research.engine import grade_claim, review_date
+from coaching.research.engine import (
+    grade_claim,
+    grade_size,
+    independent_dated_sources,
+    review_date,
+)
 from coaching.research.models import (
     DIMENSIONS,
     Comparable,
     DecisionOption,
     IndexEntry,
+    MarketSize,
     ResearchClaim,
     ResearchFrame,
     ResearchReport,
@@ -33,6 +39,19 @@ from coaching.research.models import (
 
 RESEARCH_DIR = Path(".escala") / "my-company" / "research"
 INDEX_NAME = "index.yaml"
+
+
+def _not_estimable_yet(frame: ResearchFrame) -> MarketSize | None:
+    """Without a confirmed segment or geography no size is calculated."""
+    missing = messages.size_missing_data(
+        not (frame.segment and frame.segment.strip()),
+        not (frame.geography and frame.geography.strip()),
+    )
+    return (
+        None
+        if missing is None
+        else MarketSize(kind="no_estimable", missing_data=missing)
+    )
 
 
 def build_report(
@@ -48,6 +67,7 @@ def build_report(
     limits: list[str] | None = None,
     chosen: str | None = None,
     comparables: list[Comparable] | None = None,
+    market_size: MarketSize | None = None,
 ) -> ResearchReport:
     """Grade every claim from its sources and assemble a validated report.
 
@@ -60,6 +80,10 @@ def build_report(
     if frame.search_mode == "sin_busqueda":
         line = messages.no_search_limit(len(sources))
         all_limits = [line, *(item for item in all_limits if item != line)]
+    if market_size is None and frame.mode == "mercado":
+        market_size = _not_estimable_yet(frame)
+    if market_size is not None:
+        market_size = grade_size(market_size, by_id, researched_on)
     picked = None
     if chosen is not None:
         picked = next((option for option in options if option.label == chosen), None)
@@ -71,6 +95,7 @@ def build_report(
         sources=sources,
         claims=graded,
         comparables=list(comparables or []),
+        market_size=market_size,
         not_found=list(not_found or []),
         limits=all_limits,
         options=options,
@@ -212,6 +237,41 @@ def comparables_message(
     return "\n\n".join(blocks)
 
 
+def _size_block(report: ResearchReport) -> str | None:
+    """The market size: range, how sure, how, what it assumes, and each source
+    side by side when they disagree (never averaged)."""
+    size = report.market_size
+    if size is None:
+        return None
+    if size.kind == "no_estimable" or size.low is None or size.high is None:
+        lines = [messages.size_not_estimable(size.missing_data or "")]
+    else:
+        frame = report.frame
+        by_id = {source.source_id: source for source in report.sources}
+        recent = independent_dated_sources(size.source_ids, by_id, report.researched_on)
+        status = messages.size_sources(size.status == "confirmado", recent)
+        lines = [
+            messages.size_line(
+                f"{frame.segment} en {frame.geography}",
+                size.low,
+                size.high,
+                size.unit or "",
+            ),
+            f"{status} (según {_cite(report, size.source_ids)}).",
+            f"Cómo lo calculé: {size.method}.",
+            f"Lo que supongo: {'; '.join(size.assumptions)}.",
+        ]
+        if size.sources_disagree:
+            lines.append(messages.SIZE_DISAGREE)
+            lines += [
+                f"- {_cite(report, [item.source_id])}: {messages.amount(item.value)}"
+                for item in size.figures
+            ]
+    if size.status == "por_confirmar" and size.next_source:
+        lines.append(f"Lo confirmaría: {size.next_source}.")
+    return "\n".join(lines)
+
+
 def _findings(report: ResearchReport) -> str:
     if report.claims:
         return "Lo que encontré:\n" + "\n".join(
@@ -219,6 +279,8 @@ def _findings(report: ResearchReport) -> str:
         )
     if any(item.counted for item in report.comparables):
         return messages.ONLY_THE_TABLE
+    if report.market_size is not None and report.market_size.kind == "estimado":
+        return messages.ONLY_THE_SIZE
     return "Lo que encontré: nada que pueda sostener con fuentes."
 
 
@@ -244,6 +306,9 @@ def report_message(report: ResearchReport) -> str:
     table = _comparables_block(report)
     if table is not None:
         blocks.append(table)
+    size = _size_block(report)
+    if size is not None:
+        blocks.append(size)
     blocks.append(_findings(report))
     contrary = _contrary(report)
     blocks.append(

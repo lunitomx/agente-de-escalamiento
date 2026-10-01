@@ -117,12 +117,18 @@ def test_private_data_smuggled_into_a_frame_field_is_rejected() -> None:
 def test_public_words_inside_a_company_name_are_allowed_by_the_confirmed_frame() -> (
     None
 ):
-    frame = _frame("benchmark", offer_category="tortillería")
+    private = PrivateTerms(company_names=["Nixtamal Zorblax"])
+    frame = _frame("benchmark", offer_category="nixtamal").model_copy(
+        update={"queries": ["precios de nixtamal en Puebla"]}
+    )
+    untyped = frame.model_copy(update={"offer_category": "tortillas de maíz"})
 
-    assert _check(["precios de tortillería en Puebla"], frame).accepted == [
+    assert check_queries(frame, private).accepted == ["precios de nixtamal en Puebla"]
+    assert check_queries(untyped, private).accepted == []
+    # A type of business is never private, whatever the offer says (S83.3).
+    assert _check(["precios de tortillería en Puebla"]).accepted == [
         "precios de tortillería en Puebla"
     ]
-    assert _check(["precios de tortillería en Puebla"]).accepted == []
 
 
 def test_years_are_allowed_unless_they_are_private_figures() -> None:

@@ -113,13 +113,16 @@ que sabes de él); el módulo lo usa sólo para revisar las búsquedas.
 
 Di el `message` (termina en "¿Va, o cambio algo?"). Si trae `no_safe_query`,
 `needs_offer_category` o `needs_geography`, di su `message` y vuelve a
-preguntar.
+preguntar. En `mercado`, si falta a qué tipo de cliente le vende (`segment`)
+o en qué ciudad o zona (`geography`), no se busca el tamaño y la respuesta
+trae `missing_question`: el `message` ya la hace; con su respuesta vuelve a
+llamar `frame`.
 
-En `offer_category` usa la palabra con la que él nombra su tipo de negocio
-("tortillería de maíz", no sólo "tortillas"): una búsqueda que lleve una
-palabra del nombre de su empresa sólo pasa si esa palabra está en lo que vende
-o en su zona. Si no, la búsqueda de un negocio que nombró ("Tortillería El
-Sol" frente a "Tortillería Zorblax") se descarta para no filtrar su nombre.
+El tipo de negocio ("tortillería", "taller", "panadería", "consultorio
+dental"…) nunca cuenta como dato de su empresa: "precios de tortillería en
+Puebla" o "Tortillería El Sol" se pueden buscar aunque su empresa se llame
+"Tortillería Zorblax". Lo que sí se descarta es su nombre completo y sus
+palabras propias ("Zorblax"), también disfrazadas.
 
 ### Paso 3: Buscar
 
@@ -164,6 +167,49 @@ preguntando cuáles se parecen al suyo. Marca con `"owner_confirmed": true`
 sólo los que diga que sí; los demás no entran a la tabla. Su propia empresa
 nunca es un negocio parecido (`own_company_as_comparable`).
 
+### Paso 3c: Tamaño del mercado (sólo en `mercado`)
+
+En `mercado` busca cuatro cosas: demanda, tipos de cliente, competidores y
+tamaño. El tamaño sólo con `segment` y `geography` confirmados.
+
+De dónde sale un tamaño, en este orden: cámaras y asociaciones del giro,
+prensa local o de negocios, reportes de industria y lo que publican los
+competidores (sucursales, clientes, volumen). INEGI no es la fuente principal
+del tamaño: sirve, a lo más, como una fuente más.
+
+Un tamaño nunca es un número suelto. Es una de dos:
+
+- **Un rango** (`low` menor que `high`) con su unidad, cómo lo calculaste
+  (`method`), lo que supones (`assumptions`) y sus fuentes (`supporting`).
+  Si dos fuentes dan cifras distintas, pon lo que dice cada una en `figures`;
+  nunca las promedies: el rango cubre las dos y el módulo las muestra lado a
+  lado.
+- **"No estimable todavía"** (`"kind": "no_estimable"`) con el dato que
+  falta (`missing_data`), sin ningún número.
+
+Sin tres fuentes de distintos publicadores de los últimos 90 días, el tamaño
+queda **por confirmar** con lo que encontraste; eso lo decide el módulo. El
+rango con su unidad cabe en 10 palabras o menos (por ejemplo "120,000 a
+180,000 kilos de tortilla al mes"); si no, `finding_too_long`.
+
+```json
+"market_size": {"kind": "estimado", "low": 120000, "high": 180000,
+                "unit": "kilos de tortilla al mes",
+                "method": "fondas de la zona por kilos que compra cada una",
+                "assumptions": ["cada fonda compra entre 40 y 60 kilos al mes"],
+                "supporting": ["s1", "s2"],
+                "figures": [{"value": 120000, "source_id": "s1"},
+                            {"value": 180000, "source_id": "s2"}]}
+```
+
+```json
+"market_size": {"kind": "no_estimable",
+                "missing_data": "cuántas fondas compran tortilla en Cholula"}
+```
+
+Las opciones de `mercado` son entrar o crecer en un tipo de cliente o una
+zona (o "todavía no" con el dato y la fecha).
+
 ### Paso 4: Resultado corto
 
 ```json
@@ -171,6 +217,7 @@ nunca es un negocio parecido (`own_company_as_comparable`).
  "private": {"...": "..."}, "sources": ["..."], "claims": ["..."],
  "comparables": ["... lo del paso 3b, con los sí del empresario ..."],
  "not_found": ["<lo que no encontraste>"],
+ "market_size": {"...": "sólo en mercado, lo del paso 3c"},
  "options": [{"label": "A", "text": "Subir 8% en enero"},
              {"label": "B", "text": "Mantener el precio y vender también por WhatsApp"},
              {"label": "C", "text": "Todavía no decidir", "kind": "esperar",
@@ -180,9 +227,11 @@ nunca es un negocio parecido (`own_company_as_comparable`).
 
 Di el `message` tal cual: trae lo que encontraste, lo que dice lo contrario,
 lo que no encontraste, las opciones y termina en "¿Cuál tomas?". Al
-compararse con otros, abre con la tabla de negocios parecidos. Las opciones
-son de precio, paquete o canal (o "todavía no" con el dato y la fecha). Nada
-se guarda en este paso.
+compararse con otros, abre con la tabla de negocios parecidos; en `mercado`,
+con el tamaño. Si trae `mercado_needs_size`, falta `market_size`; si trae
+`size_needs_segment_and_geography`, pregunta primero el tipo de cliente o la
+zona. Al compararse con otros, las opciones son de precio, paquete o canal
+(o "todavía no" con el dato y la fecha). Nada se guarda en este paso.
 
 ### Paso 5: Guardar su decisión
 

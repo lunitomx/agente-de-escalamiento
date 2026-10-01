@@ -11,6 +11,7 @@ from __future__ import annotations
 import re
 import unicodedata
 from datetime import date
+from decimal import Decimal
 from typing import Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -208,6 +209,111 @@ def check_comparables(
             raise ValueError("metric_needs_published_source")
 
 
+SizeKind = Literal["estimado", "no_estimable"]
+
+
+class SizeFigure(_Strict):
+    """What one source says the size is, in the size's unit."""
+
+    value: Decimal = Field(gt=0)
+    source_id: str
+
+    _check_text = field_validator("source_id")(_required)
+
+
+class MarketSize(_Strict):
+    """How big the market is: a range with method and assumptions, or "not
+    estimable yet" with the data that would allow it (E83 S83.3, rule of E71).
+
+    ``status`` and ``confidence`` are always set by the grader.
+    """
+
+    kind: SizeKind
+    low: Decimal | None = None
+    high: Decimal | None = None
+    unit: str | None = None
+    method: str | None = None
+    assumptions: list[str] = Field(default_factory=list)
+    supporting: list[str] = Field(default_factory=list)
+    figures: list[SizeFigure] = Field(default_factory=list[SizeFigure])
+    missing_data: str | None = None
+    next_source: str | None = None
+    status: ClaimStatus = "por_confirmar"
+    confidence: Confidence = "baja"
+
+    @property
+    def source_ids(self) -> list[str]:
+        """Every source the size rests on, supporting and per-source figures."""
+        return list(
+            dict.fromkeys(
+                [*self.supporting, *(item.source_id for item in self.figures)]
+            )
+        )
+
+    @property
+    def sources_disagree(self) -> bool:
+        return len({item.value for item in self.figures}) > 1
+
+    @model_validator(mode="after")
+    def _never_a_lone_number(self) -> Self:
+        if self.kind == "no_estimable":
+            if not (self.missing_data and self.missing_data.strip()):
+                raise ValueError("not_estimable_needs_missing_data")
+            if self.low is not None or self.high is not None or self.figures:
+                raise ValueError("not_estimable_has_no_number")
+            return self
+        low, high = self.low, self.high
+        if low is None or high is None or not 0 < low < high:
+            raise ValueError("size_needs_a_range")
+        if not (
+            self.unit and self.unit.strip() and self.method and self.method.strip()
+        ):
+            raise ValueError("size_needs_unit_and_method")
+        if not any(item.strip() for item in self.assumptions):
+            raise ValueError("size_needs_assumptions")
+        if not self.source_ids:
+            raise ValueError("size_needs_sources")
+        # Sources that disagree are shown side by side, never averaged: the
+        # range must hold what each one says.
+        if any(not low <= item.value <= high for item in self.figures):
+            raise ValueError("size_range_must_cover_every_source")
+        return self
+
+
+def has_segment_and_geography(frame: ResearchFrame) -> bool:
+    return bool(
+        frame.segment
+        and frame.segment.strip()
+        and frame.geography
+        and frame.geography.strip()
+    )
+
+
+def check_market_size(
+    frame: ResearchFrame, known: set[str], size: MarketSize | None
+) -> None:
+    """Rules a market size must meet against its frame and sources."""
+    if frame.mode != "mercado":
+        if size is not None:
+            raise ValueError("size_only_in_mercado")
+        return
+    if size is None:
+        # Without segment and geography the report builder states "not
+        # estimable yet"; with them the size must be stated either way.
+        raise ValueError("mercado_needs_size")
+    if size.kind == "estimado" and not has_segment_and_geography(frame):
+        raise ValueError("size_needs_segment_and_geography")
+    if not set(size.source_ids) <= known:
+        raise ValueError("unknown_source")
+    if (
+        frame.search_mode == "sin_busqueda"
+        and size.kind == "estimado"
+        and size.status == "por_confirmar"
+        and not size.next_source
+    ):
+        raise ValueError("por_confirmar_needs_next_source")
+
+
 class DecisionOption(_Strict):
     """One of the 2-3 options the research ends in."""
 
@@ -240,6 +346,7 @@ class ResearchReport(_Strict):
     comparables: list[Comparable] = Field(
         default_factory=list[Comparable], max_length=MAX_COMPARABLES
     )
+    market_size: MarketSize | None = None
     not_found: list[str] = Field(default_factory=list)
     limits: list[str] = Field(default_factory=list)
     options: list[DecisionOption] = Field(min_length=2, max_length=3)
@@ -277,6 +384,7 @@ class ResearchReport(_Strict):
         if self.chosen is not None and self.chosen not in self.options:
             raise ValueError("chosen_not_an_option")
         check_comparables(self.frame, self.sources, self.comparables)
+        check_market_size(self.frame, known, self.market_size)
         return self
 
 

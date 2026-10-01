@@ -11,6 +11,8 @@ arrives through the fields it already has:
   with its status and month (outside findings are never facts); the diagnosis
   output contract caps a line at 12 words and 96 characters, so publishers and
   dates of each source stay in the report the fact points to;
+- the market size (S83.3) → one line in ``assumptions`` with its range and
+  unit; a size not estimable yet, or sources that disagree, → ``open_questions``;
 - what was not found, and the data a "not yet" waits for → ``open_questions``;
 - a report past ``review_by`` → ``freshness="stale"`` and an offer to refresh
   it before using it.
@@ -35,6 +37,7 @@ from coaching.research.models import (
     DecisionArea,
     DecisionOption,
     IndexEntry,
+    MarketSize,
     Mode,
     ResearchReport,
     without_urls,
@@ -228,6 +231,49 @@ def _wait_prefixes(by_date: date) -> list[str]:
     return [f"Pendiente al {_day(by_date)}:", f"Para {_day(by_date)}:"]
 
 
+def _size_body(size: MarketSize) -> str:
+    low, high = size.low, size.high
+    if low is None or high is None:
+        return ""
+    return f"{messages.amount(low)} a {messages.amount(high)} {size.unit or ''}"
+
+
+def _size_prefixes(status: str, when: date, stale: bool) -> list[str]:
+    long_status, short_status = _STATUS[status]
+    if stale:
+        mark = messages.STALE_MARK.strip()
+        return [
+            f"{mark} Mercado {long_status}, {_month(when)}:",
+            f"{mark} Mercado {short_status}:",
+            f"{mark} Mercado:",
+        ]
+    return [
+        f"Mercado {long_status}, {_month(when)}:",
+        f"Mercado {short_status} {_short_month(when)}:",
+        "Mercado:",
+    ]
+
+
+def _not_estimable_prefixes(when: date) -> list[str]:
+    return [
+        f"Tamaño no estimable, {_month(when)}, falta:",
+        f"Tamaño no estimable {_short_month(when)}, falta:",
+        "Tamaño, falta:",
+    ]
+
+
+def _size_misfit(size: MarketSize | None, as_of: date) -> str | None:
+    if size is None:
+        return None
+    if size.kind == "no_estimable":
+        text = size.missing_data or ""
+        fits = _line(_not_estimable_prefixes(as_of)[-1:], text)
+    else:
+        text = _size_body(size)
+        fits = _line(_size_prefixes("por_confirmar", as_of, True)[-1:], text)
+    return text if fits is None else None
+
+
 def _only_in_report(when: date) -> str:
     return f"Investigación {_month(when)}: un hallazgo largo está sólo en el reporte"
 
@@ -239,6 +285,7 @@ def misfits(
     not_found: list[str],
     options: list[DecisionOption],
     as_of: date,
+    market_size: MarketSize | None = None,
 ) -> list[str]:
     """Texts that would not fit the diagnosis whole, even stale (checked on save)."""
     bad = [
@@ -270,6 +317,9 @@ def misfits(
         and option.by_date
         and _line(_wait_prefixes(option.by_date)[-1:], option.missing_data) is None
     ]
+    size = _size_misfit(market_size, as_of)
+    if size is not None:
+        bad.append(size)
     return list(dict.fromkeys(bad))
 
 
@@ -290,6 +340,9 @@ def _assumptions(report: ResearchReport, stale: bool) -> tuple[list[str], bool]:
         for dimension in DIMENSIONS
         if (cell := item.cells.get(dimension)) is not None
     ]
+    size = report.market_size
+    if size is not None and size.kind == "estimado":
+        lines.append(_line(_size_prefixes(size.status, when, stale), _size_body(size)))
     kept = [line for line in lines if line is not None]
     return kept, len(kept) < len(lines)
 
@@ -304,6 +357,11 @@ def _open_questions(report: ResearchReport, left_out: bool) -> list[str]:
         for claim in report.claims
         if claim.contrary
     ]
+    size = report.market_size
+    if size is not None and size.kind == "no_estimable":
+        lines.append(_line(_not_estimable_prefixes(when), size.missing_data or ""))
+    if size is not None and size.sources_disagree:
+        lines.append(f"Tamaño en duda, las fuentes no coinciden, {_month(when)}")
     if any(
         dimension not in item.cells
         for item in report.comparables
