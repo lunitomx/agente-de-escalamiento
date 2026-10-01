@@ -5,7 +5,8 @@ Actions (JSON on stdin, like ``coaching.journey``):
 
 - ``recommend``: ``request`` (the owner's words), optional ``decision`` (the
   answer to "¿qué quieres decidir?"), ``area``, ``decision_asked`` and
-  ``facts`` (else read from local memory). Looks for what already exists
+  ``facts`` (else read from local memory); stage counts of the saved journey
+  (S84.2) are added with their month and local source. Looks for what already exists
   (cash report, tracker, research) and the decision memory. When a sales
   board lacks stage counts it consults the journey trigger (T4) with
   ``asked_this_conversation``, ``other_flow_active`` and ``cash_emergency``
@@ -33,6 +34,7 @@ from coaching.dashboard.boards.memory import (
     record_decision,
 )
 from coaching.dashboard.boards.models import Recommendation
+from coaching.dashboard.boards.sources import metric_facts
 from coaching.dashboard.boards.recommend import (
     BoardRequest,
     Existing,
@@ -98,9 +100,12 @@ def _existing(base: Path) -> Existing:
 
 
 def _facts(context: Mapping[str, object], base: Path) -> list[Fact]:
-    if "facts" in context:
-        return _FACTS.validate_python(context["facts"])
-    return load_facts(base)
+    explicit = (
+        _FACTS.validate_python(context["facts"])
+        if "facts" in context
+        else load_facts(base)
+    )
+    return metric_facts(base, explicit)
 
 
 def _journey(
