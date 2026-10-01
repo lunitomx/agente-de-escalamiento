@@ -173,3 +173,27 @@ def test_a_healthy_module_still_answers_normally(
     result = json.loads(capsys.readouterr().out)
     assert result["action"] == "ask_name"
     assert result["errors"] == []
+
+
+# --- the skills say the same sentence ------------------------------------
+
+
+def _skill(name: str) -> str:
+    return (ROOT / "escala-skills" / name / "SKILL.md").read_text(encoding="utf-8")
+
+
+def test_the_door_says_the_fixed_sentence_when_a_module_does_not_answer() -> None:
+    door = _skill("escala")
+    assert FIXED in door
+    assert "internal_error" in door
+
+
+@pytest.mark.parametrize("name", ["escala-dashboard", "escala-export", "escala-pulse"])
+def test_skills_that_explain_errors_use_the_message_on_internal_error(
+    name: str,
+) -> None:
+    assert "internal_error" in _skill(name)
+
+
+def test_reportar_problema_opens_the_bug_report() -> None:
+    assert "reportar problema" in _skill("escala-bugreport")

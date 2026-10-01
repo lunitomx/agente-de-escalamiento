@@ -63,7 +63,8 @@ Where `<export_path>` is `result["artifacts"]["export_path"]` from Step 2.
 
 ### Step 5: Handle Errors
 
-If `result["errors"]` is non-empty:
+Si `result["errors"]` es `["internal_error"]`, di tal cual `result["message"]` y nada más.
+Si no, if `result["errors"]` is non-empty:
 1. Show each error
 2. Ofrece el paso que falte sin nombrar comandos: "¿Hacemos tu diagnóstico primero?" (procedimiento interno `escala-diagnose`) o "¿Empezamos por conocer tu empresa?" (procedimiento interno `escala-welcome`)
 
