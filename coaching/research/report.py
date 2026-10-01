@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import cast
 
 import yaml
-from pydantic import ValidationError
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from coaching.research import messages
 from coaching.research.engine import (
@@ -34,6 +34,8 @@ from coaching.research.models import (
     ResearchFrame,
     ResearchReport,
     SourceRecord,
+    is_recent,
+    normalize,
     without_urls,
 )
 
@@ -453,3 +455,109 @@ def save_report(report: ResearchReport, base: Path) -> Path:
         encoding="utf-8",
     )
     return path
+
+
+REUSED_PREFIX = "comp-"
+
+
+class ReusedComparables(BaseModel):
+    """Comparables of a saved, current benchmark, ready for ``fortalezas-tendencias``."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    reference: str
+    competitors: list[str] = Field(default_factory=list)
+    comparables: list[Comparable] = Field(default_factory=list[Comparable])
+    sources: list[SourceRecord] = Field(default_factory=list[SourceRecord])
+
+
+def _same_place(saved: ResearchFrame, frame: ResearchFrame) -> bool:
+    return all(
+        value is not None
+        and other is not None
+        and value.strip()
+        and normalize(value) == normalize(other)
+        for value, other in (
+            (saved.offer_category, frame.offer_category),
+            (saved.geography, frame.geography),
+        )
+    )
+
+
+def _reuse_one(
+    item: Comparable, allowed: dict[str, SourceRecord], fresh: set[str]
+) -> Comparable | None:
+    """The comparable with only cells from fresh allowed sources, ids prefixed.
+
+    A candidate (or confirmed one) whose provenance is not allowed is dropped:
+    without it the business cannot be traced to where it was found.
+    """
+    if not item.named_by_owner and item.found_in not in allowed:
+        return None
+    cells = {
+        dimension: cell.model_copy(
+            update={"source_id": REUSED_PREFIX + (cell.source_id or "")}
+        )
+        for dimension, cell in item.cells.items()
+        if cell.source_id in fresh
+    }
+    found_in = None if item.found_in is None else REUSED_PREFIX + item.found_in
+    return item.model_copy(update={"cells": cells, "found_in": found_in})
+
+
+def reusable_comparables(
+    base: Path, frame: ResearchFrame, as_of: date
+) -> ReusedComparables | None:
+    """The comparables of the newest benchmark that is still current and was
+    made for the same offer and geography (E83 S83.4).
+
+    Candidates stay candidates. A cell whose source is older than 90 days is
+    dropped (owner decision: no source beyond 90 days); without web search,
+    only the owner's own sources come back.
+    """
+    entries = sorted(
+        (entry for entry in load_index(base) if entry.mode == "benchmark"),
+        key=lambda entry: entry.researched_on,
+        reverse=True,
+    )
+    for entry in entries:
+        if as_of > entry.review_by:
+            continue
+        saved = load_saved_report(base, entry)
+        if saved is None or not _same_place(saved.frame, frame):
+            continue
+        allowed = {
+            source.source_id: source
+            for source in saved.sources
+            if frame.search_mode == "web" or source.origin != "web"
+        }
+        fresh = {
+            source_id
+            for source_id, source in allowed.items()
+            if is_recent(source, as_of) or source.published_on is None
+        }
+        comparables = [
+            reused
+            for item in saved.comparables
+            if (reused := _reuse_one(item, allowed, fresh)) is not None
+        ]
+        cited = {
+            source_id
+            for item in comparables
+            for source_id in [
+                *(cell.source_id or "" for cell in item.cells.values()),
+                item.found_in or "",
+            ]
+        }
+        sources = [
+            source.model_copy(update={"source_id": REUSED_PREFIX + source.source_id})
+            for source in saved.sources
+            if REUSED_PREFIX + source.source_id in cited
+        ]
+        return ReusedComparables(
+            reference=entry.reference,
+            competitors=[item.name for item in comparables if item.named_by_owner],
+            comparables=comparables,
+            sources=sources,
+        )
+    return None

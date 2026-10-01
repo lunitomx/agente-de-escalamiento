@@ -49,6 +49,10 @@ SIDE_LABELS = {
     "debilidad": "Debilidad",
     "tendencia": "Tendencia",
 }
+NEEDS_COMPARABLES = (
+    "Para ver tus fortalezas y debilidades frente a otros necesito negocios "
+    "parecidos que me confirmes; mientras, veo las tendencias."
+)
 TABLE_GAPS = "Lo que en la tabla dice «no encontrado»: no hallé una fuente que lo diga."
 
 
@@ -110,6 +114,10 @@ SIZE_DISAGREE = "Lo que dice cada fuente (no coinciden; no las promedio):"
 
 def comparing_with(names: list[str]) -> str:
     return f"Voy a comparar con: {_join(names)}."
+
+
+def reusing_comparables(names: list[str]) -> str:
+    return f"Te comparo con los negocios que ya me confirmaste: {_join(names)}."
 
 
 def table_title(offer: str, geography: str) -> str:

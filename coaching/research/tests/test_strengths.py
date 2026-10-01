@@ -8,10 +8,13 @@ days old; a candidate stays a candidate until the owner says yes.
 from __future__ import annotations
 
 from datetime import date, timedelta
+from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
 
+from coaching.research import messages
+from coaching.research.flow import run
 from coaching.research.models import (
     Comparable,
     DecisionOption,
@@ -20,7 +23,7 @@ from coaching.research.models import (
     ResearchReport,
     SourceRecord,
 )
-from coaching.research.report import build_report, report_message
+from coaching.research.report import build_report, report_message, save_report
 
 TODAY = date(2026, 9, 30)
 
@@ -209,3 +212,180 @@ def test_the_result_says_the_side_and_against_whom() -> None:
     assert "Tendencia: Sube el maíz" in text
     assert "Tortillería La Luna" in text  # named as candidate, never tabled
     assert text.rstrip().endswith("¿Cuál tomas?")
+
+
+# --- comparables of a current benchmark are reused ----------------------------
+
+
+def _benchmark(
+    *, researched_on: date = TODAY, geography: str = "Puebla"
+) -> ResearchReport:
+    sources = [
+        _source("s1", "Diario Uno", age=20 + (TODAY - researched_on).days),
+        _source("s2", "Revista Dos", age=80 + (TODAY - researched_on).days),
+        SourceRecord.model_validate(
+            {
+                "source_id": "d1",
+                "origin": "dueño",
+                "title": "Cotización que le llegó",
+                "publisher": "Cliente del dueño",
+                "consulted_on": researched_on.isoformat(),
+                "excerpt": "El Sol da 10% a fondas",
+            }
+        ),
+    ]
+    frame = _frame(
+        mode="benchmark",
+        decision_area="cash",
+        geography=geography,
+        queries=[f"precios de tortillas de maíz en {geography} 2026"],
+    )
+    comparables = [
+        Comparable.model_validate(
+            {
+                "name": "Tortillería El Sol",
+                "named_by_owner": True,
+                "cells": {
+                    "precio": {"value": "24 pesos el kilo", "source_id": "s1"},
+                    "paquetes": {"value": "10% a fondas", "source_id": "d1"},
+                    "canales": {"value": "pedidos por WhatsApp", "source_id": "s2"},
+                },
+            }
+        ),
+        Comparable.model_validate(
+            {
+                "name": "Tortillería La Estrella",
+                "found_in": "s2",
+                "why": "vende lo mismo en su zona",
+                "owner_confirmed": True,
+            }
+        ),
+        CANDIDATE.model_copy(update={"found_in": "s1"}),
+    ]
+    return build_report(
+        frame=frame,
+        researched_on=researched_on,
+        sources=sources,
+        claims=[],
+        options=[
+            DecisionOption(label="A", text="Subir 8% el kilo en enero"),
+            DecisionOption(label="B", text="Mantener el precio"),
+        ],
+        recommendation="A",
+        recommendation_reason="tu precio está abajo",
+        chosen="A",
+        comparables=comparables,
+    )
+
+
+def _frame_step(base: Path | None, **fields: object) -> dict[str, object]:
+    frame = _frame(queries=[], confirmed=False, competitors=[], **fields)
+    context: dict[str, object] = {
+        "action": "frame",
+        "today": TODAY.isoformat(),
+        "frame": frame.model_dump(mode="json"),
+        "private": {"company_names": ["Tortillería Zorblax"]},
+    }
+    if base is not None:
+        context["base_path"] = str(base)
+    return context
+
+
+def test_frame_reuses_the_comparables_of_a_current_benchmark(tmp_path: Path) -> None:
+    save_report(_benchmark(), tmp_path)
+
+    result = run(_frame_step(tmp_path))
+
+    assert result.errors == []
+    names = {item.name: item.counted for item in result.comparables}
+    assert names == {
+        "Tortillería El Sol": True,
+        "Tortillería La Estrella": True,
+        "Tortillería La Luna": False,  # a candidate stays a candidate
+    }
+    assert result.frame is not None
+    assert result.frame.competitors == ["Tortillería El Sol"]
+    assert "Tortillería El Sol y Tortillería La Estrella" in result.message
+    assert "Tortillería La Luna" in result.message
+    assert messages.NOT_COUNTED in result.message
+    cited = {
+        cell.source_id for item in result.comparables for cell in item.cells.values()
+    }
+    assert cited <= {source.source_id for source in result.sources}
+
+
+def test_reused_cells_keep_only_sources_up_to_90_days_old(tmp_path: Path) -> None:
+    # Researched 30 days ago: s1 is now 50 days old, s2 is 110 days old.
+    save_report(_benchmark(researched_on=TODAY - timedelta(days=30)), tmp_path)
+
+    result = run(_frame_step(tmp_path))
+
+    sol = next(item for item in result.comparables if item.name == "Tortillería El Sol")
+    assert set(sol.cells) == {"precio", "paquetes"}
+    by_id = {source.source_id: source for source in result.sources}
+    for item in result.comparables:
+        for cell in item.cells.values():
+            published = by_id[cell.source_id or ""].published_on
+            assert published is None or (TODAY - published).days <= 90
+    # A business the owner confirmed keeps where it was found (provenance);
+    # what it does is shown only from recent sources.
+    assert "Tortillería La Estrella" in {item.name for item in result.comparables}
+
+
+def test_a_stale_or_other_zone_benchmark_is_not_reused(tmp_path: Path) -> None:
+    stale, other = tmp_path / "stale", tmp_path / "other"
+    save_report(_benchmark(researched_on=TODAY - timedelta(days=91)), stale)
+    save_report(_benchmark(geography="Cholula"), other)
+
+    for base in (stale, other):
+        result = run(_frame_step(base))
+        assert result.errors == []
+        assert result.comparables == []
+        assert messages.NEEDS_COMPARABLES in result.message
+
+
+def test_nothing_is_read_without_a_base_path() -> None:
+    result = run(_frame_step(None))
+
+    assert result.errors == []
+    assert result.comparables == []
+
+
+def test_without_search_only_the_owner_sources_come_back(tmp_path: Path) -> None:
+    save_report(_benchmark(), tmp_path)
+
+    result = run(_frame_step(tmp_path, search_mode="sin_busqueda"))
+
+    assert result.message.startswith(messages.SEARCH_OFF)
+    assert {source.origin for source in result.sources} == {"dueño"}
+    sol = next(item for item in result.comparables if item.name == "Tortillería El Sol")
+    assert set(sol.cells) == {"paquetes"}
+    # Candidates found on a web page are not brought back without search.
+    assert "Tortillería La Luna" not in {item.name for item in result.comparables}
+
+
+def test_reused_comparables_feed_a_valid_strengths_report(tmp_path: Path) -> None:
+    save_report(_benchmark(), tmp_path)
+    step = run(_frame_step(tmp_path))
+    assert step.frame is not None
+    frame = step.frame.model_copy(
+        update={"confirmed": True, "queries": step.frame.queries}
+    )
+
+    report = build_report(
+        frame=frame,
+        researched_on=TODAY,
+        sources=[*step.sources, _source("t1", "Diario Tendencias")],
+        claims=[
+            _claim(supporting=[step.sources[0].source_id]),
+            _claim(
+                side="tendencia", against=[], supporting=["t1"], text="Sube el maíz"
+            ),
+        ],
+        options=OPTIONS,
+        recommendation="A",
+        recommendation_reason="es lo que te distingue",
+        comparables=step.comparables,
+    )
+
+    assert [claim.side for claim in report.claims] == ["fortaleza", "tendencia"]
