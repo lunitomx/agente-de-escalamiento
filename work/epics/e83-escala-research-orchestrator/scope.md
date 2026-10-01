@@ -1,7 +1,7 @@
 ---
 epic_id: E83
 title: ESCALA research — orquestador de investigación de negocio
-status: planned
+status: complete
 jira_key: "ESCALA-49"
 closure_disposition: active
 created: 2026-09-30
@@ -47,7 +47,7 @@ Un orquestador de varios pasos que ayuda al empresario a investigar su entorno c
 | S83.2 | Módulo benchmark (`ESCALA-58`) | M | complete — modo `benchmark`, acción `comparables` |
 | S83.3 | Módulo mercado (`ESCALA-59`) | M | complete — modo `mercado`, `market_size`, palabras de giro |
 | S83.4 | Módulo fortalezas/debilidades y tendencias, alimenta al SWT (`ESCALA-60`) | S | complete — lado y negocios confirmados, reuso del benchmark, acción `swt`, integración de los tres modos |
-| S83.5 | Integración con diagnóstico y verificación por plataforma con y sin búsqueda web (`ESCALA-61`) | S | done |
+| S83.5 | Integración con diagnóstico y verificación por plataforma con y sin búsqueda web (`ESCALA-61`) | S | complete — `diagnosis.py`, `sampling.py`, acción `check_sources` |
 
 Orden de ejecución: S83.1 → S83.2 → S83.5 → S83.3 → S83.4. Diseño detallado en `design.md`.
 
