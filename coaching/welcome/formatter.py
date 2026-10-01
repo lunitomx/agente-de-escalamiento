@@ -22,23 +22,23 @@ def format_profile(profile: dict) -> str:
 def format_summary(profile: dict) -> str:
     company = profile.get("company", {})
     lines = [
-        "## Company Profile",
+        "## Tu empresa",
         "",
-        f"**Name:** {company.get('name', 'N/A')}",
-        f"**Industry:** {company.get('industry', 'N/A')}",
-        f"**Employees:** {company.get('employees', 'N/A')}",
-        f"**Growth Stage:** {company.get('growth_stage', 'N/A')}",
+        f"**Nombre:** {company.get('name', 'N/A')}",
+        f"**Giro:** {company.get('industry', 'N/A')}",
+        f"**Empleados:** {company.get('employees', 'N/A')}",
+        f"**Etapa:** {company.get('growth_stage', 'N/A')}",
     ]
     if company.get("revenue"):
-        lines.append(f"**Revenue:** {company['revenue']}")
+        lines.append(f"**Ventas:** {company['revenue']}")
     if company.get("years_in_business"):
-        lines.append(f"**Years in Business:** {company['years_in_business']}")
+        lines.append(f"**Años en el negocio:** {company['years_in_business']}")
     if company.get("location"):
-        lines.append(f"**Location:** {company['location']}")
+        lines.append(f"**Dónde:** {company['location']}")
 
     assessment = profile.get("narrative_assessment")
     if isinstance(assessment, dict):
-        lines.extend(["", "### Assessment narrativo"])
+        lines.extend(["", "### Lo que entendí de tu negocio"])
         summary = assessment.get("company_summary")
         if isinstance(summary, str) and summary.strip():
             lines.append(summary.strip())
@@ -62,7 +62,7 @@ def format_summary(profile: dict) -> str:
     focus = profile.get("focus")
     if focus:
         name = owner_area_name(focus) if focus in OWNER_AREA_NAMES else focus
-        lines.extend(["", f"**Current Focus:** {name}"])
+        lines.extend(["", f"**Ahora trabajamos en:** {name}"])
 
     lines.append("")
     return "\n".join(lines)

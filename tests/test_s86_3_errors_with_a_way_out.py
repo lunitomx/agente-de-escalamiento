@@ -269,3 +269,42 @@ def test_no_owner_text_says_tu_claude() -> None:
         if any("tu claude" in text.lower() for text in texts)
     ]
     assert offenders == []
+
+
+# --- left over from S86.2: welcome profile headers in Spanish -------------
+
+
+def test_welcome_profile_headers_are_in_spanish() -> None:
+    from coaching.welcome.formatter import format_summary
+
+    text = format_summary(
+        {
+            "company": {
+                "name": "Panadería Ejemplo",
+                "industry": "alimentos",
+                "employees": 8,
+                "growth_stage": "startup",
+                "revenue": "2 millones",
+                "years_in_business": 5,
+                "location": "Puebla",
+            },
+            "narrative_assessment": {"company_summary": "Vende pan."},
+            "focus": "cash",
+        }
+    )
+
+    for english in (
+        "Company Profile",
+        "Name:",
+        "Industry:",
+        "Employees:",
+        "Growth Stage:",
+        "Revenue:",
+        "Years in Business:",
+        "Location:",
+        "Assessment",
+        "Current Focus",
+    ):
+        assert english not in text
+    assert "## Tu empresa" in text
+    assert "**Ahora trabajamos en:** tu dinero" in text
