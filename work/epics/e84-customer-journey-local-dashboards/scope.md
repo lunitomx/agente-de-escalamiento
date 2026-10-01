@@ -1,7 +1,7 @@
 ---
 epic_id: E84
 title: Customer journey proactivo y tableros analíticos locales
-status: planned
+status: complete
 jira_key: "ESCALA-50"
 closure_disposition: active
 created: 2026-09-30
