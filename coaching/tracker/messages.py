@@ -630,3 +630,21 @@ def prep_message(
     decisions = [*_decisions(prep), *_rock_decisions(prep.rocks)]
     parts += [NOTHING_MOVED, " ".join(decisions)]
     return "\n\n".join(parts)
+
+
+# --- S86.8 (A3): the group meeting, offered when the conversation opens -----
+
+WEEKDAY_NAMES = (
+    "lunes",
+    "martes",
+    "miércoles",
+    "jueves",
+    "viernes",
+    "sábado",
+    "domingo",
+)
+
+
+def meeting_nudge_message(day: str) -> str:
+    """The first line of the conversation: "Tu reunión del grupo es el jueves."."""
+    return f"Tu reunión del grupo es {day}. ¿Reviso tu hoja?"
