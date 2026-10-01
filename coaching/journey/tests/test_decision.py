@@ -46,7 +46,7 @@ def test_with_a_loss_and_an_experiment_recommends_the_experiment() -> None:
     assert first.kind == "decidir"
     assert "14 días" in first.text and "«Te compra»" in first.text
     assert wait.kind == "esperar" and wait.by_date == date(2026, 10, 15)
-    assert wait.missing_data == "cuántos en «Se entera de ti» en septiembre de 2026"
+    assert wait.missing_data == "cuántos en «Se entera de ti»"
     assert decision.recommendation == "A"
 
 

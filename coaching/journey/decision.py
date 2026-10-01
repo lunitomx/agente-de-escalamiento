@@ -26,7 +26,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_valida
 from coaching.journey.asks import JOURNEY_DIR
 from coaching.journey.interview import STAGE_LABEL
 from coaching.journey.models import Journey
-from coaching.journey.view import biggest_loss, period_label, spanish_date, summary
+from coaching.journey.view import biggest_loss, spanish_date, summary
 from coaching.research.models import DecisionOption
 
 JOURNEY_NAME = "journey.yaml"
@@ -69,11 +69,9 @@ class SavedJourney(_Strict):
 
 
 def _first_missing_count(journey: Journey) -> str | None:
-    periods = {item.count.period for item in journey.stages if item.count is not None}
-    when = f" en {period_label(next(iter(periods)))}" if len(periods) == 1 else ""
     for item in journey.stages:
         if item.count is None:
-            return f"cuántos en «{STAGE_LABEL[item.stage]}»{when}"
+            return f"cuántos en «{STAGE_LABEL[item.stage]}»"
     return None
 
 
