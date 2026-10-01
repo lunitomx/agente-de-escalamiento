@@ -1,5 +1,5 @@
 ---
-description: 'Genera el Progress Dashboard — vista consolidada con scores actuales, historial de pulso, victorias y áreas de atención.'
+description: 'Muestra cómo va la empresa (resumen de avance) o recomienda qué tablero ver: máximo 2 propuestas con la decisión que sirven, la fuente y el periodo de cada dato, y si se pueden armar hoy.'
 name: escala-dashboard
 ---
 
@@ -7,17 +7,76 @@ name: escala-dashboard
 
 ## Purpose
 
-Mostrar el estado de progreso de la empresa en un dashboard de 4 secciones:
-1. **Current Scores** — diagnóstico actual por decisión
-2. **Pulse History** — historial de pulsos en orden cronológico inverso
-3. **Wins** — decisiones con tendencia improving en el último pulso
-4. **Attention Areas** — decisiones con tendencia regressing o stalling 2+ pulsos
+Dos caminos, según lo que pidió el dueño:
+
+- **"¿Cómo voy?"** → el resumen de avance (scores actuales, historial de pulsos,
+  victorias y áreas de atención). Ver "Resumen de avance".
+- **"¿Qué debería ver?", "hazme un tablero", "tablero de mis ventas"** → el
+  recomendador de tableros (E84 S84.3). Ver "Tableros".
 
 ## Architecture
 
 Este skill es un **adapter delgado**. Toda la lógica vive en Python. No contiene lógica de negocio.
 
-## Steps
+## Step 0: Elegir el camino
+
+| Pedido | Camino |
+|--------|--------|
+| "cómo voy", "mi avance", "mi progreso" | Resumen de avance |
+| tablero, dashboard, gráfica, indicadores (cualquier tema) | Tableros |
+
+Si dudas, ve a Tableros: el recomendador manda al resumen de avance cuando eso
+es lo que responde.
+
+## Tableros
+
+### Step T1: Recomendar
+
+```bash
+echo '{"action": "recommend", "base_path": ".", "request": "<palabras del dueño>", "asked_this_conversation": false}' | python3 -m coaching.dashboard.boards
+```
+
+`asked_this_conversation` es `true` si ya se le preguntó en esta conversación
+cómo llega un cliente hasta que compra. Lee `result["recommendation"]["outcome"]`:
+
+| outcome | Qué hacer |
+|---------|-----------|
+| `existe` | Muestra `message` y lleva al dueño a lo que ya existe (`points_to_existing`): reporte de caja, lista de seguimiento, resumen de avance o investigación. No propongas otro tablero. |
+| `pregunta_decision` | Haz una sola pregunta, exactamente: "¿Qué quieres decidir con ese tablero? Por ejemplo: en qué paso se te van los clientes, o si tu equipo puede con lo que tiene." Con su respuesta, vuelve a T1 con `"decision": "<respuesta>"` y `"decision_asked": true`. |
+| `propuestas` | Muestra `message` tal cual: máximo 2 tableros, cada uno con la decisión que sirve, quién lo mira, cada cuánto, sus datos con fuente y periodo, y si se puede hoy. Termina en la decisión del dueño. |
+| `sin_patron` | Muestra `message`. No inventes un tablero. |
+| `pospuesto` | Muestra `message`. No insistas. |
+
+Si `journey_question` viene lleno, **no** lo juntes con las propuestas: es una
+pregunta aparte. Hazla sólo después de que el dueño decida sobre el tablero, y
+registra su respuesta con el procedimiento de cómo llega un cliente hasta que
+compra. Así hay una sola pregunta por mensaje.
+
+### Step T2: Guardar la decisión del dueño
+
+Sólo cuando el dueño contesta (sí / todavía no / no):
+
+```bash
+echo '{"action": "decide", "base_path": ".", "board_id": "<board_id>", "outcome": "construir|esperar|no", "review_on": "AAAA-MM-DD"}' | python3 -m coaching.dashboard.boards
+```
+
+- `review_on` sólo con `esperar`, y es la fecha que dio el dueño (pregúntala si
+  no la dio). Nunca la inventes.
+- Se guarda en `.escala/my-company/tableros/index.yaml`, sólo con códigos; nunca
+  las palabras del dueño. Un tablero con "todavía no" o "no" no se vuelve a
+  proponer en 30 días.
+- Muestra `message`.
+
+### Reglas de Tableros
+
+- Nunca inventes cifras: un dato que falta se dice "falta".
+- Nunca publiques un tablero (artifacts, canvas, enlaces compartidos ni nada
+  parecido). Los tableros sólo viven en la computadora del dueño.
+- No muestres nombres de procedimientos ni comandos al dueño.
+- Armar el archivo del tablero aceptado es un paso posterior (S84.4); aquí sólo
+  se recomienda y se guarda la decisión.
+
+## Resumen de avance
 
 ### Step 1: Prerequisite Check
 
@@ -27,7 +86,7 @@ test -f .escala/agent/memory/company-profile.yaml && echo "EXISTS" || echo "NO_P
 
 | Result | Action |
 |--------|--------|
-| NO_PROFILE | Redirect to `/escala-welcome` — company must be initialized first |
+| NO_PROFILE | Ofrece empezar desde el inicio: la empresa todavía no tiene perfil |
 | EXISTS | Continue |
 
 ### Step 2: Invoke Core Module
@@ -56,15 +115,17 @@ Exit 0 = validation passed. Exit 1 = missing sections (show errors).
 
 ### Step 4: Present Dashboard
 
-- Show `result["output"]` to the user directly — it's formatted markdown
-- If `result["errors"]` is non-empty, show errors and suggest remediation
-- If `artifacts["pulse_count"]` is 0, invite the user to run `/escala-pulse` to start tracking
+- La salida del módulo todavía está en inglés y menciona comandos (lo corrige
+  E80). **No la muestres cruda: resúmela en español**, sin comandos.
+- If `result["errors"]` is non-empty, explica en español qué falta.
+- If `artifacts["pulse_count"]` is 0, ofrece empezar a registrar cómo va cada
+  semana, sin mencionar comandos.
 
 ### Step 5: Handle Errors
 
 If `result["errors"]` is non-empty:
-1. Show each error
-2. Suggest running `/escala-diagnose` for score issues or `/escala-pulse` for pulse issues
+1. Explica cada error en español llano
+2. Ofrece el siguiente paso (diagnóstico o registro semanal) sin mencionar comandos
 
 ## Output Sections
 
