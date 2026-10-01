@@ -94,9 +94,33 @@ else
     echo ""
 fi
 
-# --- Reinstalar skills ---
-echo -e "  ${CYAN}Reinstalando skills...${NC}"
-bash install.sh
+# --- Reinstalar sólo donde ya estaba ESCALA ---
+# install.sh exige elegir plataforma; se reutilizan las que ya tienen la puerta
+# `escala` o atajos `escala*` de una instalación anterior (install.sh los quita).
+has_escala_link() {
+    local link
+    for link in "$1"/escala*; do
+        [[ -L "$link" ]] && return 0
+    done
+    return 1
+}
+
+INSTALL_ARGS=()
+for platform in claude codex hermes; do
+    if has_escala_link "$HOME/.$platform/skills"; then
+        INSTALL_ARGS+=(--platform "$platform")
+    fi
+done
+
+if [ ${#INSTALL_ARGS[@]} -eq 0 ]; then
+    echo -e "${ROJO}✗ No encontré ESCALA instalado en Claude Code, Codex ni Hermes.${NC}"
+    echo "  Instálalo una vez eligiendo tu plataforma, por ejemplo:"
+    echo "    ./install.sh --platform claude"
+    exit 1
+fi
+
+echo -e "  ${CYAN}Reinstalando ESCALA...${NC}"
+bash install.sh "${INSTALL_ARGS[@]}"
 
 # --- El install.sh ya actualiza el paquete Python ---
 
@@ -112,8 +136,5 @@ echo ""
 echo "  Última actualización: $(cat $CONFIG_DIR/last-update)"
 echo "  Versión: $(cat $CONFIG_DIR/version 2>/dev/null || echo 'desconocida')"
 echo ""
-echo -e "  ${AMARILLO}Nota:${NC} Desde tu terminal de IA también puedes usar:"
-echo "    /escala-update"
-echo ""
-echo -e "  Para verificar que todo funciona:"
-echo "    /escala-health"
+echo "  Próximo paso: abre tu agente de IA y cuéntale a ESCALA qué te preocupa hoy."
+echo "  Si algo no funciona, dile a ESCALA: \"revisa que todo esté bien instalado\"."

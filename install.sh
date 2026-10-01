@@ -273,15 +273,23 @@ install_on() {
     fi
 
     mkdir -p "$destination"
-    local link
-    for link in "$destination"/escala-*; do
-        if [[ -L "$link" ]]; then
+    # Atajos de instalaciones anteriores (de este repo o de otro): sólo symlinks
+    # cuyo nombre empieza con "escala", nunca la puerta ni archivos reales.
+    local link removed=0
+    for link in "$destination"/escala*; do
+        if [[ -L "$link" && "$(basename "$link")" != "escala" ]]; then
             rm "$link"
+            removed=$((removed + 1))
         fi
     done
 
     ln -sfn "$skill_dir" "$destination/escala"
     echo -e "    ${VERDE}✓${NC} 1 skill instalado (symlink) en ${destination}"
+    if [[ "$removed" -eq 1 ]]; then
+        echo "    Quité 1 atajo viejo; ahora sólo hablas con ESCALA."
+    elif [[ "$removed" -gt 1 ]]; then
+        echo "    Quité $removed atajos viejos; ahora sólo hablas con ESCALA."
+    fi
 }
 
 validate_specialist_sources() {
