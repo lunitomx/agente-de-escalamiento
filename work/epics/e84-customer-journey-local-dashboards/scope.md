@@ -47,7 +47,7 @@ Por decisión del dueño (2026-09-30), E71 (ESCALA-35) quedó absorbida por E83,
 |---|---|---|:---:|---|
 | S84.1 | `ESCALA-63` | Disparadores (cuándo sí y cuándo no preguntar) y entrevista del customer journey; procedimiento interno `escala-strategy-journey` | M | done |
 | S84.2 | `ESCALA-64` | Modelo de journey con evidencia por origen, huecos, "dónde se pierden más" y una decisión; entrada al diagnóstico | M | planned |
-| S84.3 | `ESCALA-65` | Recomendador de tablero: máximo 2 propuestas, qué decisión sirve, métricas con fuente y periodo, factibilidad; ruta `dashboard` | M | planned |
+| S84.3 | `ESCALA-65` | Recomendador de tablero: máximo 2 propuestas, qué decisión sirve, métricas con fuente y periodo, factibilidad; ruta `dashboard` | M | done |
 | S84.4 | `ESCALA-66` | Generador de tablero local (HTML autocontenido + Markdown) y matriz por plataforma | M | planned |
 
 ## Cómo E84 evita añadir superficie
@@ -132,7 +132,7 @@ Checkpoint de integración: S84.2 prueba la costura journey → diagnóstico en 
 |---|:---:|:---:|---|---|---|
 | S84.1 | M | 5 | done | M | `ESCALA-63`; catálogo 65/66 |
 | S84.2 | M | 5 | planned | - | `ESCALA-64` |
-| S84.3 | M | 5 | planned | - | `ESCALA-65` |
+| S84.3 | M | 5 | done | M | `ESCALA-65`; ruta `dashboard` primera |
 | S84.4 | M | 5 | planned | - | `ESCALA-66` |
 
 ### Sequencing Risks
