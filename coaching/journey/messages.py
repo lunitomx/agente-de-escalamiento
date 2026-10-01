@@ -23,3 +23,12 @@ LATER = (
     "Va, no te vuelvo a preguntar por esto en un mes. Si antes quieres verlo, "
     "sólo dime."
 )
+
+DECIDE = "¿Qué hacemos con esto?"
+
+NOT_SAVED_YET = "Nada se guarda hasta que elijas una opción."
+
+SAVED = (
+    "Listo, quedó guardado sólo en tu computadora; no se publica. "
+    "En 3 meses te pregunto si sigue igual."
+)

@@ -104,3 +104,26 @@ def test_a_sales_pain_phrase_reaches_strategy_and_fires_the_check(
         JourneySignals(owner_text=phrase, today=date(2026, 9, 30))
     )
     assert (decision.ask, decision.reason) == (True, "T1")
+
+
+def test_procedure_closes_the_journey_in_one_decision_saved_only_on_yes() -> None:
+    """E84 S84.2: build -> one decision -> save only with the chosen option."""
+    text = _procedure()
+
+    for action in ("build", "save"):
+        assert f'"action": "{action}"' in text
+    assert '"chosen"' in text
+    assert messages.NOT_SAVED_YET in text
+    assert "no se lo hemos preguntado a clientes" in text
+    assert "clientes_dijeron" in text
+    assert "Falta" in text
+    assert "mismo mes" in text
+
+
+def test_diagnosis_reads_the_saved_journey_as_local_evidence() -> None:
+    text = (ROOT / "escala-skills" / "escala-diagnose" / "SKILL.md").read_text(
+        encoding="utf-8"
+    )
+
+    assert '"action": "diagnosis"' in text
+    assert "python3 -m coaching.journey" in text

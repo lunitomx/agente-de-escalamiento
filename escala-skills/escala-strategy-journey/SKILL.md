@@ -34,8 +34,8 @@ cliente hasta que te compra".
   estimes un número ni lo completes tú. Si da un número aproximado ("unos
   100", "entre 80 y 120"), el módulo lo guarda como supuesto y no vuelve a
   preguntar. Sólo si no dio ningún número, el módulo pide el número una vez.
-- **Nada de esto se guarda todavía:** el borrador de la entrevista no se guarda
-  hasta que el empresario decida qué hacer con él. Lo único que se escribe es
+- **Nada se guarda sin su sí:** el borrador de la entrevista no se guarda
+  hasta que el empresario elija una opción (Paso 6). Lo único que se escribe es
   la fecha y la respuesta a la pregunta (sí / después / no), en
   `.escala/my-company/journey/asks.yaml`.
 - Los conteos del journey viven sólo en `.escala/my-company/journey/`
@@ -113,8 +113,47 @@ contestó se queda y lo que falta sale como falta.
 Cuando `step.done` es `true`, muéstrale el borrador en pocas líneas: por cada
 paso, lo que dijo y el número con su mes (di «aproximado» si fue supuesto); y
 la lista de lo que falta (`draft.missing`) tal cual, como "falta". Dile que todavía no se
-guarda nada. Cierra con una sola pregunta: "¿Así es como te compran?". La
-decisión de qué hacer con esto viene después.
+guarda nada. Cierra con una sola pregunta: "¿Así es como te compran?". Si
+corrige algo, vuelve a mandar las respuestas con la corrección.
+
+### Paso 5: Armar el journey y proponer una decisión
+
+Manda las mismas respuestas más lo que ya sabes de la conversación, sin
+preguntar nada nuevo para llenarlo:
+
+```json
+{"action": "build", "answers": [...],
+ "counts": {"pregunta": {"value": 120, "period": "2026-09", "source": "tu WhatsApp Business", "origin": "dato_con_periodo"}},
+ "evidence": [{"stage": "compra", "origin": "clientes_dijeron", "text": "<lo que dijeron>", "asked_on": "2026-09-20", "asked_count": 4}],
+ "experiment": "<qué probar donde más se pierden, con sus palabras>"}
+```
+
+- `counts` sólo si el número viene de un archivo, cuaderno o sistema suyo
+  (`dato_con_periodo`, con su mes y de dónde sale). Nunca una página web.
+- `evidence` con `clientes_dijeron` sólo si el empresario te dijo **cuándo y a
+  cuántos clientes** les preguntó. Si no, no lo pongas: el módulo dirá
+  "no se lo hemos preguntado a clientes". Nunca digas que se entrevistó a nadie.
+- `experiment` sólo si el empresario lo propone o lo acepta; sin él, la
+  recomendación es conseguir el dato que falta.
+
+Muestra el `message` tal cual: los números con su mes y de dónde salen, cada
+"Falta" como falta, dónde se pierden más (sólo si hay dos pasos seguidos
+contados en el mismo mes) y 2 o 3 opciones con la recomendada. Termina con:
+
+> Nada se guarda hasta que elijas una opción.
+
+### Paso 6: Guardar sólo con su sí
+
+Cuando elija, manda lo mismo de `build` más su opción:
+
+```json
+{"action": "save", "answers": [...], "counts": {...}, "evidence": [...], "experiment": "...", "chosen": "A"}
+```
+
+Sin `"chosen"` no se guarda nada. Se guarda en
+`.escala/my-company/journey/` y se revisa en 90 días. Di el `message` (sólo en
+su computadora; no se publica). En el siguiente diagnóstico, esta decisión
+entra como evidencia suya (`"action": "diagnosis"`).
 
 ## Ejemplo (empresa sintética "Pan Rico")
 
@@ -123,3 +162,9 @@ decisión de qué hacer con esto viene después.
    con la pregunta de arriba.
 3. Dice "después": `record` con `"outcome": "despues"`; no vuelves a preguntar
    en esta conversación ni en los siguientes 30 días.
+4. Si dice que sí: 5 preguntas, y `build` le muestra "Te pregunta: 120 en
+   septiembre de 2026 (tu WhatsApp Business)", "Regresa a comprar: falta
+   cuántos", que lo que frena es lo que él cree y donde más se pierden (de 120
+   a 18 en el mismo mes). Opción A: responder en menos de 1 hora durante 14
+   días; opción B: todavía no, primero consigue el dato que falta, para el 15
+   de octubre. Se guarda sólo cuando elige.
