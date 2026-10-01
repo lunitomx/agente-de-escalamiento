@@ -6,6 +6,10 @@ it names.  In the repository copy those live in ``escala-skills/``; a package
 Procedures are named ``<id>.md`` there, never ``SKILL.md``, so no platform
 discovers them as public skills.  Every file is the repository file byte for
 byte: the package never rewrites a procedure.
+
+The Maestro Humberto's Cash cards (S86.11) travel the same way, under
+``references/knowledge/cash/``, so a packaged ESCALA quotes him from the very
+cards the repository holds.
 """
 
 from __future__ import annotations
@@ -20,6 +24,9 @@ SKILLS_ROOT = REPOSITORY_ROOT / "escala-skills"
 REFERENCES_DIRECTORY = "references"
 CATALOG_REFERENCE = f"{REFERENCES_DIRECTORY}/catalog.yaml"
 PROCEDURES_DIRECTORY = f"{REFERENCES_DIRECTORY}/procedures"
+KNOWLEDGE_DIRECTORY = f"{REFERENCES_DIRECTORY}/knowledge"
+CASH_KNOWLEDGE_DIRECTORY = f"{KNOWLEDGE_DIRECTORY}/cash"
+CASH_KNOWLEDGE_ROOT = REPOSITORY_ROOT / ".escala" / "knowledge" / "cash"
 
 
 class DoorBundleError(ValueError):
@@ -37,19 +44,30 @@ def door_bundle(skills_root: Path = SKILLS_ROOT) -> dict[str, Path]:
         files[f"{PROCEDURES_DIRECTORY}/{capability.id}.md"] = (
             skills_root / capability.id / "SKILL.md"
         )
+    for card in sorted(CASH_KNOWLEDGE_ROOT.glob("*.md")):
+        files[f"{CASH_KNOWLEDGE_DIRECTORY}/{card.name}"] = card
     return files
 
 
 def door_bundle_paths() -> frozenset[str]:
     """Every file and directory the bundle adds beside the door."""
-    return frozenset({REFERENCES_DIRECTORY, PROCEDURES_DIRECTORY, *door_bundle()})
+    return frozenset(
+        {
+            REFERENCES_DIRECTORY,
+            PROCEDURES_DIRECTORY,
+            KNOWLEDGE_DIRECTORY,
+            CASH_KNOWLEDGE_DIRECTORY,
+            *door_bundle(),
+        }
+    )
 
 
 def copy_door_bundle(door_dir: Path) -> None:
-    """Copy the list and the procedures beside a packaged door."""
-    (door_dir / PROCEDURES_DIRECTORY).mkdir(parents=True, exist_ok=True)
+    """Copy the list, the procedures and the cards beside a packaged door."""
     for relative, source in door_bundle().items():
-        shutil.copyfile(source, door_dir / relative)
+        target = door_dir / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(source, target)
 
 
 def validate_door_bundle(door_dir: Path) -> None:

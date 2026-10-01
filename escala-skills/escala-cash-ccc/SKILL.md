@@ -40,4 +40,4 @@ CCC = DSO + DIO - DPO
 
 ---
 
-*Metodología: Alan Miltz. Implementación: Humberto Martínez Barón. Adaptación: Kokoro.*
+*Metodología: Alan Miltz. Implementación: Humberto Martínez Barrón. Adaptación: Kokoro.*

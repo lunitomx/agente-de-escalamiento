@@ -50,7 +50,7 @@ Aunque el servidor `escala_server/` ya no es necesario, el conocimiento capturad
 ## Créditos
 
 - **Buyer Personas:** Eduardo Muñoz Luna
-- **Power of One Engine:** Humberto Martínez Barón (implementación original)
+- **Power of One Engine:** Humberto Martínez Barrón (implementación original)
 - **Metodología:** Verne Harnish (Scaling Up), Alan Miltz (Power of One)
 
 ## Pipeline / Skills / Gates
