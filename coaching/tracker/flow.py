@@ -4,6 +4,8 @@
 Actions (JSON on stdin, like ``coaching.strategy_opsp``):
 
 - ``ask_name`` / ``connect``: the fixed messages (connect carries the Drive notice).
+- ``drive_not_found`` / ``drive_no_access`` (S86.3): fixed messages for when the
+  connector finds no file or has no permission; only the agent can tell.
 - ``tabs``: tab names of the connector text; no cell is read.
 - ``candidates``: reuse the remembered tab if the file and tab still match,
   otherwise propose tabs by name only.
@@ -353,6 +355,10 @@ def run(context: Mapping[str, object]) -> FlowResult:
         return FlowResult(action=action, message=messages.ASK_NAME)
     if action == "connect":
         return FlowResult(action=action, message=messages.connect_message())
+    if action == "drive_not_found":
+        return FlowResult(action=action, message=messages.DRIVE_FILE_NOT_FOUND)
+    if action == "drive_no_access":
+        return FlowResult(action=action, message=messages.DRIVE_NO_ACCESS)
     if action == "tabs":
         return FlowResult(action=action, tab_names=_tab_names(context))
     if action == "candidates":

@@ -29,7 +29,8 @@ carpeta de Google Drive u OneDrive que el equipo haya elegido.
 
 ## Context
 
-**Activación:** la frase "quiero reportar un bug/mejora" o algo parecido.
+**Activación:** la frase "quiero reportar un bug/mejora", "reportar problema"
+(la que ESCALA sugiere cuando algo falla) o algo parecido.
 Es el procedimiento interno `escala-bugreport`; no se presenta al dueño como
 comando ni se le pide escribirlo.
 

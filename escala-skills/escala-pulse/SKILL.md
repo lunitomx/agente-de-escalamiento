@@ -65,7 +65,8 @@ print(json.dumps(result, indent=2, ensure_ascii=False))
 
 ### Step 4: Handle Errors
 
-If `result["errors"]` is non-empty:
+Si `result["errors"]` es `["internal_error"]`, di tal cual `result["message"]` y nada más.
+Si no, if `result["errors"]` is non-empty:
 1. Show each error to the user
 2. For invalid answer values, ask the user to correct them (must be -1, 0, or 1)
 3. Re-run Step 3 with corrected answers

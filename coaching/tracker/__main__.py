@@ -7,10 +7,13 @@ import json
 import sys
 from typing import cast
 
-from coaching.tracker.flow import run
+from coaching.core.failsafe import run_safely
 
 
 def main() -> None:
+    # Imported here so a broken import also gets the fixed answer (S86.3).
+    from coaching.tracker.flow import run
+
     try:
         raw: object = json.loads(sys.stdin.read() or "{}")
     except json.JSONDecodeError:
@@ -19,4 +22,4 @@ def main() -> None:
     print(run(context).model_dump_json())
 
 
-main()
+run_safely(main)

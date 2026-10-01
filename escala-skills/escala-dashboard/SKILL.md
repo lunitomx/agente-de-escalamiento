@@ -143,7 +143,8 @@ Exit 0 = validation passed. Exit 1 = missing sections (show errors).
 
 ### Step 5: Handle Errors
 
-If `result["errors"]` is non-empty:
+Si `result["errors"]` es `["internal_error"]`, di tal cual `result["message"]` y nada más.
+Si no, if `result["errors"]` is non-empty:
 1. Explica cada error en español llano
 2. Ofrece el siguiente paso (diagnóstico o registro semanal) sin mencionar comandos
 
