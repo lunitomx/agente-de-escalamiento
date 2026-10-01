@@ -36,9 +36,6 @@ selections:
   - path: adapters/claude
     kind: tree
     role: agent_skill
-  - path: adapters/codex/AGENTS.template.md
-    kind: file
-    role: agent_skill
   - path: adapters/codex/agents
     kind: tree
     role: agent_skill

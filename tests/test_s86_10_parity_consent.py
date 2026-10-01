@@ -74,7 +74,6 @@ def test_private_figures_never_leave_even_with_a_yes() -> None:
 # --- T2: Codex gets the same ESCALA contract as Claude -----------------------
 
 
-
 def _fake_bin(tmp_path: Path) -> Path:
     bin_dir = tmp_path / "bin"
     bin_dir.mkdir(exist_ok=True)
@@ -163,14 +162,15 @@ def test_claude_and_codex_contracts_say_the_same_except_the_title(
     assert claude[:1] + claude[2:] == codex[:1] + codex[2:]
 
 
-def test_codex_template_lives_beside_the_codex_agents() -> None:
-    template = ROOT / "adapters" / "codex" / "AGENTS.template.md"
-    claude = ROOT / "adapters" / "claude" / "CLAUDE.template.md"
+def test_codex_reuses_the_claude_template_without_a_second_copy() -> None:
+    """One template, so the two contracts cannot drift; no new public file.
 
-    assert template.is_file()
-    assert template.read_text(encoding="utf-8").replace(
-        "# ESCALA for Codex", "# ESCALA for Claude Code"
-    ) == claude.read_text(encoding="utf-8")
+    A separate Codex template would be a new public-export selection and
+    re-pin the master-acceptance ledger (36 receipts) for a one-line title.
+    """
+    assert not (ROOT / "adapters" / "codex" / "AGENTS.template.md").exists()
+    policy = (ROOT / "governance" / "public-export.yaml").read_text(encoding="utf-8")
+    assert "AGENTS.template.md" not in policy
 
 
 def test_portable_export_carries_the_codex_contract(tmp_path: Path) -> None:
@@ -178,7 +178,6 @@ def test_portable_export_carries_the_codex_contract(tmp_path: Path) -> None:
     from tests.test_public_skill_installation import _portable_artifact
 
     artifact = _portable_artifact(tmp_path / "escala")
-    assert (artifact / "adapters" / "codex" / "AGENTS.template.md").is_file()
 
     home = tmp_path / "home"
     completed = subprocess.run(

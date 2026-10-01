@@ -376,10 +376,15 @@ validate_escala_block() {
 }
 # El bloque ESCALA es el mismo contrato para Claude (CLAUDE.md) y Codex
 # (AGENTS.md); sólo cambia la plantilla, que difiere en el título.
+# Una sola plantilla para todas las plataformas: sólo cambia el título.
+ESCALA_TEMPLATE="$SCRIPT_DIR/adapters/claude/CLAUDE.template.md"
+ESCALA_TEMPLATE_TITLE="# ESCALA for Claude Code"
+
 render_escala_block() {
-    local template="$1"
-    local skill_dir="$2"
-    local catalog_path="$3"
+    local template="$ESCALA_TEMPLATE"
+    local skill_dir="$1"
+    local catalog_path="$2"
+    local title="$3"
     local line
     if [[ ! -f "$template" ]]; then
         echo "No está disponible el contrato de ESCALA: $template" >&2
@@ -396,6 +401,7 @@ render_escala_block() {
             *"{{ESCALA_PYTHON}}"*)
                 printf "Where an ESCALA instruction runs \`python3\`, use \`%s/.venv/bin/python\` when it exists: it has the libraries ESCALA needs. Run it from the folder the business opened.\n" "$SCRIPT_DIR"
                 ;;
+            "$ESCALA_TEMPLATE_TITLE") printf "%s\n" "$title" ;;
             *) printf "%s\n" "$line" ;;
         esac
     done < "$template"
@@ -404,7 +410,7 @@ render_escala_block() {
 prepare_escala_instructions() {
     local agent_root="$1"
     local target="$agent_root/$2"
-    local template="$3"
+    local title="$3"
     local skill_dir="$SCRIPT_DIR/escala-skills/escala"
     local catalog_path="$SCRIPT_DIR/capabilities/mvp/catalog.json"
     local begin="<!-- ESCALA:BEGIN -->"
@@ -434,7 +440,7 @@ prepare_escala_instructions() {
                 cat "$target"
                 printf "\n\n"
             fi
-            render_escala_block "$template" "$skill_dir" "$catalog_path"
+            render_escala_block "$skill_dir" "$catalog_path" "$title"
         } > "$prepared" || {
             rm -f "$prepared"
             return 1
@@ -442,7 +448,7 @@ prepare_escala_instructions() {
     else
         while IFS= read -r line || [[ -n "$line" ]]; do
             if [[ "$line" == "$begin" ]]; then
-                render_escala_block "$template" "$skill_dir" "$catalog_path"
+                render_escala_block "$skill_dir" "$catalog_path" "$title"
                 replacing=true
                 continue
             fi
@@ -465,7 +471,7 @@ install_claude() {
     local claude_root="$HOME/.claude"
     local prepared
     if ! prepared="$(prepare_escala_instructions "$claude_root" "CLAUDE.md" \
-        "$SCRIPT_DIR/adapters/claude/CLAUDE.template.md")"; then
+        "# ESCALA for Claude Code")"; then
         return 1
     fi
     if [[ "$SPECIALISTS_ENABLED" == true ]] && ! validate_specialist_sources "claude" "md"; then
@@ -491,7 +497,7 @@ install_codex() {
     local codex_root="$HOME/.codex"
     local prepared
     if ! prepared="$(prepare_escala_instructions "$codex_root" "AGENTS.md" \
-        "$SCRIPT_DIR/adapters/codex/AGENTS.template.md")"; then
+        "# ESCALA for Codex")"; then
         return 1
     fi
     if [[ "$SPECIALISTS_ENABLED" == true ]] && ! validate_specialist_sources "codex" "toml"; then
