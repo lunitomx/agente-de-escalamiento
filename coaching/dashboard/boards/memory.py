@@ -140,3 +140,18 @@ def declined_boards(base: Path) -> dict[str, date]:
             if previous is None or item.decided_on > previous:
                 declined[item.board_id] = item.decided_on
     return declined
+
+
+def is_accepted(base: Path, board_id: str) -> bool:
+    """True only when the owner's latest decision on the board is "construir".
+
+    A corrupt file accepts nothing: a lost "sí" never turns into a file.
+    """
+    memory = read_decisions(base)
+    latest: BoardDecision | None = None
+    for item in memory.records:
+        if item.board_id == board_id and (
+            latest is None or item.decided_on >= latest.decided_on
+        ):
+            latest = item
+    return latest is not None and latest.outcome == "construir"

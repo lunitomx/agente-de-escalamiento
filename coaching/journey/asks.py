@@ -60,15 +60,17 @@ def asks_path(base: Path) -> Path:
 def read_asks(base: Path) -> AsksFile:
     """Recorded asks; a missing file means "never asked".
 
-    An unreadable or invalid file keeps its last-change date in ``corrupt_on``.
+    An unreadable or invalid file, or a mapping without ``asks`` (YAML such as
+    ``"::: x ["`` parses as a dict), keeps its last-change date in
+    ``corrupt_on``.
     """
     path = asks_path(base)
     if not path.exists():
         return AsksFile(records=[])
     try:
         raw: object = yaml.safe_load(path.read_text(encoding="utf-8"))
-        if isinstance(raw, dict):
-            items = cast(dict[str, object], raw).get("asks", [])
+        if isinstance(raw, dict) and "asks" in raw:
+            items = cast(dict[str, object], raw)["asks"]
             return AsksFile(records=_RECORDS.validate_python(items))
     except (OSError, yaml.YAMLError, ValidationError):
         pass

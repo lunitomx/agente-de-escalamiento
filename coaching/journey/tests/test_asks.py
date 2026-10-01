@@ -97,7 +97,9 @@ def _corrupt(base: Path, on: date, text: str = "asks: [roto") -> Path:
     return path
 
 
-@pytest.mark.parametrize("text", ["asks: [roto", "hola", "", "asks: [{x: 1}]"])
+@pytest.mark.parametrize(
+    "text", ["asks: [roto", "hola", "", "asks: [{x: 1}]", "::: x [", "otra: 1"]
+)
 def test_corrupt_file_counts_as_declined_on_its_last_change(
     tmp_path: Path, text: str
 ) -> None:
@@ -108,6 +110,17 @@ def test_corrupt_file_counts_as_declined_on_its_last_change(
     assert memory.records == []
     assert memory.corrupt_on == date(2026, 9, 10)
     assert declined_on(tmp_path) == date(2026, 9, 10)
+
+
+def test_a_dict_without_asks_is_backed_up_like_any_corrupt_file(
+    tmp_path: Path,
+) -> None:
+    path = _corrupt(tmp_path, date(2026, 9, 10), "::: x [")
+
+    _, backup = record_ask(tmp_path, _record(20, "si"))
+
+    assert backup == path.with_name("asks.yaml.bak")
+    assert backup is not None and backup.read_text(encoding="utf-8") == "::: x ["
 
 
 def test_readable_file_is_not_corrupt(tmp_path: Path) -> None:
