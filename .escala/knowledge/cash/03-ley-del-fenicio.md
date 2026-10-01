@@ -9,7 +9,7 @@ audio: 1
 
 Cobra lo antes posible y paga en el plazo que acordaste, sin ahogar a tu proveedor. Los dos tienen que ganar.
 
-## Como dice el Maestro Humberto
+## Según el curso
 
 > Cobra rápido y paga lento, siempre y cuando no estrangules al proveedor. Porque finalmente es un ganar ganar.
 
@@ -21,4 +21,4 @@ En el ejercicio del curso, los proveedores sólo financiaban 2 de cada 100 pesos
 
 Cuando el dueño piensa negociar plazos con clientes o proveedores.
 
-*Fuente: Maestro Humberto Martínez Barrón — curso de Cash, Club de Industriales (2025).*
+*Fuente: el curso de cash que vimos (2025).*

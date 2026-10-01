@@ -9,7 +9,7 @@ audio: 1
 
 Vender mucho se siente bien, pero lo que dice si la empresa está sana es la utilidad. Y lo que paga las cuentas es el efectivo.
 
-## Como dice el Maestro Humberto
+## Según el curso
 
 > El ingreso es vanidad, la utilidad es sanidad y el cash es la realidad.
 > Si una empresa está sana, va a tener utilidad.
@@ -22,4 +22,4 @@ Es el refrán financiero que trae el libro ("los ingresos son vanidad, las ganan
 
 Cuando el dueño celebra ventas récord pero no ve utilidad ni dinero en el banco.
 
-*Fuente: Maestro Humberto Martínez Barrón — curso de Cash, Club de Industriales (2025).*
+*Fuente: el curso de cash que vimos (2025).*

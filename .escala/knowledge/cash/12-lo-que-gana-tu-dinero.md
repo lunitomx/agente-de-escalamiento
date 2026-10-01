@@ -9,7 +9,7 @@ audio: 2
 
 Una cosa es la utilidad sobre ventas y otra lo que rinde el dinero que tú metiste. Mide las dos.
 
-## Como dice el Maestro Humberto
+## Según el curso
 
 > Una cosa es lo que gana mi empresa y otra cosa es lo que gana mi dinero.
 
@@ -21,4 +21,4 @@ En el ejercicio la empresa parecía ganar poco sobre sus ventas, pero el capital
 
 Cuando el dueño duda si su negocio "vale la pena" o compara contra dejar el dinero en el banco.
 
-*Fuente: Maestro Humberto Martínez Barrón — curso de Cash, Club de Industriales (2025).*
+*Fuente: el curso de cash que vimos (2025).*

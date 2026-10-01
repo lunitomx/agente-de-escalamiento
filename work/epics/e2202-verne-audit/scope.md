@@ -183,7 +183,7 @@ M3 (Polish):                   S22.9 ─► S22.10 ─► S22.11 ─► merge
 | S22.2 — Aleatorización + presentación | S | Done | ~5m | 1.0 | ✅ C5, C6, M7, m1 — 10 frases, shuffle, whoami |
 | S22.3 — board_debate con memoria | S | Done | ~3m | 1.0 | ✅ C5 validación, M3 referencia historial |
 | S22.4 — Power of One dashboard vivo | M | Done | ~10m | 1.0 | ✅ loadFromServer fix + defaults realistas |
-| S22.5 — Cash Engine Humberto | M | Done | ~15m | 1.0 | ✅ Motor 7 palancas, CCC, benchmarks, 9 tests |
+| S22.5 — Cash Engine | M | Done | ~15m | 1.0 | ✅ Motor 7 palancas, CCC, benchmarks, 9 tests |
 | S22.6 — Power of One conectado al backend | M | Done | ~10m | 1.0 | ✅ API + selector empresas demo |
 | S22.7 — Power of One idioma humano + Verne | S | Done | ~10m | 1.0 | ✅ Tooltips, Verne, guardado, toggle |
 | S22.8 — 22 dashboards (template) | XL | Done | ~15m | 1.0 | ✅ Generador produce todos con tooltips, Verne, guardado |

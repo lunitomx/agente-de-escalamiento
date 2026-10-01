@@ -103,5 +103,4 @@ Esto instala skills en `~/.claude/skills/`, `~/.hermes/skills/`, y crea
 ## Créditos
 
 - **Metodología:** Verne Harnish (Scaling Up), Alan Miltz (Power of One)
-- **Implementación original:** Humberto Martínez Barrón
 - **Creador:** Eduardo Muñoz Luna — Kokoro

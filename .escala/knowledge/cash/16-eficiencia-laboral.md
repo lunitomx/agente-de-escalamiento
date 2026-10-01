@@ -9,7 +9,7 @@ audio: 3
 
 Divide tu utilidad bruta entre lo que pagas de sueldos: sabes cuánto te deja cada peso de nómina. Y paga comisiones sobre margen, no sobre ventas.
 
-## Como dice el Maestro Humberto
+## Según el curso
 
 > Por cada peso que se gasta en mano de obra, sueldos y salarios, se obtienen 2.89.
 
@@ -21,4 +21,4 @@ En el ejercicio cada peso pagado en producción dejaba 2.89. Del libro: nunca ba
 
 Cuando el dueño quiere contratar, revisar nómina o diseñar comisiones.
 
-*Fuente: Maestro Humberto Martínez Barrón — curso de Cash, Club de Industriales (2025).*
+*Fuente: el curso de cash que vimos (2025).*

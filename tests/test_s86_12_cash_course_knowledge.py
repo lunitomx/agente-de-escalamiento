@@ -1,9 +1,10 @@
-"""S86.11: ESCALA answers about money with what the Maestro Humberto taught.
+"""S86.11/S86.12: ESCALA answers about money with what the Cash course taught.
 
-The cards in ``.escala/knowledge/cash/`` come from the Club de Industriales
-Cash course.  ESCALA quotes Humberto only from a card, credits him on every
-card, and every package carries the cards byte for byte.  The course audios
-and transcripts never enter the repository (it is public).
+The cards in ``.escala/knowledge/cash/`` come from the Cash course the group
+took.  ESCALA quotes the course only from a card and never names who gave it
+(S86.12: no attribution to a person, so nothing fiscal or legal lands on him).
+Every package carries the cards byte for byte.  The course audios and
+transcripts never enter the repository (it is public).
 """
 
 from __future__ import annotations
@@ -26,13 +27,13 @@ ROOT = Path(__file__).resolve().parents[1]
 CASH = ROOT / ".escala" / "knowledge" / "cash"
 DOOR = ROOT / "escala-skills" / "escala" / "SKILL.md"
 CASH_SKILL = ROOT / "escala-skills" / "escala-cash" / "SKILL.md"
-CREDIT = (
-    "*Fuente: Maestro Humberto Martínez Barrón — curso de Cash, "
-    "Club de Industriales (2025).*"
-)
+CREDIT = "*Fuente: el curso de cash que vimos (2025).*"
+CITATION = "Según el curso de cash que vimos, recuerda"
+# Built in pieces so this file does not trip its own search.
+INSTRUCTOR = re.compile("hum" + "berto|mart[ií]nez +bar+[oó]n", re.I)
 SECTIONS = (
     "## La idea",
-    "## Como dice el Maestro Humberto",
+    "## Según el curso",
     "## Ejemplo del curso",
     "## Cuándo usarla",
 )
@@ -49,7 +50,7 @@ PEOPLE = (
     "César",
     "Mata",
 )
-# Tax talk and crude words from the course that ESCALA never puts in his mouth.
+# Tax talk and crude words from the course that ESCALA never puts in the course's mouth.
 EXCLUDED = (
     "factura falsa",
     "comprar facturas",
@@ -78,7 +79,7 @@ def front_matter(text: str) -> dict[str, str]:
 
 
 def quote(text: str) -> str:
-    section = text.split("## Como dice el Maestro Humberto", 1)[1]
+    section = text.split("## Según el curso", 1)[1]
     section = section.split("\n## ", 1)[0]
     lines = [line[1:].strip() for line in section.splitlines() if line.startswith(">")]
     return " ".join(lines)
@@ -99,17 +100,17 @@ def test_every_card_has_the_idea_the_quote_the_example_and_the_credit(
     for heading in SECTIONS:
         assert heading in text, f"{card.name} has no '{heading}'"
     said = quote(text)
-    assert said, f"{card.name} has no quote from Humberto"
+    assert said, f"{card.name} has no quote from the course"
     assert len(said.split()) <= 45, f"{card.name}: the quote must stay short"
     assert text.rstrip().endswith(CREDIT)
 
 
 @pytest.mark.parametrize(
     "path",
-    [*cards(), CASH / "overview.md", CASH / "autor.md"],
+    [*cards(), CASH / "overview.md"],
     ids=lambda path: path.stem,
 )
-def test_no_participant_and_no_tax_advice_in_his_mouth(path: Path) -> None:
+def test_no_participant_and_no_tax_advice_in_the_cards(path: Path) -> None:
     text = path.read_text(encoding="utf-8")
     for name in PEOPLE:
         assert not re.search(rf"\b{name}\b", text), f"{path.name} names {name}"
@@ -125,18 +126,15 @@ def test_overview_lists_every_card_and_the_citation_rule() -> None:
     overview = (CASH / "overview.md").read_text(encoding="utf-8")
     for card in cards():
         assert card.name in overview, f"overview does not list {card.name}"
-    assert "Como dice el Maestro Humberto" in overview
+    assert CITATION in overview
     assert "contador" in overview  # tax questions go to the owner's accountant
 
 
-def test_the_author_card_names_him_right() -> None:
-    author = (CASH / "autor.md").read_text(encoding="utf-8")
-    assert "Maestro Humberto Martínez Barrón" in author
-    assert "Club de Industriales" in author
+def test_there_is_no_author_card() -> None:
+    assert not (CASH / "autor.md").exists()
 
 
-def test_his_surname_is_written_barron_everywhere() -> None:
-    wrong = "Martínez Bar" + "ón"
+def test_no_tracked_file_names_the_instructor() -> None:
     listed = subprocess.run(
         ["git", "ls-files"],
         cwd=ROOT,
@@ -147,9 +145,13 @@ def test_his_surname_is_written_barron_everywhere() -> None:
     offenders = [
         name
         for name in listed
-        if name.endswith((".md", ".py", ".yaml", ".json", ".sh"))
-        and (ROOT / name).is_file()
-        and wrong in (ROOT / name).read_text(encoding="utf-8", errors="ignore")
+        if INSTRUCTOR.search(name)
+        or (
+            (ROOT / name).is_file()
+            and INSTRUCTOR.search(
+                (ROOT / name).read_text(encoding="utf-8", errors="ignore")
+            )
+        )
     ]
     assert offenders == []
 
@@ -167,8 +169,9 @@ def test_the_course_audios_and_transcripts_never_enter_the_repository() -> None:
 
 def test_every_package_carries_the_cards() -> None:
     bundle = door_bundle()
-    for path in [*cards(), CASH / "overview.md", CASH / "autor.md"]:
+    for path in [*cards(), CASH / "overview.md"]:
         assert bundle[f"references/knowledge/cash/{path.name}"] == path
+    assert "references/knowledge/cash/autor.md" not in bundle
     assert {"references/knowledge", "references/knowledge/cash"} <= door_bundle_paths()
 
 
@@ -181,16 +184,16 @@ def test_a_packaged_card_is_the_repository_card_byte_for_byte(tmp_path: Path) ->
         validate_door_bundle(tmp_path)
 
 
-def test_the_door_quotes_humberto_only_from_the_cards() -> None:
+def test_the_door_quotes_the_course_only_from_the_cards() -> None:
     door = DOOR.read_text(encoding="utf-8")
     assert ".escala/knowledge/cash/" in door
     assert "references/knowledge/cash/" in door
-    assert "Como dice el Maestro Humberto, recuerda" in door
+    assert CITATION in door
     assert "una vez por tema" in door
     assert "nunca le atribuyas" in door
 
 
-def test_the_cash_procedure_reads_the_cards_and_credits_barron() -> None:
+def test_the_cash_procedure_reads_the_cards_and_cites_the_course() -> None:
     skill = CASH_SKILL.read_text(encoding="utf-8")
     assert ".escala/knowledge/cash/" in skill
-    assert "Humberto Martínez Barrón" in skill
+    assert CITATION in skill

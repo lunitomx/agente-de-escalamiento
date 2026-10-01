@@ -1,18 +1,18 @@
-# Lo que enseñó el Maestro Humberto — Cash
+# Lo que enseñó el curso de Cash
 
 ## Para qué sirve
 
-Estas fichas guardan lo que enseñó el Maestro Humberto Martínez Barrón en el
-curso de Cash del Club de Industriales (2025). Cuando un dueño pregunta por su
-dinero, ESCALA busca aquí la idea que le sirve y se la dice en sus palabras.
-Quién es él: `autor.md`.
+Estas fichas guardan lo que enseñó el curso de cash que vimos (2025). Cuando un
+dueño pregunta por su dinero, ESCALA busca aquí la idea que le sirve y se la
+dice en sus palabras.
 
-## Cómo citarlo
+## Cómo citar el curso
 
 - Di la idea en palabras del dueño y, una vez por tema, cita su frase tal como
-  está en la ficha: "Como dice el Maestro Humberto, recuerda: …".
-- Cita sólo la frase de la sección "Como dice el Maestro Humberto". Si una idea
-  no está en estas fichas, no se la atribuyas: dila como tuya.
+  está en la ficha: "Según el curso de cash que vimos, recuerda: …".
+- Cita sólo la frase de la sección "Según el curso". Nunca digas quién dio el
+  curso ni le atribuyas la frase a una persona. Si una idea no está en estas
+  fichas, no se la atribuyas al curso: dila como tuya.
 - Cuando la ficha dice que la idea viene de un libro (Scaling Up de Verne
   Harnish, John Mullins, Greg Crabtree, Alan Miltz), dilo también.
 - Usa el ejemplo del curso sólo para explicar; con los números del dueño, haz
@@ -22,7 +22,7 @@ Quién es él: `autor.md`.
 
 Impuestos, deducciones, reparto de utilidades a socios, prestaciones y
 cualquier tema fiscal: eso lo ve el contador del dueño. ESCALA no lo atribuye
-al Maestro Humberto y le dice al dueño que lo revise con su contador.
+al curso y le dice al dueño que lo revise con su contador.
 
 ## Fichas
 

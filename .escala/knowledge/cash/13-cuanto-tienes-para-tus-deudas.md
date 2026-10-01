@@ -9,7 +9,7 @@ audio: 3
 
 Divide lo que tienes a corto plazo entre lo que debes a corto plazo. Si da menos de 1, no te alcanza.
 
-## Como dice el Maestro Humberto
+## Según el curso
 
 > Nada más tengo 58 centavos para hacer frente a las deudas que tengo.
 
@@ -21,4 +21,4 @@ En el ejercicio la razón dio 0.58. Preguntó qué es peor, pérdida o falta de 
 
 Cuando el dueño tiene deudas que vencen pronto o quiere pedir otro préstamo.
 
-*Fuente: Maestro Humberto Martínez Barrón — curso de Cash, Club de Industriales (2025).*
+*Fuente: el curso de cash que vimos (2025).*

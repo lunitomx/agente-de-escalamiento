@@ -7,9 +7,9 @@ Procedures are named ``<id>.md`` there, never ``SKILL.md``, so no platform
 discovers them as public skills.  Every file is the repository file byte for
 byte: the package never rewrites a procedure.
 
-The Maestro Humberto's Cash cards (S86.11) travel the same way, under
-``references/knowledge/cash/``, so a packaged ESCALA quotes him from the very
-cards the repository holds.
+The Cash course cards (S86.11) travel the same way, under
+``references/knowledge/cash/``, so a packaged ESCALA quotes the course from the
+very cards the repository holds.
 """
 
 from __future__ import annotations
