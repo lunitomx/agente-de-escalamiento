@@ -161,3 +161,20 @@ def test_sales_are_strategy_not_cash() -> None:
 
     assert "ventas" not in routes["cash"].keywords
     assert "ventas" in routes["strategy"].keywords
+
+
+def test_door_reads_the_single_list_and_says_where_procedures_live() -> None:
+    door = (SKILLS / "escala" / "SKILL.md").read_text(encoding="utf-8")
+
+    assert "`escala-skills/catalog.yaml`" in door
+    assert "`routes`" in door
+    assert "`keep`" in door
+    # One line says where the internal procedures live.
+    assert "`escala-skills/escala-*/SKILL.md`" in door
+    # Only the catalog.json reference ("../../") is relative: the Agent Plugin
+    # package rejects any other "../" in the door.
+    assert door.count("../") == 2
+    # catalog.json stays the adapters' lifecycle contract, referenced once
+    # (the plugin and Codex builders rewrite exactly one reference).
+    assert door.count("../../capabilities/mvp/catalog.json") == 1
+    assert "seis capacidades MVP" in door
