@@ -343,6 +343,93 @@ routes:
   - indicador
   target: escala-dashboard
   message: Veamos primero qué quieres decidir con ese tablero y si ya tienes algo que lo responda.
+# S86.4: rutas directas para lo que no es de un área. Frases de varias
+# palabras y antes de las áreas, para que no se coman pedidos de negocio.
+- id: close
+  keywords:
+  - terminamos por hoy
+  - es todo por hoy
+  - cerremos la sesion
+  target: escala-close
+  message: Cerremos con lo que avanzamos hoy y lo que sigue.
+- id: bugreport
+  keywords:
+  - reportar problema
+  - reportar un problema
+  target: escala-bugreport
+  message: Te ayudo a preparar un aviso para el equipo, sin datos de tu empresa.
+- id: health
+  keywords:
+  - revisa la instalacion
+  - quedo bien instalado
+  target: escala-health
+  message: Reviso que ESCALA haya quedado bien instalado en tu computadora.
+- id: update
+  keywords:
+  - actualiza escala
+  - actualizar escala
+  - actualizate
+  target: escala-update
+  message: Reviso si hay una versión nueva de ESCALA y te digo qué cambia.
+- id: export
+  keywords:
+  - exportar
+  - descargar mi plan
+  target: escala-export
+  message: Junto tu plan en un documento que puedes guardar o compartir.
+- id: memory
+  keywords:
+  - que recuerdas
+  - te acuerdas
+  target: escala-memory
+  message: Te cuento lo que guardaste conmigo, sólo lo que autorizaste.
+- id: goal
+  keywords:
+  - meta del año
+  - meta anual
+  target: escala-goal
+  message: Veamos tu meta del año; todo lo demás se mide contra ella.
+- id: progress
+  keywords:
+  - cuanto he avanzado
+  - mi avance
+  target: escala-progress
+  message: Te muestro lo que ya avanzaste y el siguiente paso.
+- id: pulse
+  keywords:
+  - pulso
+  target: escala-pulse
+  message: Anotemos cómo va cada parte de tu empresa este trimestre.
+- id: board
+  keywords:
+  - junta de consejo
+  - consejo consultivo
+  target: escala-board
+  message: Reviso todo lo que sé de tu empresa como lo haría un consejo y te traigo las decisiones.
+- id: worksheet
+  keywords:
+  - hoja de trabajo
+  - hojas de trabajo
+  target: escala-worksheet
+  message: Llenemos juntos la hoja de trabajo, paso por paso.
+- id: level
+  keywords:
+  - ve mas rapido
+  - explicame mas sencillo
+  target: escala-level
+  message: Ajusto cómo te acompaño a lo que ya sabes.
+- id: evidence
+  keywords:
+  - en que te basas
+  - de donde sacas
+  target: escala-evidence
+  message: Te muestro qué datos sostienen lo que te dije y cuáles faltan.
+- id: discover
+  keywords:
+  - donde estan mis datos
+  - mis datos estan en
+  target: escala-discover
+  message: Veamos dónde tienes tus datos hoy para no llenar nada a mano.
 - id: cash
   keywords:
   - cash
@@ -350,7 +437,8 @@ routes:
   - dinero
   - cobrar
   - flujo de caja
-  - ventas
+  - estados financieros
+  - estado de resultados
   - no me pagan
   - no me alcanza
   - nomina
@@ -363,6 +451,7 @@ routes:
   - delegar
   - contratar
   - talento
+  - organigrama
   target: escala-people
   message: Empecemos por las personas y responsabilidades que más están frenando a tu empresa.
 - id: strategy
@@ -386,6 +475,11 @@ routes:
   - no vuelven
   - no vendo
   - vendo poco
+  # S86.4: "bajaron mis ventas" es Strategy (escala/SKILL.md); sólo es Cash si
+  # no le alcanza o no le pagan, y Cash se evalúa antes.
+  - ventas
+  - fortalezas
+  - debilidades
   target: escala-strategy
   message: Empecemos por aclarar tu rumbo y la evidencia que ya tienes sobre tu mercado.
 - id: execution
@@ -396,6 +490,17 @@ routes:
   - meta
   - reuniones
   - incendios
+  - pizarron
+  - junta semanal
+  - reunion semanal
+  - junta trimestral
+  - reunion trimestral
+  # E82: la hoja del grupo de accountability.
+  - junta del grupo
+  - reunion del grupo
+  - hoja del grupo
+  - mi hoja
+  - tracker
   target: escala-execution
   message: Empecemos por la prioridad y el ritmo operativo que más impacto puede tener esta semana.
 - id: diagnose
