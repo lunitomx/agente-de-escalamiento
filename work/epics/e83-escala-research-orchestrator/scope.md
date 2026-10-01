@@ -46,7 +46,7 @@ Un orquestador de varios pasos que ayuda al empresario a investigar su entorno c
 | S83.1 | Contrato del orquestador: encuadre, catálogo de evidencia, reporte, modo sin búsqueda (`ESCALA-57`) | M | complete — `coaching/research/`, `escala-strategy-research` |
 | S83.2 | Módulo benchmark (`ESCALA-58`) | M | complete — modo `benchmark`, acción `comparables` |
 | S83.3 | Módulo mercado (`ESCALA-59`) | M | complete — modo `mercado`, `market_size`, palabras de giro |
-| S83.4 | Módulo fortalezas/debilidades y tendencias, alimenta al SWT (`ESCALA-60`) | S | planned |
+| S83.4 | Módulo fortalezas/debilidades y tendencias, alimenta al SWT (`ESCALA-60`) | S | complete — lado y negocios confirmados, reuso del benchmark, acción `swt`, integración de los tres modos |
 | S83.5 | Integración con diagnóstico y verificación por plataforma con y sin búsqueda web (`ESCALA-61`) | S | done |
 
 Orden de ejecución: S83.1 → S83.2 → S83.5 → S83.3 → S83.4. Diseño detallado en `design.md`.
@@ -146,7 +146,7 @@ Checkpoint de integración: S83.5 prueba la costura research → diagnóstico en
 | S83.2 | M | 5 | done | M | `ESCALA-58` |
 | S83.5 | S | 3 | done | M | `ESCALA-61` |
 | S83.3 | M | 5 | done | M | `ESCALA-59` |
-| S83.4 | S | 3 | planned | - | `ESCALA-60` |
+| S83.4 | S | 3 | done | S | `ESCALA-60` |
 
 ### Sequencing Risks
 
