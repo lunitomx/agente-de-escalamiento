@@ -170,8 +170,8 @@ def _html_row(row: BoardRow) -> str:
     e = html.escape
     if row.value is None:
         return (
-            f"<section class='card'><div class='name'>{e(row.name)}</div>"
-            f"<div class='missing'>{e(_missing_text(row))}</div></section>"
+            f"<section class='card'><div class='missing'>"
+            f"{e(_missing_text(row))}</div></section>"
         )
     bar = ""
     if row.bar is not None:
@@ -211,7 +211,7 @@ def render_markdown(board: Board) -> str:
     lines = [f"> {LOCAL_ONLY}", "", f"# {board.title}", "", _subtitle(board), ""]
     for row in board.rows:
         if row.value is None:
-            lines += [f"- **{row.name}**: {_missing_text(row)}"]
+            lines += [f"- {_missing_text(row)}"]
         else:
             lines += [
                 f"- **{row.name}**: {row.value}. "
