@@ -35,6 +35,7 @@ interno indicado.
 | Sin trabajo previo | procedimiento interno `escala-cash-ccc` | "¿Vemos cuántos días pasan desde que pagas a tu proveedor hasta que tu cliente te paga?" |
 | CCC mapeado | procedimiento interno `escala-cash-power1` | "¿Vemos cuánto dinero liberas si cobras 10 días antes?" |
 | Power of One hecho | procedimiento interno `escala-cash-acceleration` | "¿Buscamos formas de que el dinero te llegue más rápido?" |
+| Te pasa sus estados financieros o su estado de resultados (sin prerequisito) | procedimiento interno `escala-cash-finanzas` | "¿Me pasas tus estados financieros como los tengas, en PDF, Excel o foto, y yo saco los números?" |
 | Todo hecho | — | "¿Volvemos a medir para ver cuánto mejoró tu efectivo?" |
 
 ### Step 4: Use Backend Engine

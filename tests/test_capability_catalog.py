@@ -56,13 +56,13 @@ def test_every_tracked_legacy_skill_has_one_explicit_alias() -> None:
         ("¿Qué tendencias vienen para mi sector?", "escala-strategy"),
         ("¿Cuánto cobra mi competencia?", "escala-strategy"),
         ("Quiero un benchmark de mi oferta", "escala-strategy"),
-        # Cash is evaluated first: "ventas" wins, and Cash can offer research.
-        ("benchmark de ventas", "escala-cash"),
+        # S86.4: sales are Strategy (escala/SKILL.md); Cash only when money
+        # does not reach or clients do not pay.
+        ("benchmark de ventas", "escala-strategy"),
         ("Necesito ayuda con mi marketing", "escala-strategy"),
         ("No me llegan prospectos", "escala-strategy"),
         ("¿Cómo consigo más prospectos?", "escala-strategy"),
-        # Cash is still evaluated first: sales words stay in Cash.
-        ("marketing para subir mis ventas", "escala-cash"),
+        ("marketing para subir mis ventas", "escala-strategy"),
         # E84: sales-pain phrases reach Strategy, where the journey check runs.
         ("Mucha gente pregunta por WhatsApp pero pocos compran", "escala-strategy"),
         ("Me preguntan mucho pero no me compran", "escala-strategy"),

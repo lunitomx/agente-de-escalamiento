@@ -42,6 +42,7 @@ interno indicado.
 | Sin trabajo previo | procedimiento interno `escala-people-fac` | "¿Anotamos quién es responsable de cada área de tu empresa y cómo se mide?" |
 | FACChart hecho | procedimiento interno `escala-people-values` | "¿Ponemos en palabras lo que en tu empresa no se negocia?" |
 | FACChart + Values | procedimiento interno `escala-people-topgrading` | "¿Armamos cómo contratar a la próxima persona para que sí sea la correcta?" |
+| Tiene su organigrama, en el formato que sea (sin prerequisito) | procedimiento interno `escala-people-organigrama` | "¿Me pasas tu organigrama como lo tengas y te digo qué huecos veo?" |
 | Todo hecho | — | "¿Revisamos qué huecos quedan en tu equipo?" |
 
 ### Step 4: Guide

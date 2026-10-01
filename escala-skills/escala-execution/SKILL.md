@@ -41,6 +41,10 @@ interno indicado.
 | Hábitos de Ejecución hecho | procedimiento interno `escala-execution-rhythms` | "¿Armamos juntos tus juntas: cuáles, cada cuándo y cuánto duran?" |
 | Rhythms diseñados | procedimiento interno `escala-execution-priorities` | "¿Elegimos las 3 a 5 cosas que tu equipo tiene que lograr este trimestre?" |
 | Todo hecho | — | "¿Volvemos a revisar cómo se cumplen las cosas para medir tu avance?" |
+| Habla de su hoja del grupo, su tracker o su junta del grupo (sin prerequisito) | procedimiento interno `escala-execution-tracker` | "¿Revisamos tu pestaña de la hoja del grupo antes de la junta?" |
+| Tiene la foto del pizarrón de su junta diaria (sin prerequisito) | procedimiento interno `escala-execution-pizarron` | "¿Me mandas la foto del pizarrón y saco quién se comprometió a qué?" |
+| Pide preparar su junta semanal (sin prerequisito) | procedimiento interno `escala-rhythm-weekly` | "¿Preparo la agenda de tu junta semanal con lo que pasó en la semana?" |
+| Pide preparar su junta trimestral o su salida de planeación (sin prerequisito) | procedimiento interno `escala-rhythm-quarterly` | "¿Preparo tu junta trimestral para que sólo llegues a decidir?" |
 
 Los Meeting Rhythms son generalmente el cambio de mayor impacto inmediato.
 

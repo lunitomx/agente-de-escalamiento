@@ -52,7 +52,8 @@ interno indicado.
 | Sin Core Values | procedimiento interno `escala-people-values` primero (prerequisito). Al dueño: "Antes de tu plan, ¿ponemos en palabras lo que en tu empresa no se negocia?" |
 | Core Values listos, sin Plan Estratégico de Una Página (OPSP) | procedimiento interno `escala-strategy-opsp`. Al dueño: "¿Armamos tu plan del negocio en una sola página?" |
 | Plan Estratégico de Una Página (OPSP) básico listo | procedimiento interno `escala-strategy-7strata`. Al dueño: "¿Vemos qué te hace distinto de tu competencia?" |
-| Todo hecho | SWOT/SWT para refinar |
+| Todo hecho | procedimiento interno `escala-strategy-swt` para refinar |
+| Pregunta por sus fortalezas, debilidades o tendencias (sin prerequisito) | `escala-strategy-swt` — fortalezas, debilidades y tendencias con lo que ya sabemos |
 | Pregunta por su competencia, su mercado o las tendencias de su sector (sin prerequisito) | `escala-strategy-research` — investigar afuera antes de decidir |
 | Habla de ventas, marketing, prospectos o clientes que no compran o no regresan (sin prerequisito) | `escala-strategy-journey` — cómo llega un cliente hasta que le compra, sólo si el módulo dice que se pregunte |
 
