@@ -31,7 +31,7 @@ para no invertir a ciegas en instalación y paridad).
 | Historia | Jira | Entrega (hallazgos) | Tam. | Criterio verificable | Estado |
 |---|---|---|:---:|---|---|
 | S86.1 | ESCALA-69 | Cero comandos visibles (Q2 + Q4) | 2 | `grep '/escala-' escala-skills/*/SKILL.md` = 0 salvo `escala`, con test; `update.sh` deja 1 skill `escala*` | done |
-| S86.2 | ESCALA-70 | Lenguaje del dueño (Q1 + A5) | 3 | Test sobre textos del dueño falla con People/Strategy/Execution/Cash/CCC/BHAG/SWT/OPSP/Deep Dive sin traducción | planned |
+| S86.2 | ESCALA-70 | Lenguaje del dueño (Q1 + A5) | 3 | Test sobre textos del dueño falla con People/Strategy/Execution/Cash/CCC/BHAG/SWT/OPSP/Deep Dive sin traducción | done |
 | S86.3 | ESCALA-71 | Errores con salida (A1 + A2) | 3 | Test por módulo con fallo simulado; ningún `message` dice "tu Claude" | planned |
 | S86.4 | ESCALA-72 | Puerta que conoce todo (S2) | 5 | Cada procedimiento `keep` alcanzable desde una frase del dueño; "bajaron mis ventas" → Strategy | planned |
 | S86.5 | ESCALA-73 | Diagnóstico que termina en acción (S4) | 3 | Último mensaje con acción, responsable y fecha + oferta de anotarlo en la hoja | planned |
