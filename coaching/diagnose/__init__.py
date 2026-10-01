@@ -19,6 +19,7 @@ from .narrative import (
     FocusProposal,
     NarrativeAssessment,
     NarrativeFinding,
+    WeeklyAction,
     assessment_to_artifact,
     build_narrative_assessment,
     render_narrative_assessment,
@@ -37,6 +38,7 @@ __all__ = [
     "FocusProposal",
     "NarrativeAssessment",
     "NarrativeFinding",
+    "WeeklyAction",
     "assessment_to_artifact",
     "build_prefill",
     "build_diagnostic_intake",
@@ -47,7 +49,9 @@ __all__ = [
     "score_diagnostic",
 ]
 
+from datetime import date
 from pathlib import Path
+
 from ..core import read_yaml, write_yaml
 
 
@@ -365,6 +369,7 @@ def _run_narrative_assessment(context: dict, base: Path) -> dict:
     )
 
     try:
+        today = _today(context)
         intake = build_diagnostic_intake(
             company=context.get("company"),
             evidence=context.get("evidence", ()),
@@ -379,6 +384,8 @@ def _run_narrative_assessment(context: dict, base: Path) -> dict:
             proposed_focuses=context.get("proposed_focuses", ()),
             open_questions=context.get("open_questions", ()),
             confirmation_status=context.get("confirmation_status", "pending"),
+            weekly_action=context.get("weekly_action"),
+            today=today,
         )
     except (TypeError, ValidationError, ValueError) as exc:
         return {
@@ -409,15 +416,47 @@ def _run_narrative_assessment(context: dict, base: Path) -> dict:
         write_yaml(profile_path, profile)
         persisted_path = str(profile_path)
 
-    return {
-        "output": render_narrative_assessment(assessment),
-        "artifacts": {
-            "action": "narrative_assessment",
-            "assessment": assessment_to_artifact(assessment),
-            "persisted_assessment_path": persisted_path,
-        },
-        "errors": [],
+    artifacts: dict[str, object] = {
+        "action": "narrative_assessment",
+        "assessment": assessment_to_artifact(assessment),
+        "persisted_assessment_path": persisted_path,
     }
+    output = render_narrative_assessment(assessment)
+    if assessment.weekly_action is not None:
+        output = _closing(assessment.weekly_action, context, base, artifacts)
+    return {"output": output, "artifacts": artifacts, "errors": []}
+
+
+def _today(context: dict) -> date:
+    """``today`` (ISO) from the context, or the real date."""
+    raw = context.get("today")
+    if raw is None:
+        return date.today()
+    return date.fromisoformat(str(raw))
+
+
+def _sheet_offer(context: dict, base: Path) -> str | None:
+    """S86.5: offer to note the action in the group sheet."""
+    from . import messages
+
+    del context, base
+    return messages.SHEET_OFFER
+
+
+def _closing(
+    action: WeeklyAction, context: dict, base: Path, artifacts: dict[str, object]
+) -> str:
+    """S86.5: the last message — constraint, one action, who, when, the offer."""
+    from . import messages
+
+    offer = _sheet_offer(context, base)
+    message = messages.closing_message(
+        action.constraint, action.action, action.responsible, action.due, offer
+    )
+    artifacts["weekly_action"] = action.model_dump(mode="json")
+    artifacts["closing_message"] = message
+    artifacts["sheet_offer"] = offer is not None
+    return message
 
 
 def _main() -> None:
