@@ -7,6 +7,8 @@ user already sees in Drive. Cells are quoted only from the confirmed tab.
 
 from __future__ import annotations
 
+from datetime import date
+
 from coaching.core import owner_area_choice
 from coaching.tracker.identity import SheetCandidate, is_placeholder_name
 from coaching.tracker.maintenance import (
@@ -17,6 +19,7 @@ from coaching.tracker.maintenance import (
 )
 from coaching.tracker.parser import CommitmentsLayout, Column, cell_ref
 from coaching.tracker.proposal import (
+    MONTHS,
     ProposedRow,
     QuarterCheck,
     RockProposal,
@@ -648,3 +651,36 @@ WEEKDAY_NAMES = (
 def meeting_nudge_message(day: str) -> str:
     """The first line of the conversation: "Tu reunión del grupo es el jueves."."""
     return f"Tu reunión del grupo es {day}. ¿Reviso tu hoja?"
+
+
+ASK_MEETING_DAY = (
+    "¿Qué día es tu reunión del grupo? Por ejemplo: «los jueves» o «el jueves "
+    "8 de octubre». Así te aviso cuando falten pocos días."
+)
+ASK_NEXT_MEETING_DATE = (
+    "Para contar cada dos semanas necesito una fecha: ¿cuándo es la próxima "
+    "reunión? Por ejemplo: «el jueves 8 de octubre»."
+)
+
+
+def date_words(day: date) -> str:
+    """``2026-10-08`` -> "jueves 8 de octubre"."""
+    return f"{WEEKDAY_NAMES[day.weekday()]} {day.day} de {MONTHS[day.month - 1]}"
+
+
+def meeting_saved_message(
+    next_date: date | None, weekday: int | None, every_weeks: int | None
+) -> str:
+    """One line that repeats what was kept, so the owner can correct it."""
+    if next_date is None:
+        when = f"los {WEEKDAY_NAMES[weekday or 0]}"
+    elif every_weeks == 2:
+        when = f"cada dos semanas; la próxima es el {date_words(next_date)}"
+    elif every_weeks == 1:
+        when = f"cada semana; la próxima es el {date_words(next_date)}"
+    else:
+        when = f"el {date_words(next_date)}"
+    return (
+        f"Listo, anoté tu reunión del grupo: {when}. Cuando falten 3 días o "
+        "menos te pregunto si reviso tu hoja."
+    )
