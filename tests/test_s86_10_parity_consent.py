@@ -308,3 +308,112 @@ def test_plugin_rejects_a_tampered_or_extra_procedure(tmp_path: Path) -> None:
     (door_dir / "references" / "procedures" / "escala-extra.md").write_text("x", encoding="utf-8")
     with pytest.raises(AgentPluginError, match="package_surface_invalid"):
         load_agent_plugin(door_dir.parents[1])
+
+
+# --- T4: the four surfaces say the same thing and reach the same places -------
+
+FAILURE_SENTENCE = (
+    "No pude abrir esa parte de ESCALA en tu computadora. No se perdió nada. "
+    "Escribe 'reportar problema' y preparo un aviso para el equipo."
+)
+CATALOG_REFERENCES = (
+    "../../capabilities/mvp/catalog.json",
+    "references/capability-catalog.json",
+    "../../core/escala-capability-contract.json",
+)
+
+
+class _Surface:
+    """Where the door, its list and its procedures are on one platform."""
+
+    def __init__(self, door_dir: Path, *, packaged: bool) -> None:
+        self.door = (door_dir / "SKILL.md").read_text(encoding="utf-8")
+        if packaged:
+            self.catalog = door_dir / "references" / "catalog.yaml"
+            self._procedures = door_dir / "references" / "procedures"
+        else:
+            self.catalog = door_dir / ".." / "catalog.yaml"
+            self._procedures = door_dir / ".."
+        self.packaged = packaged
+
+    def procedure(self, procedure_id: str) -> Path:
+        if self.packaged:
+            return self._procedures / f"{procedure_id}.md"
+        return self._procedures / procedure_id / "SKILL.md"
+
+    def reaches(self, phrase: str, procedure_id: str, hint: str | None) -> bool:
+        catalog = load_capability_catalog(self.catalog)
+        target = route_request(phrase, catalog=catalog).capability_id
+        if not self.procedure(target).is_file():
+            return False
+        if hint is None:
+            return target == procedure_id
+        if target not in AREA_ENTRIES or not self.procedure(procedure_id).is_file():
+            return False
+        rows = [
+            line
+            for line in self.procedure(target).read_text(encoding="utf-8").splitlines()
+            if line.startswith("|")
+        ]
+        return any(
+            f"`{procedure_id}`" in row and _plain(hint) in _plain(row) for row in rows
+        )
+
+
+def _surfaces(tmp_path: Path) -> dict[str, _Surface]:
+    home = tmp_path / "home"
+    completed = _install(home, _fake_bin(tmp_path), "claude", "codex")
+    assert completed.returncode == 0, completed.stderr
+    return {
+        "claude-install": _Surface(home / ".claude" / "skills" / "escala", packaged=False),
+        "codex-install": _Surface(home / ".codex" / "skills" / "escala", packaged=False),
+        "plugin": _Surface(_plugin_door(tmp_path), packaged=True),
+        "codex-package": _Surface(_codex_door(tmp_path), packaged=True),
+    }
+
+
+def _neutral(door: str) -> str:
+    for reference in CATALOG_REFERENCES:
+        door = door.replace(reference, "<catalog.json>")
+    return door
+
+
+def test_all_surfaces_show_the_same_door_consent_and_failure_sentence(
+    tmp_path: Path,
+) -> None:
+    surfaces = _surfaces(tmp_path)
+    canonical = _neutral(DOOR.read_text(encoding="utf-8"))
+
+    for name, surface in surfaces.items():
+        assert _neutral(surface.door) == canonical, name
+    consents = {consent_section(s.door) for s in surfaces.values()}
+    assert len(consents) == 1
+    for name, surface in surfaces.items():
+        assert FAILURE_SENTENCE in surface.door, name
+
+
+def test_all_surfaces_reach_the_same_procedures(tmp_path: Path) -> None:
+    surfaces = _surfaces(tmp_path)
+
+    reached = {
+        name: {
+            procedure
+            for procedure, (phrase, hint) in PHRASES.items()
+            if surface.reaches(phrase, procedure, hint)
+        }
+        for name, surface in surfaces.items()
+    }
+
+    assert all(found == set(PHRASES) for found in reached.values()), {
+        name: sorted(set(PHRASES) - found) for name, found in reached.items()
+    }
+
+
+def test_all_surfaces_close_a_diagnosis_with_the_same_procedure(tmp_path: Path) -> None:
+    """S86.5's closing (action + sheet offer) lives in escala-diagnose."""
+    surfaces = _surfaces(tmp_path)
+    source = (ROOT / "escala-skills" / "escala-diagnose" / "SKILL.md").read_bytes()
+
+    for name, surface in surfaces.items():
+        assert surface.procedure("escala-diagnose").read_bytes() == source, name
+        assert surface.procedure("escala-bugreport").is_file(), name
