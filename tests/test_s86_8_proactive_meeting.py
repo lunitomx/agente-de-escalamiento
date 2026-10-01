@@ -432,3 +432,53 @@ def test_the_real_module_answers_the_door(tmp_path: Path) -> None:
     out = json.loads(done.stdout)
     assert out["message"] == "Tu reunión del grupo es el jueves. ¿Reviso tu hoja?"
     assert out["meeting"] == "2026-10-01"
+
+
+# --- T3: what the door and the tracker procedure say --------------------------
+
+
+def _skill(name: str) -> str:
+    """The procedure text with line breaks folded, as the agent reads it."""
+    text = (ROOT / "escala-skills" / name / "SKILL.md").read_text(encoding="utf-8")
+    return " ".join(text.split())
+
+
+def _section(text: str, title: str) -> str:
+    start = text.index(title)
+    end = text.find(" ## ", start + len(title))
+    return text[start : end if end != -1 else None]
+
+
+def test_door_makes_one_opening_call_before_answering() -> None:
+    before = _section(_skill("escala"), "## Antes de responder")
+
+    assert before.count('"action": "opening"') == 1
+    assert "python3 -m coaching.tracker" in before
+    assert "primera línea" in before
+
+
+def test_door_stays_silent_when_the_opening_call_fails() -> None:
+    before = _section(_skill("escala"), "## Antes de responder")
+
+    assert "no digas nada" in before
+    assert "Cuando algo falla" in before  # it says that rule does not apply here
+
+
+def test_door_records_the_answer_and_does_not_insist() -> None:
+    before = _section(_skill("escala"), "## Antes de responder")
+
+    assert '"action": "meeting_answer"' in before
+    for outcome in ('"si"', '"despues"', '"no"'):
+        assert outcome in before
+    assert "cambia de tema" in before
+    assert "no insistas" in before
+
+
+def test_tracker_procedure_asks_the_meeting_day_only_when_it_matters() -> None:
+    skill = _skill("escala-execution-tracker")
+
+    assert '"action": "meeting_ask"' in skill
+    assert '"action": "meeting_set"' in skill
+    assert "meeting_schedule" in skill
+    assert "¿Qué día es tu reunión del grupo?" in skill
+    assert "nunca al empezar" in skill
