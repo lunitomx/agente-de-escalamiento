@@ -28,6 +28,14 @@ Actions (JSON on stdin, like ``coaching.tracker``):
   = its local path, as in ``index.yaml``; ``limit``, default 3). Without
   ``pages`` it returns the links to open; with ``pages`` ({source_id: page
   text}) it says, per source, whether the quoted excerpt is on the page.
+- ``swt``: the newest saved ``fortalezas-tendencias`` research, still
+  current, as outside evidence for the one SWT (marked, graded, no URLs,
+  ``saved_to`` = its local report). Writes nothing. ``base_path`` and
+  ``today`` (S83.4).
+
+In ``fortalezas-tendencias``, ``frame`` with an explicit ``base_path`` also
+returns the comparables of the newest current benchmark for the same offer
+and zone, with their ``sources`` (S83.4).
 
 The private specialist never writes state; this module does.
 """
@@ -54,6 +62,7 @@ from coaching.research.engine import (
     grade_claim,
     is_own_company,
 )
+from coaching.research.swt import SwtEvidence, load_swt_evidence, swt_message
 from coaching.research.sampling import SAMPLE_SIZE, SourceCheck, check_sources
 from coaching.research.models import (
     Comparable,
@@ -72,6 +81,7 @@ from coaching.research.report import (
     load_index,
     load_saved_report,
     report_message,
+    reusable_comparables,
     save_report,
 )
 
@@ -92,11 +102,13 @@ class FlowResult(BaseModel):
     rejected: list[RejectedQuery] = Field(default_factory=list[RejectedQuery])
     claims: list[ResearchClaim] = Field(default_factory=list[ResearchClaim])
     comparables: list[Comparable] = Field(default_factory=list[Comparable])
+    sources: list[SourceRecord] = Field(default_factory=list[SourceRecord])
     report: ResearchReport | None = None
     saved_to: str | None = None
     missing_question: str | None = None
     diagnostic_inputs: DiagnosticInputs | None = None
     source_checks: list[SourceCheck] = Field(default_factory=list[SourceCheck])
+    swt_evidence: list[SwtEvidence] = Field(default_factory=list[SwtEvidence])
     errors: list[str] = Field(default_factory=list)
 
 
@@ -132,8 +144,55 @@ def _missing_question(frame: ResearchFrame) -> str | None:
     )
 
 
+def _with_reuse(
+    context: Mapping[str, object], frame: ResearchFrame, result: FlowResult
+) -> FlowResult:
+    """In ``fortalezas-tendencias``, the comparables the owner already
+    confirmed in a current benchmark (S83.4). Only an explicit ``base_path``
+    is read."""
+    if frame.mode != "fortalezas-tendencias" or result.frame is None:
+        return result
+    base = _text(context, "base_path")
+    reused = (
+        None
+        if base is None
+        else reusable_comparables(Path(base), frame, _today(context))
+    )
+    counted = (
+        [] if reused is None else [i.name for i in reused.comparables if i.counted]
+    )
+    candidates = (
+        [] if reused is None else [i.name for i in reused.comparables if not i.counted]
+    )
+    lines = [
+        messages.reusing_comparables(counted) if counted else messages.NEEDS_COMPARABLES
+    ]
+    if candidates:
+        lines.append(
+            f"También aparecieron {messages.join_names(candidates)}. "
+            f"{messages.NOT_COUNTED}"
+        )
+    if reused is None:
+        return result.model_copy(
+            update={"message": f"{result.message}\n\n{' '.join(lines)}"}
+        )
+    competitors = list(dict.fromkeys([*result.frame.competitors, *reused.competitors]))
+    return result.model_copy(
+        update={
+            "frame": result.frame.model_copy(update={"competitors": competitors}),
+            "comparables": reused.comparables,
+            "sources": reused.sources,
+            "message": f"{result.message}\n\n{' '.join(lines)}",
+        }
+    )
+
+
 def _frame(context: Mapping[str, object]) -> FlowResult:
     frame = ResearchFrame.model_validate(context.get("frame"))
+    return _with_reuse(context, frame, _frame_only(context, frame))
+
+
+def _frame_only(context: Mapping[str, object], frame: ResearchFrame) -> FlowResult:
     missing = _missing_question(frame)
     private = _private(context)
     if private is None:
@@ -310,6 +369,18 @@ def _diagnosis(context: Mapping[str, object]) -> FlowResult:
     )
 
 
+def _swt(context: Mapping[str, object]) -> FlowResult:
+    """Saved outside findings for the one SWT (E83 S83.4); writes nothing."""
+    base = Path(_text(context, "base_path") or ".")
+    inputs = load_swt_evidence(base, _today(context))
+    return FlowResult(
+        action="swt",
+        swt_evidence=inputs.evidence,
+        saved_to=inputs.reference,
+        message=swt_message(inputs),
+    )
+
+
 _PAGES = TypeAdapter(dict[str, str])
 
 
@@ -351,6 +422,7 @@ _ACTIONS = {
     "save": _save,
     "diagnosis": _diagnosis,
     "check_sources": _check_sources,
+    "swt": _swt,
 }
 
 

@@ -210,6 +210,31 @@ rango con su unidad cabe en 10 palabras o menos (por ejemplo "120,000 a
 Las opciones de `mercado` son entrar o crecer en un tipo de cliente o una
 zona (o "todavía no" con el dato y la fecha).
 
+### Paso 3d: Fortalezas, debilidades y tendencias (sólo en `fortalezas-tendencias`)
+
+En el paso 2 agrega `"base_path": "."` junto al `frame`: si hay un benchmark
+guardado vigente de la misma oferta y zona, regresan sus negocios parecidos
+(`comparables`) y sus fuentes (`sources`), sin celdas de más de 90 días.
+Los candidatos siguen siendo candidatos hasta que diga que sí. Si no hay
+negocios que él confirmó, el `message` lo dice y sigues sólo con tendencias.
+
+Cada hallazgo lleva `side`. Una fortaleza o debilidad va `against` uno o más
+negocios que él nombró o confirmó, nunca un candidato. Una tendencia no va
+contra nadie y lleva al menos una fuente con fecha de los últimos 90 días.
+
+```json
+"claims": [
+  {"text": "El Sol no entrega a domicilio", "kind": "dato", "supporting": ["s1"],
+   "side": "fortaleza", "against": ["Tortillería El Sol"]},
+  {"text": "El Sol abre más temprano", "kind": "dato", "supporting": ["s2"],
+   "side": "debilidad", "against": ["Tortillería El Sol"]},
+  {"text": "Sube el precio del maíz", "kind": "dato", "supporting": ["s3"],
+   "side": "tendencia"}]
+```
+
+Las opciones son qué fortaleza apalancar o qué tendencia atender este
+trimestre (o "todavía no" con el dato y la fecha).
+
 ### Paso 4: Resultado corto
 
 ```json
@@ -271,4 +296,5 @@ confirmarla. Si no pudiste abrir una página, no la pases en `pages`: queda
 
 Vuelve con el especialista de strategy o con `escala` para actuar sobre la
 decisión. En `fortalezas-tendencias`, los hallazgos se entregan a
-`escala-strategy-swt` como evidencia externa; no escribas otro SWT.
+`escala-strategy-swt` como evidencia externa (acción `swt`, paso final de
+ese procedimiento); no escribas otro SWT.

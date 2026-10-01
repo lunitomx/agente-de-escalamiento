@@ -44,6 +44,26 @@ WHICH_LOOK_ALIKE = "¿Cuáles se parecen al tuyo? Sólo cuento los que me digas 
 NOT_FOUND_CELL = "no encontrado"
 ONLY_THE_TABLE = "Lo que encontré: lo que está en la tabla, con su fuente."
 ONLY_THE_SIZE = "Lo que encontré: el tamaño de arriba, con sus fuentes."
+SIDE_LABELS = {
+    "fortaleza": "Fortaleza",
+    "debilidad": "Debilidad",
+    "tendencia": "Tendencia",
+}
+NEEDS_COMPARABLES = (
+    "Para ver tus fortalezas y debilidades frente a otros necesito negocios "
+    "parecidos que me confirmes; mientras, veo las tendencias."
+)
+# Design (S83.4): the new last step of the SWT.
+SWT_ASK = "¿Quieres que revise qué dicen fuera de tu empresa antes de cerrar el SWT?"
+SWT_ADD = (
+    "¿Lo agrego a tu SWT como evidencia externa, aparte de lo que sale de tu empresa?"
+)
+SWT_TITLES = {
+    "fortaleza": "Fortalezas",
+    "debilidad": "Debilidades",
+    "tendencia": "Tendencias",
+}
+STATUS_WORDS = {"confirmado": "confirmado", "por_confirmar": "por confirmar"}
 TABLE_GAPS = "Lo que en la tabla dice «no encontrado»: no hallé una fuente que lo diga."
 
 
@@ -107,6 +127,10 @@ def comparing_with(names: list[str]) -> str:
     return f"Voy a comparar con: {_join(names)}."
 
 
+def reusing_comparables(names: list[str]) -> str:
+    return f"Te comparo con los negocios que ya me confirmaste: {_join(names)}."
+
+
 def table_title(offer: str, geography: str) -> str:
     return f"Cómo lo hacen negocios parecidos ({offer} en {geography}):"
 
@@ -116,6 +140,12 @@ def candidates_intro(offer: str, geography: str) -> str:
         f"Encontré estos negocios que venden {offer} en {geography} y podrían "
         "parecerse al tuyo:"
     )
+
+
+def outside_label(researched_on: date) -> str:
+    """The mark of outside evidence in the SWT."""
+    month = _MONTHS[researched_on.month - 1]
+    return f"Según fuentes externas, {month} de {researched_on.year}"
 
 
 def spanish_date(value: date) -> str:

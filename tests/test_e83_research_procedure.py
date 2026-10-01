@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from coaching.research.messages import SEARCH_OFF
+from coaching.research.messages import SEARCH_OFF, SWT_ASK
 from escala_server.capabilities import load_capability_catalog, public_install_skills
 from escala_server.specialist_team import SPECIALIST_CONTRACTS
 
@@ -171,3 +171,35 @@ def test_procedure_says_a_type_of_business_is_never_private() -> None:
     assert "tipo de negocio" in text
     assert "nunca cuenta como dato de su empresa" in text
     assert "sólo pasa si esa palabra está en lo que vende" not in text  # pre-S83.3
+
+
+SWT = ROOT / "escala-skills" / "escala-strategy-swt" / "SKILL.md"
+
+
+def test_procedure_drives_the_strengths_and_trends_mode() -> None:
+    """E83 S83.4: sides against confirmed comparables, dated trends."""
+    text = _procedure()
+
+    assert "### Paso 3d: Fortalezas, debilidades y tendencias" in text
+    assert '"side"' in text and '"against"' in text
+    for side in ('"fortaleza"', '"debilidad"', '"tendencia"'):
+        assert side in text
+    assert '"base_path"' in text  # frame reuses the current benchmark
+    assert "siguen siendo candidatos" in text
+    assert "90 días" in text
+    assert "escala-strategy-swt" in text and "no escribas otro SWT" in text
+
+
+def test_swt_brings_outside_evidence_into_the_same_file() -> None:
+    """E83 S83.4, D9: one SWT; outside evidence marked, graded, separate."""
+    text = SWT.read_text(encoding="utf-8")
+
+    assert SWT_ASK in text
+    assert '"action": "swt"' in text
+    assert "Según fuentes externas" in text
+    assert "Evidencia externa" in text
+    assert "por confirmar" in text
+    assert text.count("work/strategy/swt-{año}-Q{trimestre}.md") == 1
+    assert "no escribas otro SWT" in text
+    assert "sin URLs" in text
+    assert text.index("Evidencia externa") < text.index("### Step 5: Guardar")

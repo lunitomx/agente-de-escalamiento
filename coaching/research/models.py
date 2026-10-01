@@ -26,11 +26,14 @@ ClaimStatus = Literal["confirmado", "por_confirmar"]
 Confidence = Literal["alta", "media", "baja"]
 DecisionArea = Literal["cash", "strategy", "people", "execution"]
 OptionKind = Literal["decidir", "esperar"]
+Side = Literal["fortaleza", "debilidad", "tendencia"]
 
 Dimension = Literal["precio", "paquetes", "canales", "metricas"]
 DIMENSIONS: tuple[Dimension, ...] = ("precio", "paquetes", "canales", "metricas")
 
 EXCERPT_MAX = 300
+# One freshness window for everything (D6, owner decision 2026-09-30).
+FRESHNESS_DAYS = 90
 MAX_CLAIMS = 3
 MAX_COMPARABLES = 5
 
@@ -125,6 +128,10 @@ class ResearchClaim(_Strict):
     status: ClaimStatus = "por_confirmar"
     confidence: Confidence = "baja"
     next_source: str | None = None
+    # Only in ``fortalezas-tendencias`` (S83.4): which side of the SWT it
+    # feeds and, for a strength or weakness, the comparables it is against.
+    side: Side | None = None
+    against: list[str] = Field(default_factory=list)
 
     _check_text = field_validator("text")(_required)
 
@@ -182,7 +189,7 @@ def check_comparables(
     """
     if not comparables:
         return
-    if frame.mode != "benchmark":
+    if frame.mode not in ("benchmark", "fortalezas-tendencias"):
         raise ValueError("comparables_only_in_benchmark")
     if not (
         frame.offer_category
@@ -314,6 +321,53 @@ def check_market_size(
         raise ValueError("por_confirmar_needs_next_source")
 
 
+def is_recent(source: SourceRecord, as_of: date) -> bool:
+    """Dated, not in the future, and at most ``FRESHNESS_DAYS`` old."""
+    published = source.published_on
+    return (
+        published is not None
+        and published <= as_of
+        and (as_of - published).days <= FRESHNESS_DAYS
+    )
+
+
+def check_sides(
+    frame: ResearchFrame,
+    sources: list[SourceRecord],
+    comparables: list[Comparable],
+    claims: list[ResearchClaim],
+    as_of: date,
+) -> None:
+    """Rules of the outside strengths, weaknesses and trends (E83 S83.4).
+
+    A strength or weakness is a position against businesses the owner named
+    or confirmed, never against a candidate; a trend rests on at least one
+    source dated within the freshness window.
+    """
+    if frame.mode != "fortalezas-tendencias":
+        if any(claim.side is not None or claim.against for claim in claims):
+            raise ValueError("side_only_in_fortalezas_tendencias")
+        return
+    counted = {normalize(item.name) for item in comparables if item.counted}
+    by_id = {source.source_id: source for source in sources}
+    for claim in claims:
+        if claim.side is None:
+            raise ValueError("claim_needs_side")
+        if claim.side == "tendencia":
+            if claim.against:
+                raise ValueError("trend_has_no_comparable")
+            if not any(
+                source_id in by_id and is_recent(by_id[source_id], as_of)
+                for source_id in claim.supporting
+            ):
+                raise ValueError("trend_needs_recent_source")
+            continue
+        if not claim.against or not all(
+            normalize(name) in counted for name in claim.against
+        ):
+            raise ValueError("needs_a_confirmed_comparable")
+
+
 class DecisionOption(_Strict):
     """One of the 2-3 options the research ends in."""
 
@@ -384,6 +438,9 @@ class ResearchReport(_Strict):
         if self.chosen is not None and self.chosen not in self.options:
             raise ValueError("chosen_not_an_option")
         check_comparables(self.frame, self.sources, self.comparables)
+        check_sides(
+            self.frame, self.sources, self.comparables, self.claims, self.researched_on
+        )
         check_market_size(self.frame, known, self.market_size)
         return self
 
