@@ -46,7 +46,29 @@ De las sesiones pasadas extraer:
 
 El CEO puede ajustar — pero el punto de partida ya no es una hoja en blanco.
 
-### Step 4: Guardar
+### Step 4: Qué dicen fuera de tu empresa (Evidencia externa)
+
+Pregunta: "¿Quieres que revise qué dicen fuera de tu empresa antes de cerrar el SWT?"
+
+Si dice que sí, trae lo guardado:
+
+```bash
+echo '{"action": "swt", "base_path": "."}' | python3 -m coaching.research
+```
+
+- Con `swt_evidence`: di el `message`. Cada hallazgo ya viene marcado
+  ("Según fuentes externas, [mes]") y calificado (confirmado /
+  por confirmar). Si dice que sí, agrégalos en una sección **Evidencia externa**
+  del mismo archivo, aparte de la evidencia interna, sin URLs y citando el
+  reporte local (`saved_to`). Nunca los mezcles con lo que salió de sus datos.
+- Sin nada guardado, o con una investigación vencida: di el `message` y, si
+  quiere, sigue con `escala-strategy-research` en modo
+  `fortalezas-tendencias`; al terminar vuelves a este paso.
+- Si no quiere, cierra el SWT sólo con su evidencia interna.
+
+Es el mismo SWT: no escribas otro SWT ni otro archivo.
+
+### Step 5: Guardar
 
 `work/strategy/swt-{año}-Q{trimestre}.md`
 
@@ -54,6 +76,7 @@ El CEO puede ajustar — pero el punto de partida ya no es una hoja en blanco.
 
 - SWT con 3-5 items por categoría
 - Cada item cita fuente (sesión, KPI, worksheet)
+- Evidencia externa (si la hubo) en su propia sección, marcada y calificada
 - Resumen ejecutivo: "Tu fortaleza es operaciones. Tu debilidad es cash. La tendencia que no estás viendo es digitalización."
 
 ## Notas
