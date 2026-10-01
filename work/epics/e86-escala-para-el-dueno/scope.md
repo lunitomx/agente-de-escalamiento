@@ -35,7 +35,7 @@ para no invertir a ciegas en instalación y paridad).
 | S86.3 | ESCALA-71 | Errores con salida (A1 + A2) | 3 | Test por módulo con fallo simulado; ningún `message` dice "tu Claude" | done |
 | S86.4 | ESCALA-72 | Puerta que conoce todo (S2) | 5 | Cada procedimiento `keep` alcanzable desde una frase del dueño; "bajaron mis ventas" → Strategy | done |
 | S86.5 | ESCALA-73 | Diagnóstico que termina en acción (S4) | 3 | Último mensaje con acción, responsable y fecha + oferta de anotarlo en la hoja | done |
-| S86.6 | ESCALA-74 | Prueba con dueños reales (§5) | 2 | Sesiones con el grupo, métricas llenas | planned |
+| S86.6 | ESCALA-74 | Prueba con dueños reales (§5) | 2 | Sesiones con el grupo, métricas llenas | kit listo — sesiones pendientes |
 | S86.7 | ESCALA-75 | Hoja con menos pegado (Q3 + S3) | 5 | ≤1 pegado por sección; cero preguntas de fecha | planned |
 | S86.8 | ESCALA-76 | Reunión proactiva (A3) | 3 | Con reunión en ≤3 días se ofrece una vez; "después" no se repite | planned |
 | S86.9 | ESCALA-77 | Instalación de un paso (S1 corto plazo) | 5 | Máquina limpia: ≤3 pasos, 0 decisiones técnicas | planned |
