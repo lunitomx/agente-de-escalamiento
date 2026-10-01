@@ -372,9 +372,12 @@ routes:
   target: escala-update
   message: Reviso si hay una versión nueva de ESCALA y te digo qué cambia.
 - id: export
+  # Nunca "exportar" solo: exportar a otro país es plática de negocio común.
   keywords:
-  - exportar
+  - exportar mi plan
   - descargar mi plan
+  - bajame mi plan
+  - mi plan en pdf
   target: escala-export
   message: Junto tu plan en un documento que puedes guardar o compartir.
 - id: memory

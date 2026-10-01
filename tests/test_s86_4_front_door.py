@@ -178,3 +178,18 @@ def test_door_reads_the_single_list_and_says_where_procedures_live() -> None:
     # (the plugin and Codex builders rewrite exactly one reference).
     assert door.count("../../capabilities/mvp/catalog.json") == 1
     assert "seis capacidades MVP" in door
+
+
+@pytest.mark.parametrize(
+    "phrase",
+    ["Quiero exportar a Estados Unidos", "¿Cómo empiezo a exportar mi producto?"],
+)
+def test_exporting_as_business_is_not_downloading_the_plan(phrase: str) -> None:
+    assert route_request(phrase).capability_id != "escala-export"
+
+
+@pytest.mark.parametrize(
+    "phrase", ["Descargar mi plan", "Quiero exportar mi plan", "Bájame mi plan en PDF"]
+)
+def test_downloading_the_plan_still_reaches_export(phrase: str) -> None:
+    assert route_request(phrase).capability_id == "escala-export"
