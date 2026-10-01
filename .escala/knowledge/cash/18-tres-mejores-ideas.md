@@ -9,7 +9,7 @@ audio: 4
 
 No decidas solo ni por áreas separadas: junta a tu equipo, pongan todas las ideas, escojan tres y pruébenlas. Ten claro hacia dónde te quieres mover.
 
-## Como dice el Maestro Humberto
+## Según el curso
 
 > Toma las tres mejores ideas y experimenta sobre ellas.
 
@@ -21,4 +21,4 @@ Lo tomó de Alan Miltz: el problema es trabajar en silos, marketing lejos de fin
 
 Al cerrar un diagnóstico de Cash, para convertirlo en acción con el equipo.
 
-*Fuente: Maestro Humberto Martínez Barrón — curso de Cash, Club de Industriales (2025).*
+*Fuente: el curso de cash que vimos (2025).*

@@ -9,7 +9,7 @@ audio: 2
 
 Tus estados financieros ya te están diciendo qué anda bien y qué anda mal. La contabilidad mira hacia atrás, como el retrovisor; las finanzas miran hacia adelante.
 
-## Como dice el Maestro Humberto
+## Según el curso
 
 > Los números no hablan, los números gritan, y no los escuchamos.
 
@@ -21,4 +21,4 @@ Tus estados financieros ya te están diciendo qué anda bien y qué anda mal. La
 
 Cuando el dueño dice que no ve sus estados financieros o que "eso es cosa del contador".
 
-*Fuente: Maestro Humberto Martínez Barrón — curso de Cash, Club de Industriales (2025).*
+*Fuente: el curso de cash que vimos (2025).*

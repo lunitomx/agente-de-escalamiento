@@ -66,7 +66,7 @@ dev = [
 [tool.ruff]
 extend-exclude = [
     ".*",
-    "referencias-humberto",
+    "referencias-*",
 ]
 
 [tool.ruff.lint]
@@ -86,12 +86,12 @@ include = [
     "validators",
 ]
 exclude = [
-    "referencias-humberto",
+    "**/referencias-*",
 ]
 
 [tool.pytest.ini_options]
 norecursedirs = [
-    "referencias-humberto",
+    "referencias-*",
 ]
 testpaths = [
     "tests",

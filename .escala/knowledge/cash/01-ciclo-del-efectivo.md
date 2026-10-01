@@ -9,7 +9,7 @@ audio: 1
 
 Tu dinero sale antes de que regrese. Cuenta los días desde que pagas a tu proveedor hasta que tu cliente te paga: esos días los financias tú.
 
-## Como dice el Maestro Humberto
+## Según el curso
 
 > Lo que vamos a analizar es desde que un peso sale de tu chequera hasta el momento en que regresa.
 
@@ -21,4 +21,4 @@ Una empresa de computadoras en 1993 (el caso de Dell del libro de John Mullins):
 
 Cuando el dueño dice "vendo bien pero nunca tengo dinero" o "no sé a dónde se va el dinero".
 
-*Fuente: Maestro Humberto Martínez Barrón — curso de Cash, Club de Industriales (2025).*
+*Fuente: el curso de cash que vimos (2025).*

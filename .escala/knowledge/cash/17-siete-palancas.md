@@ -9,7 +9,7 @@ audio: 4
 
 Precio, volumen, costo de ventas y gastos se mueven en porcentaje; días de clientes, de inventario y de proveedores se mueven en días. Un 1% o un día en cualquiera cambia tu utilidad y tu efectivo.
 
-## Como dice el Maestro Humberto
+## Según el curso
 
 > Cuando aumentamos el precio, no se mueve nada del estado financiero. Se mueve nada más la utilidad.
 
@@ -21,4 +21,4 @@ En el Excel del curso, subir 1% el precio sobre unas ventas de 22.2 millones dab
 
 Cuando el dueño quiere saber qué mover primero para tener más dinero.
 
-*Fuente: Maestro Humberto Martínez Barrón — curso de Cash, Club de Industriales (2025).*
+*Fuente: el curso de cash que vimos (2025).*

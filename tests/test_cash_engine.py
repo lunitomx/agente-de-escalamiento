@@ -1,4 +1,4 @@
-"""Tests para el motor Power of One (basado en Humberto Martínez Barrón / Alan Miltz)."""
+"""Tests para el motor Power of One (basado en Alan Miltz)."""
 
 from __future__ import annotations
 

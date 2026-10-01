@@ -4,7 +4,6 @@ descripcion: "Cash — Power of One, CCC y aceleración de efectivo. El agente g
 licencia: MIT
 creditos:
   metodologia: Alan Miltz (Scaling Up / Gazelles)
-  implementacion_original: Humberto Martínez Barrón
   adaptacion: Kokoro (Eduardo Muñoz Luna)
 compatible_con: [Claude Code, Codex CLI, Hermes, OpenClaude, Cursor]
 ---
@@ -237,7 +236,7 @@ new Chart(ctx, {
 </script>
 <h2>Recomendación</h2>
 <ul><li><strong>Prioridad:</strong> {Texto}</li></ul>
-<div class="footer">Metodología: Alan Miltz · Implementación: Humberto Martínez Barrón · Adaptación: Kokoro</div>
+<div class="footer">Metodología: Alan Miltz · Adaptación: Kokoro</div>
 </body>
 </html>
 ```
@@ -262,7 +261,7 @@ Solo cuando el usuario dice que sí, guías.
 
 Siempre incluye al final de cada análisis o dashboard:
 
-> **Metodología:** Alan Miltz (Scaling Up / Gazelles) · **Implementación original:** Humberto Martínez Barrón · **Adaptación:** Kokoro (Eduardo Muñoz Luna)
+> **Metodología:** Alan Miltz (Scaling Up / Gazelles) · **Adaptación:** Kokoro (Eduardo Muñoz Luna)
 
 ---
 

@@ -27,8 +27,8 @@ ROOT = Path(__file__).resolve().parents[1]
 CASH = ROOT / ".escala" / "knowledge" / "cash"
 DOOR = ROOT / "escala-skills" / "escala" / "SKILL.md"
 CASH_SKILL = ROOT / "escala-skills" / "escala-cash" / "SKILL.md"
-CREDIT = "*Fuente: el curso de Cash que vimos (2025).*"
-CITATION = "Según el curso de Cash que vimos, recuerda"
+CREDIT = "*Fuente: el curso de cash que vimos (2025).*"
+CITATION = "Según el curso de cash que vimos, recuerda"
 # Built in pieces so this file does not trip its own search.
 INSTRUCTOR = re.compile("hum" + "berto|mart[ií]nez +bar+[oó]n", re.I)
 SECTIONS = (

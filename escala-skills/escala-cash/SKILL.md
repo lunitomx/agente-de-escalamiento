@@ -18,7 +18,7 @@ optimización del flujo de efectivo. Usa el motor backend en `escala_server/cash
 
 Leer `.escala/agent/sub-agents/cash.md`, company profile, overview.
 Lee también `.escala/knowledge/cash/overview.md` (en un paquete:
-`references/knowledge/cash/overview.md`) y abre la ficha del Maestro Humberto
+`references/knowledge/cash/overview.md`) y abre la ficha del curso de Cash
 que corresponda a lo que preguntó el dueño.
 
 ### Step 2: Check Existing Work
@@ -50,10 +50,12 @@ El motor está en `escala_server/cash/__init__.py` (PowerOfOneEngine).
 
 - NO usar jerga financiera sin tooltip: "días en cobrar" en vez de "DSO"
 - Benchmarks por industria en `escala-cash-power1`
-- Dar crédito: Alan Miltz (metodología) · Humberto Martínez Barrón (implementación)
+- Dar crédito: Alan Miltz (metodología)
 - Cuando una ficha de `.escala/knowledge/cash/` aplique, explica la idea con
-  ella y cita su frase una vez por tema: "Como dice el Maestro Humberto,
-  recuerda: …". Si no está en una ficha, no se la atribuyas.
+  ella y cita su frase una vez por tema:
+  "Según el curso de cash que vimos, recuerda: …".
+  Nunca digas quién dio el curso. Si no está en una ficha, no se la atribuyas
+  al curso.
 - El asesor debe recomendar después de cada cálculo
 
 ## Output
@@ -66,4 +68,4 @@ El motor está en `escala_server/cash/__init__.py` (PowerOfOneEngine).
 
 ---
 
-*Metodología: Alan Miltz. Implementación original: Humberto Martínez Barrón. Adaptación: Kokoro.*
+*Metodología: Alan Miltz. Adaptación: Kokoro.*

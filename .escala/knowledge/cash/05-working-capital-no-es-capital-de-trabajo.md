@@ -9,7 +9,7 @@ audio: 1
 
 El dinero atorado en la operación (clientes + inventario − proveedores) no es el "capital de trabajo" que conoce tu contador (lo que tienes a corto plazo menos lo que debes a corto plazo). Son dos números distintos.
 
-## Como dice el Maestro Humberto
+## Según el curso
 
 > No confundan, por favor. Esto muestra cuánto dinero está inmovilizado en la operación.
 
@@ -21,4 +21,4 @@ En el curso hizo la aclaración porque el libro dice "capital de trabajo" y los 
 
 Cuando el dueño o su contador mezclan los dos términos y los números no cuadran.
 
-*Fuente: Maestro Humberto Martínez Barrón — curso de Cash, Club de Industriales (2025).*
+*Fuente: el curso de cash que vimos (2025).*

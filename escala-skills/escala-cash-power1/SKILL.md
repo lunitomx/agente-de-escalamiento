@@ -1,7 +1,7 @@
 ---
 description: >-
   Power of One: impacto de mejorar 1% (o 1 día) en cada una de las 7 palancas de
-  cash flow. Basado en Alan Miltz, implementado por Humberto Martínez Barrón.
+  cash flow. Basado en Alan Miltz.
 name: escala-cash-power1
 ---
 
@@ -15,7 +15,6 @@ financieras. Identificar las de mayor impacto y generar recomendaciones accionab
 ## Créditos
 
 - **Metodología:** Alan Miltz
-- **Implementación original:** Humberto Martínez Barrón
 - **Motor backend:** `escala_server/cash/__init__.py`
 
 ## ⚠️ Reglas de Cálculo (NO improvisar)
@@ -78,8 +77,7 @@ Decir prioridad #1, por qué, y "¿Qué vas a hacer al respecto?"
 - Backend: `escala_server/cash/__init__.py`
 - Dashboard: `static/dashboards/cash/power-of-one.html`
 - Tests: `tests/test_cash_engine.py` (9 tests)
-- Original: `referencias-humberto/finanzasai/seven_levers_system/domain/services/power_of_one_engine.py`
 
 ---
 
-*Metodología: Alan Miltz. Implementación original: Humberto Martínez Barrón. Adaptación: Kokoro.*
+*Metodología: Alan Miltz. Adaptación: Kokoro.*

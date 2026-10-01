@@ -9,7 +9,7 @@ audio: 1
 
 Suma lo que te deben tus clientes y lo que tienes en inventario, réstale lo que debes a proveedores y divídelo entre tus ventas. Te dice cuántos pesos de cada 100 se quedan atorados en la operación. Mídelo cada trimestre, misma fecha contra misma fecha.
 
-## Como dice el Maestro Humberto
+## Según el curso
 
 > Por cada 100 pesos que yo vendo, estoy financiando a mis clientes 10 pesos con 68 centavos.
 
@@ -21,4 +21,4 @@ En el ejercicio del curso: clientes 10.68, más inventario, menos 2 de proveedor
 
 Cuando el dueño quiere saber si su dinero está "atorado" y dónde: en clientes, en inventario o en proveedores.
 
-*Fuente: Maestro Humberto Martínez Barrón — curso de Cash, Club de Industriales (2025).*
+*Fuente: el curso de cash que vimos (2025).*

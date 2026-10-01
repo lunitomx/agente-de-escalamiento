@@ -32,7 +32,7 @@ file:test_*
 *.pdf
 *.docx
 *.pptx
-referencias-humberto/
+referencias-*/
 
 # === Client Data (never commit) ===
 data/

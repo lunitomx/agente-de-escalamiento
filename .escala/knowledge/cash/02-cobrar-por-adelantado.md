@@ -9,7 +9,7 @@ audio: 1
 
 Si el cliente te paga antes de que tú pagues, él financia tu negocio. Crecer siempre pide efectivo.
 
-## Como dice el Maestro Humberto
+## Según el curso
 
 > Todas las empresas para crecimiento y expansión requieren de efectivo.
 
@@ -21,4 +21,4 @@ La misma empresa de computadoras cambió el modelo: el cliente configuraba y pag
 
 Cuando el dueño quiere crecer y le falta dinero, o pregunta si pedir un crédito. Primero: ¿puede cobrar antes, con anticipo o membresía?
 
-*Fuente: Maestro Humberto Martínez Barrón — curso de Cash, Club de Industriales (2025).*
+*Fuente: el curso de cash que vimos (2025).*

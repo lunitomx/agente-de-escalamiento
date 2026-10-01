@@ -5,7 +5,6 @@
 **Tag:** epic/e23-complete
 **Stories:** 11 planificadas, 11 completadas (S23.1-S23.11)
 **Créditos:** Metodología: Verne Harnish (Scaling Up), Alan Miltz (Power of One), Brad Smart (Topgrading)
-**Implementación original:** Humberto Martínez Barrón
 **Creación:** Eduardo Muñoz Luna (Kokoro)
 
 ---
@@ -73,7 +72,6 @@ E23 transformó la arquitectura de Escala de **server-dependent** a **agent-firs
 ## Créditos
 
 - **Metodología:** Verne Harnish (Scaling Up), Alan Miltz (Power of One), Brad Smart (Topgrading)
-- **Implementación original del motor Cash:** Humberto Martínez Barrón
 - **Creación y dirección:** Eduardo Muñoz Luna — Kokoro
 
 ## Pipeline / Skills / Gates

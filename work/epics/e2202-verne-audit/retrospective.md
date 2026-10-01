@@ -19,7 +19,7 @@ E22 fue una épica de auditoría completa del sistema con 3 buyer personas reale
 | S22.2 — Aleatorización + presentación | ✅ | whoami, shuffling, variedad de openings |
 | S22.3 — Debate con memoria | ✅ | Verne recuerda conversaciones anteriores |
 | S22.4 — Power of One dashboard vivo | ✅ | Dashboard interactivo con +1/-1 |
-| S22.5 — Cash Engine Humberto | ✅ | PowerOfOneEngine con 7 palancas |
+| S22.5 — Cash Engine | ✅ | PowerOfOneEngine con 7 palancas |
 | S22.6 — Power of One conectado al backend | ✅ | API REST funcional |
 | S22.7 — Idioma humano + Verne | ✅ | Tooltips, antes/después, lado Verne |
 | S22.8 — 22 dashboards template | ✅ | 22 visualizadores (cash/strategy/people/execution) |
@@ -38,19 +38,18 @@ E22 fue una épica de auditoría completa del sistema con 3 buyer personas reale
 Aunque el servidor `escala_server/` ya no es necesario, el conocimiento capturado en E22 vive en:
 - **Los 3 buyer personas** (Don Roberto, Ana&Carlos, CEO CloudScale) → casos de prueba para los skills
 - **Vocabulario coloquial** → integrado en todos los skills agent-based
-- **PowerOfOneEngine** → el motor de Humberto vive en `escala_server/cash/__init__.py` como referencia
+- **PowerOfOneEngine** → el motor original vive en `escala_server/cash/__init__.py` como referencia
 - **22 dashboards** → el patrón de visualización se usó en S23.5 (dashboard generado)
 
 ## Lecciones
 
 1. Los cambios arquitectónicos grandes (server→agent) invalidan historias de testing/export que dependían del servidor. Detectar temprano.
 2. Las 9 historias ejecutadas fueron valiosas — el vocabulario coloquial y los buyer personas son ahora base de todos los skills.
-3. El motor PowerOfOneEngine de Humberto sirvió como referencia para las fórmulas exactas en los skills agent-based.
+3. El motor PowerOfOneEngine original sirvió como referencia para las fórmulas exactas en los skills agent-based.
 
 ## Créditos
 
 - **Buyer Personas:** Eduardo Muñoz Luna
-- **Power of One Engine:** Humberto Martínez Barrón (implementación original)
 - **Metodología:** Verne Harnish (Scaling Up), Alan Miltz (Power of One)
 
 ## Pipeline / Skills / Gates

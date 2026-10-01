@@ -25,11 +25,11 @@ python3 -m pytest tests/test_pipeline_registry.py -q
 ```
 
 ```text
-python3 -m pytest tests coaching -q --ignore=referencias-humberto --ignore=tests/test_escala_migration.py
+python3 -m pytest tests coaching -q --ignore=referencias-* --ignore=tests/test_escala_migration.py
 453 passed, 2 skipped
 ```
 
-The full unfiltered `python3 -m pytest -q` is not a valid E30 gate in this checkout because it collects ignored external reference files under `referencias-humberto/`. Running the repo suite with `referencias-humberto/` ignored leaves two pre-existing migration tests that depend on local `.scaleup` sessions/worksheets containing data; those fail with zero imported rows and are unrelated to the pipeline registry change.
+The full unfiltered `python3 -m pytest -q` is not a valid E30 gate in this checkout because it collects ignored external reference files under `referencias-*/`. Running the repo suite with `referencias-*/` ignored leaves two pre-existing migration tests that depend on local `.scaleup` sessions/worksheets containing data; those fail with zero imported rows and are unrelated to the pipeline registry change.
 
 ## Explicit Deferrals
 

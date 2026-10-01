@@ -9,7 +9,7 @@ audio: 2
 
 Para decidir con tus números, tu contabilidad tiene que estar lista, ordenada, confiable y al día. Compara siempre periodo contra el mismo periodo: marzo contra marzo del año pasado.
 
-## Como dice el Maestro Humberto
+## Según el curso
 
 > Que esté lista. Que esté ordenada. Que sea confiable. Y por último, que esté al día.
 
@@ -21,4 +21,4 @@ Lo comparó con una receta: si quieres un buen platillo, necesitas buenos ingred
 
 Antes de cualquier análisis con números del dueño: primero preguntar si su contabilidad cumple las cuatro.
 
-*Fuente: Maestro Humberto Martínez Barrón — curso de Cash, Club de Industriales (2025).*
+*Fuente: el curso de cash que vimos (2025).*

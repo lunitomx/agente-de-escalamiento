@@ -59,5 +59,4 @@ Escala esperará tu respuesta.
 ## Créditos
 
 - **Metodología:** Verne Harnish (Scaling Up), Alan Miltz (Power of One)
-- **Implementación Power of One:** Humberto Martínez Barrón
 - **Creación:** Eduardo Muñoz Luna — Kokoro

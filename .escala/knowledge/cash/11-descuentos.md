@@ -9,7 +9,7 @@ audio: 2
 
 Cada descuento, rebaja o devolución sale directo de tu utilidad. Antes de darlo, pregunta para qué.
 
-## Como dice el Maestro Humberto
+## Según el curso
 
 > Estamos dando demasiados descuentos. ¿Por qué? ¿Para qué? ¿Qué beneficios tenemos con eso? ¿Realmente se está justificando?
 
@@ -21,4 +21,4 @@ En el ejercicio, las ventas subieron 55% y las devoluciones y rebajas siguieron 
 
 Cuando el dueño quiere vender más bajando precio o dando promociones.
 
-*Fuente: Maestro Humberto Martínez Barrón — curso de Cash, Club de Industriales (2025).*
+*Fuente: el curso de cash que vimos (2025).*

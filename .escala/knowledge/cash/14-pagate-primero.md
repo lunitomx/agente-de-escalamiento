@@ -9,7 +9,7 @@ audio: 3
 
 Págate a ti primero y págate lo que costaría alguien que hiciera tu trabajo. Si no, tus números mienten.
 
-## Como dice el Maestro Humberto
+## Según el curso
 
 > ¿Le estás pagando a ti primero? Y si te estás pagando a ti primero, ¿te estás pagando un salario de mercado?
 
@@ -21,4 +21,4 @@ Lo tomó de Simple Numbers (Greg Crabtree), con la misma idea de Profit First y 
 
 Cuando el dueño no se paga sueldo, se paga "lo que sobre", o su utilidad se ve buena porque no se paga.
 
-*Fuente: Maestro Humberto Martínez Barrón — curso de Cash, Club de Industriales (2025).*
+*Fuente: el curso de cash que vimos (2025).*
