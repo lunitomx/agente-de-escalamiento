@@ -23,6 +23,16 @@ Actions (JSON on stdin, like ``coaching.strategy_opsp``):
   overdue commitments, finished ones to move to Done (with the block and the
   cell to paste it), missing KPI or date, and dates "por confirmar". ``today``
   (``YYYY-MM-DD``) sets the reference date. Suggestions only; nothing is written.
+- ``opening`` (S86.8): the door's one call when a conversation opens. With a
+  confirmed tab and the group meeting in 3 days or less, ``message`` is the
+  first line ("Tu reunión del grupo es el jueves. ¿Reviso tu hoja?") and
+  ``meeting`` its date; otherwise ``message`` is empty. It never returns an
+  error: any failure means saying nothing (the nudge is optional).
+- ``meeting_ask`` / ``meeting_set`` (S86.8): ask the meeting day once, when it
+  first matters, and keep it (``weekday`` as the owner said it, and/or
+  ``next_date`` ISO; ``every_weeks`` 1 or 2, two weeks needs ``next_date``).
+- ``meeting_answer`` (S86.8): the owner's ``si`` / ``despues`` / ``no`` to the
+  offer for ``meeting`` (ISO); that meeting is not offered again.
 
 The procedure persists the choice through this module; the private specialist
 never writes state.
@@ -55,6 +65,16 @@ from coaching.tracker.maintenance import (
     MeetingPrep,
     review_before_meeting,
     to_done_block,
+)
+from coaching.tracker.meeting import (
+    MeetingAnswer,
+    MeetingSchedule,
+    next_meeting,
+    opening_nudge,
+    parse_weekday,
+    read_memory,
+    record_answer,
+    save_schedule,
 )
 from coaching.tracker.models import TrackerSheet
 from coaching.tracker.parser import (
@@ -90,6 +110,8 @@ class FlowResult(BaseModel):
     rock_proposal: RockProposal | None = None
     quarter_check: QuarterCheck | None = None
     paste_block: str = ""
+    meeting: date | None = None
+    meeting_schedule: MeetingSchedule | None = None
     errors: list[str] = Field(default_factory=list)
 
 
@@ -347,6 +369,87 @@ def _prepare(context: Mapping[str, object], base: Path) -> FlowResult:
     )
 
 
+def _opening_nudge(context: Mapping[str, object], base: Path) -> FlowResult:
+    today = _today(context)
+    memory = read_memory(base)
+    if today is None or memory is None:
+        return FlowResult(action="opening")
+    answered = [item.meeting for item in memory.answered]
+    has_tab = load_link(base) is not None
+    nudge = opening_nudge(today, memory.schedule, has_tab, answered)
+    if nudge is None:
+        return FlowResult(action="opening")
+    return FlowResult(action="opening", message=nudge.message, meeting=nudge.meeting)
+
+
+def _opening(context: Mapping[str, object], base: Path) -> FlowResult:
+    """Never an error at the door: an optional nudge that fails says nothing."""
+    try:
+        return _opening_nudge(context, base)
+    except Exception:
+        return FlowResult(action="opening")
+
+
+def _iso(context: Mapping[str, object], key: str) -> date | None:
+    raw = _text(context, key)
+    try:
+        return date.fromisoformat(raw) if raw is not None else None
+    except ValueError:
+        return None
+
+
+def _meeting_refusal(message: str, error: str) -> FlowResult:
+    return FlowResult(action="meeting_set", message=message, errors=[error])
+
+
+def _meeting_set(context: Mapping[str, object], base: Path) -> FlowResult:
+    raw_weekday = _text(context, "weekday")
+    weekday = parse_weekday(raw_weekday) if raw_weekday is not None else None
+    next_date = _iso(context, "next_date")
+    every_weeks = context.get("every_weeks")
+    today = _today(context) or date.today()
+    if every_weeks == 2 and next_date is None and weekday is not None:
+        return _meeting_refusal(messages.ASK_NEXT_MEETING_DATE, "needs_next_date")
+    try:
+        schedule = MeetingSchedule.model_validate(
+            {"next_date": next_date, "weekday": weekday, "every_weeks": every_weeks}
+        )
+    except ValidationError:
+        return _meeting_refusal(messages.ASK_MEETING_DAY, "needs_meeting_day")
+    if schedule.next_date is not None and schedule.next_date < today:
+        return _meeting_refusal(messages.ASK_MEETING_DAY, "needs_meeting_day")
+    save_schedule(base, schedule)
+    return FlowResult(
+        action="meeting_set",
+        message=messages.meeting_saved_message(
+            schedule.next_date, schedule.weekday, schedule.every_weeks
+        ),
+        meeting_schedule=schedule,
+    )
+
+
+def _meeting_answer(context: Mapping[str, object], base: Path) -> FlowResult:
+    try:
+        answer = MeetingAnswer.model_validate(
+            {"meeting": _iso(context, "meeting"), "outcome": _text(context, "outcome")}
+        )
+    except ValidationError:
+        return FlowResult(action="meeting_answer", errors=["bad_answer"])
+    record_answer(base, answer)
+    return FlowResult(action="meeting_answer", meeting=answer.meeting)
+
+
+def _meeting_schedule(
+    context: Mapping[str, object], base: Path
+) -> MeetingSchedule | None:
+    """The schedule, or ``None`` if unknown (a single date that passed is unknown)."""
+    memory = read_memory(base)
+    today = _today(context) or date.today()
+    if memory is None or memory.schedule is None:
+        return None
+    return memory.schedule if next_meeting(memory.schedule, today) else None
+
+
 def run(context: Mapping[str, object]) -> FlowResult:
     """Run one step of the guided flow."""
     action = _text(context, "action") or ""
@@ -370,5 +473,17 @@ def run(context: Mapping[str, object]) -> FlowResult:
     if action == "prepare":
         return _prepare(context, base)
     if action == "load":
-        return FlowResult(action=action, link=load_link(base))
+        return FlowResult(
+            action=action,
+            link=load_link(base),
+            meeting_schedule=_meeting_schedule(context, base),
+        )
+    if action == "opening":
+        return _opening(context, base)
+    if action == "meeting_ask":
+        return FlowResult(action=action, message=messages.ASK_MEETING_DAY)
+    if action == "meeting_set":
+        return _meeting_set(context, base)
+    if action == "meeting_answer":
+        return _meeting_answer(context, base)
     return FlowResult(action=action, errors=["unknown_action"])

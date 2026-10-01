@@ -141,8 +141,9 @@ exacta y cómo deshacer.
 
 ### Paso 7: Antes de tu reunión
 
-Cuando el empresario mencione su reunión del grupo (o pida revisar su hoja),
-con su pestaña confirmada:
+Cuando el empresario mencione su reunión del grupo, pida revisar su hoja o
+diga que sí al aviso con que `escala` abre la conversación ("Tu reunión del
+grupo es el jueves. ¿Reviso tu hoja?"), con su pestaña confirmada:
 
 `{"action": "prepare", "base_path": ".", "connector_text": "<texto>", "file_title": "<título>", "file_id": "<id>", "today": "AAAA-MM-DD"}`
 
@@ -163,6 +164,30 @@ espera su respuesta. Si da nuevas fechas o KPI, él los escribe en su hoja; si
 quieres, vuelve a llamar a `prepare` después para confirmar que quedó al día.
 Si la pestaña no tiene compromisos, ofrece el paso 6.
 
+### Paso 8: El día de su reunión (una sola vez)
+
+Para que ESCALA le ofrezca revisar su hoja antes de cada reunión sin que la
+mencione, necesita saber qué día es. Pregúntalo sólo cuando importa por
+primera vez — al terminar el paso 7, o cuando hable de su reunión — y sólo si
+`load` no trajo `meeting_schedule` (manda `"today"` en `load`: una fecha
+suelta que ya pasó cuenta como sin día); nunca al empezar la conversación ni
+en otro momento.
+
+`{"action": "meeting_ask"}` → "¿Qué día es tu reunión del grupo? …". Con su
+respuesta:
+
+`{"action": "meeting_set", "base_path": ".", "today": "AAAA-MM-DD", "weekday": "jueves"}`
+
+- "los jueves" → sólo `weekday`.
+- "el jueves 8 de octubre" → `"next_date": "2026-10-08"` (fecha ISO).
+- "cada dos semanas" → `"every_weeks": 2` con `next_date`. Si no dio la
+  fecha, el módulo la pide una vez; pregúntala y vuelve a llamar.
+
+Di el `message`, que repite lo que se anotó para que pueda corregirlo. Si
+vuelve a pedir el día, pregúntalo tal cual. Si dice que no quiere darlo, no
+insistas. El módulo guarda sólo el día y la fecha en
+`.escala/my-company/meeting.yaml`.
+
 ## Output
 
 | Item | Destination |
@@ -171,3 +196,4 @@ Si la pestaña no tiene compromisos, ofrece el paso 6.
 | Su pestaña leída (sólo en la conversación) | `sheet` del módulo; no se guarda |
 | Filas propuestas + bloque para pegar | `proposal` (o `rock_proposal` para Rocks) / `paste_block` del módulo; las pega el empresario |
 | Preparación de la reunión + bloque para Done | `prep` / `paste_block` del módulo; nada se mueve sin él |
+| Día de su reunión y respuestas al aviso (sí/después/no por reunión) | `.escala/my-company/meeting.yaml` |

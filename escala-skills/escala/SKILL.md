@@ -31,6 +31,23 @@ la capacidad interna adecuada.
    viejo, sin fuente o no confirmado, dilo y pregunta una sola cosa concreta.
 3. Si el usuario llegó desde un alias de una instalación anterior, resuélvelo con la capa interna de compatibilidad y
    comunica brevemente la transición. El alias nunca activa una segunda lógica.
+4. **Sólo en tu primera respuesta de la conversación**, una llamada para saber
+   si su reunión del grupo está cerca (con la fecha de hoy):
+   `echo '{"action": "opening", "base_path": ".", "today": "AAAA-MM-DD"}' | python3 -m coaching.tracker`
+   - Si trae `message`, es la primera línea de tu respuesta, tal cual
+     ("Tu reunión del grupo es el jueves. ¿Reviso tu hoja?"); guarda `meeting`.
+     Es la única pregunta de esa respuesta: si el empresario ya contó algo,
+     atiéndelo después de la línea sin terminar con otra pregunta.
+   - Si `message` viene vacío, no menciones la reunión.
+   - Si la llamada falla, no devuelve JSON o trae cualquier error, no digas
+     nada de ella, tampoco la frase de "Cuando algo falla": es un aviso que él
+     no pidió. Sigue como si no hubiera aviso.
+   - Con su respuesta guarda
+     `{"action": "meeting_answer", "base_path": ".", "meeting": "<meeting>", "outcome": "si"}`
+     (`"si"`, `"despues"` o `"no"`). Con un sí, sigue el procedimiento interno
+     `escala-execution-tracker` en "Antes de tu reunión". Con "después" o "no",
+     no insistas: esa reunión no se vuelve a ofrecer. Si no contesta y cambia
+     de tema, cuenta como `"despues"`.
 
 ## Ruta conversacional
 
