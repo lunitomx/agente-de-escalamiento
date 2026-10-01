@@ -82,3 +82,22 @@ def test_procedure_drives_the_boards_module_and_keeps_progress() -> None:
 )
 def test_procedure_carries_the_rules(rule: str) -> None:
     assert rule in _procedure()
+
+
+def test_procedure_generates_only_the_accepted_board() -> None:
+    text = _procedure()
+    assert '"action": "generate"' in text
+    assert "paso posterior (S84.4)" not in text
+
+
+@pytest.mark.parametrize(
+    "rule",
+    [
+        "Muestra `markdown` en el chat",
+        "no se guardó",
+        "Sólo después de un «sí»",
+        "`saved_files` vacío",
+    ],
+)
+def test_procedure_carries_the_generator_rules(rule: str) -> None:
+    assert rule in _procedure()

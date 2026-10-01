@@ -67,14 +67,34 @@ echo '{"action": "decide", "base_path": ".", "board_id": "<board_id>", "outcome"
   proponer en 30 días.
 - Muestra `message`.
 
+### Step T3: Armar el tablero aceptado
+
+Sólo después de un «sí» del dueño (T2 con `construir`):
+
+```bash
+echo '{"action": "generate", "base_path": ".", "board_id": "<board_id>"}' | python3 -m coaching.dashboard.boards
+```
+
+- Toma los números de los datos locales y del recorrido del cliente guardado;
+  cada número lleva su fuente y su mes. Nada se estima.
+- Con `saved_files`: el tablero quedó en `.escala/my-company/tableros/` (un
+  HTML que se abre en el navegador, también en el teléfono, y su gemelo `.md`).
+  Muestra `markdown` en el chat y luego `message`.
+- Con `saved_files` vacío: no había ni un número; no se armó nada. Muestra
+  `message` (dice qué datos conseguir). Es el «todavía no».
+- `errors: ["not_accepted"]`: el dueño no ha dicho que sí; vuelve a T2.
+- Si no puedes correr Python o escribir archivos, arma el tablero sólo en el
+  chat con los datos que el dueño te dé (los que falten, «Falta») y di
+  claramente que no se guardó ningún archivo.
+
 ### Reglas de Tableros
 
 - Nunca inventes cifras: un dato que falta se dice "falta".
 - Nunca publiques un tablero (artifacts, canvas, enlaces compartidos ni nada
   parecido). Los tableros sólo viven en la computadora del dueño.
 - No muestres nombres de procedimientos ni comandos al dueño.
-- Armar el archivo del tablero aceptado es un paso posterior (S84.4); aquí sólo
-  se recomienda y se guarda la decisión.
+- Sólo se arma el tablero que el dueño aceptó; nunca uno que dijo «todavía no»
+  o «no».
 
 ## Resumen de avance
 
