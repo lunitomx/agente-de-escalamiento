@@ -31,8 +31,8 @@ El skill requiere:
 
 - Una decisión confirmada (`focus.current_decision` en el perfil) o un objeto
   `decision` en el contexto.
-- Un paquete de evidencia en `context.package` (output de `/escala-evidence`).
-- Un recibo de selección en `context.selection` (output de `/escala-selector`).
+- Un paquete de evidencia en `context.package` (output del procedimiento interno `escala-evidence`).
+- Un recibo de selección en `context.selection` (output del procedimiento interno `escala-selector`).
 
 ### Step 2: Invocar el core module
 
@@ -53,7 +53,7 @@ echo '{
       "decision": "¿Cuánto cash tengo disponible para agosto?",
       "tool": "cash_analysis",
       "label": "Cash Analysis",
-      "skills": ["/escala-cash", "/escala-cash-ccc", "/escala-cash-power1"],
+      "skills": ["<ids internos de procedimientos; nunca se muestran al dueño>"],
       "evidence_used": ["worksheet-cash-ccc"],
       "reason": "Área Cash con workbook financiero disponible.",
       "missing_minimum": false
@@ -76,7 +76,7 @@ print(json.dumps(result, indent=2, ensure_ascii=False))
 | `reviewed` | La respuesta puede generarse | Pasar a S43.5 para entregar la respuesta ejecutiva |
 | `clarify` | Falta información o hay advertencias | Hacer la pregunta en `output` o `artifacts.questions` antes de responder |
 | `blocked` | Contradicción crítica o desalineación | No generar recomendación; resolver el problema señalado en `output` |
-| (error) | Faltan entradas | Ejecutar `/escala-decision`, `/escala-evidence` o `/escala-selector` primero |
+| (error) | Faltan entradas | Ejecuta antes el procedimiento interno `escala-decision`, `escala-evidence` o `escala-selector` |
 
 Ejemplo de respuesta `reviewed`:
 

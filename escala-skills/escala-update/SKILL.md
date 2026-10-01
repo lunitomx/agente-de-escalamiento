@@ -13,7 +13,7 @@ Actualizar los skills del Agente de Escalamiento desde GitHub. Lee la ruta del r
 
 - El usuario quiere la versión más reciente de los skills
 - Aparecen nuevos skills o fixes en el repo
-- El usuario ejecuta `/escala-update`
+- El usuario pide actualizar ESCALA ("actualízate", "¿hay versión nueva?")
 
 ## Pasos
 
@@ -62,12 +62,20 @@ fi
 
 ### Paso 4: Reinstalar skills + paquete Python
 
+`install.sh` exige elegir plataforma. Reinstala sólo donde ya estaba ESCALA:
+
 ```bash
-bash install.sh
+ARGS=()
+for p in claude codex hermes; do
+    for link in "$HOME/.$p/skills"/escala*; do
+        if [ -L "$link" ]; then ARGS+=(--platform "$p"); break; fi
+    done
+done
+bash install.sh "${ARGS[@]}"
 ```
 
 El instalador se encarga de:
-- Actualizar symlinks de skills
+- Dejar sólo la puerta `escala` y quitar los atajos viejos (dice cuántos quitó)
 - Actualizar el paquete Python (`pip install -e .`)
 - Verificar que los módulos importan correctamente
 - Guardar versión y timestamp

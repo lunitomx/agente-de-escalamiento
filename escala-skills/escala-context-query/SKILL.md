@@ -33,7 +33,7 @@ Company Context:
   - {fact} (added: {date})
 ```
 
-If no facts exist, report: "No hay hechos registrados. Usa /escala-context-add para agregar."
+If no facts exist, report: "Todavía no tengo datos guardados de tu empresa. ¿Me cuentas uno para anotarlo?" Si acepta, ejecuta el procedimiento interno `escala-context-add`.
 
 ## Output
 

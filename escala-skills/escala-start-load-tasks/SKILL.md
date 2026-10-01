@@ -1,13 +1,13 @@
 ---
 name: escala-start-load-tasks
-description: 'Load open tasks from task board. Sub-skill of /escala-start.'
+description: 'Load open tasks from task board. Sub-skill del procedimiento interno `escala-start`.'
 ---
 
 # Load Open Tasks
 
 ## Purpose
 
-Read the task board and extract counts and in-progress items. Sub-skill of `/escala-start`.
+Read the task board and extract counts and in-progress items. Sub-skill del procedimiento interno `escala-start`.
 
 ## Steps
 

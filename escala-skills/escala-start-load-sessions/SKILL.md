@@ -1,13 +1,13 @@
 ---
 name: escala-start-load-sessions
-description: 'Load last 3 session logs. Sub-skill of /escala-start.'
+description: 'Load last 3 session logs. Sub-skill del procedimiento interno `escala-start`.'
 ---
 
 # Load Recent Sessions
 
 ## Purpose
 
-Read the most recent session logs and produce a summary. Sub-skill of `/escala-start`.
+Read the most recent session logs and produce a summary. Sub-skill del procedimiento interno `escala-start`.
 
 ## Steps
 

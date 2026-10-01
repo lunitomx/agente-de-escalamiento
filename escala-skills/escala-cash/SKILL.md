@@ -26,12 +26,16 @@ ls work/cash/ 2>/dev/null
 
 ### Step 3: Recommend Next Tool
 
-| Estado | Recomendación |
-|--------|--------------|
-| Sin trabajo previo | `/escala-cash-ccc` — mapear CCC |
-| CCC mapeado | `/escala-cash-power1` — Power of One |
-| Power of One hecho | `/escala-cash-acceleration` |
-| Todo hecho | Re-mapear, medir mejoras |
+Ofrece el siguiente paso como pregunta en español llano. No muestres el nombre
+del procedimiento ni un comando; si el dueño acepta, ejecuta el procedimiento
+interno indicado.
+
+| Estado | Procedimiento interno | Cómo se lo ofreces al dueño |
+|--------|-----------------------|-----------------------------|
+| Sin trabajo previo | procedimiento interno `escala-cash-ccc` | "¿Vemos cuántos días pasan desde que pagas a tu proveedor hasta que tu cliente te paga?" |
+| CCC mapeado | procedimiento interno `escala-cash-power1` | "¿Vemos cuánto dinero liberas si cobras 10 días antes?" |
+| Power of One hecho | procedimiento interno `escala-cash-acceleration` | "¿Buscamos formas de que el dinero te llegue más rápido?" |
+| Todo hecho | — | "¿Volvemos a medir para ver cuánto mejoró tu efectivo?" |
 
 ### Step 4: Use Backend Engine
 

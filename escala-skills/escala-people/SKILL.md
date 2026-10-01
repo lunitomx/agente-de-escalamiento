@@ -33,12 +33,16 @@ Evaluar qué herramientas ya se han completado.
 
 ### Step 3: Recommend Next Tool
 
-| Estado | Recomendación |
-|--------|--------------|
-| Sin trabajo previo | `/escala-people-fac` — Mapa de Funciones y Responsabilidades |
-| FACChart hecho | `/escala-people-values` — Core Values Discovery |
-| FACChart + Values | `/escala-people-topgrading` — Proceso de contratación |
-| Todo hecho | Revisar gaps, re-evaluar scores |
+Ofrece el siguiente paso como pregunta en español llano. No muestres el nombre
+del procedimiento ni un comando; si el dueño acepta, ejecuta el procedimiento
+interno indicado.
+
+| Estado | Procedimiento interno | Cómo se lo ofreces al dueño |
+|--------|-----------------------|-----------------------------|
+| Sin trabajo previo | procedimiento interno `escala-people-fac` | "¿Anotamos quién es responsable de cada área de tu empresa y cómo se mide?" |
+| FACChart hecho | procedimiento interno `escala-people-values` | "¿Ponemos en palabras lo que en tu empresa no se negocia?" |
+| FACChart + Values | procedimiento interno `escala-people-topgrading` | "¿Armamos cómo contratar a la próxima persona para que sí sea la correcta?" |
+| Todo hecho | — | "¿Revisamos qué huecos quedan en tu equipo?" |
 
 ### Step 4: Guide
 

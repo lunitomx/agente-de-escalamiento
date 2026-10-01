@@ -23,7 +23,7 @@ test -f .escala/agent/memory/company-profile.yaml && echo "EXISTS" || echo "NO_P
 
 | Result | Action |
 |--------|--------|
-| NO_PROFILE | Redirect to `/escala-welcome` — company must be initialized first |
+| NO_PROFILE | Ejecuta el procedimiento interno `escala-welcome` — la empresa debe existir primero. Al dueño: "Antes de tu registro semanal necesito conocer tu empresa. ¿Empezamos?" |
 | EXISTS | Continue |
 
 ### Step 2: Collect Answers

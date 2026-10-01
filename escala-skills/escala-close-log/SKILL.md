@@ -1,13 +1,13 @@
 ---
 name: escala-close-log
-description: 'Write session log file with YAML frontmatter. Sub-skill of /escala-close.'
+description: 'Write session log file with YAML frontmatter. Sub-skill del procedimiento interno `escala-close`.'
 ---
 
 # Write Session Log
 
 ## Purpose
 
-Take captured session data and write a structured log file. Sub-skill of `/escala-close`.
+Take captured session data and write a structured log file. Sub-skill del procedimiento interno `escala-close`.
 
 ## Steps
 

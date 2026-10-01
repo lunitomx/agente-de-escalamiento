@@ -43,4 +43,4 @@ Guardar en `work/execution/meeting-rhythms.md`.
 | Item | Destination |
 |------|-------------|
 | Meeting Rhythm plan | `work/execution/meeting-rhythms.md` |
-| Next | `/escala-execution-priorities` |
+| Next | procedimiento interno `escala-execution-priorities`. Ofrécelo sin nombrarlo: "¿Elegimos las 3 a 5 cosas que tu equipo tiene que lograr este trimestre?" |

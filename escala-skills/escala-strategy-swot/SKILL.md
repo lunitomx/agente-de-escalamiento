@@ -40,6 +40,6 @@ Identificar 1-2 insights estratégicos clave que alimenten el Plan Estratégico 
 | Item | Destination |
 |------|-------------|
 | SWOT Analysis | `work/strategy/swot.md` |
-| Next | `/escala-strategy-opsp` |
+| Next | procedimiento interno `escala-strategy-opsp`. Ofrécelo sin nombrarlo: "¿Pasamos esto a tu plan del negocio en una sola página?" |
 
 ---

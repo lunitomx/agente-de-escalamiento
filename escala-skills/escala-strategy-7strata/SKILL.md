@@ -51,6 +51,6 @@ Guardar en `work/strategy/7-strata.md`.
 | Item | Destination |
 |------|-------------|
 | 7 Estratos de Estrategia analysis | `work/strategy/7-strata.md` |
-| Next | `/escala-strategy-opsp` (para integrar al Plan Estratégico de Una Página (OPSP)) |
+| Next | procedimiento interno `escala-strategy-opsp` (para integrar al Plan Estratégico de Una Página (OPSP)). Ofrécelo sin nombrarlo: "¿Pasamos lo que te hace distinto a tu plan de una sola página?" |
 
 ---

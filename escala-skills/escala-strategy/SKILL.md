@@ -43,11 +43,15 @@ Antes de definir cliente central, promesa de marca, posicionamiento o plan:
 
 ### Step 3: Recommend Next Tool
 
+Ofrece el siguiente paso como pregunta en español llano. No muestres el nombre
+del procedimiento ni un comando; si el dueño acepta, ejecuta el procedimiento
+interno indicado.
+
 | Estado | Recomendación |
 |--------|--------------|
-| Sin Core Values | `/escala-people-values` primero (prerequisito) |
-| Core Values listos, sin Plan Estratégico de Una Página (OPSP) | `/escala-strategy-opsp` — Plan Estratégico de Una Página (OPSP) |
-| Plan Estratégico de Una Página (OPSP) básico listo | `/escala-strategy-7strata` — profundizar diferenciación |
+| Sin Core Values | procedimiento interno `escala-people-values` primero (prerequisito). Al dueño: "Antes de tu plan, ¿ponemos en palabras lo que en tu empresa no se negocia?" |
+| Core Values listos, sin Plan Estratégico de Una Página (OPSP) | procedimiento interno `escala-strategy-opsp`. Al dueño: "¿Armamos tu plan del negocio en una sola página?" |
+| Plan Estratégico de Una Página (OPSP) básico listo | procedimiento interno `escala-strategy-7strata`. Al dueño: "¿Vemos qué te hace distinto de tu competencia?" |
 | Todo hecho | SWOT/SWT para refinar |
 | Pregunta por su competencia, su mercado o las tendencias de su sector (sin prerequisito) | `escala-strategy-research` — investigar afuera antes de decidir |
 | Habla de ventas, marketing, prospectos o clientes que no compran o no regresan (sin prerequisito) | `escala-strategy-journey` — cómo llega un cliente hasta que le compra, sólo si el módulo dice que se pregunte |

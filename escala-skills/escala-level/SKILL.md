@@ -47,7 +47,7 @@ print(json.dumps(run(json.loads(sys.stdin.read())), indent=2, ensure_ascii=False
 
 ## Integration
 
-El nivel se carga automáticamente en `/escala-start` y se pasa como contexto a todos los skills de coaching.
+El nivel se carga automáticamente en el procedimiento interno `escala-start` y se pasa como contexto a todos los skills de coaching.
 
 El SKILL.md de cada skill debe incluir:
 ```

@@ -135,7 +135,7 @@ así que retomar no pierde nada).
 |------|-------------|
 | Estado estructurado | `.escala/my-company/opsp.yaml` |
 | Documento exportado | `.escala/my-company/opsp.md` |
-| Next | `/escala-execution` o `/escala-progress` |
+| Next | procedimiento interno `escala-execution` o `escala-progress`. Ofrécelo sin nombrarlo: "¿Vemos cómo lograr que tu equipo cumpla este plan cada semana?" |
 
 ## Quality Checklist
 
