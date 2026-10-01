@@ -192,7 +192,7 @@ def test_interview_returns_next_question_and_writes_nothing(tmp_path: Path) -> N
 
 
 def test_unknown_action_and_invalid_input_are_reported() -> None:
-    assert run({"action": "save"}).errors == ["unknown_action"]
+    assert run({"action": "publish"}).errors == ["unknown_action"]
     assert run({"action": "check", "signals": {"constraint_area": "ventas"}}).errors
 
 
@@ -295,3 +295,55 @@ def test_recording_over_a_corrupt_memory_keeps_a_backup_and_says_so(
     ]
     backup = asks_path(tmp_path).with_name("asks.yaml.bak")
     assert backup.read_text(encoding="utf-8") == "asks: [roto"
+
+
+def test_build_and_save_reject_unknown_stages_and_remote_sources(
+    tmp_path: Path,
+) -> None:
+    base = {"base_path": str(tmp_path), "today": "2026-10-01"}
+    bad_stage = run({**base, "action": "build", "counts": {"vende": {}}})
+    assert bad_stage.errors
+    remote = run(
+        {
+            **base,
+            "action": "build",
+            "counts": {
+                "compra": {
+                    "value": 1,
+                    "period": "2026-09",
+                    "source": "https://crm.example",
+                    "origin": "dato_con_periodo",
+                }
+            },
+        }
+    )
+    assert remote.errors
+    unknown_choice = run({**base, "action": "save", "chosen": "Z"})
+    assert unknown_choice.errors == ["chosen_must_be_an_option"]
+    assert _files(tmp_path) == []
+
+
+def test_customers_said_in_build_drops_the_not_asked_warning(tmp_path: Path) -> None:
+    result = run(
+        {
+            "base_path": str(tmp_path),
+            "today": "2026-10-01",
+            "action": "build",
+            "answers": [
+                {"stage": "compra", "field": "paso", "answer": "por WhatsApp, 18"},
+                {"stage": "compra", "field": "friccion", "answer": "tardo"},
+            ],
+            "evidence": [
+                {
+                    "stage": "compra",
+                    "origin": "clientes_dijeron",
+                    "text": "tardas en contestar",
+                    "asked_on": "2026-09-20",
+                    "asked_count": 4,
+                }
+            ],
+        }
+    )
+    assert result.errors == []
+    assert "no se lo hemos preguntado" not in result.message
+    assert "Se lo preguntaste a 4 clientes" in result.message
