@@ -100,8 +100,14 @@ def build_cash_decision(
     *,
     as_of: date | None = None,
     scenarios: tuple[CashScenarioRequest, ...] = (),
+    statement_months: int | None = None,
 ) -> CashDecision:
-    """Validate statement evidence before invoking the V1 cash engine."""
+    """Validate statement evidence before invoking the V1 cash engine.
+
+    ``statement_months`` is how many months the income statement covers (C10):
+    1 = a single month (annualized ×12), 12 = a full year (×1). Unknown or an
+    accumulated 2–11 months blocks: an accumulated statement is never ×12 (S86.15).
+    """
 
     findings = set(statements.findings)
     figures = _required_figures(statements)
@@ -158,6 +164,14 @@ def build_cash_decision(
     ):
         findings.add("invalid_profit_input")
 
+    annualization = annualization_factor(period, statement_months)
+    if annualization is None:
+        findings.add(
+            "statement_months_unknown"
+            if statement_months is None
+            else "accumulated_statement_not_annualized"
+        )
+
     if findings:
         return CashDecision(
             status="blocked",
@@ -166,7 +180,7 @@ def build_cash_decision(
         )
 
     assert all(figure is not None for figure in selected.values())
-    annualization = _annualization_factor(period)
+    assert annualization is not None
     input_values = _build_inputs(selected, annualization)
     freshness = "fresh"
     confidence = "high"
@@ -288,8 +302,21 @@ def _common_periods(figures: dict[str, tuple[FinancialFigure, ...]]) -> tuple[st
     return tuple(sorted(set.intersection(*available)))
 
 
-def _annualization_factor(period: str) -> int:
-    return 12 if re.fullmatch(r"20\d{2}-\d{1,2}", period) else 1
+def annualization_factor(period: str, statement_months: int | None) -> int | None:
+    """How many times a monthly-period figure is multiplied to reach a year.
+
+    Before S86.15 every ``YYYY-MM`` period was ×12, so an accumulated January–June
+    statement (``2026-06``) came out 6 times too big. Now only a month the owner
+    confirmed is ×12; ``None`` means «do not calculate».
+    """
+
+    if not re.fullmatch(r"20\d{2}-\d{1,2}", period):
+        return 1
+    if statement_months == 1:
+        return 12
+    if statement_months == 12:
+        return 1
+    return None
 
 
 def _build_inputs(

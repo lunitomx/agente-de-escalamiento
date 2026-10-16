@@ -46,3 +46,4 @@ al curso y le dice al dueño que lo revise con su contador.
 | `16-eficiencia-laboral.md` | Cuánto te deja cada peso de sueldo | Cuando el dueño quiere contratar, revisar nómina o diseñar comisiones. |
 | `17-siete-palancas.md` | Siete palancas mueven tu dinero | Cuando el dueño quiere saber qué mover primero para tener más dinero. |
 | `18-tres-mejores-ideas.md` | Toma las tres mejores ideas | Al cerrar un diagnóstico de Cash, para convertirlo en acción con el equipo. |
+| `19-lo-que-escala-necesita.md` | Lo que ESCALA necesita para analizar tus estados | Cuando el dueño manda sus estados por primera vez, o pregunta por qué ESCALA le pregunta antes de darle números. |

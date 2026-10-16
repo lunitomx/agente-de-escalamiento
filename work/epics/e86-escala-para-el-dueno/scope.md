@@ -52,7 +52,7 @@ para no invertir a ciegas en instalación y paridad).
 | S86.12 | ESCALA-80 | Fichas de cash sin nombre del instructor | 2 | Cero menciones en archivos versionados; cita "Según el curso de cash que vimos" | done |
 | S86.13 | ESCALA-81 | El poder del uno da el efectivo correcto | 3 | 7 palancas al centavo: flujo total 1,143,864.91; utilidad 1,010,740.66 | done |
 | S86.14 | ESCALA-82 | ESCALA lee los estados como vienen | 5 | CONTPAQi y Aspel sintéticos completos; una prueba por falla A4 | done |
-| S86.15 | ESCALA-83 | Cada cuenta en su caja y revisión R1–R11 | 5 | Mover una cuenta de caja cambia el resultado; acumulado nunca ×12 | planned |
+| S86.15 | ESCALA-83 | Cada cuenta en su caja y revisión R1–R11 | 5 | Mover una cuenta de caja cambia el resultado; acumulado nunca ×12 | done |
 | S86.16 | ESCALA-84 | Una sola calculadora, que viaja con ESCALA | 5 | Prueba dentro del paquete; cero procedimientos que calculan con el modelo | planned |
 | S86.17 | ESCALA-85 | Escenario «analiza mis estados» de punta a punta | 5 | 3 entradas (completa, sin balance anterior, sucia); ningún número del modelo | planned |
 | S86.18 | ESCALA-86 | Panel «Tu contabilidad real» | 3 | Financiamiento = operación = 15,014,008.75; otras cuentas por renglones | planned |

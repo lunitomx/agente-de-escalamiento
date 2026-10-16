@@ -77,6 +77,7 @@ def main() -> int:
         decision = build_cash_decision(
             statements,
             as_of=AS_OF,
+            statement_months=1,
             scenarios=(
                 CashScenarioRequest(
                     scenario_id="price-plus-one", adjustments={"price": 1}
