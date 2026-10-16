@@ -207,8 +207,12 @@ def test_cada_numero_dice_de_donde_sale(panel: PanelContabilidad) -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_renglon_de_otras_en_otra_caja_el_panel_no_sale(mi_empresa: EstadosRevisados) -> None:
-    movido = _cambia_renglon(mi_empresa, "Activo fijo neto", FIN, caja="capital de trabajo")
+def test_renglon_de_otras_en_otra_caja_el_panel_no_sale(
+    mi_empresa: EstadosRevisados,
+) -> None:
+    movido = _cambia_renglon(
+        mi_empresa, "Activo fijo neto", FIN, caja="capital de trabajo"
+    )
     panel = panel_de(movido)
     assert panel.balances == ()
     assert len(panel.preguntas) == 1
@@ -223,7 +227,9 @@ def test_renglon_de_otras_en_otra_caja_el_panel_no_sale(mi_empresa: EstadosRevis
     assert pregunta.pregunta.endswith("?")
 
 
-def test_pasivo_de_otras_a_deuda_neta_tambien_se_ve(mi_empresa: EstadosRevisados) -> None:
+def test_pasivo_de_otras_a_deuda_neta_tambien_se_ve(
+    mi_empresa: EstadosRevisados,
+) -> None:
     movido = _cambia_renglon(mi_empresa, "Acreedores diversos", INI, caja="deuda neta")
     panel = panel_de(movido)
     assert panel.balances == ()
@@ -231,7 +237,9 @@ def test_pasivo_de_otras_a_deuda_neta_tambien_se_ve(mi_empresa: EstadosRevisados
     assert panel.preguntas[0].diferencia == Decimal("13885547.68")
 
 
-def test_clientes_a_deuda_neta_sin_recalcular_tampoco_sale(mi_empresa: EstadosRevisados) -> None:
+def test_clientes_a_deuda_neta_sin_recalcular_tampoco_sale(
+    mi_empresa: EstadosRevisados,
+) -> None:
     # Otras cuentas sí iguala (no se tocó), pero capital de trabajo por renglones no.
     movido = _cambia_renglon(mi_empresa, "Clientes", FIN, caja="deuda neta")
     panel = panel_de(movido)
@@ -287,7 +295,11 @@ def test_sin_ventas_el_balance_sale_y_por_cada_100_no_calculable(
     sin_ventas = mi_empresa.model_copy(
         update={
             "resultados": resultados.model_copy(
-                update={"cuentas": tuple(c for c in resultados.cuentas if c.concepto != "ventas")}
+                update={
+                    "cuentas": tuple(
+                        c for c in resultados.cuentas if c.concepto != "ventas"
+                    )
+                }
             )
         }
     )
@@ -314,7 +326,10 @@ def test_la_pagina_tiene_dos_columnas_y_el_origen(panel: PanelContabilidad) -> N
     assert "<title>Tu contabilidad real</title>" in texto
     assert "Financiamiento" in texto and "Operación" in texto
     assert texto.count("15,014,008.75") >= 2
-    assert "Por cada 100 pesos que vendes, 14.10 se quedan atrapados en capital de trabajo." in texto
+    assert (
+        "Por cada 100 pesos que vendes, 14.10 se quedan atrapados en capital de trabajo."
+        in texto
+    )
     assert "sale de:" in texto
     assert "Activo fijo neto" in texto
     assert "<script src" not in texto
@@ -324,7 +339,9 @@ def test_la_pagina_tiene_dos_columnas_y_el_origen(panel: PanelContabilidad) -> N
 def test_la_pagina_de_un_panel_que_no_sale_trae_la_pregunta(
     mi_empresa: EstadosRevisados,
 ) -> None:
-    movido = _cambia_renglon(mi_empresa, "Activo fijo neto", FIN, caja="capital de trabajo")
+    movido = _cambia_renglon(
+        mi_empresa, "Activo fijo neto", FIN, caja="capital de trabajo"
+    )
     texto = pagina(panel_de(movido))
     assert "15,014,008.75" not in texto
     assert "25,318,585.22" in texto
@@ -335,7 +352,13 @@ def test_main_escribe_la_pagina(mi_empresa: EstadosRevisados, tmp_path: Path) ->
     archivo.write_text(mi_empresa.model_dump_json(), encoding="utf-8")
     salida = tmp_path / "contabilidad.html"
     proceso = subprocess.run(
-        [sys.executable, "-m", "escala_server.cash.contabilidad", str(archivo), str(salida)],
+        [
+            sys.executable,
+            "-m",
+            "escala_server.cash.contabilidad",
+            str(archivo),
+            str(salida),
+        ],
         cwd=ROOT,
         capture_output=True,
         text=True,
@@ -350,7 +373,9 @@ def test_main_escribe_la_pagina(mi_empresa: EstadosRevisados, tmp_path: Path) ->
 def test_main_no_escribe_si_no_cuadra(
     mi_empresa: EstadosRevisados, tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    movido = _cambia_renglon(mi_empresa, "Activo fijo neto", FIN, caja="capital de trabajo")
+    movido = _cambia_renglon(
+        mi_empresa, "Activo fijo neto", FIN, caja="capital de trabajo"
+    )
     archivo = tmp_path / "estados-revisados.json"
     archivo.write_text(movido.model_dump_json(), encoding="utf-8")
     salida = tmp_path / "contabilidad.html"

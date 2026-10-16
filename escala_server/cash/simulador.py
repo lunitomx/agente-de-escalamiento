@@ -81,7 +81,9 @@ def _vistas(meses: int) -> tuple[tuple[Vista, ...], tuple[str, ...]]:
     )
     if meses == 1:
         return (mensual,), (suponer,)
-    return (Vista(clave="acumulado", nombre=f"Los {meses} meses", meses=1), mensual), (suponer,)
+    return (Vista(clave="acumulado", nombre=f"Los {meses} meses", meses=1), mensual), (
+        suponer,
+    )
 
 
 def _advertencias(resultado: ResultadoDelCurso) -> tuple[Advertencia, ...]:
@@ -97,7 +99,9 @@ def _advertencias(resultado: ResultadoDelCurso) -> tuple[Advertencia, ...]:
     ct = None
     if resultado.balance_final is not None:
         try:
-            ct = resultado.indicador("capital_de_trabajo_por_cada_100", resultado.balance_final)
+            ct = resultado.indicador(
+                "capital_de_trabajo_por_cada_100", resultado.balance_final
+            )
         except KeyError:
             ct = None
     if isinstance(ct, Calculado):
@@ -116,7 +120,9 @@ def _advertencias(resultado: ResultadoDelCurso) -> tuple[Advertencia, ...]:
             f"100 de ventas; no calculable: {razon}."
         )
         origen = f"no calculable: {razon}"
-    volumen = Advertencia(palanca="volumen", texto=texto, origen=origen, lamina=LAMINA_VOLUMEN)
+    volumen = Advertencia(
+        palanca="volumen", texto=texto, origen=origen, lamina=LAMINA_VOLUMEN
+    )
     return precio, volumen
 
 
@@ -130,7 +136,11 @@ def simulador_de(resultado: ResultadoDelCurso) -> Simulador:
     if razon is not None or resultado.periodo is None:
         return Simulador(no_calculable=razon)
     periodo = resultado.periodo
-    meses = (periodo.hasta.year - periodo.desde.year) * 12 + periodo.hasta.month - periodo.desde.month
+    meses = (
+        (periodo.hasta.year - periodo.desde.year) * 12
+        + periodo.hasta.month
+        - periodo.desde.month
+    )
     if meses < 1:
         return Simulador(no_calculable="tus estados cubren menos de un mes")
     vistas, sin_vista = _vistas(meses)
@@ -267,7 +277,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     """``python -m escala_server.cash.simulador <estados-revisados.json> <salida.html>``."""
     argumentos = list(sys.argv[1:] if argv is None else argv)
     if len(argumentos) != 2:
-        return _no("uso: python -m escala_server.cash.simulador <estados-revisados.json> <salida.html>")
+        return _no(
+            "uso: python -m escala_server.cash.simulador <estados-revisados.json> <salida.html>"
+        )
     try:
         texto = Path(argumentos[0]).read_text(encoding="utf-8")
     except OSError:

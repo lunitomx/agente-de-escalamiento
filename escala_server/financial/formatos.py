@@ -73,7 +73,9 @@ CONCEPTOS: dict[str, _Concepto] = {
             "venta de activos",
         ),
     ),
-    "costo_ventas": _Concepto(("costo de ventas", "costo de venta", "costo de lo vendido")),
+    "costo_ventas": _Concepto(
+        ("costo de ventas", "costo de venta", "costo de lo vendido")
+    ),
     "gastos_operacion": _Concepto(
         (
             "gastos de operacion",
@@ -146,7 +148,9 @@ NOMBRE_DE_CONCEPTO: dict[str, str] = {
 }
 
 
-def coincide(nombre: str, frases: tuple[str, ...], exclusiones: tuple[str, ...] = ()) -> int:
+def coincide(
+    nombre: str, frases: tuple[str, ...], exclusiones: tuple[str, ...] = ()
+) -> int:
     """Largo (en palabras) de la frase más larga que coincide; 0 si ninguna.
 
     Si el nombre trae una exclusión, no coincide aunque traiga la frase.
@@ -202,8 +206,10 @@ def leer_monto(texto: str) -> Decimal | None:
             valor = Decimal(repr(float(cifra)))
     except (InvalidOperation, ValueError):
         return None
-    negativo = bool(coincidencia["abre"]) or bool(coincidencia["menos"]) or bool(
-        coincidencia["menos2"]
+    negativo = (
+        bool(coincidencia["abre"])
+        or bool(coincidencia["menos"])
+        or bool(coincidencia["menos2"])
     )
     return -valor if negativo else valor
 
@@ -230,7 +236,20 @@ MESES: dict[str, int] = {
     "nov": 11, "noviembre": 11, "november": 11,
     "dic": 12, "diciembre": 12, "dec": 12, "december": 12,
 }  # fmt: skip
-_ABREVIADO = ("ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic")
+_ABREVIADO = (
+    "ene",
+    "feb",
+    "mar",
+    "abr",
+    "may",
+    "jun",
+    "jul",
+    "ago",
+    "sep",
+    "oct",
+    "nov",
+    "dic",
+)
 _COMPLETO = (
     "enero", "febrero", "marzo", "abril", "mayo", "junio",
     "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
@@ -240,12 +259,39 @@ _MES = "|".join(sorted(MESES, key=len, reverse=True))
 _ANIO = r"(?:19|20)\d{2}"
 # Orden: primero las formas con día, luego mes y año; cada hallazgo se borra.
 _PATRONES: tuple[tuple[str, re.Pattern[str]], ...] = (
-    ("dma", re.compile(rf"(?<!\d)(\d{{1,2}})\s*[/.-]\s*(\d{{1,2}}|{_MES})\s*[/.-]\s*({_ANIO})(?!\d)")),
-    ("dma", re.compile(rf"(?<!\d)(\d{{1,2}})\s+de\s+({_MES})\s+(?:de|del)\s+({_ANIO})(?!\d)")),
-    ("amd", re.compile(rf"(?<!\d)({_ANIO})[/-](\d{{1,2}})(?:[/-](\d{{1,2}}))?(?![\d/-])")),
-    ("ma", re.compile(rf"(?<![a-z])({_MES})\s*[/.-]?\s*(?:de\s+|del\s+)?({_ANIO})(?!\d)")),
+    (
+        "dma",
+        re.compile(
+            rf"(?<!\d)(\d{{1,2}})\s*[/.-]\s*(\d{{1,2}}|{_MES})\s*[/.-]\s*({_ANIO})(?!\d)"
+        ),
+    ),
+    (
+        "dma",
+        re.compile(
+            rf"(?<!\d)(\d{{1,2}})\s+de\s+({_MES})\s+(?:de|del)\s+({_ANIO})(?!\d)"
+        ),
+    ),
+    (
+        "amd",
+        re.compile(rf"(?<!\d)({_ANIO})[/-](\d{{1,2}})(?:[/-](\d{{1,2}}))?(?![\d/-])"),
+    ),
+    (
+        "ma",
+        re.compile(rf"(?<![a-z])({_MES})\s*[/.-]?\s*(?:de\s+|del\s+)?({_ANIO})(?!\d)"),
+    ),
 )
-_RELLENO = {"al", "a", "de", "del", "saldo", "saldos", "periodo", "ejercicio", "cierre", "y"}
+_RELLENO = {
+    "al",
+    "a",
+    "de",
+    "del",
+    "saldo",
+    "saldos",
+    "periodo",
+    "ejercicio",
+    "cierre",
+    "y",
+}
 
 
 @dataclass(frozen=True)

@@ -69,7 +69,9 @@ def _del_dueno(tmp_path: Path) -> list[str]:
     return sorted(p.name for p in carpeta.iterdir()) if carpeta.exists() else []
 
 
-def test_sin_si_no_escribe_nada(capsys: pytest.CaptureFixture[str], tmp_path: Path) -> None:
+def test_sin_si_no_escribe_nada(
+    capsys: pytest.CaptureFixture[str], tmp_path: Path
+) -> None:
     salida = _corre(capsys, tmp_path, archivos=COMPLETA, respuestas=RESPUESTAS)
     assert salida["calculo"] is not None
     assert salida["guardado"] == []
@@ -81,7 +83,12 @@ def test_otra_respuesta_no_escribe_nada(
     capsys: pytest.CaptureFixture[str], tmp_path: Path, respuesta: str
 ) -> None:
     salida = _corre(
-        capsys, tmp_path, "--guardar", respuesta, archivos=COMPLETA, respuestas=RESPUESTAS
+        capsys,
+        tmp_path,
+        "--guardar",
+        respuesta,
+        archivos=COMPLETA,
+        respuestas=RESPUESTAS,
     )
     assert salida["guardado"] == []
     assert _del_dueno(tmp_path) == []
@@ -90,8 +97,13 @@ def test_otra_respuesta_no_escribe_nada(
 def test_con_si_guarda_y_la_calculadora_lo_lee_igual(
     capsys: pytest.CaptureFixture[str], tmp_path: Path
 ) -> None:
-    salida = _corre(capsys, tmp_path, "--guardar", "sí", archivos=COMPLETA, respuestas=RESPUESTAS)
-    assert _del_dueno(tmp_path) == ["conversacion.json", "estados-revisados-2026-01-31.json"]
+    salida = _corre(
+        capsys, tmp_path, "--guardar", "sí", archivos=COMPLETA, respuestas=RESPUESTAS
+    )
+    assert _del_dueno(tmp_path) == [
+        "conversacion.json",
+        "estados-revisados-2026-01-31.json",
+    ]
     assert len(salida["guardado"]) == 2
     assert "Guardé" in salida["mensaje"]
     assert "¿Guardo" not in salida["mensaje"]
@@ -101,7 +113,9 @@ def test_con_si_guarda_y_la_calculadora_lo_lee_igual(
     calculo = json.loads(capsys.readouterr().out)
     assert calculo == salida["calculo"]
     capital = next(
-        i for i in calculo["indicadores"] if i["clave"] == "capital_de_trabajo" and i["fecha"] == "2025-12-31"
+        i
+        for i in calculo["indicadores"]
+        if i["clave"] == "capital_de_trabajo" and i["fecha"] == "2025-12-31"
     )
     assert Decimal(capital["valor"]) == Decimal("6178173.85")
 
@@ -109,14 +123,20 @@ def test_con_si_guarda_y_la_calculadora_lo_lee_igual(
 def test_la_platica_guardada_no_trae_cifras(
     capsys: pytest.CaptureFixture[str], tmp_path: Path
 ) -> None:
-    _corre(capsys, tmp_path, "--guardar", "sí", archivos=COMPLETA, respuestas=RESPUESTAS)
-    platica = json.loads((tmp_path / "work" / "cash" / SLUG / "conversacion.json").read_text())
+    _corre(
+        capsys, tmp_path, "--guardar", "sí", archivos=COMPLETA, respuestas=RESPUESTAS
+    )
+    platica = json.loads(
+        (tmp_path / "work" / "cash" / SLUG / "conversacion.json").read_text()
+    )
     assert set(platica) == {"empresa", "archivos", "respuestas"}
     assert "6178173.85" not in json.dumps(platica)
 
 
 def test_nunca_sobrescribe(capsys: pytest.CaptureFixture[str], tmp_path: Path) -> None:
-    _corre(capsys, tmp_path, "--guardar", "sí", archivos=COMPLETA, respuestas=RESPUESTAS)
+    _corre(
+        capsys, tmp_path, "--guardar", "sí", archivos=COMPLETA, respuestas=RESPUESTAS
+    )
     _corre(capsys, tmp_path, "--guardar", "sí")
     assert "estados-revisados-2026-01-31-2.json" in _del_dueno(tmp_path)
 
@@ -132,7 +152,14 @@ def test_sin_calculo_el_si_solo_guarda_la_platica(
 def test_seguir_otro_dia(capsys: pytest.CaptureFixture[str], tmp_path: Path) -> None:
     """Otro día el archivo de trabajo ya no está; sigue desde lo que guardó con «sí»."""
 
-    _corre(capsys, tmp_path, "--guardar", "sí", archivos=COMPLETA, respuestas=RESPUESTAS[:3])
+    _corre(
+        capsys,
+        tmp_path,
+        "--guardar",
+        "sí",
+        archivos=COMPLETA,
+        respuestas=RESPUESTAS[:3],
+    )
     salida = _corre(capsys, tmp_path, conversacion="otro-dia.json")
     claves = [p["clave"] for p in salida["preguntas"]]
     assert "C10" not in claves

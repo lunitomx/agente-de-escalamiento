@@ -118,7 +118,9 @@ def _hallazgos(revision: RevisionDeEstados, codigo: str):
         ("Capital contable", "capital", "capital"),
     ],
 )
-def test_cada_cuenta_tiene_su_caja_por_regla_escrita(nombre: str, lado: str, caja: str) -> None:
+def test_cada_cuenta_tiene_su_caja_por_regla_escrita(
+    nombre: str, lado: str, caja: str
+) -> None:
     regla = regla_de(nombre)
 
     assert regla is not None
@@ -178,7 +180,9 @@ def test_cada_cuenta_del_balance_dice_su_caja_y_por_que() -> None:
     assert acomodo.cuentas
     assert all(cuenta.caja is not None and cuenta.porque for cuenta in acomodo.cuentas)
     # Los totales del documento no se acomodan: se usan para revisar (R3).
-    assert all(not cuenta.nombre.lower().startswith("total") for cuenta in acomodo.cuentas)
+    assert all(
+        not cuenta.nombre.lower().startswith("total") for cuenta in acomodo.cuentas
+    )
     assert {total.nombre for total in acomodo.totales_del_documento} >= {
         "Total ACTIVO",
         "Total PASIVO",
@@ -278,7 +282,9 @@ def test_la_errata_de_031_de_la_lamina_70_produce_el_aviso() -> None:
     assert "no cuadra por 0.31: ¿redondeo o falta una cuenta?" in aviso.mensaje
     # Dentro de la tolerancia de 1 peso: avisa y pregunta, no bloquea.
     assert not aviso.bloquea
-    assert "no cuadra por 0.31: ¿redondeo o falta una cuenta?" in render_asi_acomode(revision)
+    assert "no cuadra por 0.31: ¿redondeo o falta una cuenta?" in render_asi_acomode(
+        revision
+    )
     # El documento dice capital 9,256,923.52 y sus cuentas suman 9,256,923.83 (R3).
     r3 = [h for h in _hallazgos(revision, "R3") if h.resultado != "cuadra"]
     assert any("9,256,923.83" in h.mensaje for h in r3)
@@ -288,7 +294,10 @@ def test_la_errata_de_031_de_la_lamina_70_produce_el_aviso() -> None:
 def test_un_balance_que_no_cuadra_no_calcula_y_dice_la_diferencia() -> None:
     texto = _texto("contpaqi_balance.txt").replace("5,639,601.55", "5,640,601.55")
     revision = revisar_estados(
-        [_contpaqi_balance(texto)], _contpaqi_resultados(), respuestas=ACUMULADO, hoy=HOY
+        [_contpaqi_balance(texto)],
+        _contpaqi_resultados(),
+        respuestas=ACUMULADO,
+        hoy=HOY,
     )
 
     r1 = _hallazgos(revision, "R1")[0]
@@ -317,7 +326,10 @@ def test_r2_mi_empresa_utilidad_igual_al_resultado_del_ejercicio() -> None:
 def test_r2_avisa_si_la_utilidad_no_es_el_resultado_del_ejercicio() -> None:
     texto = _texto("contpaqi_balance.txt").replace("5,018,095.92", "5,018,095.61")
     revision = revisar_estados(
-        [_contpaqi_balance(texto)], _contpaqi_resultados(), respuestas=ACUMULADO, hoy=HOY
+        [_contpaqi_balance(texto)],
+        _contpaqi_resultados(),
+        respuestas=ACUMULADO,
+        hoy=HOY,
     )
 
     [r2] = _hallazgos(revision, "R2")
@@ -473,10 +485,14 @@ def _decision(tmp_path: Path, months: int | None):
     statements = reconstruct_statements(
         profile_financial_workbook(config, workbook), as_of=date(2026, 7, 10)
     )
-    return build_cash_decision(statements, as_of=date(2026, 7, 10), statement_months=months)
+    return build_cash_decision(
+        statements, as_of=date(2026, 7, 10), statement_months=months
+    )
 
 
-def test_la_decision_de_cash_nunca_multiplica_un_acumulado_de_6_meses(tmp_path: Path) -> None:
+def test_la_decision_de_cash_nunca_multiplica_un_acumulado_de_6_meses(
+    tmp_path: Path,
+) -> None:
     decision = _decision(tmp_path, 6)
 
     assert decision.status == "blocked"
@@ -571,7 +587,9 @@ def test_con_un_umbral_mas_alto_la_tasa_no_se_menciona() -> None:
 
 def test_r5_balance_en_pesos_y_estado_en_miles_no_calcula() -> None:
     resultados = _lee(
-        _texto("aspel_resultados.txt").replace("(Cifras en pesos)", "(Cifras en miles de pesos)")
+        _texto("aspel_resultados.txt").replace(
+            "(Cifras en pesos)", "(Cifras en miles de pesos)"
+        )
     )
     revision = revisar_estados(
         [_aspel_balance()], resultados, respuestas=ACUMULADO, hoy=HOY
@@ -587,7 +605,10 @@ def test_r6_proveedores_negativos_no_calcula_y_pregunta() -> None:
         "Proveedores | 1,232,468.24", "Proveedores | (1,232,468.24)"
     )
     revision = revisar_estados(
-        [_contpaqi_balance(texto)], _contpaqi_resultados(), respuestas=ACUMULADO, hoy=HOY
+        [_contpaqi_balance(texto)],
+        _contpaqi_resultados(),
+        respuestas=ACUMULADO,
+        hoy=HOY,
     )
 
     r6 = [h for h in _hallazgos(revision, "R6") if h.resultado == "no cuadra"]
@@ -598,10 +619,14 @@ def test_r6_proveedores_negativos_no_calcula_y_pregunta() -> None:
 
 def test_r7_una_cuenta_sin_caja_no_calcula_y_pregunta() -> None:
     texto = _texto("contpaqi_balance.txt").replace(
-        "Activo diferido | 1,956,618.46 |", "Inversión en criptomonedas | 1,956,618.46 |"
+        "Activo diferido | 1,956,618.46 |",
+        "Inversión en criptomonedas | 1,956,618.46 |",
     )
     revision = revisar_estados(
-        [_contpaqi_balance(texto)], _contpaqi_resultados(), respuestas=ACUMULADO, hoy=HOY
+        [_contpaqi_balance(texto)],
+        _contpaqi_resultados(),
+        respuestas=ACUMULADO,
+        hoy=HOY,
     )
 
     r7 = next(p for p in revision.preguntas if p.codigo == "R7")
@@ -618,18 +643,28 @@ def test_r7_el_anticipo_de_clientes_va_a_otras_cuentas_sin_preguntar() -> None:
         "Acreedores diversos | 11,846,834.45", "Anticipo de clientes | 11,846,834.45"
     )
     revision = revisar_estados(
-        [_contpaqi_balance(texto)], _contpaqi_resultados(), respuestas=ACUMULADO, hoy=HOY
+        [_contpaqi_balance(texto)],
+        _contpaqi_resultados(),
+        respuestas=ACUMULADO,
+        hoy=HOY,
     )
 
-    cuenta = next(c for c in revision.acomodo.cuentas if c.nombre == "Anticipo de clientes")
+    cuenta = next(
+        c for c in revision.acomodo.cuentas if c.nombre == "Anticipo de clientes"
+    )
     assert cuenta.caja == "otras cuentas"
     assert "R7" not in _codigos(revision)
 
 
 def test_r8_pasa_el_aviso_de_digito_invertido_del_lector() -> None:
-    texto = _texto("contpaqi_balance.txt").replace("1,956,618.46 | ", "1,965,618.46 | ", 1)
+    texto = _texto("contpaqi_balance.txt").replace(
+        "1,956,618.46 | ", "1,965,618.46 | ", 1
+    )
     revision = revisar_estados(
-        [_contpaqi_balance(texto)], _contpaqi_resultados(), respuestas=ACUMULADO, hoy=HOY
+        [_contpaqi_balance(texto)],
+        _contpaqi_resultados(),
+        respuestas=ACUMULADO,
+        hoy=HOY,
     )
 
     assert [h.resultado for h in _hallazgos(revision, "R8")] == ["aviso"]
@@ -649,14 +684,19 @@ def test_r9_el_capital_bajo_mas_de_lo_que_explica_la_utilidad() -> None:
     assert "2,966,528.27" in r9.mensaje and "0.00" in r9.mensaje
 
     dijo_bien = _mi_empresa(
-        Respuestas(periodo="acumulado del año", retiros_de_capital=Decimal("2966528.27"))
+        Respuestas(
+            periodo="acumulado del año", retiros_de_capital=Decimal("2966528.27")
+        )
     )
     assert [h.resultado for h in _hallazgos(dijo_bien, "R9")] == ["cuadra"]
 
 
 def test_r11_un_balance_viejo_avisa_pero_no_bloquea() -> None:
     revision = revisar_estados(
-        [_aspel_balance()], _aspel_resultados(), respuestas=ACUMULADO, hoy=date(2026, 10, 16)
+        [_aspel_balance()],
+        _aspel_resultados(),
+        respuestas=ACUMULADO,
+        hoy=date(2026, 10, 16),
     )
 
     [r11] = _hallazgos(revision, "R11")
@@ -670,5 +710,8 @@ def test_asi_acomode_tus_cuentas_muestra_caja_y_por_que() -> None:
 
     assert texto.startswith("Así acomodé tus cuentas")
     assert "| Cuenta | Monto | Fecha | Caja | Por qué |" in texto
-    assert "| Préstamos bancarios a largo plazo | 5,818,564.98 | 31-dic-2025 | deuda neta |" in texto
+    assert (
+        "| Préstamos bancarios a largo plazo | 5,818,564.98 | 31-dic-2025 | deuda neta |"
+        in texto
+    )
     assert "Deuda neta" in texto and "5,757,085.23" in texto

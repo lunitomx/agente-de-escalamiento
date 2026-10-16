@@ -455,9 +455,7 @@ def test_skill_lines_said_to_the_owner_have_no_bare_english_terms() -> None:
 def test_welcome_first_sentence_names_the_areas_in_spanish() -> None:
     from coaching.core import OWNER_AREA_NAMES
 
-    text = (ROOT / "escala-skills/escala-welcome/SKILL.md").read_text(
-        encoding="utf-8"
-    )
+    text = (ROOT / "escala-skills/escala-welcome/SKILL.md").read_text(encoding="utf-8")
 
     assert "People, Strategy, Execution y Cash" not in text
     assert all(name in text for name in OWNER_AREA_NAMES.values())

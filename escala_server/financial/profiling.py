@@ -499,10 +499,7 @@ def _profile_sheet(sheet: RawSheet) -> FinancialSheetProfile:
         value.strip() for value in (row_values[header_index] if row_values else [])
     )
     periods = _unique_tokens(
-        value
-        for row in row_values
-        for value in row
-        if _is_period(value)
+        value for row in row_values for value in row if _is_period(value)
     )
     currencies = _unique_tokens(
         value.upper()
@@ -629,7 +626,9 @@ def _alias_score(
         return 0.0
     if normalized in normalized_aliases:
         return 1.0
-    if coincide(normalized, tuple(alias for alias in normalized_aliases if len(alias) > 3)):
+    if coincide(
+        normalized, tuple(alias for alias in normalized_aliases if len(alias) > 3)
+    ):
         return 0.75
     return 0.0
 
@@ -647,8 +646,7 @@ def _header_index(rows: list[list[str]]) -> int:
             sum(
                 1
                 for value in row
-                if _is_period(value)
-                or _normalize(value) in _ALIASES["revenue"]
+                if _is_period(value) or _normalize(value) in _ALIASES["revenue"]
             ),
         )
         for index, row in enumerate(rows[:10])

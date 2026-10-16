@@ -33,7 +33,12 @@ from escala_server.cash.curso import (
     margen_pretax,
     margen_sobre_utilidad_bruta,
 )
-from escala_server.financial.lector import CuentaLeida, LecturaEstados, leer_estados, leer_texto
+from escala_server.financial.lector import (
+    CuentaLeida,
+    LecturaEstados,
+    leer_estados,
+    leer_texto,
+)
 from escala_server.financial.revisiones import Respuestas, revisar_estados
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -45,7 +50,9 @@ ACUMULADO = Respuestas(periodo="acumulado del año")
 CUATRO_MILLONES = Decimal("4000000")
 
 
-def _estados(texto_resultados: str | None = None, del_dueno: DatosDelDueno | None = None) -> EstadosRevisados:
+def _estados(
+    texto_resultados: str | None = None, del_dueno: DatosDelDueno | None = None
+) -> EstadosRevisados:
     if texto_resultados is None:
         resultados = leer_estados(ESTADOS / "aspel_resultados.txt", hoy=HOY)
     else:
@@ -56,7 +63,9 @@ def _estados(texto_resultados: str | None = None, del_dueno: DatosDelDueno | Non
         respuestas=ACUMULADO,
         hoy=HOY,
     )
-    return EstadosRevisados(revision=revision, resultados=resultados, del_dueno=del_dueno)
+    return EstadosRevisados(
+        revision=revision, resultados=resultados, del_dueno=del_dueno
+    )
 
 
 def _caso_2() -> str:
@@ -165,16 +174,24 @@ def test_sobre_ub_caso_2(caso_2: BloqueDelMargen) -> None:
         ("100", "300", "0", "ventas"),
     ],
 )
-def test_sobre_ub_negativas_no_calculable(uai: str, ub: str, ventas: str, palabra: str) -> None:
-    indicador = margen_sobre_utilidad_bruta(Decimal(uai), Decimal(ub), Decimal(ventas), FIN)
+def test_sobre_ub_negativas_no_calculable(
+    uai: str, ub: str, ventas: str, palabra: str
+) -> None:
+    indicador = margen_sobre_utilidad_bruta(
+        Decimal(uai), Decimal(ub), Decimal(ventas), FIN
+    )
     assert isinstance(indicador, NoCalculable), indicador
     assert palabra in indicador.no_calculable
 
 
 def test_sobre_ub_justo_en_40_no_aplica() -> None:
-    indicador = margen_sobre_utilidad_bruta(Decimal("100"), Decimal("400"), Decimal("1000"), FIN)
+    indicador = margen_sobre_utilidad_bruta(
+        Decimal("100"), Decimal("400"), Decimal("1000"), FIN
+    )
     assert isinstance(indicador, NoAplica)
-    indicador = margen_sobre_utilidad_bruta(Decimal("100"), Decimal("399.99"), Decimal("1000"), FIN)
+    indicador = margen_sobre_utilidad_bruta(
+        Decimal("100"), Decimal("399.99"), Decimal("1000"), FIN
+    )
     assert _valor(indicador) == Decimal("25.00")
 
 
@@ -190,7 +207,9 @@ def test_sobre_ub_justo_en_40_no_aplica() -> None:
         ("2045326", "6781210.60", "30.16"),  # caso 2 de L79: UAI real de Mi Empresa
     ],
 )
-def test_devoluciones_casos_de_la_lamina(devoluciones: str, uai: str, esperado: str) -> None:
+def test_devoluciones_casos_de_la_lamina(
+    devoluciones: str, uai: str, esperado: str
+) -> None:
     indicador = devoluciones_sobre_utilidad(Decimal(devoluciones), Decimal(uai), FIN)
     assert _valor(indicador) == Decimal(esperado)
     assert isinstance(indicador, Calculado) and indicador.lamina == "L79"
@@ -317,7 +336,9 @@ def test_ventas_cero_en_estados_completos() -> None:
         ]
     )
     revision = revisar_estados([balance], resultados, respuestas=ACUMULADO, hoy=HOY)
-    margen = _margen(calcular_curso(EstadosRevisados(revision=revision, resultados=resultados)))
+    margen = _margen(
+        calcular_curso(EstadosRevisados(revision=revision, resultados=resultados))
+    )
     assert isinstance(margen.pretax, NoCalculable)
     assert isinstance(margen.sobre_utilidad_bruta, NoCalculable)
 

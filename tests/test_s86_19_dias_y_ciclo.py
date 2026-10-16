@@ -51,7 +51,9 @@ def _mi_empresa(respuestas: Respuestas = ACUMULADO) -> EstadosRevisados:
         respuestas=respuestas,
         hoy=HOY,
     )
-    return EstadosRevisados(revision=revision, resultados=resultados, respuestas=respuestas)
+    return EstadosRevisados(
+        revision=revision, resultados=resultados, respuestas=respuestas
+    )
 
 
 def _valor(dias: DiasDelDinero, clave: str, fecha: date) -> Decimal:
@@ -67,7 +69,9 @@ def como_vienen() -> DiasDelDinero:
 
 @pytest.fixture(scope="module")
 def sin_iva() -> DiasDelDinero:
-    return dias_del_dinero(_mi_empresa(), BaseDeDias(iva_incluido=True, tasa_iva=Decimal("16")))
+    return dias_del_dinero(
+        _mi_empresa(), BaseDeDias(iva_incluido=True, tasa_iva=Decimal("16"))
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -103,12 +107,16 @@ def test_mi_empresa_usa_365_en_los_dos_anios(como_vienen: DiasDelDinero) -> None
     assert anterior.origen.endswith("÷ 365)")
 
 
-def test_mi_empresa_coincide_con_la_calculadora_del_curso(como_vienen: DiasDelDinero) -> None:
+def test_mi_empresa_coincide_con_la_calculadora_del_curso(
+    como_vienen: DiasDelDinero,
+) -> None:
     """Una sola definición: con los saldos como vienen, los mismos días que S86.16."""
     curso = calcular_curso(_mi_empresa())
     for clave in ("clientes", "inventario", "proveedores", "ciclo"):
         for fecha in (INI, FIN):
-            del_curso = curso.indicador("ciclo" if clave == "ciclo" else f"dias_{clave}", fecha)
+            del_curso = curso.indicador(
+                "ciclo" if clave == "ciclo" else f"dias_{clave}", fecha
+            )
             assert isinstance(del_curso, Calculado)
             assert _valor(como_vienen, clave, fecha) == del_curso.valor
 
@@ -136,7 +144,9 @@ def test_ciclo_empeoro(como_vienen: DiasDelDinero) -> None:
         ("proveedores", "empeoró"),  # 24.31 → 19.59: pagas antes
     ],
 )
-def test_veredicto_por_cuenta(como_vienen: DiasDelDinero, clave: str, veredicto: str) -> None:
+def test_veredicto_por_cuenta(
+    como_vienen: DiasDelDinero, clave: str, veredicto: str
+) -> None:
     assert como_vienen.cambio(clave).veredicto == veredicto
 
 
@@ -186,7 +196,9 @@ def test_sin_iva_trae_la_cifra_con_iva_del_curso(sin_iva: DiasDelDinero) -> None
 
 def test_la_tasa_de_iva_cambia_el_resultado() -> None:
     """La tasa es dato: con 8% sale otro número."""
-    ocho = dias_del_dinero(_mi_empresa(), BaseDeDias(iva_incluido=True, tasa_iva=Decimal("8")))
+    ocho = dias_del_dinero(
+        _mi_empresa(), BaseDeDias(iva_incluido=True, tasa_iva=Decimal("8"))
+    )
     # 46.9682 ÷ 1.08 = 43.49
     assert _valor(ocho, "clientes", FIN) == Decimal("43.49")
 
@@ -210,7 +222,9 @@ def test_iva_no() -> None:
 
 
 def test_la_base_sale_de_las_respuestas_guardadas() -> None:
-    respuestas = Respuestas(periodo="acumulado del año", iva_incluido=True, ventas_a_credito=Decimal("100"))
+    respuestas = Respuestas(
+        periodo="acumulado del año", iva_incluido=True, ventas_a_credito=Decimal("100")
+    )
     base = BaseDeDias.de(respuestas, tasa_iva=Decimal("16"))
     assert base.iva_incluido is True and base.ventas_a_credito == Decimal("100")
     dias = dias_del_dinero(_mi_empresa(respuestas), base)
@@ -438,13 +452,20 @@ def test_el_escenario_guarda_las_respuestas_c1_y_c9(
     from escala_server.cash import escenario
 
     argv = [
-        "--empresa", "Mi Empresa, S.A. de C.V.",
-        "--carpeta", str(tmp_path / "work" / "cash"),
-        "--conversacion", str(tmp_path / "trabajo" / "platica.json"),
-        "--hoy", "2026-01-31",
-        "--archivo", str(ESTADOS / "aspel_balance.txt"),
-        "--archivo", str(ESTADOS / "aspel_resultados.txt"),
-        "--guardar", "sí",
+        "--empresa",
+        "Mi Empresa, S.A. de C.V.",
+        "--carpeta",
+        str(tmp_path / "work" / "cash"),
+        "--conversacion",
+        str(tmp_path / "trabajo" / "platica.json"),
+        "--hoy",
+        "2026-01-31",
+        "--archivo",
+        str(ESTADOS / "aspel_balance.txt"),
+        "--archivo",
+        str(ESTADOS / "aspel_resultados.txt"),
+        "--guardar",
+        "sí",
     ]
     for respuesta in (
         "C10=acumulado del año",
@@ -460,7 +481,13 @@ def test_el_escenario_guarda_las_respuestas_c1_y_c9(
         argv += ["--responde", respuesta]
     assert escenario.main(argv) == 0
     capsys.readouterr()
-    guardado = tmp_path / "work" / "cash" / "mi-empresa-s-a-de-c-v" / "estados-revisados-2026-01-31.json"
+    guardado = (
+        tmp_path
+        / "work"
+        / "cash"
+        / "mi-empresa-s-a-de-c-v"
+        / "estados-revisados-2026-01-31.json"
+    )
     estados = EstadosRevisados.model_validate_json(guardado.read_text(encoding="utf-8"))
     assert estados.respuestas is not None
     assert estados.respuestas.iva_incluido is True

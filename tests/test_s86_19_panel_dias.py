@@ -66,7 +66,16 @@ def _texto(html: str) -> str:
 
 def test_pagina_trae_los_numeros_del_curso(html_como_vienen: str) -> None:
     texto = _texto(html_como_vienen)
-    for numero in ("36.08", "46.97", "25.30", "28.15", "24.31", "19.59", "37.07", "55.53"):
+    for numero in (
+        "36.08",
+        "46.97",
+        "25.30",
+        "28.15",
+        "24.31",
+        "19.59",
+        "37.07",
+        "55.53",
+    ):
         assert numero in texto, numero
     assert "Tu ciclo pasó de 37.07 a 55.53 días: empeoró" in texto
     # Proveedores bajó: pagas antes, y eso también empeora tu efectivo.

@@ -165,7 +165,15 @@ def _texto_suma(partes: Sequence[tuple[str, Decimal]]) -> str:
     return texto[2:] if texto.startswith("+ ") else texto
 
 
-def _numero(clave: str, nombre: str, fecha: date, valor: Decimal, formula: str, origen: str, lamina: str) -> Calculado:
+def _numero(
+    clave: str,
+    nombre: str,
+    fecha: date,
+    valor: Decimal,
+    formula: str,
+    origen: str,
+    lamina: str,
+) -> Calculado:
     return Calculado(
         clave=clave,
         nombre=nombre,
@@ -241,9 +249,24 @@ def _revisa(
             dn + capital - ct,
             "financiamiento menos capital de trabajo",
         ),
-        ("capital de trabajo", _suma(_de_la_caja(cuentas, "capital de trabajo")), ct, "el total que revisó ESCALA"),
-        ("deuda neta", _suma(_de_la_caja(cuentas, "deuda neta")), dn, "el total que revisó ESCALA"),
-        ("capital", _suma(_de_la_caja(cuentas, "capital")), capital, "el total que revisó ESCALA"),
+        (
+            "capital de trabajo",
+            _suma(_de_la_caja(cuentas, "capital de trabajo")),
+            ct,
+            "el total que revisó ESCALA",
+        ),
+        (
+            "deuda neta",
+            _suma(_de_la_caja(cuentas, "deuda neta")),
+            dn,
+            "el total que revisó ESCALA",
+        ),
+        (
+            "capital",
+            _suma(_de_la_caja(cuentas, "capital")),
+            capital,
+            "el total que revisó ESCALA",
+        ),
     ]
     avisos: list[str] = []
     for caja, por_renglones, contra, contra_que in comparaciones:
@@ -272,12 +295,19 @@ def _frase(ct_por_cada_100: Indicador) -> str:
             f"Por cada 100 pesos que vendes, tus proveedores te financian {formato_monto(abs(valor))} "
             "más de lo que tienes en clientes e inventario."
         )
-    razon = ct_por_cada_100.no_calculable if isinstance(ct_por_cada_100, NoCalculable) else ct_por_cada_100.no_aplica
+    razon = (
+        ct_por_cada_100.no_calculable
+        if isinstance(ct_por_cada_100, NoCalculable)
+        else ct_por_cada_100.no_aplica
+    )
     return f"Por cada 100 de ventas: no calculable: {razon}"
 
 
 def _balance(
-    fecha: date, cuentas: Sequence[CuentaEnCaja], resultado: ResultadoDelCurso, avisos: list[str]
+    fecha: date,
+    cuentas: Sequence[CuentaEnCaja],
+    resultado: ResultadoDelCurso,
+    avisos: list[str],
 ) -> BalanceSimplificado:
     def calculado(clave: str) -> Calculado:
         indicador = resultado.indicador(clave, fecha)
@@ -302,7 +332,9 @@ def _balance(
         otras,
         fecha,
     )
-    activo_fijo = _grupo_de_renglones("activo_fijo", "Activo fijo", "suma de sus renglones", fijo, fecha)
+    activo_fijo = _grupo_de_renglones(
+        "activo_fijo", "Activo fijo", "suma de sus renglones", fijo, fecha
+    )
     resto_de_otras = _grupo_de_renglones(
         "resto_de_otras",
         "Resto de otras cuentas",
@@ -348,7 +380,9 @@ def _balance(
         if avisos:
             aviso += " (" + "; ".join(avisos) + ")"
         aviso += ": ¿redondeo o falta una cuenta?"
-    por_cada_100 = tuple(resultado.indicador(clave, fecha) for clave in CLAVES_POR_CADA_100)
+    por_cada_100 = tuple(
+        resultado.indicador(clave, fecha) for clave in CLAVES_POR_CADA_100
+    )
     return BalanceSimplificado(
         fecha=fecha,
         financiamiento=financiamiento,
@@ -357,13 +391,17 @@ def _balance(
             clave="deuda_neta",
             nombre=dn.nombre,
             total=dn,
-            renglones=tuple(_renglon(c, fecha) for c in _de_la_caja(cuentas, "deuda neta")),
+            renglones=tuple(
+                _renglon(c, fecha) for c in _de_la_caja(cuentas, "deuda neta")
+            ),
         ),
         capital=Grupo(
             clave="capital",
             nombre=capital.nombre,
             total=capital,
-            renglones=tuple(_renglon(c, fecha) for c in _de_la_caja(cuentas, "capital")),
+            renglones=tuple(
+                _renglon(c, fecha) for c in _de_la_caja(cuentas, "capital")
+            ),
         ),
         capital_de_trabajo=ct,
         activo_fijo=activo_fijo,
@@ -383,7 +421,9 @@ def panel_de(estados: EstadosRevisados) -> PanelContabilidad:
     resultado = calcular_curso(estados)
     if resultado.no_calculable is not None:
         return PanelContabilidad(no_calculable=resultado.no_calculable)
-    fechas = [f for f in (resultado.balance_final, resultado.balance_inicial) if f is not None]
+    fechas = [
+        f for f in (resultado.balance_final, resultado.balance_inicial) if f is not None
+    ]
     preguntas: list[PreguntaDelPanel] = []
     listos: list[tuple[date, list[CuentaEnCaja], list[str]]] = []
     for fecha in fechas:
@@ -402,7 +442,10 @@ def panel_de(estados: EstadosRevisados) -> PanelContabilidad:
     if not listos:
         return PanelContabilidad(no_calculable="falta el balance al final del periodo")
     return PanelContabilidad(
-        balances=tuple(_balance(fecha, cuentas, resultado, avisos) for fecha, cuentas, avisos in listos)
+        balances=tuple(
+            _balance(fecha, cuentas, resultado, avisos)
+            for fecha, cuentas, avisos in listos
+        )
     )
 
 
@@ -494,7 +537,11 @@ def _indicador_html(indicador: Indicador) -> str:
             f'<div class="cifra">{formato_monto(indicador.valor)}</div>'
             f'<p class="origen">{_e(indicador.origen)} (lámina {_e(indicador.lamina)})</p></div>'
         )
-    razon = indicador.no_calculable if isinstance(indicador, NoCalculable) else indicador.no_aplica
+    razon = (
+        indicador.no_calculable
+        if isinstance(indicador, NoCalculable)
+        else indicador.no_aplica
+    )
     return f"<div><b>{_e(indicador.nombre)}</b><p>no calculable: {_e(razon)}</p></div>"
 
 
@@ -555,7 +602,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     """``python -m escala_server.cash.contabilidad <estados-revisados.json> <salida.html>``."""
     argumentos = list(sys.argv[1:] if argv is None else argv)
     if len(argumentos) != 2:
-        return _no("uso: python -m escala_server.cash.contabilidad <estados-revisados.json> <salida.html>")
+        return _no(
+            "uso: python -m escala_server.cash.contabilidad <estados-revisados.json> <salida.html>"
+        )
     try:
         texto = Path(argumentos[0]).read_text(encoding="utf-8")
     except OSError:

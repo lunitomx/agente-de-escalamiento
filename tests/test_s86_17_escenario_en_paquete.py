@@ -39,17 +39,25 @@ RESPUESTAS = (
 def _agent_plugin(tmp_path: Path) -> Path:
     raiz = tmp_path / "artifacts"
     raiz.mkdir()
-    return build_agent_plugin(output=raiz / "escala-agent-plugin", allowed_root=raiz) / "skills" / "escala"
+    return (
+        build_agent_plugin(output=raiz / "escala-agent-plugin", allowed_root=raiz)
+        / "skills"
+        / "escala"
+    )
 
 
 def _codex(tmp_path: Path) -> Path:
     raiz = tmp_path / "codex-install"
     raiz.mkdir()
-    paquete = build_codex_adapter(catalog_path=CATALOG, output=raiz / "codex", allowed_root=raiz)
+    paquete = build_codex_adapter(
+        catalog_path=CATALOG, output=raiz / "codex", allowed_root=raiz
+    )
     return paquete / "skills" / "escala"
 
 
-def _corre(lanzador: Path, *argumentos: str, cwd: Path) -> subprocess.CompletedProcess[str]:
+def _corre(
+    lanzador: Path, *argumentos: str, cwd: Path
+) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         [sys.executable, "-I", str(lanzador), *argumentos],
         capture_output=True,
@@ -63,7 +71,9 @@ def test_el_paquete_lleva_el_escenario() -> None:
     assert "references/calculadora/escala_server/cash/escenario.py" in door_bundle()
 
 
-@pytest.mark.parametrize("construir", [_agent_plugin, _codex], ids=["agent-plugin", "codex"])
+@pytest.mark.parametrize(
+    "construir", [_agent_plugin, _codex], ids=["agent-plugin", "codex"]
+)
 def test_el_escenario_corre_dentro_del_paquete(tmp_path: Path, construir: Any) -> None:
     puerta: Path = construir(tmp_path)
     lanzador = puerta / CALCULATOR_LAUNCHER
@@ -104,8 +114,12 @@ def test_el_escenario_corre_dentro_del_paquete(tmp_path: Path, construir: Any) -
     assert Decimal(resumen["flujo_neto"]["valor"]) == Decimal("-3705245.84")
     assert not (afuera / "work").exists()  # sin «sí», nada
 
-    texto = _corre(lanzador, *argumentos[:13], "--formato", "texto", "--guardar", "sí", cwd=afuera)
+    texto = _corre(
+        lanzador, *argumentos[:13], "--formato", "texto", "--guardar", "sí", cwd=afuera
+    )
     assert texto.returncode == 0, texto.stdout + texto.stderr
     assert "6,178,173.85" in texto.stdout
-    guardados = sorted(p.name for p in (afuera / "work" / "cash" / "mi-empresa").iterdir())
+    guardados = sorted(
+        p.name for p in (afuera / "work" / "cash" / "mi-empresa").iterdir()
+    )
     assert guardados == ["conversacion.json", "estados-revisados-2026-01-31.json"]

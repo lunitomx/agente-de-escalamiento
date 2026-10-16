@@ -37,7 +37,9 @@ def test_la_frase_llega_a_cash(frase: str) -> None:
     assert route_request(frase).capability_id == "escala-cash"
 
 
-@pytest.mark.parametrize("ruta", [PUERTA, CASH, FINANZAS], ids=["puerta", "cash", "finanzas"])
+@pytest.mark.parametrize(
+    "ruta", [PUERTA, CASH, FINANZAS], ids=["puerta", "cash", "finanzas"]
+)
 def test_usan_la_entrada_del_escenario(ruta: Path) -> None:
     texto = _texto(ruta)
     assert ENTRADA in texto

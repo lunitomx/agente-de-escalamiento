@@ -55,7 +55,12 @@ from escala_server.cash.curso import (
     utilidad_ajustada,
 )
 from escala_server.financial.cajas import CuentaEnCaja
-from escala_server.financial.formatos import fecha_corta, formato_monto, leer_monto, normalizar
+from escala_server.financial.formatos import (
+    fecha_corta,
+    formato_monto,
+    leer_monto,
+    normalizar,
+)
 from escala_server.financial.lector import LecturaEstados, Unidad, leer_estados
 from escala_server.financial.revisiones import (
     Hallazgo,
@@ -124,7 +129,18 @@ _IMPORTANCIA: tuple[str, ...] = (
     "C2",
 )
 # Entre los problemas: la unidad y los signos suelen explicar por qué no cuadra.
-_PROBLEMAS: tuple[str, ...] = ("archivo", "R5", "R6", "R1", "R3", "R4", "R2", "R8", "R9", "R10")
+_PROBLEMAS: tuple[str, ...] = (
+    "archivo",
+    "R5",
+    "R6",
+    "R1",
+    "R3",
+    "R4",
+    "R2",
+    "R8",
+    "R9",
+    "R10",
+)
 _BLOQUEAN_SIN_NO_SE = frozenset({"C10", "R7", "unidad", "R8", "suma"})
 _POR_CORREGIR = "Mándame el archivo corregido (si hace falta, pídeselo a tu contador); con eso sigo."
 
@@ -234,7 +250,14 @@ def entender(clave: str, valor: str) -> Entendido | None:
     if tipo == "C10":
         if texto in {"mes", "del mes", "solo del mes", "mensual"}:
             return "mes"
-        if texto in {"acumulado", "acumulado del ano", "del ano", "ano", "anual", "desde enero"}:
+        if texto in {
+            "acumulado",
+            "acumulado del ano",
+            "del ano",
+            "ano",
+            "anual",
+            "desde enero",
+        }:
             return "acumulado del año"
         return None
     if tipo == "R7":
@@ -246,7 +269,12 @@ def entender(clave: str, valor: str) -> Entendido | None:
     if tipo == "C2":
         if texto in {"todas", "todas mis ventas", "todo"}:
             return "todas"
-        if texto in {"solo lo facturado", "lo facturado", "facturado", "solo facturado"}:
+        if texto in {
+            "solo lo facturado",
+            "lo facturado",
+            "facturado",
+            "solo facturado",
+        }:
             return "solo lo facturado"
         return None
     if tipo == "C1":
@@ -386,11 +414,16 @@ def _leer(conversacion: Conversacion, aplicadas: _Aplicadas, hoy: date) -> _Leid
             lectura = lectura.model_copy(update={"unidad": unidad_dicha})
             preguntas = [p for p in preguntas if "en qué vienen las cifras" not in p]
         for suma in lectura.sumas_por_confirmar:
-            if aplicadas.entendidas.get(_clave_de_suma(suma.concepto, suma.fecha)) is True:
+            if (
+                aplicadas.entendidas.get(_clave_de_suma(suma.concepto, suma.fecha))
+                is True
+            ):
                 preguntas = [p for p in preguntas if p != suma.pregunta]
         lectura = lectura.model_copy(update={"preguntas": tuple(preguntas)})
         if lectura.fecha is None:
-            problemas.append(_problema(f"«{ruta.name}» no dice de qué fecha son las cifras."))
+            problemas.append(
+                _problema(f"«{ruta.name}» no dice de qué fecha son las cifras.")
+            )
         unidad = unidad or lectura.unidad
         (estados if _es_resultados(lectura) else balances).append(lectura)
     if not conversacion.archivos:
@@ -401,7 +434,11 @@ def _leer(conversacion: Conversacion, aplicadas: _Aplicadas, hoy: date) -> _Leid
         problemas.append(_problema("Me falta tu estado de resultados."))
     if len(estados) > 1:
         nombres = " y ".join(f"«{e.archivo}»" for e in estados)
-        problemas.append(_problema(f"Recibí {len(estados)} estados de resultados ({nombres}): uso uno."))
+        problemas.append(
+            _problema(
+                f"Recibí {len(estados)} estados de resultados ({nombres}): uso uno."
+            )
+        )
     return _Leido(balances, estados[0] if estados else None, problemas, unidad)
 
 
@@ -415,7 +452,11 @@ def _clave_de_suma(concepto: str, fecha: date | None) -> str:
 
 
 def _orden_de_problema(hallazgo: Hallazgo) -> int:
-    return _PROBLEMAS.index(hallazgo.revision) if hallazgo.revision in _PROBLEMAS else len(_PROBLEMAS)
+    return (
+        _PROBLEMAS.index(hallazgo.revision)
+        if hallazgo.revision in _PROBLEMAS
+        else len(_PROBLEMAS)
+    )
 
 
 def _pendientes(
@@ -456,7 +497,11 @@ def _pendientes(
                     bloquea=p.bloquea,
                 )
             )
-    sin_unidad = [lectura.archivo or "tu archivo" for lectura in lecturas if lectura.unidad is None]
+    sin_unidad = [
+        lectura.archivo or "tu archivo"
+        for lectura in lecturas
+        if lectura.unidad is None
+    ]
     if sin_unidad and "unidad" not in entendidas:
         nombres = " y ".join(f"«{nombre}»" for nombre in sin_unidad)
         preguntas.append(
@@ -507,8 +552,16 @@ def _pendientes(
 
 _GRUPOS: tuple[tuple[str, tuple[str, ...], str], ...] = (
     ("Bancos", ("bancos",), "No encontré bancos ni caja."),
-    ("Clientes", ("clientes",), "No encontré clientes (cuentas por cobrar por ventas)."),
-    ("Inventario", ("inventario",), "No encontré inventario. Si no vendes producto, no hace falta."),
+    (
+        "Clientes",
+        ("clientes",),
+        "No encontré clientes (cuentas por cobrar por ventas).",
+    ),
+    (
+        "Inventario",
+        ("inventario",),
+        "No encontré inventario. Si no vendes producto, no hace falta.",
+    ),
     ("Proveedores", ("proveedores",), "No encontré proveedores."),
     ("Préstamos del banco", ("prestamos", "sobregiro"), ""),
     ("Capital", ("capital", "resultado_del_ejercicio"), "No encontré el capital."),
@@ -548,11 +601,15 @@ def _lista(
     renglones: list[Renglon] = []
 
     def agrega(seccion: str, marca: Marca, nombre: str, detalle: str) -> None:
-        renglones.append(Renglon(seccion=seccion, marca=marca, nombre=nombre, detalle=detalle))
+        renglones.append(
+            Renglon(seccion=seccion, marca=marca, nombre=nombre, detalle=detalle)
+        )
 
     balance = "Balance general"
     fechas = revision.acomodo.fechas if revision is not None else ()
-    cierre = (revision.balance_final if revision else None) or (fechas[-1] if fechas else None)
+    cierre = (revision.balance_final if revision else None) or (
+        fechas[-1] if fechas else None
+    )
     if cierre is None:
         agrega(balance, "✘", "Balance al cierre", "Me falta tu balance general.")
     else:
@@ -564,7 +621,12 @@ def _lista(
         ) + "depende de si tu estado de resultados es del mes o del año."
         agrega(balance, "?", "Balance al inicio del periodo", detalle)
     elif revision.balance_inicial is not None:
-        agrega(balance, "✔", "Balance al inicio del periodo", f"al {fecha_corta(revision.balance_inicial)}.")
+        agrega(
+            balance,
+            "✔",
+            "Balance al inicio del periodo",
+            f"al {fecha_corta(revision.balance_inicial)}.",
+        )
     else:
         agrega(
             balance,
@@ -579,16 +641,28 @@ def _lista(
         for nombre, reglas, si_falta in _GRUPOS:
             cuentas = [c for c in al_cierre if c.regla in reglas]
             if not cuentas:
-                agrega(balance, "✔" if not si_falta else "✘", nombre, si_falta or "No trae préstamos del banco.")
+                agrega(
+                    balance,
+                    "✔" if not si_falta else "✘",
+                    nombre,
+                    si_falta or "No trae préstamos del banco.",
+                )
                 continue
             negativa = any(c.regla in _NO_NEGATIVAS and c.monto < 0 for c in cuentas)
             agrega(balance, "✘" if negativa else "✔", nombre, _montos(cuentas))
-        otras = [c for c in al_cierre if c.caja == "otras cuentas" and c.regla is not None]
+        otras = [
+            c for c in al_cierre if c.caja == "otras cuentas" and c.regla is not None
+        ]
         if otras:
             agrega(balance, "✔", "Otras cuentas", _montos(otras))
         sin_regla = {c.nombre: c for c in al_cierre if c.regla is None}
         for c in sin_regla.values():
-            agrega(balance, "?", c.nombre, f"{formato_monto(c.monto)}: no sé en qué caja va.")
+            agrega(
+                balance,
+                "?",
+                c.nombre,
+                f"{formato_monto(c.monto)}: no sé en qué caja va.",
+            )
         for clave, valor in aplicadas.entendidas.items():
             if _tipo(clave) == "R7" and isinstance(valor, str):
                 cuenta = clave.split(":", 1)[1]
@@ -599,15 +673,29 @@ def _lista(
         for nombre in sorted(dudosas):
             valor = aplicadas.entendidas.get(f"C11:{nombre}")
             if valor is None:
-                agrega(balance, "?", f"{nombre}: ¿paga interés?", "Si paga interés, es deuda.")
+                agrega(
+                    balance,
+                    "?",
+                    f"{nombre}: ¿paga interés?",
+                    "Si paga interés, es deuda.",
+                )
             else:
-                texto = "no sé" if isinstance(valor, _NoSe) else ("sí paga" if valor else "no paga")
+                texto = (
+                    "no sé"
+                    if isinstance(valor, _NoSe)
+                    else ("sí paga" if valor else "no paga")
+                )
                 agrega(balance, "✔", f"{nombre}: ¿paga interés?", _dicho(texto))
         r1 = [h for h in revision.hallazgos if h.revision == "R1"]
         if r1 and all(h.resultado == "cuadra" for h in r1):
             agrega(balance, "✔", "Activo = pasivo + capital", "cuadra en cada fecha.")
         elif r1:
-            agrega(balance, "✘", "Activo = pasivo + capital", "no cuadra (abajo te digo por cuánto).")
+            agrega(
+                balance,
+                "✘",
+                "Activo = pasivo + capital",
+                "no cuadra (abajo te digo por cuánto).",
+            )
 
     estado = "Estado de resultados"
     resultados = leido.resultados
@@ -629,13 +717,19 @@ def _lista(
         por_sumar = {
             s.concepto
             for s in resultados.sumas_por_confirmar
-            if s.fecha == hasta and aplicadas.entendidas.get(_clave_de_suma(s.concepto, s.fecha)) is not True
+            if s.fecha == hasta
+            and aplicadas.entendidas.get(_clave_de_suma(s.concepto, s.fecha))
+            is not True
         }
         for concepto, nombre, obligatorio in _DEL_ESTADO:
             del_concepto = [
-                c for c in resultados.cuentas if c.concepto == concepto and c.fecha == hasta
+                c
+                for c in resultados.cuentas
+                if c.concepto == concepto and c.fecha == hasta
             ]
-            renglones_del = [c for c in del_concepto if not c.es_total] or del_concepto[:1]
+            renglones_del = [c for c in del_concepto if not c.es_total] or del_concepto[
+                :1
+            ]
             if not renglones_del:
                 agrega(
                     estado,
@@ -644,7 +738,9 @@ def _lista(
                     "no viene en tu estado de resultados.",
                 )
                 continue
-            detalle = "; ".join(f"«{c.nombre}» {formato_monto(c.monto)}" for c in renglones_del)
+            detalle = "; ".join(
+                f"«{c.nombre}» {formato_monto(c.monto)}" for c in renglones_del
+            )
             negativa = concepto == "ventas" and any(c.monto < 0 for c in renglones_del)
             marca: Marca = "✘" if negativa else ("?" if concepto in por_sumar else "✔")
             agrega(estado, marca, nombre, detalle)
@@ -659,7 +755,9 @@ def _lista(
         if isinstance(valor, str):
             agrega(preguntas, "✔", "En qué vienen las cifras", _dicho(valor))
         else:
-            agrega(preguntas, "?", "En qué vienen las cifras", "tus archivos no lo dicen.")
+            agrega(
+                preguntas, "?", "En qué vienen las cifras", "tus archivos no lo dicen."
+            )
     for codigo, nombre in _PREGUNTAS_DE_LA_LISTA:
         if codigo in aplicadas.entendidas:
             agrega(preguntas, "✔", nombre, _dicho(conversacion.respuestas[codigo]))
@@ -670,7 +768,8 @@ def _lista(
         revisiones = "Revisiones"
         fallan = {h.revision for h in revision.hallazgos if h.resultado != "cuadra"}
         cuadran = sorted(
-            {h.revision for h in revision.hallazgos if h.resultado == "cuadra"} - fallan,
+            {h.revision for h in revision.hallazgos if h.resultado == "cuadra"}
+            - fallan,
             key=lambda r: int(r[1:]),
         )
         for h in revision.hallazgos:
@@ -720,7 +819,9 @@ def _anuncio(calculo: ResultadoDelCurso, unidad: Unidad | None) -> str:
     for razon, nombres in no_puedo.items():
         partes.append(f"No puedo calcular {_en_lista(nombres)}, porque {razon}.")
     if unidad is not None and unidad != "pesos":
-        partes.append(f"Tus cifras vienen en {unidad}: los montos de abajo están en {unidad}.")
+        partes.append(
+            f"Tus cifras vienen en {unidad}: los montos de abajo están en {unidad}."
+        )
     return " ".join(partes)
 
 
@@ -734,7 +835,10 @@ def _linea(indicador: Indicador) -> LineaDeResumen:
     }
     if isinstance(indicador, Calculado):
         return LineaDeResumen(
-            valor=indicador.valor, unidad=indicador.unidad, origen=indicador.origen, **base
+            valor=indicador.valor,
+            unidad=indicador.unidad,
+            origen=indicador.origen,
+            **base,
         )
     if isinstance(indicador, NoAplica):
         return LineaDeResumen(no_aplica=indicador.no_aplica, **base)
@@ -800,7 +904,9 @@ class _Travesuras:
     sin_monto: tuple[str, ...] = ()
 
 
-def _travesuras(estados: EstadosRevisados, entendidas: dict[str, Entendido]) -> _Travesuras:
+def _travesuras(
+    estados: EstadosRevisados, entendidas: dict[str, Entendido]
+) -> _Travesuras:
     """Suma solo lo que dijo el dueño; sin respuesta, hace la pregunta opcional."""
     ajustes: list[AjusteDelDueno] = []
     sin_monto: list[str] = []
@@ -814,7 +920,9 @@ def _travesuras(estados: EstadosRevisados, entendidas: dict[str, Entendido]) -> 
             sin_monto.append(concepto)
     if not ajustes and not sin_monto and entendidas.get("C6") is not False:
         return _Travesuras(pregunta=PREGUNTA_TRAVESURAS)
-    return _Travesuras(resultado=utilidad_ajustada(estados, ajustes), sin_monto=tuple(sin_monto))
+    return _Travesuras(
+        resultado=utilidad_ajustada(estados, ajustes), sin_monto=tuple(sin_monto)
+    )
 
 
 def _parte_de_travesuras(parte: Calculado | NoCalculable) -> str:
@@ -826,12 +934,16 @@ def _parte_de_travesuras(parte: Calculado | NoCalculable) -> str:
     )
 
 
-def _texto_de_travesuras(resultado: UtilidadAjustada, sin_monto: tuple[str, ...]) -> str:
+def _texto_de_travesuras(
+    resultado: UtilidadAjustada, sin_monto: tuple[str, ...]
+) -> str:
     lineas = ["Tu utilidad sin travesuras (gastos personales que pagó la empresa):"]
     lineas.append(_parte_de_travesuras(resultado.utilidad_contable))
     if resultado.ajustes:
         lineas.append("- Ajustes que me dijiste:")
-        lineas += [f"  - {a.concepto}: {formato_monto(a.monto)}" for a in resultado.ajustes]
+        lineas += [
+            f"  - {a.concepto}: {formato_monto(a.monto)}" for a in resultado.ajustes
+        ]
     else:
         lineas.append("- Ajustes que me dijiste: ninguno.")
     lineas += [f"  - «{concepto}»: sin monto no lo sumo." for concepto in sin_monto]
@@ -848,9 +960,7 @@ def _texto_de_travesuras(resultado: UtilidadAjustada, sin_monto: tuple[str, ...]
 # ---------------------------------------------------------------------------
 
 
-def atender(
-    conversacion: Conversacion, *, hoy: date, carpeta: Path = CARPETA
-) -> Paso:
+def atender(conversacion: Conversacion, *, hoy: date, carpeta: Path = CARPETA) -> Paso:
     """Un mensaje de ESCALA: lista, hasta 3 preguntas o el anuncio y el resumen."""
 
     aplicadas = _aplicar(conversacion)
@@ -871,7 +981,9 @@ def atender(
     travesuras = _Travesuras()
     if not pendientes and revision is not None and leido.resultados is not None:
         estados = EstadosRevisados(
-            revision=revision, resultados=leido.resultados, respuestas=aplicadas.respuestas
+            revision=revision,
+            resultados=leido.resultados,
+            respuestas=aplicadas.respuestas,
         )
         calculo = calcular_curso(estados)
         if calculo.no_calculable is None:
@@ -901,7 +1013,9 @@ def atender(
 
 def _mensaje(paso: Paso, hoy: date) -> str:
     partes = [f"Analizo los estados de {paso.empresa.rstrip('.')}."]
-    partes.append("Esto es lo que necesito (✔ lo tengo · ? no me queda claro · ✘ me falta):")
+    partes.append(
+        "Esto es lo que necesito (✔ lo tengo · ? no me queda claro · ✘ me falta):"
+    )
     seccion = ""
     renglones: list[str] = []
     for renglon in paso.lista:
@@ -935,10 +1049,16 @@ def _mensaje(paso: Paso, hoy: date) -> str:
         return "\n\n".join(partes)
     if paso.anuncio is not None:
         partes.append(paso.anuncio)
-    if paso.resumen and paso.calculo is not None and paso.calculo.balance_final is not None:
+    if (
+        paso.resumen
+        and paso.calculo is not None
+        and paso.calculo.balance_final is not None
+    ):
         cierre = fecha_corta(paso.calculo.balance_final)
         lineas = "\n".join(_texto_de_linea(linea) for linea in paso.resumen)
-        partes.append(f"Resumen al {cierre} (lo calculó la calculadora de ESCALA):\n{lineas}")
+        partes.append(
+            f"Resumen al {cierre} (lo calculó la calculadora de ESCALA):\n{lineas}"
+        )
         if paso.travesuras is not None:
             partes.append(_texto_de_travesuras(paso.travesuras, paso.sin_monto))
         elif paso.pregunta_travesuras is not None:
@@ -1051,7 +1171,9 @@ def _libre(carpeta: Path, nombre: str) -> Path:
     return ruta
 
 
-def guardar(paso: Paso, conversacion: Conversacion, *, carpeta: Path, hoy: date) -> list[Path]:
+def guardar(
+    paso: Paso, conversacion: Conversacion, *, carpeta: Path, hoy: date
+) -> list[Path]:
     """Escribe en ``carpeta/<empresa>/``. Llamar sólo después de un «sí» del dueño."""
 
     destino = carpeta / carpeta_de(conversacion.empresa)
@@ -1090,7 +1212,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     except ValueError:
         return _no(f"la fecha «{args.hoy}» no es AAAA-MM-DD")
     empresa: str = args.empresa
-    trabajo = Path(args.conversacion) if args.conversacion else ruta_del_borrador(empresa)
+    trabajo = (
+        Path(args.conversacion) if args.conversacion else ruta_del_borrador(empresa)
+    )
     carpeta = Path(args.carpeta)
     conversacion = Conversacion(empresa=empresa)
     # Entre mensajes: el archivo de trabajo. Otro día: lo que el dueño guardó con «sí».
@@ -1121,7 +1245,11 @@ def main(argv: Sequence[str] | None = None) -> int:
             return _no(f"la respuesta «{respuesta}» no trae CLAVE=VALOR")
         respuestas[clave.strip()] = valor.strip()
     conversacion = conversacion.model_copy(
-        update={"empresa": empresa, "archivos": tuple(archivos), "respuestas": respuestas}
+        update={
+            "empresa": empresa,
+            "archivos": tuple(archivos),
+            "respuestas": respuestas,
+        }
     )
     paso = atender(conversacion, hoy=hoy, carpeta=carpeta)
     guardados: list[Path] = []

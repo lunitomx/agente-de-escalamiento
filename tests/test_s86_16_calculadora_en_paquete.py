@@ -65,11 +65,15 @@ def _agent_plugin(tmp_path: Path) -> Path:
 def _codex(tmp_path: Path) -> Path:
     raiz = tmp_path / "codex-install"
     raiz.mkdir()
-    paquete = build_codex_adapter(catalog_path=CATALOG, output=raiz / "codex", allowed_root=raiz)
+    paquete = build_codex_adapter(
+        catalog_path=CATALOG, output=raiz / "codex", allowed_root=raiz
+    )
     return paquete / "skills" / "escala"
 
 
-def _corre(lanzador: Path, *argumentos: str, cwd: Path, extra: tuple[str, ...] = ()) -> subprocess.CompletedProcess[str]:
+def _corre(
+    lanzador: Path, *argumentos: str, cwd: Path, extra: tuple[str, ...] = ()
+) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         [sys.executable, "-I", *extra, str(lanzador), *argumentos],
         capture_output=True,
@@ -79,12 +83,20 @@ def _corre(lanzador: Path, *argumentos: str, cwd: Path, extra: tuple[str, ...] =
     )
 
 
-def _indicador(datos: dict[str, Any], clave: str, fecha: str = "2025-12-31") -> dict[str, Any]:
-    return next(i for i in datos["indicadores"] if i["clave"] == clave and i["fecha"] == fecha)
+def _indicador(
+    datos: dict[str, Any], clave: str, fecha: str = "2025-12-31"
+) -> dict[str, Any]:
+    return next(
+        i for i in datos["indicadores"] if i["clave"] == clave and i["fecha"] == fecha
+    )
 
 
-@pytest.mark.parametrize("construir", [_agent_plugin, _codex], ids=["agent-plugin", "codex"])
-def test_la_calculadora_corre_dentro_del_paquete(tmp_path: Path, construir: Any) -> None:
+@pytest.mark.parametrize(
+    "construir", [_agent_plugin, _codex], ids=["agent-plugin", "codex"]
+)
+def test_la_calculadora_corre_dentro_del_paquete(
+    tmp_path: Path, construir: Any
+) -> None:
     puerta: Path = construir(tmp_path)
     lanzador = puerta / CALCULATOR_LAUNCHER
     assert lanzador.is_file()
@@ -105,14 +117,21 @@ def test_la_calculadora_corre_dentro_del_paquete(tmp_path: Path, construir: Any)
     datos = json.loads(salida.stdout)
     assert Decimal(_indicador(datos, "dias_clientes")["valor"]) == Decimal("46.97")
     assert Decimal(_indicador(datos, "flujo_neto")["valor"]) == Decimal("-3705245.84")
-    assert Decimal(_indicador(datos, "flujo_de_operacion")["valor"]) == Decimal("4835206.16")
+    assert Decimal(_indicador(datos, "flujo_de_operacion")["valor"]) == Decimal(
+        "4835206.16"
+    )
     assert Decimal(datos["poder_del_uno_flujo"]["valor"]) == Decimal("1143864.91")
 
 
 def test_sin_pydantic_no_calcula_y_lo_dice(tmp_path: Path) -> None:
     puerta = _agent_plugin(tmp_path)
     # -S: sin site-packages, como una computadora con Python pero sin pydantic.
-    salida = _corre(puerta / CALCULATOR_LAUNCHER, str(_estados(tmp_path)), cwd=tmp_path, extra=("-S",))
+    salida = _corre(
+        puerta / CALCULATOR_LAUNCHER,
+        str(_estados(tmp_path)),
+        cwd=tmp_path,
+        extra=("-S",),
+    )
     assert salida.returncode != 0
     datos = json.loads(salida.stdout)
     assert set(datos) == {"no_calculable"}
@@ -126,9 +145,15 @@ def test_python_viejo_no_calcula() -> None:
 
 
 def test_en_la_copia_del_repo_tambien_corre(tmp_path: Path) -> None:
-    salida = _corre(ROOT / "escala_server" / "cash" / "calcular.py", str(_estados(tmp_path)), cwd=tmp_path)
+    salida = _corre(
+        ROOT / "escala_server" / "cash" / "calcular.py",
+        str(_estados(tmp_path)),
+        cwd=tmp_path,
+    )
     assert salida.returncode == 0, salida.stderr
-    assert Decimal(_indicador(json.loads(salida.stdout), "ciclo")["valor"]) == Decimal("55.53")
+    assert Decimal(_indicador(json.loads(salida.stdout), "ciclo")["valor"]) == Decimal(
+        "55.53"
+    )
 
 
 def test_el_paquete_lleva_la_calculadora_byte_a_byte(tmp_path: Path) -> None:
@@ -144,6 +169,8 @@ def test_el_paquete_lleva_la_calculadora_byte_a_byte(tmp_path: Path) -> None:
     puerta = _agent_plugin(tmp_path)
     validate_door_bundle(puerta)
     curso = puerta / "references/calculadora/escala_server/cash/curso.py"
-    curso.write_text(curso.read_text(encoding="utf-8") + "\n# cambio\n", encoding="utf-8")
+    curso.write_text(
+        curso.read_text(encoding="utf-8") + "\n# cambio\n", encoding="utf-8"
+    )
     with pytest.raises(DoorBundleError, match="door_bundle_drift"):
         validate_door_bundle(puerta)
