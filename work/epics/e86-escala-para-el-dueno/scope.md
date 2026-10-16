@@ -63,7 +63,7 @@ para no invertir a ciegas en instalación y paridad).
 | S86.23 | ESCALA-91 | Precio contra volumen y descuento | 3 | Equilibrio 26.60%; «cálculo de ESCALA» rotulado | done |
 | S86.24 | ESCALA-92 | Margen pre-tax, salario de mercado y devoluciones | 3 | 15.47%; F6.2 «no calculable» con negativos | done |
 | S86.25 | ESCALA-93 | Las travesuras | 2 | Ajustada 5,463,710.03; solo montos del dueño | done |
-| S86.26 | ESCALA-94 | El recorrido con paneles y decisión | 3 | Recorrido Mi Empresa de estados a todos los paneles | planned |
+| S86.26 | ESCALA-94 | El recorrido con paneles y decisión | 3 | Recorrido Mi Empresa de estados a todos los paneles | done |
 | S86.27 | ESCALA-95 | Limpieza de duplicados de cash | 2 | Una sola definición por fórmula | done |
 | S86.28 | ESCALA-96 | Evaluación instantánea (ola 5) | 5 | En espera: 3 dueños reales | waiting |
 | S86.29 | ESCALA-97 | Los 5 caminos para crecer (ola 5) | 3 | En espera | waiting |

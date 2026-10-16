@@ -907,12 +907,15 @@ class BaseDeDias(_Modelo):
     def de(
         cls, respuestas: Respuestas | None, *, tasa_iva: Decimal | None = None
     ) -> BaseDeDias:
-        """La base con lo que el dueño ya contestó en la revisión (C1 y C9)."""
+        """La base con lo que el dueño ya contestó (C1, C9 y, desde S86.26, su tasa de IVA).
+
+        ``tasa_iva`` explícita gana sobre la que el dueño contestó.
+        """
         if respuestas is None:
             return cls(tasa_iva=tasa_iva)
         return cls(
             iva_incluido=respuestas.iva_incluido,
-            tasa_iva=tasa_iva,
+            tasa_iva=tasa_iva if tasa_iva is not None else respuestas.tasa_iva,
             ventas_a_credito=respuestas.ventas_a_credito,
         )
 

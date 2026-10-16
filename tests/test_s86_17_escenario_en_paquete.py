@@ -122,4 +122,6 @@ def test_el_escenario_corre_dentro_del_paquete(tmp_path: Path, construir: Any) -
     guardados = sorted(
         p.name for p in (afuera / "work" / "cash" / "mi-empresa").iterdir()
     )
-    assert guardados == ["conversacion.json", "estados-revisados-2026-01-31.json"]
+    # S86.26: con el «sí» también se guardan las páginas de los paneles.
+    assert guardados[:2] == ["conversacion.json", "estados-revisados-2026-01-31.json"]
+    assert all(n.startswith("panel-") for n in guardados[2:])

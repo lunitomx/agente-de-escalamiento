@@ -6,8 +6,12 @@ Uso, en la copia de ESCALA o dentro de un paquete:
     python3 <ruta>/escala_server/cash/calcular.py --verifica
     python3 <ruta>/escala_server/cash/calcular.py escenario --empresa NOMBRE \
         --archivo RUTA [--archivo RUTA] [--responde CLAVE=VALOR ...] [--guardar sí]
+    python3 <ruta>/escala_server/cash/calcular.py perfil --empresa NOMBRE \
+        --estados <estados-revisados.json> [--responde CLAVE=VALOR ...] [--guardar sí]
 
-``escenario`` es «analiza mi balance general y mi estado de resultados» (S86.17).
+``escenario`` es «analiza mi balance general y mi estado de resultados» (S86.17);
+termina en la fase 7 de 8 con los paneles (S86.26). ``perfil`` es la plática de
+los límites de tu perfil ideal (S86.21), para la fase 8.
 
 Sólo usa la biblioteca estándar hasta revisar que hay con qué calcular:
 Python 3.10 o más nuevo y la biblioteca pydantic. Si falta algo, imprime
@@ -69,6 +73,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     if argumentos[:1] == ["escenario"]:
         return escenario.main(argumentos[1:])
+    if argumentos[:1] == ["perfil"]:
+        from escala_server.cash import panel_perfil
+
+        return panel_perfil.main(argumentos[1:])
     if argumentos == ["--verifica"]:
         print(
             json.dumps(
