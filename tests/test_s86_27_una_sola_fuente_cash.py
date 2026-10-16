@@ -59,7 +59,8 @@ DUPLICADOS_FUERA_DE_CASH = frozenset(
 _CUENTA = (
     r"(?:(?:cambio en )?(?:ventas|clientes|inventarios?|proveedores|costo(?: de ventas)?|"
     r"utilidad(?: bruta| de operaci[oó]n| antes de impuestos)?|"
-    r"gastos(?: de operaci[oó]n)?|capital de trabajo|deuda neta|capital|bancos|"
+    r"gastos(?: de operaci[oó]n)?|capital de trabajo|deuda neta|capital(?: social)?|bancos|"
+    r"reservas|resultados|utilidad contable|ajustes|"
     r"pr[eé]stamos(?: que pagan inter[eé]s)?|devoluciones(?:, rebajas y bonificaciones)?|"
     r"salario de mercado|sueldo(?: actual del due[nñ]o)?|"
     r"d[ií]as(?: del periodo| de clientes| de inventario| de proveedores)|"
