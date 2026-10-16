@@ -42,6 +42,7 @@ CALCULATOR_MODULES = (
     "escala_server/cash/__init__.py",
     "escala_server/cash/calcular.py",
     "escala_server/cash/curso.py",
+    "escala_server/cash/escenario.py",
     "escala_server/financial/__init__.py",
     "escala_server/financial/cajas.py",
     "escala_server/financial/cash_decision.py",
