@@ -1,0 +1,21 @@
+"Mi Empresa, S.A. de C.V."
+Estado de Posición Financiera al 31/Dic/2025
+
+ACTIVO,,PASIVO,
+ACTIVO CIRCULANTE,,PASIVO A CORTO PLAZO,
+Bancos,"210,291.16",Proveedores,"1,232,468.24"
+Clientes,"5,639,601.55",Acreedores diversos,"11,846,834.45"
+Inventarios,"1,771,040.54",Préstamos bancarios a corto plazo,"148,811.41"
+Otros activos circulantes,"2,527,257.34",Total PASIVO A CORTO PLAZO,"13,228,114.10"
+Total ACTIVO CIRCULANTE,"10,148,190.59",PASIVO A LARGO PLAZO,
+ACTIVO FIJO,,Documentos por pagar a largo plazo,"9,119,791.67"
+Activo fijo neto,"25,318,585.22",Préstamos bancarios a largo plazo,"5,818,564.98"
+Total ACTIVO FIJO,"25,318,585.22",Total PASIVO A LARGO PLAZO,"14,938,356.65"
+ACTIVO DIFERIDO,,Total PASIVO,"28,166,470.75"
+Activo diferido,"1,956,618.46",CAPITAL CONTABLE,
+Total ACTIVO DIFERIDO,"1,956,618.46",Capital social,"2,000,000.00"
+,,Reserva legal,"400,000.00"
+,,Resultados de ejercicios anteriores,"1,838,827.60"
+,,Utilidad del ejercicio,"5,018,095.92"
+,,Total CAPITAL CONTABLE,"9,256,923.52"
+Total ACTIVO,"37,423,394.27",Total PASIVO Y CAPITAL,"37,423,394.27"

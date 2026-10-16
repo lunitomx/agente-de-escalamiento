@@ -1,0 +1,15 @@
+Mi Empresa, S.A. de C.V.
+Estado de Resultados comparativo
+(Cifras en pesos)
+Cuenta | Nombre | Dic-2025 | Dic-2024
+4100-000-000 | Ventas netas | 43826513.09 | 35681743.00
+5100-000-000 | Costo de ventas | 22966464.00 | 17524848.56
+6100-000-000 | Gastos de venta | 5368415.92 | 4716402.95
+6200-000-000 | Gastos de administración | 8052623.88 | 7074604.42
+ | Total gastos de operación | 13421039.80 | 11791007.37
+ | Utilidad de operación | 7439009.29 | 6365887.07
+7100-000-000 | Gastos financieros | 1339211.23 | 875951.27
+7200-000-000 | Otros ingresos (venta de activos) | 681412.54 | (797135.85)
+ | Utilidad antes de impuestos | 6781210.60 | 4692799.95
+7300-000-000 | ISR | 1763114.68 | 1126271.99
+ | Utilidad neta | 5018095.92 | 3566527.96
