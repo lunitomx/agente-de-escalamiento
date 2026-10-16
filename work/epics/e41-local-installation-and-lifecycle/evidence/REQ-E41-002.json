@@ -1,7 +1,6 @@
 {
-  "evidence": "A clean Windows target used the same manifest capability set with platform-specific recorded evidence.",
+  "evidence": "A clean Windows target prepared the same local capability set with platform-specific recorded evidence.",
   "negative_cases": [
-    "cross_platform_bundle_rejected",
     "authoritative_sqlite_in_exchange_rejected",
     "tampered_update_rejected_before_writes",
     "interrupted_migration_safe_stop_with_backup"

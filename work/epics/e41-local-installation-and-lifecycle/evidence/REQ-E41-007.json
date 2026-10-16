@@ -1,7 +1,6 @@
 {
-  "evidence": "macOS/Windows install, runtime, offline schedule, permissions/authority, update, rollback, corruption and publication-boundary checks passed.",
+  "evidence": "macOS/Windows local preparation, runtime, offline schedule, permissions/authority, update, rollback, tampering and publication-boundary checks passed.",
   "negative_cases": [
-    "cross_platform_bundle_rejected",
     "authoritative_sqlite_in_exchange_rejected",
     "tampered_update_rejected_before_writes",
     "interrupted_migration_safe_stop_with_backup"
