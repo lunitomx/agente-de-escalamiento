@@ -292,6 +292,16 @@ def test_cash_decision_exposes_ccc_assumptions_and_comparable_scenarios(
         ).combined_cash_impact
         > 0
     )
+    # S86.13: flujo de precio +1% = 1% ventas anualizadas (120,000 × 12)
+    # − 1% clientes (18,000) = 14,400 − 180. Antes daba 14,400 (sin clientes).
+    assert (
+        next(
+            scenario
+            for scenario in decision.scenarios
+            if scenario.scenario_id == "price-plus-one"
+        ).combined_cash_impact
+        == 14220.0
+    )
     assert decision.recommendations
     receipt = render_cash_decision_receipt_json(decision)
     assert str(tmp_path) not in receipt

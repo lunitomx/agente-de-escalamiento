@@ -436,6 +436,7 @@ def _build_router() -> Router:
             "data": {
                 "combined_cash_impact": result.combined_cash_impact,
                 "combined_ebit_impact": result.combined_ebit_impact,
+                "cash_basis": "antes de ISR",
                 "metrics": result.metrics,
                 "impacts": [
                     {
@@ -447,6 +448,8 @@ def _build_router() -> Router:
                         "time": i.time,
                         "improvement_pct": i.improvement_pct,
                         "improvement_days": i.improvement_days,
+                        "cash_formula": i.cash_formula,
+                        "ebit_formula": i.ebit_formula,
                     }
                     for i in result.impacts
                 ],

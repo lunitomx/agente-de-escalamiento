@@ -23,15 +23,18 @@ NO usar sliders continuos. NO calcular Volumen con precio completo. NO usar 30 d
 
 ### Las 7 Palancas
 
-| Palanca | Tipo | +1% significa | Fórmula |
-|---------|------|---------------|---------|
-| Precio | % | Subir precio 1% | Ventas × 1% |
-| Volumen | % | Vender 1% más | Ventas × 1% × **Margen Contribución** |
-| COGS | % | Reducir costo 1% | COGS × 1% |
-| OPEX | % | Gastar 1% menos | OPEX × 1% |
-| AR (cobrar) | día | Cobrar 1 día antes | Ventas diarias × 1 (365d) |
-| INV (inventario) | día | 1 día menos almacén | COGS diario × 1 (365d) |
-| AP (pagar) | día | Pagar 1 día después | COGS diario × 1 (365d) |
+| Palanca | Tipo | +1% significa | Utilidad (antes de ISR) | Flujo (antes de ISR) |
+|---------|------|---------------|-------------------------|----------------------|
+| Precio | % | Subir precio 1% | Ventas × 1% | Ventas × 1% − Clientes × 1% |
+| Volumen | % | Vender 1% más | Utilidad bruta × 1% | Utilidad bruta × 1% − Capital de trabajo × 1% (clientes + inventario − proveedores) |
+| COGS | % | Reducir costo 1% | COGS × 1% | COGS × 1% + (Inventario − Proveedores) × 1% |
+| OPEX | % | Gastar 1% menos | OPEX × 1% | OPEX × 1% |
+| AR (cobrar) | día | Cobrar 1 día antes | 0 | Ventas ÷ 365 |
+| INV (inventario) | día | 1 día menos almacén | 0 | COGS ÷ 365 |
+| AP (pagar) | día | Pagar 1 día después | 0 | COGS ÷ 365 |
+
+Según el curso de cash que vimos: el flujo descuenta el capital de trabajo que se lleva cada palanca.
+Tú no haces estas cuentas: las hace `POST /api/cash/power-of-one`, que devuelve cada número con su fórmula.
 
 ### Diseño UI
 
@@ -52,7 +55,7 @@ Preguntar en lenguaje coloquial. No usar COGS, DSO, CCC. Usar "costo de producto
 
 ### Step 2: Calculate Impact
 
-Usar `POST /api/cash/power-of-one` o las fórmulas de arriba.
+Usar `POST /api/cash/power-of-one`. No calcules a mano: muestra el número y la fórmula que devuelve (`cash_formula`, `ebit_formula`).
 
 ### Step 3: Prioritize
 
@@ -76,7 +79,7 @@ Decir prioridad #1, por qué, y "¿Qué vas a hacer al respecto?"
 
 - Backend: `escala_server/cash/__init__.py`
 - Dashboard: `static/dashboards/cash/power-of-one.html`
-- Tests: `tests/test_cash_engine.py` (9 tests)
+- Tests: `tests/test_cash_engine.py`, `tests/test_s86_13_power_of_one_cash.py` (Mi Empresa al centavo)
 
 ---
 

@@ -156,14 +156,14 @@
         <!-- Impacto -->
         <div class="impact-cards">
           <div class="impact-card">
-            <h3>EFECTIVO EXTRA POR AÑO</h3>
+            <h3>EFECTIVO EXTRA POR AÑO (ANTES DE ISR)</h3>
             <div id="total-cf" class="value neutral">$0</div>
-            <div class="sub">Lo que tu negocio genera de más</div>
+            <div class="sub">Lo que tu negocio genera de más, antes de ISR. Ya descuenta lo que se queda en clientes, inventario y proveedores.</div>
           </div>
           <div class="impact-card">
-            <h3>UTILIDAD EXTRA POR AÑO</h3>
+            <h3>UTILIDAD EXTRA POR AÑO (ANTES DE ISR)</h3>
             <div id="total-ebit" class="value neutral">$0</div>
-            <div class="sub">Ganancia adicional en tu operación</div>
+            <div class="sub">Ganancia adicional en tu operación, antes de ISR</div>
           </div>
           <div class="impact-card">
             <h3>MEJORA TOTAL</h3>
@@ -471,6 +471,7 @@
         (d.impacts || []).forEach(function(imp) {
           var el = document.getElementById('impact-' + imp.lever);
           if (el) {
+            el.title = 'Flujo antes de ISR: ' + (imp.cash_formula || '') + '\nUtilidad antes de ISR: ' + (imp.ebit_formula || '');
             var total = (imp.cash_impact || 0) + (imp.ebit_impact || 0);
             if (showAfter) {
               el.innerHTML = '<span style="color:' + (total > 0 ? '#16a34a' : total < 0 ? '#dc2626' : '#94a3b8') + '">' +

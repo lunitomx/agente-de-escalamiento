@@ -51,17 +51,18 @@ CCC = DSO + DIO - DPO
 
 Cada palanca se mejora **+1%** (porcentaje) o **+1 día** (días base 365).
 
-| # | Palanca | Tipo | +1% significa | Fórmula de impacto |
-|---|---------|------|---------------|-------------------|
-| 1 | **Precio** | % | Subir precio 1% | Ventas × 1% |
-| 2 | **Volumen** | % | Vender 1% más | Ventas × 1% × **Margen de Contribución** |
-| 3 | **COGS** (Costo Producto) | % | Reducir costo 1% | COGS × 1% |
-| 4 | **OPEX** (Gastos Operativos) | % | Gastar 1% menos | OPEX × 1% |
-| 5 | **AR** (Cuentas x Cobrar) | día | Cobrar 1 día antes | (Ventas ÷ 365) × 1 |
-| 6 | **INV** (Inventario) | día | 1 día menos almacén | (COGS ÷ 365) × 1 |
-| 7 | **AP** (Cuentas x Pagar) | día | Pagar 1 día después | (COGS ÷ 365) × 1 |
+| # | Palanca | Tipo | +1% significa | Utilidad (antes de ISR) | Flujo (antes de ISR) |
+|---|---------|------|---------------|-------------------------|----------------------|
+| 1 | **Precio** | % | Subir precio 1% | Ventas × 1% | Ventas × 1% − Clientes × 1% |
+| 2 | **Volumen** | % | Vender 1% más | Utilidad bruta × 1% | Utilidad bruta × 1% − Capital de trabajo × 1% |
+| 3 | **COGS** (Costo Producto) | % | Reducir costo 1% | COGS × 1% | COGS × 1% + (Inventario − Proveedores) × 1% |
+| 4 | **OPEX** (Gastos Operativos) | % | Gastar 1% menos | OPEX × 1% | OPEX × 1% |
+| 5 | **AR** (Cuentas x Cobrar) | día | Cobrar 1 día antes | 0 | Ventas ÷ 365 |
+| 6 | **INV** (Inventario) | día | 1 día menos almacén | 0 | COGS ÷ 365 |
+| 7 | **AP** (Cuentas x Pagar) | día | Pagar 1 día después | 0 | COGS ÷ 365 |
 
-⚠️ **Regla crítica**: Volumen usa **Margen de Contribución**, no Ventas totales. NO calcules Volumen × Ventas completas.
+Capital de trabajo = Clientes + Inventario − Proveedores. Utilidad bruta = Ventas − COGS.
+⚠️ **Regla crítica**: el flujo descuenta el capital de trabajo que se lleva cada palanca (según el curso de cash que vimos). Volumen usa **utilidad bruta**, no Ventas totales.
 
 ### Margen de Contribución
 
