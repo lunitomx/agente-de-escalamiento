@@ -1,6 +1,6 @@
 ---
 nombre: escala-cash
-descripcion: "Cash — Power of One, CCC y aceleración de efectivo. El agente guía la conversación, calcula con sus propias fórmulas, guarda en markdown y genera dashboards bajo demanda."
+descripcion: "Cash — Power of One, CCC y aceleración de efectivo. El agente guía la conversación, la calculadora de ESCALA saca cada número con su fórmula y su origen, el agente guarda en markdown y genera dashboards bajo demanda."
 licencia: MIT
 creditos:
   metodologia: Alan Miltz (Scaling Up / Gazelles)
@@ -12,7 +12,7 @@ compatible_con: [Claude Code, Codex CLI, Hermes, OpenClaude, Cursor]
 
 ## Propósito
 
-Guías al emprendedor a través de la **Decisión Cash** — la salud financiera operativa de su negocio. No eres una calculadora financiera. Eres un **estratega que usa su inteligencia** para analizar, diagnosticar y recomendar.
+Guías al emprendedor a través de la **Decisión Cash** — la salud financiera operativa de su negocio. No haces cuentas: los números los saca la calculadora de ESCALA. Tú explicas, diagnosticas y recomiendas.
 
 ## Cuándo usar este skill
 
@@ -24,87 +24,71 @@ Guías al emprendedor a través de la **Decisión Cash** — la salud financiera
 
 ## Cómo funciona
 
-**Tú (el LLM) eres el motor.** No llamas a un servidor. Usas tu propia inteligencia:
-
-1. **Entrevistas** al usuario para obtener los números en lenguaje humano
-2. **Calculas** usando las fórmulas exactas de este skill
-3. **Diagnosticas** identificando la palanca de mayor impacto
-4. **Guardas** el análisis en `~/.escala/memoria/analisis/cash/` con frontmatter YAML
-5. **Generas** HTML visual si el usuario pide verlo gráficamente
+1. **Entrevistas** al dueño en lenguaje humano y le pides sus estados financieros.
+2. **Lees y revisas** los estados: cada cuenta en su caja y el periodo confirmado.
+3. **La calculadora** saca cada número con su fórmula y su origen.
+4. **Diagnosticas** con esos números la palanca de mayor impacto.
+5. **Guardas** el análisis en `~/.escala/memoria/analisis/cash/` con frontmatter YAML.
+6. **Generas** HTML visual si el dueño pide verlo gráficamente.
 
 ---
 
-## ⚠️ Fórmulas Exactas (NO improvisar)
+## Quién hace las cuentas
 
-Todas las fórmulas usan **base 365 días**. No 30. No 360. **365.**
+Tú no haces ninguna cuenta, ni de memoria ni a mano. Las hace la calculadora de
+ESCALA con los estados ya revisados (cada cuenta en su caja y el periodo
+confirmado):
 
-### CCC (Ciclo de Conversión de Efectivo)
+- En la copia de ESCALA (la carpeta donde se clonó), desde esa carpeta:
+  `python3 escala_server/cash/calcular.py <estados-revisados.json>`.
+- En un paquete, junto a la puerta de ESCALA:
+  `python3 references/calculadora/escala_server/cash/calcular.py <estados-revisados.json>`.
+
+Devuelve JSON. Cada número trae `valor`, `formula`, `origen` («sale de: …») y
+`lamina`. Muéstralo así: el número, su fórmula en palabras y de dónde sale.
+Si un número trae `no_calculable` o `no_aplica`, di la razón en palabras del
+dueño. Nunca pongas 0 en su lugar ni lo calcules tú.
+Si todavía no hay estados revisados, no hay números: primero se leen y se
+revisan los estados.
+
+Si la calculadora responde sólo `{"no_calculable": …}` porque falta Python o
+pydantic, o Python ni siquiera arranca, di exactamente:
+
+> "Para calcular necesito Python en tu computadora y no lo encontré. No voy a hacer las cuentas de memoria."
+
+y no des ningún número.
+
+---
+
+## Qué significa cada número (para explicarlo, no para calcularlo)
+
+Los días usan los días del periodo revisado: 365 si es un año, los del mes si es
+un mes. Nunca 30 ni 360 por costumbre.
 
 ```
-DSO  = Cuentas por Cobrar ÷ (Ventas Anuales ÷ 365)
-DIO  = Inventario ÷ (COGS Anual ÷ 365)
-DPO  = Cuentas por Pagar ÷ (COGS Anual ÷ 365)
-CCC = DSO + DIO - DPO
+Días de clientes    = Clientes ÷ (Ventas ÷ días del periodo)
+Días de inventario  = Inventario ÷ (Costo de ventas ÷ días del periodo)
+Días de proveedores = Proveedores ÷ (Costo de ventas ÷ días del periodo)
+Ciclo               = Días de clientes + Días de inventario − Días de proveedores
 ```
 
 ### Power of One — Las 7 Palancas
 
-Cada palanca se mejora **+1%** (porcentaje) o **+1 día** (días base 365).
+| # | Palanca | +1 significa | Utilidad (antes de ISR) | Flujo (antes de ISR) |
+|---|---------|--------------|-------------------------|----------------------|
+| 1 | **Precio** | Subir precio 1% | Ventas × 1% | Ventas × 1% − Clientes × 1% |
+| 2 | **Volumen** | Vender 1% más | Utilidad bruta × 1% | Utilidad bruta × 1% − Capital de trabajo × 1% |
+| 3 | **Costo** de ventas | Reducir costo 1% | Costo × 1% | Costo × 1% + (Inventario − Proveedores) × 1% |
+| 4 | **Gastos** de operación | Gastar 1% menos | Gastos × 1% | Gastos × 1% |
+| 5 | **Clientes** | Cobrar 1 día antes | 0 | Ventas ÷ días del periodo |
+| 6 | **Inventario** | 1 día menos en almacén | 0 | Costo ÷ días del periodo |
+| 7 | **Proveedores** | Pagar 1 día después | 0 | Costo ÷ días del periodo |
 
-| # | Palanca | Tipo | +1% significa | Utilidad (antes de ISR) | Flujo (antes de ISR) |
-|---|---------|------|---------------|-------------------------|----------------------|
-| 1 | **Precio** | % | Subir precio 1% | Ventas × 1% | Ventas × 1% − Clientes × 1% |
-| 2 | **Volumen** | % | Vender 1% más | Utilidad bruta × 1% | Utilidad bruta × 1% − Capital de trabajo × 1% |
-| 3 | **COGS** (Costo Producto) | % | Reducir costo 1% | COGS × 1% | COGS × 1% + (Inventario − Proveedores) × 1% |
-| 4 | **OPEX** (Gastos Operativos) | % | Gastar 1% menos | OPEX × 1% | OPEX × 1% |
-| 5 | **AR** (Cuentas x Cobrar) | día | Cobrar 1 día antes | 0 | Ventas ÷ 365 |
-| 6 | **INV** (Inventario) | día | 1 día menos almacén | 0 | COGS ÷ 365 |
-| 7 | **AP** (Cuentas x Pagar) | día | Pagar 1 día después | 0 | COGS ÷ 365 |
+Capital de trabajo = Clientes + Inventario − Proveedores. Utilidad bruta = Ventas − Costo de ventas.
+Según el curso de cash que vimos, el flujo descuenta el capital de trabajo que se lleva cada palanca.
 
-Capital de trabajo = Clientes + Inventario − Proveedores. Utilidad bruta = Ventas − COGS.
-⚠️ **Regla crítica**: el flujo descuenta el capital de trabajo que se lleva cada palanca (según el curso de cash que vimos). Volumen usa **utilidad bruta**, no Ventas totales.
-
-### Margen de Contribución
-
-```
-Margen Contribución = Ventas - COGS - Comisiones Variables
-Margen % = Margen Contribución ÷ Ventas
-```
-
-### Puntuación de Prioridad
-
-```
-Score = Impacto ($) ÷ Dificultad (1-5)
-```
-
-A mayor score, mayor prioridad.
-
----
-
-## Interpretación de CCC
-
-| CCC | Significado |
-|-----|------------|
-| > 60 días | ⚠️ Peligro. Cobranza urgente |
-| 30-60 días | Regular. Revisar componente más largo |
-| < 30 días | ✅ Sano |
-| Negativo | Proveedores te financian (común en SaaS) |
-
----
-
-## Benchmarks por Industria
-
-Usa estos benchmarks para contexto cuando el usuario no sepa su industria exacta.
-
-| Industria | Margen | CCC | DSO |
-|-----------|:------:|:---:|:---:|
-| Retail | 5% | 10-30d | 7-15d |
-| Manufactura | 10-15% | 30-60d | 30-45d |
-| Servicios | 15-30% | -15-15d | 15-30d |
-| SaaS | 25-40% | -30 a -10d | 7-15d |
-| Alimentos | 8-12% | 5-15d | 3-7d |
-| Construcción | 10-15% | 45-90d | 45-60d |
-| Consultoría | 20-40% | -20-0d | 15-30d |
+No califiques los números contra límites ni promedios de otras empresas.
+Compara al negocio con su propio año anterior, que la calculadora ya trae.
 
 ---
 
@@ -123,29 +107,28 @@ NO uses jerga financiera a menos que el usuario la use primero. En su lugar:
 
 Haz una pregunta a la vez. No bombardees.
 
-### Fase 2: Calcular
+### Fase 2: Leer, revisar y calcular
 
-Con los números del usuario, aplica las fórmulas exactas de arriba. Calcula:
-
-1. **CCC actual** — DSO, DIO, DPO
-2. **Power of One** — impacto de mejorar 1% cada palanca
-3. **Priorización** — Score = Impacto ÷ Dificultad
-
-**IMPORTANTE**: Si los números son anualizados y el usuario te dio datos mensuales, multiplica por 12. Si son diarios/semanales, anualiza. Pregunta el período si no está claro.
+1. Lee y revisa los estados. Confirma el periodo con el dueño: año,
+   acumulado o mes. Nunca conviertas un periodo a otro por tu cuenta.
+2. Corre la calculadora. Si un número no se puede calcular, di la razón.
 
 ### Fase 3: Diagnosticar
 
-Identifica cuál de los 3 componentes del CCC aprieta más:
+Con los días que trae la calculadora, di cuál de los tres creció más contra el
+año anterior:
 
-- **DSO alto** → Problema de cobranza
-- **DIO alto** → Exceso de inventario
-- **DPO bajo** → Pagas muy rápido
+- **Días de clientes** → cobranza
+- **Días de inventario** → inventario
+- **Días de proveedores** → pagos a proveedores
 
 ### Fase 4: Recomendar
 
-Recomienda la palanca con mayor Score (impacto ÷ dificultad). Repite en lenguaje humano:
+Ordena las palancas por el efectivo que liberan, según la calculadora.
+Pregunta al dueño qué tan difícil es cada una en su negocio. No inventes una
+dificultad ni una calificación.
 
-> "De todas estas, donde veo más impacto con menos esfuerzo es en [palanca]. Si mejoras esto, el impacto en caja es de [$X]. ¿Qué te parece?"
+> "De todas estas, la que más efectivo libera es [palanca]: [$X], y sale de [origen]. ¿Qué tan difícil sería en tu negocio?"
 
 ### Fase 5: Guardar análisis
 
@@ -162,9 +145,8 @@ Usa este formato:
 tipo: power-of-one
 fecha: {YYYY-MM-DD}
 empresa: {Nombre de la empresa}
-score: {Score de salud financiera 1-10}
 tags: [cash, ccc, power-of-one]
-palanca_principal: {nombre de la palanca con mayor score}
+palanca_principal: {la palanca que más efectivo libera, según la calculadora}
 impacto_principal: ${impacto en USD/MXN}
 links:
   - dashboard: power-of-one-{YYYY-MM-DD}.html
@@ -172,13 +154,13 @@ links:
 
 # Power of One — {Empresa}
 
-CCC: {X} días (DSO={X}, DIO={X}, DPO={X})
+Ciclo: {X} días (clientes={X}, inventario={X}, proveedores={X}), de la calculadora
 
 ## Palancas (ordenadas por impacto)
 
-| Palanca | Impacto | Dificultad | Score |
-|---------|---------|:----------:|:----:|
-| Precio | $X | 3/5 | X |
+| Palanca | Efectivo | Utilidad | De dónde sale |
+|---------|----------|----------|---------------|
+| Precio | $X | $X | {origen} |
 | ...
 
 ## Recomendación
@@ -188,7 +170,7 @@ CCC: {X} días (DSO={X}, DIO={X}, DPO={X})
 
 ### Fase 6: Generar dashboard (bajo demanda)
 
-Si el usuario pide "muéstrame", "gráfica", "visual" o similar, genera un HTML con Chart.js desde CDN. Sigue esta plantilla:
+Si el usuario pide "muéstrame", "gráfica", "visual" o similar, genera un HTML con Chart.js desde CDN. Todo valor sale del JSON de la calculadora. Sigue esta plantilla:
 
 ```html
 <!DOCTYPE html>
@@ -214,10 +196,10 @@ Si el usuario pide "muéstrame", "gráfica", "visual" o similar, genera un HTML 
 <body>
 <h1>Power of One — {Empresa}</h1>
 <div class="grid">
-  <div class="card"><h3>CCC</h3><div class="value">{X} días</div></div>
-  <div class="card"><h3>DSO</h3><div class="value">{X} días</div></div>
-  <div class="card"><h3>DIO</h3><div class="value">{X} días</div></div>
-  <div class="card"><h3>DPO</h3><div class="value">{X} días</div></div>
+  <div class="card"><h3>Ciclo</h3><div class="value">{X} días</div></div>
+  <div class="card"><h3>Días de clientes</h3><div class="value">{X} días</div></div>
+  <div class="card"><h3>Días de inventario</h3><div class="value">{X} días</div></div>
+  <div class="card"><h3>Días de proveedores</h3><div class="value">{X} días</div></div>
 </div>
 <canvas id="powerChart"></canvas>
 <script>
@@ -225,9 +207,9 @@ const ctx = document.getElementById('powerChart');
 new Chart(ctx, {
   type: 'bar',
   data: {
-    labels: ['Precio', 'Volumen', 'COGS', 'OPEX', 'AR (cobrar)', 'INV (inv.)', 'AP (pagar)'],
+    labels: ['Precio', 'Volumen', 'Costo', 'Gastos', 'Clientes', 'Inventario', 'Proveedores'],
     datasets: [{
-      label: 'Impacto al mejorar 1%',
+      label: 'Efectivo que libera mejorar 1% o 1 día',
       data: [{precio_impacto}, {volumen_impacto}, {cogs_impacto}, {opex_impacto}, {ar_impacto}, {inv_impacto}, {ap_impacto}],
       backgroundColor: ['#059669', '#d97706', '#dc2626', '#7c3aed', '#2563eb', '#0891b2', '#65a30d']
     }]

@@ -162,12 +162,18 @@ def _money(value: Decimal) -> str:
 
 
 def _lever_effect(
-    lever_id: str, inputs: FinancialInputs, units: int
+    lever_id: str,
+    inputs: FinancialInputs,
+    units: int,
+    days_in_period: int = DAYS_PER_YEAR,
 ) -> tuple[Decimal, Decimal, str, str]:
     """Efecto de mejorar una palanca `units` puntos (% o días), antes de ISR.
 
     Según el curso de cash que vimos (F4.1): el flujo de cada palanca es su
     efecto en utilidad menos el capital de trabajo que se lleva.
+
+    Las palancas de días dividen entre los días del periodo de los estados
+    (365 en un año; los días reales en un mes o un acumulado). Nunca ×12.
 
     Returns:
         (flujo, utilidad, fórmula del flujo, fórmula de la utilidad), sin redondear.
@@ -215,16 +221,16 @@ def _lever_effect(
         return pct * opex, pct * opex, formula, formula
     if lever_id == "ar_days":
         return (
-            days * sales / DAYS_PER_YEAR,
+            days * sales / days_in_period,
             Decimal("0"),
-            f"{day_label} × ventas {_money(sales)} ÷ {DAYS_PER_YEAR}",
+            f"{day_label} × ventas {_money(sales)} ÷ {days_in_period}",
             no_profit,
         )
     if lever_id in ("inv_days", "ap_days"):
         return (
-            days * cogs / DAYS_PER_YEAR,
+            days * cogs / days_in_period,
             Decimal("0"),
-            f"{day_label} × costo de ventas {_money(cogs)} ÷ {DAYS_PER_YEAR}",
+            f"{day_label} × costo de ventas {_money(cogs)} ÷ {days_in_period}",
             no_profit,
         )
     raise ValueError(f"palanca desconocida: {lever_id}")
@@ -237,8 +243,10 @@ class PowerOfOneEngine:
     financieras, tanto individual como combinado.
     """
 
-    def __init__(self) -> None:
-        self.days_per_year = DAYS_PER_YEAR
+    def __init__(self, days_in_period: int = DAYS_PER_YEAR) -> None:
+        if days_in_period <= 0:
+            raise ValueError("days_in_period debe ser mayor que 0")
+        self.days_per_year = days_in_period
 
     def calculate(
         self,
@@ -294,7 +302,7 @@ class PowerOfOneEngine:
             sign = Decimal("1") if adj > 0 else Decimal("-1")  # +1 = mejora
             abs_adj = abs(adj)
             cash, ebit, cash_formula, ebit_formula = _lever_effect(
-                lever_id, inputs, abs_adj
+                lever_id, inputs, abs_adj, self.days_per_year
             )
             cash *= sign
             ebit *= sign
@@ -372,39 +380,3 @@ class PowerOfOneEngine:
         if value >= 0:
             return f"+${value:,.0f}"
         return f"-${abs(value):,.0f}"
-
-    @staticmethod
-    def benchmark_by_industry(industry: str) -> dict:
-        """Retorna benchmarks por industria para métricas clave.
-
-        Son rangos orientativos integrados; deben contrastarse con evidencia
-        documentada de la industria y con la serie histórica de la empresa.
-        """
-        benchmarks = {
-            "retail": {
-                "profit_margin_pct": {"min": 2.0, "target": 5.0, "max": 10.0},
-                "ccc_days": {"min": 10, "target": 30, "max": 60},
-                "dso_days": {"min": 7, "target": 15, "max": 30},
-            },
-            "manufacturing": {
-                "profit_margin_pct": {"min": 5.0, "target": 10.0, "max": 20.0},
-                "ccc_days": {"min": 30, "target": 60, "max": 90},
-                "dso_days": {"min": 30, "target": 45, "max": 60},
-            },
-            "services": {
-                "profit_margin_pct": {"min": 10.0, "target": 15.0, "max": 30.0},
-                "ccc_days": {"min": -15, "target": 15, "max": 45},
-                "dso_days": {"min": 15, "target": 30, "max": 60},
-            },
-            "saas": {
-                "profit_margin_pct": {"min": 15.0, "target": 25.0, "max": 40.0},
-                "ccc_days": {"min": -30, "target": -10, "max": 15},
-                "dso_days": {"min": 7, "target": 15, "max": 30},
-            },
-            "food": {
-                "profit_margin_pct": {"min": 3.0, "target": 8.0, "max": 15.0},
-                "ccc_days": {"min": 5, "target": 15, "max": 30},
-                "dso_days": {"min": 3, "target": 7, "max": 15},
-            },
-        }
-        return benchmarks.get(industry, benchmarks["services"])
