@@ -6,7 +6,13 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse, parse_qs
 
-from .cors import CORSHandler
+from .cors import (
+    RECHAZO_HOST,
+    RECHAZO_ORIGEN,
+    CORSHandler,
+    anfitrion_local,
+    origen_permitido,
+)
 from .dashboard import DashboardHandler
 from .handlers import (
     CompaniesHandler,
@@ -34,7 +40,33 @@ class EscalaRequestHandler(BaseHTTPRequestHandler):
     outcomes: Any = None  # type: ignore[annotation-unchecked]
     specialist_team: Any = None  # type: ignore[annotation-unchecked]
 
+    def _puerto(self) -> int:
+        # HTTPServer guarda el puerto real (también con port=0).
+        return int(getattr(self.server, "server_port", 0))
+
+    def _rechaza_si_no_es_local(self, cambia_datos: bool = False) -> bool:
+        """Seguridad (S86.36): 403 si ``Host`` no es local (DNS rebinding).
+
+        En una petición que cambia datos, 403 también si llega un ``Origin``
+        que no es el propio servidor local. Ejemplo: un POST desde
+        ``https://ejemplo-malo.com`` no guarda nada.
+        """
+        if not anfitrion_local(self.headers.get("Host")):
+            self._send_json_error(403, RECHAZO_HOST)
+            return True
+        origen = self.headers.get("Origin")
+        if (
+            cambia_datos
+            and origen is not None
+            and not origen_permitido(origen, self._puerto())
+        ):
+            self._send_json_error(403, RECHAZO_ORIGEN)
+            return True
+        return False
+
     def do_GET(self):
+        if self._rechaza_si_no_es_local():
+            return
         path = self.path
         # Parse query string before dispatch
         parsed = urlparse(path)
@@ -62,6 +94,8 @@ class EscalaRequestHandler(BaseHTTPRequestHandler):
         malformed payloads or unexpected handler exceptions don't crash
         the worker thread.
         """
+        if self._rechaza_si_no_es_local(cambia_datos=True):
+            return
         handler, params = self.router.dispatch(method, self.path)
         if not handler:
             return self._send_json_error(404, "Not found")
@@ -85,8 +119,13 @@ class EscalaRequestHandler(BaseHTTPRequestHandler):
     def do_PATCH(self):
         self._handle_api_request("PATCH")
 
+    def do_DELETE(self):
+        self._handle_api_request("DELETE")
+
     def do_OPTIONS(self):
         """Handle CORS preflight."""
+        if self._rechaza_si_no_es_local():
+            return
         self.send_response(204)
         self._add_cors_headers()
         self.end_headers()
@@ -176,10 +215,8 @@ class EscalaRequestHandler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def _add_cors_headers(self):
-        # HTTPServer guarda el puerto real (también con port=0).
-        puerto = int(getattr(self.server, "server_port", 0))
         origen = self.headers.get("Origin")
-        for key, value in CORSHandler.get_headers(origen, puerto).items():
+        for key, value in CORSHandler.get_headers(origen, self._puerto()).items():
             self.send_header(key, value)
 
     def log_message(self, format, *args):
