@@ -8,7 +8,7 @@ source:
 bindings:
   public_boundary:
     path: governance/public-boundary.yaml
-    sha256: 1e8810b79ad55e555eee1122254bd0bb81dd5febc015f7e790836da69d3895f8
+    sha256: 338e5d0b7059c3dd55add818ea4545eb902160d23a5a19a34604d4b7087f99ae
     hash_kind: semantic
   exposure_baseline:
     path: work/epics/e36-product-truth-ip-governance/stories/s36.2-evidence/baseline.json
@@ -27,6 +27,9 @@ bindings:
     sha256: b7729a5601792e2a64eca11d2fc9dd4f677f4cb0d649b2582d4e1bed7105a04d
     hash_kind: semantic
 selections:
+  - path: .escala/knowledge/cash
+    kind: tree
+    role: business_knowledge
   - path: LICENSE
     kind: file
     role: operator_documentation

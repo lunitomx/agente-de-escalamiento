@@ -270,7 +270,8 @@ def test_la_exportacion_lleva_el_lector_de_estados() -> None:
     # La calculadora importa el lector de estados: sin él no corre.
     assert "escala_server/financial" in rutas
     # Las fichas del curso no las lee la calculadora; las lee la puerta.
-    # Publicarlas pide cambiar la frontera pública: decisión aparte.
+    # Viajan desde S86.32 (tests/test_s86_32_fichas_cash_portables.py).
+    assert ".escala/knowledge/cash" in rutas
 
 
 def test_la_copia_portable_calcula_mi_empresa(tmp_path: Path) -> None:

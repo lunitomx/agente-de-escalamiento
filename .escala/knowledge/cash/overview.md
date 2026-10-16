@@ -52,3 +52,7 @@ al curso y le dice al dueño que lo revise con su contador.
 | `17-siete-palancas.md` | Siete palancas mueven tu dinero | Cuando el dueño quiere saber qué mover primero para tener más dinero. |
 | `18-tres-mejores-ideas.md` | Toma las tres mejores ideas | Al cerrar un diagnóstico de Cash, para convertirlo en acción con el equipo. |
 | `19-lo-que-escala-necesita.md` | Lo que ESCALA necesita para analizar tus estados | Cuando el dueño manda sus estados por primera vez, o pregunta por qué ESCALA le pregunta antes de darle números. |
+
+---
+
+**Aviso.** Este agente lo creó Eduardo Luna para participantes de EO y EOA en Querétaro, con apuntes y lecciones de cursos que tomó. Lo hizo con cariño para empresarios de su zona. No es un producto oficial de Scaling Up, de Gazelles ni de EO, ni está avalado por ellos. Se prohíbe su uso comercial.

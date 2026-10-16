@@ -120,3 +120,7 @@ no conservan una segunda implementación.
 
 Los entregables editables se guardan en `work/`. Tú controlas esa carpeta, sus
 respaldos y cualquier sincronización con tu equipo.
+
+---
+
+**Aviso.** Este agente lo creó Eduardo Luna para participantes de EO y EOA en Querétaro, con apuntes y lecciones de cursos que tomó. Lo hizo con cariño para empresarios de su zona. No es un producto oficial de Scaling Up, de Gazelles ni de EO, ni está avalado por ellos. Se prohíbe su uso comercial.

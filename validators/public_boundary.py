@@ -157,11 +157,24 @@ class VocabularyRule(_StrictModel):
     id: str = Field(min_length=3, max_length=128)
     targets: list[VocabularyTarget] = Field(min_length=1)
     terms: list[str] = Field(min_length=1)
+    # Exact relative paths whose TEXT this rule does not scan (S86.32): the
+    # attribution notice and the course overview name the methodology as a
+    # reference.  Paths are still scanned, and no glob is accepted.
+    text_exempt_paths: list[str] = Field(default_factory=list[str])
 
     @field_validator("id")
     @classmethod
     def validate_id(cls, value: str) -> str:
         return _validate_rule_id(value)
+
+    @field_validator("text_exempt_paths")
+    @classmethod
+    def validate_text_exempt_paths(cls, values: list[str]) -> list[str]:
+        validated = [_validate_relative_path(value) for value in values]
+        if any(character in value for value in validated for character in "*?["):
+            raise ValueError("text exemptions must be exact paths")
+        _reject_duplicates(validated, "text exempt paths")
+        return sorted(validated)
 
     @field_validator("targets")
     @classmethod
@@ -569,6 +582,8 @@ def scan_public_content(
 
     folded_text = text.casefold()
     for rule in policy.vocabulary_rules:
+        if safe_path in rule.text_exempt_paths:
+            continue
         if VocabularyTarget.TEXT in rule.targets and any(
             term.casefold() in folded_text for term in rule.terms
         ):
