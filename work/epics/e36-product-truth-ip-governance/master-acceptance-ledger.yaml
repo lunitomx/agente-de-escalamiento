@@ -612,7 +612,7 @@ requirements:
   - id: REQ-E41-001
     owner: {epic: E41, story: S41.1}
     source_ids: [SRC-INSTALL-001, SRC-LOCAL-001]
-    acceptance: "A fresh supported macOS machine can install the qualified local package with one documented flow and no repository-development layout."
+    acceptance: "A fresh supported macOS machine installs ESCALA with the one documented line from the README: instalar.sh uses git clone to copy the public repository into ~/ESCALA and runs install.sh --platform claude --with-specialists; pasting the same line again updates that copy with git pull --ff-only."
     evidence:
       artifact_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-001.json
       receipt_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-001.receipt.json
@@ -629,7 +629,7 @@ requirements:
   - id: REQ-E41-002
     owner: {epic: E41, story: S41.1}
     source_ids: [SRC-INSTALL-001, SRC-LOCAL-001]
-    acceptance: "A fresh supported Windows machine can install the same qualified capability set with recorded platform evidence."
+    acceptance: "Windows has no native install today: instalar.sh stops with a plain-language message and points the owner to WSL2, where the same line installs ESCALA; on Windows only the local preparation (install and data roots, version marker and SQLite) is qualified, with recorded platform evidence."
     evidence:
       artifact_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-002.json
       receipt_path: work/epics/e41-local-installation-and-lifecycle/evidence/REQ-E41-002.receipt.json

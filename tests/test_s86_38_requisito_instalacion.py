@@ -34,7 +34,10 @@ MACOS_PIECES: dict[str, tuple[Path, str]] = {
         INSTALAR,
         "./install.sh --platform claude --with-specialists",
     ),
-    "same line again updates": (README, "Para actualizar, pega otra vez la misma línea"),
+    "same line again updates": (
+        README,
+        "Para actualizar, pega otra vez la misma línea",
+    ),
     "git pull --ff-only": (INSTALAR, "pull --ff-only"),
 }
 WINDOWS_PIECES: dict[str, tuple[Path, str]] = {
@@ -50,7 +53,9 @@ _DENIES_CLONE = re.compile(
 
 def _acceptance(requirement_id: str) -> str:
     ledger = load_master_acceptance_ledger(LEDGER_PATH)
-    return next(item.acceptance for item in ledger.requirements if item.id == requirement_id)
+    return next(
+        item.acceptance for item in ledger.requirements if item.id == requirement_id
+    )
 
 
 def test_patron_atrapa_el_texto_viejo_y_no_el_nuevo() -> None:
