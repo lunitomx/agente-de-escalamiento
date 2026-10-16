@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 import shutil
+import site
 import stat
 import subprocess
 import sys
@@ -1035,13 +1036,25 @@ def _build_canonical_export(
 def _run_from_export(
     artifact: Path, workspace: Path, code: str
 ) -> subprocess.CompletedProcess[str]:
-    """Run ``code`` with the exported copy first on the import path."""
+    """Run ``code`` with only the exported copy and third-party packages importable.
 
-    environment = os.environ | {"PYTHONPATH": str(artifact)}
+    ``-I -S``: no PYTHON* variables, no user site, no ``.pth`` files. The editable
+    install of this checkout lives in a ``.pth`` file, so it cannot lend a module
+    that the copy is missing (S86.33). The package folders go on ``sys.path`` as
+    plain folders, so their ``.pth`` files are not run either.
+    """
+
+    paths = [str(artifact), *site.getsitepackages()]
+    prelude = (
+        f"import sys; sys.path[:0] = {paths!r}; "
+        "import escala_server; "
+        f"assert escala_server.__file__.startswith({str(artifact)!r}), "
+        "escala_server.__file__; "
+    )
     return subprocess.run(
-        [sys.executable, "-c", code],
+        [sys.executable, "-I", "-S", "-c", prelude + code],
         cwd=workspace,
-        env=environment,
+        env={"PATH": os.environ.get("PATH", ""), "HOME": str(workspace)},
         check=False,
         capture_output=True,
         text=True,
