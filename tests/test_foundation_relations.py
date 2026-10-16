@@ -99,8 +99,15 @@ def test_real_e59_relation_queue_validates_against_real_manifest() -> None:
     from validators.ontology_v2 import load_review_queue
     from validators.source_manifest import load_source_manifest
 
+    from tests.versioned_evidence import require_local_evidence
+
     root = Path(__file__).resolve().parents[1]
     evidence = root / "work/epics/e59-foundations-4d-fidelity/evidence"
+    # S86.37: corpus-derived evidence is local-only; skip with reason if absent.
+    for name in ("s59-v2-review-queue.json", "s59-v2-relation-review-queue.json"):
+        require_local_evidence(
+            root, f"work/epics/e59-foundations-4d-fidelity/evidence/{name}"
+        )
     nodes = {
         candidate.proposed_node.id
         for candidate in load_review_queue(

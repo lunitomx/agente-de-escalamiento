@@ -10,6 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 import yaml
 
 from validators.governance_contract import ClosureDispositionPolicy
+from validators.versioned_files import versioned_files
 
 _EPIC_ID = re.compile(r"^E[1-9][0-9]*$")
 _SAFE_PATH = re.compile(
@@ -91,9 +92,13 @@ def validate_scope_inventory(
         raise ScopeInventoryError("scope inventory references unknown disposition")
 
     expected: dict[str, Literal["archived_epic", "story_scope"]] = {}
-    for scope_path in sorted((repo_root / "work/epics").glob("**/scope.md")):
-        relative = scope_path.relative_to(repo_root).as_posix()
-        text = scope_path.read_text(encoding="utf-8")
+    # Only versioned scopes count: an ignored local leftover (S86.37) is not
+    # part of the repository, but a force-added one must be classified.
+    for versioned in versioned_files(repo_root, "work/epics"):
+        if versioned.name != "scope.md":
+            continue
+        relative = versioned.as_posix()
+        text = (repo_root / relative).read_text(encoding="utf-8")
         nested = "/stories/" in relative
         epic_id = _frontmatter_value(text, "epic_id")
         if nested:

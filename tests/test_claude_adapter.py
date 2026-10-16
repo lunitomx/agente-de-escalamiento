@@ -8,6 +8,8 @@ import shutil
 import subprocess
 from pathlib import Path
 
+from validators.adapter_parity import claude_public_skills
+
 
 ROOT = Path(__file__).resolve().parents[1]
 ADAPTER = ROOT / "adapters" / "claude"
@@ -183,6 +185,7 @@ def test_inverted_claude_markers_fail_before_skill_install(tmp_path: Path) -> No
 
 def test_checkout_claude_surface_exposes_only_escala() -> None:
     skills = ROOT / ".claude" / "skills"
-    assert sorted(path.name for path in skills.iterdir()) == ["escala"]
+    # S86.37: local, gitignored RaiSE dev skills are not the public surface.
+    assert claude_public_skills(ROOT) == ["escala"]
     assert (skills / "escala").is_symlink()
     assert (skills / "escala").resolve() == ROOT / "escala-skills" / "escala"

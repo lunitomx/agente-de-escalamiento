@@ -6,6 +6,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from validators.adapter_parity import discoverable_legacy_aliases
+
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "refresh_legacy_skill_aliases.py"
 
@@ -33,6 +35,5 @@ def test_legacy_aliases_only_redirect_to_a_canonical_contract() -> None:
 
 
 def test_legacy_aliases_are_not_in_discoverable_skill_roots() -> None:
-    for root in (ROOT / ".claude/skills", ROOT / ".agents/skills"):
-        if root.exists():
-            assert not list(root.glob("scaleup-*/SKILL.md"))
+    # S86.37: only versioned files count; ignored local agent copies do not.
+    assert discoverable_legacy_aliases(ROOT) == []
