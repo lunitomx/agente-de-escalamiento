@@ -11,7 +11,7 @@ authorities:
     hash_kind: semantic
   public_export:
     path: governance/public-export.yaml
-    sha256: b869f568e62d06719354e33e2bfb2ebea934693bef6760be04dc18246d6eaf0a
+    sha256: 909a04be4c67fa0517bc63202f834f66a481b1d1d455dc1a4f5d384577954715
     hash_kind: semantic
 source_requirements:
   - id: SRC-CASH-001
