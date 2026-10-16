@@ -33,7 +33,13 @@ from typing import Literal, Sequence
 
 from pydantic import BaseModel, ConfigDict, ValidationError
 
-from escala_server.cash import LEVER_META, FinancialInputs, LeverImpact, PowerOfOneEngine
+from escala_server.cash import (
+    LEVER_META,
+    FinancialInputs,
+    LeverImpact,
+    PowerOfOneEngine,
+    lever_parts,
+)
 from escala_server.financial.cajas import Caja, CuentaEnCaja, TotalesPorCaja, con_signo
 from escala_server.financial.formatos import fecha_corta, formato_monto
 from escala_server.financial.lector import LecturaEstados
@@ -90,6 +96,36 @@ class Palanca(_Modelo):
     utilidad: Indicador
 
 
+class Coeficiente(_Modelo):
+    """Pesos que deja mover una palanca 1 punto (1% o 1 día), sin redondear (S86.22)."""
+
+    clave: str
+    nombre: str
+    valor: Decimal
+    formula: str
+    origen: str
+    lamina: str
+
+
+ParteDelSimulador = Coeficiente | NoCalculable | NoAplica
+
+
+class PalancaDelSimulador(_Modelo):
+    """Los dos lados de una palanca para el simulador (S86.22).
+
+    ``por_periodo`` es utilidad y se repite cada periodo; ``una_vez`` es lo que
+    se queda o se libera una sola vez en clientes, inventario o proveedores.
+    """
+
+    palanca: str
+    lever: str
+    nombre: str
+    unidad: Literal["%", "días"]
+    mejora: str
+    por_periodo: ParteDelSimulador
+    una_vez: ParteDelSimulador
+
+
 class EstadosRevisados(_Modelo):
     """Lo que recibe la calculadora: la revisión de S86.15 y el estado de resultados."""
 
@@ -107,6 +143,13 @@ class ResultadoDelCurso(_Modelo):
     poder_del_uno_flujo: Indicador | None = None
     poder_del_uno_utilidad: Indicador | None = None
     pendientes: tuple[str, ...] = ()
+    simulador: tuple[PalancaDelSimulador, ...] = ()
+
+    def del_simulador(self, clave: str) -> PalancaDelSimulador:
+        for palanca in self.simulador:
+            if palanca.palanca == clave:
+                return palanca
+        raise KeyError(clave)
 
     def indicador(self, clave: str, fecha: date) -> Indicador:
         for indicador in self.indicadores:
@@ -741,6 +784,18 @@ TOTAL_UTILIDAD = _def(
 )
 
 
+def _entradas(d: _Fecha, utilidad_neta: Decimal) -> FinancialInputs:
+    return FinancialInputs(
+        net_sales=d.ventas.valor if d.ventas is not None else CERO,
+        cost_of_goods_sold=d.costo.valor,
+        total_opex=d.gastos.valor,
+        accounts_receivable=d.clientes.valor,
+        inventory=d.inventario.valor,
+        accounts_payable=d.proveedores.valor,
+        net_profit=utilidad_neta,
+    )
+
+
 def _poder_del_uno(
     d: _Fecha, dias: int | None, de_dias: dict[str, Indicador], utilidad_neta: Decimal
 ) -> tuple[tuple[Palanca, ...], Indicador, Indicador]:
@@ -767,15 +822,7 @@ def _poder_del_uno(
         if not isinstance(de_dias[clave], Calculado):
             fuera[lever] = de_dias[clave]
 
-    entradas = FinancialInputs(
-        net_sales=d.ventas.valor,
-        cost_of_goods_sold=d.costo.valor,
-        total_opex=d.gastos.valor,
-        accounts_receivable=d.clientes.valor,
-        inventory=d.inventario.valor,
-        accounts_payable=d.proveedores.valor,
-        net_profit=utilidad_neta,
-    )
+    entradas = _entradas(d, utilidad_neta)
     resultado = PowerOfOneEngine(days_in_period=dias).calculate(
         entradas, {lever: 1 for lever in LEVER_META if lever not in fuera}
     )
@@ -802,6 +849,89 @@ def _poder_del_uno(
         _calculado(TOTAL_FLUJO, fecha, Decimal(str(resultado.combined_cash_impact)), origen_flujo),
         _calculado(TOTAL_UTILIDAD, fecha, Decimal(str(resultado.combined_ebit_impact)), origen_utilidad),
     )
+
+
+# ---------------------------------------------------------------------------
+# Simulador de las 7 palancas (S86.22): dos coeficientes por palanca
+# ---------------------------------------------------------------------------
+
+SEIS_DECIMALES = Decimal("0.000001")
+
+# Palanca del motor → (unidad, qué es mejorar, lado por periodo, lado de una vez)
+PARTES: dict[str, tuple[Literal["%", "días"], str, str, str]] = {
+    "price": ("%", "subir el precio", "1% × ventas", "−1% × clientes"),
+    "volume": (
+        "%",
+        "vender más",
+        "1% × utilidad bruta",
+        "−1% × capital de trabajo (clientes + inventario − proveedores)",
+    ),
+    "cogs": ("%", "bajar el costo de ventas", "1% × costo de ventas", "1% × (inventario − proveedores)"),
+    "opex": ("%", "bajar los gastos de operación", "1% × gastos de operación", "no deja nada en balance"),
+    "ar_days": ("días", "cobrar antes", "mover días no cambia la utilidad", "1 día × ventas ÷ días del periodo"),
+    "inv_days": (
+        "días",
+        "tener menos días de inventario",
+        "mover días no cambia la utilidad",
+        "1 día × costo de ventas ÷ días del periodo",
+    ),
+    "ap_days": (
+        "días",
+        "pagar a proveedores más tarde",
+        "mover días no cambia la utilidad",
+        "1 día × costo de ventas ÷ días del periodo",
+    ),
+}
+
+
+def _parte(lever: str, una_vez: bool, valor: Decimal, origen: str) -> Coeficiente:
+    clave, nombre, _, _ = PALANCAS[lever]
+    _, _, formula_periodo, formula_una_vez = PARTES[lever]
+    lado = "una_vez" if una_vez else "por_periodo"
+    return Coeficiente(
+        clave=f"simulador.{clave}.{lado}",
+        nombre=f"{nombre}: {'una sola vez' if una_vez else 'cada periodo'}",
+        valor=valor.quantize(SEIS_DECIMALES, rounding=ROUND_HALF_UP),
+        formula=formula_una_vez if una_vez else formula_periodo,
+        origen=f"sale de: {origen}",
+        lamina=LAMINA_PODER_DEL_UNO,
+    )
+
+
+def _simulador(
+    d: _Fecha, dias: int | None, palancas: tuple[Palanca, ...], utilidad_neta: Decimal
+) -> tuple[PalancaDelSimulador, ...]:
+    """Coeficientes por 1 punto de cada palanca, del mismo motor que el poder del uno."""
+    if not palancas or dias is None:
+        return ()
+    entradas = _entradas(d, utilidad_neta)
+    salida: list[PalancaDelSimulador] = []
+    for lever, palanca in zip(LEVER_META, palancas, strict=True):
+        unidad, mejora, _, _ = PARTES[lever]
+        # «Costo de ventas −1%» → «Costo de ventas»; «Clientes −1 día» → «Clientes»
+        nombre = palanca.nombre.rsplit(" ", 2 if unidad == "días" else 1)[0]
+        flujo, utilidad = palanca.flujo, palanca.utilidad
+        por_periodo: ParteDelSimulador
+        una_vez: ParteDelSimulador
+        if isinstance(flujo, Calculado) or isinstance(utilidad, Calculado):
+            partes = lever_parts(lever, entradas, 1, dias)
+            por_periodo = _parte(lever, False, partes.per_period, partes.per_period_formula)
+            una_vez = _parte(lever, True, partes.one_time, partes.one_time_formula)
+        else:
+            # La palanca no entra al poder del uno: la misma razón, en gris.
+            por_periodo, una_vez = utilidad, flujo
+        salida.append(
+            PalancaDelSimulador(
+                palanca=palanca.palanca,
+                lever=lever,
+                nombre=nombre,
+                unidad=unidad,
+                mejora=mejora,
+                por_periodo=por_periodo,
+                una_vez=una_vez,
+            )
+        )
+    return tuple(salida)
 
 
 # ---------------------------------------------------------------------------
@@ -869,6 +999,7 @@ def calcular_curso(estados: EstadosRevisados) -> ResultadoDelCurso:
         poder_del_uno_flujo=total_flujo,
         poder_del_uno_utilidad=total_utilidad,
         pendientes=pendientes,
+        simulador=_simulador(final, dias, palancas, neta),
         **base,
     )
 

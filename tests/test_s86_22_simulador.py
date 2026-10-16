@@ -93,13 +93,14 @@ def _coeficiente(resultado: ResultadoDelCurso, palanca: str, lado: str) -> Coefi
 # Motor: una sola definición, dos lados
 # ---------------------------------------------------------------------------
 
+# Mi Empresa al 31-dic-2025 (los mismos que lee la calculadora de los estados).
 INPUTS = FinancialInputs(
     net_sales=Decimal("43826513.09"),
-    cost_of_goods_sold=Decimal("22966463.99"),
-    total_opex=Decimal("13421040.08"),
+    cost_of_goods_sold=Decimal("22966464.00"),
+    total_opex=Decimal("13421039.80"),
     accounts_receivable=Decimal("5639601.55"),
-    inventory=Decimal("1771357.35"),
-    accounts_payable=Decimal("1232785.05"),
+    inventory=Decimal("1771040.54"),
+    accounts_payable=Decimal("1232468.24"),
     net_profit=Decimal("0"),
 )
 
