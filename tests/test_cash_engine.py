@@ -79,8 +79,11 @@ class TestPowerOfOneEngine:
         result = self.engine.calculate(self.inputs, adjustments=adjustments)
 
         price = [i for i in result.impacts if i.lever == "price"][0]
-        # 2% de 12M = 240K
-        assert abs(price.cash_impact - 240000) < 1000
+        # Flujo = 2% de ventas 12M − 2% de clientes 1.5M = 240,000 − 30,000.
+        # Según el curso de cash que vimos: subir precio también sube lo que
+        # te deben los clientes, y eso no es efectivo todavía.
+        assert price.cash_impact == 210000.0
+        assert price.ebit_impact == 240000.0
 
     def test_priorities_ordered(self):
         """Las prioridades se ordenan por impacto/dificultad."""

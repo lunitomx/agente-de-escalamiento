@@ -1,0 +1,48 @@
+# Mi Empresa, S.A. de C.V. — empresa sintética de ejemplo.
+# Números del ejemplo del curso de cash que vimos (dos años: anterior y actual).
+# Sirve para las pruebas de oro de cash. No es una empresa real.
+empresa: "Mi Empresa, S.A. de C.V."
+moneda: MXN
+unidad: pesos
+anterior:
+  balance:
+    bancos: 120537.91
+    clientes: 3526879.97
+    inventario: 1214882.30
+    otros_activos_circulantes: 2398742.29
+    activo_fijo: 24997852.36
+    activo_diferido: 1753951.70
+    proveedores: 1167391.55
+    otras_acreedoras: 13885547.68
+    bancos_corto_plazo: 98756.25
+    documentos_largo_plazo: 9582174.13
+    bancos_largo_plazo: 2073621.05
+    capital_total: 7205355.87
+  estado_resultados:
+    ventas: 35681743.00
+    costo_de_ventas: 17524848.56
+    gastos_de_operacion: 11791007.37
+    utilidad_de_operacion: 6365887.07
+    utilidad_antes_de_isr: 4692799.95
+    utilidad_neta: 3566527.96
+actual:
+  balance:
+    bancos: 210291.16
+    clientes: 5639601.55
+    inventario: 1771040.54
+    otros_activos_circulantes: 2527257.34
+    activo_fijo: 25318585.22
+    activo_diferido: 1956618.46
+    proveedores: 1232468.24
+    otras_acreedoras: 11846834.45
+    bancos_corto_plazo: 148811.41
+    documentos_largo_plazo: 9119791.67
+    bancos_largo_plazo: 5818564.98
+    capital_total: 9256923.52
+  estado_resultados:
+    ventas: 43826513.09
+    costo_de_ventas: 22966464.00
+    gastos_de_operacion: 13421039.80
+    utilidad_de_operacion: 7439009.29
+    utilidad_antes_de_isr: 6781210.60
+    utilidad_neta: 5018095.92
