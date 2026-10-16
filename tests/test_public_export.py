@@ -1007,53 +1007,86 @@ def test_selected_server_has_no_private_ingester_dependency() -> None:
     assert '"/api/knowledge/ingest"' not in server_source
 
 
+_START_SERVER = (
+    "from escala_server.server import make_server; "
+    "server = make_server(host='127.0.0.1', port=0, "
+    "static_root='escala_server/static', db_path='escala.sqlite'); "
+    "server.server_close()"
+)
+_LIFECYCLE_HELP = (
+    "import runpy, sys; sys.argv = ['escala_server.lifecycle', '--help']; "
+    "runpy.run_module('escala_server.lifecycle', run_name='__main__', alter_sys=True)"
+)
+
+
+def _build_canonical_export(
+    destination: Path, policy: PublicExportPolicy | None = None
+) -> Path:
+    build_public_export(
+        repository=ROOT,
+        destination=destination,
+        source_commit=_git(ROOT, "rev-parse", "HEAD"),
+        policy=policy or load_public_export_policy(EXPORT_POLICY_PATH),
+        inventory=load_third_party_inventory(THIRD_PARTY_PATH),
+    )
+    return destination
+
+
+def _run_from_export(
+    artifact: Path, workspace: Path, code: str
+) -> subprocess.CompletedProcess[str]:
+    """Run ``code`` with the exported copy first on the import path."""
+
+    environment = os.environ | {"PYTHONPATH": str(artifact)}
+    return subprocess.run(
+        [sys.executable, "-c", code],
+        cwd=workspace,
+        env=environment,
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=10,
+    )
+
+
 def test_canonical_export_starts_server_and_lifecycle_in_isolated_process(
     tmp_path: Path,
 ) -> None:
     """The distribution must not rely on the source checkout at runtime."""
 
-    source_commit = _git(ROOT, "rev-parse", "HEAD")
-    artifact = tmp_path / "artifact"
-    build_public_export(
-        repository=ROOT,
-        destination=artifact,
-        source_commit=source_commit,
-        policy=load_public_export_policy(EXPORT_POLICY_PATH),
-        inventory=load_third_party_inventory(THIRD_PARTY_PATH),
-    )
-    environment = os.environ | {"PYTHONPATH": str(artifact)}
+    artifact = _build_canonical_export(tmp_path / "artifact")
     workspace = tmp_path / "isolated-workspace"
     workspace.mkdir()
-    server = subprocess.run(
-        [
-            sys.executable,
-            "-c",
-            (
-                "from escala_server.server import make_server; "
-                "server = make_server(host='127.0.0.1', port=0, "
-                "static_root='escala_server/static', db_path='escala.sqlite'); "
-                "server.server_close()"
-            ),
-        ],
-        cwd=workspace,
-        env=environment,
-        check=False,
-        capture_output=True,
-        text=True,
-        timeout=10,
-    )
-    lifecycle = subprocess.run(
-        [sys.executable, "-m", "escala_server.lifecycle", "--help"],
-        cwd=workspace,
-        env=environment,
-        check=False,
-        capture_output=True,
-        text=True,
-        timeout=10,
-    )
+    server = _run_from_export(artifact, workspace, _START_SERVER)
+    lifecycle = _run_from_export(artifact, workspace, _LIFECYCLE_HELP)
 
     assert server.returncode == 0, server.stderr
     assert lifecycle.returncode == 0, lifecycle.stderr
+
+
+def test_export_start_fails_when_a_runtime_module_is_left_out(
+    tmp_path: Path,
+) -> None:
+    """S86.36: if the export list drops a module, the copy must not start.
+
+    S86.33 found that the start check passed without ``escala_server/retirados.py``
+    because the editable install of the checkout lent the module.
+    """
+
+    policy = load_public_export_policy(EXPORT_POLICY_PATH)
+    left_out = "escala_server/retirados.py"
+    assert left_out in {selection.path for selection in policy.selections}
+    # The build refuses a policy that differs from the committed one, so the
+    # copy is built whole and the module is taken out afterwards.
+    artifact = _build_canonical_export(tmp_path / "artifact")
+    (artifact / left_out).unlink()
+    workspace = tmp_path / "isolated-workspace"
+    workspace.mkdir()
+
+    server = _run_from_export(artifact, workspace, _START_SERVER)
+
+    assert server.returncode != 0
+    assert "retirados" in server.stderr
 
 
 def test_selected_package_metadata_is_source_neutral() -> None:
