@@ -1,0 +1,25 @@
+Mi Empresa, S.A. de C.V.
+Balance General comparativo
+(Cifras en pesos) — estado sucio de prueba: proveedores en negativo y una cuenta sin regla
+Cuenta | Nombre | Dic-2025 | Dic-2024
+1000-000-000 | ACTIVO
+1100-000-000 | ACTIVO CIRCULANTE
+1101-000-000 | Caja y bancos | 210291.16 | 120537.91
+1102-000-000 | Clientes | 5639601.55 | 3526879.97
+1103-000-000 | Inventarios | 1771040.54 | 1214882.30
+1104-000-000 | Otros activos circulantes | 2527257.34 | 2398742.29
+ | Total ACTIVO CIRCULANTE | 10148190.59 | 7261042.47
+1200-000-000 | Activo fijo neto | 25318585.22 | 24997852.36
+1300-000-000 | Activo diferido | 1956618.46 | 1753951.70
+1301-000-000 | Cuenta puente | 300000.00 | 300000.00
+ | Total ACTIVO | 37423394.27 | 34012846.53
+2000-000-000 | PASIVO
+2100-000-000 | Proveedores | (1232468.24) | (1167391.55)
+2101-000-000 | Acreedores diversos | 11846834.45 | 13885547.68
+2102-000-000 | Préstamos bancarios a corto plazo | 148811.41 | 98756.25
+2200-000-000 | Documentos por pagar a largo plazo | 9119791.67 | 9582174.13
+2201-000-000 | Préstamos bancarios a largo plazo | 5818564.98 | 2073621.05
+ | Total PASIVO | 28166470.75 | 26807490.66
+3000-000-000 | CAPITAL CONTABLE
+3100-000-000 | Capital contable | 9256923.52 | 7205355.87
+ | Total PASIVO Y CAPITAL | 37423394.27 | 34012846.53
