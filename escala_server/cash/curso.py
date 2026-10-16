@@ -938,6 +938,8 @@ class DiasDelAnio(_Modelo):
     cronograma: Cronograma | None = None
     sin_cronograma: str | None = None
     nota: str | None = None
+    # Los días sin redondear, para decidir colores y veredictos (S86.21). No van en el JSON.
+    sin_redondear: dict[str, Decimal | None] = Field(default_factory=dict, exclude=True)
 
 
 class Cambio(_Modelo):
@@ -1189,16 +1191,21 @@ def _dias_del_anio(
         ciclo=ciclo,
     )
     cronograma, sin_cronograma = _cronograma(anio)
+    crudos: dict[str, Decimal | None] = {
+        "clientes": de_clientes[1],
+        "inventario": de_inventario[1],
+        "proveedores": de_proveedores[1],
+        "ciclo": ciclo_crudo,
+    }
     return _DelAnio(
         anio.model_copy(
-            update={"cronograma": cronograma, "sin_cronograma": sin_cronograma}
+            update={
+                "cronograma": cronograma,
+                "sin_cronograma": sin_cronograma,
+                "sin_redondear": crudos,
+            }
         ),
-        {
-            "clientes": de_clientes[1],
-            "inventario": de_inventario[1],
-            "proveedores": de_proveedores[1],
-            "ciclo": ciclo_crudo,
-        },
+        crudos,
     )
 
 
