@@ -42,13 +42,17 @@ from typing import Literal, Sequence
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from escala_server.cash.curso import (
+    EJEMPLOS_DE_TRAVESURAS,
+    AjusteDelDueno,
     Calculado,
     EstadosRevisados,
     Indicador,
     NoAplica,
     NoCalculable,
     ResultadoDelCurso,
+    UtilidadAjustada,
     calcular_curso,
+    utilidad_ajustada,
 )
 from escala_server.financial.cajas import CuentaEnCaja
 from escala_server.financial.formatos import fecha_corta, formato_monto, leer_monto, normalizar
@@ -102,6 +106,8 @@ OPCIONES: dict[str, tuple[str, ...]] = {
     "C4": ("una cantidad en pesos", "no", "no sé"),
     "C3": ("una cantidad en pesos", "no sé"),
     "C2": ("todas", "solo lo facturado", "no sé"),
+    # S86.25: «C6=no» o un gasto por respuesta: «C6:<concepto>=<monto en pesos>».
+    "C6": ("no", "cada gasto con su monto en pesos"),
 }
 # De la más importante a la menos importante (después de los problemas).
 _IMPORTANCIA: tuple[str, ...] = (
@@ -174,6 +180,10 @@ class Paso(_Modelo):
     anuncio: str | None = None
     calculo: ResultadoDelCurso | None = None
     resumen: tuple[LineaDeResumen, ...] = ()
+    # S86.25: la pregunta opcional por gastos personales, o la utilidad ajustada.
+    pregunta_travesuras: Pregunta | None = None
+    travesuras: UtilidadAjustada | None = None
+    sin_monto: tuple[str, ...] = ()
     mensaje: str = ""
     # Lo que se guarda con «sí». No va en la salida para el modelo.
     estados: EstadosRevisados | None = Field(default=None, exclude=True)
@@ -245,12 +255,27 @@ def entender(clave: str, valor: str) -> Entendido | None:
         except InvalidOperation:
             return None
         return porcentaje if Decimal("0") <= porcentaje <= Decimal("100") else None
+    if tipo == "C6":
+        return _travesura(clave, texto)
     if tipo in {"C3", "C4"}:
         if tipo == "C4" and texto in {"no", "ninguno", "ninguna", "cero"}:
             return Decimal("0")
         monto = leer_monto(texto)
         return monto if monto is not None and monto >= 0 else None
     return None
+
+
+def _travesura(clave: str, texto: str) -> Entendido | None:
+    """S86.25: «C6» acepta «no»; «C6:<concepto>» acepta un monto mayor que 0.
+
+    ESCALA no estima: un monto que no entiende no se suma, se dice.
+    """
+    if clave == "C6":
+        return False if texto in {"no", "n", "ninguno", "ninguna", "nada"} else None
+    if not clave.split(":", 1)[1].strip():
+        return None
+    monto = leer_monto(texto)
+    return monto if monto is not None and monto > 0 else None
 
 
 @dataclass(frozen=True)
@@ -749,6 +774,76 @@ def _texto_de_linea(linea: LineaDeResumen) -> str:
 
 
 # ---------------------------------------------------------------------------
+# Las travesuras (S86.25): opcional, sin juicio, después del resumen
+# ---------------------------------------------------------------------------
+
+PREGUNTA_TRAVESURAS = Pregunta(
+    clave="C6",
+    pregunta=(
+        "Opcional, sin juicio: ¿la empresa pagó gastos personales tuyos o de tu familia, "
+        "o hubo ventas que no quedaron en tus estados? Según el curso de cash que vimos, "
+        f"pasa seguido; por ejemplo: {', '.join(EJEMPLOS_DE_TRAVESURAS)}. "
+        "Si quieres verlos, dime cada uno con su monto en pesos. Si no hay, contesta «no»."
+    ),
+    para_que=(
+        "Para ver tu utilidad como si esos gastos no estuvieran. "
+        "Solo sumo los montos que tú me des; no estimo ninguno."
+    ),
+    opciones=OPCIONES["C6"],
+)
+
+
+@dataclass(frozen=True)
+class _Travesuras:
+    pregunta: Pregunta | None = None
+    resultado: UtilidadAjustada | None = None
+    sin_monto: tuple[str, ...] = ()
+
+
+def _travesuras(estados: EstadosRevisados, entendidas: dict[str, Entendido]) -> _Travesuras:
+    """Suma solo lo que dijo el dueño; sin respuesta, hace la pregunta opcional."""
+    ajustes: list[AjusteDelDueno] = []
+    sin_monto: list[str] = []
+    for clave, valor in entendidas.items():
+        if _tipo(clave) != "C6" or clave == "C6":
+            continue
+        concepto = clave.split(":", 1)[1].strip()
+        if isinstance(valor, Decimal):
+            ajustes.append(AjusteDelDueno(concepto=concepto, monto=valor))
+        else:
+            sin_monto.append(concepto)
+    if not ajustes and not sin_monto and entendidas.get("C6") is not False:
+        return _Travesuras(pregunta=PREGUNTA_TRAVESURAS)
+    return _Travesuras(resultado=utilidad_ajustada(estados, ajustes), sin_monto=tuple(sin_monto))
+
+
+def _parte_de_travesuras(parte: Calculado | NoCalculable) -> str:
+    if isinstance(parte, NoCalculable):
+        return f"- {parte.nombre}: no calculable: {parte.no_calculable}"
+    return (
+        f"- {parte.nombre}: {formato_monto(parte.valor)}\n"
+        f"  {parte.formula}. {parte.origen} (lámina {parte.lamina})."
+    )
+
+
+def _texto_de_travesuras(resultado: UtilidadAjustada, sin_monto: tuple[str, ...]) -> str:
+    lineas = ["Tu utilidad sin travesuras (gastos personales que pagó la empresa):"]
+    lineas.append(_parte_de_travesuras(resultado.utilidad_contable))
+    if resultado.ajustes:
+        lineas.append("- Ajustes que me dijiste:")
+        lineas += [f"  - {a.concepto}: {formato_monto(a.monto)}" for a in resultado.ajustes]
+    else:
+        lineas.append("- Ajustes que me dijiste: ninguno.")
+    lineas += [f"  - «{concepto}»: sin monto no lo sumo." for concepto in sin_monto]
+    lineas.append(_parte_de_travesuras(resultado.utilidad_ajustada))
+    lineas.append(
+        "Solo sumo los montos que tú me diste; no estimo ninguno. "
+        f"No recalculo impuestos. {resultado.aviso}"
+    )
+    return "\n".join(lineas)
+
+
+# ---------------------------------------------------------------------------
 # El paso
 # ---------------------------------------------------------------------------
 
@@ -773,12 +868,14 @@ def atender(
     estados: EstadosRevisados | None = None
     anuncio: str | None = None
     resumen: list[LineaDeResumen] = []
+    travesuras = _Travesuras()
     if not pendientes and revision is not None and leido.resultados is not None:
         estados = EstadosRevisados(revision=revision, resultados=leido.resultados)
         calculo = calcular_curso(estados)
         if calculo.no_calculable is None:
             anuncio = _anuncio(calculo, leido.unidad)
             resumen = _resumen(calculo)
+            travesuras = _travesuras(estados, aplicadas.entendidas)
         else:
             estados = None
 
@@ -792,6 +889,9 @@ def atender(
         anuncio=anuncio,
         calculo=calculo,
         resumen=tuple(resumen),
+        pregunta_travesuras=travesuras.pregunta,
+        travesuras=travesuras.resultado,
+        sin_monto=travesuras.sin_monto,
         estados=estados,
     )
     return paso.model_copy(update={"mensaje": _mensaje(paso, hoy)})
@@ -837,6 +937,14 @@ def _mensaje(paso: Paso, hoy: date) -> str:
         cierre = fecha_corta(paso.calculo.balance_final)
         lineas = "\n".join(_texto_de_linea(linea) for linea in paso.resumen)
         partes.append(f"Resumen al {cierre} (lo calculó la calculadora de ESCALA):\n{lineas}")
+        if paso.travesuras is not None:
+            partes.append(_texto_de_travesuras(paso.travesuras, paso.sin_monto))
+        elif paso.pregunta_travesuras is not None:
+            pregunta = paso.pregunta_travesuras
+            partes.append(
+                f"{pregunta.pregunta}\n   Para qué: {pregunta.para_que}"
+                f"\n   Puedes contestar: {' · '.join(pregunta.opciones)}."
+            )
         partes.append(
             f"¿Guardo tus estados revisados en {paso.carpeta} con fecha {hoy.isoformat()}? "
             "Si quieres, responde «sí». Sin tu «sí» no guardo nada."

@@ -212,8 +212,8 @@ def test_tras_el_resumen_pregunta_por_gastos_personales_sin_juicio() -> None:
     for ejemplo in ("viaje familiar", "camioneta", "computadora"):
         assert ejemplo in pregunta.pregunta
     assert "Opcional" in paso.mensaje
-    # La pregunta no trae ningún monto sugerido.
-    assert not any(ch.isdigit() for ch in pregunta.pregunta)
+    # La pregunta no trae ningún monto sugerido: ni un solo número.
+    assert not any(ch.isdigit() for ch in pregunta.pregunta + " ".join(pregunta.opciones))
     # El «¿Guardo …?» sigue al final.
     assert paso.mensaje.split("\n\n")[-1].startswith("¿Guardo ")
 

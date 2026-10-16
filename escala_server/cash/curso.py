@@ -31,7 +31,7 @@ from pathlib import Path
 import sys
 from typing import Literal, Sequence
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
 from escala_server.cash import (
     LEVER_META,
@@ -1236,6 +1236,156 @@ def precio_contra_volumen(
     if final is None:
         return PrecioContraVolumen(no_calculable="falta el balance al final del periodo", descuento=descuento, volumen=volumen)
     return _precio_contra_volumen(final, descuento, volumen)
+
+
+# ---------------------------------------------------------------------------
+# Las travesuras: ajustes que confiesa el dueño (S86.25)
+# ---------------------------------------------------------------------------
+#
+# Según el curso de cash que vimos (F1.4, lámina 12): para ver la utilidad «sin
+# travesuras», el dueño suma los gastos personales que pagó la empresa y las
+# ventas que no quedaron registradas.
+#
+# Sobre qué utilidad se suma: la lámina 12 suma los ajustes directo a la
+# UTILIDAD NETA (el resultado del ejercicio), sin recalcular el ISR:
+#
+#   5,018,095.92 + 445,164.11 = 5,463,260.03   (lámina, con la errata 97,492)
+#
+# Errata L12: el ajuste de gastos es 55,820 + 41,875 + 247 = 97,942, no 97,492.
+# Con el correcto, los ajustes suman 445,614.11 y la utilidad ajustada es
+# 5,463,710.03. Ojo: 5,463,710.03 − 97,942 = 5,365,768.03 NO es un renglón del
+# estado de resultados; es la utilidad neta 5,018,095.92 + la venta sin factura
+# 123,250 + el ajuste de intereses 224,422.11 (los otros dos ajustes de la
+# lámina). La base es siempre el renglón «Utilidad neta».
+#
+# ESCALA solo suma los montos que dio el dueño: nunca estima ni sugiere uno.
+# No recalcula impuestos ni recomienda nada fiscal.
+
+AVISO_FISCAL = "Lo fiscal lo ve tu contador."
+
+# Los ejemplos del curso, sin montos: el dueño pone los suyos.
+EJEMPLOS_DE_TRAVESURAS: tuple[str, ...] = (
+    "un viaje familiar",
+    "la camioneta que usa un familiar",
+    "la computadora de un hijo",
+    "una venta que no quedó registrada",
+)
+
+UTILIDAD_CONTABLE = _def(
+    "utilidad_contable",
+    "Utilidad contable",
+    "la utilidad neta de tu estado de resultados",
+    "L11",
+    "pesos",
+)
+AJUSTES_DEL_DUENO = _def(
+    "ajustes_del_dueno",
+    "Ajustes que me dijiste",
+    "suma de los montos que me dijiste",
+    "L12",
+    "pesos",
+)
+UTILIDAD_AJUSTADA = _def(
+    "utilidad_ajustada",
+    "Utilidad ajustada",
+    "utilidad contable + ajustes que me dijiste",
+    "L12",
+    "pesos",
+)
+
+
+class AjusteDelDueno(_Modelo):
+    """Un gasto personal que pagó la empresa (o una venta no registrada), en palabras del dueño."""
+
+    concepto: str = Field(min_length=1)
+    monto: Decimal = Field(gt=0)
+
+    @field_validator("concepto")
+    @classmethod
+    def _con_texto(cls, concepto: str) -> str:
+        limpio = concepto.strip()
+        if not limpio:
+            raise ValueError("el ajuste necesita un concepto")
+        return limpio
+
+
+ParteDeUtilidadAjustada = Calculado | NoCalculable
+
+
+class UtilidadAjustada(_Modelo):
+    """Utilidad contable, los ajustes que dijo el dueño y la utilidad ajustada (F1.4)."""
+
+    ajustes: tuple[AjusteDelDueno, ...] = ()
+    utilidad_contable: ParteDeUtilidadAjustada
+    total_de_ajustes: ParteDeUtilidadAjustada
+    utilidad_ajustada: ParteDeUtilidadAjustada
+    aviso: str = AVISO_FISCAL
+
+
+def _utilidad_neta(resultados: LecturaEstados, fecha: date) -> _Cifra | None:
+    renglones = [
+        c
+        for c in resultados.cuentas
+        if c.concepto == "utilidad_neta" and c.fecha == fecha and not c.es_total
+    ]
+    if not renglones:
+        return None
+    return _Cifra(renglones[0].monto, f"utilidad neta {_dinero(renglones[0].monto)}")
+
+
+def utilidad_ajustada(
+    estados: EstadosRevisados, ajustes: Sequence[AjusteDelDueno]
+) -> UtilidadAjustada:
+    """Utilidad ajustada = utilidad neta al cierre + suma de los ajustes del dueño.
+
+    Sin ajustes, la utilidad ajustada es la contable. Nunca inventa un ajuste.
+    """
+    revision = estados.revision
+    fecha = revision.balance_final
+    ajustes_ = tuple(ajustes)
+    if not revision.puede_calcular or fecha is None:
+        razon = _por_que_no(revision) if not revision.puede_calcular else "falta el balance al final del periodo"
+        return UtilidadAjustada(
+            ajustes=ajustes_,
+            utilidad_contable=_no_calculable(UTILIDAD_CONTABLE, fecha, razon),
+            total_de_ajustes=_no_calculable(AJUSTES_DEL_DUENO, fecha, razon),
+            utilidad_ajustada=_no_calculable(UTILIDAD_AJUSTADA, fecha, razon),
+        )
+
+    suma = sum((a.monto for a in ajustes_), CERO)
+    detalle = " + ".join(f"{a.concepto} {_dinero(a.monto)}" for a in ajustes_)
+    total = _calculado(
+        AJUSTES_DEL_DUENO,
+        fecha,
+        suma,
+        detalle if ajustes_ else "no me dijiste ningún ajuste",
+    )
+    neta = _utilidad_neta(estados.resultados, fecha)
+    if neta is None:
+        razon = f"tu estado de resultados al {fecha_corta(fecha)} no trae la utilidad neta"
+        return UtilidadAjustada(
+            ajustes=ajustes_,
+            utilidad_contable=_no_calculable(UTILIDAD_CONTABLE, fecha, razon),
+            total_de_ajustes=total,
+            utilidad_ajustada=_no_calculable(UTILIDAD_AJUSTADA, fecha, razon),
+        )
+    contable = _calculado(
+        UTILIDAD_CONTABLE,
+        fecha,
+        neta.valor,
+        f"{neta.texto} (renglón «Utilidad neta» de tu estado de resultados al {fecha_corta(fecha)})",
+    )
+    origen = (
+        f"{neta.texto} + {detalle}"
+        if ajustes_
+        else f"{neta.texto} (no me dijiste ningún ajuste)"
+    )
+    return UtilidadAjustada(
+        ajustes=ajustes_,
+        utilidad_contable=contable,
+        total_de_ajustes=total,
+        utilidad_ajustada=_calculado(UTILIDAD_AJUSTADA, fecha, neta.valor + suma, origen),
+    )
 
 
 # ---------------------------------------------------------------------------
