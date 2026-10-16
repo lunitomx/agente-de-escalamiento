@@ -73,7 +73,7 @@ para no invertir a ciegas en instalación y paridad).
 | S86.33 | ESCALA-102 | Quitar el tablero viejo del poder del uno del programa local | 2 | Sin power-of-one.html ni su ruta; aviso en español en la ruta vieja; todo manda al simulador | done |
 | S86.34 | ESCALA-101 | El simulador de las 7 palancas como artefacto en Claude | 2 | HTML apto para artefacto; 1,143,864.91 / 1,010,740.66; publicar sólo con «sí» | done |
 | S86.35 | ESCALA-103 | Quitar el instalador zip viejo | 2 | Sin generador de escala-local-*.zip; README sigue con la línea única | done |
-| S86.37 | ESCALA-105 | Las pruebas no dependen de archivos locales que git no sigue | 2 | 0 fallas en copia principal y limpia; caso malo versionado sigue fallando | in-progress |
+| S86.37 | ESCALA-105 | Las pruebas no dependen de archivos locales que git no sigue | 2 | 0 fallas en copia principal y limpia; caso malo versionado sigue fallando | done |
 
 ## Fuera de alcance
 
