@@ -321,6 +321,19 @@ def _empty_profile(
     )
 
 
+def read_raw_sheets(source_path: Path) -> list[RawSheet]:
+    """Celdas tal como vienen de un ``.xlsx``, ``.csv`` o ``.tsv`` (S86.14).
+
+    El renglón de cada celda es el de la hoja: las filas vacías de Excel cuentan.
+    """
+
+    formats = {".csv": "csv", ".tsv": "tsv", ".xlsx": "xlsx"}
+    format_name = formats.get(source_path.suffix.lower())
+    if format_name is None:
+        raise ValueError("format_not_supported")
+    return _read_sheets(source_path, format_name)
+
+
 def _read_sheets(source_path: Path, format_name: str) -> list[RawSheet]:
     if format_name in {"csv", "tsv"}:
         raw = source_path.read_bytes().decode("utf-8-sig")
@@ -432,8 +445,15 @@ def _xlsx_sheet(name: str, payload: bytes, shared: tuple[str, ...]) -> RawSheet:
                 formula = formula_element.text or ""
                 formula_cells[coordinate] = (formula, raw_value)
             cells[index] = value
+        row_number = row_element.attrib.get("r", "")
+        if row_number.isdigit():
+            # Excel omite las filas vacías; se rellenan para conservar el renglón.
+            while len(rows) < int(row_number) - 1:
+                rows.append([])
         if cells:
             rows.append([cells.get(index, "") for index in range(max(cells) + 1)])
+        elif row_number.isdigit():
+            rows.append([])
     raw_sheet = _raw_sheet(name, rows)
     updated_rows: list[tuple[RawCell, ...]] = []
     for row in raw_sheet.rows:
