@@ -13,8 +13,9 @@ dice en sus palabras.
 - Cita sólo la frase de la sección "Según el curso". Nunca digas quién dio el
   curso ni le atribuyas la frase a una persona. Si una idea no está en estas
   fichas, no se la atribuyas al curso: dila como tuya.
-- Cuando la ficha dice que la idea viene de un libro (Scaling Up de Verne
-  Harnish, John Mullins, Greg Crabtree, Alan Miltz), dilo también.
+- Cuando la ficha dice que la idea viene de un libro
+  (Scaling Up de Verne Harnish, John Mullins, Greg Crabtree, Alan Miltz),
+  dilo también.
 - Usa el ejemplo del curso sólo para explicar. Con los números del dueño, las
   cuentas las hace la calculadora de ESCALA (`escala_server/cash/calcular.py`;
   en un paquete, `references/calculadora/escala_server/cash/calcular.py`).
@@ -52,3 +53,7 @@ al curso y le dice al dueño que lo revise con su contador.
 | `17-siete-palancas.md` | Siete palancas mueven tu dinero | Cuando el dueño quiere saber qué mover primero para tener más dinero. |
 | `18-tres-mejores-ideas.md` | Toma las tres mejores ideas | Al cerrar un diagnóstico de Cash, para convertirlo en acción con el equipo. |
 | `19-lo-que-escala-necesita.md` | Lo que ESCALA necesita para analizar tus estados | Cuando el dueño manda sus estados por primera vez, o pregunta por qué ESCALA le pregunta antes de darle números. |
+
+---
+
+**Aviso.** Este agente lo creó Eduardo Luna para participantes de EO y EOA en Querétaro, con apuntes y lecciones de cursos que tomó. Lo hizo con cariño para empresarios de su zona. No es un producto oficial de Scaling Up, de Gazelles ni de EO, ni está avalado por ellos. Se prohíbe su uso comercial.

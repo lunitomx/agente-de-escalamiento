@@ -13,7 +13,12 @@ from pathlib import Path
 
 import pytest
 
-from escala_server.cash.curso import BaseDeDias, Calculado, EstadosRevisados, dias_del_dinero
+from escala_server.cash.curso import (
+    BaseDeDias,
+    Calculado,
+    EstadosRevisados,
+    dias_del_dinero,
+)
 from escala_server.cash.perfil import (
     CONTRADICCION_GASTOS_B,
     Clave,
@@ -90,7 +95,12 @@ def test_de_cada_peso_mi_empresa(mi_empresa: EstadosRevisados) -> None:
 def test_de_cada_peso_trae_los_renglones_de_abajo(mi_empresa: EstadosRevisados) -> None:
     peso = porcentajes_de_un_peso(mi_empresa)
     claves = [p.clave for p in peso.partes]
-    for clave in ("gastos_financieros", "utilidad_antes_impuestos", "isr", "utilidad_neta"):
+    for clave in (
+        "gastos_financieros",
+        "utilidad_antes_impuestos",
+        "isr",
+        "utilidad_neta",
+    ):
         assert clave in claves
     # 5,018,095.92 ÷ 43,826,513.09 = 11.45%
     assert _parte(peso.partes, "utilidad_neta").mostrado == Decimal("11.45")
@@ -198,14 +208,26 @@ def test_el_semaforo_usa_el_valor_sin_redondear() -> None:
 
 
 def test_el_borde_dice_si_se_incluye() -> None:
-    excluye = Limites(ideal=Decimal(50), verde=Borde(valor=Decimal(50), incluye=False), rojo=Borde(valor=Decimal(47), incluye=False))
-    incluye = Limites(ideal=Decimal(50), verde=Borde(valor=Decimal(50), incluye=True), rojo=Borde(valor=Decimal(47), incluye=True))
+    excluye = Limites(
+        ideal=Decimal(50),
+        verde=Borde(valor=Decimal(50), incluye=False),
+        rojo=Borde(valor=Decimal(47), incluye=False),
+    )
+    incluye = Limites(
+        ideal=Decimal(50),
+        verde=Borde(valor=Decimal(50), incluye=True),
+        rojo=Borde(valor=Decimal(47), incluye=True),
+    )
     assert color("utilidad_bruta", Decimal(50), excluye) == "amarillo"
     assert color("utilidad_bruta", Decimal(50), incluye) == "verde"
     assert color("utilidad_bruta", Decimal(47), excluye) == "amarillo"
     assert color("utilidad_bruta", Decimal(47), incluye) == "rojo"
     # Menos es mejor (gastos): verde «menos de 30».
-    gastos = Limites(ideal=Decimal(30), verde=Borde(valor=Decimal(30), incluye=False), rojo=Borde(valor=Decimal(33), incluye=False))
+    gastos = Limites(
+        ideal=Decimal(30),
+        verde=Borde(valor=Decimal(30), incluye=False),
+        rojo=Borde(valor=Decimal(33), incluye=False),
+    )
     assert color("gastos", Decimal("29.99"), gastos) == "verde"
     assert color("gastos", Decimal(30), gastos) == "amarillo"
     assert color("gastos", Decimal("33.01"), gastos) == "rojo"
@@ -218,11 +240,15 @@ def test_gastos_de_la_version_b_queda_sin_resolver() -> None:
 
 
 def test_entender_limites() -> None:
-    limites = entender_limites("utilidad_bruta", "ideal 50, verde más de 50, rojo menos de 47")
+    limites = entender_limites(
+        "utilidad_bruta", "ideal 50, verde más de 50, rojo menos de 47"
+    )
     assert isinstance(limites, Limites)
     assert limites.verde == Borde(valor=Decimal(50), incluye=False)
     assert limites.rojo == Borde(valor=Decimal(47), incluye=False)
-    otra = entender_limites("dias_clientes", "ideal 40; verde 40 o menos; rojo más de 45")
+    otra = entender_limites(
+        "dias_clientes", "ideal 40; verde 40 o menos; rojo más de 45"
+    )
     assert isinstance(otra, Limites)
     assert otra.verde == Borde(valor=Decimal(40), incluye=True)
     con_signos = entender_limites("gastos", "ideal 30% verde <30 rojo >=33.5")
@@ -233,16 +259,26 @@ def test_entender_limites() -> None:
 def test_entender_limites_sin_ideal_o_al_reves() -> None:
     falta = entender_limites("utilidad_bruta", "verde más de 50, rojo menos de 47")
     assert isinstance(falta, str) and "ideal" in falta
-    al_reves = entender_limites("utilidad_bruta", "ideal 50, verde menos de 50, rojo más de 47")
+    al_reves = entender_limites(
+        "utilidad_bruta", "ideal 50, verde menos de 50, rojo más de 47"
+    )
     assert isinstance(al_reves, str) and "más es mejor" in al_reves
 
 
 def test_limites_que_se_pisan() -> None:
     # Gastos como la lámina L71: verde menos de 33, rojo más de 30.
-    pisan = Limites(ideal=Decimal(33), verde=Borde(valor=Decimal(33), incluye=False), rojo=Borde(valor=Decimal(30), incluye=False))
+    pisan = Limites(
+        ideal=Decimal(33),
+        verde=Borde(valor=Decimal(33), incluye=False),
+        rojo=Borde(valor=Decimal(30), incluye=False),
+    )
     razon = revisar_limites("gastos", pisan)
     assert razon is not None and "verde y rojo a la vez" in razon
-    mismo_borde = Limites(ideal=Decimal(50), verde=Borde(valor=Decimal(50), incluye=True), rojo=Borde(valor=Decimal(50), incluye=True))
+    mismo_borde = Limites(
+        ideal=Decimal(50),
+        verde=Borde(valor=Decimal(50), incluye=True),
+        rojo=Borde(valor=Decimal(50), incluye=True),
+    )
     assert revisar_limites("utilidad_bruta", mismo_borde) is not None
     assert revisar_limites("utilidad_bruta", _b("utilidad_bruta")) is None
 
@@ -261,7 +297,12 @@ def test_semaforo_trae_meta_y_distancia(mi_empresa: EstadosRevisados) -> None:
 
 
 def test_sin_valor_no_pinta() -> None:
-    sin = SinValor(clave="dias_inventario", nombre="Días de inventario", unidad="días", razon="no aplica: no tienes inventario")
+    sin = SinValor(
+        clave="dias_inventario",
+        nombre="Días de inventario",
+        unidad="días",
+        razon="no aplica: no tienes inventario",
+    )
     tarjeta = semaforo(sin, _b("dias_inventario"))
     assert tarjeta.color is None
     assert tarjeta.razon is not None and "inventario" in tarjeta.razon

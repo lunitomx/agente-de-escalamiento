@@ -82,6 +82,7 @@ path_rules:
     disposition: candidate_public
     deny_class: null
     globs:
+      - .escala/knowledge/cash/**
       - coaching/**
       - conocimiento/**
       - escala-skills/**
@@ -102,6 +103,11 @@ vocabulary_rules:
       - ScaleUp
       - Scaling Up
       - scaling_up
+    # S86.32: the attribution notice and the cash course overview name the
+    # methodology as a reference.  Exact phrases; any other use still fails.
+    permitted_phrases:
+      - No es un producto oficial de Scaling Up, de Gazelles ni de EO
+      - Scaling Up de Verne Harnish
   - id: public.author_identity
     targets: [path, text]
     terms:
@@ -109,10 +115,16 @@ vocabulary_rules:
       - Verne Harnish
       - VerneHandler
       - verne_handler
+    # S86.32: the cash course overview cites the book and its author.
+    permitted_phrases:
+      - Scaling Up de Verne Harnish
   - id: public.company_identity
     targets: [path, text]
     terms:
       - Gazelles
+    # S86.32: the attribution notice says ESCALA is not an official product.
+    permitted_phrases:
+      - No es un producto oficial de Scaling Up, de Gazelles ni de EO
   - id: public.execution_identity
     targets: [path, text]
     terms:

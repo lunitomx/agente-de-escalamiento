@@ -157,11 +157,33 @@ class VocabularyRule(_StrictModel):
     id: str = Field(min_length=3, max_length=128)
     targets: list[VocabularyTarget] = Field(min_length=1)
     terms: list[str] = Field(min_length=1)
+    # Exact phrases this rule ignores in TEXT (S86.32): the attribution notice
+    # and the course overview name the methodology as a reference.  Any other
+    # use of a term in the same file still fails; paths are never exempt.
+    permitted_phrases: list[str] = Field(default_factory=list[str])
 
     @field_validator("id")
     @classmethod
     def validate_id(cls, value: str) -> str:
         return _validate_rule_id(value)
+
+    @field_validator("permitted_phrases")
+    @classmethod
+    def validate_permitted_phrases(cls, values: list[str]) -> list[str]:
+        validated = [_validate_safe_term(value) for value in values]
+        _reject_duplicates(
+            [value.casefold() for value in validated], "permitted phrases"
+        )
+        return sorted(validated, key=str.casefold)
+
+    @model_validator(mode="after")
+    def validate_phrases_name_a_term(self) -> VocabularyRule:
+        if VocabularyTarget.TEXT not in self.targets and self.permitted_phrases:
+            raise ValueError("permitted phrases apply to text rules only")
+        for phrase in self.permitted_phrases:
+            if not any(term.casefold() in phrase.casefold() for term in self.terms):
+                raise ValueError("a permitted phrase must contain a rule term")
+        return self
 
     @field_validator("targets")
     @classmethod
@@ -569,8 +591,11 @@ def scan_public_content(
 
     folded_text = text.casefold()
     for rule in policy.vocabulary_rules:
+        rule_text = folded_text
+        for phrase in rule.permitted_phrases:
+            rule_text = rule_text.replace(phrase.casefold(), " ")
         if VocabularyTarget.TEXT in rule.targets and any(
-            term.casefold() in folded_text for term in rule.terms
+            term.casefold() in rule_text for term in rule.terms
         ):
             violations.append(
                 _source_neutral_violation(
