@@ -146,3 +146,15 @@ def test_los_procedimientos_mandan_al_simulador() -> None:
     )
     assert "work/cash/power-of-one.md" not in aceleracion
     assert "panel-simulador-" in aceleracion
+
+
+def test_el_aviso_viaja_en_la_copia_que_se_instala() -> None:
+    # server.py importa retirados.py: sin él la copia instalada no arranca.
+    # La prueba de arranque de test_public_export no lo ve porque la instalación
+    # editable del repo le presta el módulo.
+    from validators.public_export import load_public_export_policy
+
+    politica = load_public_export_policy(ROOT / "governance" / "public-export.yaml")
+    elegidos = {seleccion.path for seleccion in politica.selections}
+    assert "escala_server/server.py" in elegidos
+    assert "escala_server/retirados.py" in elegidos
