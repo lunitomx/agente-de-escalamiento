@@ -22,10 +22,11 @@ from __future__ import annotations
 
 from datetime import date
 from decimal import ROUND_HALF_UP, Decimal
+from pathlib import Path
 import re
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from escala_server.cash.curso import (
     AVISO_FISCAL,
@@ -36,6 +37,7 @@ from escala_server.cash.curso import (
     NoCalculable,
     dias_del_dinero,
 )
+from escala_server.cash.escenario import carpeta_de, escribir_privado
 from escala_server.financial.formatos import fecha_corta, formato_monto
 from escala_server.financial.lector import LecturaEstados
 
@@ -536,3 +538,238 @@ def semaforo(valor: ValorOSin, limites: Limites) -> Tarjeta:
             ),
         }
     )
+
+
+# ---------------------------------------------------------------------------
+# La plática: ESCALA pregunta antes de pintar; guarda sólo con «sí»
+# ---------------------------------------------------------------------------
+
+MAXIMO_DE_PREGUNTAS = 3
+ARCHIVO = "perfil-ideal.json"
+
+# Lo que puede contestar el dueño: clave corta o completa → indicador.
+ALIAS: dict[str, Clave] = {
+    "ub": "utilidad_bruta",
+    "utilidad_bruta": "utilidad_bruta",
+    "gastos": "gastos",
+    "uo": "utilidad_de_operacion",
+    "utilidad_de_operacion": "utilidad_de_operacion",
+    "clientes": "dias_clientes",
+    "dias_clientes": "dias_clientes",
+    "inventario": "dias_inventario",
+    "dias_inventario": "dias_inventario",
+    "proveedores": "dias_proveedores",
+    "dias_proveedores": "dias_proveedores",
+}
+
+
+class PlaticaDelPerfil(_Modelo):
+    """Lo que el dueño ha contestado. Nunca cifras calculadas."""
+
+    empresa: str
+    respuestas: dict[str, str] = Field(default_factory=dict)
+
+
+class PerfilGuardado(_Modelo):
+    empresa: str
+    guardado: date
+    limites: dict[Clave, Limites]
+
+
+class PreguntaDelPerfil(_Modelo):
+    clave: str
+    pregunta: str
+
+
+class PasoDelPerfil(_Modelo):
+    mensaje: str
+    preguntas: tuple[PreguntaDelPerfil, ...] = ()
+    limites: dict[Clave, Limites] = Field(default_factory=dict)
+    tarjetas: tuple[Tarjeta, ...] = ()  # vacío: no se pinta
+    de_un_peso: DeUnPeso | None = None
+    pintar: bool = False
+    pide_guardar: bool = False
+    avisos: tuple[str, ...] = ()
+
+
+def es_si(respuesta: str | None) -> bool:
+    return respuesta is not None and respuesta.strip().lower() in ("sí", "si")
+
+
+def _ejemplo(clave: Clave) -> str:
+    limites = VERSION_B[clave]
+    if limites is None:
+        return CONTRADICCION_GASTOS_B
+    return (
+        f"Según el curso de cash que vimos, un ejemplo es: ideal {_con_unidad(clave, limites.ideal)}; "
+        f"{texto_de_limites(clave, limites)}."
+    )
+
+
+def _pregunta_de(clave: Clave, error: str | None, con_curso: bool) -> PreguntaDelPerfil:
+    nombre = DEFINICIONES[clave][0]
+    sentido = "más es mejor" if _mas_es_mejor(clave) else "menos es mejor"
+    del_curso = VERSION_B[clave]
+    borde = _numero(del_curso.verde.valor) if del_curso is not None else "30"
+    partes: list[str] = []
+    if error is not None:
+        partes.append(error[0].upper() + error[1:] + ("" if error.endswith((".", "?")) else "."))
+    partes.append(
+        f"{nombre} ({sentido}): ¿cuál es tu ideal, desde dónde es verde y desde dónde es rojo? "
+        f"Dime si el borde cuenta: «más de {borde}» no incluye el {borde}; «{borde} o más» sí."
+    )
+    if clave == "gastos" and con_curso:
+        partes.append(CONTRADICCION_GASTOS_B)
+    elif error is None:
+        partes.append(_ejemplo(clave))
+    return PreguntaDelPerfil(clave=clave, pregunta=" ".join(partes))
+
+
+def _pregunta_del_curso() -> PreguntaDelPerfil:
+    renglones = "".join(
+        f"\n   - {DEFINICIONES[clave][0]}: {_ejemplo(clave).split(', un ejemplo es: ')[-1].rstrip('.')}"
+        for clave in INDICADORES
+        if VERSION_B[clave] is not None
+    )
+    return PreguntaDelPerfil(
+        clave="curso",
+        pregunta=(
+            f"Según el curso de cash que vimos, un ejemplo es (versión B):{renglones}\n"
+            "Son límites de ejemplo: el curso mismo dice que cada empresa pone los suyos. "
+            "¿Los tomo como punto de partida y luego cambias los que quieras? (sí / no). "
+            "Los gastos de ese ejemplo se contradicen; te los pregunto aparte."
+        ),
+    )
+
+
+def _linea_de_tarjeta(tarjeta: Tarjeta) -> str:
+    if tarjeta.valor is None or tarjeta.color is None:
+        return f"- {tarjeta.nombre}: sin color, {tarjeta.razon}."
+    valor = tarjeta.valor
+    unidad = "%" if valor.unidad == "%" else " días"
+    return (
+        f"- {tarjeta.nombre}: {formato_monto(valor.mostrado)}{unidad} → {tarjeta.color} "
+        f"({tarjeta.nivel}). {tarjeta.texto_distancia}"
+    )
+
+
+def atender(
+    platica: PlaticaDelPerfil,
+    valores: tuple[ValorOSin, ...],
+    de_un_peso: DeUnPeso | None,
+    *,
+    guardado: PerfilGuardado | None,
+) -> PasoDelPerfil:
+    """Arma los límites (guardados < ejemplo del curso < lo que contestó el dueño) y decide.
+
+    Si falta un solo límite, pregunta (máximo 3) y no pinta.
+    """
+    limites: dict[Clave, Limites] = dict(guardado.limites) if guardado is not None else {}
+    respuestas = platica.respuestas
+    con_curso = es_si(respuestas.get("curso"))
+    if con_curso:
+        for clave in INDICADORES:
+            del_curso = VERSION_B[clave]
+            if del_curso is not None:
+                limites[clave] = del_curso
+    errores: dict[Clave, str] = {}
+    avisos: list[str] = []
+    for llave, texto in respuestas.items():
+        if llave == "curso":
+            continue
+        clave = ALIAS.get(llave.strip().lower())
+        if clave is None:
+            avisos.append(f"No conozco el indicador «{llave}»; no lo usé.")
+            continue
+        entendido = entender_limites(clave, texto)
+        razon = entendido if isinstance(entendido, str) else revisar_limites(clave, entendido)
+        if razon is not None:
+            errores[clave] = razon
+            limites.pop(clave, None)
+        else:
+            assert isinstance(entendido, Limites)
+            limites[clave] = entendido
+    ordenados: dict[Clave, Limites] = {c: limites[c] for c in INDICADORES if c in limites}
+    faltan: list[Clave] = [c for c in INDICADORES if c not in ordenados]
+    if faltan:
+        preguntas: list[PreguntaDelPerfil] = []
+        if guardado is None and "curso" not in respuestas and not ordenados:
+            preguntas.append(_pregunta_del_curso())
+        # Primero lo que el dueño contestó y no se entendió.
+        faltan.sort(key=lambda clave: clave not in errores)
+        for clave in faltan:
+            preguntas.append(_pregunta_de(clave, errores.get(clave), con_curso))
+        preguntas = preguntas[:MAXIMO_DE_PREGUNTAS]
+        mensaje = [
+            "Antes de pintar tu semáforo necesito tus límites: tu ideal, desde dónde es verde "
+            "y desde dónde es rojo. No pinto colores con límites que no son tuyos.",
+            f"Me {'falta' if len(faltan) == 1 else 'faltan'} {len(faltan)} de {len(INDICADORES)}.",
+        ]
+        if con_curso:
+            mensaje.append(
+                "Tomé el ejemplo del curso para "
+                + ", ".join(DEFINICIONES[c][0].lower() for c in ordenados)
+                + "."
+            )
+        mensaje += [f"{i}. {p.pregunta}" for i, p in enumerate(preguntas, start=1)]
+        mensaje += avisos
+        if ordenados:
+            mensaje.append("Si quieres guardar lo que llevamos, responde «sí». Sin tu «sí» no guardo nada.")
+        return PasoDelPerfil(
+            mensaje="\n\n".join(mensaje),
+            preguntas=tuple(preguntas),
+            limites=ordenados,
+            de_un_peso=de_un_peso,
+            pide_guardar=bool(ordenados),
+            avisos=tuple(avisos),
+        )
+    tarjetas = tuple(semaforo(valor, ordenados[valor.clave]) for valor in valores)
+    pide_guardar = guardado is None or guardado.limites != ordenados
+    mensaje = ["Tu semáforo, con tus límites (el color usa el valor sin redondear):"]
+    mensaje += [_linea_de_tarjeta(t) for t in tarjetas]
+    mensaje += avisos
+    if pide_guardar:
+        mensaje.append(
+            "¿Guardo estos límites para la próxima vez? Si quieres, responde «sí». "
+            "Sin tu «sí» no guardo nada."
+        )
+    return PasoDelPerfil(
+        mensaje="\n\n".join(mensaje),
+        limites=ordenados,
+        tarjetas=tarjetas,
+        de_un_peso=de_un_peso,
+        pintar=True,
+        pide_guardar=pide_guardar,
+        avisos=tuple(avisos),
+    )
+
+
+def ruta_del_perfil(empresa: str, *, carpeta: Path) -> Path:
+    return carpeta / carpeta_de(empresa) / ARCHIVO
+
+
+def leer_guardado(empresa: str, *, carpeta: Path) -> PerfilGuardado | str | None:
+    """El perfil que el dueño guardó con «sí»; la razón si no se puede leer; None si no hay."""
+    ruta = ruta_del_perfil(empresa, carpeta=carpeta)
+    if ruta.is_symlink():
+        return f"{ruta} es un enlace simbólico; no leo a través de un enlace"
+    if not ruta.exists():
+        return None
+    try:
+        return PerfilGuardado.model_validate_json(ruta.read_text(encoding="utf-8"))
+    except (OSError, ValidationError):
+        return f"no pude leer tus límites guardados en {ruta}"
+
+
+def guardar_perfil(paso: PasoDelPerfil, empresa: str, *, carpeta: Path, hoy: date) -> Path | None:
+    """Escribe ``carpeta/<empresa>/perfil-ideal.json``. Llamar sólo después de un «sí».
+
+    Sin límites no escribe nada. Guardar otra vez reemplaza el perfil: es la
+    decisión vigente del dueño, dicha con «sí».
+    """
+    if not paso.limites:
+        return None
+    ruta = ruta_del_perfil(empresa, carpeta=carpeta)
+    perfil = PerfilGuardado(empresa=empresa, guardado=hoy, limites=paso.limites)
+    escribir_privado(ruta, perfil.model_dump_json(indent=2))
+    return ruta
