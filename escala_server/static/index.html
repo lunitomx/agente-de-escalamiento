@@ -59,6 +59,13 @@
       font-size: 0.75rem; color: #94a3b8; margin-top: 8px;
     }
 
+    .decision-card .lineas { margin-top: 8px; font-size: 0.75rem; color: #334155; }
+    .decision-card .linea { margin-top: 4px; }
+    .decision-card .linea.verde { color: #16a34a; }
+    .decision-card .linea.amarillo { color: #ca8a04; }
+    .decision-card .linea.rojo { color: #dc2626; }
+    .decision-card .sale-de { font-size: 0.7rem; color: #94a3b8; }
+
     .card-cash { border-left-color: #16a34a; }
     .card-strategy { border-left-color: #2563eb; }
     .card-people { border-left-color: #d946ef; }
@@ -191,8 +198,9 @@
               } else {
                 scoreEl.textContent = '—';
                 scoreEl.className = 'score na';
-                metaEl.textContent = 'Completa un worksheet para ver métricas';
+                metaEl.textContent = (decision && decision.label) || 'Completa un worksheet para ver métricas';
               }
+              renderLineas(metaEl, decision);
             } catch (e) {
               scoreEl.textContent = '--';
               metaEl.textContent = 'Error al cargar';
@@ -209,6 +217,31 @@
           if (metaEl) metaEl.textContent = 'Error de conexión';
         };
         xhr.send();
+      }
+
+      // S86.36: cada número de la nota con su «sale de:». Sólo texto, sin cuentas.
+      function renderLineas(metaEl, decision) {
+        if (!decision || !decision.lineas || !decision.lineas.length) return;
+        var lista = document.createElement('div');
+        lista.className = 'lineas';
+        if (decision.sale_de) {
+          var nota = document.createElement('div');
+          nota.className = 'sale-de';
+          nota.textContent = decision.sale_de;
+          lista.appendChild(nota);
+        }
+        for (var i = 0; i < decision.lineas.length; i++) {
+          var l = decision.lineas[i];
+          var fila = document.createElement('div');
+          fila.className = 'linea' + (l.color ? ' ' + l.color : '');
+          fila.textContent = l.texto + (l.color ? ' (' + l.color + ')' : '');
+          var origen = document.createElement('div');
+          origen.className = 'sale-de';
+          origen.textContent = l.sale_de;
+          fila.appendChild(origen);
+          lista.appendChild(fila);
+        }
+        metaEl.parentNode.insertBefore(lista, metaEl.nextSibling);
       }
 
       function renderTools() {

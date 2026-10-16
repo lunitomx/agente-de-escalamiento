@@ -6,6 +6,7 @@ import signal
 import socket
 import subprocess
 import sys
+import tempfile
 import time
 from pathlib import Path
 from typing import Any
@@ -176,7 +177,10 @@ class TestDashboardHandler:
         import uuid
 
         self.db_path = f"file:test_dash_{uuid.uuid4().hex[:8]}?mode=memory&cache=shared"
-        self.handler = DashboardHandler(db_path=self.db_path)
+        # Carpeta vacía: el panel no lee el work/cash del checkout (S86.36).
+        self.handler = DashboardHandler(
+            db_path=self.db_path, carpeta_cash=Path(tempfile.mkdtemp())
+        )
 
     def test_summary_empty_db(self):
         result = self.handler.summary()
@@ -200,27 +204,17 @@ class TestDashboardHandler:
         assert result["data"]["decisions"]["strategy"]["score"] == 25
         assert result["data"]["decisions"]["strategy"]["status"] == "critical"
 
-    def test_cash_score_from_power_of_one(self):
+    def test_cash_score_ignores_old_power_of_one_sheet(self):
+        """S86.36: la nota de Cash sale del recorrido de cash, no de la hoja vieja."""
         ws = WorksheetsHandler(db_path=self.db_path)
-        financials = {
-            "net_sales": 12000000,
-            "cogs": 7200000,
-            "opex": 3600000,
-            "accounts_receivable": 1500000,
-            "inventory": 600000,
-            "accounts_payable": 800000,
-            "net_profit": 1200000,
-        }
         ws.save_worksheet(
             "cash",
             "power-of-one",
-            {"data": {"financials": financials, "adjustments": {}}},
+            {"data": {"financials": {"net_sales": 12000000}, "adjustments": {}}},
         )
-        result = self.handler.summary()
-        cash = result["data"]["decisions"]["cash"]
-        assert cash["score"] is not None
-        assert 0 <= cash["score"] <= 100
-        assert cash["status"] in ("good", "warning", "critical")
+        cash = self.handler.summary()["data"]["decisions"]["cash"]
+        assert cash["score"] is None
+        assert cash["label"].startswith("Sin datos: corre el recorrido de cash")
 
     def test_overall_averages_available_scores(self):
         ws = WorksheetsHandler(db_path=self.db_path)

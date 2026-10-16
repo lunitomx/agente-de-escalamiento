@@ -38,7 +38,9 @@ def _b(valor: str, incluye: bool = False) -> Borde:
 LIMITES: dict[Clave, Limites] = {
     "utilidad_bruta": Limites(ideal=Decimal("50"), verde=_b("50", True), rojo=_b("40")),
     "gastos": Limites(ideal=Decimal("30"), verde=_b("30"), rojo=_b("35")),
-    "utilidad_de_operacion": Limites(ideal=Decimal("15"), verde=_b("15"), rojo=_b("10")),
+    "utilidad_de_operacion": Limites(
+        ideal=Decimal("15"), verde=_b("15"), rojo=_b("10")
+    ),
     "dias_clientes": Limites(ideal=Decimal("45"), verde=_b("50"), rojo=_b("60")),
     "dias_inventario": Limites(ideal=Decimal("25"), verde=_b("30"), rojo=_b("45")),
     "dias_proveedores": Limites(ideal=Decimal("30"), verde=_b("30"), rojo=_b("20")),
