@@ -883,6 +883,47 @@ def _ruta_de_trabajo(empresa: str) -> Path:
     return Path(tempfile.gettempdir()) / "escala-cash" / f"{carpeta_de(empresa)}.json"
 
 
+def es_si(respuesta: str | None) -> bool:
+    """Sólo «sí» (o «si») cuenta como permiso para guardar."""
+
+    return respuesta is not None and _limpia(respuesta) == "si"
+
+
+def _libre(carpeta: Path, nombre: str) -> Path:
+    """Nunca sobrescribe: la segunda versión del día es ``-2``, luego ``-3``…"""
+
+    ruta = carpeta / f"{nombre}.json"
+    version = 2
+    while ruta.exists():
+        ruta = carpeta / f"{nombre}-{version}.json"
+        version += 1
+    return ruta
+
+
+def guardar(paso: Paso, conversacion: Conversacion, *, carpeta: Path, hoy: date) -> list[Path]:
+    """Escribe en ``carpeta/<empresa>/``. Llamar sólo después de un «sí» del dueño."""
+
+    destino = carpeta / carpeta_de(conversacion.empresa)
+    destino.mkdir(parents=True, exist_ok=True)
+    platica = destino / "conversacion.json"
+    platica.write_text(conversacion.model_dump_json(indent=2), encoding="utf-8")
+    guardados = [platica]
+    if paso.estados is not None:
+        revisados = _libre(destino, f"estados-revisados-{hoy.isoformat()}")
+        revisados.write_text(paso.estados.model_dump_json(indent=2), encoding="utf-8")
+        guardados.append(revisados)
+    return guardados
+
+
+def _mensaje_de_guardado(guardados: list[Path]) -> str:
+    nombres = " y ".join(f"«{ruta.name}»" for ruta in guardados)
+    carpeta = guardados[0].parent.as_posix()
+    texto = f"Guardé {nombres} en {carpeta}/."
+    if len(guardados) == 1:
+        texto += " Todavía no hay cálculo: guardé la plática para seguir otro día."
+    return texto
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     """``python -m escala_server.cash.escenario --empresa … --archivo …`` → JSON."""
 
@@ -899,12 +940,16 @@ def main(argv: Sequence[str] | None = None) -> int:
         return _no(f"la fecha «{args.hoy}» no es AAAA-MM-DD")
     empresa: str = args.empresa
     trabajo = Path(args.conversacion) if args.conversacion else _ruta_de_trabajo(empresa)
+    carpeta = Path(args.carpeta)
     conversacion = Conversacion(empresa=empresa)
-    if trabajo.exists():
+    # Entre mensajes: el archivo de trabajo. Otro día: lo que el dueño guardó con «sí».
+    guardada = carpeta / carpeta_de(empresa) / "conversacion.json"
+    anterior = trabajo if trabajo.exists() else guardada if guardada.exists() else None
+    if anterior is not None:
         try:
-            conversacion = Conversacion.model_validate_json(trabajo.read_text(encoding="utf-8"))
+            conversacion = Conversacion.model_validate_json(anterior.read_text(encoding="utf-8"))
         except (OSError, ValidationError):
-            return _no(f"no pude leer la plática guardada en {trabajo}")
+            return _no(f"no pude leer la plática guardada en {anterior}")
     archivos = [a for a in conversacion.archivos if a not in args.quita_archivo]
     for archivo in args.archivo:
         ruta = str(Path(archivo).resolve())
@@ -919,13 +964,22 @@ def main(argv: Sequence[str] | None = None) -> int:
     conversacion = conversacion.model_copy(
         update={"empresa": empresa, "archivos": tuple(archivos), "respuestas": respuestas}
     )
-    paso = atender(conversacion, hoy=hoy, carpeta=Path(args.carpeta))
+    paso = atender(conversacion, hoy=hoy, carpeta=carpeta)
     trabajo.parent.mkdir(parents=True, exist_ok=True)
     trabajo.write_text(conversacion.model_dump_json(indent=2), encoding="utf-8")
+    guardados: list[Path] = []
+    if es_si(args.guardar):
+        guardados = guardar(paso, conversacion, carpeta=carpeta, hoy=hoy)
+        partes = [p for p in paso.mensaje.split("\n\n") if not p.startswith("¿Guardo ")]
+        partes.append(_mensaje_de_guardado(guardados))
+        paso = paso.model_copy(update={"mensaje": "\n\n".join(partes)})
     if args.formato == "texto":
         _imprime(paso.mensaje)
-    else:
-        _imprime(paso.model_dump_json(indent=2))
+        return 0
+    salida = json.loads(paso.model_dump_json())
+    salida["guardado"] = [ruta.as_posix() for ruta in guardados]
+    salida["conversacion"] = trabajo.as_posix()
+    _imprime(json.dumps(salida, ensure_ascii=False, indent=2))
     return 0
 
 

@@ -94,6 +94,7 @@ def test_con_si_guarda_y_la_calculadora_lo_lee_igual(
     assert _del_dueno(tmp_path) == ["conversacion.json", "estados-revisados-2026-01-31.json"]
     assert len(salida["guardado"]) == 2
     assert "Guardé" in salida["mensaje"]
+    assert "¿Guardo" not in salida["mensaje"]
 
     revisados = tmp_path / "work" / "cash" / SLUG / "estados-revisados-2026-01-31.json"
     assert curso.main([str(revisados)]) == 0
