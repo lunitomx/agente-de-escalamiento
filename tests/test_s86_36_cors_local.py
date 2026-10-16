@@ -5,6 +5,12 @@ Con ``Access-Control-Allow-Origin: *``, cualquier página que el dueño abra en
 su navegador podía leerlos desde ``localhost:8080``. Ahora la cabecera sólo se
 manda a ``http://localhost:<puerto>`` y ``http://127.0.0.1:<puerto>``.
 Ejemplo: una petición con ``Origin: https://ejemplo-malo.com`` no la recibe.
+
+Quitar «*» no basta contra el «DNS rebinding»: una página de ataque hace que su
+propio dominio apunte a 127.0.0.1 y, para el navegador, es el mismo origen.
+Por eso el servidor también revisa la cabecera ``Host`` en toda petición:
+``Host: malo.ejemplo.com`` recibe 403 sin datos. Y un POST/PATCH/DELETE con un
+``Origin`` que no es el propio servidor local también recibe 403.
 """
 
 from __future__ import annotations
@@ -12,12 +18,14 @@ from __future__ import annotations
 from collections.abc import Iterator
 from http.server import HTTPServer
 from pathlib import Path
+import json
 import threading
+import urllib.error
 import urllib.request
 
 import pytest
 
-from escala_server.cors import CORSHandler
+from escala_server.cors import CORSHandler, anfitrion_local
 from escala_server.server import make_server
 
 STATIC = Path(__file__).resolve().parents[1] / "escala_server" / "static"
@@ -108,3 +116,107 @@ def test_el_servidor_escucha_solo_en_la_maquina(tmp_path: Path) -> None:
         assert server.server_address[0] == "127.0.0.1"
     finally:
         server.server_close()
+
+
+# ---------------------------------------------------------------------------
+# DNS rebinding: la cabecera Host y el Origin de los cambios
+# ---------------------------------------------------------------------------
+
+
+def _con_host(
+    puerto: int,
+    ruta: str,
+    host: str,
+    metodo: str = "GET",
+    origen: str | None = None,
+    cuerpo: bytes | None = None,
+):
+    peticion = urllib.request.Request(
+        f"http://127.0.0.1:{puerto}{ruta}", data=cuerpo, method=metodo
+    )
+    peticion.add_header("Host", host)
+    if origen is not None:
+        peticion.add_header("Origin", origen)
+    if cuerpo is not None:
+        peticion.add_header("Content-Type", "application/json")
+    return urllib.request.urlopen(peticion, timeout=5)
+
+
+def _rechazo(error: urllib.error.HTTPError) -> str:
+    assert error.code == 403
+    texto = error.read().decode("utf-8")
+    assert "dashboard" not in texto and "decisions" not in texto
+    return texto
+
+
+@pytest.mark.parametrize("ruta", ["/api/dashboard/summary", "/index.html"])
+def test_host_ajeno_recibe_403_sin_datos(servidor: int, ruta: str) -> None:
+    with pytest.raises(urllib.error.HTTPError) as error:
+        _con_host(servidor, ruta, "malo.ejemplo.com")
+    assert "local" in _rechazo(error.value)
+
+
+def test_host_ajeno_con_puerto_tambien(servidor: int) -> None:
+    with pytest.raises(urllib.error.HTTPError) as error:
+        _con_host(servidor, "/api/dashboard/summary", f"malo.ejemplo.com:{servidor}")
+    _rechazo(error.value)
+
+
+@pytest.mark.parametrize("host", ["localhost", "127.0.0.1", "[::1]"])
+def test_host_local_con_y_sin_puerto(servidor: int, host: str) -> None:
+    for valor in (host, f"{host}:{servidor}"):
+        with _con_host(servidor, "/api/dashboard/summary", valor) as respuesta:
+            assert respuesta.status == 200
+        with _con_host(servidor, "/index.html", valor) as respuesta:
+            assert respuesta.status == 200
+
+
+def test_post_con_origin_ajeno_recibe_403(servidor: int) -> None:
+    cuerpo = json.dumps({"name": "Ataque"}).encode("utf-8")
+    with pytest.raises(urllib.error.HTTPError) as error:
+        _con_host(
+            servidor,
+            "/api/companies",
+            f"localhost:{servidor}",
+            metodo="POST",
+            origen=MALO,
+            cuerpo=cuerpo,
+        )
+    _rechazo(error.value)
+
+
+def test_post_con_origin_local_si_pasa(servidor: int) -> None:
+    cuerpo = json.dumps({"name": "Mi Empresa"}).encode("utf-8")
+    with _con_host(
+        servidor,
+        "/api/companies",
+        f"localhost:{servidor}",
+        metodo="POST",
+        origen=f"http://localhost:{servidor}",
+        cuerpo=cuerpo,
+    ) as respuesta:
+        assert respuesta.status == 200
+
+
+@pytest.mark.parametrize(
+    ("host", "local"),
+    [
+        ("localhost", True),
+        ("localhost:8080", True),
+        ("127.0.0.1:8080", True),
+        ("[::1]", True),
+        ("[::1]:8080", True),
+        ("LOCALHOST:8080", True),
+        (None, False),
+        ("", False),
+        ("malo.ejemplo.com", False),
+        ("localhost.malo.ejemplo.com", False),
+        ("127.0.0.1.nip.io", False),
+        ("malo@localhost", False),
+        ("localhost:80:80", False),
+        ("localhost:abc", False),
+        ("::1", False),
+    ],
+)
+def test_anfitrion_local(host: str | None, local: bool) -> None:
+    assert anfitrion_local(host) is local
