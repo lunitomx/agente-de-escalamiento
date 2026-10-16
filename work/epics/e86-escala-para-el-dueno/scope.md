@@ -61,7 +61,7 @@ para no invertir a ciegas en instalación y paridad).
 | S86.21 | ESCALA-89 | Tu perfil ideal, con tus límites | 5 | Sin límites pregunta; color sin redondear | planned |
 | S86.22 | ESCALA-90 | Simulador de las 7 palancas | 5 | Vista mensual: precio nunca resta efectivo | done |
 | S86.23 | ESCALA-91 | Precio contra volumen y descuento | 3 | Equilibrio 26.60%; «cálculo de ESCALA» rotulado | planned |
-| S86.24 | ESCALA-92 | Margen pre-tax, salario de mercado y devoluciones | 3 | 15.47%; F6.2 «no calculable» con negativos | planned |
+| S86.24 | ESCALA-92 | Margen pre-tax, salario de mercado y devoluciones | 3 | 15.47%; F6.2 «no calculable» con negativos | done |
 | S86.25 | ESCALA-93 | Las travesuras | 2 | Ajustada 5,463,710.03; solo montos del dueño | planned |
 | S86.26 | ESCALA-94 | El recorrido con paneles y decisión | 3 | Recorrido Mi Empresa de estados a todos los paneles | planned |
 | S86.27 | ESCALA-95 | Limpieza de duplicados de cash | 2 | Una sola definición por fórmula | planned |
