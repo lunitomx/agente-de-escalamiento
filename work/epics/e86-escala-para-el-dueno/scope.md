@@ -58,7 +58,7 @@ para no invertir a ciegas en instalación y paridad).
 | S86.18 | ESCALA-86 | Panel «Tu contabilidad real» | 3 | Financiamiento = operación = 15,014,008.75; otras cuentas por renglones | done |
 | S86.19 | ESCALA-87 | Panel «Días y ciclo del dinero» | 3 | 36.08→46.97; 25.30→28.15; 24.31→19.59; sin IVA 40.49 | done |
 | S86.20 | ESCALA-88 | Panel «Las tres medidas» y los 4 capítulos | 5 | Cascada al centavo −3,705,245.84; 5ª fila contra C3/C4 | done |
-| S86.21 | ESCALA-89 | Tu perfil ideal, con tus límites | 5 | Sin límites pregunta; color sin redondear | planned |
+| S86.21 | ESCALA-89 | Tu perfil ideal, con tus límites | 5 | Sin límites pregunta; color sin redondear | done |
 | S86.22 | ESCALA-90 | Simulador de las 7 palancas | 5 | Vista mensual: precio nunca resta efectivo | done |
 | S86.23 | ESCALA-91 | Precio contra volumen y descuento | 3 | Equilibrio 26.60%; «cálculo de ESCALA» rotulado | done |
 | S86.24 | ESCALA-92 | Margen pre-tax, salario de mercado y devoluciones | 3 | 15.47%; F6.2 «no calculable» con negativos | done |
