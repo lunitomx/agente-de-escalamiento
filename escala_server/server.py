@@ -14,6 +14,7 @@ from .handlers import (
     SessionsHandler,
     MemoryHandler,
 )
+from .retirados import pagina_retirada
 from .router import Router
 
 
@@ -95,6 +96,12 @@ class EscalaRequestHandler(BaseHTTPRequestHandler):
         # Remove query strings
         path = path.split("?")[0]
 
+        # S86.33: una página retirada da un aviso en español, no un 404 mudo.
+        aviso = pagina_retirada(path)
+        if aviso is not None:
+            self._send_html(410, aviso)
+            return
+
         # Default to index.html for root
         if path == "/" or path == "":
             path = "/index.html"
@@ -140,6 +147,15 @@ class EscalaRequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(content)
         except OSError:
             self._send_json_error(500, "Internal server error")
+
+    def _send_html(self, status_code: int, html: str):
+        body = html.encode("utf-8")
+        self.send_response(status_code)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self._add_cors_headers()
+        self.end_headers()
+        self.wfile.write(body)
 
     def _send_json_response(self, data: dict):
         body = json.dumps(data).encode("utf-8")
@@ -418,43 +434,5 @@ def _build_router() -> Router:
     @router.post("/api/advisor/team-review")
     def advisor_team_review(payload=None):
         return EscalaRequestHandler.specialist_team.review(payload or {})
-
-    # ── Cash / Power of One routes ────────────────────────────────
-
-    @router.post("/api/cash/power-of-one")
-    def cash_power_of_one(payload=None):
-        from .cash import PowerOfOneEngine, FinancialInputs
-
-        data = payload or {}
-        inputs = FinancialInputs.from_dict(data.get("financials", {}))
-        adjustments = data.get("adjustments")
-        engine = PowerOfOneEngine()
-        result = engine.calculate(inputs, adjustments=adjustments)
-
-        return {
-            "status": "ok",
-            "data": {
-                "combined_cash_impact": result.combined_cash_impact,
-                "combined_ebit_impact": result.combined_ebit_impact,
-                "cash_basis": "antes de ISR",
-                "metrics": result.metrics,
-                "impacts": [
-                    {
-                        "lever": i.lever,
-                        "label": i.label,
-                        "cash_impact": i.cash_impact,
-                        "ebit_impact": i.ebit_impact,
-                        "difficulty": i.difficulty,
-                        "time": i.time,
-                        "improvement_pct": i.improvement_pct,
-                        "improvement_days": i.improvement_days,
-                        "cash_formula": i.cash_formula,
-                        "ebit_formula": i.ebit_formula,
-                    }
-                    for i in result.impacts
-                ],
-                "priorities": result.priorities,
-            },
-        }
 
     return router

@@ -134,6 +134,6 @@ def test_each_lever_shows_its_formula_with_the_owner_numbers() -> None:
     assert "365" in impacts["ar_days"].cash_formula
 
 
-# S86.33: el tablero viejo del servidor y su ruta `POST /api/cash/power-of-one`
+# S86.33: el tablero viejo del servidor y su ruta POST del poder del uno
 # se quitaron. El poder del uno vive en el simulador del recorrido de cash; su
 # rótulo «antes de ISR» lo cuida tests/test_s86_22_simulador.py.

@@ -14,8 +14,10 @@ Diseñar estrategias concretas para acelerar el flujo de efectivo basándose en 
 
 ### Step 1: Load Previous Work
 
-Leer `work/cash/ccc-analysis.md` y `work/cash/power-of-one.md`.
-Si no existen → sugerir hacer CCC y Análisis Power of One primero.
+Leer `work/cash/ccc-analysis.md` y lo que guardó el recorrido de cash en
+`work/cash/<empresa>/`: los estados revisados y el simulador de las palancas
+(`panel-simulador-<fecha>.html`).
+Si no existen → sugerir hacer primero el recorrido de cash (`escala-cash`).
 
 ### Step 2: Explore Strategies
 

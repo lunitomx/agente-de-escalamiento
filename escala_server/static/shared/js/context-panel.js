@@ -14,7 +14,6 @@
   var CATEGORY_MAP = {
     cash: 'cash',
     ccc: 'cash',
-    'power-of-one': 'cash',
     fundability: 'cash',
     'recurring-revenue': 'cash',
     strategy: 'strategy',

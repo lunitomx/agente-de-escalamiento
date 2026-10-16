@@ -72,9 +72,13 @@ paquete Python y servidor web local:
 .venv/bin/python -m escala_server
 ```
 
-Endpoints disponibles: `POST /api/cash/power-of-one`, `POST /api/advisor/ask`,
+Endpoints disponibles: `POST /api/advisor/ask`,
 `GET/POST /api/worksheets/{decision}/{tool}`, entre otros. Ver
 `escala_server/README.md` para la referencia completa.
+
+El poder del uno ya no es un tablero del servidor: vive en el simulador del
+recorrido de cash (`/escala-cash`), que se guarda como
+`panel-simulador-<fecha>.html` con tu «sí».
 
 ## Operación local
 
