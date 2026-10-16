@@ -12,7 +12,7 @@ Números de Mi Empresa (validados en S86.16–S86.25):
 - tres medidas: flujo neto −3,705,245.84
 - simulador (todas las palancas en 1): efectivo 1,143,864.91, utilidad 1,010,740.66
 - precio contra volumen: 26.60% de equilibrio; combinado −1,911,041.64 y el curso −1,253,643.95
-- margen: pre-tax 15.47%; con salario 1,200,000 y sueldo 0, 12.73%; devoluciones 2,045,326 → 30.16%
+- margen: pre-tax 15.47%; con salario 1,200,000 y sueldo 0, 12.73% y utilidad real 6,239,009.29; devoluciones 2,045,326 → 30.16%
 """
 
 from __future__ import annotations
@@ -280,6 +280,7 @@ def test_con_salario_el_margen_baja(platica: tuple[list[Paso], Conversacion]) ->
     )
     panel = _panel(paso, "margen")
     assert "12.73%" in panel.titular
+    assert panel.pagina is not None and "6,239,009.29" in panel.pagina  # utilidad real
     assert paso.estados is not None and paso.estados.del_dueno is not None
     assert paso.estados.del_dueno.salario_de_mercado == Decimal("1200000")
     assert paso.estados.del_dueno.sueldo_actual_del_dueno == Decimal("0")
