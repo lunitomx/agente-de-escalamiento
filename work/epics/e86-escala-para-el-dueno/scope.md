@@ -69,7 +69,7 @@ para no invertir a ciegas en instalación y paridad).
 | S86.29 | ESCALA-97 | Los 5 caminos para crecer (ola 5) | 3 | En espera | waiting |
 | S86.30 | ESCALA-98 | Semana y trimestre (ola 5) | 3 | En espera | waiting |
 | S86.31 | ESCALA-99 | Post-its con tu board (ola 5) | 3 | En espera | waiting |
-| S86.32 | ESCALA-100 | Las fichas del curso de cash en la copia que se instala, con aviso de autoría | 2 | 19 fichas + overview en la copia; aviso al final del README | in-progress |
+| S86.32 | ESCALA-100 | Las fichas del curso de cash en la copia que se instala, con aviso de autoría | 2 | 19 fichas + overview en la copia; aviso al final del README | done |
 
 ## Fuera de alcance
 
