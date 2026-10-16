@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from tests.versioned_evidence import require_local_evidence
 from validators.ontology_v2 import load_review_queue
 
 
@@ -25,6 +26,8 @@ def _load_json(path: Path) -> dict:
 def test_e61_seven_strata_fidelity_links_sections_relations_and_visual_receipt() -> (
     None
 ):
+    # S86.37: corpus-derived evidence is local-only; skip with reason if absent.
+    require_local_evidence(ROOT, "work/epics/e61-strategy-corpus-fidelity/evidence/s61.2-strategy-review-queue.json")
     evidence = ROOT / "work/epics/e61-strategy-corpus-fidelity/evidence"
     queue = load_review_queue(evidence / "s61.2-strategy-review-queue.json")
     candidates = {item.candidate_id: item for item in queue.candidates}
@@ -78,6 +81,8 @@ def test_e61_seven_strata_fidelity_links_sections_relations_and_visual_receipt()
 def test_e62_execution_review_keeps_repairs_source_bounded_and_visual_receipt_linked() -> (
     None
 ):
+    # S86.37: corpus-derived evidence is local-only; skip with reason if absent.
+    require_local_evidence(ROOT, "work/epics/e62-execution-corpus-fidelity/evidence/s62.2-execution-review-queue.json")
     evidence = ROOT / "work/epics/e62-execution-corpus-fidelity/evidence"
     queue = load_review_queue(evidence / "s62.2-execution-review-queue.json")
     candidates = {item.candidate_id: item for item in queue.candidates}
