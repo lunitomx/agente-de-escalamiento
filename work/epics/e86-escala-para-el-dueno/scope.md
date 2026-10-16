@@ -55,7 +55,7 @@ para no invertir a ciegas en instalación y paridad).
 | S86.15 | ESCALA-83 | Cada cuenta en su caja y revisión R1–R11 | 5 | Mover una cuenta de caja cambia el resultado; acumulado nunca ×12 | done |
 | S86.16 | ESCALA-84 | Una sola calculadora, que viaja con ESCALA | 5 | Prueba dentro del paquete; cero procedimientos que calculan con el modelo | done |
 | S86.17 | ESCALA-85 | Escenario «analiza mis estados» de punta a punta | 5 | 3 entradas (completa, sin balance anterior, sucia); ningún número del modelo | done |
-| S86.18 | ESCALA-86 | Panel «Tu contabilidad real» | 3 | Financiamiento = operación = 15,014,008.75; otras cuentas por renglones | planned |
+| S86.18 | ESCALA-86 | Panel «Tu contabilidad real» | 3 | Financiamiento = operación = 15,014,008.75; otras cuentas por renglones | done |
 | S86.19 | ESCALA-87 | Panel «Días y ciclo del dinero» | 3 | 36.08→46.97; 25.30→28.15; 24.31→19.59; sin IVA 40.49 | planned |
 | S86.20 | ESCALA-88 | Panel «Las tres medidas» y los 4 capítulos | 5 | Cascada al centavo −3,705,245.84; 5ª fila contra C3/C4 | planned |
 | S86.21 | ESCALA-89 | Tu perfil ideal, con tus límites | 5 | Sin límites pregunta; color sin redondear | planned |
