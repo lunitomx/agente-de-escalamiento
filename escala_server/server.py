@@ -176,7 +176,10 @@ class EscalaRequestHandler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def _add_cors_headers(self):
-        for key, value in CORSHandler.get_headers().items():
+        # HTTPServer guarda el puerto real (también con port=0).
+        puerto = int(getattr(self.server, "server_port", 0))
+        origen = self.headers.get("Origin")
+        for key, value in CORSHandler.get_headers(origen, puerto).items():
             self.send_header(key, value)
 
     def log_message(self, format, *args):
@@ -188,7 +191,7 @@ class EscalaRequestHandler(BaseHTTPRequestHandler):
 
 
 def make_server(
-    host: str = "localhost",
+    host: str = "127.0.0.1",
     port: int = 8080,
     static_root: str = ".",
     db_path: str | None = None,
@@ -196,7 +199,7 @@ def make_server(
     """Create and configure an Escala server instance.
 
     Args:
-        host: Host to bind to
+        host: Host to bind to (default: only this machine, 127.0.0.1)
         port: Port to bind to
         static_root: Root directory for static files
         db_path: Path to SQLite database (default: ~/.escala/escala.db)

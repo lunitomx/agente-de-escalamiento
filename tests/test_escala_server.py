@@ -96,9 +96,9 @@ class TestRouter:
 
 class TestCORSHandler:
     def test_cors_headers_present(self):
-        headers = CORSHandler.get_headers()
-        assert "Access-Control-Allow-Origin" in headers
-        assert headers["Access-Control-Allow-Origin"] == "*"
+        # S86.36, Seguridad: sólo el propio servidor local; nunca «*».
+        headers = CORSHandler.get_headers("http://localhost:8080", 8080)
+        assert headers["Access-Control-Allow-Origin"] == "http://localhost:8080"
         assert "Access-Control-Allow-Methods" in headers
         assert "Access-Control-Allow-Headers" in headers
 
