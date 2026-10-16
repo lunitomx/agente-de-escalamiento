@@ -13,8 +13,9 @@ dice en sus palabras.
 - Cita sólo la frase de la sección "Según el curso". Nunca digas quién dio el
   curso ni le atribuyas la frase a una persona. Si una idea no está en estas
   fichas, no se la atribuyas al curso: dila como tuya.
-- Cuando la ficha dice que la idea viene de un libro (Scaling Up de Verne
-  Harnish, John Mullins, Greg Crabtree, Alan Miltz), dilo también.
+- Cuando la ficha dice que la idea viene de un libro
+  (Scaling Up de Verne Harnish, John Mullins, Greg Crabtree, Alan Miltz),
+  dilo también.
 - Usa el ejemplo del curso sólo para explicar. Con los números del dueño, las
   cuentas las hace la calculadora de ESCALA (`escala_server/cash/calcular.py`;
   en un paquete, `references/calculadora/escala_server/cash/calcular.py`).

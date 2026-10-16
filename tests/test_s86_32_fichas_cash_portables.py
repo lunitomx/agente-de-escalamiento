@@ -3,9 +3,9 @@
 Lo que se prueba:
 - el README que se instala y el overview de las fichas terminan con el aviso de
   autoría, tal cual;
-- la frontera pública admite nombrar la metodología sólo en esas dos rutas
-  exactas; en cualquier otro archivo exportado sigue fallando, y la frase
-  «derived from Scaling Up» falla en todas partes;
+- la frontera pública admite nombrar la metodología sólo en dos frases exactas
+  (el aviso y la cita del libro); cualquier otra mención sigue fallando, aun en
+  el mismo README, y «derived from Scaling Up» falla en todas partes;
 - la copia construida desde HEAD trae las 19 fichas y el overview, byte a byte,
   y el verificador independiente pasa.
 """
@@ -61,7 +61,7 @@ def test_quitar_el_aviso_se_nota() -> None:
     assert not _termina_con_aviso(cambiado)
 
 
-# ── La frontera pública: exención por ruta exacta, sólo de texto ───────────
+# ── La frontera pública: exención por frase exacta, sólo de texto ──────────
 
 
 def _reglas(ruta: str, texto: str) -> set[str]:
@@ -74,30 +74,30 @@ def _reglas(ruta: str, texto: str) -> set[str]:
 
 
 @pytest.mark.parametrize("ruta", CON_AVISO)
-def test_el_aviso_pasa_la_frontera_en_su_ruta(ruta: str) -> None:
+def test_el_archivo_con_aviso_pasa_la_frontera(ruta: str) -> None:
     texto = (ROOT / ruta).read_text(encoding="utf-8")
     assert _reglas(ruta, texto) == set()
 
 
 @pytest.mark.parametrize(
-    "ruta",
+    ("texto", "regla"),
     [
-        "escala_server/README.md",
-        ".escala/knowledge/cash/01-ciclo-del-efectivo.md",
-        "conocimiento/cash/README.md",
-        "docs/README.md",
+        ("ESCALA usa la metodología Scaling Up.", "public.product_identity"),
+        ("Hecho con Gazelles.", "public.company_identity"),
+        ("Según Verne Harnish.", "public.author_identity"),
+        ("Gazelles legacy public candidate", "public.company_identity"),
     ],
 )
-def test_el_aviso_en_otra_ruta_sigue_fallando(ruta: str) -> None:
-    assert {"public.product_identity", "public.company_identity"} <= _reglas(
-        ruta, AVISO
-    )
+def test_otra_mencion_en_el_mismo_readme_sigue_fallando(texto: str, regla: str) -> None:
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    assert regla in _reglas("README.md", readme + "\n" + texto + "\n")
 
 
-def test_el_autor_del_libro_solo_se_admite_en_el_overview() -> None:
-    texto = "Scaling Up de Verne Harnish"
-    assert _reglas(".escala/knowledge/cash/overview.md", texto) == set()
-    assert "public.author_identity" in _reglas("README.md", texto)
+def test_la_frase_partida_no_se_admite() -> None:
+    # La exención es la frase exacta: partida en dos líneas, falla.
+    texto = "un libro (Scaling Up de Verne\n  Harnish)"
+    reglas = _reglas(".escala/knowledge/cash/overview.md", texto)
+    assert {"public.product_identity", "public.author_identity"} <= reglas
 
 
 @pytest.mark.parametrize("ruta", CON_AVISO)
@@ -109,7 +109,7 @@ def test_atribuir_el_producto_a_la_metodologia_falla_en_todas_partes(
     )
 
 
-def test_la_ruta_exenta_no_exime_el_nombre_de_archivo() -> None:
+def test_ningun_nombre_de_archivo_queda_exento() -> None:
     politica = load_public_boundary_policy(BOUNDARY)
     violaciones = scan_public_content(
         ".escala/knowledge/cash/scaling_up.md", b"hola", politica

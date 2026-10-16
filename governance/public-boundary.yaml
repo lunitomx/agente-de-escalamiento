@@ -104,10 +104,10 @@ vocabulary_rules:
       - Scaling Up
       - scaling_up
     # S86.32: the attribution notice and the cash course overview name the
-    # methodology as a reference.  Exact paths; text only.
-    text_exempt_paths:
-      - .escala/knowledge/cash/overview.md
-      - README.md
+    # methodology as a reference.  Exact phrases; any other use still fails.
+    permitted_phrases:
+      - No es un producto oficial de Scaling Up, de Gazelles ni de EO
+      - Scaling Up de Verne Harnish
   - id: public.author_identity
     targets: [path, text]
     terms:
@@ -116,16 +116,15 @@ vocabulary_rules:
       - VerneHandler
       - verne_handler
     # S86.32: the cash course overview cites the book and its author.
-    text_exempt_paths:
-      - .escala/knowledge/cash/overview.md
+    permitted_phrases:
+      - Scaling Up de Verne Harnish
   - id: public.company_identity
     targets: [path, text]
     terms:
       - Gazelles
     # S86.32: the attribution notice says ESCALA is not an official product.
-    text_exempt_paths:
-      - .escala/knowledge/cash/overview.md
-      - README.md
+    permitted_phrases:
+      - No es un producto oficial de Scaling Up, de Gazelles ni de EO
   - id: public.execution_identity
     targets: [path, text]
     terms:
