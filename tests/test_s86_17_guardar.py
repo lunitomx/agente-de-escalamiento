@@ -100,11 +100,14 @@ def test_con_si_guarda_y_la_calculadora_lo_lee_igual(
     salida = _corre(
         capsys, tmp_path, "--guardar", "sí", archivos=COMPLETA, respuestas=RESPUESTAS
     )
-    assert _del_dueno(tmp_path) == [
+    guardados = _del_dueno(tmp_path)
+    assert guardados[:2] == [
         "conversacion.json",
         "estados-revisados-2026-01-31.json",
     ]
-    assert len(salida["guardado"]) == 2
+    # S86.26: con el «sí» también se guardan las páginas de los paneles.
+    assert all(n.startswith("panel-") and n.endswith(".html") for n in guardados[2:])
+    assert len(salida["guardado"]) == len(guardados)
     assert "Guardé" in salida["mensaje"]
     assert "¿Guardo" not in salida["mensaje"]
 

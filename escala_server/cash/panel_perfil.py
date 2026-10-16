@@ -33,7 +33,7 @@ from typing import Sequence
 from pydantic import ValidationError
 
 from escala_server.cash.curso import BaseDeDias, EstadosRevisados
-from escala_server.cash.escenario import (
+from escala_server.cash.archivos import (
     CARPETA,
     EscrituraInsegura,
     carpeta_de,
@@ -162,10 +162,14 @@ def _de_un_peso(peso: DeUnPeso | None) -> str:
         return ""
     titulo = "<h2>De cada peso que vendes</h2>"
     if peso.no_calculable is not None:
-        return f'{titulo}<div class="aviso">No calculable: {_e(peso.no_calculable)}</div>'
-    cuando = f'<p class="sub">Al {_e(fecha_corta(peso.fecha))}.</p>' if peso.fecha else ""
+        return (
+            f'{titulo}<div class="aviso">No calculable: {_e(peso.no_calculable)}</div>'
+        )
+    cuando = (
+        f'<p class="sub">Al {_e(fecha_corta(peso.fecha))}.</p>' if peso.fecha else ""
+    )
     filas = "".join(
-        f"<tr><td>{_e(parte.nombre)}<div class=\"sale\">{_e(_sale_de(parte.origen))}</div></td>"
+        f'<tr><td>{_e(parte.nombre)}<div class="sale">{_e(_sale_de(parte.origen))}</div></td>'
         f'<td class="num">{_e(formato_monto(parte.mostrado))}%</td></tr>'
         for parte in peso.partes
     )
@@ -264,7 +268,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     guardado = leer_guardado(empresa, carpeta=carpeta)
     if isinstance(guardado, str):
         return _no(guardado)
-    trabajo = Path(args.conversacion) if args.conversacion else ruta_del_borrador(empresa)
+    trabajo = (
+        Path(args.conversacion) if args.conversacion else ruta_del_borrador(empresa)
+    )
     platica = _lee_platica(trabajo, empresa)
     if isinstance(platica, str):
         return _no(platica)
@@ -284,7 +290,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     ruta_guardada: Path | None = None
     try:
         escribir_privado(
-            trabajo, platica.model_dump_json(indent=2), carpeta_privada=args.conversacion is None
+            trabajo,
+            platica.model_dump_json(indent=2),
+            carpeta_privada=args.conversacion is None,
         )
         if es_si(args.guardar):
             ruta_guardada = guardar_perfil(paso, empresa, carpeta=carpeta, hoy=hoy)
@@ -296,7 +304,9 @@ def main(argv: Sequence[str] | None = None) -> int:
             f"Guardé tus límites en {ruta_guardada.as_posix()}. "
             "La próxima vez pinto con ellos sin volver a preguntar."
         )
-        paso = paso.model_copy(update={"mensaje": "\n\n".join(partes), "pide_guardar": False})
+        paso = paso.model_copy(
+            update={"mensaje": "\n\n".join(partes), "pide_guardar": False}
+        )
     salida_html: str | None = None
     if args.html and paso.pintar:
         destino = Path(args.html)

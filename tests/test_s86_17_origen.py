@@ -55,7 +55,13 @@ def _paso(entrada: str) -> Paso:
 
 def _resumen(mensaje: str) -> str:
     inicio = mensaje.index("Resumen al")
-    fin = mensaje.index("¿Guardo")
+    # S86.26: los paneles van después del resumen; sus números se revisan contra
+    # los datos de cada panel en test_s86_26_recorrido.
+    fin = (
+        mensaje.index("Tus paneles")
+        if "Tus paneles" in mensaje
+        else mensaje.index("¿Guardo")
+    )
     return mensaje[inicio:fin]
 
 

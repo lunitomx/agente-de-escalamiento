@@ -56,6 +56,8 @@ class Respuestas(_Modelo):
     retiros_del_dueno: Decimal | None = None  # C3
     retiros_de_capital: Decimal | None = None  # C4
     iva_incluido: bool | None = None  # C9
+    # S86.26: la tasa de IVA de los saldos, en %. Dato del dueño: ESCALA no supone 16%.
+    tasa_iva: Decimal | None = Field(default=None, gt=0, le=100)
     pagan_interes: dict[str, bool] = Field(default_factory=dict[str, bool])  # C11
     movimientos: dict[str, Caja] = Field(default_factory=dict[str, Caja])
     # R7: qué es una cuenta que ninguna regla reconoce (nombre → clave de la regla).

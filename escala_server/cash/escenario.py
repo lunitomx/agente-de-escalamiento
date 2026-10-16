@@ -32,19 +32,27 @@ from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal, InvalidOperation
 import json
-import os
 from pathlib import Path
-import re
 import sys
-import tempfile
 from typing import Literal, Sequence
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
+from escala_server.cash.archivos import (
+    CARPETA,
+    EscrituraInsegura,
+    carpeta_de,
+    escribir_privado,
+    libre,
+    sin_enlace,
+)
 from escala_server.cash.curso import (
     EJEMPLOS_DE_TRAVESURAS,
+    PREGUNTA_TASA,
+    PREGUNTAS_DEL_DUENO,
     AjusteDelDueno,
     Calculado,
+    DatosDelDueno,
     EstadosRevisados,
     Indicador,
     NoAplica,
@@ -53,6 +61,12 @@ from escala_server.cash.curso import (
     UtilidadAjustada,
     calcular_curso,
     utilidad_ajustada,
+)
+from escala_server.cash.recorrido import (
+    FASES,
+    TOTAL_DE_FASES,
+    PanelDelRecorrido,
+    paneles_del_recorrido,
 )
 from escala_server.financial.cajas import CuentaEnCaja
 from escala_server.financial.formatos import (
@@ -71,7 +85,6 @@ from escala_server.financial.revisiones import (
 )
 
 Marca = Literal["✔", "?", "✘"]
-CARPETA = Path("work/cash")
 
 # Lo que sale en el resumen, en este orden: capital de trabajo, días, ciclo y
 # las tres medidas del flujo.
@@ -113,6 +126,11 @@ OPCIONES: dict[str, tuple[str, ...]] = {
     "C2": ("todas", "solo lo facturado", "no sé"),
     # S86.25: «C6=no» o un gasto por respuesta: «C6:<concepto>=<monto en pesos>».
     "C6": ("no", "cada gasto con su monto en pesos"),
+    # S86.26: las preguntas del recorrido, opcionales, después del resumen.
+    "tasa_iva": ("un porcentaje mayor que 0 y hasta 100", "no sé"),
+    "salario_de_mercado": ("una cantidad en pesos", "no sé"),
+    "sueldo_actual_del_dueno": ("una cantidad en pesos", "0", "no sé"),
+    "devoluciones": ("una cantidad en pesos", "no sé"),
 }
 # De la más importante a la menos importante (después de los problemas).
 _IMPORTANCIA: tuple[str, ...] = (
@@ -140,6 +158,12 @@ _PROBLEMAS: tuple[str, ...] = (
     "R8",
     "R9",
     "R10",
+)
+# S86.26: montos que sólo el dueño sabe; van a ``DatosDelDueno`` de la calculadora.
+_DEL_DUENO: tuple[str, ...] = (
+    "salario_de_mercado",
+    "sueldo_actual_del_dueno",
+    "devoluciones",
 )
 _BLOQUEAN_SIN_NO_SE = frozenset({"C10", "R7", "unidad", "R8", "suma"})
 _POR_CORREGIR = "Mándame el archivo corregido (si hace falta, pídeselo a tu contador); con eso sigo."
@@ -200,15 +224,13 @@ class Paso(_Modelo):
     pregunta_travesuras: Pregunta | None = None
     travesuras: UtilidadAjustada | None = None
     sin_monto: tuple[str, ...] = ()
+    # S86.26: en qué fase vamos (de 8), los paneles y las preguntas opcionales del recorrido.
+    fase: int = 1
+    paneles: tuple[PanelDelRecorrido, ...] = ()
+    preguntas_del_recorrido: tuple[Pregunta, ...] = ()
     mensaje: str = ""
     # Lo que se guarda con «sí». No va en la salida para el modelo.
     estados: EstadosRevisados | None = Field(default=None, exclude=True)
-
-
-def carpeta_de(empresa: str) -> str:
-    """«Mi Empresa, S.A. de C.V.» → «mi-empresa-s-a-de-c-v»."""
-
-    return re.sub(r"[^a-z0-9]+", "-", normalizar(empresa)).strip("-") or "empresa"
 
 
 # ---------------------------------------------------------------------------
@@ -277,16 +299,23 @@ def entender(clave: str, valor: str) -> Entendido | None:
         }:
             return "solo lo facturado"
         return None
-    if tipo == "C1":
+    if tipo in {"C1", "tasa_iva"}:
         try:
             porcentaje = Decimal(texto.replace("%", "").replace(",", "").strip())
         except InvalidOperation:
             return None
-        return porcentaje if Decimal("0") <= porcentaje <= Decimal("100") else None
+        minimo_valido = porcentaje > 0 if tipo == "tasa_iva" else porcentaje >= 0
+        return porcentaje if minimo_valido and porcentaje <= Decimal("100") else None
     if tipo == "C6":
         return _travesura(clave, texto)
-    if tipo in {"C3", "C4"}:
-        if tipo == "C4" and texto in {"no", "ninguno", "ninguna", "cero"}:
+    if tipo in {"C3", "C4", *_DEL_DUENO}:
+        if tipo in {"C4", "sueldo_actual_del_dueno"} and texto in {
+            "no",
+            "ninguno",
+            "ninguna",
+            "cero",
+            "no me pago",
+        }:
             return Decimal("0")
         monto = leer_monto(texto)
         return monto if monto is not None and monto >= 0 else None
@@ -335,6 +364,7 @@ def _aplicar(conversacion: Conversacion) -> _Aplicadas:
     periodo = dicho("C10")
     credito, completas = dicho("C1"), dicho("C2")
     del_dueno, de_capital, iva = dicho("C3"), dicho("C4"), dicho("C9")
+    tasa = dicho("tasa_iva")
     respuestas = Respuestas(
         periodo=_periodo(periodo),
         ventas_a_credito=credito if isinstance(credito, Decimal) else None,
@@ -348,6 +378,7 @@ def _aplicar(conversacion: Conversacion) -> _Aplicadas:
         retiros_del_dueno=del_dueno if isinstance(del_dueno, Decimal) else None,
         retiros_de_capital=de_capital if isinstance(de_capital, Decimal) else None,
         iva_incluido=iva if isinstance(iva, bool) else None,
+        tasa_iva=tasa if isinstance(tasa, Decimal) else None,
         pagan_interes={
             clave.split(":", 1)[1]: valor
             for clave, valor in entendidas.items()
@@ -956,6 +987,77 @@ def _texto_de_travesuras(
 
 
 # ---------------------------------------------------------------------------
+# Las preguntas del recorrido (S86.26): tasa de IVA, salario y devoluciones
+# ---------------------------------------------------------------------------
+
+PREGUNTA_TASA_IVA = Pregunta(
+    clave="tasa_iva",
+    pregunta=PREGUNTA_TASA,
+    para_que="Para mostrarte tus días de cobro y de pago sin IVA.",
+    opciones=OPCIONES["tasa_iva"],
+)
+PREGUNTAS_DEL_RECORRIDO: dict[str, Pregunta] = {
+    clave: Pregunta(
+        clave=clave,
+        pregunta=PREGUNTAS_DEL_DUENO[clave].pregunta,
+        para_que=PREGUNTAS_DEL_DUENO[clave].para_que,
+        opciones=OPCIONES[clave],
+    )
+    for clave in _DEL_DUENO
+}
+MAXIMO_DE_PREGUNTAS = 3
+
+
+def _preguntas_del_recorrido(
+    aplicadas: _Aplicadas, con_travesuras: bool
+) -> tuple[Pregunta, ...]:
+    """Opcionales, después del resumen. Con la de travesuras, nunca más de 3."""
+    entendidas = aplicadas.entendidas
+    candidatas: list[Pregunta] = []
+    if aplicadas.respuestas.iva_incluido is True and "tasa_iva" not in entendidas:
+        candidatas.append(PREGUNTA_TASA_IVA)
+    for clave in _DEL_DUENO:
+        if clave in entendidas:
+            continue
+        if (
+            clave == "sueldo_actual_del_dueno"
+            and entendidas.get("salario_de_mercado") is NO_SE
+        ):
+            continue  # sin salario de mercado, el sueldo actual no cambia nada
+        candidatas.append(PREGUNTAS_DEL_RECORRIDO[clave])
+    cupo = MAXIMO_DE_PREGUNTAS - (1 if con_travesuras else 0)
+    return tuple(candidatas[:cupo])
+
+
+def _del_dueno(entendidas: dict[str, Entendido]) -> DatosDelDueno | None:
+    montos = {
+        clave: valor
+        for clave in _DEL_DUENO
+        if isinstance(valor := entendidas.get(clave), Decimal)
+    }
+    if not montos:
+        return None
+    return DatosDelDueno(
+        salario_de_mercado=montos.get("salario_de_mercado"),
+        sueldo_actual_del_dueno=montos.get("sueldo_actual_del_dueno"),
+        devoluciones=montos.get("devoluciones"),
+    )
+
+
+def _fase(paso: Paso, *, sin_archivos: bool) -> int:
+    """1 leer · 3 preguntar · 4 revisar (algo no cuadra) · 7 mostrar los paneles."""
+    if sin_archivos:
+        return 1
+    if paso.paneles:
+        return 7
+    if any(p.clave is None for p in paso.preguntas) or paso.calculo is not None:
+        return 4
+    if paso.preguntas:
+        return 3
+    return 2
+
+
+# ---------------------------------------------------------------------------
 # El paso
 # ---------------------------------------------------------------------------
 
@@ -979,10 +1081,13 @@ def atender(conversacion: Conversacion, *, hoy: date, carpeta: Path = CARPETA) -
     anuncio: str | None = None
     resumen: list[LineaDeResumen] = []
     travesuras = _Travesuras()
+    paneles: tuple[PanelDelRecorrido, ...] = ()
+    del_recorrido: tuple[Pregunta, ...] = ()
     if not pendientes and revision is not None and leido.resultados is not None:
         estados = EstadosRevisados(
             revision=revision,
             resultados=leido.resultados,
+            del_dueno=_del_dueno(aplicadas.entendidas),
             respuestas=aplicadas.respuestas,
         )
         calculo = calcular_curso(estados)
@@ -990,6 +1095,12 @@ def atender(conversacion: Conversacion, *, hoy: date, carpeta: Path = CARPETA) -
             anuncio = _anuncio(calculo, leido.unidad)
             resumen = _resumen(calculo)
             travesuras = _travesuras(estados, aplicadas.entendidas)
+            paneles = paneles_del_recorrido(
+                estados, calculo, empresa=conversacion.empresa, carpeta=carpeta
+            )
+            del_recorrido = _preguntas_del_recorrido(
+                aplicadas, travesuras.pregunta is not None
+            )
         else:
             estados = None
 
@@ -1006,13 +1117,26 @@ def atender(conversacion: Conversacion, *, hoy: date, carpeta: Path = CARPETA) -
         pregunta_travesuras=travesuras.pregunta,
         travesuras=travesuras.resultado,
         sin_monto=travesuras.sin_monto,
+        paneles=paneles,
+        preguntas_del_recorrido=del_recorrido,
         estados=estados,
+    )
+    paso = paso.model_copy(
+        update={"fase": _fase(paso, sin_archivos=not conversacion.archivos)}
     )
     return paso.model_copy(update={"mensaje": _mensaje(paso, hoy)})
 
 
 def _mensaje(paso: Paso, hoy: date) -> str:
     partes = [f"Analizo los estados de {paso.empresa.rstrip('.')}."]
+    partes.append(
+        f"Vamos en la fase {paso.fase} de {TOTAL_DE_FASES}: {FASES[paso.fase]}."
+        + (
+            f" La fase {TOTAL_DE_FASES} es {FASES[TOTAL_DE_FASES]}."
+            if paso.fase == 7
+            else ""
+        )
+    )
     partes.append(
         "Esto es lo que necesito (✔ lo tengo · ? no me queda claro · ✘ me falta):"
     )
@@ -1067,11 +1191,45 @@ def _mensaje(paso: Paso, hoy: date) -> str:
                 f"{pregunta.pregunta}\n   Para qué: {pregunta.para_que}"
                 f"\n   Puedes contestar: {' · '.join(pregunta.opciones)}."
             )
+        if paso.paneles:
+            partes.append(_texto_de_paneles(paso.paneles))
+        if paso.preguntas_del_recorrido:
+            partes.append(
+                _texto_de_preguntas_del_recorrido(paso.preguntas_del_recorrido)
+            )
+        guardo = (
+            "tus estados revisados y las páginas de tus paneles"
+            if any(p.pagina is not None for p in paso.paneles)
+            else "tus estados revisados"
+        )
         partes.append(
-            f"¿Guardo tus estados revisados en {paso.carpeta} con fecha {hoy.isoformat()}? "
+            f"¿Guardo {guardo} en {paso.carpeta} con fecha {hoy.isoformat()}? "
             "Si quieres, responde «sí». Sin tu «sí» no guardo nada."
         )
     return "\n\n".join(partes)
+
+
+def _texto_de_paneles(paneles: tuple[PanelDelRecorrido, ...]) -> str:
+    lineas = ["Tus paneles. Para ver (fase 7):"]
+    for fase, encabezado in ((7, ""), (8, "Para decidir (fase 8):")):
+        if encabezado:
+            lineas.append(encabezado)
+        for panel in paneles:
+            if panel.fase != fase:
+                continue
+            estado = "" if panel.estado == "listo" else f" [{panel.estado}]"
+            lineas.append(f"- {panel.nombre}{estado}: {panel.titular}")
+    return "\n".join(lineas)
+
+
+def _texto_de_preguntas_del_recorrido(preguntas: tuple[Pregunta, ...]) -> str:
+    lineas = ["Opcional, para afinar tus paneles:"]
+    for numero, pregunta in enumerate(preguntas, start=1):
+        lineas.append(
+            f"{numero}. {pregunta.pregunta}\n   Para qué: {pregunta.para_que}"
+            f"\n   Puedes contestar: {' · '.join(pregunta.opciones)}."
+        )
+    return "\n".join(lineas)
 
 
 # ---------------------------------------------------------------------------
@@ -1116,41 +1274,8 @@ def ruta_del_borrador(empresa: str) -> Path:
     return Path.home() / ".escala" / "borradores" / f"{carpeta_de(empresa)}.json"
 
 
-class EscrituraInsegura(Exception):
-    """La ruta es un enlace simbólico: no se escribe ni se lee a través de él."""
-
-
-def _sin_enlace(ruta: Path) -> None:
-    if ruta.is_symlink() or ruta.parent.is_symlink():
-        raise EscrituraInsegura(
-            f"{ruta} es un enlace simbólico; no escribo ni leo a través de un enlace"
-        )
-
-
-def escribir_privado(ruta: Path, texto: str, *, carpeta_privada: bool = False) -> None:
-    """Escribe de forma atómica (temporal en la misma carpeta + ``os.replace``).
-
-    El archivo queda 0o600. Con ``carpeta_privada`` la carpeta queda 0o700.
-    Nunca sigue un enlace simbólico: si ``ruta`` lo es, no escribe.
-    """
-
-    ruta.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
-    _sin_enlace(ruta)
-    if carpeta_privada:
-        os.chmod(ruta.parent, 0o700)
-    descriptor, temporal = tempfile.mkstemp(dir=ruta.parent, prefix=".", suffix=".tmp")
-    try:
-        with os.fdopen(descriptor, "w", encoding="utf-8") as archivo:
-            archivo.write(texto)
-        os.chmod(temporal, 0o600)
-        os.replace(temporal, ruta)  # reemplaza la entrada; no sigue enlaces
-    except BaseException:
-        Path(temporal).unlink(missing_ok=True)
-        raise
-
-
 def _lee(ruta: Path) -> str:
-    _sin_enlace(ruta)
+    sin_enlace(ruta)
     return ruta.read_text(encoding="utf-8")
 
 
@@ -1158,17 +1283,6 @@ def es_si(respuesta: str | None) -> bool:
     """Sólo «sí» (o «si») cuenta como permiso para guardar."""
 
     return respuesta is not None and _limpia(respuesta) == "si"
-
-
-def _libre(carpeta: Path, nombre: str) -> Path:
-    """Nunca sobrescribe: la segunda versión del día es ``-2``, luego ``-3``…"""
-
-    ruta = carpeta / f"{nombre}.json"
-    version = 2
-    while ruta.exists() or ruta.is_symlink():
-        ruta = carpeta / f"{nombre}-{version}.json"
-        version += 1
-    return ruta
 
 
 def guardar(
@@ -1182,9 +1296,16 @@ def guardar(
     escribir_privado(platica, conversacion.model_dump_json(indent=2))
     guardados = [platica]
     if paso.estados is not None:
-        revisados = _libre(destino, f"estados-revisados-{hoy.isoformat()}")
+        revisados = libre(destino, f"estados-revisados-{hoy.isoformat()}")
         escribir_privado(revisados, paso.estados.model_dump_json(indent=2))
         guardados.append(revisados)
+    # S86.26: la página de cada panel que salió. Nunca sobrescribe.
+    for panel in paso.paneles:
+        if panel.pagina is None:
+            continue
+        ruta = libre(destino, f"panel-{panel.clave}-{hoy.isoformat()}", ".html")
+        escribir_privado(ruta, panel.pagina)
+        guardados.append(ruta)
     return guardados
 
 

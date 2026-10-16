@@ -37,7 +37,7 @@ from escala_server.cash.curso import (
     NoCalculable,
     dias_del_dinero,
 )
-from escala_server.cash.escenario import carpeta_de, escribir_privado
+from escala_server.cash.archivos import carpeta_de, escribir_privado
 from escala_server.financial.formatos import fecha_corta, formato_monto
 from escala_server.financial.lector import LecturaEstados
 
@@ -117,7 +117,9 @@ class DeUnPeso(_Modelo):
 
 def _renglon(resultados: LecturaEstados, concepto: str, fecha: date) -> Decimal | None:
     """Como la calculadora: los renglones del concepto; si sólo hay total, el total."""
-    del_concepto = [c for c in resultados.cuentas if c.concepto == concepto and c.fecha == fecha]
+    del_concepto = [
+        c for c in resultados.cuentas if c.concepto == concepto and c.fecha == fecha
+    ]
     renglones = [c for c in del_concepto if not c.es_total] or del_concepto[:1]
     if not renglones:
         return None
@@ -128,7 +130,9 @@ def _dinero(valor: Decimal) -> str:
     return formato_monto(_dos(valor))
 
 
-def _parte(clave: str, nombre: str, monto: Decimal, texto: str, ventas: Decimal) -> ParteDeUnPeso:
+def _parte(
+    clave: str, nombre: str, monto: Decimal, texto: str, ventas: Decimal
+) -> ParteDeUnPeso:
     valor = monto / ventas * CIEN
     return ParteDeUnPeso(
         clave=clave,
@@ -163,7 +167,13 @@ def porcentajes_de_un_peso(estados: EstadosRevisados) -> DeUnPeso:
     ub = ventas - costo
     uo = ub - gastos
     partes = [
-        _parte("costo", "Costo de ventas", costo, f"costo de ventas {_dinero(costo)}", ventas),
+        _parte(
+            "costo",
+            "Costo de ventas",
+            costo,
+            f"costo de ventas {_dinero(costo)}",
+            ventas,
+        ),
         _parte(
             "utilidad_bruta",
             "Utilidad bruta",
@@ -171,7 +181,13 @@ def porcentajes_de_un_peso(estados: EstadosRevisados) -> DeUnPeso:
             f"utilidad bruta {_dinero(ub)} (ventas {_dinero(ventas)} − costo de ventas {_dinero(costo)})",
             ventas,
         ),
-        _parte("gastos", "Gastos de operación", gastos, f"gastos de operación {_dinero(gastos)}", ventas),
+        _parte(
+            "gastos",
+            "Gastos de operación",
+            gastos,
+            f"gastos de operación {_dinero(gastos)}",
+            ventas,
+        ),
         _parte(
             "utilidad_de_operacion",
             "Utilidad de operación",
@@ -182,7 +198,11 @@ def porcentajes_de_un_peso(estados: EstadosRevisados) -> DeUnPeso:
     ]
     abajo = (
         ("intereses", "gastos_financieros", "Gastos financieros"),
-        ("utilidad_antes_impuestos", "utilidad_antes_impuestos", "Utilidad antes de impuestos"),
+        (
+            "utilidad_antes_impuestos",
+            "utilidad_antes_impuestos",
+            "Utilidad antes de impuestos",
+        ),
         ("isr", "isr", "ISR"),
         ("utilidad_neta", "utilidad_neta", "Utilidad neta"),
     )
@@ -227,17 +247,26 @@ class SinValor(_Modelo):
 ValorOSin = ValorDelPerfil | SinValor
 
 
-def valores_del_perfil(estados: EstadosRevisados, base: BaseDeDias) -> tuple[ValorOSin, ...]:
+def valores_del_perfil(
+    estados: EstadosRevisados, base: BaseDeDias
+) -> tuple[ValorOSin, ...]:
     """Los seis indicadores del año actual, sin redondear y con su «sale de:»."""
     peso = porcentajes_de_un_peso(estados)
     por_clave: dict[Clave, ValorOSin] = {}
-    porcentajes: tuple[Clave, ...] = ("utilidad_bruta", "gastos", "utilidad_de_operacion")
+    porcentajes: tuple[Clave, ...] = (
+        "utilidad_bruta",
+        "gastos",
+        "utilidad_de_operacion",
+    )
     for clave in porcentajes:
         nombre, unidad, _, lamina = DEFINICIONES[clave]
         parte = next((p for p in peso.partes if p.clave == clave), None)
         if parte is None or peso.fecha is None:
             por_clave[clave] = SinValor(
-                clave=clave, nombre=nombre, unidad=unidad, razon=f"no calculable: {peso.no_calculable}"
+                clave=clave,
+                nombre=nombre,
+                unidad=unidad,
+                razon=f"no calculable: {peso.no_calculable}",
             )
             continue
         por_clave[clave] = ValorDelPerfil(
@@ -264,7 +293,12 @@ def valores_del_perfil(estados: EstadosRevisados, base: BaseDeDias) -> tuple[Val
         nombre, unidad, _, lamina = DEFINICIONES[clave]
         if anio is None:
             razon = dias.no_calculable or "falta el balance al final del periodo"
-            por_clave[clave] = SinValor(clave=clave, nombre=nombre, unidad=unidad, razon=f"no calculable: {razon}")
+            por_clave[clave] = SinValor(
+                clave=clave,
+                nombre=nombre,
+                unidad=unidad,
+                razon=f"no calculable: {razon}",
+            )
             continue
         indicador = getattr(anio, cuenta)
         crudo = anio.sin_redondear.get(cuenta)
@@ -284,12 +318,19 @@ def valores_del_perfil(estados: EstadosRevisados, base: BaseDeDias) -> tuple[Val
             )
         elif isinstance(indicador, NoCalculable):
             por_clave[clave] = SinValor(
-                clave=clave, nombre=nombre, unidad=unidad, razon=f"no calculable: {indicador.no_calculable}"
+                clave=clave,
+                nombre=nombre,
+                unidad=unidad,
+                razon=f"no calculable: {indicador.no_calculable}",
             )
         else:
             assert isinstance(indicador, NoAplica | Calculado)
-            razon = indicador.no_aplica if isinstance(indicador, NoAplica) else "sin valor"
-            por_clave[clave] = SinValor(clave=clave, nombre=nombre, unidad=unidad, razon=f"no aplica: {razon}")
+            razon = (
+                indicador.no_aplica if isinstance(indicador, NoAplica) else "sin valor"
+            )
+            por_clave[clave] = SinValor(
+                clave=clave, nombre=nombre, unidad=unidad, razon=f"no aplica: {razon}"
+            )
     return tuple(por_clave[clave] for clave in INDICADORES)
 
 
@@ -444,7 +485,9 @@ def entender_limites(clave: Clave, texto: str) -> Limites | str:
         return f"falta tu ideal de {nombre}. Ejemplo de respuesta: «{EJEMPLO_DE_RESPUESTA}»"
     bordes: dict[str, tuple[Decimal, bool, bool]] = {}
     for color_ in ("verde", "rojo"):
-        hallado = re.search(color_ + r"\s*:?\s*(.*?)(?=(?:[,;]\s*)?(?:verde|rojo|ideal)\b|$)", limpio)
+        hallado = re.search(
+            color_ + r"\s*:?\s*(.*?)(?=(?:[,;]\s*)?(?:verde|rojo|ideal)\b|$)", limpio
+        )
         leido = _borde(hallado.group(1)) if hallado else None
         if leido is None:
             return (
@@ -489,14 +532,18 @@ class Tarjeta(_Modelo):
 
 
 def _sin_redondear(valor: Decimal) -> str:
-    return format(valor.quantize(Decimal("0.000001"), rounding=ROUND_HALF_UP).normalize(), "f")
+    return format(
+        valor.quantize(Decimal("0.000001"), rounding=ROUND_HALF_UP).normalize(), "f"
+    )
 
 
 def semaforo(valor: ValorOSin, limites: Limites) -> Tarjeta:
     clave = valor.clave
     nombre, unidad, mas, _ = DEFINICIONES[clave]
     origen_meta = (
-        "sale de: tu límite" if limites.fuente == "tuyo" else "sale de: el ejemplo del curso (versión B) que tomaste"
+        "sale de: tu límite"
+        if limites.fuente == "tuyo"
+        else "sale de: el ejemplo del curso (versión B) que tomaste"
     )
     base = Tarjeta(
         clave=clave,
@@ -519,8 +566,9 @@ def semaforo(valor: ValorOSin, limites: Limites) -> Tarjeta:
         lado = "arriba" if distancia > 0 else "debajo"
         bien = (distancia > 0) == mas
         cuanto = f"{formato_monto(abs(distancia))} {medida}"
-        texto = f"{cuanto} {lado} de tu ideal de {_con_unidad(clave, limites.ideal)}. " + (
-            "Mejor que tu ideal." if bien else f"Te falta mejorar {cuanto}."
+        texto = (
+            f"{cuanto} {lado} de tu ideal de {_con_unidad(clave, limites.ideal)}. "
+            + ("Mejor que tu ideal." if bien else f"Te falta mejorar {cuanto}.")
         )
     return base.model_copy(
         update={
@@ -613,7 +661,9 @@ def _pregunta_de(clave: Clave, error: str | None, con_curso: bool) -> PreguntaDe
     borde = _numero(del_curso.verde.valor) if del_curso is not None else "30"
     partes: list[str] = []
     if error is not None:
-        partes.append(error[0].upper() + error[1:] + ("" if error.endswith((".", "?")) else "."))
+        partes.append(
+            error[0].upper() + error[1:] + ("" if error.endswith((".", "?")) else ".")
+        )
     partes.append(
         f"{nombre} ({sentido}): ¿cuál es tu ideal, desde dónde es verde y desde dónde es rojo? "
         f"Dime si el borde cuenta: «más de {borde}» no incluye el {borde}; «{borde} o más» sí."
@@ -664,7 +714,9 @@ def atender(
 
     Si falta un solo límite, pregunta (máximo 3) y no pinta.
     """
-    limites: dict[Clave, Limites] = dict(guardado.limites) if guardado is not None else {}
+    limites: dict[Clave, Limites] = (
+        dict(guardado.limites) if guardado is not None else {}
+    )
     respuestas = platica.respuestas
     con_curso = es_si(respuestas.get("curso"))
     if con_curso:
@@ -682,14 +734,20 @@ def atender(
             avisos.append(f"No conozco el indicador «{llave}»; no lo usé.")
             continue
         entendido = entender_limites(clave, texto)
-        razon = entendido if isinstance(entendido, str) else revisar_limites(clave, entendido)
+        razon = (
+            entendido
+            if isinstance(entendido, str)
+            else revisar_limites(clave, entendido)
+        )
         if razon is not None:
             errores[clave] = razon
             limites.pop(clave, None)
         else:
             assert isinstance(entendido, Limites)
             limites[clave] = entendido
-    ordenados: dict[Clave, Limites] = {c: limites[c] for c in INDICADORES if c in limites}
+    ordenados: dict[Clave, Limites] = {
+        c: limites[c] for c in INDICADORES if c in limites
+    }
     faltan: list[Clave] = [c for c in INDICADORES if c not in ordenados]
     if faltan:
         preguntas: list[PreguntaDelPerfil] = []
@@ -714,7 +772,9 @@ def atender(
         mensaje += [f"{i}. {p.pregunta}" for i, p in enumerate(preguntas, start=1)]
         mensaje += avisos
         if ordenados:
-            mensaje.append("Si quieres guardar lo que llevamos, responde «sí». Sin tu «sí» no guardo nada.")
+            mensaje.append(
+                "Si quieres guardar lo que llevamos, responde «sí». Sin tu «sí» no guardo nada."
+            )
         return PasoDelPerfil(
             mensaje="\n\n".join(mensaje),
             preguntas=tuple(preguntas),
@@ -761,7 +821,9 @@ def leer_guardado(empresa: str, *, carpeta: Path) -> PerfilGuardado | str | None
         return f"no pude leer tus límites guardados en {ruta}"
 
 
-def guardar_perfil(paso: PasoDelPerfil, empresa: str, *, carpeta: Path, hoy: date) -> Path | None:
+def guardar_perfil(
+    paso: PasoDelPerfil, empresa: str, *, carpeta: Path, hoy: date
+) -> Path | None:
     """Escribe ``carpeta/<empresa>/perfil-ideal.json``. Llamar sólo después de un «sí».
 
     Sin límites no escribe nada. Guardar otra vez reemplaza el perfil: es la

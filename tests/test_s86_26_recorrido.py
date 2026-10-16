@@ -30,6 +30,7 @@ from escala_server.cash.escenario import Conversacion, Paso, atender, guardar
 from escala_server.cash.perfil import (
     VERSION_B,
     Borde,
+    Clave,
     Limites,
     PerfilGuardado,
     ruta_del_perfil,
@@ -174,7 +175,9 @@ def test_sin_limites_el_perfil_primero_pregunta(
 
 
 def _limites_guardados(carpeta: Path) -> None:
-    limites = {c: lim for c, lim in VERSION_B.items() if lim is not None}
+    limites: dict[Clave, Limites] = {
+        c: lim for c, lim in VERSION_B.items() if lim is not None
+    }
     limites["gastos"] = Limites(
         ideal=Decimal("30"),
         verde=Borde(valor=Decimal("30"), incluye=False),
@@ -183,7 +186,9 @@ def _limites_guardados(carpeta: Path) -> None:
     ruta = ruta_del_perfil(EMPRESA, carpeta=carpeta)
     ruta.parent.mkdir(parents=True)
     ruta.write_text(
-        PerfilGuardado(empresa=EMPRESA, guardado=HOY, limites=limites).model_dump_json(),
+        PerfilGuardado(
+            empresa=EMPRESA, guardado=HOY, limites=limites
+        ).model_dump_json(),
         encoding="utf-8",
     )
 
@@ -306,7 +311,7 @@ def test_no_se_no_vuelve_a_preguntar(platica: tuple[list[Paso], Conversacion]) -
 def test_una_respuesta_que_no_se_entiende_se_dice(
     platica: tuple[list[Paso], Conversacion], clave: str, valor: str
 ) -> None:
-    paso = _paso(platica[1], C6="no", **{clave: valor})
+    paso = atender(_con(platica[1], C6="no", **{clave: valor}), hoy=HOY)
     assert any(valor in error for error in paso.errores)
     assert clave in [p.clave for p in paso.preguntas_del_recorrido]
 
@@ -324,8 +329,9 @@ def test_cada_pagina_dice_de_donde_sale(
             continue
         assert panel.pagina.startswith("<!doctype html>"), panel.clave
         assert "sale de" in panel.pagina, panel.clave
-        if panel.clave != "simulador":
-            assert "<script" not in panel.pagina, panel.clave
+        if panel.clave != "simulador":  # sólo datos; ningún script que haga cuentas
+            for etiqueta in re.findall(r"<script[^>]*>", panel.pagina):
+                assert 'type="application/json"' in etiqueta, panel.clave
 
 
 def test_pagina_de_precio_contra_volumen(
@@ -378,7 +384,12 @@ def test_sin_si_no_escribe_paneles(
     tmp_path: Path,
 ) -> None:
     argv = ["--empresa", EMPRESA, "--carpeta", str(tmp_path / "cash")]
-    argv += ["--conversacion", str(tmp_path / "borrador.json"), "--hoy", HOY.isoformat()]
+    argv += [
+        "--conversacion",
+        str(tmp_path / "borrador.json"),
+        "--hoy",
+        HOY.isoformat(),
+    ]
     for archivo in COMPLETA:
         argv += ["--archivo", archivo]
     for clave, valor in platica[1].respuestas.items():
