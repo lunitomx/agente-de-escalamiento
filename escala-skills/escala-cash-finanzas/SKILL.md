@@ -70,21 +70,45 @@ pydantic, o Python ni siquiera arranca, di exactamente:
 
 y no des ningún número.
 
-### Step 5: Guardar, sólo con «sí»
+El segundo párrafo de `mensaje` dice en qué fase van: «Vamos en la fase N de 8».
+Las 8 fases son leer, decir qué tengo y qué me falta, preguntar, revisar,
+anunciar, calcular, mostrar los paneles (fase 7) y decidir con ellos (fase 8).
 
-Al final, `mensaje` pregunta si guarda los estados revisados en
-`work/cash/<empresa>/`. Sin su «sí» no guardes nada. Si dice «sí», corre otra
-vez el escenario con `--guardar sí` y muestra `mensaje`. Así puede seguir otro
-día donde se quedó.
+### Step 5: Los paneles (fases 7 y 8)
 
-Pregunta después: "¿Qué quieres revisar primero: tus días, tu capital de
-trabajo o tu flujo?"
+Cuando calcula, el escenario llega a la fase 7 y `mensaje` trae «Tus paneles»:
+para ver (contabilidad real, días y ciclo, las tres medidas del flujo) y para
+decidir (perfil ideal, simulador, precio contra volumen, margen antes de
+impuestos). Cada panel trae su estado y un titular con números de la
+calculadora. Muéstralos tal cual; si uno dice «no calculable», muestra su razón.
+
+`mensaje` puede traer también «Opcional, para afinar tus paneles»: la tasa de
+IVA, el salario de mercado del dueño, lo que hoy se paga y sus devoluciones.
+Pásalas como en el Step 3 (`--responde tasa_iva=16`). Si no las sabe, no
+insistas.
+
+El perfil ideal necesita los límites del dueño. Después de guardar, platícalos
+con:
+`python3 <calculadora>/escala_server/cash/calcular.py perfil --empresa "<empresa>" --estados work/cash/<empresa>/estados-revisados-<fecha>.json`
+y repite sus preguntas como vienen. Lo fiscal sólo se muestra; no lo
+recomiendes.
+
+### Step 6: Guardar, sólo con «sí»
+
+Al final, `mensaje` pregunta si guarda los estados revisados y las páginas de
+los paneles en `work/cash/<empresa>/`. Sin su «sí» no guardes nada. Si dice
+«sí», corre otra vez el escenario con `--guardar sí` y muestra `mensaje`. Cada
+panel queda como una página `panel-<panel>-<fecha>.html` que el dueño abre en
+su navegador. Así puede seguir otro día donde se quedó.
+
+Pregunta después: "¿Con qué panel quieres decidir primero?"
 
 ## Output
 
 - Números de la calculadora, cada uno con fórmula, origen y lámina.
 - Lo que no se pudo calcular, con su razón.
-- Con «sí»: estados revisados guardados en `work/cash/<empresa>/`.
+- Los paneles de la fase 7 (para ver) y de la fase 8 (para decidir).
+- Con «sí»: estados revisados y páginas de los paneles en `work/cash/<empresa>/`.
 
 ## Notas
 

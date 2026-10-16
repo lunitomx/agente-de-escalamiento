@@ -48,7 +48,9 @@ la capacidad interna adecuada.
    (en la copia: `escala_server/cash/calcular.py escenario`). Muestra su
    `mensaje` tal cual y repite sus preguntas como vienen.
    Nunca escribas un número que no venga en `mensaje`. Pasa cada respuesta con `--responde <clave>=<respuesta>` y guarda sólo cuando el
-   dueño diga «sí», con `--guardar sí`. El detalle está en `escala-cash-finanzas`.
+   dueño diga «sí», con `--guardar sí`. El escenario dice en qué fase de 8 van
+   y, al calcular, muestra sus paneles para ver (fase 7) y para decidir
+   (fase 8). El detalle está en `escala-cash-finanzas`.
    `../../capabilities/mvp/catalog.json` es el contrato del ciclo de trabajo de
    las seis capacidades MVP para los adaptadores; no lo uses para elegir ruta.
 2. Carga únicamente el contexto local que el usuario autorizó. Si un dato es
