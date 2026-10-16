@@ -186,7 +186,8 @@ def test_el_remitente_detecta_un_cambio_a_mano(tmp_path: Path) -> None:
     from scripts.refresh_agent_cash_pointer import main
 
     assert main(["--check"]) == 0
-    copia = tmp_path / "SKILL.md"
+    copia = tmp_path / "escala-cash" / "SKILL.md"
+    copia.parent.mkdir()
     copia.write_text("Días de clientes = clientes ÷ ventas\n", encoding="utf-8")
     assert main(["--check", "--root", str(tmp_path)]) == 1
 

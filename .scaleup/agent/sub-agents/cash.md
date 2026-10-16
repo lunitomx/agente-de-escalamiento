@@ -15,7 +15,10 @@ La decisión de Cash cubre:
 
 ## Knowledge Path
 
-`.scaleup/knowledge/cash/`
+Este sub-agente es del árbol anterior. El vigente es
+`.escala/agent/sub-agents/cash.md`: síguelo. El conocimiento de cash vive en
+`conocimiento/cash/` (libro) y `.escala/knowledge/cash/` (curso). Los números
+los saca la calculadora de ESCALA (`escala_server/cash/calcular.py`).
 
 ## Tools & Skills
 

@@ -102,13 +102,15 @@ data: {
 
 ### Bar chart — comparación de impactos
 ```javascript
-// Datos: Power of One impacto por palanca
+// Datos: Power of One impacto por palanca. Cada valor es el `flujo` de esa
+// palanca en el JSON de la calculadora de ESCALA (escala_server/cash/calcular.py).
+// Nunca pongas números de ejemplo ni los calcules tú.
 type: 'bar',
 data: {
-  labels: ['Precio', 'Volumen', 'COGS', 'Gastos', 'A/R', 'Inventario', 'A/P'],
+  labels: ['Precio', 'Volumen', 'Costo', 'Gastos', 'Clientes', 'Inventario', 'Proveedores'],
   datasets: [{
-    label: 'Impacto en Cash Flow',
-    data: [120000, 48000, 38400, 21600, 41096, 19726, 19726],
+    label: 'Impacto en flujo',
+    data: [{FLUJO_PRECIO}, {FLUJO_VOLUMEN}, {FLUJO_COSTO}, {FLUJO_GASTOS}, {FLUJO_CLIENTES}, {FLUJO_INVENTARIO}, {FLUJO_PROVEEDORES}],
     backgroundColor: ['#16a34a', '#2563eb', '#ca8a04', '#dc2626', '#8b5cf6', '#ec4899', '#14b8a6']
   }]
 }
@@ -136,17 +138,22 @@ y Chart.js:
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:800px;margin:0 auto;">
   <div style="background:white;border-radius:12px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
     <h3>💰 Cash</h3>
-    <div style="font-size:2rem;font-weight:700;color:{COLOR};">{CCC} días</div>
-    <div style="font-size:0.8rem;color:#94a3b8;">Ciclo de efectivo</div>
+    <div style="font-size:2rem;font-weight:700;">{CICLO} días</div>
+    <div style="font-size:0.8rem;color:#94a3b8;">Ciclo de efectivo · año anterior: {CICLO_ANTERIOR} días</div>
   </div>
   <!-- Repite para Strategy, People, Execution -->
 </div>
 ```
 
-Colores de semáforo:
-- ✅ Verde (`#16a34a`) = bueno (CCC < 30, score > 80%)
+El ciclo de efectivo no lleva color: no hay un número de días que sea bueno o
+malo para todos los negocios. Muestra el `ciclo` que da la calculadora de
+ESCALA y el del año anterior para que el dueño compare. Si la calculadora dice
+`no_calculable`, escribe la razón en lugar del número.
+
+Colores de semáforo (sólo para el score de los dailys):
+- ✅ Verde (`#16a34a`) = bueno (score > 80%)
 - ⚠️ Amarillo (`#ca8a04`) = regular
-- ❌ Rojo (`#dc2626`) = malo (CCC > 60, score < 50%)
+- ❌ Rojo (`#dc2626`) = malo (score < 50%)
 
 ## Cómo guardar y abrir
 

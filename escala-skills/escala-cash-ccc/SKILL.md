@@ -42,12 +42,13 @@ y no des ningún número.
 
 Claves del JSON (una por fecha del balance, con el año anterior para comparar):
 
-- `dias_clientes`: clientes ÷ (ventas ÷ días del periodo).
-- `dias_inventario`: inventario ÷ (costo de ventas ÷ días del periodo).
-- `dias_proveedores`: proveedores ÷ (costo de ventas ÷ días del periodo).
-- `ciclo`: días de clientes + días de inventario − días de proveedores.
+- `dias_clientes`: cuántos días tarda tu cliente en pagarte.
+- `dias_inventario`: cuántos días se queda tu mercancía en el almacén.
+- `dias_proveedores`: cuántos días tardas en pagarle a tu proveedor.
+- `ciclo`: cuántos días tarda en regresar tu peso.
 
-Las fórmulas están aquí sólo para explicarlas. Los valores salen del JSON.
+Cada clave trae su fórmula en el campo `formula` del JSON: explícala con esas
+palabras. Las fórmulas viven sólo en la calculadora; aquí no se repiten.
 Los días del periodo los confirma el dueño al revisar sus estados: 365 si es
 un año, los días del mes si es un mes. Nunca uses 30 ni 360 por costumbre.
 

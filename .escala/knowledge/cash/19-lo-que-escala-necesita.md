@@ -19,11 +19,11 @@ Mi Empresa, al 31-dic-2025: activo 37,423,394.27 = pasivo 28,166,470.75 + capita
 
 Las 4 cajas al 31-dic-2025:
 
-- Capital de trabajo = clientes + inventario − proveedores = 5,639,601.55 + 1,771,040.54 − 1,232,468.24 = 6,178,173.85.
-- Deuda neta = préstamos bancarios de corto y largo plazo − bancos = 148,811.41 + 5,818,564.98 − 210,291.16 = 5,757,085.23.
-- Otras cuentas = todo lo demás = 8,835,834.90.
-- Capital = 9,256,923.52.
-- Capital de trabajo + otras cuentas = deuda neta + capital = 15,014,008.75.
+- Capital de trabajo: clientes 5,639,601.55 + inventario 1,771,040.54 − proveedores 1,232,468.24 = 6,178,173.85.
+- Deuda neta: préstamos bancarios de corto plazo 148,811.41 + de largo plazo 5,818,564.98 − bancos 210,291.16 = 5,757,085.23.
+- Otras cuentas: todo lo demás, 8,835,834.90.
+- Capital: 9,256,923.52.
+- Las cajas cuadran: capital de trabajo 6,178,173.85 + otras cuentas 8,835,834.90 = deuda neta 5,757,085.23 + capital 9,256,923.52 = 15,014,008.75.
 
 Si una cuenta de capital se escribe 1,838,827.91 en vez de 1,838,827.60, el balance no cuadra por 0.31. ESCALA pregunta: ¿redondeo o falta una cuenta?
 

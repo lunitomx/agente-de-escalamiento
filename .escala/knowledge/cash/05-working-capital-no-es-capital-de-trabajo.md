@@ -7,7 +7,7 @@ audio: 1
 
 ## La idea
 
-El dinero atorado en la operación (clientes + inventario − proveedores) no es el "capital de trabajo" que conoce tu contador (lo que tienes a corto plazo menos lo que debes a corto plazo). Son dos números distintos.
+El dinero atorado en la operación (lo que te deben tus clientes y lo que tienes en inventario, menos lo que le debes a tus proveedores) no es el "capital de trabajo" que conoce tu contador (lo que tienes a corto plazo menos lo que debes a corto plazo). Son dos números distintos.
 
 ## Según el curso
 
