@@ -61,7 +61,9 @@ def mi_empresa() -> ResultadoDelCurso:
     return calcular_curso(_mi_empresa_estados())
 
 
-def _calculado(resultado: ResultadoDelCurso, clave: str, fecha: date = FIN) -> Calculado:
+def _calculado(
+    resultado: ResultadoDelCurso, clave: str, fecha: date = FIN
+) -> Calculado:
     indicador = resultado.indicador(clave, fecha)
     assert isinstance(indicador, Calculado), (clave, fecha, indicador)
     return indicador
@@ -153,7 +155,9 @@ def test_poder_del_uno_totales(mi_empresa: ResultadoDelCurso) -> None:
 
 def test_origen_de_los_dias_de_clientes(mi_empresa: ResultadoDelCurso) -> None:
     dias = _calculado(mi_empresa, "dias_clientes")
-    assert dias.origen == "sale de: clientes 5,639,601.55 ÷ (ventas 43,826,513.09 ÷ 365)"
+    assert (
+        dias.origen == "sale de: clientes 5,639,601.55 ÷ (ventas 43,826,513.09 ÷ 365)"
+    )
     assert dias.formula == "clientes ÷ (ventas ÷ días del periodo)"
     assert dias.lamina == "L49"
 
@@ -195,7 +199,9 @@ def test_todo_numero_trae_formula_y_origen(mi_empresa: ResultadoDelCurso) -> Non
             assert parte.origen.startswith("sale de: ")
 
 
-def test_el_origen_muestra_las_cuentas_del_balance(mi_empresa: ResultadoDelCurso) -> None:
+def test_el_origen_muestra_las_cuentas_del_balance(
+    mi_empresa: ResultadoDelCurso,
+) -> None:
     ct = _calculado(mi_empresa, "capital_de_trabajo")
     assert "Clientes 5,639,601.55" in ct.origen
     assert "− Proveedores" in ct.origen
@@ -207,7 +213,9 @@ def test_poder_del_uno_usa_el_motor_de_s86_13(monkeypatch: pytest.MonkeyPatch) -
     llamadas: list[FinancialInputs] = []
 
     class Espia(PowerOfOneEngine):
-        def calculate(self, inputs: FinancialInputs, adjustments: dict[str, int] | None = None):  # type: ignore[override]
+        def calculate(
+            self, inputs: FinancialInputs, adjustments: dict[str, int] | None = None
+        ):  # type: ignore[override]
             llamadas.append(inputs)
             return super().calculate(inputs, adjustments)
 
@@ -225,7 +233,9 @@ def test_poder_del_uno_usa_el_motor_de_s86_13(monkeypatch: pytest.MonkeyPatch) -
 Fila = tuple[str, str | None, str | None, str | None]
 
 
-def _lectura(filas: list[Fila], inicial: date = INI, final: date = FIN) -> LecturaEstados:
+def _lectura(
+    filas: list[Fila], inicial: date = INI, final: date = FIN
+) -> LecturaEstados:
     cuentas: list[CuentaLeida] = []
     for renglon, (nombre, concepto, al_inicio, al_final) in enumerate(filas, start=1):
         for fecha, monto in ((inicial, al_inicio), (final, al_final)):
@@ -420,7 +430,9 @@ def test_main_imprime_json(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -
     assert main([str(_archivo(tmp_path))]) == 0
     datos = json.loads(capsys.readouterr().out)
     dias = next(
-        i for i in datos["indicadores"] if i["clave"] == "dias_clientes" and i["fecha"] == "2025-12-31"
+        i
+        for i in datos["indicadores"]
+        if i["clave"] == "dias_clientes" and i["fecha"] == "2025-12-31"
     )
     assert Decimal(dias["valor"]) == Decimal("46.97")
     assert dias["origen"].startswith("sale de: clientes")

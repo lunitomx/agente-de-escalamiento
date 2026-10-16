@@ -65,9 +65,18 @@ LAMINA_ENGANA = "L25"
 LAMINA_AJUSTADO = "L70"
 
 CLAVES_DE_MEDIDAS: tuple[tuple[str, str], ...] = (
-    ("flujo_neto", "La medida del director general: cuánto efectivo dejó o pidió la empresa."),
-    ("flujo_de_operacion", "El indicador del equipo: cuánto efectivo deja la operación."),
-    ("marginal", "Qué pasa con tu efectivo cuando creces: de cada peso más de venta, cuánto queda."),
+    (
+        "flujo_neto",
+        "La medida del director general: cuánto efectivo dejó o pidió la empresa.",
+    ),
+    (
+        "flujo_de_operacion",
+        "El indicador del equipo: cuánto efectivo deja la operación.",
+    ),
+    (
+        "marginal",
+        "Qué pasa con tu efectivo cuando creces: de cada peso más de venta, cuánto queda.",
+    ),
 )
 
 
@@ -95,7 +104,9 @@ class CambioDeRenglon(_Modelo):
 
 
 class Capitulo(_Modelo):
-    clave: Literal["rentabilidad", "capital_de_trabajo", "otras_cuentas", "salidas_de_capital"]
+    clave: Literal[
+        "rentabilidad", "capital_de_trabajo", "otras_cuentas", "salidas_de_capital"
+    ]
     nombre: str
     valor: Decimal
     formula: str
@@ -174,7 +185,10 @@ def _saldos(cuentas: Sequence[CuentaEnCaja], caja: Caja) -> dict[str, _Saldo]:
             saldos[c.nombre] = _Saldo(c.renglon, c.lado, c.monto, signo)
         else:
             saldos[c.nombre] = _Saldo(
-                previo.renglon, previo.lado, previo.monto + c.monto, previo.con_signo + signo
+                previo.renglon,
+                previo.lado,
+                previo.monto + c.monto,
+                previo.con_signo + signo,
             )
     return saldos
 
@@ -194,7 +208,11 @@ def _lectura(lado: str, cambio: Decimal) -> str:
 
 
 def _cambios(
-    inicial: Sequence[CuentaEnCaja], final: Sequence[CuentaEnCaja], caja: Caja, ini: date, fin: date
+    inicial: Sequence[CuentaEnCaja],
+    final: Sequence[CuentaEnCaja],
+    caja: Caja,
+    ini: date,
+    fin: date,
 ) -> tuple[CambioDeRenglon, ...]:
     antes, despues = _saldos(inicial, caja), _saldos(final, caja)
     nombres = list(despues) + [n for n in antes if n not in despues]
@@ -226,7 +244,10 @@ def _cambios(
 
 
 def _texto_suma(partes: Sequence[tuple[str, Decimal]]) -> str:
-    textos = [f"{'−' if monto < 0 else '+'} {nombre} {formato_monto(abs(monto))}" for nombre, monto in partes]
+    textos = [
+        f"{'−' if monto < 0 else '+'} {nombre} {formato_monto(abs(monto))}"
+        for nombre, monto in partes
+    ]
     texto = " ".join(textos) or "no hay cuentas en esta caja (0.00)"
     return texto[2:] if texto.startswith("+ ") else texto
 
@@ -255,7 +276,9 @@ def _medidas(resultado: ResultadoDelCurso, fin: date) -> tuple[Medida, ...]:
     )
 
 
-def _engana(inicial: Sequence[CuentaEnCaja], final: Sequence[CuentaEnCaja], ini: date, fin: date) -> Calculado | None:
+def _engana(
+    inicial: Sequence[CuentaEnCaja], final: Sequence[CuentaEnCaja], ini: date, fin: date
+) -> Calculado | None:
     def bancos(cuentas: Sequence[CuentaEnCaja]) -> Decimal | None:
         de_bancos = [c.monto for c in cuentas if c.regla == "bancos"]
         return sum(de_bancos, CERO) if de_bancos else None
@@ -283,7 +306,11 @@ def _flujo_ajustado(flujo_neto: Calculado, resultado: ResultadoDelCurso) -> Indi
     formula = "flujo neto + flujo de las 7 palancas del poder del uno"
     palancas = resultado.poder_del_uno_flujo
     if not isinstance(palancas, Calculado):
-        razon = _razon(palancas) if palancas is not None else "no se calculó el poder del uno"
+        razon = (
+            _razon(palancas)
+            if palancas is not None
+            else "no se calculó el poder del uno"
+        )
         return NoCalculable(
             clave="flujo_neto_ajustado",
             nombre=nombre,
@@ -308,11 +335,17 @@ def _flujo_ajustado(flujo_neto: Calculado, resultado: ResultadoDelCurso) -> Indi
     )
 
 
-def _preguntas_de_retiros(respuestas: Respuestas, salio: Decimal) -> tuple[PreguntaDeRetiros, ...]:
+def _preguntas_de_retiros(
+    respuestas: Respuestas, salio: Decimal
+) -> tuple[PreguntaDeRetiros, ...]:
     if salio >= 0:
-        contexto = f"Tu capital creció {formato_monto(salio)} menos que tu utilidad neta."
+        contexto = (
+            f"Tu capital creció {formato_monto(salio)} menos que tu utilidad neta."
+        )
     else:
-        contexto = f"Tu capital creció {formato_monto(abs(salio))} más que tu utilidad neta."
+        contexto = (
+            f"Tu capital creció {formato_monto(abs(salio))} más que tu utilidad neta."
+        )
     para_que = f"Para explicar la 5ª fila de los 4 capítulos. {contexto}"
     preguntas: list[PreguntaDeRetiros] = []
     if respuestas.retiros_del_dueno is None:
@@ -358,7 +391,9 @@ def _retiros(quinta: Decimal, respuestas: Respuestas | None) -> ComparacionDeRet
             preguntas=preguntas,
         )
     # Una sola definición con R9 (S86.15): C3 + C4; lo que no contestó cuenta 0.
-    dijo = (respuestas.retiros_del_dueno or CERO) + (respuestas.retiros_de_capital or CERO)
+    dijo = (respuestas.retiros_del_dueno or CERO) + (
+        respuestas.retiros_de_capital or CERO
+    )
     sin_explicar = salio - dijo
     if abs(sin_explicar) <= TOLERANCIA:
         estado: Literal["cuadra", "sin explicar"] = "cuadra"
@@ -498,7 +533,9 @@ def panel_de(estados: EstadosRevisados) -> PanelDelFlujo:
         ),
         Capitulo(
             clave="salidas_de_capital",
-            nombre="5ª fila. Salidas de capital" if quinta <= 0 else "5ª fila. Entradas de capital",
+            nombre="5ª fila. Salidas de capital"
+            if quinta <= 0
+            else "5ª fila. Entradas de capital",
             valor=quinta,
             formula="(capital al final − capital al inicio) − utilidad neta",
             origen=(
@@ -667,7 +704,9 @@ def _cascada_html(panel: PanelDelFlujo) -> str:
 
 
 def _retiros_html(retiros: ComparacionDeRetiros) -> str:
-    clase = {"cuadra": "cuadra", "sin explicar": "pregunta", "sin respuesta": "aviso"}[retiros.estado]
+    clase = {"cuadra": "cuadra", "sin explicar": "pregunta", "sin respuesta": "aviso"}[
+        retiros.estado
+    ]
     preguntas = "".join(
         f'<p class="aviso pregunta"><b>{_e(p.codigo)}.</b> {_e(p.pregunta)}<br><small>{_e(p.para_que)}</small></p>'
         for p in retiros.preguntas
@@ -697,7 +736,7 @@ def _cuerpo(panel: PanelDelFlujo) -> str:
         partes.append(
             '<p class="aviso">Lo que engaña: tus bancos cambiaron '
             f"{formato_monto(panel.engana.valor)}, pero eso no es tu flujo. "
-            f'<br><small>{_e(panel.engana.origen)} (lámina {_e(panel.engana.lamina)})</small></p>'
+            f"<br><small>{_e(panel.engana.origen)} (lámina {_e(panel.engana.lamina)})</small></p>"
         )
     partes.append("<h2>Los 4 capítulos: a dónde se fue tu utilidad</h2>")
     if panel.capitulos:
@@ -708,7 +747,9 @@ def _cuerpo(panel: PanelDelFlujo) -> str:
             partes.append("<h2>La 5ª fila contra lo que me dijiste</h2>")
             partes.append(_retiros_html(panel.retiros))
     else:
-        partes.append(f'<p class="aviso">No calculable: {_e(panel.capitulos_no_calculable or "")}</p>')
+        partes.append(
+            f'<p class="aviso">No calculable: {_e(panel.capitulos_no_calculable or "")}</p>'
+        )
     if panel.flujo_ajustado is not None:
         partes.append("<h2>Con el poder del uno</h2>")
         partes.append(
@@ -749,7 +790,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     """``python -m escala_server.cash.flujo <estados-revisados.json> <salida.html>``."""
     argumentos = list(sys.argv[1:] if argv is None else argv)
     if len(argumentos) != 2:
-        return _no("uso: python -m escala_server.cash.flujo <estados-revisados.json> <salida.html>")
+        return _no(
+            "uso: python -m escala_server.cash.flujo <estados-revisados.json> <salida.html>"
+        )
     try:
         texto = Path(argumentos[0]).read_text(encoding="utf-8")
     except OSError:

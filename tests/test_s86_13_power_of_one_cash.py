@@ -18,7 +18,9 @@ from escala_server.cash import FinancialInputs, LeverImpact, PowerOfOneEngine
 
 ROOT = Path(__file__).resolve().parent.parent
 FIXTURE = ROOT / "tests" / "fixtures" / "cash" / "mi_empresa.yaml"
-DASHBOARD = ROOT / "escala_server" / "static" / "dashboards" / "cash" / "power-of-one.html"
+DASHBOARD = (
+    ROOT / "escala_server" / "static" / "dashboards" / "cash" / "power-of-one.html"
+)
 
 
 def _mi_empresa() -> dict[str, Any]:
@@ -93,8 +95,12 @@ def test_more_customers_balance_lowers_price_and_volume_cash() -> None:
     base = _by_lever(_inputs())
     more_ar = _by_lever(_inputs(accounts_receivable=Decimal("6639601.55")))
     # +1,000,000 en clientes → 1% = 10,000 menos de flujo en precio y en volumen.
-    assert more_ar["price"].cash_impact == pytest.approx(base["price"].cash_impact - 10000, abs=0.01)
-    assert more_ar["volume"].cash_impact == pytest.approx(base["volume"].cash_impact - 10000, abs=0.01)
+    assert more_ar["price"].cash_impact == pytest.approx(
+        base["price"].cash_impact - 10000, abs=0.01
+    )
+    assert more_ar["volume"].cash_impact == pytest.approx(
+        base["volume"].cash_impact - 10000, abs=0.01
+    )
     # La utilidad no cambia: clientes es balance, no resultados.
     assert more_ar["price"].ebit_impact == base["price"].ebit_impact
 
@@ -102,9 +108,13 @@ def test_more_customers_balance_lowers_price_and_volume_cash() -> None:
 def test_inventory_and_suppliers_move_cost_cash() -> None:
     base = _by_lever(_inputs())
     more_inv = _by_lever(_inputs(inventory=Decimal("2771040.54")))
-    assert more_inv["cogs"].cash_impact == pytest.approx(base["cogs"].cash_impact + 10000, abs=0.01)
+    assert more_inv["cogs"].cash_impact == pytest.approx(
+        base["cogs"].cash_impact + 10000, abs=0.01
+    )
     more_ap = _by_lever(_inputs(accounts_payable=Decimal("2232468.24")))
-    assert more_ap["cogs"].cash_impact == pytest.approx(base["cogs"].cash_impact - 10000, abs=0.01)
+    assert more_ap["cogs"].cash_impact == pytest.approx(
+        base["cogs"].cash_impact - 10000, abs=0.01
+    )
 
 
 def test_worsening_a_lever_flips_the_sign() -> None:

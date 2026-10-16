@@ -18,7 +18,14 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from .cajas import CLAVES_DE_REGLAS, Acomodo, Caja, CuentaEnCaja, TotalesPorCaja, acomodar
+from .cajas import (
+    CLAVES_DE_REGLAS,
+    Acomodo,
+    Caja,
+    CuentaEnCaja,
+    TotalesPorCaja,
+    acomodar,
+)
 from .formatos import fecha_corta, formato_monto, palabras
 from .lector import DIAS_PARA_AVISAR, CuentaLeida, LecturaEstados
 
@@ -120,7 +127,9 @@ def _periodo(tipo: Periodo, hasta: date) -> PeriodoDelEstado:
         desde = date(hasta.year - 1, 12, 31)
     else:
         desde = _fin_del_mes_anterior(hasta)
-    return PeriodoDelEstado(tipo=tipo, desde=desde, hasta=hasta, dias=(hasta - desde).days)
+    return PeriodoDelEstado(
+        tipo=tipo, desde=desde, hasta=hasta, dias=(hasta - desde).days
+    )
 
 
 def _fecha_del_estado(resultados: LecturaEstados | None) -> date | None:
@@ -136,7 +145,11 @@ def _del_estado(
     if resultados is None or fecha is None:
         return None
     for cuenta in resultados.cuentas:
-        if cuenta.concepto == concepto and not cuenta.es_total and cuenta.fecha == fecha:
+        if (
+            cuenta.concepto == concepto
+            and not cuenta.es_total
+            and cuenta.fecha == fecha
+        ):
             return cuenta.monto
     return None
 
@@ -211,7 +224,9 @@ def _r10(totales: TotalesPorCaja, tolerancia: Decimal) -> Hallazgo:
     )
 
 
-def _que_suma(total: CuentaLeida) -> Literal["activo", "pasivo", "capital", "pasivo y capital"] | None:
+def _que_suma(
+    total: CuentaLeida,
+) -> Literal["activo", "pasivo", "capital", "pasivo y capital"] | None:
     resto = palabras(total.nombre)[1:]
     if resto == ("activo",):
         return "activo"
@@ -248,7 +263,11 @@ def _r3(acomodo: Acomodo, tolerancia: Decimal) -> list[Hallazgo]:
             f"«{total.nombre}» al {fecha_corta(totales.fecha)} dice "
             f"{formato_monto(total.monto)} y sus cuentas suman {formato_monto(suma)}"
         )
-        mensaje += "." if resultado == "cuadra" else f": diferencia de {formato_monto(diferencia)}."
+        mensaje += (
+            "."
+            if resultado == "cuadra"
+            else f": diferencia de {formato_monto(diferencia)}."
+        )
         hallazgos.append(
             Hallazgo(
                 revision="R3",
@@ -292,7 +311,11 @@ def _r2(
         f"Tu estado de resultados da {formato_monto(utilidad)} de utilidad neta y el "
         f"balance dice {formato_monto(del_balance.monto)} en «{del_balance.nombre}»"
     )
-    mensaje += "." if resultado == "cuadra" else f": diferencia de {formato_monto(diferencia)}. ¿Cuál es la buena?"
+    mensaje += (
+        "."
+        if resultado == "cuadra"
+        else f": diferencia de {formato_monto(diferencia)}. ¿Cuál es la buena?"
+    )
     # Avisa, no bloquea: el contador pudo traspasar parte de la utilidad.
     return Hallazgo(
         revision="R2",
@@ -385,7 +408,11 @@ def _r5(balances: list[LecturaEstados], resultados: LecturaEstados | None) -> Ha
     )
 
 
-_NO_NEGATIVAS = {"clientes": "Clientes", "inventario": "Inventario", "proveedores": "Proveedores"}
+_NO_NEGATIVAS = {
+    "clientes": "Clientes",
+    "inventario": "Inventario",
+    "proveedores": "Proveedores",
+}
 
 
 def _r6(acomodo: Acomodo, resultados: LecturaEstados | None) -> list[Hallazgo]:
@@ -443,7 +470,9 @@ def _r9(
     if respuestas.retiros_de_capital is None and respuestas.retiros_del_dueno is None:
         return []  # C3/C4 todavía no se contestan; la pregunta C4 lleva el número.
     salio = -cambio_menos_utilidad
-    dijo = (respuestas.retiros_de_capital or _CERO) + (respuestas.retiros_del_dueno or _CERO)
+    dijo = (respuestas.retiros_de_capital or _CERO) + (
+        respuestas.retiros_del_dueno or _CERO
+    )
     diferencia = abs(salio - dijo)
     if diferencia <= tolerancia:
         return [
@@ -515,7 +544,9 @@ def _deuda_del_banco(cuentas: tuple[CuentaEnCaja, ...], fecha: date) -> Decimal:
     )
 
 
-def _sin_contestar_interes(acomodo: Acomodo, respuestas: Respuestas) -> list[CuentaEnCaja]:
+def _sin_contestar_interes(
+    acomodo: Acomodo, respuestas: Respuestas
+) -> list[CuentaEnCaja]:
     return [
         c
         for c in acomodo.cuentas
@@ -537,7 +568,12 @@ def _tasas(
     fechas: list[date],
     intereses: Decimal | None,
 ) -> tuple[Decimal | None, Decimal | None]:
-    if periodo is None or periodo.dias not in _DIAS_DE_UN_ANIO or intereses is None or not fechas:
+    if (
+        periodo is None
+        or periodo.dias not in _DIAS_DE_UN_ANIO
+        or intereses is None
+        or not fechas
+    ):
         return None, None
     banco = _promedio([_deuda_del_banco(acomodo.cuentas, f) for f in fechas])
     tasa = intereses / banco * _CIEN if banco else None
@@ -656,11 +692,11 @@ def _preguntas(
     for cuenta in dudosas.values():
         pregunta = f"¿«{cuenta.nombre}» paga interés?"
         if tasa is not None and tasa > umbral_tasa * _CIEN:
-            pregunta = (
-                f"Con tu deuda del banco, los intereses dan una tasa de {_pct(tasa)} al año."
-            )
+            pregunta = f"Con tu deuda del banco, los intereses dan una tasa de {_pct(tasa)} al año."
             if tasa_con is not None:
-                pregunta += f" Si sumo «{cuenta.nombre}», la tasa queda en {_pct(tasa_con)}."
+                pregunta += (
+                    f" Si sumo «{cuenta.nombre}», la tasa queda en {_pct(tasa_con)}."
+                )
             pregunta += f" ¿«{cuenta.nombre}» paga interés?"
         preguntas.append(
             PreguntaPendiente(
@@ -728,7 +764,9 @@ def revisar_estados(
     fechas = acomodo.fechas
 
     hasta = _fecha_del_estado(resultados)
-    periodo = _periodo(respuestas.periodo, hasta) if respuestas.periodo and hasta else None
+    periodo = (
+        _periodo(respuestas.periodo, hasta) if respuestas.periodo and hasta else None
+    )
     if periodo is not None:
         final = periodo.hasta if periodo.hasta in fechas else None
         inicial = periodo.desde if periodo.desde in fechas else None
@@ -739,13 +777,18 @@ def revisar_estados(
     utilidad = _del_estado(resultados, "utilidad_neta", hasta)
     intereses = _del_estado(resultados, "intereses", hasta)
     cambio_menos_utilidad: Decimal | None = None
-    inicio, fin = (acomodo.en(inicial) if inicial else None), (acomodo.en(final) if final else None)
+    inicio, fin = (
+        (acomodo.en(inicial) if inicial else None),
+        (acomodo.en(final) if final else None),
+    )
     if inicio is not None and fin is not None and utilidad is not None:
         cambio_menos_utilidad = fin.capital - inicio.capital - utilidad
 
     hallazgos: list[Hallazgo] = []
     for totales in acomodo.totales:
-        sin_caja = sum(1 for c in acomodo.cuentas if c.caja is None and c.fecha == totales.fecha)
+        sin_caja = sum(
+            1 for c in acomodo.cuentas if c.caja is None and c.fecha == totales.fecha
+        )
         hallazgos.append(_r1(totales, tolerancia, sin_caja))
     hallazgos.append(_r2(acomodo, final if final else hasta, utilidad, tolerancia))
     hallazgos += _r3(acomodo, tolerancia)
@@ -815,7 +858,9 @@ def render_asi_acomode(revision: RevisionDeEstados) -> str:
             "",
             "Las 4 cajas (uso: activo suma y pasivo resta; fuente: pasivo y capital suman, activo resta)",
             "",
-            "| Caja | " + " | ".join(fecha_corta(t.fecha) for t in acomodo.totales) + " |",
+            "| Caja | "
+            + " | ".join(fecha_corta(t.fecha) for t in acomodo.totales)
+            + " |",
             "|---|" + "---|" * len(acomodo.totales),
         ]
         filas: list[tuple[str, Caja]] = [
@@ -842,7 +887,10 @@ def render_asi_acomode(revision: RevisionDeEstados) -> str:
         if hallazgo.revision == "R1" or hallazgo.resultado != "cuadra":
             lineas.append(f"- {hallazgo.revision}: {hallazgo.mensaje}")
     if not revision.puede_calcular:
-        lineas += ["", "No calculo nada todavía: primero hay que resolver lo que bloquea."]
+        lineas += [
+            "",
+            "No calculo nada todavía: primero hay que resolver lo que bloquea.",
+        ]
     if revision.preguntas:
         lineas += ["", "Preguntas", ""]
         lineas += [

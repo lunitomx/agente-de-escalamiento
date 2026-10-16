@@ -31,7 +31,12 @@ from .lector import CuentaLeida
 
 Caja = Literal["capital de trabajo", "deuda neta", "otras cuentas", "capital"]
 Lado = Literal["activo", "pasivo", "capital"]
-CAJAS: tuple[Caja, ...] = ("capital de trabajo", "deuda neta", "otras cuentas", "capital")
+CAJAS: tuple[Caja, ...] = (
+    "capital de trabajo",
+    "deuda neta",
+    "otras cuentas",
+    "capital",
+)
 _CAJAS_DE_USO: frozenset[Caja] = frozenset({"capital de trabajo", "otras cuentas"})
 
 
@@ -58,7 +63,14 @@ _ANTICIPOS = ("anticipo", "anticipos")
 REGLAS: tuple[Regla, ...] = (
     Regla(
         "bancos",
-        ("bancos", "banco", "caja", "caja y bancos", "efectivo", "efectivo y equivalentes"),
+        (
+            "bancos",
+            "banco",
+            "caja",
+            "caja y bancos",
+            "efectivo",
+            "efectivo y equivalentes",
+        ),
         "activo",
         "deuda neta",
         "El efectivo resta a la deuda: es dinero con el que podrías pagarla.",
@@ -188,7 +200,12 @@ REGLAS: tuple[Regla, ...] = (
     ),
     Regla(
         "activo_diferido",
-        ("activo diferido", "cargos diferidos", "gastos anticipados", "depositos en garantia"),
+        (
+            "activo diferido",
+            "cargos diferidos",
+            "gastos anticipados",
+            "depositos en garantia",
+        ),
         "activo",
         "otras cuentas",
         "Son pagos hechos por adelantado: van en otras cuentas.",
@@ -325,12 +342,16 @@ def _acomodar_una(
     caja: Caja = regla.caja
     porque = regla.porque
     if dicha:
-        porque = f"Me dijiste qué es: va con {regla.clave.replace('_', ' ')}. {regla.porque}"
+        porque = (
+            f"Me dijiste qué es: va con {regla.clave.replace('_', ' ')}. {regla.porque}"
+        )
     movida = False
     if cuenta.nombre in movimientos and movimientos[cuenta.nombre] != regla.caja:
         caja = movimientos[cuenta.nombre]
         movida = True
-        porque = f"La moviste tú a {caja}. Por regla iba en {regla.caja}: {regla.porque}"
+        porque = (
+            f"La moviste tú a {caja}. Por regla iba en {regla.caja}: {regla.porque}"
+        )
     elif regla.pregunta_interes and con_interes.get(cuenta.nombre) is True:
         caja = "deuda neta"
         porque = "Me dijiste que paga interés: es deuda, va en deuda neta."
@@ -404,6 +425,7 @@ def acomodar(
         cuentas=tuple(acomodadas),
         totales_del_documento=tuple(cuenta for cuenta in cuentas if cuenta.es_total),
         totales=tuple(
-            _totales(fecha, [c for c in acomodadas if c.fecha == fecha]) for fecha in fechas
+            _totales(fecha, [c for c in acomodadas if c.fecha == fecha])
+            for fecha in fechas
         ),
     )

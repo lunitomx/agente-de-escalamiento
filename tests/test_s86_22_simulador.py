@@ -28,7 +28,12 @@ from typing import Any
 
 import pytest
 
-from escala_server.cash import LEVER_META, FinancialInputs, PowerOfOneEngine, lever_parts
+from escala_server.cash import (
+    LEVER_META,
+    FinancialInputs,
+    PowerOfOneEngine,
+    lever_parts,
+)
 from escala_server.cash import _lever_effect  # pyright: ignore[reportPrivateUsage]
 from escala_server.cash.curso import (
     Coeficiente,
@@ -109,7 +114,9 @@ INPUTS = FinancialInputs(
 @pytest.mark.parametrize("units", [1, 5])
 def test_el_flujo_del_motor_es_la_suma_de_sus_dos_lados(lever: str, units: int) -> None:
     partes = lever_parts(lever, INPUTS, units)
-    flujo, utilidad, formula_flujo, formula_utilidad = _lever_effect(lever, INPUTS, units)
+    flujo, utilidad, formula_flujo, formula_utilidad = _lever_effect(
+        lever, INPUTS, units
+    )
     assert partes.per_period + partes.one_time == flujo
     assert partes.per_period == utilidad
     assert partes.cash_formula == formula_flujo
@@ -120,7 +127,9 @@ def test_lado_de_una_vez_del_precio_es_lo_que_se_queda_en_clientes() -> None:
     partes = lever_parts("price", INPUTS, 1)
     assert partes.one_time == -Decimal("0.01") * INPUTS.accounts_receivable
     assert "clientes 5,639,601.55" in partes.one_time_formula
-    otro = FinancialInputs(**{**INPUTS.__dict__, "accounts_receivable": Decimal("1000000")})
+    otro = FinancialInputs(
+        **{**INPUTS.__dict__, "accounts_receivable": Decimal("1000000")}
+    )
     assert lever_parts("price", otro, 1).one_time == Decimal("-10000.00")
 
 
@@ -176,7 +185,9 @@ def test_los_coeficientes_salen_del_balance(mi_empresa: ResultadoDelCurso) -> No
     assert _coeficiente(mi_empresa, "precio", "por_periodo").valor > 0
 
 
-def test_la_calculadora_sigue_dando_flujo_y_utilidad(mi_empresa: ResultadoDelCurso) -> None:
+def test_la_calculadora_sigue_dando_flujo_y_utilidad(
+    mi_empresa: ResultadoDelCurso,
+) -> None:
     assert len(mi_empresa.poder_del_uno) == 7
     assert len(mi_empresa.simulador) == 7
     assert [p.unidad for p in mi_empresa.simulador] == ["%"] * 4 + ["días"] * 3
@@ -212,7 +223,9 @@ def test_la_advertencia_de_volumen_se_calcula() -> None:
             ("Utilidad neta", "utilidad_neta", "200", "200"),
         ],
     )
-    texto = next(a.texto for a in simulador_de(resultado).advertencias if a.palanca == "volumen")
+    texto = next(
+        a.texto for a in simulador_de(resultado).advertencias if a.palanca == "volumen"
+    )
     assert "50.00 por cada 100" in texto
     assert "14.10" not in texto
 
@@ -350,7 +363,9 @@ process.stdin.on('end', () => {
 
 def _datos_de_la_pagina(html: str) -> dict[str, Any]:
     encontrado = re.search(
-        r'<script id="datos-simulador" type="application/json">(.*?)</script>', html, re.S
+        r'<script id="datos-simulador" type="application/json">(.*?)</script>',
+        html,
+        re.S,
     )
     assert encontrado, "la página no trae los coeficientes embebidos"
     datos: dict[str, Any] = json.loads(encontrado.group(1))
@@ -375,7 +390,18 @@ def _d(valor: float) -> Decimal:
     return _cents(Decimal(str(valor)))
 
 
-TODAS_EN_1 = {p: 1 for p in ("precio", "volumen", "costo", "gastos", "clientes", "inventario", "proveedores")}
+TODAS_EN_1 = {
+    p: 1
+    for p in (
+        "precio",
+        "volumen",
+        "costo",
+        "gastos",
+        "clientes",
+        "inventario",
+        "proveedores",
+    )
+}
 
 
 def test_las_7_en_1_anual(simulador: Simulador) -> None:
@@ -386,9 +412,15 @@ def test_las_7_en_1_anual(simulador: Simulador) -> None:
     assert _d(anual["efectivo_cada_periodo"]) == Decimal("1010740.66")
 
 
-def test_vista_mensual_subir_el_precio_nunca_resta_efectivo(simulador: Simulador) -> None:
+def test_vista_mensual_subir_el_precio_nunca_resta_efectivo(
+    simulador: Simulador,
+) -> None:
     datos = _datos_de_la_pagina(pagina(simulador))
-    casos = [{"movimientos": {"precio": n}, "vista": v} for n in range(1, 11) for v in ("mensual", "anual")]
+    casos = [
+        {"movimientos": {"precio": n}, "vista": v}
+        for n in range(1, 11)
+        for v in ("mensual", "anual")
+    ]
     resultados = _simula(datos, casos)
     for caso, r in zip(casos, resultados):
         n = caso["movimientos"]["precio"]
@@ -399,14 +431,18 @@ def test_vista_mensual_subir_el_precio_nunca_resta_efectivo(simulador: Simulador
             assert r["efectivo_total"] is None
             # Mezclarlos daría negativo: así se ve la trampa que la prueba evita.
             assert r["efectivo_cada_periodo"] + r["una_vez"] < 0
-            assert _d(r["efectivo_cada_periodo"]) == _cents(Decimal(n) * Decimal("438265.1309") / 12)
+            assert _d(r["efectivo_cada_periodo"]) == _cents(
+                Decimal(n) * Decimal("438265.1309") / 12
+            )
 
 
 def test_cobro_5_dias_antes_y_subo_2_por_ciento_igual_que_el_motor(
     simulador: Simulador,
 ) -> None:
     datos = _datos_de_la_pagina(pagina(simulador))
-    [r] = _simula(datos, [{"movimientos": {"clientes": 5, "precio": 2}, "vista": "anual"}])
+    [r] = _simula(
+        datos, [{"movimientos": {"clientes": 5, "precio": 2}, "vista": "anual"}]
+    )
     motor = PowerOfOneEngine().calculate(INPUTS, {"ar_days": 5, "price": 2})
     assert _d(r["efectivo_total"]) == Decimal(str(motor.combined_cash_impact))
     assert _d(r["utilidad"]) == Decimal(str(motor.combined_ebit_impact))
@@ -425,7 +461,9 @@ def test_la_pagina_usa_los_coeficientes_embebidos(simulador: Simulador) -> None:
 
 def test_palanca_que_no_aplica_no_se_mueve() -> None:
     datos = _datos_de_la_pagina(pagina(simulador_de(_servicios())))
-    [r] = _simula(datos, [{"movimientos": {"costo": 5, "inventario": 3}, "vista": "anual"}])
+    [r] = _simula(
+        datos, [{"movimientos": {"costo": 5, "inventario": 3}, "vista": "anual"}]
+    )
     assert r["efectivo_total"] == 0 and r["utilidad"] == 0
     costo = next(p for p in r["palancas"] if p["palanca"] == "costo")
     assert costo["aplica"] is False and "costo de ventas" in costo["razon"]
@@ -446,7 +484,9 @@ def test_la_pagina_rotula_antes_de_isr_y_no_trae_formulas(simulador: Simulador) 
 # ---------------------------------------------------------------------------
 
 
-def test_main_escribe_la_pagina(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+def test_main_escribe_la_pagina(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     estados = tmp_path / "estados-revisados.json"
     estados.write_text(_mi_empresa_estados().model_dump_json(), encoding="utf-8")
     salida = tmp_path / "simulador.html"
@@ -471,7 +511,13 @@ def test_modulo_se_corre_con_python_m(tmp_path: Path) -> None:
     estados.write_text(_mi_empresa_estados().model_dump_json(), encoding="utf-8")
     salida = tmp_path / "simulador.html"
     corrida = subprocess.run(
-        [sys.executable, "-m", "escala_server.cash.simulador", str(estados), str(salida)],
+        [
+            sys.executable,
+            "-m",
+            "escala_server.cash.simulador",
+            str(estados),
+            str(salida),
+        ],
         capture_output=True,
         text=True,
         cwd=ROOT,

@@ -81,6 +81,9 @@ selections:
   - path: escala_server/diff.py
     kind: file
     role: local_runtime
+  - path: escala_server/financial
+    kind: tree
+    role: local_runtime
   - path: escala_server/graph_engine.py
     kind: file
     role: local_runtime

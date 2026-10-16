@@ -49,9 +49,21 @@ USO = (
 
 _CUENTAS: tuple[tuple[str, str, str], ...] = (
     ("clientes", "Días de clientes", "Cuánto tardas en cobrar. Menos es mejor."),
-    ("inventario", "Días de inventario", "Cuánto tiempo guardas la mercancía. Menos es mejor."),
-    ("proveedores", "Días de proveedores", "Cuánto tardas en pagar. Más es mejor para tu efectivo."),
-    ("ciclo", "Ciclo del efectivo", "Clientes + inventario − proveedores: los días que financias tú."),
+    (
+        "inventario",
+        "Días de inventario",
+        "Cuánto tiempo guardas la mercancía. Menos es mejor.",
+    ),
+    (
+        "proveedores",
+        "Días de proveedores",
+        "Cuánto tardas en pagar. Más es mejor para tu efectivo.",
+    ),
+    (
+        "ciclo",
+        "Ciclo del efectivo",
+        "Clientes + inventario − proveedores: los días que financias tú.",
+    ),
 )
 
 _ESTILO = """
@@ -140,9 +152,7 @@ def _celda(fecha_texto: str, indicador: Indicador) -> str:
         assert isinstance(indicador, NoAplica)
         valor = f'<div class="razon">No aplica: {_e(indicador.no_aplica)}</div>'
         detalle = ""
-    return (
-        f'<div class="anio"><div class="fecha">{_e(fecha_texto)}</div>{valor}{detalle}</div>'
-    )
+    return f'<div class="anio"><div class="fecha">{_e(fecha_texto)}</div>{valor}{detalle}</div>'
 
 
 def _clase(cambio: Cambio) -> str:
@@ -151,7 +161,8 @@ def _clase(cambio: Cambio) -> str:
 
 def _tarjeta(dias: DiasDelDinero, clave: str, nombre: str, que: str) -> str:
     celdas = "".join(
-        _celda(f"Al {fecha_corta(anio.fecha)}", getattr(anio, clave)) for anio in dias.anios
+        _celda(f"Al {fecha_corta(anio.fecha)}", getattr(anio, clave))
+        for anio in dias.anios
     )
     try:
         cambio = dias.cambio(clave)
@@ -167,7 +178,10 @@ def _tarjeta(dias: DiasDelDinero, clave: str, nombre: str, que: str) -> str:
 def _posicion(dia: Decimal, escala: Decimal) -> str:
     if escala <= 0:
         return "0"
-    return format(min(max(dia / escala * 100, Decimal(0)), Decimal(100)).quantize(Decimal("0.1")), "f")
+    return format(
+        min(max(dia / escala * 100, Decimal(0)), Decimal(100)).quantize(Decimal("0.1")),
+        "f",
+    )
 
 
 def _financia(cronograma: Cronograma) -> str:
@@ -192,7 +206,10 @@ def _linea(anio: DiasDelAnio) -> str:
     desde, hasta = sorted((cronograma.pago, cronograma.cobro))
     izquierda = _posicion(desde, escala)
     ancho = format(
-        (Decimal(_posicion(hasta, escala)) - Decimal(izquierda)).quantize(Decimal("0.1")), "f"
+        (Decimal(_posicion(hasta, escala)) - Decimal(izquierda)).quantize(
+            Decimal("0.1")
+        ),
+        "f",
     )
     puntos = "".join(
         f'<span class="punto" style="left:{_posicion(dia, escala)}%" title="{_e(nombre)}"></span>'
@@ -222,13 +239,17 @@ def _linea(anio: DiasDelAnio) -> str:
 
 def _avisos(dias: DiasDelDinero) -> str:
     cajas = [f'<div class="aviso"><b>Aviso.</b> {_e(a)}</div>' for a in dias.avisos]
-    cajas += [f'<div class="aviso"><b>Pregunta.</b> {_e(p)}</div>' for p in dias.preguntas]
+    cajas += [
+        f'<div class="aviso"><b>Pregunta.</b> {_e(p)}</div>' for p in dias.preguntas
+    ]
     return f'<div class="avisos">{"".join(cajas)}</div>' if cajas else ""
 
 
 def _cuerpo(dias: DiasDelDinero) -> str:
     if dias.no_calculable is not None:
-        return f'<div class="aviso"><b>No calculable:</b> {_e(dias.no_calculable)}</div>'
+        return (
+            f'<div class="aviso"><b>No calculable:</b> {_e(dias.no_calculable)}</div>'
+        )
     sub = ""
     if dias.periodo is not None:
         sub = (
@@ -236,7 +257,9 @@ def _cuerpo(dias: DiasDelDinero) -> str:
             f"{_e(fecha_corta(dias.periodo.hasta))}: {dias.periodo.dias} días. "
             f"Días de cobro sobre {_e(dias.base_de_ventas)}.</p>"
         )
-    tarjetas = "".join(_tarjeta(dias, clave, nombre, que) for clave, nombre, que in _CUENTAS)
+    tarjetas = "".join(
+        _tarjeta(dias, clave, nombre, que) for clave, nombre, que in _CUENTAS
+    )
     lineas = "".join(_linea(anio) for anio in dias.anios)
     return (
         f'{sub}<p class="rotulo">{_e(dias.rotulo)}</p>{_avisos(dias)}'
@@ -255,7 +278,13 @@ def pagina(dias: DiasDelDinero) -> str:
 # Entrada
 # ---------------------------------------------------------------------------
 
-_IVA: dict[str, bool | None] = {"sí": True, "si": True, "no": False, "no sé": None, "no se": None}
+_IVA: dict[str, bool | None] = {
+    "sí": True,
+    "si": True,
+    "no": False,
+    "no sé": None,
+    "no se": None,
+}
 
 
 def _imprime(texto: str) -> None:
@@ -279,7 +308,9 @@ def _banderas(resto: list[str]) -> dict[str, str] | str:
         bandera = resto[i]
         if bandera not in ("--iva", "--tasa-iva", "--credito") or i + 1 >= len(resto):
             return USO
-        leidas[bandera] = resto[i + 1].strip().lower() if bandera == "--iva" else resto[i + 1]
+        leidas[bandera] = (
+            resto[i + 1].strip().lower() if bandera == "--iva" else resto[i + 1]
+        )
         i += 2
     return leidas
 

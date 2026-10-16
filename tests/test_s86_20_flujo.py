@@ -52,7 +52,9 @@ def _estados(respuestas: Respuestas | None = None) -> EstadosRevisados:
         respuestas=respuestas,
         hoy=HOY,
     )
-    return EstadosRevisados(revision=revision, resultados=resultados, respuestas=respuestas)
+    return EstadosRevisados(
+        revision=revision, resultados=resultados, respuestas=respuestas
+    )
 
 
 def _con_retiros(del_dueno: str | None, de_capital: str | None) -> EstadosRevisados:
@@ -104,7 +106,9 @@ def test_cada_medida_dice_formula_origen_y_para_quien(panel: PanelDelFlujo) -> N
     assert "deuda neta" in panel.medida("flujo_neto").formula
 
 
-def test_bancos_final_menos_inicial_se_muestra_como_lo_que_engana(panel: PanelDelFlujo) -> None:
+def test_bancos_final_menos_inicial_se_muestra_como_lo_que_engana(
+    panel: PanelDelFlujo,
+) -> None:
     assert panel.engana is not None
     assert panel.engana.valor == Decimal("89753.25")
     assert "210,291.16" in panel.engana.origen and "120,537.91" in panel.engana.origen
@@ -169,7 +173,9 @@ def test_cada_capitulo_dice_de_donde_sale(panel: PanelDelFlujo) -> None:
     assert "5,018,095.92" in salidas.origen
 
 
-def test_mover_una_cuenta_con_escala_cambia_el_capitulo_y_la_cascada_sigue_sumando() -> None:
+def test_mover_una_cuenta_con_escala_cambia_el_capitulo_y_la_cascada_sigue_sumando() -> (
+    None
+):
     movido = panel_de(
         _estados(
             Respuestas(
@@ -199,7 +205,9 @@ def test_un_renglon_cambiado_a_mano_no_da_panel(mi_empresa: EstadosRevisados) ->
     )
     resultado = panel_de(editado)
     assert resultado.capitulos == ()
-    assert resultado.preguntas and resultado.preguntas[0].diferencia == Decimal("25318585.22")
+    assert resultado.preguntas and resultado.preguntas[0].diferencia == Decimal(
+        "25318585.22"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -271,10 +279,16 @@ def test_sin_balance_inicial_no_calculable(mi_empresa: EstadosRevisados) -> None
     assert "inicio" in resultado.no_calculable
 
 
-def test_sin_utilidad_neta_los_capitulos_no_se_calculan(mi_empresa: EstadosRevisados) -> None:
+def test_sin_utilidad_neta_los_capitulos_no_se_calculan(
+    mi_empresa: EstadosRevisados,
+) -> None:
     lectura = mi_empresa.resultados
     sin_neta = lectura.model_copy(
-        update={"cuentas": tuple(c for c in lectura.cuentas if c.concepto != "utilidad_neta")}
+        update={
+            "cuentas": tuple(
+                c for c in lectura.cuentas if c.concepto != "utilidad_neta"
+            )
+        }
     )
     resultado = panel_de(mi_empresa.model_copy(update={"resultados": sin_neta}))
     assert resultado.capitulos == ()
@@ -298,7 +312,13 @@ def test_la_pagina_trae_la_cascada_y_el_origen(panel: PanelDelFlujo) -> None:
     assert texto.startswith("<!doctype html>")
     assert "<script" not in texto
     assert texto.count('class="barra') == 5
-    for cifra in ("5,018,095.92", "2,603,803.13", "3,153,010.36", "2,966,528.27", "3,705,245.84"):
+    for cifra in (
+        "5,018,095.92",
+        "2,603,803.13",
+        "3,153,010.36",
+        "2,966,528.27",
+        "3,705,245.84",
+    ):
         assert cifra in texto
     assert "2,038,713.23" in texto and "sale de:" in texto
     assert "2,561,380.93" in texto and "0.3350" in texto

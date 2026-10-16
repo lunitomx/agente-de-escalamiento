@@ -140,7 +140,11 @@ def test_keep_procedure_is_reachable_from_the_door(
         ("Mis ventas bajaron este mes", "escala-strategy", None),
         ("benchmark de ventas", "escala-strategy", None),
         ("marketing para subir mis ventas", "escala-strategy", None),
-        ("Prepárame para mi junta del grupo", "escala-execution-tracker", "junta del grupo"),
+        (
+            "Prepárame para mi junta del grupo",
+            "escala-execution-tracker",
+            "junta del grupo",
+        ),
         ("Tablero de mis ventas", "escala-dashboard", None),
         ("¿Cuánto cobra mi competencia?", "escala-strategy-research", "competencia"),
         # Real money phrases stay in Cash even when they mention sales.

@@ -42,7 +42,12 @@ from escala_server.workspace.authority import WorkspaceConfig
 
 ESTADOS = Path(__file__).parent / "fixtures" / "cash" / "estados"
 HOY = date(2026, 10, 16)
-REPORTES = ("contpaqi_balance", "contpaqi_resultados", "aspel_balance", "aspel_resultados")
+REPORTES = (
+    "contpaqi_balance",
+    "contpaqi_resultados",
+    "aspel_balance",
+    "aspel_resultados",
+)
 FIN_2025 = date(2025, 12, 31)
 FIN_2024 = date(2024, 12, 31)
 
@@ -114,9 +119,7 @@ def test_a4_1_el_lector_de_e38_no_toma_costo_de_ventas_como_ventas(
     config = _config(tmp_path)
     source = config.exchange_root / "estado.csv"
     source.write_text(
-        "Cuenta,2026-07,Moneda\n"
-        "Costo de ventas,50,MXN\n"
-        "Anticipo de clientes,7,MXN\n",
+        "Cuenta,2026-07,Moneda\nCosto de ventas,50,MXN\nAnticipo de clientes,7,MXN\n",
         encoding="utf-8",
     )
     profile = profile_financial_workbook(config, source)
@@ -140,7 +143,10 @@ def test_a4_2_varias_filas_del_mismo_concepto_piden_confirmacion() -> None:
     assert "Gastos de administración" in nombres
 
     sumas = {(suma.concepto, suma.fecha): suma for suma in lectura.sumas_por_confirmar}
-    assert set(sumas) == {("gastos_operacion", FIN_2025), ("gastos_operacion", FIN_2024)}
+    assert set(sumas) == {
+        ("gastos_operacion", FIN_2025),
+        ("gastos_operacion", FIN_2024),
+    }
     actual = sumas[("gastos_operacion", FIN_2025)]
     assert actual.estado == "pide confirmación"
     assert actual.nombres == ("Gastos de venta", "Gastos de administración")
@@ -185,7 +191,9 @@ def test_a4_2_mover_una_fila_cambia_la_suma() -> None:
         ("15/06/2025", date(2025, 6, 15)),
     ],
 )
-def test_a4_3_fechas_en_las_formas_de_los_contadores(texto: str, esperada: date) -> None:
+def test_a4_3_fechas_en_las_formas_de_los_contadores(
+    texto: str, esperada: date
+) -> None:
     assert max(buscar_fechas(texto)) == esperada
 
 
@@ -238,7 +246,9 @@ def test_a4_4_sin_unidad_pregunta_pesos_o_miles() -> None:
         ("Cifras en millones de pesos", "millones de pesos"),
     ],
 )
-def test_a4_4_con_unidad_no_pregunta_y_no_escala_montos(leyenda: str, unidad: str) -> None:
+def test_a4_4_con_unidad_no_pregunta_y_no_escala_montos(
+    leyenda: str, unidad: str
+) -> None:
     lectura = leer_texto(f"Balance al 31/12/2025\n{leyenda}\nBancos  210.29\n", hoy=HOY)
     assert lectura.unidad == unidad
     assert not any("pesos o miles" in pregunta for pregunta in lectura.preguntas)
@@ -296,11 +306,15 @@ def test_a4_6_montos_con_parentesis(texto: str, monto: Decimal | None) -> None:
 
 
 def test_a4_6_venta_de_activos_negativa_en_aspel() -> None:
-    for archivo in ("aspel_resultados.csv", "aspel_resultados.xlsx", "aspel_resultados.txt"):
+    for archivo in (
+        "aspel_resultados.csv",
+        "aspel_resultados.xlsx",
+        "aspel_resultados.txt",
+    ):
         lectura = leer_estados(ESTADOS / archivo, hoy=HOY)
-        assert _montos(lectura, FIN_2024)["Otros ingresos (venta de activos)"] == Decimal(
-            "-797135.85"
-        ), archivo
+        assert _montos(lectura, FIN_2024)[
+            "Otros ingresos (venta de activos)"
+        ] == Decimal("-797135.85"), archivo
 
 
 def test_a4_6_el_lector_de_e38_lee_parentesis(tmp_path: Path) -> None:
@@ -446,7 +460,9 @@ def test_los_archivos_salen_del_generador(tmp_path: Path) -> None:
     for reporte in REPORTES:
         for sufijo in (".xlsx", ".csv", ".txt"):
             nombre = f"{reporte}{sufijo}"
-            assert filecmp.cmp(tmp_path / nombre, ESTADOS / nombre, shallow=False), nombre
+            assert filecmp.cmp(tmp_path / nombre, ESTADOS / nombre, shallow=False), (
+                nombre
+            )
 
 
 def test_excel_conserva_el_numero_de_renglon_con_filas_vacias() -> None:
@@ -465,7 +481,10 @@ def test_asi_lei_tus_cuentas_muestra_nombre_monto_fecha_y_renglon() -> None:
     lectura = leer_estados(ESTADOS / "aspel_resultados.csv", hoy=HOY)
     texto = render_asi_lei(lectura)
     assert texto.startswith("Así leí tus cuentas")
-    assert "| Otros ingresos (venta de activos) | -797,135.85 | 31-dic-2024 | 12 |" in texto
+    assert (
+        "| Otros ingresos (venta de activos) | -797,135.85 | 31-dic-2024 | 12 |"
+        in texto
+    )
     assert "| Ventas netas | 43,826,513.09 | 31-dic-2025 | 5 |" in texto
     assert "pide confirmación" in texto
 

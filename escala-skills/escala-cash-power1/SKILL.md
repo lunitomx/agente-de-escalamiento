@@ -49,15 +49,19 @@ y no des ningún número.
 El JSON trae `poder_del_uno` con una fila por palanca (`flujo`, `utilidad`) y
 los totales `poder_del_uno_flujo` y `poder_del_uno_utilidad`.
 
-| Palanca | Clave | +1 significa | Utilidad (antes de ISR) | Flujo (antes de ISR) |
-|---------|-------|--------------|-------------------------|----------------------|
-| Precio | `precio` | Subir precio 1% | Ventas × 1% | Ventas × 1% − Clientes × 1% |
-| Volumen | `volumen` | Vender 1% más | Utilidad bruta × 1% | Utilidad bruta × 1% − Capital de trabajo × 1% |
-| Costo | `costo` | Reducir costo 1% | Costo de ventas × 1% | Costo de ventas × 1% + (Inventario − Proveedores) × 1% |
-| Gastos | `gastos` | Gastar 1% menos | Gastos × 1% | Gastos × 1% |
-| Clientes | `clientes` | Cobrar 1 día antes | 0 | Ventas ÷ días del periodo |
-| Inventario | `inventario` | 1 día menos en almacén | 0 | Costo de ventas ÷ días del periodo |
-| Proveedores | `proveedores` | Pagar 1 día después | 0 | Costo de ventas ÷ días del periodo |
+| Palanca | Clave | +1 significa |
+|---------|-------|--------------|
+| Precio | `precio` | Subir precio 1% |
+| Volumen | `volumen` | Vender 1% más |
+| Costo | `costo` | Reducir costo 1% |
+| Gastos | `gastos` | Gastar 1% menos |
+| Clientes | `clientes` | Cobrar 1 día antes |
+| Inventario | `inventario` | 1 día menos en almacén |
+| Proveedores | `proveedores` | Pagar 1 día después |
+
+Cada fila del JSON trae la fórmula de su utilidad y de su flujo (antes de ISR)
+en el campo `formula`: explícala con esas palabras. Las fórmulas viven sólo en
+la calculadora; aquí no se repiten.
 
 Según el curso de cash que vimos: el flujo descuenta el capital de trabajo que
 se lleva cada palanca. Una palanca que no aplica (sin inventario, por ejemplo)

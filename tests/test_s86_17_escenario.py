@@ -32,7 +32,10 @@ FIN = date(2025, 12, 31)
 EMPRESA = "Mi Empresa, S.A. de C.V."
 
 COMPLETA = (str(ESTADOS / "aspel_balance.txt"), str(ESTADOS / "aspel_resultados.txt"))
-SIN_ANTERIOR = (str(ESTADOS / "contpaqi_balance.txt"), str(ESTADOS / "contpaqi_resultados.txt"))
+SIN_ANTERIOR = (
+    str(ESTADOS / "contpaqi_balance.txt"),
+    str(ESTADOS / "contpaqi_resultados.txt"),
+)
 SUCIA = (str(ESTADOS / "sucio_balance.txt"), str(ESTADOS / "aspel_resultados.txt"))
 
 # Lo que contesta el dueño de Mi Empresa, por clave de pregunta.
@@ -204,7 +207,10 @@ def test_sin_anterior_dice_que_no_puede_y_por_que(sin_anterior: list[Paso]) -> N
     assert "No puedo calcular" in anuncio
     assert "Flujo neto" in anuncio and "Flujo de operación" in anuncio
     assert "porque falta el balance al inicio del periodo" in anuncio
-    assert "no calculable: falta el balance al inicio del periodo" in sin_anterior[-1].mensaje
+    assert (
+        "no calculable: falta el balance al inicio del periodo"
+        in sin_anterior[-1].mensaje
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -217,7 +223,9 @@ def sucia() -> tuple[list[Paso], Conversacion]:
     return _platica(SUCIA)
 
 
-def test_sucia_no_calcula_y_dice_el_numero(sucia: tuple[list[Paso], Conversacion]) -> None:
+def test_sucia_no_calcula_y_dice_el_numero(
+    sucia: tuple[list[Paso], Conversacion],
+) -> None:
     pasos, _ = sucia
     primero = pasos[0]
     assert primero.calculo is None and primero.anuncio is None
@@ -273,7 +281,9 @@ def test_respuesta_que_no_entiende_se_vuelve_a_preguntar() -> None:
 
 
 def test_no_se_no_sirve_para_lo_que_bloquea() -> None:
-    conversacion = Conversacion(empresa=EMPRESA, archivos=COMPLETA, respuestas={"C10": "no sé"})
+    conversacion = Conversacion(
+        empresa=EMPRESA, archivos=COMPLETA, respuestas={"C10": "no sé"}
+    )
     paso = atender(conversacion, hoy=HOY)
     assert paso.preguntas[0].clave == "C10"
     assert paso.errores

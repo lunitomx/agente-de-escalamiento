@@ -46,7 +46,9 @@ def _numeros(texto: str) -> set[str]:
 
 def _paso(entrada: str) -> Paso:
     archivos = tuple(str(ESTADOS / nombre) for nombre in ENTRADAS[entrada])
-    paso = atender(Conversacion(empresa=EMPRESA, archivos=archivos, respuestas=RESPUESTAS), hoy=HOY)
+    paso = atender(
+        Conversacion(empresa=EMPRESA, archivos=archivos, respuestas=RESPUESTAS), hoy=HOY
+    )
     assert paso.calculo is not None and paso.resumen
     return paso
 
@@ -63,7 +65,9 @@ def _sin_origen(texto: str, paso: Paso) -> set[str]:
 
 
 def _lista(mensaje: str) -> str:
-    return mensaje[mensaje.index("Balance general") : mensaje.index("Lo que te pregunto")]
+    return mensaje[
+        mensaje.index("Balance general") : mensaje.index("Lo que te pregunto")
+    ]
 
 
 def _montos_leidos(entrada: str) -> set[str]:

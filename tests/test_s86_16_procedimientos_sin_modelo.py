@@ -28,7 +28,12 @@ TODOS = PROCEDIMIENTOS + AGENTE + CONOCIMIENTO
 # Los que muestran números al dueño: deben mandar a la calculadora.
 CON_NUMEROS = [
     ROOT / "escala-skills" / nombre / "SKILL.md"
-    for nombre in ("escala-cash", "escala-cash-ccc", "escala-cash-finanzas", "escala-cash-power1")
+    for nombre in (
+        "escala-cash",
+        "escala-cash-ccc",
+        "escala-cash-finanzas",
+        "escala-cash-power1",
+    )
 ] + [ROOT / "escala-agent" / "skills" / "escala-cash" / "SKILL.md"]
 
 PROHIBIDO: dict[str, str] = {
@@ -48,7 +53,9 @@ PROHIBIDO: dict[str, str] = {
 def problemas(texto: str) -> list[str]:
     encontrados: list[str] = []
     for nombre, patron in PROHIBIDO.items():
-        for coincidencia in re.finditer(patron, texto, flags=re.IGNORECASE | re.MULTILINE):
+        for coincidencia in re.finditer(
+            patron, texto, flags=re.IGNORECASE | re.MULTILINE
+        ):
             encontrados.append(f"{nombre}: «{coincidencia.group(0)}»")
     return encontrados
 
@@ -82,7 +89,9 @@ def test_ningun_procedimiento_calcula_con_el_modelo(ruta: Path) -> None:
     assert problemas(ruta.read_text(encoding="utf-8")) == []
 
 
-@pytest.mark.parametrize("ruta", CON_NUMEROS, ids=lambda ruta: str(ruta.relative_to(ROOT)))
+@pytest.mark.parametrize(
+    "ruta", CON_NUMEROS, ids=lambda ruta: str(ruta.relative_to(ROOT))
+)
 def test_los_numeros_salen_de_la_calculadora(ruta: Path) -> None:
     texto = ruta.read_text(encoding="utf-8")
     assert "escala_server/cash/calcular.py" in texto
@@ -90,7 +99,9 @@ def test_los_numeros_salen_de_la_calculadora(ruta: Path) -> None:
 
 
 def test_la_puerta_manda_a_la_calculadora() -> None:
-    puerta = (ROOT / "escala-skills" / "escala" / "SKILL.md").read_text(encoding="utf-8")
+    puerta = (ROOT / "escala-skills" / "escala" / "SKILL.md").read_text(
+        encoding="utf-8"
+    )
     assert "references/calculadora/escala_server/cash/calcular.py" in puerta
     assert "No voy a hacer las cuentas de memoria." in puerta
 

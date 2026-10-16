@@ -96,10 +96,15 @@ def leer_estados(ruta: Path, *, hoy: date | None = None) -> LecturaEstados:
 
     if ruta.suffix.lower() in {".txt", ".md"}:
         return leer_texto(
-            ruta.read_text(encoding="utf-8-sig"), hoy=hoy, hoja=ruta.stem, archivo=ruta.name
+            ruta.read_text(encoding="utf-8-sig"),
+            hoy=hoy,
+            hoja=ruta.stem,
+            archivo=ruta.name,
         )
     hojas = [
-        _Hoja(hoja.name, [[celda.value.strip() for celda in fila] for fila in hoja.rows])
+        _Hoja(
+            hoja.name, [[celda.value.strip() for celda in fila] for fila in hoja.rows]
+        )
         for hoja in read_raw_sheets(ruta)
     ]
     return _leer(hojas, hoy=hoy, archivo=ruta.name)
@@ -125,7 +130,9 @@ def leer_texto(
         elif "|" in linea:
             filas.append([celda.strip() for celda in linea.split("|")])
         else:
-            filas.append([celda.strip() for celda in re.split(r"\t|\s{2,}", linea.strip())])
+            filas.append(
+                [celda.strip() for celda in re.split(r"\t|\s{2,}", linea.strip())]
+            )
     return _leer([_Hoja(hoja, filas)], hoy=hoy, archivo=archivo)
 
 
@@ -152,10 +159,14 @@ def _tiene_letras(celda: str) -> bool:
 
 
 def _es_etiqueta(celda: str) -> bool:
-    return _tiene_letras(celda) and leer_monto(celda) is None and fecha_pura(celda) is None
+    return (
+        _tiene_letras(celda) and leer_monto(celda) is None and fecha_pura(celda) is None
+    )
 
 
-def _encabezado_de_periodos(filas: list[list[str]]) -> tuple[int, dict[int, date]] | None:
+def _encabezado_de_periodos(
+    filas: list[list[str]],
+) -> tuple[int, dict[int, date]] | None:
     for indice, fila in enumerate(filas):
         # Una celda sólo con fecha es encabezado si abajo hay montos en su columna;
         # si no, es un título («Al 31/12/2025») y la fecha es la del documento.
@@ -173,7 +184,9 @@ def _encabezado_de_periodos(filas: list[list[str]]) -> tuple[int, dict[int, date
     return None
 
 
-def _leer(hojas: list[_Hoja], *, hoy: date | None, archivo: str | None) -> LecturaEstados:
+def _leer(
+    hojas: list[_Hoja], *, hoy: date | None, archivo: str | None
+) -> LecturaEstados:
     hoy = hoy or date.today()
     cuentas: list[CuentaLeida] = []
     avisos: list[Aviso] = []
@@ -227,7 +240,10 @@ def _leer_hoja(hoja: _Hoja) -> tuple[list[CuentaLeida], list[Aviso], list[str]]:
         lecturas = _por_periodos(filas, *encabezado)
     else:
         fechas = [
-            f for fila in filas for celda in fila if leer_monto(celda) is None
+            f
+            for fila in filas
+            for celda in fila
+            if leer_monto(celda) is None
             for f in buscar_fechas(celda)
         ]
         lecturas = _por_pares(filas, max(fechas) if fechas else None)
@@ -306,7 +322,9 @@ def _por_pares(filas: list[list[str]], fecha: date | None) -> list[_Lectura]:
         for columna, celda in enumerate(fila):
             if _es_etiqueta(celda):
                 if pendiente is not None:
-                    lecturas.append((indice + 1, pendiente[0], pendiente[1], None, fecha))
+                    lecturas.append(
+                        (indice + 1, pendiente[0], pendiente[1], None, fecha)
+                    )
                 pendiente = (columna, celda)
                 continue
             monto = leer_monto(celda)
@@ -320,7 +338,10 @@ def _por_pares(filas: list[list[str]], fecha: date | None) -> list[_Lectura]:
 
 def _unidad(textos: list[str]) -> Unidad | None:
     for texto in textos:
-        if contiene_frase(texto, "millones de pesos") or normalizar(texto) == "millones":
+        if (
+            contiene_frase(texto, "millones de pesos")
+            or normalizar(texto) == "millones"
+        ):
             return "millones de pesos"
         if contiene_frase(texto, "miles de pesos") or normalizar(texto) == "miles":
             return "miles de pesos"
@@ -413,7 +434,9 @@ def main(argv: list[str] | None = None) -> int:
 
     argumentos = sys.argv[1:] if argv is None else argv
     if len(argumentos) != 1:
-        print("Uso: python -m escala_server.financial.lector <archivo>", file=sys.stderr)
+        print(
+            "Uso: python -m escala_server.financial.lector <archivo>", file=sys.stderr
+        )
         return 2
     print(render_asi_lei(leer_estados(Path(argumentos[0]))), end="")
     return 0

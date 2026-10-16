@@ -59,21 +59,34 @@ def test_la_ruta_no_esta_en_el_tmp_compartido() -> None:
 def test_permisos_del_borrador(
     capsys: pytest.CaptureFixture[str], tmp_path: Path, casa: Path
 ) -> None:
-    codigo, _ = _corre(capsys, tmp_path, "--archivo", str(ESTADOS / "aspel_balance.txt"))
+    codigo, _ = _corre(
+        capsys, tmp_path, "--archivo", str(ESTADOS / "aspel_balance.txt")
+    )
     assert codigo == 0
     borrador = casa / ".escala" / "borradores" / f"{SLUG}.json"
     assert stat.S_IMODE(borrador.stat().st_mode) == 0o600
     assert stat.S_IMODE(borrador.parent.stat().st_mode) == 0o700
-    assert [p.name for p in borrador.parent.iterdir()] == [borrador.name]  # sin temporales
+    assert [p.name for p in borrador.parent.iterdir()] == [
+        borrador.name
+    ]  # sin temporales
 
 
 def test_la_platica_sigue_en_el_borrador(
     capsys: pytest.CaptureFixture[str], tmp_path: Path, casa: Path
 ) -> None:
-    _corre(capsys, tmp_path, "--archivo", str(ESTADOS / "aspel_balance.txt"), "--responde", "C9=sí")
+    _corre(
+        capsys,
+        tmp_path,
+        "--archivo",
+        str(ESTADOS / "aspel_balance.txt"),
+        "--responde",
+        "C9=sí",
+    )
     _, salida = _corre(capsys, tmp_path)
     assert all(p["clave"] != "C9" for p in salida["preguntas"])  # type: ignore[index, union-attr]
-    assert not (tmp_path / "work" / "cash" / SLUG).exists()  # sin «sí», nada en work/cash
+    assert not (
+        tmp_path / "work" / "cash" / SLUG
+    ).exists()  # sin «sí», nada en work/cash
 
 
 def test_no_sigue_enlaces_simbolicos(
@@ -84,7 +97,9 @@ def test_no_sigue_enlaces_simbolicos(
     victima = tmp_path / "victima.txt"
     victima.write_text("no me toques", encoding="utf-8")
     os.symlink(victima, carpeta / f"{SLUG}.json")
-    codigo, salida = _corre(capsys, tmp_path, "--archivo", str(ESTADOS / "aspel_balance.txt"))
+    codigo, salida = _corre(
+        capsys, tmp_path, "--archivo", str(ESTADOS / "aspel_balance.txt")
+    )
     assert codigo != 0
     assert "enlace" in str(salida["no_calculable"])
     assert victima.read_text(encoding="utf-8") == "no me toques"

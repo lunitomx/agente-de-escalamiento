@@ -55,7 +55,11 @@ def test_con_respuesta_va_a_su_caja_y_deja_de_bloquear() -> None:
     revision = _revisar({"Cuenta puente": "deudores"})
     assert not [p for p in revision.preguntas if p.codigo == "R7"]
     cuenta = next(c for c in revision.acomodo.cuentas if c.nombre == "Cuenta puente")
-    assert (cuenta.regla, cuenta.lado, cuenta.caja) == ("deudores", "activo", "otras cuentas")
+    assert (cuenta.regla, cuenta.lado, cuenta.caja) == (
+        "deudores",
+        "activo",
+        "otras cuentas",
+    )
     assert "Me dijiste" in cuenta.porque
     assert revision.puede_calcular
 

@@ -43,7 +43,11 @@ from escala_server.cash import (
 from escala_server.financial.cajas import Caja, CuentaEnCaja, TotalesPorCaja, con_signo
 from escala_server.financial.formatos import fecha_corta, formato_monto
 from escala_server.financial.lector import LecturaEstados
-from escala_server.financial.revisiones import PeriodoDelEstado, Respuestas, RevisionDeEstados
+from escala_server.financial.revisiones import (
+    PeriodoDelEstado,
+    Respuestas,
+    RevisionDeEstados,
+)
 
 CENTAVO = Decimal("0.01")
 DIEZMILESIMO = Decimal("0.0001")
@@ -261,11 +265,15 @@ class _Definicion:
     unidad: Unidad
 
 
-def _def(clave: str, nombre: str, formula: str, lamina: str, unidad: Unidad) -> _Definicion:
+def _def(
+    clave: str, nombre: str, formula: str, lamina: str, unidad: Unidad
+) -> _Definicion:
     return _Definicion(clave, nombre, formula, lamina, unidad)
 
 
-UTILIDAD_BRUTA = _def("utilidad_bruta", "Utilidad bruta", "ventas − costo de ventas", "L11", "pesos")
+UTILIDAD_BRUTA = _def(
+    "utilidad_bruta", "Utilidad bruta", "ventas − costo de ventas", "L11", "pesos"
+)
 UTILIDAD_DE_OPERACION = _def(
     "utilidad_de_operacion",
     "Utilidad de operación",
@@ -309,7 +317,11 @@ FINANCIAMIENTO = _def(
     "pesos",
 )
 DIAS_CLIENTES = _def(
-    "dias_clientes", "Días de clientes", "clientes ÷ (ventas ÷ días del periodo)", "L49", "días"
+    "dias_clientes",
+    "Días de clientes",
+    "clientes ÷ (ventas ÷ días del periodo)",
+    "L49",
+    "días",
 )
 DIAS_INVENTARIO = _def(
     "dias_inventario",
@@ -354,7 +366,11 @@ FLUJO_DE_OPERACION = _def(
     "pesos",
 )
 MARGEN_BRUTO = _def(
-    "margen_bruto", "Utilidad bruta por peso de venta", "utilidad bruta ÷ ventas", "L63", "proporción"
+    "margen_bruto",
+    "Utilidad bruta por peso de venta",
+    "utilidad bruta ÷ ventas",
+    "L63",
+    "proporción",
 )
 CT_POR_VENTAS = _def(
     "capital_de_trabajo_por_ventas",
@@ -406,7 +422,12 @@ PALANCAS: dict[str, tuple[str, str, str, str]] = {
         "1% × costo de ventas + 1% × (inventario − proveedores)",
         "1% × costo de ventas",
     ),
-    "opex": ("gastos", "Gastos de operación −1%", "1% × gastos de operación", "1% × gastos de operación"),
+    "opex": (
+        "gastos",
+        "Gastos de operación −1%",
+        "1% × gastos de operación",
+        "1% × gastos de operación",
+    ),
     "ar_days": (
         "clientes",
         "Clientes −1 día",
@@ -451,7 +472,9 @@ def _redondea(valor: Decimal, unidad: Unidad) -> Decimal:
     return valor.quantize(paso, rounding=ROUND_HALF_UP)
 
 
-def _calculado(definicion: _Definicion, fecha: date, valor: Decimal, origen: str) -> Calculado:
+def _calculado(
+    definicion: _Definicion, fecha: date, valor: Decimal, origen: str
+) -> Calculado:
     return Calculado(
         clave=definicion.clave,
         nombre=definicion.nombre,
@@ -464,7 +487,9 @@ def _calculado(definicion: _Definicion, fecha: date, valor: Decimal, origen: str
     )
 
 
-def _no_calculable(definicion: _Definicion, fecha: date | None, razon: str) -> NoCalculable:
+def _no_calculable(
+    definicion: _Definicion, fecha: date | None, razon: str
+) -> NoCalculable:
     return NoCalculable(
         clave=definicion.clave,
         nombre=definicion.nombre,
@@ -495,7 +520,9 @@ _ETIQUETAS = {
 }
 
 
-def _del_resultado(resultados: LecturaEstados, concepto: str, fecha: date) -> _Cifra | None:
+def _del_resultado(
+    resultados: LecturaEstados, concepto: str, fecha: date
+) -> _Cifra | None:
     """Suma los renglones de un concepto en el estado de resultados a una fecha."""
 
     etiqueta = _ETIQUETAS[concepto]
@@ -521,7 +548,9 @@ def _o_cero(cifra: _Cifra | None, concepto: str) -> _Cifra:
 
 
 def _del_balance(cuentas: list[CuentaEnCaja], regla: str, etiqueta: str) -> _Cifra:
-    de_la_regla = [c for c in cuentas if c.regla == regla and c.caja == "capital de trabajo"]
+    de_la_regla = [
+        c for c in cuentas if c.regla == regla and c.caja == "capital de trabajo"
+    ]
     total = sum((c.monto for c in de_la_regla), CERO)
     return _Cifra(total, f"{etiqueta} {_dinero(total)}", existe=bool(de_la_regla))
 
@@ -562,7 +591,9 @@ class _Fecha:
     proveedores: _Cifra
 
 
-def _datos(revision: RevisionDeEstados, resultados: LecturaEstados, fecha: date) -> _Fecha | None:
+def _datos(
+    revision: RevisionDeEstados, resultados: LecturaEstados, fecha: date
+) -> _Fecha | None:
     totales = revision.acomodo.en(fecha)
     if totales is None:
         return None
@@ -572,8 +603,12 @@ def _datos(revision: RevisionDeEstados, resultados: LecturaEstados, fecha: date)
         totales=totales,
         cuentas=cuentas,
         ventas=_del_resultado(resultados, "ventas", fecha),
-        costo=_o_cero(_del_resultado(resultados, "costo_ventas", fecha), "costo_ventas"),
-        gastos=_o_cero(_del_resultado(resultados, "gastos_operacion", fecha), "gastos_operacion"),
+        costo=_o_cero(
+            _del_resultado(resultados, "costo_ventas", fecha), "costo_ventas"
+        ),
+        gastos=_o_cero(
+            _del_resultado(resultados, "gastos_operacion", fecha), "gastos_operacion"
+        ),
         clientes=_del_balance(cuentas, "clientes", "clientes"),
         inventario=_del_balance(cuentas, "inventario", "inventario"),
         proveedores=_del_balance(cuentas, "proveedores", "proveedores"),
@@ -581,7 +616,9 @@ def _datos(revision: RevisionDeEstados, resultados: LecturaEstados, fecha: date)
 
 
 def _falta_ventas(fecha: date) -> str:
-    return f"falta el renglón de ventas del estado de resultados al {fecha_corta(fecha)}"
+    return (
+        f"falta el renglón de ventas del estado de resultados al {fecha_corta(fecha)}"
+    )
 
 
 def _ventas_en_cero(fecha: date) -> str:
@@ -601,7 +638,9 @@ def _cajas(d: _Fecha) -> list[Indicador]:
             t.capital_de_trabajo,
             _origen_de_caja(d.cuentas, "capital de trabajo"),
         ),
-        _calculado(DEUDA_NETA, d.fecha, t.deuda_neta, _origen_de_caja(d.cuentas, "deuda neta")),
+        _calculado(
+            DEUDA_NETA, d.fecha, t.deuda_neta, _origen_de_caja(d.cuentas, "deuda neta")
+        ),
         _calculado(
             OTRAS_CUENTAS,
             d.fecha,
@@ -654,9 +693,17 @@ def _dias(
 ) -> Indicador:
     nombre = cuenta.texto.split(" ")[0]
     if not cuenta.existe or cuenta.valor == 0:
-        return _no_aplica(definicion, fecha, f"no tienes {nombre} en el balance al {fecha_corta(fecha)}")
+        return _no_aplica(
+            definicion,
+            fecha,
+            f"no tienes {nombre} en el balance al {fecha_corta(fecha)}",
+        )
     if dias is None:
-        return _no_calculable(definicion, fecha, "falta confirmar qué periodo cubre tu estado de resultados")
+        return _no_calculable(
+            definicion,
+            fecha,
+            "falta confirmar qué periodo cubre tu estado de resultados",
+        )
     if base is None:
         return _no_calculable(definicion, fecha, _falta_ventas(fecha))
     if not base.existe:
@@ -672,17 +719,23 @@ def _dias(
             f"{etiqueta} al {fecha_corta(fecha)} es 0 o menos: no se puede dividir entre él",
         )
     valor = cuenta.valor / (base.valor / dias)
-    return _calculado(definicion, fecha, valor, f"{cuenta.texto} ÷ ({base.texto} ÷ {dias})")
+    return _calculado(
+        definicion, fecha, valor, f"{cuenta.texto} ÷ ({base.texto} ÷ {dias})"
+    )
 
 
 def _ciclo(partes: list[tuple[str, str, Indicador]], fecha: date) -> Indicador:
     for _, _, parte in partes:
         if isinstance(parte, NoCalculable):
             return _no_calculable(
-                CICLO, fecha, f"no se pueden calcular los {parte.nombre.lower()}: {parte.no_calculable}"
+                CICLO,
+                fecha,
+                f"no se pueden calcular los {parte.nombre.lower()}: {parte.no_calculable}",
             )
     if all(isinstance(parte, NoAplica) for _, _, parte in partes):
-        return _no_aplica(CICLO, fecha, "no tienes clientes, inventario ni proveedores en el balance")
+        return _no_aplica(
+            CICLO, fecha, "no tienes clientes, inventario ni proveedores en el balance"
+        )
     total = CERO
     textos: list[str] = []
     for signo, nombre, parte in partes:
@@ -697,7 +750,9 @@ def _ciclo(partes: list[tuple[str, str, Indicador]], fecha: date) -> Indicador:
 
 def _dias_y_ciclo(d: _Fecha, dias: int | None) -> list[Indicador]:
     clientes = _dias(DIAS_CLIENTES, d.clientes, d.ventas, d.fecha, dias, "ventas")
-    inventario = _dias(DIAS_INVENTARIO, d.inventario, d.costo, d.fecha, dias, "costo de ventas")
+    inventario = _dias(
+        DIAS_INVENTARIO, d.inventario, d.costo, d.fecha, dias, "costo de ventas"
+    )
     proveedores = _dias(
         DIAS_PROVEEDORES, d.proveedores, d.costo, d.fecha, dias, "costo de ventas"
     )
@@ -717,7 +772,9 @@ def _sobre_ventas(d: _Fecha) -> list[Indicador]:
     definiciones += [CT_POR_CADA_100, MARGEN_BRUTO, CT_POR_VENTAS, MARGINAL]
     if d.ventas is None or d.ventas.valor <= 0:
         razon = _falta_ventas(d.fecha) if d.ventas is None else _ventas_en_cero(d.fecha)
-        return [_no_calculable(definicion, d.fecha, razon) for definicion in definiciones]
+        return [
+            _no_calculable(definicion, d.fecha, razon) for definicion in definiciones
+        ]
     ventas = d.ventas
     indicadores: list[Indicador] = []
     for cuenta, definicion in (
@@ -727,7 +784,11 @@ def _sobre_ventas(d: _Fecha) -> list[Indicador]:
     ):
         if not cuenta.existe:
             indicadores.append(
-                _no_aplica(definicion, d.fecha, f"no tienes {cuenta.texto.split(' ')[0]} en el balance")
+                _no_aplica(
+                    definicion,
+                    d.fecha,
+                    f"no tienes {cuenta.texto.split(' ')[0]} en el balance",
+                )
             )
             continue
         indicadores.append(
@@ -751,7 +812,12 @@ def _sobre_ventas(d: _Fecha) -> list[Indicador]:
     margen = ub / ventas.valor
     ct_ventas = ct / ventas.valor
     indicadores += [
-        _calculado(MARGEN_BRUTO, d.fecha, margen, f"utilidad bruta {_dinero(ub)} ÷ {ventas.texto}"),
+        _calculado(
+            MARGEN_BRUTO,
+            d.fecha,
+            margen,
+            f"utilidad bruta {_dinero(ub)} ÷ {ventas.texto}",
+        ),
         _calculado(
             CT_POR_VENTAS,
             d.fecha,
@@ -801,7 +867,9 @@ def _flujos(inicial: _Fecha | None, final: _Fecha) -> list[Indicador]:
     ]
     ub = _utilidad_bruta(final)
     if ub is None:
-        indicadores.append(_no_calculable(FLUJO_DE_OPERACION, fecha, _falta_ventas(fecha)))
+        indicadores.append(
+            _no_calculable(FLUJO_DE_OPERACION, fecha, _falta_ventas(fecha))
+        )
     else:
         uo = ub.valor - final.gastos.valor
         indicadores.append(
@@ -836,7 +904,9 @@ class BaseDeDias(_Modelo):
     ventas_a_credito: Decimal | None = Field(default=None, ge=0, le=100)  # en %
 
     @classmethod
-    def de(cls, respuestas: Respuestas | None, *, tasa_iva: Decimal | None = None) -> BaseDeDias:
+    def de(
+        cls, respuestas: Respuestas | None, *, tasa_iva: Decimal | None = None
+    ) -> BaseDeDias:
         """La base con lo que el dueño ya contestó en la revisión (C1 y C9)."""
         if respuestas is None:
             return cls(tasa_iva=tasa_iva)
@@ -968,7 +1038,8 @@ def _a_credito(ventas: _Cifra | None, porcentaje: Decimal | None) -> _Cifra | No
         return ventas
     valor = ventas.valor * porcentaje / CIEN
     return _Cifra(
-        valor, f"ventas a crédito {_dinero(valor)} ({_numero(porcentaje)}% de {ventas.texto})"
+        valor,
+        f"ventas a crédito {_dinero(valor)} ({_numero(porcentaje)}% de {ventas.texto})",
     )
 
 
@@ -994,7 +1065,9 @@ def _ciclo_del_dinero(
             razon = f"no se pueden calcular los {parte.nombre.lower()}: {parte.no_calculable}"
             return _no_calculable(CICLO, fecha, razon), None
     if all(isinstance(parte, NoAplica) for _, _, parte, _ in partes):
-        return _no_aplica(CICLO, fecha, "no tienes clientes, inventario ni proveedores en el balance"), None
+        return _no_aplica(
+            CICLO, fecha, "no tienes clientes, inventario ni proveedores en el balance"
+        ), None
     # Como la calculadora del curso: la suma de los días ya redondeados (se lee y cuadra).
     total = CERO
     crudo = CERO
@@ -1021,12 +1094,19 @@ def _cronograma(anio: DiasDelAnio) -> tuple[Cronograma | None, str | None]:
         if isinstance(parte, NoCalculable):
             return None, f"no calculable: {parte.no_calculable}"
     if not isinstance(anio.ciclo, Calculado):
-        return None, "no aplica: no tienes clientes, inventario ni proveedores en el balance"
+        return (
+            None,
+            "no aplica: no tienes clientes, inventario ni proveedores en el balance",
+        )
     pago, venta = _dia(anio.proveedores), _dia(anio.inventario)
     cobro = venta + _dia(anio.clientes)
 
     def de(parte: Indicador, nombre: str) -> str:
-        valor = f"{nombre} {formato_monto(parte.valor)}" if isinstance(parte, Calculado) else f"{nombre} no aplica"
+        valor = (
+            f"{nombre} {formato_monto(parte.valor)}"
+            if isinstance(parte, Calculado)
+            else f"{nombre} no aplica"
+        )
         return valor
 
     origen = (
@@ -1060,7 +1140,9 @@ def _dias_del_anio(
 ) -> _DelAnio:
     fecha = d.fecha
     clientes = _sin_iva(d.clientes, divisor) if divisor is not None else d.clientes
-    proveedores = _sin_iva(d.proveedores, divisor) if divisor is not None else d.proveedores
+    proveedores = (
+        _sin_iva(d.proveedores, divisor) if divisor is not None else d.proveedores
+    )
     ventas = _a_credito(d.ventas, credito)
     sufijo = " sin IVA" if divisor is not None else ""
     def_clientes = replace(
@@ -1071,7 +1153,8 @@ def _dias_del_anio(
         ),
     )
     def_proveedores = replace(
-        DIAS_PROVEEDORES, formula=f"proveedores{sufijo} ÷ (costo de ventas ÷ días del periodo)"
+        DIAS_PROVEEDORES,
+        formula=f"proveedores{sufijo} ÷ (costo de ventas ÷ días del periodo)",
     )
     de_clientes = _con_crudo(def_clientes, clientes, ventas, fecha, dias, "ventas")
     if d.ventas is not None and (not d.costo.existe or d.costo.valor <= 0):
@@ -1084,8 +1167,12 @@ def _dias_del_anio(
             None,
         )
     else:
-        de_inventario = _con_crudo(DIAS_INVENTARIO, d.inventario, d.costo, fecha, dias, "costo de ventas")
-        de_proveedores = _con_crudo(def_proveedores, proveedores, d.costo, fecha, dias, "costo de ventas")
+        de_inventario = _con_crudo(
+            DIAS_INVENTARIO, d.inventario, d.costo, fecha, dias, "costo de ventas"
+        )
+        de_proveedores = _con_crudo(
+            def_proveedores, proveedores, d.costo, fecha, dias, "costo de ventas"
+        )
     ciclo, ciclo_crudo = _ciclo_del_dinero(
         fecha,
         [
@@ -1103,7 +1190,9 @@ def _dias_del_anio(
     )
     cronograma, sin_cronograma = _cronograma(anio)
     return _DelAnio(
-        anio.model_copy(update={"cronograma": cronograma, "sin_cronograma": sin_cronograma}),
+        anio.model_copy(
+            update={"cronograma": cronograma, "sin_cronograma": sin_cronograma}
+        ),
         {
             "clientes": de_clientes[1],
             "inventario": de_inventario[1],
@@ -1201,14 +1290,19 @@ def dias_del_dinero(estados: EstadosRevisados, base: BaseDeDias) -> DiasDelDiner
     revision = estados.revision
     resultados = estados.resultados
     if not revision.puede_calcular:
-        return DiasDelDinero(no_calculable=_por_que_no(revision), periodo=revision.periodo)
+        return DiasDelDinero(
+            no_calculable=_por_que_no(revision), periodo=revision.periodo
+        )
     final = (
         _datos(revision, resultados, revision.balance_final)
         if revision.balance_final is not None
         else None
     )
     if final is None:
-        return DiasDelDinero(no_calculable="falta el balance al final del periodo", periodo=revision.periodo)
+        return DiasDelDinero(
+            no_calculable="falta el balance al final del periodo",
+            periodo=revision.periodo,
+        )
     inicial = (
         _datos(revision, resultados, revision.balance_inicial)
         if revision.balance_inicial is not None
@@ -1250,7 +1344,9 @@ def dias_del_dinero(estados: EstadosRevisados, base: BaseDeDias) -> DiasDelDiner
         elif iva == "con IVA":
             nota = "Sin IVA: no calculable: falta confirmar tu tasa de IVA."
         if nota is not None:
-            del_anio = _DelAnio(del_anio.anio.model_copy(update={"nota": nota}), del_anio.crudos)
+            del_anio = _DelAnio(
+                del_anio.anio.model_copy(update={"nota": nota}), del_anio.crudos
+            )
         por_anio.append(del_anio)
 
     anterior = por_anio[0] if inicial is not None else None
@@ -1261,7 +1357,9 @@ def dias_del_dinero(estados: EstadosRevisados, base: BaseDeDias) -> DiasDelDiner
         iva=iva,
         rotulo=ROTULOS[iva],
         tasa_iva=base.tasa_iva if divisor is not None else None,
-        base_de_ventas="ventas a crédito" if a_credito is not None else "ventas totales",
+        base_de_ventas="ventas a crédito"
+        if a_credito is not None
+        else "ventas totales",
         avisos=tuple(avisos),
         preguntas=tuple(preguntas),
         anios=tuple(a.anio for a in por_anio),
@@ -1307,7 +1405,10 @@ def _con_impacto(lever: str, fecha: date, impacto: LeverImpact) -> Palanca:
         palanca=clave,
         nombre=nombre,
         flujo=_calculado(
-            _palanca_def(lever, True), fecha, Decimal(str(impacto.cash_impact)), impacto.cash_formula
+            _palanca_def(lever, True),
+            fecha,
+            Decimal(str(impacto.cash_impact)),
+            impacto.cash_formula,
         ),
         utilidad=_calculado(
             _palanca_def(lever, False),
@@ -1357,18 +1458,30 @@ def _poder_del_uno(
             razon = _falta_ventas(fecha)
         else:
             razon = _ventas_en_cero(fecha) + "; sin ventas no hay palancas que medir"
-        return (), _no_calculable(TOTAL_FLUJO, fecha, razon), _no_calculable(TOTAL_UTILIDAD, fecha, razon)
+        return (
+            (),
+            _no_calculable(TOTAL_FLUJO, fecha, razon),
+            _no_calculable(TOTAL_UTILIDAD, fecha, razon),
+        )
 
     fuera: dict[str, Indicador] = {}
     if not d.costo.existe or d.costo.valor <= 0:
         fuera["cogs"] = _no_aplica(
-            _palanca_def("cogs", True), fecha, "tu estado de resultados no trae costo de ventas"
+            _palanca_def("cogs", True),
+            fecha,
+            "tu estado de resultados no trae costo de ventas",
         )
     if not d.gastos.existe or d.gastos.valor <= 0:
         fuera["opex"] = _no_aplica(
-            _palanca_def("opex", True), fecha, "tu estado de resultados no trae gastos de operación"
+            _palanca_def("opex", True),
+            fecha,
+            "tu estado de resultados no trae gastos de operación",
         )
-    for lever, clave in (("ar_days", "dias_clientes"), ("inv_days", "dias_inventario"), ("ap_days", "dias_proveedores")):
+    for lever, clave in (
+        ("ar_days", "dias_clientes"),
+        ("inv_days", "dias_inventario"),
+        ("ap_days", "dias_proveedores"),
+    ):
         if not isinstance(de_dias[clave], Calculado):
             fuera[lever] = de_dias[clave]
 
@@ -1378,12 +1491,16 @@ def _poder_del_uno(
     )
     impactos = {impacto.lever: impacto for impacto in resultado.impacts}
     palancas = tuple(
-        _sin_palanca(lever, fecha, fuera[lever]) if lever in fuera else _con_impacto(lever, fecha, impactos[lever])
+        _sin_palanca(lever, fecha, fuera[lever])
+        if lever in fuera
+        else _con_impacto(lever, fecha, impactos[lever])
         for lever in LEVER_META
     )
     con_valor = [p for p in palancas if isinstance(p.flujo, Calculado)]
     origen_flujo = " + ".join(
-        f"{p.palanca} {formato_monto(p.flujo.valor)}" for p in con_valor if isinstance(p.flujo, Calculado)
+        f"{p.palanca} {formato_monto(p.flujo.valor)}"
+        for p in con_valor
+        if isinstance(p.flujo, Calculado)
     )
     origen_utilidad = " + ".join(
         f"{p.palanca} {formato_monto(p.utilidad.valor)}"
@@ -1396,8 +1513,18 @@ def _poder_del_uno(
         origen_utilidad += nota
     return (
         palancas,
-        _calculado(TOTAL_FLUJO, fecha, Decimal(str(resultado.combined_cash_impact)), origen_flujo),
-        _calculado(TOTAL_UTILIDAD, fecha, Decimal(str(resultado.combined_ebit_impact)), origen_utilidad),
+        _calculado(
+            TOTAL_FLUJO,
+            fecha,
+            Decimal(str(resultado.combined_cash_impact)),
+            origen_flujo,
+        ),
+        _calculado(
+            TOTAL_UTILIDAD,
+            fecha,
+            Decimal(str(resultado.combined_ebit_impact)),
+            origen_utilidad,
+        ),
     )
 
 
@@ -1416,9 +1543,24 @@ PARTES: dict[str, tuple[Literal["%", "días"], str, str, str]] = {
         "1% × utilidad bruta",
         "−1% × capital de trabajo (clientes + inventario − proveedores)",
     ),
-    "cogs": ("%", "bajar el costo de ventas", "1% × costo de ventas", "1% × (inventario − proveedores)"),
-    "opex": ("%", "bajar los gastos de operación", "1% × gastos de operación", "no deja nada en balance"),
-    "ar_days": ("días", "cobrar antes", "mover días no cambia la utilidad", "1 día × ventas ÷ días del periodo"),
+    "cogs": (
+        "%",
+        "bajar el costo de ventas",
+        "1% × costo de ventas",
+        "1% × (inventario − proveedores)",
+    ),
+    "opex": (
+        "%",
+        "bajar los gastos de operación",
+        "1% × gastos de operación",
+        "no deja nada en balance",
+    ),
+    "ar_days": (
+        "días",
+        "cobrar antes",
+        "mover días no cambia la utilidad",
+        "1 día × ventas ÷ días del periodo",
+    ),
     "inv_days": (
         "días",
         "tener menos días de inventario",
@@ -1465,7 +1607,9 @@ def _simulador(
         una_vez: ParteDelSimulador
         if isinstance(flujo, Calculado) or isinstance(utilidad, Calculado):
             partes = lever_parts(lever, entradas, 1, dias)
-            por_periodo = _parte(lever, False, partes.per_period, partes.per_period_formula)
+            por_periodo = _parte(
+                lever, False, partes.per_period, partes.per_period_formula
+            )
             una_vez = _parte(lever, True, partes.one_time, partes.one_time_formula)
         else:
             # La palanca no entra al poder del uno: la misma razón, en gris.
@@ -1524,17 +1668,28 @@ def _cifra_pv(
     )
 
 
-def _no_calculable_pv(clave: str, nombre: str, formula: str, lamina: str, razon: str) -> NoCalculable:
+def _no_calculable_pv(
+    clave: str, nombre: str, formula: str, lamina: str, razon: str
+) -> NoCalculable:
     return NoCalculable(
-        clave=clave, nombre=nombre, fecha=None, formula=formula, lamina=lamina, no_calculable=razon
+        clave=clave,
+        nombre=nombre,
+        fecha=None,
+        formula=formula,
+        lamina=lamina,
+        no_calculable=razon,
     )
 
 
-def _precio_contra_volumen(d: _Fecha, descuento: int, volumen: int) -> PrecioContraVolumen:
+def _precio_contra_volumen(
+    d: _Fecha, descuento: int, volumen: int
+) -> PrecioContraVolumen:
     """F3b.2 y F3b.3 con los estados al cierre. Precio y volumen salen del motor."""
     if d.ventas is None or d.ventas.valor <= 0:
         razon = _falta_ventas(d.fecha) if d.ventas is None else _ventas_en_cero(d.fecha)
-        return PrecioContraVolumen(no_calculable=razon, descuento=descuento, volumen=volumen)
+        return PrecioContraVolumen(
+            no_calculable=razon, descuento=descuento, volumen=volumen
+        )
 
     entradas = _entradas(d, CERO)
     ventas, costo = d.ventas.valor, d.costo.valor
@@ -1547,40 +1702,91 @@ def _precio_contra_volumen(d: _Fecha, descuento: int, volumen: int) -> PrecioCon
     vol_1_flujo = vol_1.per_period + vol_1.one_time
 
     cifras: list[ParteDePrecioVolumen] = [
-        _cifra_pv("precio.utilidad", "Subir el precio 1%: utilidad", precio.per_period, "pesos",
-                  "1% × ventas", precio.per_period_formula, "L36"),
-        _cifra_pv("precio.flujo", "Subir el precio 1%: flujo", precio_flujo, "pesos",
-                  "1% × ventas − 1% × clientes", precio.cash_formula, "L36"),
-        _cifra_pv("volumen_1.utilidad", "Vender 1% más: utilidad", vol_1.per_period, "pesos",
-                  "1% × utilidad bruta", vol_1.per_period_formula, "L37"),
-        _cifra_pv("volumen_1.flujo", "Vender 1% más: flujo", vol_1_flujo, "pesos",
-                  "1% × utilidad bruta − 1% × capital de trabajo", vol_1.cash_formula, "L37"),
+        _cifra_pv(
+            "precio.utilidad",
+            "Subir el precio 1%: utilidad",
+            precio.per_period,
+            "pesos",
+            "1% × ventas",
+            precio.per_period_formula,
+            "L36",
+        ),
+        _cifra_pv(
+            "precio.flujo",
+            "Subir el precio 1%: flujo",
+            precio_flujo,
+            "pesos",
+            "1% × ventas − 1% × clientes",
+            precio.cash_formula,
+            "L36",
+        ),
+        _cifra_pv(
+            "volumen_1.utilidad",
+            "Vender 1% más: utilidad",
+            vol_1.per_period,
+            "pesos",
+            "1% × utilidad bruta",
+            vol_1.per_period_formula,
+            "L37",
+        ),
+        _cifra_pv(
+            "volumen_1.flujo",
+            "Vender 1% más: flujo",
+            vol_1_flujo,
+            "pesos",
+            "1% × utilidad bruta − 1% × capital de trabajo",
+            vol_1.cash_formula,
+            "L37",
+        ),
     ]
 
     # Razones (L38): cuántas veces rinde subir el precio contra vender más.
-    sin_ub = "la utilidad bruta es 0 o menos: vender más no deja utilidad con qué comparar"
+    sin_ub = (
+        "la utilidad bruta es 0 o menos: vender más no deja utilidad con qué comparar"
+    )
     formula_ru = "utilidad por subir el precio 1% ÷ utilidad por vender 1% más"
     formula_rf = "flujo por subir el precio 1% ÷ flujo por vender 1% más"
     razon_u: ParteDePrecioVolumen
     razon_f: ParteDePrecioVolumen
     if ub <= 0:
-        razon_u = _no_calculable_pv("razon.utilidad", "Precio contra volumen: utilidad", formula_ru, "L38", sin_ub)
+        razon_u = _no_calculable_pv(
+            "razon.utilidad",
+            "Precio contra volumen: utilidad",
+            formula_ru,
+            "L38",
+            sin_ub,
+        )
     else:
         razon_u = _cifra_pv(
-            "razon.utilidad", "Precio contra volumen: utilidad", precio.per_period / vol_1.per_period,
-            "veces", formula_ru,
-            f"precio {_dinero(precio.per_period)} ÷ volumen {_dinero(vol_1.per_period)}", "L38",
+            "razon.utilidad",
+            "Precio contra volumen: utilidad",
+            precio.per_period / vol_1.per_period,
+            "veces",
+            formula_ru,
+            f"precio {_dinero(precio.per_period)} ÷ volumen {_dinero(vol_1.per_period)}",
+            "L38",
         )
     if ub <= 0 or vol_1_flujo <= 0:
-        razon = sin_ub if ub <= 0 else (
-            "vender 1% más pide más capital de trabajo del que deja: "
-            f"su flujo es {_dinero(vol_1_flujo)}"
+        razon = (
+            sin_ub
+            if ub <= 0
+            else (
+                "vender 1% más pide más capital de trabajo del que deja: "
+                f"su flujo es {_dinero(vol_1_flujo)}"
+            )
         )
-        razon_f = _no_calculable_pv("razon.flujo", "Precio contra volumen: flujo", formula_rf, "L38", razon)
+        razon_f = _no_calculable_pv(
+            "razon.flujo", "Precio contra volumen: flujo", formula_rf, "L38", razon
+        )
     else:
         razon_f = _cifra_pv(
-            "razon.flujo", "Precio contra volumen: flujo", precio_flujo / vol_1_flujo, "veces", formula_rf,
-            f"precio {_dinero(precio_flujo)} ÷ volumen {_dinero(vol_1_flujo)}", "L38",
+            "razon.flujo",
+            "Precio contra volumen: flujo",
+            precio_flujo / vol_1_flujo,
+            "veces",
+            formula_rf,
+            f"precio {_dinero(precio_flujo)} ÷ volumen {_dinero(vol_1_flujo)}",
+            "L38",
         )
     cifras += [razon_u, razon_f]
 
@@ -1592,20 +1798,60 @@ def _precio_contra_volumen(d: _Fecha, descuento: int, volumen: int) -> PrecioCon
     d_ = f"{descuento}%"
     v_ = f"{volumen}%"
     cifras += [
-        _cifra_pv("descuento.utilidad", f"Descuento de {d_}: utilidad", desc_u, "pesos",
-                  f"−{d_} × ventas", f"−{precio_d.per_period_formula}", "L41"),
-        _cifra_pv("descuento.flujo", f"Descuento de {d_}: flujo", desc_f, "pesos",
-                  f"−{d_} × ventas + {d_} × clientes", f"−({precio_d.cash_formula})", "L41"),
-        _cifra_pv("volumen.utilidad", f"Vender {v_} más: utilidad", vol_u, "pesos",
-                  f"{v_} × utilidad bruta", vol_v.per_period_formula, "L40"),
-        _cifra_pv("volumen.flujo", f"Vender {v_} más: flujo", vol_f, "pesos",
-                  f"{v_} × utilidad bruta − {v_} × capital de trabajo", vol_v.cash_formula, "L40"),
-        _cifra_pv("neto_del_curso.utilidad", "Descuento y volumen, sumados como el curso: utilidad",
-                  desc_u + vol_u, "pesos", "efecto del descuento + efecto del volumen",
-                  f"descuento {_dinero(desc_u)} + volumen {_dinero(vol_u)}", "L43"),
-        _cifra_pv("neto_del_curso.flujo", "Descuento y volumen, sumados como el curso: flujo",
-                  desc_f + vol_f, "pesos", "efecto del descuento + efecto del volumen",
-                  f"descuento {_dinero(desc_f)} + volumen {_dinero(vol_f)}", "L43"),
+        _cifra_pv(
+            "descuento.utilidad",
+            f"Descuento de {d_}: utilidad",
+            desc_u,
+            "pesos",
+            f"−{d_} × ventas",
+            f"−{precio_d.per_period_formula}",
+            "L41",
+        ),
+        _cifra_pv(
+            "descuento.flujo",
+            f"Descuento de {d_}: flujo",
+            desc_f,
+            "pesos",
+            f"−{d_} × ventas + {d_} × clientes",
+            f"−({precio_d.cash_formula})",
+            "L41",
+        ),
+        _cifra_pv(
+            "volumen.utilidad",
+            f"Vender {v_} más: utilidad",
+            vol_u,
+            "pesos",
+            f"{v_} × utilidad bruta",
+            vol_v.per_period_formula,
+            "L40",
+        ),
+        _cifra_pv(
+            "volumen.flujo",
+            f"Vender {v_} más: flujo",
+            vol_f,
+            "pesos",
+            f"{v_} × utilidad bruta − {v_} × capital de trabajo",
+            vol_v.cash_formula,
+            "L40",
+        ),
+        _cifra_pv(
+            "neto_del_curso.utilidad",
+            "Descuento y volumen, sumados como el curso: utilidad",
+            desc_u + vol_u,
+            "pesos",
+            "efecto del descuento + efecto del volumen",
+            f"descuento {_dinero(desc_u)} + volumen {_dinero(vol_u)}",
+            "L43",
+        ),
+        _cifra_pv(
+            "neto_del_curso.flujo",
+            "Descuento y volumen, sumados como el curso: flujo",
+            desc_f + vol_f,
+            "pesos",
+            "efecto del descuento + efecto del volumen",
+            f"descuento {_dinero(desc_f)} + volumen {_dinero(vol_f)}",
+            "L43",
+        ),
     ]
 
     # Cálculo de ESCALA: el volumen extra también va con descuento.
@@ -1616,11 +1862,14 @@ def _precio_contra_volumen(d: _Fecha, descuento: int, volumen: int) -> PrecioCon
     combinado = factor_v * ub_con_descuento - ub
     cifras.append(
         _cifra_pv(
-            "combinado.utilidad", f"{d_} de descuento y {v_} más de volumen, juntos: utilidad", combinado,
+            "combinado.utilidad",
+            f"{d_} de descuento y {v_} más de volumen, juntos: utilidad",
+            combinado,
             "pesos",
             "(1 + volumen) × (ventas × (1 − descuento) − costo de ventas) − utilidad bruta",
             f"{factor_v} × ({texto_ub_d}) − utilidad bruta {_dinero(ub)}",
-            "L43 (el curso suma los dos efectos; aquí se calculan juntos)", CALCULO_DE_ESCALA,
+            "L43 (el curso suma los dos efectos; aquí se calculan juntos)",
+            CALCULO_DE_ESCALA,
         )
     )
     formula_eq = "utilidad bruta ÷ (ventas × (1 − descuento) − costo de ventas) − 1"
@@ -1628,21 +1877,32 @@ def _precio_contra_volumen(d: _Fecha, descuento: int, volumen: int) -> PrecioCon
     equilibrio: ParteDePrecioVolumen
     if ub <= 0:
         equilibrio = _no_calculable_pv(
-            "equilibrio.volumen", nombre_eq, formula_eq, "L43",
+            "equilibrio.volumen",
+            nombre_eq,
+            formula_eq,
+            "L43",
             "la utilidad bruta es 0 o menos: no hay utilidad que cuidar",
         )
     elif ub_con_descuento <= 0:
         margen = (CIEN * ub / ventas).quantize(CENTAVO, rounding=ROUND_HALF_UP)
         equilibrio = _no_calculable_pv(
-            "equilibrio.volumen", nombre_eq, formula_eq, "L43",
+            "equilibrio.volumen",
+            nombre_eq,
+            formula_eq,
+            "L43",
             f"el descuento de {d_} es igual o mayor que tu margen bruto ({margen}%): "
             "cada venta con descuento deja 0 o pierde, y ningún volumen lo compensa",
         )
     else:
         equilibrio = _cifra_pv(
-            "equilibrio.volumen", "Volumen extra para que el descuento no pierda utilidad",
-            CIEN * (ub / ub_con_descuento - 1), "%", formula_eq,
-            f"utilidad bruta {_dinero(ub)} ÷ ({texto_ub_d}) − 1", "L43", CALCULO_DE_ESCALA,
+            "equilibrio.volumen",
+            "Volumen extra para que el descuento no pierda utilidad",
+            CIEN * (ub / ub_con_descuento - 1),
+            "%",
+            formula_eq,
+            f"utilidad bruta {_dinero(ub)} ÷ ({texto_ub_d}) − 1",
+            "L43",
+            CALCULO_DE_ESCALA,
         )
     cifras.append(equilibrio)
 
@@ -1652,11 +1912,15 @@ def _precio_contra_volumen(d: _Fecha, descuento: int, volumen: int) -> PrecioCon
             f"Subir el precio 1% te deja {razon_u.valor} veces la utilidad que te deja vender 1% más (L38)."
         )
     else:
-        mensajes.append(f"Precio contra volumen, utilidad: no calculable: {razon_u.no_calculable}.")
+        mensajes.append(
+            f"Precio contra volumen, utilidad: no calculable: {razon_u.no_calculable}."
+        )
     if isinstance(razon_f, CifraDePrecioVolumen):
         mensajes.append(f"En efectivo, {razon_f.valor} veces (L38).")
     else:
-        mensajes.append(f"Precio contra volumen, efectivo: no calculable: {razon_f.no_calculable}.")
+        mensajes.append(
+            f"Precio contra volumen, efectivo: no calculable: {razon_f.no_calculable}."
+        )
     if isinstance(equilibrio, CifraDePrecioVolumen):
         mensajes.append(
             f"Si das {d_} de descuento, necesitas vender {equilibrio.valor}% más solo para quedar igual"
@@ -1672,7 +1936,12 @@ def _precio_contra_volumen(d: _Fecha, descuento: int, volumen: int) -> PrecioCon
         f" ({CALCULO_DE_ESCALA}: el volumen extra también va con descuento);"
         f" el curso lo simplifica sumando los dos efectos, y da {_signo(desc_u + vol_u)}."
     )
-    return PrecioContraVolumen(cifras=tuple(cifras), mensajes=tuple(mensajes), descuento=descuento, volumen=volumen)
+    return PrecioContraVolumen(
+        cifras=tuple(cifras),
+        mensajes=tuple(mensajes),
+        descuento=descuento,
+        volumen=volumen,
+    )
 
 
 def precio_contra_volumen(
@@ -1691,17 +1960,27 @@ def precio_contra_volumen(
             volumen=volumen,
         )
     if volumen < 0:
-        return PrecioContraVolumen(no_calculable="el volumen extra no puede ser negativo", descuento=descuento, volumen=volumen)
+        return PrecioContraVolumen(
+            no_calculable="el volumen extra no puede ser negativo",
+            descuento=descuento,
+            volumen=volumen,
+        )
     revision = estados.revision
     if not revision.puede_calcular:
-        return PrecioContraVolumen(no_calculable=_por_que_no(revision), descuento=descuento, volumen=volumen)
+        return PrecioContraVolumen(
+            no_calculable=_por_que_no(revision), descuento=descuento, volumen=volumen
+        )
     final = (
         _datos(revision, estados.resultados, revision.balance_final)
         if revision.balance_final is not None
         else None
     )
     if final is None:
-        return PrecioContraVolumen(no_calculable="falta el balance al final del periodo", descuento=descuento, volumen=volumen)
+        return PrecioContraVolumen(
+            no_calculable="falta el balance al final del periodo",
+            descuento=descuento,
+            volumen=volumen,
+        )
     return _precio_contra_volumen(final, descuento, volumen)
 
 
@@ -1811,7 +2090,11 @@ def utilidad_ajustada(
     fecha = revision.balance_final
     ajustes_ = tuple(ajustes)
     if not revision.puede_calcular or fecha is None:
-        razon = _por_que_no(revision) if not revision.puede_calcular else "falta el balance al final del periodo"
+        razon = (
+            _por_que_no(revision)
+            if not revision.puede_calcular
+            else "falta el balance al final del periodo"
+        )
         return UtilidadAjustada(
             ajustes=ajustes_,
             utilidad_contable=_no_calculable(UTILIDAD_CONTABLE, fecha, razon),
@@ -1829,7 +2112,9 @@ def utilidad_ajustada(
     )
     neta = _utilidad_neta(estados.resultados, fecha)
     if neta is None:
-        razon = f"tu estado de resultados al {fecha_corta(fecha)} no trae la utilidad neta"
+        razon = (
+            f"tu estado de resultados al {fecha_corta(fecha)} no trae la utilidad neta"
+        )
         return UtilidadAjustada(
             ajustes=ajustes_,
             utilidad_contable=_no_calculable(UTILIDAD_CONTABLE, fecha, razon),
@@ -1851,7 +2136,9 @@ def utilidad_ajustada(
         ajustes=ajustes_,
         utilidad_contable=contable,
         total_de_ajustes=total,
-        utilidad_ajustada=_calculado(UTILIDAD_AJUSTADA, fecha, neta.valor + suma, origen),
+        utilidad_ajustada=_calculado(
+            UTILIDAD_AJUSTADA, fecha, neta.valor + suma, origen
+        ),
     )
 
 
@@ -1955,7 +2242,9 @@ def _cifra(valor: Decimal, etiqueta: str) -> _Cifra:
     return _Cifra(valor, f"{etiqueta} {_dinero(valor)}")
 
 
-def _sin_ventas(definicion: _Definicion, ventas: _Cifra | None, fecha: date) -> NoCalculable | None:
+def _sin_ventas(
+    definicion: _Definicion, ventas: _Cifra | None, fecha: date
+) -> NoCalculable | None:
     if ventas is None:
         return _no_calculable(definicion, fecha, _falta_ventas(fecha))
     if ventas.valor <= 0:
@@ -1980,7 +2269,9 @@ def _pretax(uai: _Cifra | None, ventas: _Cifra | None, fecha: date) -> PretaxCon
         return PretaxConLinea(_falta_uai(MARGEN_PRETAX, fecha), None)
     assert ventas is not None
     valor = CIEN * uai.valor / ventas.valor
-    indicador = _calculado(MARGEN_PRETAX, fecha, valor, f"100 × {uai.texto} ÷ {ventas.texto}")
+    indicador = _calculado(
+        MARGEN_PRETAX, fecha, valor, f"100 × {uai.texto} ÷ {ventas.texto}"
+    )
     return PretaxConLinea(indicador, valor >= LINEA_DEL_PRETAX)
 
 
@@ -2008,7 +2299,9 @@ def _sobre_ub(
         )
     proporcion = ub.valor / ventas.valor
     if proporcion >= LIMITE_DE_LA_UB:
-        porcentaje = formato_monto((CIEN * proporcion).quantize(CENTAVO, rounding=ROUND_HALF_UP))
+        porcentaje = formato_monto(
+            (CIEN * proporcion).quantize(CENTAVO, rounding=ROUND_HALF_UP)
+        )
         return _no_aplica(
             MARGEN_SOBRE_UB,
             fecha,
@@ -2016,11 +2309,16 @@ def _sobre_ub(
             " el margen se mide contra las ventas",
         )
     return _calculado(
-        MARGEN_SOBRE_UB, fecha, CIEN * uai.valor / ub.valor, f"100 × {uai.texto} ÷ {ub.texto}"
+        MARGEN_SOBRE_UB,
+        fecha,
+        CIEN * uai.valor / ub.valor,
+        f"100 × {uai.texto} ÷ {ub.texto}",
     )
 
 
-def _devoluciones(devoluciones: _Cifra | None, uai: _Cifra | None, fecha: date) -> Indicador:
+def _devoluciones(
+    devoluciones: _Cifra | None, uai: _Cifra | None, fecha: date
+) -> Indicador:
     if devoluciones is None:
         return _no_calculable(
             DEVOLUCIONES_SOBRE_UTILIDAD,
@@ -2047,7 +2345,9 @@ def _devoluciones(devoluciones: _Cifra | None, uai: _Cifra | None, fecha: date) 
 def margen_pretax(uai: Decimal, ventas: Decimal, fecha: date) -> PretaxConLinea:
     """F6.1 con montos sueltos: 100 × UAI ÷ ventas, y si llega a la línea del 10%."""
 
-    return _pretax(_cifra(uai, "utilidad antes de impuestos"), _cifra(ventas, "ventas"), fecha)
+    return _pretax(
+        _cifra(uai, "utilidad antes de impuestos"), _cifra(ventas, "ventas"), fecha
+    )
 
 
 def margen_sobre_utilidad_bruta(
@@ -2063,7 +2363,9 @@ def margen_sobre_utilidad_bruta(
     )
 
 
-def devoluciones_sobre_utilidad(devoluciones: Decimal, uai: Decimal, fecha: date) -> Indicador:
+def devoluciones_sobre_utilidad(
+    devoluciones: Decimal, uai: Decimal, fecha: date
+) -> Indicador:
     """F6.3 con montos sueltos: 100 × devoluciones ÷ UAI."""
 
     return _devoluciones(
@@ -2073,20 +2375,29 @@ def devoluciones_sobre_utilidad(devoluciones: Decimal, uai: Decimal, fecha: date
     )
 
 
-def _falta_del_dueno(definicion: _Definicion, dueno: DatosDelDueno, fecha: date) -> NoCalculable | None:
+def _falta_del_dueno(
+    definicion: _Definicion, dueno: DatosDelDueno, fecha: date
+) -> NoCalculable | None:
     if dueno.salario_de_mercado is None:
         return _no_calculable(
-            definicion, fecha, "falta el salario de mercado: lo da el dueño, ESCALA no lo supone"
+            definicion,
+            fecha,
+            "falta el salario de mercado: lo da el dueño, ESCALA no lo supone",
         )
     if dueno.sueldo_actual_del_dueno is None:
         return _no_calculable(
-            definicion, fecha, "falta cuánto se paga hoy el dueño en la nómina (0 si no se paga)"
+            definicion,
+            fecha,
+            "falta cuánto se paga hoy el dueño en la nómina (0 si no se paga)",
         )
     return None
 
 
 def _ajuste_de_salario(dueno: DatosDelDueno) -> tuple[Decimal, str]:
-    assert dueno.salario_de_mercado is not None and dueno.sueldo_actual_del_dueno is not None
+    assert (
+        dueno.salario_de_mercado is not None
+        and dueno.sueldo_actual_del_dueno is not None
+    )
     ajuste = dueno.salario_de_mercado - dueno.sueldo_actual_del_dueno
     texto = (
         f"(salario de mercado {_dinero(dueno.salario_de_mercado)}"
@@ -2105,7 +2416,10 @@ def _utilidad_real(d: _Fecha, dueno: DatosDelDueno) -> Indicador:
     uo = ub.valor - d.gastos.valor
     ajuste, texto = _ajuste_de_salario(dueno)
     return _calculado(
-        UTILIDAD_REAL, d.fecha, uo - ajuste, f"utilidad de operación {_dinero(uo)} − {texto}"
+        UTILIDAD_REAL,
+        d.fecha,
+        uo - ajuste,
+        f"utilidad de operación {_dinero(uo)} − {texto}",
     )
 
 
@@ -2123,7 +2437,10 @@ def _pretax_con_salario(
     ajuste, texto = _ajuste_de_salario(dueno)
     valor = CIEN * (uai.valor - ajuste) / ventas.valor
     indicador = _calculado(
-        PRETAX_CON_SALARIO, fecha, valor, f"100 × ({uai.texto} − {texto}) ÷ {ventas.texto}"
+        PRETAX_CON_SALARIO,
+        fecha,
+        valor,
+        f"100 × ({uai.texto} − {texto}) ÷ {ventas.texto}",
     )
     return PretaxConLinea(indicador, valor >= LINEA_DEL_PRETAX)
 
@@ -2132,12 +2449,16 @@ def _isr(resultados: LecturaEstados, fecha: date) -> Indicador:
     isr = _del_resultado(resultados, "isr", fecha)
     if isr is None:
         return _no_calculable(
-            ISR, fecha, f"tu estado de resultados no trae el renglón de ISR al {fecha_corta(fecha)}"
+            ISR,
+            fecha,
+            f"tu estado de resultados no trae el renglón de ISR al {fecha_corta(fecha)}",
         )
     return _calculado(ISR, fecha, isr.valor, isr.texto)
 
 
-def _bloque_del_margen(d: _Fecha, resultados: LecturaEstados, dueno: DatosDelDueno) -> BloqueDelMargen:
+def _bloque_del_margen(
+    d: _Fecha, resultados: LecturaEstados, dueno: DatosDelDueno
+) -> BloqueDelMargen:
     fecha = d.fecha
     uai = _del_resultado(resultados, "utilidad_antes_impuestos", fecha)
     ub = _utilidad_bruta(d)
@@ -2195,10 +2516,14 @@ def calcular_curso(estados: EstadosRevisados) -> ResultadoDelCurso:
     if not revision.puede_calcular:
         return ResultadoDelCurso(no_calculable=_por_que_no(revision), **base)
     if revision.balance_final is None:
-        return ResultadoDelCurso(no_calculable="falta el balance al final del periodo", **base)
+        return ResultadoDelCurso(
+            no_calculable="falta el balance al final del periodo", **base
+        )
     final = _datos(revision, resultados, revision.balance_final)
     if final is None:
-        return ResultadoDelCurso(no_calculable="falta el balance al final del periodo", **base)
+        return ResultadoDelCurso(
+            no_calculable="falta el balance al final del periodo", **base
+        )
     inicial = (
         _datos(revision, resultados, revision.balance_inicial)
         if revision.balance_inicial is not None
@@ -2224,12 +2549,18 @@ def calcular_curso(estados: EstadosRevisados) -> ResultadoDelCurso:
         (
             c.monto
             for c in resultados.cuentas
-            if c.concepto == "utilidad_neta" and c.fecha == final.fecha and not c.es_total
+            if c.concepto == "utilidad_neta"
+            and c.fecha == final.fecha
+            and not c.es_total
         ),
         CERO,
     )
-    palancas, total_flujo, total_utilidad = _poder_del_uno(final, dias, de_dias_final, neta)
-    pendientes = tuple(p.pregunta for p in revision.preguntas) + tuple(resultados.preguntas)
+    palancas, total_flujo, total_utilidad = _poder_del_uno(
+        final, dias, de_dias_final, neta
+    )
+    pendientes = tuple(p.pregunta for p in revision.preguntas) + tuple(
+        resultados.preguntas
+    )
     return ResultadoDelCurso(
         indicadores=tuple(indicadores),
         poder_del_uno=palancas,
@@ -2237,8 +2568,12 @@ def calcular_curso(estados: EstadosRevisados) -> ResultadoDelCurso:
         poder_del_uno_utilidad=total_utilidad,
         pendientes=pendientes,
         simulador=_simulador(final, dias, palancas, neta),
-        precio_contra_volumen=_precio_contra_volumen(final, DESCUENTO_DEL_CURSO, VOLUMEN_DEL_CURSO),
-        margen=_bloque_del_margen(final, resultados, estados.del_dueno or DatosDelDueno()),
+        precio_contra_volumen=_precio_contra_volumen(
+            final, DESCUENTO_DEL_CURSO, VOLUMEN_DEL_CURSO
+        ),
+        margen=_bloque_del_margen(
+            final, resultados, estados.del_dueno or DatosDelDueno()
+        ),
         **base,
     )
 

@@ -62,7 +62,12 @@ def test_consent_tells_the_truth_about_transmission() -> None:
 def test_consent_asks_before_each_step_with_a_real_example() -> None:
     consent = consent_section(DOOR.read_text(encoding="utf-8"))
 
-    for step in ("Buscar en internet", "Guardar", "Escribir en su hoja", "Leer un archivo"):
+    for step in (
+        "Buscar en internet",
+        "Guardar",
+        "Escribir en su hoja",
+        "Leer un archivo",
+    ):
         assert step in consent, step
     assert (
         "Para buscar precios de tu competencia voy a mandar a internet sólo "
@@ -93,7 +98,9 @@ def _fake_bin(tmp_path: Path) -> Path:
     return bin_dir
 
 
-def _install(home: Path, bin_dir: Path, *platforms: str) -> subprocess.CompletedProcess[str]:
+def _install(
+    home: Path, bin_dir: Path, *platforms: str
+) -> subprocess.CompletedProcess[str]:
     args = ["bash", str(INSTALLER), "--skills-only"]
     for platform in platforms:
         args += ["--platform", platform]
@@ -190,7 +197,10 @@ def test_portable_export_carries_the_codex_contract(tmp_path: Path) -> None:
     completed = subprocess.run(
         ["bash", str(artifact / "install.sh"), "--skills-only", "--platform", "codex"],
         cwd=artifact,
-        env={"HOME": str(home), "PATH": str(_fake_bin(tmp_path)) + ":" + os.environ["PATH"]},
+        env={
+            "HOME": str(home),
+            "PATH": str(_fake_bin(tmp_path)) + ":" + os.environ["PATH"],
+        },
         capture_output=True,
         text=True,
         check=False,
@@ -198,9 +208,9 @@ def test_portable_export_carries_the_codex_contract(tmp_path: Path) -> None:
     )
 
     assert completed.returncode == 0, completed.stderr
-    assert f"`{artifact}/.venv/bin/python`" in (home / ".codex" / "AGENTS.md").read_text(
-        encoding="utf-8"
-    )
+    assert f"`{artifact}/.venv/bin/python`" in (
+        home / ".codex" / "AGENTS.md"
+    ).read_text(encoding="utf-8")
 
 
 # --- T3: each package carries the list and the procedures the door needs -----
@@ -227,7 +237,9 @@ def _codex_door(tmp_path: Path) -> Path:
 PACKAGES = {"plugin": _plugin_door, "codex": _codex_door}
 
 
-def _package_reaches(door_dir: Path, phrase: str, procedure: str, hint: str | None) -> bool:
+def _package_reaches(
+    door_dir: Path, phrase: str, procedure: str, hint: str | None
+) -> bool:
     """S86.4's reachability, read only from files inside the package."""
     procedures = door_dir / "references" / "procedures"
     catalog = load_capability_catalog(door_dir / "references" / "catalog.yaml")
@@ -240,7 +252,9 @@ def _package_reaches(door_dir: Path, phrase: str, procedure: str, hint: str | No
         return False
     rows = [
         line
-        for line in (procedures / f"{target}.md").read_text(encoding="utf-8").splitlines()
+        for line in (procedures / f"{target}.md")
+        .read_text(encoding="utf-8")
+        .splitlines()
         if line.startswith("|")
     ]
     return any(f"`{procedure}`" in row and _plain(hint) in _plain(row) for row in rows)
@@ -274,14 +288,14 @@ def test_package_bundle_is_the_repo_byte_for_byte_and_hides_procedures(
     shipped = {p.stem for p in (door_dir / "references" / "procedures").iterdir()}
     assert shipped == ids
     for procedure in ids:
-        assert (door_dir / "references" / "procedures" / f"{procedure}.md").read_bytes() == (
-            ROOT / "escala-skills" / procedure / "SKILL.md"
-        ).read_bytes()
+        assert (
+            door_dir / "references" / "procedures" / f"{procedure}.md"
+        ).read_bytes() == (ROOT / "escala-skills" / procedure / "SKILL.md").read_bytes()
     # Only the door is a skill: no platform discovers a procedure as a command.
     package_root = door_dir.parents[1]
-    assert [p.relative_to(package_root).as_posix() for p in package_root.rglob("SKILL.md")] == [
-        "skills/escala/SKILL.md"
-    ]
+    assert [
+        p.relative_to(package_root).as_posix() for p in package_root.rglob("SKILL.md")
+    ] == ["skills/escala/SKILL.md"]
 
 
 def test_door_says_where_the_list_and_procedures_live_in_a_package() -> None:
@@ -300,12 +314,16 @@ def test_door_carries_the_product_python_rule_for_every_platform() -> None:
 def test_plugin_rejects_a_tampered_or_extra_procedure(tmp_path: Path) -> None:
     door_dir = _plugin_door(tmp_path / "a")
     tampered = door_dir / "references" / "procedures" / "escala-diagnose.md"
-    tampered.write_text(tampered.read_text(encoding="utf-8") + "\nOtra cosa.\n", encoding="utf-8")
+    tampered.write_text(
+        tampered.read_text(encoding="utf-8") + "\nOtra cosa.\n", encoding="utf-8"
+    )
     with pytest.raises(AgentPluginError, match="door_bundle_drift"):
         load_agent_plugin(door_dir.parents[1])
 
     door_dir = _plugin_door(tmp_path / "b")
-    (door_dir / "references" / "procedures" / "escala-extra.md").write_text("x", encoding="utf-8")
+    (door_dir / "references" / "procedures" / "escala-extra.md").write_text(
+        "x", encoding="utf-8"
+    )
     with pytest.raises(AgentPluginError, match="package_surface_invalid"):
         load_agent_plugin(door_dir.parents[1])
 
@@ -365,8 +383,12 @@ def _surfaces(tmp_path: Path) -> dict[str, _Surface]:
     completed = _install(home, _fake_bin(tmp_path), "claude", "codex")
     assert completed.returncode == 0, completed.stderr
     return {
-        "claude-install": _Surface(home / ".claude" / "skills" / "escala", packaged=False),
-        "codex-install": _Surface(home / ".codex" / "skills" / "escala", packaged=False),
+        "claude-install": _Surface(
+            home / ".claude" / "skills" / "escala", packaged=False
+        ),
+        "codex-install": _Surface(
+            home / ".codex" / "skills" / "escala", packaged=False
+        ),
         "plugin": _Surface(_plugin_door(tmp_path), packaged=True),
         "codex-package": _Surface(_codex_door(tmp_path), packaged=True),
     }

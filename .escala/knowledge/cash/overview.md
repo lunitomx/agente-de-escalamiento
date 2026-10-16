@@ -15,8 +15,13 @@ dice en sus palabras.
   fichas, no se la atribuyas al curso: dila como tuya.
 - Cuando la ficha dice que la idea viene de un libro (Scaling Up de Verne
   Harnish, John Mullins, Greg Crabtree, Alan Miltz), dilo también.
-- Usa el ejemplo del curso sólo para explicar; con los números del dueño, haz
-  la cuenta con los suyos.
+- Usa el ejemplo del curso sólo para explicar. Con los números del dueño, las
+  cuentas las hace la calculadora de ESCALA (`escala_server/cash/calcular.py`;
+  en un paquete, `references/calculadora/escala_server/cash/calcular.py`).
+  Cada número trae su fórmula y su origen. Las fórmulas viven sólo en la
+  calculadora: estas fichas las explican con palabras y ejemplos, no las
+  repiten. Si la calculadora no corre, di:
+  "No voy a hacer las cuentas de memoria." y no des ningún número.
 
 ## Qué no está aquí
 

@@ -91,7 +91,12 @@ VALORES: list[tuple[str, str, str, str]] = [
     ("volumen_1.flujo", "146818.75", "curso", "L37"),
     ("descuento.utilidad", "-4382651.31", "curso", "L41"),
     ("descuento.flujo", "-3818691.15", "curso", "L41"),
-    ("volumen.utilidad", "3129007.36", "curso", "L40"),  # L40 dice 3,129,002.86 (errata)
+    (
+        "volumen.utilidad",
+        "3129007.36",
+        "curso",
+        "L40",
+    ),  # L40 dice 3,129,002.86 (errata)
     # 3,129,007.3635 − 926,726.0775 = 2,202,281.286 → .29 (L40 lo trae .29)
     ("volumen.flujo", "2202281.29", "curso", "L40"),
     ("neto_del_curso.utilidad", "-1253643.95", "curso", "L43"),  # L43: −1,253,644.31
@@ -122,7 +127,9 @@ def test_cada_cifra_dice_de_donde_sale(mi_empresa: PrecioContraVolumen) -> None:
     assert "381,869.12" in razon.origen and "146,818.75" in razon.origen
 
 
-def test_lo_que_no_es_del_curso_lleva_la_etiqueta(mi_empresa: PrecioContraVolumen) -> None:
+def test_lo_que_no_es_del_curso_lleva_la_etiqueta(
+    mi_empresa: PrecioContraVolumen,
+) -> None:
     for cifra in mi_empresa.cifras:
         assert isinstance(cifra, CifraDePrecioVolumen)
         es_de_escala = cifra.clave in {"combinado.utilidad", "equilibrio.volumen"}
@@ -160,7 +167,9 @@ def test_otro_descuento_da_otro_equilibrio() -> None:
     cinco = precio_contra_volumen(_mi_empresa_estados(), descuento=5, volumen=15)
     # UB ÷ (0.95 × ventas − costo) − 1 = 20,860,049.09 ÷ 18,668,723.4355 − 1
     assert _cifra(cinco, "equilibrio.volumen").valor == Decimal("11.74")
-    assert "Si das 5% de descuento, necesitas vender 11.74% más" in "\n".join(cinco.mensajes)
+    assert "Si das 5% de descuento, necesitas vender 11.74% más" in "\n".join(
+        cinco.mensajes
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -211,7 +220,9 @@ def _sintetico(
             ("Utilidad neta", "utilidad_neta", "200", "200"),
         ]
     )
-    revision = revisar_estados([_lectura(_balance(clientes))], resultados, respuestas=ACUMULADO, hoy=HOY)
+    revision = revisar_estados(
+        [_lectura(_balance(clientes))], resultados, respuestas=ACUMULADO, hoy=HOY
+    )
     return precio_contra_volumen(
         EstadosRevisados(revision=revision, resultados=resultados),
         descuento=descuento,
@@ -224,19 +235,31 @@ def test_sintetico_a_mano() -> None:
     r = _sintetico()
     assert _cifra(r, "razon.utilidad").valor == Decimal("2.00")  # 10 ÷ 5
     assert _cifra(r, "equilibrio.volumen").valor == Decimal("25.00")  # 500 ÷ 400 − 1
-    assert _cifra(r, "combinado.utilidad").valor == Decimal("-40.00")  # 1.15 × 400 − 500
+    assert _cifra(r, "combinado.utilidad").valor == Decimal(
+        "-40.00"
+    )  # 1.15 × 400 − 500
     assert _cifra(r, "neto_del_curso.utilidad").valor == Decimal("-25.00")  # −100 + 75
 
 
 def test_mover_clientes_cambia_el_flujo_pero_no_la_utilidad() -> None:
     base, mas_clientes = _sintetico(), _sintetico(clientes="350")
-    assert _cifra(base, "razon.utilidad").valor == _cifra(mas_clientes, "razon.utilidad").valor
-    assert _cifra(base, "razon.flujo").valor != _cifra(mas_clientes, "razon.flujo").valor
-    assert _cifra(base, "descuento.flujo").valor != _cifra(mas_clientes, "descuento.flujo").valor
+    assert (
+        _cifra(base, "razon.utilidad").valor
+        == _cifra(mas_clientes, "razon.utilidad").valor
+    )
+    assert (
+        _cifra(base, "razon.flujo").valor != _cifra(mas_clientes, "razon.flujo").valor
+    )
+    assert (
+        _cifra(base, "descuento.flujo").valor
+        != _cifra(mas_clientes, "descuento.flujo").valor
+    )
 
 
 def test_mover_el_costo_cambia_el_equilibrio() -> None:
-    assert _cifra(_sintetico(costo="600"), "equilibrio.volumen").valor == Decimal("33.33")  # 400 ÷ 300 − 1
+    assert _cifra(_sintetico(costo="600"), "equilibrio.volumen").valor == Decimal(
+        "33.33"
+    )  # 400 ÷ 300 − 1
 
 
 def test_descuento_igual_al_margen_no_es_calculable() -> None:
@@ -269,7 +292,11 @@ def test_entradas_fuera_de_rango(descuento: int, volumen: int) -> None:
 
 def test_sin_ventas_no_es_calculable() -> None:
     resultados = _lectura([("Utilidad neta", "utilidad_neta", "200", "200")])
-    revision = revisar_estados([_lectura(_balance())], resultados, respuestas=ACUMULADO, hoy=HOY)
-    r = precio_contra_volumen(EstadosRevisados(revision=revision, resultados=resultados))
+    revision = revisar_estados(
+        [_lectura(_balance())], resultados, respuestas=ACUMULADO, hoy=HOY
+    )
+    r = precio_contra_volumen(
+        EstadosRevisados(revision=revision, resultados=resultados)
+    )
     assert r.no_calculable is not None
     assert r.cifras == ()

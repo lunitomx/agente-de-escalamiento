@@ -105,7 +105,9 @@ def mi_empresa() -> EstadosRevisados:
 # ---------------------------------------------------------------------------
 
 
-def test_lamina_12_utilidad_ajustada_con_el_ajuste_correcto(mi_empresa: EstadosRevisados) -> None:
+def test_lamina_12_utilidad_ajustada_con_el_ajuste_correcto(
+    mi_empresa: EstadosRevisados,
+) -> None:
     # Errata L12: la lámina teclea 97,492 y da 5,463,260.03. El correcto es 97,942.
     resultado = utilidad_ajustada(mi_empresa, _ajustes(*LAMINA_12))
 
@@ -134,9 +136,15 @@ def test_sin_los_gastos_personales_queda_la_utilidad_neta_mas_los_otros_dos(
     assert _calculado(resultado.utilidad_ajustada).valor == Decimal("5365768.03")
 
 
-def test_cambiar_un_monto_del_dueno_cambia_la_utilidad_ajustada(mi_empresa: EstadosRevisados) -> None:
+def test_cambiar_un_monto_del_dueno_cambia_la_utilidad_ajustada(
+    mi_empresa: EstadosRevisados,
+) -> None:
     # Con el monto de la errata (97,492 en lugar de 97,942) sale el número de la lámina.
-    con_errata = [LAMINA_12[0], ("gastos personales (como los tecleó la lámina)", "97492"), LAMINA_12[4]]
+    con_errata = [
+        LAMINA_12[0],
+        ("gastos personales (como los tecleó la lámina)", "97492"),
+        LAMINA_12[4],
+    ]
     resultado = utilidad_ajustada(mi_empresa, _ajustes(*con_errata))
     assert _calculado(resultado.utilidad_ajustada).valor == Decimal("5463260.03")
 
@@ -170,7 +178,9 @@ def test_sin_utilidad_neta_no_calcula_y_no_pone_cero() -> None:
     sin_neta = leidos.model_copy(
         update={"cuentas": [c for c in leidos.cuentas if c.concepto != "utilidad_neta"]}
     )
-    resultado = utilidad_ajustada(_estados(sin_neta), _ajustes(("viaje familiar", "55820")))
+    resultado = utilidad_ajustada(
+        _estados(sin_neta), _ajustes(("viaje familiar", "55820"))
+    )
     assert isinstance(resultado.utilidad_contable, NoCalculable)
     assert isinstance(resultado.utilidad_ajustada, NoCalculable)
     assert "utilidad neta" in resultado.utilidad_ajustada.no_calculable
@@ -186,7 +196,9 @@ def test_lo_fiscal_lo_ve_el_contador(mi_empresa: EstadosRevisados) -> None:
 
 def test_el_resultado_es_un_modelo_pydantic(mi_empresa: EstadosRevisados) -> None:
     resultado = utilidad_ajustada(mi_empresa, _ajustes(*LAMINA_12))
-    assert UtilidadAjustada.model_validate_json(resultado.model_dump_json()) == resultado
+    assert (
+        UtilidadAjustada.model_validate_json(resultado.model_dump_json()) == resultado
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -213,7 +225,9 @@ def test_tras_el_resumen_pregunta_por_gastos_personales_sin_juicio() -> None:
         assert ejemplo in pregunta.pregunta
     assert "Opcional" in paso.mensaje
     # La pregunta no trae ningún monto sugerido: ni un solo número.
-    assert not any(ch.isdigit() for ch in pregunta.pregunta + " ".join(pregunta.opciones))
+    assert not any(
+        ch.isdigit() for ch in pregunta.pregunta + " ".join(pregunta.opciones)
+    )
     # El «¿Guardo …?» sigue al final.
     assert paso.mensaje.split("\n\n")[-1].startswith("¿Guardo ")
 
@@ -258,7 +272,9 @@ def test_un_monto_que_no_se_entiende_se_dice(valor: str) -> None:
 # ---------------------------------------------------------------------------
 
 
-def _corre(capsys: pytest.CaptureFixture[str], tmp_path: Path, *extra: str) -> dict[str, Any]:
+def _corre(
+    capsys: pytest.CaptureFixture[str], tmp_path: Path, *extra: str
+) -> dict[str, Any]:
     argv = [
         "--empresa",
         EMPRESA,
@@ -279,15 +295,23 @@ def _corre(capsys: pytest.CaptureFixture[str], tmp_path: Path, *extra: str) -> d
     return json.loads(capsys.readouterr().out)
 
 
-def test_sin_si_no_se_guardan_los_ajustes(capsys: pytest.CaptureFixture[str], tmp_path: Path) -> None:
+def test_sin_si_no_se_guardan_los_ajustes(
+    capsys: pytest.CaptureFixture[str], tmp_path: Path
+) -> None:
     salida = _corre(capsys, tmp_path)
     assert salida["guardado"] == []
-    assert Decimal(salida["travesuras"]["utilidad_ajustada"]["valor"]) == Decimal("5463710.03")
+    assert Decimal(salida["travesuras"]["utilidad_ajustada"]["valor"]) == Decimal(
+        "5463710.03"
+    )
     assert not (tmp_path / "work" / "cash" / SLUG).exists()
 
 
-def test_con_si_los_ajustes_quedan_en_la_platica(capsys: pytest.CaptureFixture[str], tmp_path: Path) -> None:
+def test_con_si_los_ajustes_quedan_en_la_platica(
+    capsys: pytest.CaptureFixture[str], tmp_path: Path
+) -> None:
     salida = _corre(capsys, tmp_path, "--guardar", "sí")
     assert salida["guardado"]
-    guardada = json.loads((tmp_path / "work" / "cash" / SLUG / "conversacion.json").read_text("utf-8"))
+    guardada = json.loads(
+        (tmp_path / "work" / "cash" / SLUG / "conversacion.json").read_text("utf-8")
+    )
     assert guardada["respuestas"]["C6:viaje familiar"] == "55820"
