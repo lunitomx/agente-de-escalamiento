@@ -44,7 +44,7 @@ from .profiling import read_raw_sheets
 Unidad = Literal["pesos", "miles de pesos", "millones de pesos"]
 DIAS_PARA_AVISAR = 90
 # La utilidad ya es un resultado: dos renglones de utilidad no se suman.
-_SIN_SUMA = {"utilidad_neta"}
+_SIN_SUMA = {"utilidad_neta", "utilidad_antes_impuestos"}
 
 
 class _Modelo(BaseModel):

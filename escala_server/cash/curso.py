@@ -31,7 +31,7 @@ from pathlib import Path
 import sys
 from typing import Literal, Sequence
 
-from pydantic import BaseModel, ConfigDict, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from escala_server.cash import (
     LEVER_META,
@@ -50,7 +50,7 @@ DIEZMILESIMO = Decimal("0.0001")
 CERO = Decimal("0")
 CIEN = Decimal("100")
 
-Unidad = Literal["pesos", "días", "por cada 100 de ventas", "proporción"]
+Unidad = Literal["pesos", "días", "por cada 100 de ventas", "proporción", "%"]
 
 
 class _Modelo(BaseModel):
@@ -126,11 +126,52 @@ class PalancaDelSimulador(_Modelo):
     una_vez: ParteDelSimulador
 
 
+class DatosDelDueno(_Modelo):
+    """Montos que sólo el dueño sabe (S86.24). ``None`` = todavía no lo dice.
+
+    Todos son del mismo periodo que el estado de resultados. ESCALA no los supone.
+    """
+
+    salario_de_mercado: Decimal | None = Field(default=None, ge=0)
+    sueldo_actual_del_dueno: Decimal | None = Field(default=None, ge=0)
+    devoluciones: Decimal | None = Field(default=None, ge=0)
+
+
+class PreguntaDelDueno(_Modelo):
+    clave: Literal["salario_de_mercado", "sueldo_actual_del_dueno", "devoluciones"]
+    pregunta: str
+    para_que: str
+
+
+class BloqueDelMargen(_Modelo):
+    """Margen antes de impuestos, salario de mercado y devoluciones (S86.24, L75–L79).
+
+    ``por_encima_de_la_linea`` compara el valor sin redondear contra la línea
+    de referencia (10% o más = sí). ``None`` cuando el margen no se calcula.
+    """
+
+    fecha: date
+    pretax: Indicador
+    linea_de_referencia: Decimal
+    por_encima_de_la_linea: bool | None
+    sobre_utilidad_bruta: Indicador
+    devoluciones: Indicador
+    salario_de_mercado: Decimal | None
+    sueldo_actual_del_dueno: Decimal | None
+    utilidad_real: Indicador
+    pretax_con_salario: Indicador
+    por_encima_de_la_linea_con_salario: bool | None
+    isr: Indicador
+    nota_fiscal: str
+    preguntas: tuple[PreguntaDelDueno, ...] = ()
+
+
 class EstadosRevisados(_Modelo):
     """Lo que recibe la calculadora: la revisión de S86.15 y el estado de resultados."""
 
     revision: RevisionDeEstados
     resultados: LecturaEstados
+    del_dueno: DatosDelDueno | None = None
 
 
 class ResultadoDelCurso(_Modelo):
@@ -144,6 +185,7 @@ class ResultadoDelCurso(_Modelo):
     poder_del_uno_utilidad: Indicador | None = None
     pendientes: tuple[str, ...] = ()
     simulador: tuple[PalancaDelSimulador, ...] = ()
+    margen: BloqueDelMargen | None = None
 
     def del_simulador(self, clave: str) -> PalancaDelSimulador:
         for palanca in self.simulador:
@@ -400,6 +442,8 @@ _ETIQUETAS = {
     "ventas": "ventas",
     "costo_ventas": "costo de ventas",
     "gastos_operacion": "gastos de operación",
+    "utilidad_antes_impuestos": "utilidad antes de impuestos",
+    "isr": "ISR",
 }
 
 
@@ -939,6 +983,322 @@ def _simulador(
 # ---------------------------------------------------------------------------
 
 
+# ---------------------------------------------------------------------------
+# Margen antes de impuestos, salario de mercado y devoluciones (S86.24)
+# ---------------------------------------------------------------------------
+
+LINEA_DEL_PRETAX = Decimal("10")
+LIMITE_DE_LA_UB = Decimal("0.40")
+
+MARGEN_PRETAX = _def(
+    "margen_pretax",
+    "Margen antes de impuestos",
+    "100 × utilidad antes de impuestos ÷ ventas",
+    "L77",
+    "%",
+)
+MARGEN_SOBRE_UB = _def(
+    "margen_sobre_utilidad_bruta",
+    "Margen sobre la utilidad bruta",
+    "si la utilidad bruta es menos del 40% de las ventas:"
+    " 100 × utilidad antes de impuestos ÷ utilidad bruta",
+    "L78",
+    "%",
+)
+DEVOLUCIONES_SOBRE_UTILIDAD = _def(
+    "devoluciones_sobre_utilidad",
+    "Devoluciones sobre la utilidad",
+    "100 × devoluciones, rebajas y bonificaciones ÷ utilidad antes de impuestos",
+    "L79",
+    "%",
+)
+UTILIDAD_REAL = _def(
+    "utilidad_real",
+    "Utilidad real con salario de mercado",
+    "utilidad de operación − (salario de mercado − sueldo actual del dueño)",
+    "L75 (cálculo de ESCALA)",
+    "pesos",
+)
+PRETAX_CON_SALARIO = _def(
+    "margen_pretax_con_salario",
+    "Margen antes de impuestos con salario de mercado",
+    "100 × (utilidad antes de impuestos − (salario de mercado − sueldo actual del dueño))"
+    " ÷ ventas",
+    "L75 y L77 (cálculo de ESCALA)",
+    "%",
+)
+ISR = _def("isr", "ISR", "renglón de ISR del estado de resultados", "L11", "pesos")
+
+NOTA_FISCAL = (
+    "ESCALA sólo muestra el ISR de tu estado de resultados. "
+    "Cualquier decisión de impuestos la ves con tu contador."
+)
+
+PREGUNTAS_DEL_DUENO: dict[str, PreguntaDelDueno] = {
+    p.clave: p
+    for p in (
+        PreguntaDelDueno(
+            clave="salario_de_mercado",
+            pregunta=(
+                "¿Cuánto le pagarías a una persona capacitada, que no sea dueña, por hacer "
+                "lo que tú haces en la empresa? Dime el monto del mismo periodo que tu "
+                "estado de resultados."
+            ),
+            para_que="Para ver tu margen como si la empresa te pagara un sueldo de mercado.",
+        ),
+        PreguntaDelDueno(
+            clave="sueldo_actual_del_dueno",
+            pregunta=(
+                "¿Cuánto te pagas hoy en la nómina de la empresa en ese mismo periodo? "
+                "Si no te pagas sueldo, dime 0."
+            ),
+            para_que="Para restar sólo la diferencia contra el salario de mercado.",
+        ),
+        PreguntaDelDueno(
+            clave="devoluciones",
+            pregunta=(
+                "¿Cuánto sumaron las devoluciones, rebajas y bonificaciones del periodo? "
+                "Si tu estado sólo trae ventas netas, tu contador tiene el dato."
+            ),
+            para_que="Para ver cuánta de tu utilidad se comen.",
+        ),
+    )
+}
+
+
+@dataclass(frozen=True)
+class PretaxConLinea:
+    """El margen pre-tax y si llega a la línea del 10% (con el valor sin redondear)."""
+
+    indicador: Indicador
+    por_encima_de_la_linea: bool | None
+
+
+def _cifra(valor: Decimal, etiqueta: str) -> _Cifra:
+    return _Cifra(valor, f"{etiqueta} {_dinero(valor)}")
+
+
+def _sin_ventas(definicion: _Definicion, ventas: _Cifra | None, fecha: date) -> NoCalculable | None:
+    if ventas is None:
+        return _no_calculable(definicion, fecha, _falta_ventas(fecha))
+    if ventas.valor <= 0:
+        return _no_calculable(definicion, fecha, _ventas_en_cero(fecha))
+    return None
+
+
+def _falta_uai(definicion: _Definicion, fecha: date) -> NoCalculable:
+    return _no_calculable(
+        definicion,
+        fecha,
+        "tu estado de resultados no trae el renglón de utilidad antes de impuestos"
+        f" al {fecha_corta(fecha)}",
+    )
+
+
+def _pretax(uai: _Cifra | None, ventas: _Cifra | None, fecha: date) -> PretaxConLinea:
+    falta = _sin_ventas(MARGEN_PRETAX, ventas, fecha)
+    if falta is not None:
+        return PretaxConLinea(falta, None)
+    if uai is None:
+        return PretaxConLinea(_falta_uai(MARGEN_PRETAX, fecha), None)
+    assert ventas is not None
+    valor = CIEN * uai.valor / ventas.valor
+    indicador = _calculado(MARGEN_PRETAX, fecha, valor, f"100 × {uai.texto} ÷ {ventas.texto}")
+    return PretaxConLinea(indicador, valor >= LINEA_DEL_PRETAX)
+
+
+def _sobre_ub(
+    uai: _Cifra | None, ub: _Cifra | None, ventas: _Cifra | None, fecha: date
+) -> Indicador:
+    falta = _sin_ventas(MARGEN_SOBRE_UB, ventas, fecha)
+    if falta is not None:
+        return falta
+    if uai is None:
+        return _falta_uai(MARGEN_SOBRE_UB, fecha)
+    assert ventas is not None and ub is not None
+    if ub.valor <= 0:
+        return _no_calculable(
+            MARGEN_SOBRE_UB,
+            fecha,
+            f"la utilidad bruta es 0 o negativa ({_dinero(ub.valor)}):"
+            " un porcentaje sobre ella no dice nada",
+        )
+    if uai.valor < 0:
+        return _no_calculable(
+            MARGEN_SOBRE_UB,
+            fecha,
+            f"la utilidad antes de impuestos es negativa ({_dinero(uai.valor)}): hay pérdida",
+        )
+    proporcion = ub.valor / ventas.valor
+    if proporcion >= LIMITE_DE_LA_UB:
+        porcentaje = formato_monto((CIEN * proporcion).quantize(CENTAVO, rounding=ROUND_HALF_UP))
+        return _no_aplica(
+            MARGEN_SOBRE_UB,
+            fecha,
+            f"tu utilidad bruta es {porcentaje}% de tus ventas (40% o más):"
+            " el margen se mide contra las ventas",
+        )
+    return _calculado(
+        MARGEN_SOBRE_UB, fecha, CIEN * uai.valor / ub.valor, f"100 × {uai.texto} ÷ {ub.texto}"
+    )
+
+
+def _devoluciones(devoluciones: _Cifra | None, uai: _Cifra | None, fecha: date) -> Indicador:
+    if devoluciones is None:
+        return _no_calculable(
+            DEVOLUCIONES_SOBRE_UTILIDAD,
+            fecha,
+            "falta el monto de devoluciones, rebajas y bonificaciones: lo da el dueño",
+        )
+    if uai is None:
+        return _falta_uai(DEVOLUCIONES_SOBRE_UTILIDAD, fecha)
+    if uai.valor <= 0:
+        return _no_calculable(
+            DEVOLUCIONES_SOBRE_UTILIDAD,
+            fecha,
+            f"la utilidad antes de impuestos es 0 o negativa ({_dinero(uai.valor)}):"
+            " no hay utilidad que se coman",
+        )
+    return _calculado(
+        DEVOLUCIONES_SOBRE_UTILIDAD,
+        fecha,
+        CIEN * devoluciones.valor / uai.valor,
+        f"100 × {devoluciones.texto} ÷ {uai.texto}",
+    )
+
+
+def margen_pretax(uai: Decimal, ventas: Decimal, fecha: date) -> PretaxConLinea:
+    """F6.1 con montos sueltos: 100 × UAI ÷ ventas, y si llega a la línea del 10%."""
+
+    return _pretax(_cifra(uai, "utilidad antes de impuestos"), _cifra(ventas, "ventas"), fecha)
+
+
+def margen_sobre_utilidad_bruta(
+    uai: Decimal, utilidad_bruta: Decimal, ventas: Decimal, fecha: date
+) -> Indicador:
+    """F6.2 con montos sueltos: sólo si la UB es menos del 40% de las ventas."""
+
+    return _sobre_ub(
+        _cifra(uai, "utilidad antes de impuestos"),
+        _cifra(utilidad_bruta, "utilidad bruta"),
+        _cifra(ventas, "ventas"),
+        fecha,
+    )
+
+
+def devoluciones_sobre_utilidad(devoluciones: Decimal, uai: Decimal, fecha: date) -> Indicador:
+    """F6.3 con montos sueltos: 100 × devoluciones ÷ UAI."""
+
+    return _devoluciones(
+        _cifra(devoluciones, "devoluciones, rebajas y bonificaciones"),
+        _cifra(uai, "utilidad antes de impuestos"),
+        fecha,
+    )
+
+
+def _falta_del_dueno(definicion: _Definicion, dueno: DatosDelDueno, fecha: date) -> NoCalculable | None:
+    if dueno.salario_de_mercado is None:
+        return _no_calculable(
+            definicion, fecha, "falta el salario de mercado: lo da el dueño, ESCALA no lo supone"
+        )
+    if dueno.sueldo_actual_del_dueno is None:
+        return _no_calculable(
+            definicion, fecha, "falta cuánto se paga hoy el dueño en la nómina (0 si no se paga)"
+        )
+    return None
+
+
+def _ajuste_de_salario(dueno: DatosDelDueno) -> tuple[Decimal, str]:
+    assert dueno.salario_de_mercado is not None and dueno.sueldo_actual_del_dueno is not None
+    ajuste = dueno.salario_de_mercado - dueno.sueldo_actual_del_dueno
+    texto = (
+        f"(salario de mercado {_dinero(dueno.salario_de_mercado)}"
+        f" − sueldo actual del dueño {_dinero(dueno.sueldo_actual_del_dueno)})"
+    )
+    return ajuste, texto
+
+
+def _utilidad_real(d: _Fecha, dueno: DatosDelDueno) -> Indicador:
+    falta = _falta_del_dueno(UTILIDAD_REAL, dueno, d.fecha)
+    if falta is not None:
+        return falta
+    ub = _utilidad_bruta(d)
+    if ub is None:
+        return _no_calculable(UTILIDAD_REAL, d.fecha, _falta_ventas(d.fecha))
+    uo = ub.valor - d.gastos.valor
+    ajuste, texto = _ajuste_de_salario(dueno)
+    return _calculado(
+        UTILIDAD_REAL, d.fecha, uo - ajuste, f"utilidad de operación {_dinero(uo)} − {texto}"
+    )
+
+
+def _pretax_con_salario(
+    uai: _Cifra | None, ventas: _Cifra | None, dueno: DatosDelDueno, fecha: date
+) -> PretaxConLinea:
+    falta = _falta_del_dueno(PRETAX_CON_SALARIO, dueno, fecha) or _sin_ventas(
+        PRETAX_CON_SALARIO, ventas, fecha
+    )
+    if falta is not None:
+        return PretaxConLinea(falta, None)
+    if uai is None:
+        return PretaxConLinea(_falta_uai(PRETAX_CON_SALARIO, fecha), None)
+    assert ventas is not None
+    ajuste, texto = _ajuste_de_salario(dueno)
+    valor = CIEN * (uai.valor - ajuste) / ventas.valor
+    indicador = _calculado(
+        PRETAX_CON_SALARIO, fecha, valor, f"100 × ({uai.texto} − {texto}) ÷ {ventas.texto}"
+    )
+    return PretaxConLinea(indicador, valor >= LINEA_DEL_PRETAX)
+
+
+def _isr(resultados: LecturaEstados, fecha: date) -> Indicador:
+    isr = _del_resultado(resultados, "isr", fecha)
+    if isr is None:
+        return _no_calculable(
+            ISR, fecha, f"tu estado de resultados no trae el renglón de ISR al {fecha_corta(fecha)}"
+        )
+    return _calculado(ISR, fecha, isr.valor, isr.texto)
+
+
+def _bloque_del_margen(d: _Fecha, resultados: LecturaEstados, dueno: DatosDelDueno) -> BloqueDelMargen:
+    fecha = d.fecha
+    uai = _del_resultado(resultados, "utilidad_antes_impuestos", fecha)
+    ub = _utilidad_bruta(d)
+    ub_cifra = None if ub is None else _cifra(ub.valor, "utilidad bruta")
+    devoluciones = (
+        None
+        if dueno.devoluciones is None
+        else _cifra(dueno.devoluciones, "devoluciones, rebajas y bonificaciones")
+    )
+    pretax = _pretax(uai, d.ventas, fecha)
+    con_salario = _pretax_con_salario(uai, d.ventas, dueno, fecha)
+    faltan = [
+        clave
+        for clave, valor in (
+            ("salario_de_mercado", dueno.salario_de_mercado),
+            ("sueldo_actual_del_dueno", dueno.sueldo_actual_del_dueno),
+            ("devoluciones", dueno.devoluciones),
+        )
+        if valor is None
+    ]
+    return BloqueDelMargen(
+        fecha=fecha,
+        pretax=pretax.indicador,
+        linea_de_referencia=LINEA_DEL_PRETAX,
+        por_encima_de_la_linea=pretax.por_encima_de_la_linea,
+        sobre_utilidad_bruta=_sobre_ub(uai, ub_cifra, d.ventas, fecha),
+        devoluciones=_devoluciones(devoluciones, uai, fecha),
+        salario_de_mercado=dueno.salario_de_mercado,
+        sueldo_actual_del_dueno=dueno.sueldo_actual_del_dueno,
+        utilidad_real=_utilidad_real(d, dueno),
+        pretax_con_salario=con_salario.indicador,
+        por_encima_de_la_linea_con_salario=con_salario.por_encima_de_la_linea,
+        isr=_isr(resultados, fecha),
+        nota_fiscal=NOTA_FISCAL,
+        preguntas=tuple(PREGUNTAS_DEL_DUENO[clave] for clave in faltan),
+    )
+
+
 def _por_que_no(revision: RevisionDeEstados) -> str:
     razones = [h.mensaje for h in revision.hallazgos if h.bloquea]
     razones += [p.pregunta for p in revision.preguntas if p.bloquea]
@@ -1000,6 +1360,7 @@ def calcular_curso(estados: EstadosRevisados) -> ResultadoDelCurso:
         poder_del_uno_utilidad=total_utilidad,
         pendientes=pendientes,
         simulador=_simulador(final, dias, palancas, neta),
+        margen=_bloque_del_margen(final, resultados, estados.del_dueno or DatosDelDueno()),
         **base,
     )
 

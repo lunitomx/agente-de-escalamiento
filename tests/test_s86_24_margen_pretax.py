@@ -130,7 +130,7 @@ def test_pretax_ventas_cero_no_calculable() -> None:
 
 def test_pretax_sin_renglon_de_uai_no_calculable() -> None:
     texto = (ESTADOS / "aspel_resultados.txt").read_text(encoding="utf-8")
-    sin_uai = "\n".join(l for l in texto.splitlines() if "antes de impuestos" not in l)
+    sin_uai = "\n".join(r for r in texto.splitlines() if "antes de impuestos" not in r)
     margen = _margen(calcular_curso(_estados(sin_uai)))
     assert isinstance(margen.pretax, NoCalculable)
     assert "utilidad antes de impuestos" in margen.pretax.no_calculable
