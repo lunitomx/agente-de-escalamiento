@@ -24,7 +24,7 @@
       "status": "pass"
     }
   ],
-  "ledger_sha256": "755ffc06218f3cdb0e55c38b3e7f031f6df95b0d3029bae84f264b8a03f891b1",
+  "ledger_sha256": "3c150d40b02b38541c6aedc7d0c001d477db0ca7c0fa7c0b8dd4b80f8dbcf062",
   "platforms": [
     "macos",
     "windows"
@@ -32,5 +32,5 @@
   "requirement_id": "REQ-E41-005",
   "result": "pass",
   "schema_version": 1,
-  "source_commit": "16959c29873db8639c28e950281ba25da8cb2783"
+  "source_commit": "e03383cc139854831ab3b0af9529a939e42dcb07"
 }

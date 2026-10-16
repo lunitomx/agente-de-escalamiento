@@ -39,8 +39,8 @@
   "contract_status": "pass",
   "epic_count": 6,
   "epic_filter": null,
-  "ledger_markdown_sha256": "17f5a86b8621ddbeab03e9a232b597b47e7b85d336620fc8ee8291c9a2bb9f22",
-  "ledger_sha256": "755ffc06218f3cdb0e55c38b3e7f031f6df95b0d3029bae84f264b8a03f891b1",
+  "ledger_markdown_sha256": "c1c8a5866afc64b77da825f004dfc0f9952ee187fe0c05ba8d135c68a4fe410d",
+  "ledger_sha256": "3c150d40b02b38541c6aedc7d0c001d477db0ca7c0fa7c0b8dd4b80f8dbcf062",
   "mission_id": "escala-local-v2-plan-maestro-2607202112",
   "mission_readiness": "unproved",
   "mode": "baseline",
@@ -86,5 +86,5 @@
   "requirement_count": 42,
   "schema_version": 1,
   "unproved_count": 6,
-  "verifier_source_commit": "16959c29873db8639c28e950281ba25da8cb2783"
+  "verifier_source_commit": "9c8bba51f03bd922208810bac66ccdd30f9d17ef"
 }

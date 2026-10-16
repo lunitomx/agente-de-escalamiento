@@ -1,5 +1,5 @@
 {
-  "evidence": "A clean Windows target prepared the same local capability set with platform-specific recorded evidence.",
+  "evidence": "A clean Windows target prepared the same local install/data roots, version marker and SQLite with platform-specific recorded evidence. There is no native Windows install: instalar.sh stops and points the owner to WSL2, where the same line installs ESCALA.",
   "negative_cases": [
     "authoritative_sqlite_in_exchange_rejected",
     "tampered_update_rejected_before_writes",

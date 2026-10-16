@@ -151,3 +151,12 @@ La documentación está completa cuando todos los hallazgos tienen propietario, 
 - La invocación directa del script de inventario falló porque no añadía la raíz al import path; la ejecución como módulo indicada arriba pasó. No se modificó el script para esta tarea documental.
 
 Estas comprobaciones validan la planificación y su integración al backlog. Las reparaciones de producto, pruebas AT y observaciones con empresarios permanecen pendientes en sus épicas.
+
+## Nota — 2026-10-16 (S86.38)
+
+El enlace «bundle lifecycle» a `escala_server/lifecycle/installer.py` ya no
+apunta a un paquete. En S86.35 se quitó el zip `escala-local-*`; ese archivo
+sólo prepara las carpetas locales (`prepare_local_install`). El dueño instala
+con la línea del README: `instalar.sh` clona el repositorio en `~/ESCALA` y corre
+`install.sh --platform claude --with-specialists`. En Windows, por WSL2. El
+resto de este documento se deja como estaba el 2026-09-12.

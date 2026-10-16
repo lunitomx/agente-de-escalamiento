@@ -139,12 +139,12 @@ def main() -> int:
             {
                 "id": "REQ-E41-001",
                 "status": "pass",
-                "evidence": "A clean macOS target prepared local install/data roots, version marker and SQLite without network access; the owner installs with the documented one-line flow (instalar.sh). The E41 zip archive was retired in S86.35.",
+                "evidence": "A clean macOS target prepared local install/data roots, version marker and SQLite without network access; the owner installs with the documented one-line flow (instalar.sh: git clone into ~/ESCALA, then install.sh --platform claude --with-specialists; the same line updates with git pull --ff-only). The E41 zip archive was retired in S86.35.",
             },
             {
                 "id": "REQ-E41-002",
                 "status": "pass",
-                "evidence": "A clean Windows target prepared the same local capability set with platform-specific recorded evidence.",
+                "evidence": "A clean Windows target prepared the same local install/data roots, version marker and SQLite with platform-specific recorded evidence. There is no native Windows install: instalar.sh stops and points the owner to WSL2, where the same line installs ESCALA.",
             },
             {
                 "id": "REQ-E41-003",

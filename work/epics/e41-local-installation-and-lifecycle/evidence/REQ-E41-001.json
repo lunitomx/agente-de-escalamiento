@@ -1,5 +1,5 @@
 {
-  "evidence": "A clean macOS target prepared local install/data roots, version marker and SQLite without network access; the owner installs with the documented one-line flow (instalar.sh). The E41 zip archive was retired in S86.35.",
+  "evidence": "A clean macOS target prepared local install/data roots, version marker and SQLite without network access; the owner installs with the documented one-line flow (instalar.sh: git clone into ~/ESCALA, then install.sh --platform claude --with-specialists; the same line updates with git pull --ff-only). The E41 zip archive was retired in S86.35.",
   "negative_cases": [
     "authoritative_sqlite_in_exchange_rejected",
     "tampered_update_rejected_before_writes",
