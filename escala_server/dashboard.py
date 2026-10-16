@@ -21,21 +21,23 @@ from coaching.execution_habits.engine import ExecutionAssessment  # noqa: E402
 from coaching.people_facchart.engine import FACChart  # noqa: E402
 from coaching.strategy_opsp.engine import SECTIONS, missing_fields  # noqa: E402
 
-from .cash import FinancialInputs, PowerOfOneEngine  # noqa: E402
+from .cash.archivos import CARPETA  # noqa: E402
+from .cash.nota import nota_de_cash  # noqa: E402
 from .handlers import WorksheetsHandler  # noqa: E402
 
 
 class DashboardHandler:
     """Aggregate decision scores and focus for the home dashboard."""
 
-    def __init__(self, db_path: str = ":memory:"):
+    def __init__(self, db_path: str = ":memory:", carpeta_cash: Path = CARPETA):
         self.worksheets = WorksheetsHandler(db_path)
-        self.cash_engine = PowerOfOneEngine()
+        # Donde el recorrido de cash guarda con «sí» (``work/cash``, junto al proyecto).
+        self.carpeta_cash = carpeta_cash
 
     def summary(self) -> dict:
         """Return a summary with a score per decision and a focus hint."""
         strategy = self._strategy_score()
-        cash = self._cash_score()
+        cash: dict[str, Any] = self._cash_score()
         people: dict[str, Any] | None = self._people_score()
         execution: dict[str, Any] | None = self._execution_score()
 
@@ -76,51 +78,13 @@ class DashboardHandler:
             "missing": missing,
         }
 
-    def _cash_score(self) -> dict:
-        """Score based on Power of One worksheet completeness + health."""
-        result = self.worksheets.get_worksheets("cash", "power-of-one")
-        data = result.get("data") or {}
-        payload = data.get("data") if isinstance(data.get("data"), dict) else data
-        financials = payload.get("financials") if isinstance(payload, dict) else None
+    def _cash_score(self) -> dict[str, object]:
+        """La nota de Cash sale de lo que el recorrido de cash guardó con «sí» (S86.36).
 
-        required_fields = [
-            "net_sales",
-            "cogs",
-            "opex",
-            "accounts_receivable",
-            "inventory",
-            "accounts_payable",
-            "net_profit",
-        ]
-
-        if not financials:
-            return {"score": None, "status": "missing", "label": "Sin datos"}
-
-        present = [f for f in required_fields if f in financials]
-        completeness = len(present) / len(required_fields)
-
-        # Health bonus: profit margin and CCC from a baseline +1%/+1d simulation
-        health = 0.0
-        try:
-            inputs = FinancialInputs.from_dict(financials)
-            if inputs.net_sales > 0:
-                result = self.cash_engine.calculate(inputs)
-                metrics = result.metrics
-                margin = metrics.get("profit_margin_pct", 0)
-                ccc = metrics.get("ccc_days", 0)
-                margin_score = min(max(margin / 20, 0), 1)  # 20% margin = 1.0
-                ccc_score = 1 - min(max(ccc / 90, 0), 1)  # 0 CCC = 1.0, 90 = 0.0
-                health = (margin_score + ccc_score) / 2
-        except Exception:
-            health = 0.0
-
-        score = round((completeness * 0.6 + health * 0.4) * 100)
-        status = "good" if score >= 70 else "warning" if score >= 40 else "critical"
-        return {
-            "score": score,
-            "status": status,
-            "label": f"{len(present)}/{len(required_fields)} campos",
-        }
+        Ya no lee la hoja ``cash/power-of-one``: sólo la llenaba el tablero que
+        se quitó en S86.33. La hoja no se borra.
+        """
+        return nota_de_cash(self.carpeta_cash).para_el_panel()
 
     def _people_score(self) -> dict | None:
         """Score based on FACChart worksheet completeness and health."""
@@ -191,7 +155,12 @@ class DashboardHandler:
             "people": "People",
             "execution": "Execution",
         }
-        if focus_score < 0:
+        siguiente = (
+            decisions[focus_key].get("siguiente") if decisions[focus_key] else None
+        )
+        if focus_score < 0 and siguiente:
+            message = f"{labels.get(focus_key, focus_key)}: {siguiente}"
+        elif focus_score < 0:
             message = f"{labels.get(focus_key, focus_key)} no tiene datos. Empieza por su worksheet."
         else:
             message = (
