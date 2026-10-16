@@ -4,6 +4,10 @@ Uso, en la copia de ESCALA o dentro de un paquete:
 
     python3 <ruta>/escala_server/cash/calcular.py <estados-revisados.json>
     python3 <ruta>/escala_server/cash/calcular.py --verifica
+    python3 <ruta>/escala_server/cash/calcular.py escenario --empresa NOMBRE \
+        --archivo RUTA [--archivo RUTA] [--responde CLAVE=VALOR ...] [--guardar sí]
+
+``escenario`` es «analiza mi balance general y mi estado de resultados» (S86.17).
 
 Sólo usa la biblioteca estándar hasta revisar que hay con qué calcular:
 Python 3.10 o más nuevo y la biblioteca pydantic. Si falta algo, imprime
@@ -61,8 +65,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     except ImportError:
         return _no(f"{SIN_CON_QUE_CALCULAR} (falta pydantic)")
 
-    from escala_server.cash import curso
+    from escala_server.cash import curso, escenario
 
+    if argumentos[:1] == ["escenario"]:
+        return escenario.main(argumentos[1:])
     if argumentos == ["--verifica"]:
         print(
             json.dumps(

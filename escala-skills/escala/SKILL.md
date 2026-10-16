@@ -42,6 +42,13 @@ la capacidad interna adecuada.
    `references/calculadora/escala_server/cash/calcular.py` en un paquete.
    Si no corre, di: "Para calcular necesito Python en tu computadora y no lo
    encontré. No voy a hacer las cuentas de memoria."
+   Cuando el dueño dice «analiza mi balance general y mi estado de resultados»
+   o manda sus estados, corre el escenario de ESCALA:
+   `python3 references/calculadora/escala_server/cash/calcular.py escenario --empresa "<empresa>" --archivo <ruta> --formato json`
+   (en la copia: `escala_server/cash/calcular.py escenario`). Muestra su
+   `mensaje` tal cual y repite sus preguntas como vienen.
+   Nunca escribas un número que no venga en `mensaje`. Pasa cada respuesta con `--responde <clave>=<respuesta>` y guarda sólo cuando el
+   dueño diga «sí», con `--guardar sí`. El detalle está en `escala-cash-finanzas`.
    `../../capabilities/mvp/catalog.json` es el contrato del ciclo de trabajo de
    las seis capacidades MVP para los adaptadores; no lo uses para elegir ruta.
 2. Carga únicamente el contexto local que el usuario autorizó. Si un dato es

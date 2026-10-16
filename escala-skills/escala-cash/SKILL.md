@@ -38,10 +38,16 @@ interno indicado.
 | Sin trabajo previo | procedimiento interno `escala-cash-ccc` | "¿Vemos cuántos días pasan desde que pagas a tu proveedor hasta que tu cliente te paga?" |
 | CCC mapeado | procedimiento interno `escala-cash-power1` | "¿Vemos cuánto dinero liberas si cobras 10 días antes?" |
 | Power of One hecho | procedimiento interno `escala-cash-acceleration` | "¿Buscamos formas de que el dinero te llegue más rápido?" |
-| Te pasa sus estados financieros o su estado de resultados (sin prerequisito) | procedimiento interno `escala-cash-finanzas` | "¿Me pasas tus estados financieros como los tengas, en PDF, Excel o foto, y yo saco los números?" |
+| Te pasa sus estados financieros, su balance general o su estado de resultados, o dice «analiza mi balance general y mi estado de resultados» (sin prerequisito) | procedimiento interno `escala-cash-finanzas` | "¿Me pasas tus estados financieros como los tengas, en PDF, Excel o foto, y yo saco los números?" |
 | Todo hecho | — | "¿Volvemos a medir para ver cuánto mejoró tu efectivo?" |
 
 ### Step 4: Quién hace las cuentas
+
+Si el dueño trae sus estados («analiza mi balance general y mi estado de
+resultados»), `escala-cash-finanzas` corre el escenario de ESCALA:
+`python3 escala_server/cash/calcular.py escenario --empresa "<empresa>" --archivo <ruta> ...`
+(en un paquete, `references/calculadora/escala_server/cash/calcular.py escenario`).
+El escenario lee, pregunta, revisa y calcula; tú muestras su mensaje.
 
 Tú no haces ninguna cuenta, ni de memoria ni a mano. Las hace la calculadora de
 ESCALA con los estados ya revisados (cada cuenta en su caja y el periodo
