@@ -4,9 +4,9 @@
 - Mission readiness: `unproved`
 - Mode: `baseline`
 - Epic filter: `all`
-- Verifier source commit: `0a795b2d961ec8cc4c7a4c53bae7d13865d0c10d`
-- Ledger SHA-256: `91c3b8d5803902000656032c50d6ee32d78f34a1c9fd68ce16caa78c734c34aa`
-- Ledger Markdown SHA-256: `0a5480e6601d7ceca26021e4dae69b8b345a6ee6015b0af5a5187595a6c81479`
+- Verifier source commit: `1744367b6106587ff8398aa4373f2d9a5d523832`
+- Ledger SHA-256: `31d344bb1561d1a15067d283785e6a6bed7ecf33bf4986bcb609fa34410794c4`
+- Ledger Markdown SHA-256: `ad6e9eca81e8c9229f1bdd28d7adc51c2d4a93276a35c44abcda4054a27080d0`
 - Epics: `6`
 - Requirements: `42`
 - Proved: `36`
@@ -16,7 +16,7 @@
 
 - Closure dispositions SHA-256: `e5b9e9207fce7bbacd3af0a9e93368d6ccf38f979932d10360a2063924f8f023`
 - Epic identities SHA-256: `eb62cd804fa3b0559d20394e27be583b6daa445c6619938b43d4a1a92d052d52`
-- Public export SHA-256: `b0280635f50bec4927cda537d349436ef3f50e88fab5ab960a76c347319ec6d1`
+- Public export SHA-256: `edf050196aa60cbb5ad265f8ff8a5e616e599399a2bd95f73b31ff563014de8e`
 - Runtime authority: `installer_machine`
 - Authoritative SQLite synchronization: `forbidden`
 - Human legal review: `required`
