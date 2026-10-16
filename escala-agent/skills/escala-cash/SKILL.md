@@ -3,7 +3,6 @@ nombre: escala-cash
 descripcion: "Cash — remite al procedimiento de ESCALA. Los números los saca la calculadora de ESCALA."
 licencia: MIT
 creditos:
-  metodologia: Alan Miltz (Scaling Up / Gazelles)
   adaptacion: Kokoro (Eduardo Muñoz Luna)
 compatible_con: [Claude Code, Codex CLI, Hermes, OpenClaude, Cursor]
 ---

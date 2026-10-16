@@ -259,21 +259,23 @@ def test_el_overview_manda_las_cuentas_a_la_calculadora() -> None:
 # ── La copia portable lleva lo que la calculadora necesita ─────────────────
 
 
-def test_la_exportacion_lleva_las_fichas_y_el_lector() -> None:
+def test_la_exportacion_lleva_el_lector_de_estados() -> None:
     import yaml
 
     politica: Any = yaml.safe_load(
         (ROOT / "governance" / "public-export.yaml").read_text(encoding="utf-8")
     )
     rutas = {seleccion["path"] for seleccion in politica["selections"]}
-    assert {".escala/knowledge/cash", "escala_server/financial"} <= rutas
+    # La calculadora importa el lector de estados: sin él no corre.
+    assert "escala_server/financial" in rutas
+    # Las fichas del curso no las lee la calculadora; las lee la puerta.
+    # Publicarlas pide cambiar la frontera pública: decisión aparte.
 
 
 def test_la_copia_portable_calcula_mi_empresa(tmp_path: Path) -> None:
     from tests.test_public_skill_installation import _portable_artifact
 
     copia = _portable_artifact(tmp_path / "escala")
-    assert (copia / ".escala" / "knowledge" / "cash" / "overview.md").is_file()
     afuera = tmp_path / "carpeta-del-negocio"
     afuera.mkdir()
     salida = subprocess.run(
