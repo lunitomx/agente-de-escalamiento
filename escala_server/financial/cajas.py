@@ -292,7 +292,7 @@ class Acomodo(_Modelo):
         return tuple(total.fecha for total in self.totales)
 
 
-def _con_signo(lado: Lado, caja: Caja, monto: Decimal) -> Decimal:
+def con_signo(lado: Lado, caja: Caja, monto: Decimal) -> Decimal:
     if caja in _CAJAS_DE_USO:
         return monto if lado == "activo" else -monto
     return -monto if lado == "activo" else monto
@@ -355,7 +355,7 @@ def _totales(fecha: date, cuentas: list[CuentaEnCaja]) -> TotalesPorCaja:
     for cuenta in cuentas:
         if cuenta.lado is None or cuenta.caja is None:
             continue
-        por_caja[cuenta.caja] += _con_signo(cuenta.lado, cuenta.caja, cuenta.monto)
+        por_caja[cuenta.caja] += con_signo(cuenta.lado, cuenta.caja, cuenta.monto)
         por_lado[cuenta.lado] += cuenta.monto
     return TotalesPorCaja(
         fecha=fecha,
