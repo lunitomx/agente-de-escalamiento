@@ -32,6 +32,7 @@ from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal, InvalidOperation
 import json
+import os
 from pathlib import Path
 import re
 import sys
@@ -879,8 +880,48 @@ def _argumentos() -> argparse.ArgumentParser:
     return parser
 
 
-def _ruta_de_trabajo(empresa: str) -> Path:
-    return Path(tempfile.gettempdir()) / "escala-cash" / f"{carpeta_de(empresa)}.json"
+def ruta_del_borrador(empresa: str) -> Path:
+    """El borrador de la plática: privado del usuario, sobrevive un reinicio."""
+
+    return Path.home() / ".escala" / "borradores" / f"{carpeta_de(empresa)}.json"
+
+
+class EscrituraInsegura(Exception):
+    """La ruta es un enlace simbólico: no se escribe ni se lee a través de él."""
+
+
+def _sin_enlace(ruta: Path) -> None:
+    if ruta.is_symlink() or ruta.parent.is_symlink():
+        raise EscrituraInsegura(
+            f"{ruta} es un enlace simbólico; no escribo ni leo a través de un enlace"
+        )
+
+
+def escribir_privado(ruta: Path, texto: str, *, carpeta_privada: bool = False) -> None:
+    """Escribe de forma atómica (temporal en la misma carpeta + ``os.replace``).
+
+    El archivo queda 0o600. Con ``carpeta_privada`` la carpeta queda 0o700.
+    Nunca sigue un enlace simbólico: si ``ruta`` lo es, no escribe.
+    """
+
+    ruta.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    _sin_enlace(ruta)
+    if carpeta_privada:
+        os.chmod(ruta.parent, 0o700)
+    descriptor, temporal = tempfile.mkstemp(dir=ruta.parent, prefix=".", suffix=".tmp")
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8") as archivo:
+            archivo.write(texto)
+        os.chmod(temporal, 0o600)
+        os.replace(temporal, ruta)  # reemplaza la entrada; no sigue enlaces
+    except BaseException:
+        Path(temporal).unlink(missing_ok=True)
+        raise
+
+
+def _lee(ruta: Path) -> str:
+    _sin_enlace(ruta)
+    return ruta.read_text(encoding="utf-8")
 
 
 def es_si(respuesta: str | None) -> bool:
@@ -894,7 +935,7 @@ def _libre(carpeta: Path, nombre: str) -> Path:
 
     ruta = carpeta / f"{nombre}.json"
     version = 2
-    while ruta.exists():
+    while ruta.exists() or ruta.is_symlink():
         ruta = carpeta / f"{nombre}-{version}.json"
         version += 1
     return ruta
@@ -906,11 +947,11 @@ def guardar(paso: Paso, conversacion: Conversacion, *, carpeta: Path, hoy: date)
     destino = carpeta / carpeta_de(conversacion.empresa)
     destino.mkdir(parents=True, exist_ok=True)
     platica = destino / "conversacion.json"
-    platica.write_text(conversacion.model_dump_json(indent=2), encoding="utf-8")
+    escribir_privado(platica, conversacion.model_dump_json(indent=2))
     guardados = [platica]
     if paso.estados is not None:
         revisados = _libre(destino, f"estados-revisados-{hoy.isoformat()}")
-        revisados.write_text(paso.estados.model_dump_json(indent=2), encoding="utf-8")
+        escribir_privado(revisados, paso.estados.model_dump_json(indent=2))
         guardados.append(revisados)
     return guardados
 
@@ -939,15 +980,23 @@ def main(argv: Sequence[str] | None = None) -> int:
     except ValueError:
         return _no(f"la fecha «{args.hoy}» no es AAAA-MM-DD")
     empresa: str = args.empresa
-    trabajo = Path(args.conversacion) if args.conversacion else _ruta_de_trabajo(empresa)
+    trabajo = Path(args.conversacion) if args.conversacion else ruta_del_borrador(empresa)
     carpeta = Path(args.carpeta)
     conversacion = Conversacion(empresa=empresa)
     # Entre mensajes: el archivo de trabajo. Otro día: lo que el dueño guardó con «sí».
     guardada = carpeta / carpeta_de(empresa) / "conversacion.json"
-    anterior = trabajo if trabajo.exists() else guardada if guardada.exists() else None
+    anterior = (
+        trabajo
+        if trabajo.exists() or trabajo.is_symlink()
+        else guardada
+        if guardada.exists() or guardada.is_symlink()
+        else None
+    )
     if anterior is not None:
         try:
-            conversacion = Conversacion.model_validate_json(anterior.read_text(encoding="utf-8"))
+            conversacion = Conversacion.model_validate_json(_lee(anterior))
+        except EscrituraInsegura as error:
+            return _no(str(error))
         except (OSError, ValidationError):
             return _no(f"no pude leer la plática guardada en {anterior}")
     archivos = [a for a in conversacion.archivos if a not in args.quita_archivo]
@@ -965,11 +1014,18 @@ def main(argv: Sequence[str] | None = None) -> int:
         update={"empresa": empresa, "archivos": tuple(archivos), "respuestas": respuestas}
     )
     paso = atender(conversacion, hoy=hoy, carpeta=carpeta)
-    trabajo.parent.mkdir(parents=True, exist_ok=True)
-    trabajo.write_text(conversacion.model_dump_json(indent=2), encoding="utf-8")
     guardados: list[Path] = []
-    if es_si(args.guardar):
-        guardados = guardar(paso, conversacion, carpeta=carpeta, hoy=hoy)
+    try:
+        escribir_privado(
+            trabajo,
+            conversacion.model_dump_json(indent=2),
+            carpeta_privada=args.conversacion is None,
+        )
+        if es_si(args.guardar):
+            guardados = guardar(paso, conversacion, carpeta=carpeta, hoy=hoy)
+    except EscrituraInsegura as error:
+        return _no(str(error))
+    if guardados:
         partes = [p for p in paso.mensaje.split("\n\n") if not p.startswith("¿Guardo ")]
         partes.append(_mensaje_de_guardado(guardados))
         paso = paso.model_copy(update={"mensaje": "\n\n".join(partes)})
