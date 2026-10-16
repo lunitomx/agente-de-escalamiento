@@ -101,6 +101,20 @@ los paneles en `work/cash/<empresa>/`. Sin su «sí» no guardes nada. Si dice
 panel queda como una página `panel-<panel>-<fecha>.html` que el dueño abre en
 su navegador. Así puede seguir otro día donde se quedó.
 
+### Step 7: El simulador en el chat, sólo con otro «sí»
+
+El escenario guarda el simulador como `panel-simulador-<fecha>.html`; la ruta
+viene en `guardado`. La página trae todo adentro: no se conecta a nada.
+
+- Si tienes una herramienta para publicar artefactos (por ejemplo, la de
+  Claude), ofrece publicarlo para que el dueño mueva las palancas desde un
+  enlace en su chat. Di tal cual: "Esta página lleva tus números y sólo tú la
+  ves hasta que la compartas. ¿La publico como artefacto?" Sin su «sí» no la
+  publiques. Con su «sí», publica esa página como está, sin cambiarla ni
+  cambiar sus números, y déjala privada. Dale el enlace.
+- Si no tienes esa herramienta, no la ofrezcas: dile dónde quedó la página y
+  ábrela en su navegador como hoy.
+
 Pregunta después: "¿Con qué panel quieres decidir primero?"
 
 ## Output
@@ -109,6 +123,7 @@ Pregunta después: "¿Con qué panel quieres decidir primero?"
 - Lo que no se pudo calcular, con su razón.
 - Los paneles de la fase 7 (para ver) y de la fase 8 (para decidir).
 - Con «sí»: estados revisados y páginas de los paneles en `work/cash/<empresa>/`.
+- Con otro «sí» y herramienta de artefactos: el simulador publicado, privado.
 
 ## Notas
 

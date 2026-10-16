@@ -69,6 +69,7 @@ para no invertir a ciegas en instalación y paridad).
 | S86.29 | ESCALA-97 | Los 5 caminos para crecer (ola 5) | 3 | En espera | waiting |
 | S86.30 | ESCALA-98 | Semana y trimestre (ola 5) | 3 | En espera | waiting |
 | S86.31 | ESCALA-99 | Post-its con tu board (ola 5) | 3 | En espera | waiting |
+| S86.34 | ESCALA-101 | El simulador de las 7 palancas como artefacto en Claude | 2 | HTML apto para artefacto; 1,143,864.91 / 1,010,740.66; publicar sólo con «sí» | done |
 
 ## Fuera de alcance
 

@@ -157,12 +157,24 @@ def simulador_de(resultado: ResultadoDelCurso) -> Simulador:
 # La página: un archivo, datos embebidos + simulador.js
 # ---------------------------------------------------------------------------
 
-_ESTILO = """
-:root { --fondo:#f7f6f2; --tinta:#1f2328; --suave:#6b7075; --linea:#d9d6cc;
-  --tarjeta:#ffffff; --bien:#1f7a4d; --mal:#b3261e; --aviso:#8a5a00; --gris:#a3a3a3; }
-@media (prefers-color-scheme: dark) { :root { --fondo:#16181b; --tinta:#e8e6e1;
+# S86.34: el tema oscuro sigue al sistema del dueño, salvo que un artefacto
+# fuerce el claro o el oscuro con ``data-theme``. Las mismas variables en ambos.
+_OSCURO = """--fondo:#16181b; --tinta:#e8e6e1;
   --suave:#9aa0a6; --linea:#33373c; --tarjeta:#1f2226; --bien:#5cc28f; --mal:#ff8a80;
-  --aviso:#f0b43c; --gris:#5f6368; } }
+  --aviso:#f0b43c; --gris:#5f6368;"""
+
+_ESTILO = (
+    """
+:root { color-scheme: light dark; --fondo:#f7f6f2; --tinta:#1f2328; --suave:#6b7075;
+  --linea:#d9d6cc; --tarjeta:#ffffff; --bien:#1f7a4d; --mal:#b3261e; --aviso:#8a5a00;
+  --gris:#a3a3a3; }
+:root[data-theme="light"] { color-scheme: light; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {"""
+    + _OSCURO
+    + """} }
+:root[data-theme="dark"] {"""
+    + _OSCURO
+    + """}
 * { box-sizing:border-box; }
 body { margin:0; background:var(--fondo); color:var(--tinta);
   font:16px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
@@ -192,6 +204,7 @@ h1 { font-size:1.6rem; margin:0 0 4px; } .sub { color:var(--suave); margin:0 0 2
 .pie { margin-top:24px; font-size:.8rem; color:var(--suave); }
 @media (max-width:560px) { .palanca { grid-template-columns:1fr; } .palanca .mov { text-align:left; } }
 """
+)
 
 _PLANTILLA = """<!doctype html>
 <html lang="es">

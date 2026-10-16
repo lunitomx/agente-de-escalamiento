@@ -114,10 +114,14 @@ qué sale y qué no:
    una fila en tu pestaña de la hoja del grupo, nada más. ¿Va?"
 4. **Leer un archivo suyo.** Ejemplo: "¿Leo tu estado de resultados de
    septiembre para sacar tus números? ¿Va?"
+5. **Publicar una página como artefacto**, sólo si puedes publicar artefactos.
+   Di: "Esta página lleva tus números y sólo tú la ves hasta que la compartas.
+   ¿La publico como artefacto?" Si no puedes, ábrela en su navegador.
 
 Sin su "sí" no lo hagas. Si dice que no, sigue sin ese paso y no lo vuelvas a
 pedir en esta conversación. Los nombres de su empresa, de su gente y sus cifras
-nunca van en una búsqueda ni a una herramienta de fuera, ni con su sí.
+nunca van en una búsqueda ni a una herramienta de fuera, ni con su sí. El
+artefacto del paso 5 no es de fuera: queda privado en su cuenta del asistente.
 
 ## Cuando algo falla
 
