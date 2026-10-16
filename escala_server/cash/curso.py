@@ -292,6 +292,13 @@ OTRAS_CUENTAS = _def(
     "L56",
     "pesos",
 )
+CAPITAL = _def(
+    "capital",
+    "Capital",
+    "capital social + reservas + resultados (las cuentas de la caja de capital)",
+    "L18",
+    "pesos",
+)
 FINANCIAMIENTO = _def(
     "financiamiento",
     "Financiamiento",
@@ -600,6 +607,7 @@ def _cajas(d: _Fecha) -> list[Indicador]:
             f"deuda neta {_dinero(t.deuda_neta)} + capital {_dinero(t.capital)}"
             f" − capital de trabajo {_dinero(t.capital_de_trabajo)}",
         ),
+        _calculado(CAPITAL, d.fecha, t.capital, _origen_de_caja(d.cuentas, "capital")),
         _calculado(
             FINANCIAMIENTO,
             d.fecha,

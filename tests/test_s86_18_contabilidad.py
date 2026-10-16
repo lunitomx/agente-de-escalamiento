@@ -216,7 +216,8 @@ def test_renglon_de_otras_en_otra_caja_el_panel_no_sale(mi_empresa: EstadosRevis
     assert pregunta.bloquea
     assert pregunta.fecha == FIN
     assert pregunta.por_renglones == Decimal("-16482750.32")
-    assert pregunta.residuo == Decimal("8835834.90")
+    assert pregunta.contra == Decimal("8835834.90")
+    assert pregunta.caja == "otras cuentas"
     assert pregunta.diferencia == Decimal("25318585.22")
     assert "25,318,585.22" in pregunta.pregunta
     assert pregunta.pregunta.endswith("?")
@@ -228,6 +229,18 @@ def test_pasivo_de_otras_a_deuda_neta_tambien_se_ve(mi_empresa: EstadosRevisados
     assert panel.balances == ()
     assert [p.fecha for p in panel.preguntas] == [INI]
     assert panel.preguntas[0].diferencia == Decimal("13885547.68")
+
+
+def test_clientes_a_deuda_neta_sin_recalcular_tampoco_sale(mi_empresa: EstadosRevisados) -> None:
+    # Otras cuentas sí iguala (no se tocó), pero capital de trabajo por renglones no.
+    movido = _cambia_renglon(mi_empresa, "Clientes", FIN, caja="deuda neta")
+    panel = panel_de(movido)
+    assert panel.balances == ()
+    pregunta = panel.preguntas[0]
+    assert pregunta.caja == "capital de trabajo"
+    assert pregunta.por_renglones == Decimal("538572.30")
+    assert pregunta.contra == Decimal("6178173.85")
+    assert pregunta.diferencia == Decimal("5639601.55")
 
 
 def test_centavos_sale_con_aviso(mi_empresa: EstadosRevisados) -> None:
