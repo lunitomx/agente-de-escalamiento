@@ -10,6 +10,12 @@ byte: the package never rewrites a procedure.
 The Cash course cards (S86.11) travel the same way, under
 ``references/knowledge/cash/``, so a packaged ESCALA quotes the course from the
 very cards the repository holds.
+
+The cash calculator (S86.16) travels the same way, under
+``references/calculadora/``: the ``escala_server`` modules it imports, byte for
+byte, so a packaged ESCALA computes with the same code as the repository and
+never asks the model to do the arithmetic.  It needs Python 3.10+ and pydantic
+on the owner's computer; ``calcular.py`` says so when they are missing.
 """
 
 from __future__ import annotations
@@ -27,6 +33,29 @@ PROCEDURES_DIRECTORY = f"{REFERENCES_DIRECTORY}/procedures"
 KNOWLEDGE_DIRECTORY = f"{REFERENCES_DIRECTORY}/knowledge"
 CASH_KNOWLEDGE_DIRECTORY = f"{KNOWLEDGE_DIRECTORY}/cash"
 CASH_KNOWLEDGE_ROOT = REPOSITORY_ROOT / ".escala" / "knowledge" / "cash"
+CALCULATOR_DIRECTORY = f"{REFERENCES_DIRECTORY}/calculadora"
+CALCULATOR_LAUNCHER = f"{CALCULATOR_DIRECTORY}/escala_server/cash/calcular.py"
+# Every module the calculator imports (the test runs it inside a built package
+# with ``python -I`` and checks each loaded module comes from the package).
+CALCULATOR_MODULES = (
+    "escala_server/__init__.py",
+    "escala_server/cash/__init__.py",
+    "escala_server/cash/calcular.py",
+    "escala_server/cash/curso.py",
+    "escala_server/financial/__init__.py",
+    "escala_server/financial/cajas.py",
+    "escala_server/financial/cash_decision.py",
+    "escala_server/financial/formatos.py",
+    "escala_server/financial/lector.py",
+    "escala_server/financial/profiling.py",
+    "escala_server/financial/report.py",
+    "escala_server/financial/revisiones.py",
+    "escala_server/financial/statements.py",
+    "escala_server/workspace/__init__.py",
+    "escala_server/workspace/authority.py",
+    "escala_server/workspace/inbox.py",
+    "escala_server/workspace/ingestion.py",
+)
 
 
 class DoorBundleError(ValueError):
@@ -46,24 +75,25 @@ def door_bundle(skills_root: Path = SKILLS_ROOT) -> dict[str, Path]:
         )
     for card in sorted(CASH_KNOWLEDGE_ROOT.glob("*.md")):
         files[f"{CASH_KNOWLEDGE_DIRECTORY}/{card.name}"] = card
+    for module in CALCULATOR_MODULES:
+        files[f"{CALCULATOR_DIRECTORY}/{module}"] = REPOSITORY_ROOT / module
     return files
 
 
 def door_bundle_paths() -> frozenset[str]:
     """Every file and directory the bundle adds beside the door."""
-    return frozenset(
-        {
-            REFERENCES_DIRECTORY,
-            PROCEDURES_DIRECTORY,
-            KNOWLEDGE_DIRECTORY,
-            CASH_KNOWLEDGE_DIRECTORY,
-            *door_bundle(),
-        }
-    )
+    files = door_bundle()
+    directories = {
+        parent.as_posix()
+        for relative in files
+        for parent in Path(relative).parents
+        if parent.as_posix() != "."
+    }
+    return frozenset({*directories, *files})
 
 
 def copy_door_bundle(door_dir: Path) -> None:
-    """Copy the list, the procedures and the cards beside a packaged door."""
+    """Copy the list, the procedures, the cards and the calculator beside a packaged door."""
     for relative, source in door_bundle().items():
         target = door_dir / relative
         target.parent.mkdir(parents=True, exist_ok=True)
