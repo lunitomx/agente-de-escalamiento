@@ -74,7 +74,6 @@ para no invertir a ciegas en instalación y paridad).
 | S86.34 | ESCALA-101 | El simulador de las 7 palancas como artefacto en Claude | 2 | HTML apto para artefacto; 1,143,864.91 / 1,010,740.66; publicar sólo con «sí» | done |
 | S86.35 | ESCALA-103 | Quitar el instalador zip viejo | 2 | Sin generador de escala-local-*.zip; README sigue con la línea única | done |
 | S86.36 | ESCALA-104 | La nota de Cash del panel de control sale del recorrido de cash | 3 | Mi Empresa: ciclo 55.53, días 46.97/28.15/19.59, flujo neto −3,705,245.84; sin perfil, sin color; sin recorrido, «Sin datos»; la copia arranca en un Python aislado; Seguridad: CORS sólo local y Host local (403) | done |
-| S86.36 | ESCALA-104 | La nota de Cash del panel de control sale del recorrido de cash | 3 | Mi Empresa: ciclo 55.53, días 46.97/28.15/19.59, flujo neto −3,705,245.84; sin perfil, sin color; sin recorrido, «Sin datos»; la copia arranca en un Python aislado | in-progress |
 | S86.37 | ESCALA-105 | Las pruebas no dependen de archivos locales que git no sigue | 2 | 0 fallas en copia principal y limpia; caso malo versionado sigue fallando | done |
 
 ## Fuera de alcance
