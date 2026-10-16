@@ -155,7 +155,9 @@ class DashboardHandler:
             "people": "People",
             "execution": "Execution",
         }
-        siguiente = decisions[focus_key].get("siguiente") if decisions[focus_key] else None
+        siguiente = (
+            decisions[focus_key].get("siguiente") if decisions[focus_key] else None
+        )
         if focus_score < 0 and siguiente:
             message = f"{labels.get(focus_key, focus_key)}: {siguiente}"
         elif focus_score < 0:
