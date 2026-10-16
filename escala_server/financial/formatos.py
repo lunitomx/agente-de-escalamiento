@@ -89,6 +89,14 @@ CONCEPTOS: dict[str, _Concepto] = {
         ("a favor", "productos financieros", "ganados"),
     ),
     "isr": _Concepto(("isr", "impuesto sobre la renta", "impuestos a la utilidad")),
+    "utilidad_antes_impuestos": _Concepto(
+        (
+            "utilidad antes de impuestos",
+            "utilidad antes de isr",
+            "utilidad antes de impuestos a la utilidad",
+            "resultado antes de impuestos",
+        )
+    ),
     "utilidad_neta": _Concepto(
         ("utilidad neta", "utilidad del ejercicio", "resultado del ejercicio"),
         ("anteriores",),
@@ -125,6 +133,7 @@ NOMBRE_DE_CONCEPTO: dict[str, str] = {
     "gastos_operacion": "gastos de operación",
     "intereses": "gastos financieros",
     "isr": "ISR",
+    "utilidad_antes_impuestos": "utilidad antes de impuestos",
     "utilidad_neta": "utilidad neta",
     "bancos": "bancos",
     "clientes": "clientes",
