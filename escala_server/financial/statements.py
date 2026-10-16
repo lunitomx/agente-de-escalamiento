@@ -9,6 +9,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from .formatos import leer_monto, periodo_iso
 from .profiling import (
     FinancialWorkbookProfile,
     MappingQuestion,
@@ -458,6 +459,9 @@ def _derived(
 
 
 def _decimal(value: str) -> Decimal | None:
+    amount = leer_monto(value)  # S86.14: «(5,000)» es −5,000
+    if amount is not None:
+        return amount
     normalized = value.strip().replace(",", "").replace("$", "")
     if not normalized:
         return None
@@ -494,7 +498,7 @@ def _period_token(value: str) -> str | None:
     token = value.strip()
     if re.fullmatch(r"20\d{2}[-/]\d{1,2}(?:[-/]\d{1,2})?", token):
         return token.replace("/", "-")
-    return None
+    return periodo_iso(token)  # S86.14: «Dic-2025», «31/12/2025»
 
 
 def _freshness(period: str, as_of: date) -> Freshness:

@@ -21,6 +21,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from .formatos import coincide, periodo_iso
 from escala_server.workspace.authority import WorkspaceConfig, validate_workspace
 from escala_server.workspace.ingestion import (
     SourceIdentity,
@@ -121,6 +122,21 @@ class FinancialWorkbookProfile(_StrictModel):
 
 
 _PERIOD_RE = re.compile(r"^(?:20\d{2}[-/]\d{1,2}|20\d{2}[-/]\d{1,2}[-/]\d{1,2})$")
+# S86.14: palabra completa con exclusiones («Costo de ventas» no es «revenue»;
+# «Anticipo de clientes» no es «accounts_receivable»).
+_EXCLUSIONS: dict[MappingTarget, tuple[str, ...]] = {
+    "revenue": (
+        "costo",
+        "devoluciones",
+        "descuentos",
+        "rebajas",
+        "gastos de venta",
+        "gastos de ventas",
+        "venta de activos",
+    ),
+    "accounts_receivable": ("anticipo", "anticipos"),
+    "accounts_payable": ("anticipo", "anticipos"),
+}
 _CURRENCY_ALIASES = {"mxn", "usd", "eur", "gbp", "cad", "m$", "$", "€", "£"}
 _UNIT_ALIASES = {
     "pesos",
@@ -486,7 +502,7 @@ def _profile_sheet(sheet: RawSheet) -> FinancialSheetProfile:
         value
         for row in row_values
         for value in row
-        if _PERIOD_RE.fullmatch(value.strip())
+        if _is_period(value)
     )
     currencies = _unique_tokens(
         value.upper()
@@ -535,7 +551,7 @@ def _mapping_candidates(
         label = row[0].value.strip()
         normalized = _normalize(label)
         for target, aliases in _ALIASES.items():
-            score = _alias_score(normalized, aliases)
+            score = _alias_score(normalized, aliases, _EXCLUSIONS.get(target, ()))
             if score <= 0:
                 continue
             candidate_id = (
@@ -605,17 +621,21 @@ def _mapping_questions(
     return tuple(questions)
 
 
-def _alias_score(normalized: str, aliases: tuple[str, ...]) -> float:
+def _alias_score(
+    normalized: str, aliases: tuple[str, ...], exclusions: tuple[str, ...] = ()
+) -> float:
     normalized_aliases = tuple(_normalize(alias) for alias in aliases)
+    if coincide(normalized, exclusions):
+        return 0.0
     if normalized in normalized_aliases:
         return 1.0
-    if any(
-        alias in normalized or normalized in alias
-        for alias in normalized_aliases
-        if len(alias) > 3
-    ):
+    if coincide(normalized, tuple(alias for alias in normalized_aliases if len(alias) > 3)):
         return 0.75
     return 0.0
+
+
+def _is_period(value: str) -> bool:
+    return bool(_PERIOD_RE.fullmatch(value.strip())) or periodo_iso(value) is not None
 
 
 def _header_index(rows: list[list[str]]) -> int:
@@ -627,7 +647,7 @@ def _header_index(rows: list[list[str]]) -> int:
             sum(
                 1
                 for value in row
-                if _PERIOD_RE.fullmatch(value.strip())
+                if _is_period(value)
                 or _normalize(value) in _ALIASES["revenue"]
             ),
         )
