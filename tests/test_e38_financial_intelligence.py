@@ -263,9 +263,11 @@ def test_cash_decision_exposes_ccc_assumptions_and_comparable_scenarios(
 ) -> None:
     statements = _cash_statements(tmp_path)
 
+    # S86.15: el estado es sólo del mes (C10); sin ese dato no se anualiza.
     decision = build_cash_decision(
         statements,
         as_of=date(2026, 7, 22),
+        statement_months=1,
         scenarios=(
             CashScenarioRequest(scenario_id="price-plus-one", adjustments={"price": 1}),
             CashScenarioRequest(
@@ -354,6 +356,7 @@ def test_local_cash_report_is_visual_downloadable_and_deterministic(
     decision = build_cash_decision(
         statements,
         as_of=date(2026, 7, 22),
+        statement_months=1,
         scenarios=(
             CashScenarioRequest(scenario_id="price-plus-one", adjustments={"price": 1}),
         ),
