@@ -75,6 +75,7 @@ para no invertir a ciegas en instalación y paridad).
 | S86.35 | ESCALA-103 | Quitar el instalador zip viejo | 2 | Sin generador de escala-local-*.zip; README sigue con la línea única | done |
 | S86.36 | ESCALA-104 | La nota de Cash del panel de control sale del recorrido de cash | 3 | Mi Empresa: ciclo 55.53, días 46.97/28.15/19.59, flujo neto −3,705,245.84; sin perfil, sin color; sin recorrido, «Sin datos»; la copia arranca en un Python aislado; Seguridad: CORS sólo local y Host local (403) | done |
 | S86.37 | ESCALA-105 | Las pruebas no dependen de archivos locales que git no sigue | 2 | 0 fallas en copia principal y limpia; caso malo versionado sigue fallando | done |
+| S86.38 | ESCALA-106 | El requisito de instalación describe la instalación de una línea | 2 | REQ-E41-001/002 dicen git clone a ~/ESCALA (Mac) y WSL2 (Windows); 36 probados / 6 sin probar | in-progress |
 
 ## Fuera de alcance
 
