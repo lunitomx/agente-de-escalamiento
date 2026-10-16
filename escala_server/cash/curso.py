@@ -126,6 +126,44 @@ class PalancaDelSimulador(_Modelo):
     una_vez: ParteDelSimulador
 
 
+FuenteDeCifra = Literal["curso", "cálculo de ESCALA"]
+
+
+class CifraDePrecioVolumen(_Modelo):
+    """Un número de precio contra volumen o del descuento (S86.23).
+
+    ``fuente`` dice si el número está en el curso o si lo calcula ESCALA.
+    """
+
+    clave: str
+    nombre: str
+    valor: Decimal
+    unidad: Literal["pesos", "veces", "%"]
+    formula: str
+    origen: str
+    lamina: str
+    fuente: FuenteDeCifra
+
+
+ParteDePrecioVolumen = CifraDePrecioVolumen | NoCalculable
+
+
+class PrecioContraVolumen(_Modelo):
+    """Precio contra volumen (F3b.2) y el costo de un descuento (F3b.3), S86.23."""
+
+    descuento: int
+    volumen: int
+    no_calculable: str | None = None
+    cifras: tuple[ParteDePrecioVolumen, ...] = ()
+    mensajes: tuple[str, ...] = ()
+
+    def cifra(self, clave: str) -> ParteDePrecioVolumen:
+        for cifra in self.cifras:
+            if cifra.clave == clave:
+                return cifra
+        raise KeyError(clave)
+
+
 class EstadosRevisados(_Modelo):
     """Lo que recibe la calculadora: la revisión de S86.15 y el estado de resultados."""
 
@@ -144,6 +182,7 @@ class ResultadoDelCurso(_Modelo):
     poder_del_uno_utilidad: Indicador | None = None
     pendientes: tuple[str, ...] = ()
     simulador: tuple[PalancaDelSimulador, ...] = ()
+    precio_contra_volumen: PrecioContraVolumen | None = None
 
     def del_simulador(self, clave: str) -> PalancaDelSimulador:
         for palanca in self.simulador:
@@ -935,6 +974,227 @@ def _simulador(
 
 
 # ---------------------------------------------------------------------------
+# Precio contra volumen y el costo de un descuento (S86.23)
+# ---------------------------------------------------------------------------
+
+# El ejemplo del curso (L39): «10% de descuento para vender 15% más».
+DESCUENTO_DEL_CURSO = 10
+VOLUMEN_DEL_CURSO = 15
+CALCULO_DE_ESCALA: FuenteDeCifra = "cálculo de ESCALA"
+
+
+def _signo(valor: Decimal) -> str:
+    """Monto a centavos con el signo menos tipográfico, para lo que lee el dueño."""
+    texto = _dinero(valor)
+    return "−" + texto[1:] if texto.startswith("-") else texto
+
+
+def _cifra_pv(
+    clave: str,
+    nombre: str,
+    valor: Decimal,
+    unidad: Literal["pesos", "veces", "%"],
+    formula: str,
+    origen: str,
+    lamina: str,
+    fuente: FuenteDeCifra = "curso",
+) -> CifraDePrecioVolumen:
+    if fuente == CALCULO_DE_ESCALA:
+        nombre = f"{nombre} ({CALCULO_DE_ESCALA})"
+    return CifraDePrecioVolumen(
+        clave=clave,
+        nombre=nombre,
+        valor=valor.quantize(CENTAVO, rounding=ROUND_HALF_UP),
+        unidad=unidad,
+        formula=formula,
+        origen=f"sale de: {origen}",
+        lamina=lamina,
+        fuente=fuente,
+    )
+
+
+def _no_calculable_pv(clave: str, nombre: str, formula: str, lamina: str, razon: str) -> NoCalculable:
+    return NoCalculable(
+        clave=clave, nombre=nombre, fecha=None, formula=formula, lamina=lamina, no_calculable=razon
+    )
+
+
+def _precio_contra_volumen(d: _Fecha, descuento: int, volumen: int) -> PrecioContraVolumen:
+    """F3b.2 y F3b.3 con los estados al cierre. Precio y volumen salen del motor."""
+    if d.ventas is None or d.ventas.valor <= 0:
+        razon = _falta_ventas(d.fecha) if d.ventas is None else _ventas_en_cero(d.fecha)
+        return PrecioContraVolumen(no_calculable=razon, descuento=descuento, volumen=volumen)
+
+    entradas = _entradas(d, CERO)
+    ventas, costo = d.ventas.valor, d.costo.valor
+    ub = ventas - costo
+    precio = lever_parts("price", entradas, 1)
+    vol_1 = lever_parts("volume", entradas, 1)
+    precio_d = lever_parts("price", entradas, descuento)
+    vol_v = lever_parts("volume", entradas, volumen)
+    precio_flujo = precio.per_period + precio.one_time
+    vol_1_flujo = vol_1.per_period + vol_1.one_time
+
+    cifras: list[ParteDePrecioVolumen] = [
+        _cifra_pv("precio.utilidad", "Subir el precio 1%: utilidad", precio.per_period, "pesos",
+                  "1% × ventas", precio.per_period_formula, "L36"),
+        _cifra_pv("precio.flujo", "Subir el precio 1%: flujo", precio_flujo, "pesos",
+                  "1% × ventas − 1% × clientes", precio.cash_formula, "L36"),
+        _cifra_pv("volumen_1.utilidad", "Vender 1% más: utilidad", vol_1.per_period, "pesos",
+                  "1% × utilidad bruta", vol_1.per_period_formula, "L37"),
+        _cifra_pv("volumen_1.flujo", "Vender 1% más: flujo", vol_1_flujo, "pesos",
+                  "1% × utilidad bruta − 1% × capital de trabajo", vol_1.cash_formula, "L37"),
+    ]
+
+    # Razones (L38): cuántas veces rinde subir el precio contra vender más.
+    sin_ub = "la utilidad bruta es 0 o menos: vender más no deja utilidad con qué comparar"
+    formula_ru = "utilidad por subir el precio 1% ÷ utilidad por vender 1% más"
+    formula_rf = "flujo por subir el precio 1% ÷ flujo por vender 1% más"
+    razon_u: ParteDePrecioVolumen
+    razon_f: ParteDePrecioVolumen
+    if ub <= 0:
+        razon_u = _no_calculable_pv("razon.utilidad", "Precio contra volumen: utilidad", formula_ru, "L38", sin_ub)
+    else:
+        razon_u = _cifra_pv(
+            "razon.utilidad", "Precio contra volumen: utilidad", precio.per_period / vol_1.per_period,
+            "veces", formula_ru,
+            f"precio {_dinero(precio.per_period)} ÷ volumen {_dinero(vol_1.per_period)}", "L38",
+        )
+    if ub <= 0 or vol_1_flujo <= 0:
+        razon = sin_ub if ub <= 0 else (
+            "vender 1% más pide más capital de trabajo del que deja: "
+            f"su flujo es {_dinero(vol_1_flujo)}"
+        )
+        razon_f = _no_calculable_pv("razon.flujo", "Precio contra volumen: flujo", formula_rf, "L38", razon)
+    else:
+        razon_f = _cifra_pv(
+            "razon.flujo", "Precio contra volumen: flujo", precio_flujo / vol_1_flujo, "veces", formula_rf,
+            f"precio {_dinero(precio_flujo)} ÷ volumen {_dinero(vol_1_flujo)}", "L38",
+        )
+    cifras += [razon_u, razon_f]
+
+    # El descuento y el volumen como los suma el curso (L40, L41, L43).
+    desc_u = -precio_d.per_period
+    desc_f = -(precio_d.per_period + precio_d.one_time)
+    vol_u = vol_v.per_period
+    vol_f = vol_v.per_period + vol_v.one_time
+    d_ = f"{descuento}%"
+    v_ = f"{volumen}%"
+    cifras += [
+        _cifra_pv("descuento.utilidad", f"Descuento de {d_}: utilidad", desc_u, "pesos",
+                  f"−{d_} × ventas", f"−{precio_d.per_period_formula}", "L41"),
+        _cifra_pv("descuento.flujo", f"Descuento de {d_}: flujo", desc_f, "pesos",
+                  f"−{d_} × ventas + {d_} × clientes", f"−({precio_d.cash_formula})", "L41"),
+        _cifra_pv("volumen.utilidad", f"Vender {v_} más: utilidad", vol_u, "pesos",
+                  f"{v_} × utilidad bruta", vol_v.per_period_formula, "L40"),
+        _cifra_pv("volumen.flujo", f"Vender {v_} más: flujo", vol_f, "pesos",
+                  f"{v_} × utilidad bruta − {v_} × capital de trabajo", vol_v.cash_formula, "L40"),
+        _cifra_pv("neto_del_curso.utilidad", "Descuento y volumen, sumados como el curso: utilidad",
+                  desc_u + vol_u, "pesos", "efecto del descuento + efecto del volumen",
+                  f"descuento {_dinero(desc_u)} + volumen {_dinero(vol_u)}", "L43"),
+        _cifra_pv("neto_del_curso.flujo", "Descuento y volumen, sumados como el curso: flujo",
+                  desc_f + vol_f, "pesos", "efecto del descuento + efecto del volumen",
+                  f"descuento {_dinero(desc_f)} + volumen {_dinero(vol_f)}", "L43"),
+    ]
+
+    # Cálculo de ESCALA: el volumen extra también va con descuento.
+    factor_d = 1 - Decimal(descuento) / CIEN
+    factor_v = 1 + Decimal(volumen) / CIEN
+    ub_con_descuento = ventas * factor_d - costo
+    texto_ub_d = f"{d.ventas.texto} × {factor_d} − {d.costo.texto}"
+    combinado = factor_v * ub_con_descuento - ub
+    cifras.append(
+        _cifra_pv(
+            "combinado.utilidad", f"{d_} de descuento y {v_} más de volumen, juntos: utilidad", combinado,
+            "pesos",
+            "(1 + volumen) × (ventas × (1 − descuento) − costo de ventas) − utilidad bruta",
+            f"{factor_v} × ({texto_ub_d}) − utilidad bruta {_dinero(ub)}",
+            "L43 (el curso suma los dos efectos; aquí se calculan juntos)", CALCULO_DE_ESCALA,
+        )
+    )
+    formula_eq = "utilidad bruta ÷ (ventas × (1 − descuento) − costo de ventas) − 1"
+    nombre_eq = f"Volumen extra para que {d_} de descuento no pierda utilidad ({CALCULO_DE_ESCALA})"
+    equilibrio: ParteDePrecioVolumen
+    if ub <= 0:
+        equilibrio = _no_calculable_pv(
+            "equilibrio.volumen", nombre_eq, formula_eq, "L43",
+            "la utilidad bruta es 0 o menos: no hay utilidad que cuidar",
+        )
+    elif ub_con_descuento <= 0:
+        margen = (CIEN * ub / ventas).quantize(CENTAVO, rounding=ROUND_HALF_UP)
+        equilibrio = _no_calculable_pv(
+            "equilibrio.volumen", nombre_eq, formula_eq, "L43",
+            f"el descuento de {d_} es igual o mayor que tu margen bruto ({margen}%): "
+            "cada venta con descuento deja 0 o pierde, y ningún volumen lo compensa",
+        )
+    else:
+        equilibrio = _cifra_pv(
+            "equilibrio.volumen", "Volumen extra para que el descuento no pierda utilidad",
+            CIEN * (ub / ub_con_descuento - 1), "%", formula_eq,
+            f"utilidad bruta {_dinero(ub)} ÷ ({texto_ub_d}) − 1", "L43", CALCULO_DE_ESCALA,
+        )
+    cifras.append(equilibrio)
+
+    mensajes: list[str] = []
+    if isinstance(razon_u, CifraDePrecioVolumen):
+        mensajes.append(
+            f"Subir el precio 1% te deja {razon_u.valor} veces la utilidad que te deja vender 1% más (L38)."
+        )
+    else:
+        mensajes.append(f"Precio contra volumen, utilidad: no calculable: {razon_u.no_calculable}.")
+    if isinstance(razon_f, CifraDePrecioVolumen):
+        mensajes.append(f"En efectivo, {razon_f.valor} veces (L38).")
+    else:
+        mensajes.append(f"Precio contra volumen, efectivo: no calculable: {razon_f.no_calculable}.")
+    if isinstance(equilibrio, CifraDePrecioVolumen):
+        mensajes.append(
+            f"Si das {d_} de descuento, necesitas vender {equilibrio.valor}% más solo para quedar igual"
+            f" ({CALCULO_DE_ESCALA})."
+        )
+    else:
+        mensajes.append(
+            f"Si das {d_} de descuento, el volumen para quedar igual es no calculable: "
+            f"{equilibrio.no_calculable}."
+        )
+    mensajes.append(
+        f"Con {d_} de descuento y {v_} más de volumen, tu utilidad cambia {_signo(combinado)}"
+        f" ({CALCULO_DE_ESCALA}: el volumen extra también va con descuento);"
+        f" el curso lo simplifica sumando los dos efectos, y da {_signo(desc_u + vol_u)}."
+    )
+    return PrecioContraVolumen(cifras=tuple(cifras), mensajes=tuple(mensajes), descuento=descuento, volumen=volumen)
+
+
+def precio_contra_volumen(
+    estados: EstadosRevisados,
+    descuento: int = DESCUENTO_DEL_CURSO,
+    volumen: int = VOLUMEN_DEL_CURSO,
+) -> PrecioContraVolumen:
+    """Precio contra volumen y el costo de dar ``descuento``% para vender ``volumen``% más.
+
+    Los dos van en puntos enteros de %, como las palancas del motor.
+    """
+    if not 0 < descuento < 100:
+        return PrecioContraVolumen(
+            no_calculable="el descuento tiene que ser mayor que 0% y menor que 100%",
+            descuento=descuento,
+            volumen=volumen,
+        )
+    if volumen < 0:
+        return PrecioContraVolumen(no_calculable="el volumen extra no puede ser negativo", descuento=descuento, volumen=volumen)
+    revision = estados.revision
+    if not revision.puede_calcular:
+        return PrecioContraVolumen(no_calculable=_por_que_no(revision), descuento=descuento, volumen=volumen)
+    final = (
+        _datos(revision, estados.resultados, revision.balance_final)
+        if revision.balance_final is not None
+        else None
+    )
+    if final is None:
+        return PrecioContraVolumen(no_calculable="falta el balance al final del periodo", descuento=descuento, volumen=volumen)
+    return _precio_contra_volumen(final, descuento, volumen)
+
+
+# ---------------------------------------------------------------------------
 # Entrada pública
 # ---------------------------------------------------------------------------
 
@@ -1000,6 +1260,7 @@ def calcular_curso(estados: EstadosRevisados) -> ResultadoDelCurso:
         poder_del_uno_utilidad=total_utilidad,
         pendientes=pendientes,
         simulador=_simulador(final, dias, palancas, neta),
+        precio_contra_volumen=_precio_contra_volumen(final, DESCUENTO_DEL_CURSO, VOLUMEN_DEL_CURSO),
         **base,
     )
 
