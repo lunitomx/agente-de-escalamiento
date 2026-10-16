@@ -70,6 +70,7 @@ para no invertir a ciegas en instalación y paridad).
 | S86.30 | ESCALA-98 | Semana y trimestre (ola 5) | 3 | En espera | waiting |
 | S86.31 | ESCALA-99 | Post-its con tu board (ola 5) | 3 | En espera | waiting |
 | S86.32 | ESCALA-100 | Las fichas del curso de cash en la copia que se instala, con aviso de autoría | 2 | 19 fichas + overview en la copia; aviso al final del README | done |
+| S86.33 | ESCALA-102 | Quitar el tablero viejo del poder del uno del programa local | 2 | Sin power-of-one.html ni su ruta; aviso en español en la ruta vieja; todo manda al simulador | done |
 | S86.34 | ESCALA-101 | El simulador de las 7 palancas como artefacto en Claude | 2 | HTML apto para artefacto; 1,143,864.91 / 1,010,740.66; publicar sólo con «sí» | done |
 
 ## Fuera de alcance

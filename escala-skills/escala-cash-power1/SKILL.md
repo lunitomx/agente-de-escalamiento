@@ -91,7 +91,10 @@ Di la prioridad #1, por qué, y "¿Qué vas a hacer al respecto?"
 ## References
 
 - Calculadora: `escala_server/cash/curso.py`
-- Dashboard: `escala_server/static/dashboards/cash/power-of-one.html`
+- Simulador: lo arma el recorrido de cash (`escala-cash`, fase 8) con
+  `escala_server/cash/simulador.py`. Con el «sí» del dueño queda guardado como
+  `work/cash/<empresa>/panel-simulador-<fecha>.html`. El programa local ya no
+  trae un tablero del poder del uno.
 - Tests: `tests/test_s86_16_calculadora_curso.py` y
   `tests/test_s86_13_power_of_one_cash.py` (Mi Empresa al centavo)
 

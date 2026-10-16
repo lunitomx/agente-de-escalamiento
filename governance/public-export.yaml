@@ -108,6 +108,9 @@ selections:
   - path: escala_server/outcome_learning.py
     kind: file
     role: local_runtime
+  - path: escala_server/retirados.py
+    kind: file
+    role: local_runtime
   - path: escala_server/router.py
     kind: file
     role: local_runtime
