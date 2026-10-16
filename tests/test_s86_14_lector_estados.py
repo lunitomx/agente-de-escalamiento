@@ -189,6 +189,14 @@ def test_a4_3_fechas_en_las_formas_de_los_contadores(texto: str, esperada: date)
     assert max(buscar_fechas(texto)) == esperada
 
 
+@pytest.mark.parametrize("titulo", ["Al 31/12/2025", "31/12/2025"])
+def test_a4_3_fecha_sola_en_un_titulo_no_es_columna(titulo: str) -> None:
+    lectura = leer_texto(f"Mi Empresa\n{titulo}\nBancos  210.29\n", hoy=HOY)
+    assert [(c.nombre, c.monto, c.fecha) for c in lectura.cuentas] == [
+        ("Bancos", Decimal("210.29"), FIN_2025)
+    ]
+
+
 def test_a4_3_columnas_dic_2025_y_dic_2024() -> None:
     lectura = leer_estados(ESTADOS / "aspel_balance.csv", hoy=HOY)
     assert {cuenta.fecha for cuenta in lectura.cuentas} == {FIN_2025, FIN_2024}

@@ -157,10 +157,16 @@ def _es_etiqueta(celda: str) -> bool:
 
 def _encabezado_de_periodos(filas: list[list[str]]) -> tuple[int, dict[int, date]] | None:
     for indice, fila in enumerate(filas):
+        # Una celda sólo con fecha es encabezado si abajo hay montos en su columna;
+        # si no, es un título («Al 31/12/2025») y la fecha es la del documento.
         columnas = {
             columna: fecha
             for columna, celda in enumerate(fila)
             if (fecha := fecha_pura(celda)) is not None
+            and any(
+                columna < len(abajo) and leer_monto(abajo[columna]) is not None
+                for abajo in filas[indice + 1 :]
+            )
         }
         if columnas:
             return indice, columnas
@@ -220,7 +226,10 @@ def _leer_hoja(hoja: _Hoja) -> tuple[list[CuentaLeida], list[Aviso], list[str]]:
     if encabezado is not None:
         lecturas = _por_periodos(filas, *encabezado)
     else:
-        fechas = [f for texto in textos for f in buscar_fechas(texto)]
+        fechas = [
+            f for fila in filas for celda in fila if leer_monto(celda) is None
+            for f in buscar_fechas(celda)
+        ]
         lecturas = _por_pares(filas, max(fechas) if fechas else None)
 
     cuentas: list[CuentaLeida] = []
