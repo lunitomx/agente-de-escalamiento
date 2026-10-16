@@ -189,7 +189,7 @@ def _lectura(filas: list[Fila]) -> LecturaEstados:
     return LecturaEstados(cuentas=tuple(cuentas), fecha=FIN)
 
 
-def _balance(clientes: str = "400") -> list[Fila]:
+def _balance(clientes: str = "300") -> list[Fila]:
     return [
         ("Bancos", None, "100", "200"),
         ("Clientes", None, "300", clientes),
@@ -201,7 +201,7 @@ def _balance(clientes: str = "400") -> list[Fila]:
 
 
 def _sintetico(
-    *, costo: str = "500", clientes: str = "400", descuento: int = 10, volumen: int = 15
+    *, costo: str = "500", clientes: str = "300", descuento: int = 10, volumen: int = 15
 ) -> PrecioContraVolumen:
     resultados = _lectura(
         [
@@ -220,7 +220,7 @@ def _sintetico(
 
 
 def test_sintetico_a_mano() -> None:
-    # ventas 1000, costo 500 → UB 500; CT 400 + 200 − 100 = 500
+    # ventas 1000, costo 500 → UB 500; CT 300 + 200 − 100 = 400
     r = _sintetico()
     assert _cifra(r, "razon.utilidad").valor == Decimal("2.00")  # 10 ÷ 5
     assert _cifra(r, "equilibrio.volumen").valor == Decimal("25.00")  # 500 ÷ 400 − 1
@@ -229,7 +229,7 @@ def test_sintetico_a_mano() -> None:
 
 
 def test_mover_clientes_cambia_el_flujo_pero_no_la_utilidad() -> None:
-    base, mas_clientes = _sintetico(), _sintetico(clientes="450")
+    base, mas_clientes = _sintetico(), _sintetico(clientes="350")
     assert _cifra(base, "razon.utilidad").valor == _cifra(mas_clientes, "razon.utilidad").valor
     assert _cifra(base, "razon.flujo").valor != _cifra(mas_clientes, "razon.flujo").valor
     assert _cifra(base, "descuento.flujo").valor != _cifra(mas_clientes, "descuento.flujo").valor
@@ -254,7 +254,7 @@ def test_utilidad_bruta_cero_no_es_calculable() -> None:
 
 
 def test_volumen_que_no_deja_efectivo_no_da_razon_de_flujo() -> None:
-    # UB 100 < CT 500: vender 1% más pide más capital de trabajo del que deja.
+    # UB 100 < CT 400: vender 1% más pide más capital de trabajo del que deja.
     r = _sintetico(costo="900")
     assert isinstance(r.cifra("razon.utilidad"), CifraDePrecioVolumen)
     assert "capital de trabajo" in _no_calculable(r, "razon.flujo").no_calculable
