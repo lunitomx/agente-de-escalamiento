@@ -607,6 +607,10 @@ def test_r7_una_cuenta_sin_caja_no_calcula_y_pregunta() -> None:
     r7 = next(p for p in revision.preguntas if p.codigo == "R7")
     assert r7.cuenta == "Inversión en criptomonedas" and r7.bloquea
     assert not revision.puede_calcular
+    # R1 no cuadra por 1,956,618.46 y dice por qué: esa cuenta no entra en ninguna caja.
+    [r1] = _hallazgos(revision, "R1")
+    assert r1.diferencia == Decimal("1956618.46")
+    assert "1 cuenta(s) sin caja" in r1.mensaje
 
 
 def test_r7_el_anticipo_de_clientes_va_a_otras_cuentas_sin_preguntar() -> None:

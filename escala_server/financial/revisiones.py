@@ -144,7 +144,7 @@ def _compara(
     return "aviso" if diferencia <= tolerancia else "no cuadra"
 
 
-def _r1(totales: TotalesPorCaja, tolerancia: Decimal) -> Hallazgo:
+def _r1(totales: TotalesPorCaja, tolerancia: Decimal, sin_caja: int = 0) -> Hallazgo:
     fuentes = totales.pasivo + totales.capital_contable
     diferencia = abs(totales.activo - fuentes)
     resultado = _compara(diferencia, tolerancia)
@@ -167,6 +167,8 @@ def _r1(totales: TotalesPorCaja, tolerancia: Decimal) -> Hallazgo:
             f"{otro_lado}: no cuadra por {formato_monto(diferencia)}. "
             "No calculo nada hasta que cuadre: ¿falta una cuenta o hay una cifra mal escrita?"
         )
+    if resultado != "cuadra" and sin_caja:
+        mensaje += f" Ojo: {sin_caja} cuenta(s) sin caja no entran en la suma."
     return Hallazgo(
         revision="R1",
         resultado=resultado,
@@ -728,7 +730,8 @@ def revisar_estados(
 
     hallazgos: list[Hallazgo] = []
     for totales in acomodo.totales:
-        hallazgos.append(_r1(totales, tolerancia))
+        sin_caja = sum(1 for c in acomodo.cuentas if c.caja is None and c.fecha == totales.fecha)
+        hallazgos.append(_r1(totales, tolerancia, sin_caja))
     hallazgos.append(_r2(acomodo, final if final else hasta, utilidad, tolerancia))
     hallazgos += _r3(acomodo, tolerancia)
     hallazgos += _r4(periodo, fechas, inicial, final)
