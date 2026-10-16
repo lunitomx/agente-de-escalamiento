@@ -54,7 +54,13 @@ def paso(mi_empresa: EstadosRevisados) -> PasoDelPerfil:
 
 
 def _tarjetas(html: str) -> dict[str, str]:
-    return dict(re.findall(r'<section class="tarjeta [^"]*" id="([a-z_]+)">(.*?)</section>', html, flags=re.S))
+    return dict(
+        re.findall(
+            r'<section class="tarjeta [^"]*" id="([a-z_]+)">(.*?)</section>',
+            html,
+            flags=re.S,
+        )
+    )
 
 
 def test_seis_tarjetas_con_su_color(paso: PasoDelPerfil) -> None:
@@ -70,7 +76,11 @@ def test_seis_tarjetas_con_su_color(paso: PasoDelPerfil) -> None:
         "dias_proveedores": "rojo",
     }
     # El nivel va en texto, no sólo en color.
-    assert "amarillo · regular" in html and "rojo · malo" in html and "verde · óptimo" in html
+    assert (
+        "amarillo · regular" in html
+        and "rojo · malo" in html
+        and "verde · óptimo" in html
+    )
 
 
 def test_cada_tarjeta_trae_valor_meta_distancia_y_origen(paso: PasoDelPerfil) -> None:
@@ -131,11 +141,16 @@ def _corre(
 ) -> tuple[int, dict[str, object]]:
     codigo = main(
         [
-            "--empresa", EMPRESA,
-            "--estados", str(estados),
-            "--carpeta", str(tmp_path / "work" / "cash"),
-            "--conversacion", str(tmp_path / "borrador.json"),
-            "--hoy", HOY.isoformat(),
+            "--empresa",
+            EMPRESA,
+            "--estados",
+            str(estados),
+            "--carpeta",
+            str(tmp_path / "work" / "cash"),
+            "--conversacion",
+            str(tmp_path / "borrador.json"),
+            "--hoy",
+            HOY.isoformat(),
             *extra,
         ]
     )
@@ -163,14 +178,24 @@ def test_entrada_sigue_la_platica_y_guarda_solo_con_si(
     _corre(capsys, tmp_path, estados_json, "--responde", "curso=sí")
     # Segundo mensaje: sólo gastos; lo demás viene del borrador.
     codigo, salida = _corre(
-        capsys, tmp_path, estados_json, "--responde", f"gastos={GASTOS}", "--html", str(html), "--guardar", "no"
+        capsys,
+        tmp_path,
+        estados_json,
+        "--responde",
+        f"gastos={GASTOS}",
+        "--html",
+        str(html),
+        "--guardar",
+        "no",
     )
     assert codigo == 0 and salida["pintar"] is True
     assert html.exists()
     assert salida["guardado"] is None
     assert not (tmp_path / "work").exists()
     codigo, salida = _corre(capsys, tmp_path, estados_json, "--guardar", "sí")
-    guardado = tmp_path / "work" / "cash" / "mi-empresa-s-a-de-c-v" / "perfil-ideal.json"
+    guardado = (
+        tmp_path / "work" / "cash" / "mi-empresa-s-a-de-c-v" / "perfil-ideal.json"
+    )
     assert salida["guardado"] == guardado.as_posix()
     assert guardado.exists()
     assert "Guardé tus límites" in str(salida["mensaje"])

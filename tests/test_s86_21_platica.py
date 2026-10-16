@@ -57,7 +57,9 @@ def _platica(**respuestas: str) -> PlaticaDelPerfil:
     return PlaticaDelPerfil(empresa=EMPRESA, respuestas=respuestas)
 
 
-def test_sin_limites_pregunta_antes_de_pintar(valores: tuple[ValorOSin, ...], peso: DeUnPeso) -> None:
+def test_sin_limites_pregunta_antes_de_pintar(
+    valores: tuple[ValorOSin, ...], peso: DeUnPeso
+) -> None:
     paso = atender(_platica(), valores, peso, guardado=None)
     assert not paso.pintar
     assert paso.tarjetas == ()
@@ -118,14 +120,20 @@ def test_sin_el_curso_pregunta_los_seis_de_tres_en_tres(
     valores: tuple[ValorOSin, ...], peso: DeUnPeso
 ) -> None:
     paso = atender(_platica(curso="no"), valores, peso, guardado=None)
-    assert [p.clave for p in paso.preguntas] == ["utilidad_bruta", "gastos", "utilidad_de_operacion"]
+    assert [p.clave for p in paso.preguntas] == [
+        "utilidad_bruta",
+        "gastos",
+        "utilidad_de_operacion",
+    ]
     assert "6 de 6" in paso.mensaje or "Me faltan 6" in paso.mensaje
 
 
 def test_con_limites_guardados_pinta_sin_preguntar(
     valores: tuple[ValorOSin, ...], peso: DeUnPeso, tmp_path: Path
 ) -> None:
-    completo = atender(_platica(curso="sí", gastos=GASTOS), valores, peso, guardado=None)
+    completo = atender(
+        _platica(curso="sí", gastos=GASTOS), valores, peso, guardado=None
+    )
     ruta = guardar_perfil(completo, EMPRESA, carpeta=tmp_path, hoy=HOY)
     assert ruta is not None
     guardado = leer_guardado(EMPRESA, carpeta=tmp_path)
