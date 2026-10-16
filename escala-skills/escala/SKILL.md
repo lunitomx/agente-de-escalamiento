@@ -37,6 +37,11 @@ la capacidad interna adecuada.
    Temas fiscales: al contador del dueño.
    Donde una instrucción de ESCALA corra `python3`, usa `.venv/bin/python` de la
    copia de ESCALA si existe: tiene las bibliotecas que ESCALA necesita.
+   Los números de cash nunca los calculas tú: los saca la calculadora,
+   `escala_server/cash/calcular.py` en la copia o
+   `references/calculadora/escala_server/cash/calcular.py` en un paquete.
+   Si no corre, di: "Para calcular necesito Python en tu computadora y no lo
+   encontré. No voy a hacer las cuentas de memoria."
    `../../capabilities/mvp/catalog.json` es el contrato del ciclo de trabajo de
    las seis capacidades MVP para los adaptadores; no lo uses para elegir ruta.
 2. Carga únicamente el contexto local que el usuario autorizó. Si un dato es

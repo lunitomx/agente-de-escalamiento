@@ -1,7 +1,8 @@
 ---
 description: >-
-  Power of One: impacto de mejorar 1% (o 1 día) en cada una de las 7 palancas de
-  cash flow. Basado en Alan Miltz.
+  Power of One: cuánto efectivo y cuánta utilidad libera mejorar 1% (o 1 día)
+  cada una de las 7 palancas. Lo calcula la calculadora de ESCALA. Basado en
+  Alan Miltz.
 name: escala-cash-power1
 ---
 
@@ -9,77 +10,86 @@ name: escala-cash-power1
 
 ## Purpose
 
-Calcular el impacto en cash flow de mejorar 1% (o 1 día) cada una de las 7 palancas
-financieras. Identificar las de mayor impacto y generar recomendaciones accionables.
+Mostrar cuánto efectivo y cuánta utilidad libera mejorar 1% (o 1 día) cada una
+de las 7 palancas. Identificar la de mayor impacto y recomendar una acción.
 
 ## Créditos
 
 - **Metodología:** Alan Miltz
-- **Motor backend:** `escala_server/cash/__init__.py`
+- **Calculadora:** `escala_server/cash/calcular.py` (usa el motor
+  `escala_server/cash/__init__.py`)
 
-## ⚠️ Reglas de Cálculo (NO improvisar)
+## Quién hace las cuentas
 
-NO usar sliders continuos. NO calcular Volumen con precio completo. NO usar 30 días.
+Tú no haces ninguna cuenta, ni de memoria ni a mano. Las hace la calculadora de
+ESCALA con los estados ya revisados (cada cuenta en su caja y el periodo
+confirmado):
 
-### Las 7 Palancas
+- En la copia de ESCALA, desde su carpeta:
+  `python3 escala_server/cash/calcular.py <estados-revisados.json>`.
+- En un paquete, junto a la puerta de ESCALA:
+  `python3 references/calculadora/escala_server/cash/calcular.py <estados-revisados.json>`.
 
-| Palanca | Tipo | +1% significa | Utilidad (antes de ISR) | Flujo (antes de ISR) |
-|---------|------|---------------|-------------------------|----------------------|
-| Precio | % | Subir precio 1% | Ventas × 1% | Ventas × 1% − Clientes × 1% |
-| Volumen | % | Vender 1% más | Utilidad bruta × 1% | Utilidad bruta × 1% − Capital de trabajo × 1% (clientes + inventario − proveedores) |
-| COGS | % | Reducir costo 1% | COGS × 1% | COGS × 1% + (Inventario − Proveedores) × 1% |
-| OPEX | % | Gastar 1% menos | OPEX × 1% | OPEX × 1% |
-| AR (cobrar) | día | Cobrar 1 día antes | 0 | Ventas ÷ 365 |
-| INV (inventario) | día | 1 día menos almacén | 0 | COGS ÷ 365 |
-| AP (pagar) | día | Pagar 1 día después | 0 | COGS ÷ 365 |
+Devuelve JSON. Cada número trae `valor`, `formula`, `origen` («sale de: …») y
+`lamina`. Muéstralo así: el número, su fórmula en palabras y de dónde sale.
+Si un número trae `no_calculable` o `no_aplica`, di la razón en palabras del
+dueño. Nunca pongas 0 en su lugar ni lo calcules tú.
+Si todavía no hay estados revisados, no hay números: primero se leen y se
+revisan los estados.
 
-Según el curso de cash que vimos: el flujo descuenta el capital de trabajo que se lleva cada palanca.
-Tú no haces estas cuentas: las hace `POST /api/cash/power-of-one`, que devuelve cada número con su fórmula.
+Si la calculadora responde sólo `{"no_calculable": …}` porque falta Python o
+pydantic, o Python ni siquiera arranca, di exactamente:
 
-### Diseño UI
+> "Para calcular necesito Python en tu computadora y no lo encontré. No voy a hacer las cuentas de memoria."
 
-- **Botones +1 / -1** — NO sliders
-- +1 = mejora, -1 = empeoramiento (para TODAS las palancas)
-- Toggle "Antes / Después"
-- Tooltips en idioma humano: "Lo que te cuesta hacer tu producto" no "COGS"
+y no des ningún número.
 
-### Métricas (base 365 días)
+## Las 7 palancas (para explicarlas, no para calcular)
 
-DSO = AR / (Ventas/365). DIO = Inv / (COGS/365). DPO = AP / (COGS/365). CCC = DSO + DIO - DPO.
+El JSON trae `poder_del_uno` con una fila por palanca (`flujo`, `utilidad`) y
+los totales `poder_del_uno_flujo` y `poder_del_uno_utilidad`.
+
+| Palanca | Clave | +1 significa | Utilidad (antes de ISR) | Flujo (antes de ISR) |
+|---------|-------|--------------|-------------------------|----------------------|
+| Precio | `precio` | Subir precio 1% | Ventas × 1% | Ventas × 1% − Clientes × 1% |
+| Volumen | `volumen` | Vender 1% más | Utilidad bruta × 1% | Utilidad bruta × 1% − Capital de trabajo × 1% |
+| Costo | `costo` | Reducir costo 1% | Costo de ventas × 1% | Costo de ventas × 1% + (Inventario − Proveedores) × 1% |
+| Gastos | `gastos` | Gastar 1% menos | Gastos × 1% | Gastos × 1% |
+| Clientes | `clientes` | Cobrar 1 día antes | 0 | Ventas ÷ días del periodo |
+| Inventario | `inventario` | 1 día menos en almacén | 0 | Costo de ventas ÷ días del periodo |
+| Proveedores | `proveedores` | Pagar 1 día después | 0 | Costo de ventas ÷ días del periodo |
+
+Según el curso de cash que vimos: el flujo descuenta el capital de trabajo que
+se lleva cada palanca. Una palanca que no aplica (sin inventario, por ejemplo)
+no aparece en la tabla de la calculadora; dilo así al dueño.
 
 ## Steps
 
-### Step 1: Gather Numbers (humano)
+### Step 1: Estados revisados
 
-Preguntar en lenguaje coloquial. No usar COGS, DSO, CCC. Usar "costo de producto", "días en cobrar".
+Si no hay estados revisados, primero pásalos por el procedimiento interno
+`escala-cash-finanzas`. No pidas números sueltos para calcular.
 
-### Step 2: Calculate Impact
+### Step 2: Correr la calculadora
 
-Usar `POST /api/cash/power-of-one`. No calcules a mano: muestra el número y la fórmula que devuelve (`cash_formula`, `ebit_formula`).
+Muestra cada palanca con su efectivo, su utilidad, su fórmula y de dónde sale.
 
-### Step 3: Prioritize
+### Step 3: Priorizar con el dueño
 
-Score = Impacto ÷ Dificultad. Incluir: impacto ($), dificultad (1-5), tiempo, principio Rockefeller.
+Ordena por el efectivo que libera cada palanca, según el JSON. Pregunta al
+dueño qué tan difícil es cada una en su negocio. No inventes una dificultad ni
+una calificación.
 
 ### Step 4: Recomendación priorizada
 
-Decir prioridad #1, por qué, y "¿Qué vas a hacer al respecto?"
-
-## Benchmarks
-
-| Industria | Margen | CCC | DSO |
-|-----------|:------:|:---:|:---:|
-| Retail | 5% | 10-30d | 7-15d |
-| Manufactura | 10% | 30-60d | 30-45d |
-| Servicios | 15% | -15-15d | 15-30d |
-| SaaS | 25% | -30 a -10d | 7-15d |
-| Alimentos | 8% | 5-15d | 3-7d |
+Di la prioridad #1, por qué, y "¿Qué vas a hacer al respecto?"
 
 ## References
 
-- Backend: `escala_server/cash/__init__.py`
-- Dashboard: `static/dashboards/cash/power-of-one.html`
-- Tests: `tests/test_cash_engine.py`, `tests/test_s86_13_power_of_one_cash.py` (Mi Empresa al centavo)
+- Calculadora: `escala_server/cash/curso.py`
+- Dashboard: `escala_server/static/dashboards/cash/power-of-one.html`
+- Tests: `tests/test_s86_16_calculadora_curso.py` y
+  `tests/test_s86_13_power_of_one_cash.py` (Mi Empresa al centavo)
 
 ---
 

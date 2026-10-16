@@ -380,39 +380,3 @@ class PowerOfOneEngine:
         if value >= 0:
             return f"+${value:,.0f}"
         return f"-${abs(value):,.0f}"
-
-    @staticmethod
-    def benchmark_by_industry(industry: str) -> dict:
-        """Retorna benchmarks por industria para métricas clave.
-
-        Son rangos orientativos integrados; deben contrastarse con evidencia
-        documentada de la industria y con la serie histórica de la empresa.
-        """
-        benchmarks = {
-            "retail": {
-                "profit_margin_pct": {"min": 2.0, "target": 5.0, "max": 10.0},
-                "ccc_days": {"min": 10, "target": 30, "max": 60},
-                "dso_days": {"min": 7, "target": 15, "max": 30},
-            },
-            "manufacturing": {
-                "profit_margin_pct": {"min": 5.0, "target": 10.0, "max": 20.0},
-                "ccc_days": {"min": 30, "target": 60, "max": 90},
-                "dso_days": {"min": 30, "target": 45, "max": 60},
-            },
-            "services": {
-                "profit_margin_pct": {"min": 10.0, "target": 15.0, "max": 30.0},
-                "ccc_days": {"min": -15, "target": 15, "max": 45},
-                "dso_days": {"min": 15, "target": 30, "max": 60},
-            },
-            "saas": {
-                "profit_margin_pct": {"min": 15.0, "target": 25.0, "max": 40.0},
-                "ccc_days": {"min": -30, "target": -10, "max": 15},
-                "dso_days": {"min": 7, "target": 15, "max": 30},
-            },
-            "food": {
-                "profit_margin_pct": {"min": 3.0, "target": 8.0, "max": 15.0},
-                "ccc_days": {"min": 5, "target": 15, "max": 30},
-                "dso_days": {"min": 3, "target": 7, "max": 15},
-            },
-        }
-        return benchmarks.get(industry, benchmarks["services"])

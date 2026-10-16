@@ -99,18 +99,6 @@ class TestPowerOfOneEngine:
         assert "+" in PowerOfOneEngine.format_currency(1000)
         assert "-" in PowerOfOneEngine.format_currency(-500)
 
-    def test_benchmark_retail(self):
-        """Benchmarks de retail existen y tienen las claves correctas."""
-        bench = PowerOfOneEngine.benchmark_by_industry("retail")
-        assert "profit_margin_pct" in bench
-        assert "ccc_days" in bench
-        assert "dso_days" in bench
-
-    def test_benchmark_unknown_defaults_to_services(self):
-        """Industria desconocida usa services como default."""
-        bench = PowerOfOneEngine.benchmark_by_industry("unknown")
-        assert bench["profit_margin_pct"]["target"] == 15.0
-
     def test_saas_ccc_negative(self):
         """SaaS típicamente tiene CCC negativo (cobran antes de pagar)."""
         inputs = FinancialInputs(

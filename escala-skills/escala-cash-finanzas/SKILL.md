@@ -1,5 +1,5 @@
 ---
-description: 'Pásame tu P&L y balance (PDF, Excel, foto) y calculo tu Power of One y CCC automáticamente. Sin fórmulas, sin Excel manual.'
+description: 'Pásame tus estados financieros como los tengas (PDF, Excel, foto). ESCALA los lee, revisa que cuadren y saca con su calculadora tu ciclo de efectivo y tu Power of One, cada número con su fórmula y de dónde sale.'
 name: escala-cash-finanzas
 ---
 
@@ -7,79 +7,79 @@ name: escala-cash-finanzas
 
 ## Purpose
 
-No me pidas que llenes el Power of One a mano. Pásame tu Estado de Resultados y Balance — el que ya tienes en PDF, Excel, Google Sheets, o hasta una foto de tu pantalla. Yo extraigo los números, calculo tu CCC, y te digo exactamente cuánto cash genera cada palanca del Power of One.
+El dueño no llena el Power of One a mano. Pasa su estado de resultados y su
+balance como los tenga. ESCALA los lee, pone cada cuenta en su caja, revisa
+que cuadren y la calculadora saca los números del curso.
 
 ## Steps
 
 ### Step 1: Recibir los estados financieros
 
-Preguntar al usuario: "¿Dónde están tus estados financieros?"
+Pregunta: "¿Dónde están tus estados financieros?"
 
-Opciones:
-- **PDF del contador** — "Súbelo, extraigo los números clave."
-- **Excel / Google Sheets** — "Compártelo, yo leo las celdas."
-- **Foto de pantalla** — "Tómale foto a tu P&L y balance, yo identifico las cifras."
-- **De cabeza** — "Dame los 6 números clave y yo hago el resto."
+- **PDF o Excel del contador**: "Pásamelo como lo tengas."
+- **Foto de pantalla**: "Tómale foto a tu estado de resultados y a tu balance."
+- **De cabeza**: sin estados no hay cuentas que revisar. Pide al dueño que se
+  los pida a su contador. No calcules con cifras sueltas.
 
-### Step 2: Extraer los números clave
+### Step 2: Leer y revisar los estados
 
-Del P&L extraer:
-- Ingresos totales (último trimestre o año)
-- Costo de ventas (COGS)
-- Gastos operativos
-- Utilidad neta
+1. Lee cada archivo con el lector de ESCALA:
+   `python3 -m escala_server.financial.lector <archivo>` en la copia de ESCALA;
+   en un paquete, antepón `PYTHONPATH=references/calculadora`.
+2. Muestra lo que leíste y confirma con el dueño las preguntas que salgan:
+   el periodo (año, acumulado o mes) y las cuentas que no tienen caja.
+3. Sólo cuando la revisión dice que se puede calcular hay estados revisados.
+   Si algo no cuadra, dilo y no des números.
 
-Del Balance extraer:
-- Cuentas por cobrar (Accounts Receivable)
-- Inventario
-- Cuentas por pagar (Accounts Payable)
+### Step 3: Calcular con la calculadora de ESCALA
 
-Validar con el usuario: "Esto es lo que extraje. ¿Son correctos estos números?"
+Tú no haces ninguna cuenta, ni de memoria ni a mano. Las hace la calculadora de
+ESCALA con los estados ya revisados (cada cuenta en su caja y el periodo
+confirmado):
 
-### Step 3: Calcular métricas ESCALA
+- En la copia de ESCALA, desde su carpeta:
+  `python3 escala_server/cash/calcular.py <estados-revisados.json>`.
+- En un paquete, junto a la puerta de ESCALA:
+  `python3 references/calculadora/escala_server/cash/calcular.py <estados-revisados.json>`.
 
-**Power of One — 7 palancas:**
-1. Precio (+1%) → impacto en EBIT y Cash
-2. Volumen (+1%) → impacto
-3. Costo variable (-1%) → impacto
-4. Costo fijo (-1%) → impacto
-5. Días de cuentas por cobrar (-1 día) → impacto
-6. Días de inventario (-1 día) → impacto
-7. Días de cuentas por pagar (+1 día) → impacto
+Devuelve JSON. Cada número trae `valor`, `formula`, `origen` («sale de: …») y
+`lamina`. Muéstralo así: el número, su fórmula en palabras y de dónde sale.
+Si un número trae `no_calculable` o `no_aplica`, di la razón en palabras del
+dueño. Nunca pongas 0 en su lugar ni lo calcules tú.
+Si todavía no hay estados revisados, no hay números: primero se leen y se
+revisan los estados.
 
-**Cash Conversion Cycle:**
-- DSO = (Cuentas por cobrar / Ingresos) × 365
-- DIO = (Inventario / COGS) × 365
-- DPO = (Cuentas por pagar / COGS) × 365
-- CCC = DSO + DIO - DPO
+Si la calculadora responde sólo `{"no_calculable": …}` porque falta Python o
+pydantic, o Python ni siquiera arranca, di exactamente:
+
+> "Para calcular necesito Python en tu computadora y no lo encontré. No voy a hacer las cuentas de memoria."
+
+y no des ningún número.
 
 ### Step 4: Presentar el diagnóstico
 
-Mostrar tabla Power of One con impacto en cash de cada palanca.
-
-Mostrar CCC: "Tu ciclo de efectivo es de X días. Tardas Y días en cobrar, Z días en vender inventario, y W días en pagar a proveedores."
-
-**Diagnóstico automático:**
-- Si CCC > 90 días: "ALERTA: Tu ciclo de efectivo es muy largo. Estás financiando a tus clientes."
-- Si DSO > 60 días: "ALERTA: Tus clientes te pagan muy lento. Cada día que reduces DSO libera $X."
-- Si Margen Bruto < 30%: "ALERTA: Margen bajo. La palanca de precio es tu mayor oportunidad."
-- Si la palanca #1 (precio) genera más cash que las otras 6 juntas: "Tu mayor oportunidad está en el precio. Un 1% de aumento te da $X."
+- Muestra el ciclo de efectivo con sus tres días, el capital de trabajo, el
+  flujo neto, el flujo de operación y el Power of One de la calculadora.
+- Cada número va con su fórmula en palabras y de dónde sale.
+- Compara con el año anterior que trae la calculadora. No califiques contra
+  límites ni promedios de otras empresas: no hay uno que valga para todos.
+- Di cuál palanca del Power of One libera más efectivo, según el JSON.
 
 ### Step 5: Guardar y próximos pasos
 
-Guardar en `work/cash/power-of-one.md` y `work/cash/ccc.md`.
+Guarda en `work/cash/power-of-one.md` y `work/cash/ccc.md` el JSON de la
+calculadora y tu recomendación.
 
-Preguntar: "¿Quieres que simulemos escenarios? Puedo calcular qué pasa si mejoras 5% en precio o reduces 10 días tu DSO."
+Pregunta: "¿Qué vas a hacer con la palanca que más efectivo libera?"
 
 ## Output
 
-- Power of One calculado con las 7 palancas
-- CCC desglosado (DSO, DIO, DPO)
-- Diagnóstico automático con alertas
-- Archivos guardados en work/cash/
+- Números de la calculadora, cada uno con fórmula, origen y lámina.
+- Lo que no se pudo calcular, con su razón.
+- Archivos guardados en `work/cash/`.
 
 ## Notas
 
-- Este skill NO programa nada. Usa las capacidades nativas de Claude Code/Codex para leer documentos, extraer números y hacer cálculos.
-- Si el usuario no tiene estados financieros formales, guiarlo con preguntas simples: "¿Cuánto vendiste el mes pasado? ¿Cuánto te costó? ¿Cuánto tienes en caja?"
-- Mostrar fórmulas, periodos y supuestos; validar cada cifra extraída con el usuario antes de recomendar una acción.
+- Este procedimiento no hace cuentas: lee, revisa y llama a la calculadora.
+- Valida con el dueño cada cifra leída antes de calcular.
