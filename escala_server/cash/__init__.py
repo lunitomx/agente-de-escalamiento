@@ -16,7 +16,7 @@ Las 7 palancas:
 from __future__ import annotations
 
 from dataclasses import dataclass
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 from enum import Enum
 from typing import Any
 
@@ -135,6 +135,8 @@ class LeverImpact:
     direction: str  # "up" o "down"
     difficulty: int  # 1-5
     time: str
+    cash_formula: str = ""  # Fórmula del flujo con los números del dueño
+    ebit_formula: str = ""  # Fórmula de la utilidad con los números del dueño
 
 
 @dataclass
@@ -145,6 +147,87 @@ class PowerOfOneResult:
     combined_ebit_impact: float
     metrics: dict[str, float]  # DSO, DIO, DPO, CCC, margen, etc.
     priorities: list[dict]  # Palancas ordenadas por impacto/dificultad
+
+
+CENT = Decimal("0.01")
+
+
+def _cents(value: Decimal) -> float:
+    """Redondea a centavos (mitad hacia arriba) solo al final del cálculo."""
+    return float(value.quantize(CENT, rounding=ROUND_HALF_UP))
+
+
+def _money(value: Decimal) -> str:
+    return f"{value:,.2f}"
+
+
+def _lever_effect(
+    lever_id: str, inputs: FinancialInputs, units: int
+) -> tuple[Decimal, Decimal, str, str]:
+    """Efecto de mejorar una palanca `units` puntos (% o días), antes de ISR.
+
+    Según el curso de cash que vimos (F4.1): el flujo de cada palanca es su
+    efecto en utilidad menos el capital de trabajo que se lleva.
+
+    Returns:
+        (flujo, utilidad, fórmula del flujo, fórmula de la utilidad), sin redondear.
+    """
+    pct = Decimal(units) / Decimal("100")
+    label = f"{units}%"
+    days = Decimal(units)
+    day_label = f"{units} día" if units == 1 else f"{units} días"
+    sales = inputs.net_sales
+    cogs = inputs.cost_of_goods_sold
+    ar = inputs.accounts_receivable
+    inv = inputs.inventory
+    ap = inputs.accounts_payable
+    no_profit = "0: mover días no cambia la utilidad"
+
+    if lever_id == "price":
+        return (
+            pct * sales - pct * ar,
+            pct * sales,
+            f"{label} × ventas {_money(sales)} − {label} × clientes {_money(ar)}",
+            f"{label} × ventas {_money(sales)}",
+        )
+    if lever_id == "volume":
+        gross = sales - cogs
+        working_capital = ar + inv - ap
+        return (
+            pct * gross - pct * working_capital,
+            pct * gross,
+            f"{label} × utilidad bruta {_money(gross)} − {label} × capital de trabajo "
+            f"{_money(working_capital)} (clientes {_money(ar)} + inventario {_money(inv)}"
+            f" − proveedores {_money(ap)})",
+            f"{label} × utilidad bruta {_money(gross)} (ventas − costo de ventas)",
+        )
+    if lever_id == "cogs":
+        return (
+            pct * cogs + pct * (inv - ap),
+            pct * cogs,
+            f"{label} × costo de ventas {_money(cogs)} + {label} × (inventario "
+            f"{_money(inv)} − proveedores {_money(ap)})",
+            f"{label} × costo de ventas {_money(cogs)}",
+        )
+    if lever_id == "opex":
+        opex = inputs.total_opex
+        formula = f"{label} × gastos de operación {_money(opex)}"
+        return pct * opex, pct * opex, formula, formula
+    if lever_id == "ar_days":
+        return (
+            days * sales / DAYS_PER_YEAR,
+            Decimal("0"),
+            f"{day_label} × ventas {_money(sales)} ÷ {DAYS_PER_YEAR}",
+            no_profit,
+        )
+    if lever_id in ("inv_days", "ap_days"):
+        return (
+            days * cogs / DAYS_PER_YEAR,
+            Decimal("0"),
+            f"{day_label} × costo de ventas {_money(cogs)} ÷ {DAYS_PER_YEAR}",
+            no_profit,
+        )
+    raise ValueError(f"palanca desconocida: {lever_id}")
 
 
 class PowerOfOneEngine:
@@ -200,81 +283,27 @@ class PowerOfOneEngine:
         )
 
         impacts: list[LeverImpact] = []
+        raw_cash_total = Decimal("0")
+        raw_ebit_total = Decimal("0")
 
         for lever_id, meta in LEVER_META.items():
             adj = adjustments.get(lever_id, 0)
             if adj == 0:
                 continue
 
-            is_improvement = adj > 0  # +1 = mejora
+            sign = Decimal("1") if adj > 0 else Decimal("-1")  # +1 = mejora
             abs_adj = abs(adj)
-            pct_change = Decimal(str(abs_adj)) / Decimal("100")
-
-            if meta["type"] == "pct":
-                if lever_id == "price":
-                    # +1% precio → impacto = ventas × 1% (volumen constante)
-                    delta = inputs.net_sales * pct_change
-                    cf = float(delta) if is_improvement else -float(delta)
-                    ebit = float(delta) if is_improvement else -float(delta)
-
-                elif lever_id == "volume":
-                    # +1% volumen → impacto = ventas × 1% × margen contribución
-                    delta = inputs.net_sales * pct_change * contribution_margin
-                    cf = float(delta) if is_improvement else -float(delta)
-                    ebit = float(delta) if is_improvement else -float(delta)
-
-                elif lever_id == "cogs":
-                    # -1% COGS → ahorro directo
-                    delta = inputs.cost_of_goods_sold * pct_change
-                    if is_improvement:
-                        cf = float(delta)  # reducción COGS = cash positivo
-                        ebit = float(delta)
-                    else:
-                        cf = -float(delta)
-                        ebit = -float(delta)
-
-                elif lever_id == "opex":
-                    # -1% OPEX → ahorro directo
-                    delta = inputs.total_opex * pct_change
-                    if is_improvement:
-                        cf = float(delta)
-                        ebit = float(delta)
-                    else:
-                        cf = -float(delta)
-                        ebit = -float(delta)
-                else:
-                    cf, ebit = 0.0, 0.0
-
-            else:
-                # Days lever
-                if is_improvement:
-                    if lever_id == "ar_days":
-                        # -1 día DSO → cash = ventas diarias × 1
-                        cf = float(daily_sales) * abs_adj
-                        ebit = 0.0
-                    elif lever_id == "inv_days":
-                        # -1 día DIO → cash = COGS diario × 1
-                        cf = float(daily_cogs) * abs_adj
-                        ebit = 0.0
-                    elif lever_id == "ap_days":
-                        # +1 día DPO → cash = COGS diario × 1
-                        cf = float(daily_cogs) * abs_adj
-                        ebit = 0.0
-                    else:
-                        cf, ebit = 0.0, 0.0
-                else:
-                    # Empeoramiento: signo opuesto
-                    if lever_id == "ar_days":
-                        cf = -float(daily_sales) * abs_adj
-                        ebit = 0.0
-                    elif lever_id == "inv_days":
-                        cf = -float(daily_cogs) * abs_adj
-                        ebit = 0.0
-                    elif lever_id == "ap_days":
-                        cf = -float(daily_cogs) * abs_adj
-                        ebit = 0.0
-                    else:
-                        cf, ebit = 0.0, 0.0
+            cash, ebit, cash_formula, ebit_formula = _lever_effect(
+                lever_id, inputs, abs_adj
+            )
+            cash *= sign
+            ebit *= sign
+            if sign < 0:
+                cash_formula = f"−({cash_formula})"
+                ebit_formula = f"−({ebit_formula})" if ebit != 0 else ebit_formula
+            raw_cash_total += cash
+            raw_ebit_total += ebit
+            pct_change = Decimal(abs_adj) / Decimal("100")
 
             impacts.append(
                 LeverImpact(
@@ -284,17 +313,19 @@ class PowerOfOneEngine:
                     improvement_days=abs_adj if meta["type"] == "day" else 0,
                     current_value=0.0,
                     improved_value=0.0,
-                    cash_impact=round(cf, 2),
-                    ebit_impact=round(ebit, 2),
+                    cash_impact=_cents(cash),
+                    ebit_impact=_cents(ebit),
                     direction=meta["improvement_dir"],
                     difficulty=meta["difficulty"],
                     time=meta["time"],
+                    cash_formula=cash_formula,
+                    ebit_formula=ebit_formula,
                 )
             )
 
-        # Combinado
-        total_cf = round(sum(i.cash_impact for i in impacts), 2)
-        total_ebit = round(sum(i.ebit_impact for i in impacts), 2)
+        # Combinado: se suma sin redondear y se redondea una sola vez.
+        total_cf = _cents(raw_cash_total)
+        total_ebit = _cents(raw_ebit_total)
 
         # Priorizar por impacto/dificultad
         scored = sorted(
