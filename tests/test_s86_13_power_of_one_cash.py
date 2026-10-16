@@ -18,9 +18,6 @@ from escala_server.cash import FinancialInputs, LeverImpact, PowerOfOneEngine
 
 ROOT = Path(__file__).resolve().parent.parent
 FIXTURE = ROOT / "tests" / "fixtures" / "cash" / "mi_empresa.yaml"
-DASHBOARD = (
-    ROOT / "escala_server" / "static" / "dashboards" / "cash" / "power-of-one.html"
-)
 
 
 def _mi_empresa() -> dict[str, Any]:
@@ -137,23 +134,6 @@ def test_each_lever_shows_its_formula_with_the_owner_numbers() -> None:
     assert "365" in impacts["ar_days"].cash_formula
 
 
-def test_power_of_one_route_returns_corrected_cash_and_formulas() -> None:
-    from escala_server.server import _build_router  # pyright: ignore[reportPrivateUsage]
-
-    router = _build_router()
-    fn, params = router.dispatch("POST", "/api/cash/power-of-one")
-    assert fn is not None
-    inputs = _inputs()
-    payload = {"financials": inputs.to_dict()}
-    response = fn(payload=payload, **params)
-    data = response["data"]
-    assert data["combined_cash_impact"] == 1143864.91
-    price = next(i for i in data["impacts"] if i["lever"] == "price")
-    assert price["cash_impact"] == 381869.12
-    assert "clientes" in price["cash_formula"]
-    assert data["cash_basis"] == "antes de ISR"
-
-
-def test_dashboard_labels_cash_before_income_tax() -> None:
-    html = DASHBOARD.read_text(encoding="utf-8")
-    assert "antes de ISR" in html
+# S86.33: el tablero viejo del servidor y su ruta `POST /api/cash/power-of-one`
+# se quitaron. El poder del uno vive en el simulador del recorrido de cash; su
+# rótulo «antes de ISR» lo cuida tests/test_s86_22_simulador.py.
