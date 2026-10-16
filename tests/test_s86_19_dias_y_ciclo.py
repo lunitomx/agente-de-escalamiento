@@ -144,7 +144,12 @@ def test_proveedores_mejora_si_sube() -> None:
     """Pagar después es bueno para tu efectivo: el veredicto se invierte."""
     dias = dias_del_dinero(
         _sinteticos(
-            [*BALANCE[:3], ("Proveedores", None, "100", "200"), *BALANCE[4:]],
+            [
+                ("Bancos", None, "100", "300"),  # para que el balance cuadre
+                *BALANCE[1:3],
+                ("Proveedores", None, "100", "200"),
+                *BALANCE[4:],
+            ],
         ),
         BaseDeDias(),
     )

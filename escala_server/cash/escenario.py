@@ -774,7 +774,9 @@ def atender(
     anuncio: str | None = None
     resumen: list[LineaDeResumen] = []
     if not pendientes and revision is not None and leido.resultados is not None:
-        estados = EstadosRevisados(revision=revision, resultados=leido.resultados)
+        estados = EstadosRevisados(
+            revision=revision, resultados=leido.resultados, respuestas=aplicadas.respuestas
+        )
         calculo = calcular_curso(estados)
         if calculo.no_calculable is None:
             anuncio = _anuncio(calculo, leido.unidad)
