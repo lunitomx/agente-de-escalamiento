@@ -161,22 +161,42 @@ def _money(value: Decimal) -> str:
     return f"{value:,.2f}"
 
 
-def _lever_effect(
+@dataclass(frozen=True)
+class LeverParts:
+    """Los dos lados del efecto de mover una palanca, antes de ISR, sin redondear.
+
+    Según el curso de cash que vimos (F4.1):
+
+    - ``per_period``: lo que cambia cada periodo (más venta, menos costo o gasto).
+      Es la utilidad y se repite cada periodo.
+    - ``one_time``: lo que se queda (negativo) o se libera (positivo) una sola vez
+      en clientes, inventario o proveedores. Es balance.
+
+    El flujo es la suma de los dos: ``cash``.
+    """
+
+    per_period: Decimal
+    one_time: Decimal
+    per_period_formula: str
+    one_time_formula: str
+    cash_formula: str
+
+    @property
+    def cash(self) -> Decimal:
+        return self.per_period + self.one_time
+
+
+def lever_parts(
     lever_id: str,
     inputs: FinancialInputs,
     units: int,
     days_in_period: int = DAYS_PER_YEAR,
-) -> tuple[Decimal, Decimal, str, str]:
-    """Efecto de mejorar una palanca `units` puntos (% o días), antes de ISR.
+) -> LeverParts:
+    """Efecto de mejorar una palanca `units` puntos (% o días), en sus dos lados.
 
-    Según el curso de cash que vimos (F4.1): el flujo de cada palanca es su
-    efecto en utilidad menos el capital de trabajo que se lleva.
-
+    Es la única definición de las fórmulas: ``_lever_effect`` y el motor salen de aquí.
     Las palancas de días dividen entre los días del periodo de los estados
     (365 en un año; los días reales en un mes o un acumulado). Nunca ×12.
-
-    Returns:
-        (flujo, utilidad, fórmula del flujo, fórmula de la utilidad), sin redondear.
     """
     pct = Decimal(units) / Decimal("100")
     label = f"{units}%"
@@ -190,50 +210,89 @@ def _lever_effect(
     no_profit = "0: mover días no cambia la utilidad"
 
     if lever_id == "price":
-        return (
-            pct * sales - pct * ar,
-            pct * sales,
-            f"{label} × ventas {_money(sales)} − {label} × clientes {_money(ar)}",
-            f"{label} × ventas {_money(sales)}",
+        return LeverParts(
+            per_period=pct * sales,
+            one_time=-(pct * ar),
+            per_period_formula=f"{label} × ventas {_money(sales)}",
+            one_time_formula=f"−{label} × clientes {_money(ar)}",
+            cash_formula=f"{label} × ventas {_money(sales)} − {label} × clientes {_money(ar)}",
         )
     if lever_id == "volume":
         gross = sales - cogs
         working_capital = ar + inv - ap
-        return (
-            pct * gross - pct * working_capital,
-            pct * gross,
-            f"{label} × utilidad bruta {_money(gross)} − {label} × capital de trabajo "
+        detail = (
             f"{_money(working_capital)} (clientes {_money(ar)} + inventario {_money(inv)}"
-            f" − proveedores {_money(ap)})",
-            f"{label} × utilidad bruta {_money(gross)} (ventas − costo de ventas)",
+            f" − proveedores {_money(ap)})"
+        )
+        return LeverParts(
+            per_period=pct * gross,
+            one_time=-(pct * working_capital),
+            per_period_formula=(
+                f"{label} × utilidad bruta {_money(gross)} (ventas − costo de ventas)"
+            ),
+            one_time_formula=f"−{label} × capital de trabajo {detail}",
+            cash_formula=(
+                f"{label} × utilidad bruta {_money(gross)} − {label} × capital de trabajo "
+                + detail
+            ),
         )
     if lever_id == "cogs":
-        return (
-            pct * cogs + pct * (inv - ap),
-            pct * cogs,
-            f"{label} × costo de ventas {_money(cogs)} + {label} × (inventario "
-            f"{_money(inv)} − proveedores {_money(ap)})",
-            f"{label} × costo de ventas {_money(cogs)}",
+        stock = f"{label} × (inventario {_money(inv)} − proveedores {_money(ap)})"
+        return LeverParts(
+            per_period=pct * cogs,
+            one_time=pct * (inv - ap),
+            per_period_formula=f"{label} × costo de ventas {_money(cogs)}",
+            one_time_formula=stock,
+            cash_formula=f"{label} × costo de ventas {_money(cogs)} + {stock}",
         )
     if lever_id == "opex":
         opex = inputs.total_opex
         formula = f"{label} × gastos de operación {_money(opex)}"
-        return pct * opex, pct * opex, formula, formula
+        return LeverParts(
+            per_period=pct * opex,
+            one_time=Decimal("0"),
+            per_period_formula=formula,
+            one_time_formula="0: los gastos no se quedan en clientes, inventario ni proveedores",
+            cash_formula=formula,
+        )
     if lever_id == "ar_days":
-        return (
-            days * sales / days_in_period,
-            Decimal("0"),
-            f"{day_label} × ventas {_money(sales)} ÷ {days_in_period}",
-            no_profit,
+        formula = f"{day_label} × ventas {_money(sales)} ÷ {days_in_period}"
+        return LeverParts(
+            per_period=Decimal("0"),
+            one_time=days * sales / days_in_period,
+            per_period_formula=no_profit,
+            one_time_formula=formula,
+            cash_formula=formula,
         )
     if lever_id in ("inv_days", "ap_days"):
-        return (
-            days * cogs / days_in_period,
-            Decimal("0"),
-            f"{day_label} × costo de ventas {_money(cogs)} ÷ {days_in_period}",
-            no_profit,
+        formula = f"{day_label} × costo de ventas {_money(cogs)} ÷ {days_in_period}"
+        return LeverParts(
+            per_period=Decimal("0"),
+            one_time=days * cogs / days_in_period,
+            per_period_formula=no_profit,
+            one_time_formula=formula,
+            cash_formula=formula,
         )
     raise ValueError(f"palanca desconocida: {lever_id}")
+
+
+def _lever_effect(
+    lever_id: str,
+    inputs: FinancialInputs,
+    units: int,
+    days_in_period: int = DAYS_PER_YEAR,
+) -> tuple[Decimal, Decimal, str, str]:
+    """Efecto de mejorar una palanca `units` puntos (% o días), antes de ISR.
+
+    Según el curso de cash que vimos (F4.1): el flujo de cada palanca es su
+    efecto en utilidad menos el capital de trabajo que se lleva. Sale de
+    ``lever_parts``: flujo = por periodo + una vez.
+
+    Returns:
+        (flujo, utilidad, fórmula del flujo, fórmula de la utilidad), sin redondear.
+    """
+    parts = lever_parts(lever_id, inputs, units, days_in_period)
+    return parts.cash, parts.per_period, parts.cash_formula, parts.per_period_formula
 
 
 class PowerOfOneEngine:
