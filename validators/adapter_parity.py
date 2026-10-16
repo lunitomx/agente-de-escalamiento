@@ -19,6 +19,7 @@ from escala_server.capabilities import (
 )
 from scripts.refresh_legacy_skill_aliases import expected_files
 from validators.capability_map import load_capability_map, validate_capability_map
+from validators.versioned_files import versioned_files
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
@@ -98,6 +99,37 @@ def _claude_manifest() -> dict[str, Any]:
     return manifest
 
 
+def discoverable_legacy_aliases(repo_root: Path) -> list[str]:
+    """Versioned legacy aliases sitting where an agent would discover them.
+
+    Ignored local copies (``.agents/`` is gitignored) are not shipped and do
+    not count; a force-added one does (S86.37).
+    """
+    found: list[str] = []
+    for root in DISCOVERABLE_SKILL_ROOTS:
+        relative_root = root.relative_to(REPOSITORY_ROOT).as_posix()
+        for path in versioned_files(repo_root, relative_root):
+            inside = path.relative_to(relative_root)
+            if len(inside.parts) == 2 and inside.match(_LEGACY_GLOB):
+                found.append(path.as_posix())
+    return found
+
+
+def claude_public_skills(repo_root: Path) -> list[str]:
+    """Top-level names of the versioned ``.claude/skills`` entries.
+
+    Local RaiSE development skills (``.claude/skills/rai-*/``, gitignored) are
+    not part of the public surface; a force-added one is (S86.37).
+    """
+    relative_root = CLAUDE_SKILLS_ROOT.relative_to(REPOSITORY_ROOT).as_posix()
+    return sorted(
+        {
+            path.relative_to(relative_root).parts[0]
+            for path in versioned_files(repo_root, relative_root)
+        }
+    )
+
+
 def is_exact_legacy_redirect(content: str, expected: str) -> bool:
     """A legacy wrapper may only be the exact generated compatibility redirect."""
     return content == expected
@@ -115,13 +147,7 @@ def _legacy_migration() -> dict[str, Any]:
     wrapper_names = {path.parent.name for path in wrapper_paths}
     if wrapper_names != set(alias_map):
         raise AdapterParityError("legacy_wrapper_surface_drift")
-    discovered_aliases = [
-        path
-        for root in DISCOVERABLE_SKILL_ROOTS
-        if root.is_dir()
-        for path in root.glob(_LEGACY_GLOB)
-    ]
-    if discovered_aliases:
+    if discoverable_legacy_aliases(REPOSITORY_ROOT):
         raise AdapterParityError("legacy_alias_publicly_discoverable")
     for path, expected_content in expected_wrappers.items():
         content = path.read_text(encoding="utf-8")
@@ -249,9 +275,8 @@ def validate_claude_adapter(report: dict[str, Any]) -> tuple[str, ...]:
         manifest = _claude_manifest()
     except AdapterParityError as exc:
         return (str(exc),)
-    try:
-        skills = sorted(path.name for path in CLAUDE_SKILLS_ROOT.iterdir())
-    except OSError:
+    skills = claude_public_skills(REPOSITORY_ROOT)
+    if not skills:
         return ("claude_public_surface_unavailable",)
     if skills != [_PUBLIC_ENTRYPOINT]:
         errors.append("claude_public_surface_drift")
