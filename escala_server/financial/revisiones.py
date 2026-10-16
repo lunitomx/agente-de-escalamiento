@@ -16,9 +16,9 @@ from datetime import date, timedelta
 from decimal import Decimal
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from .cajas import Acomodo, Caja, CuentaEnCaja, TotalesPorCaja, acomodar
+from .cajas import CLAVES_DE_REGLAS, Acomodo, Caja, CuentaEnCaja, TotalesPorCaja, acomodar
 from .formatos import fecha_corta, formato_monto, palabras
 from .lector import DIAS_PARA_AVISAR, CuentaLeida, LecturaEstados
 
@@ -51,6 +51,16 @@ class Respuestas(_Modelo):
     iva_incluido: bool | None = None  # C9
     pagan_interes: dict[str, bool] = Field(default_factory=dict[str, bool])  # C11
     movimientos: dict[str, Caja] = Field(default_factory=dict[str, Caja])
+    # R7: qué es una cuenta que ninguna regla reconoce (nombre → clave de la regla).
+    que_es: dict[str, str] = Field(default_factory=dict[str, str])
+
+    @field_validator("que_es")
+    @classmethod
+    def _reglas_que_existen(cls, valor: dict[str, str]) -> dict[str, str]:
+        for nombre, clave in valor.items():
+            if clave not in CLAVES_DE_REGLAS:
+                raise ValueError(f"«{nombre}»: no conozco la regla «{clave}»")
+        return valor
 
 
 class PeriodoDelEstado(_Modelo):
@@ -707,9 +717,14 @@ def revisar_estados(
     balances = list(balances)
     cuentas = [cuenta for lectura in balances for cuenta in lectura.cuentas]
     acomodo = acomodar(
-        cuentas, movimientos=respuestas.movimientos, con_interes=respuestas.pagan_interes
+        cuentas,
+        movimientos=respuestas.movimientos,
+        con_interes=respuestas.pagan_interes,
+        que_es=respuestas.que_es,
     )
-    sin_mover = acomodar(cuentas, con_interes=respuestas.pagan_interes)
+    sin_mover = acomodar(
+        cuentas, con_interes=respuestas.pagan_interes, que_es=respuestas.que_es
+    )
     fechas = acomodo.fechas
 
     hasta = _fecha_del_estado(resultados)

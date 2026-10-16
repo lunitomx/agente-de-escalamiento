@@ -225,6 +225,7 @@ REGLAS: tuple[Regla, ...] = (
 )
 
 _POR_CLAVE = {regla.clave: regla for regla in REGLAS}
+CLAVES_DE_REGLAS: frozenset[str] = frozenset(_POR_CLAVE)
 
 
 def regla_de(nombre: str) -> Regla | None:
@@ -302,8 +303,12 @@ def _acomodar_una(
     cuenta: CuentaLeida,
     movimientos: dict[str, Caja],
     con_interes: dict[str, bool],
+    que_es: dict[str, str],
 ) -> CuentaEnCaja:
     regla = regla_de(cuenta.nombre)
+    dicha = regla is None and cuenta.nombre in que_es
+    if dicha:
+        regla = regla_por_clave(que_es[cuenta.nombre])
     if regla is None:
         return CuentaEnCaja(
             nombre=cuenta.nombre,
@@ -319,6 +324,8 @@ def _acomodar_una(
         )
     caja: Caja = regla.caja
     porque = regla.porque
+    if dicha:
+        porque = f"Me dijiste qué es: va con {regla.clave.replace('_', ' ')}. {regla.porque}"
     movida = False
     if cuenta.nombre in movimientos and movimientos[cuenta.nombre] != regla.caja:
         caja = movimientos[cuenta.nombre]
@@ -374,18 +381,23 @@ def acomodar(
     *,
     movimientos: dict[str, Caja] | None = None,
     con_interes: dict[str, bool] | None = None,
+    que_es: dict[str, str] | None = None,
 ) -> Acomodo:
     """Acomoda cada cuenta del balance en su caja y suma cada caja por fecha.
 
     ``movimientos``: cuentas que el dueño movió de caja (nombre → caja).
     ``con_interes``: respuesta C11 por cuenta (nombre → ¿paga interés?).
+    ``que_es``: respuesta R7 por cuenta sin regla (nombre → clave de la regla).
     Los totales del documento no se acomodan: se guardan para revisar (R3).
     """
 
     movidas = movimientos or {}
     interes = con_interes or {}
+    dichas = que_es or {}
     acomodadas = [
-        _acomodar_una(cuenta, movidas, interes) for cuenta in cuentas if not cuenta.es_total
+        _acomodar_una(cuenta, movidas, interes, dichas)
+        for cuenta in cuentas
+        if not cuenta.es_total
     ]
     fechas = sorted({cuenta.fecha for cuenta in acomodadas if cuenta.fecha is not None})
     return Acomodo(
