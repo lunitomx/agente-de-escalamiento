@@ -1,0 +1,13 @@
+Mi Empresa, S.A. de C.V.
+Estado de Resultados del 1/Ene/2025 al 31/Dic/2025
+Concepto | Acumulado | %
+Ventas netas | 43,826,513.09 | 100.00
+Costo de ventas | 22,966,464.00 | 52.40
+Utilidad bruta | 20,860,049.09 | 47.60
+Gastos de operación | 13,421,039.80 | 30.62
+Utilidad de operación | 7,439,009.29 | 16.97
+Gastos financieros | 1,339,211.23 | 3.06
+Otros ingresos | 681,412.54 | 1.55
+Utilidad antes de impuestos | 6,781,210.60 | 15.47
+ISR | 1,763,114.68 | 4.02
+Utilidad neta | 5,018,095.92 | 11.45
