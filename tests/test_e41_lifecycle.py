@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-import hashlib
 import json
 from pathlib import Path
-import zipfile
 
 import pytest
 
@@ -13,11 +11,10 @@ from escala_server.lifecycle import (
     LifecycleRuntime,
     ScheduleRequest,
     UpdateManager,
-    build_install_bundle,
     build_native_schedule,
-    install_package,
     make_update_artifact,
     migrate_local_state,
+    prepare_local_install,
     render_native_schedule,
     verify_update_artifact,
 )
@@ -39,51 +36,48 @@ def _request(
     )
 
 
-def _bundle(tmp_path: Path, platform: str = "macos") -> tuple[Path, InstallRequest]:
-    source = tmp_path / "source"
-    (source / "escala_server").mkdir(parents=True)
-    (source / "escala_server" / "__init__.py").write_text(
-        "__version__ = '1.2.3'\n", encoding="utf-8"
-    )
-    bundle = build_install_bundle(source, tmp_path / "dist", "1.2.3", platform)  # type: ignore[arg-type]
-    return bundle, _request(tmp_path, platform)
+def _installed(tmp_path: Path, platform: str = "macos") -> InstallRequest:
+    request = _request(tmp_path, platform)
+    prepare_local_install(request)
+    return request
 
 
-def test_build_and_install_bundle_has_no_repository_layout(tmp_path: Path) -> None:
-    bundle, request = _bundle(tmp_path)
+def test_prepare_local_install_keeps_state_local_and_offline(tmp_path: Path) -> None:
+    request = _request(tmp_path)
 
-    receipt = install_package(bundle, request)
+    receipt = prepare_local_install(request)
 
     assert receipt.status == "pass"
-    assert receipt.repository_layout is False
     assert receipt.network_required is False
-    assert (request.install_root / "app/escala_server/__init__.py").is_file()
     assert (request.data_root / "escala.sqlite").is_file()
     assert (request.install_root / "install.json").is_file()
     assert not (request.install_root / ".git").exists()
 
 
-def test_install_rejects_cross_platform_bundle(tmp_path: Path) -> None:
-    bundle, request = _bundle(tmp_path, "macos")
-    windows_request = _request(tmp_path, "windows")
+def test_windows_prepare_uses_same_capability_set(tmp_path: Path) -> None:
+    request = _request(tmp_path, "windows")
 
-    with pytest.raises(LifecycleError, match="platform_mismatch"):
-        install_package(bundle, windows_request)
-
-
-def test_windows_install_uses_same_capability_set(tmp_path: Path) -> None:
-    bundle, request = _bundle(tmp_path, "windows")
-
-    receipt = install_package(bundle, request)
+    receipt = prepare_local_install(request)
 
     assert receipt.status == "pass"
     assert receipt.platform == "windows"
-    assert (request.install_root / "app/escala_server/__init__.py").exists()
+    assert (request.install_root / "install.json").is_file()
+
+
+def test_prepare_rejects_authoritative_sqlite_in_exchange(tmp_path: Path) -> None:
+    exchange = tmp_path / "exchange"
+    exchange.mkdir()
+    request = _request(tmp_path, exchange=exchange).model_copy(
+        update={"database_path": exchange / "shared.sqlite"}
+    )
+
+    with pytest.raises(LifecycleError):
+        prepare_local_install(request)
+    assert not (request.install_root / "install.json").exists()
 
 
 def test_runtime_starts_reports_health_and_stops_locally(tmp_path: Path) -> None:
-    bundle, request = _bundle(tmp_path)
-    install_package(bundle, request)
+    request = _installed(tmp_path)
     runtime = LifecycleRuntime(request)
 
     started = runtime.start()
@@ -114,10 +108,9 @@ def test_optional_exchange_is_documents_only_and_canonical_state_stays_local(
 ) -> None:
     exchange = tmp_path / "Google Drive"
     exchange.mkdir()
-    bundle, request = _bundle(tmp_path)
-    request = request.model_copy(update={"exchange_root": exchange})
+    request = _request(tmp_path, exchange=exchange)
 
-    receipt = install_package(bundle, request)
+    receipt = prepare_local_install(request)
 
     assert receipt.exchange_configured is True
     assert request.database_path.parent != exchange
@@ -127,8 +120,7 @@ def test_optional_exchange_is_documents_only_and_canonical_state_stays_local(
 
 
 def test_update_verifies_hash_preserves_state_and_rolls_back(tmp_path: Path) -> None:
-    bundle, request = _bundle(tmp_path)
-    install_package(bundle, request)
+    request = _installed(tmp_path)
     state = request.data_root / "company-state.json"
     state.write_text('{"company":"Nopal Foods"}\n', encoding="utf-8")
     update_file = tmp_path / "update.bin"
@@ -154,8 +146,7 @@ def test_update_verifies_hash_preserves_state_and_rolls_back(tmp_path: Path) -> 
 
 
 def test_update_rejects_tampered_artifact_before_writes(tmp_path: Path) -> None:
-    bundle, request = _bundle(tmp_path)
-    install_package(bundle, request)
+    request = _installed(tmp_path)
     update_file = tmp_path / "update.bin"
     update_file.write_bytes(b"original")
     artifact = make_update_artifact(update_file, "2.0.0", tmp_path / "updates")
@@ -170,8 +161,7 @@ def test_update_rejects_tampered_artifact_before_writes(tmp_path: Path) -> None:
 
 
 def test_migration_creates_backup_and_safe_stops_on_failure(tmp_path: Path) -> None:
-    bundle, request = _bundle(tmp_path)
-    install_package(bundle, request)
+    request = _installed(tmp_path)
     marker = request.data_root / "schema.json"
     marker.write_text('{"schema":1}\n', encoding="utf-8")
 
@@ -204,11 +194,3 @@ def test_native_schedule_is_offline_and_platform_specific(
     assert "https://" not in rendered
     assert "localhost" not in rendered
     assert "Escala" in rendered
-
-
-def test_bundle_manifest_hash_is_deterministic(tmp_path: Path) -> None:
-    bundle, _ = _bundle(tmp_path)
-    with zipfile.ZipFile(bundle) as archive:
-        manifest = json.loads(archive.read("manifest.json"))
-        payload = archive.read("app/escala_server/__init__.py")
-    assert manifest["files"][0]["sha256"] == hashlib.sha256(payload).hexdigest()

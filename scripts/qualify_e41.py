@@ -19,11 +19,10 @@ from escala_server.lifecycle import (  # noqa: E402
     LifecycleRuntime,
     ScheduleRequest,
     UpdateManager,
-    build_install_bundle,
     build_native_schedule,
-    install_package,
     make_update_artifact,
     migrate_local_state,
+    prepare_local_install,
     render_native_schedule,
     verify_update_artifact,
     write_native_schedule,
@@ -54,16 +53,6 @@ def main() -> int:
     source_commit = _source_commit()
     with tempfile.TemporaryDirectory(prefix="e41-qualification-") as temporary:
         root = Path(temporary)
-        bundles = {
-            platform: build_install_bundle(ROOT, root / "packages", "1.0.0", platform)
-            for platform in ("macos", "windows")
-        }
-        manifests = {
-            platform: _manifest(bundle) for platform, bundle in bundles.items()
-        }
-        assert _manifest_paths(manifests["macos"]) == _manifest_paths(
-            manifests["windows"]
-        )
         requests = {
             platform: InstallRequest(
                 platform=platform,  # type: ignore[arg-type]
@@ -76,8 +65,7 @@ def main() -> int:
             for platform in ("macos", "windows")
         }
         receipts = {
-            platform: install_package(bundles[platform], requests[platform])
-            for platform in requests
+            platform: prepare_local_install(requests[platform]) for platform in requests
         }
         runtime_results = {}
         for platform, request in requests.items():
@@ -151,12 +139,12 @@ def main() -> int:
             {
                 "id": "REQ-E41-001",
                 "status": "pass",
-                "evidence": "A clean macOS target installed the archive into app/data roots without repository layout or network access.",
+                "evidence": "A clean macOS target prepared local install/data roots, version marker and SQLite without network access; the owner installs with the documented one-line flow (instalar.sh). The E41 zip archive was retired in S86.35.",
             },
             {
                 "id": "REQ-E41-002",
                 "status": "pass",
-                "evidence": "A clean Windows target used the same manifest capability set with platform-specific recorded evidence.",
+                "evidence": "A clean Windows target prepared the same local capability set with platform-specific recorded evidence.",
             },
             {
                 "id": "REQ-E41-003",
@@ -181,7 +169,7 @@ def main() -> int:
             {
                 "id": "REQ-E41-007",
                 "status": "pass",
-                "evidence": "macOS/Windows install, runtime, offline schedule, permissions/authority, update, rollback, corruption and publication-boundary checks passed.",
+                "evidence": "macOS/Windows local preparation, runtime, offline schedule, permissions/authority, update, rollback, tampering and publication-boundary checks passed.",
             },
         ]
         payload = {
@@ -192,7 +180,6 @@ def main() -> int:
             "requirements_proved": REQUIREMENTS,
             "checks": checks,
             "negative_cases": [
-                "cross_platform_bundle_rejected",
                 "authoritative_sqlite_in_exchange_rejected",
                 "tampered_update_rejected_before_writes",
                 "interrupted_migration_safe_stop_with_backup",
@@ -236,7 +223,6 @@ def main() -> int:
             "",
             "## Negative matrix",
             "",
-            "- cross-platform bundle mismatch rejected",
             "- synchronized SQLite authority rejected",
             "- tampered update rejected before writes",
             "- interrupted migration safe-stopped with recoverable backup",
@@ -254,25 +240,6 @@ def main() -> int:
     _write_requirement_receipts(checks, source_commit)
     print(f"E41 qualification PASS: {EVIDENCE_PATH}")
     return 0
-
-
-def _manifest(bundle: Path) -> dict[str, object]:
-    import zipfile
-
-    with zipfile.ZipFile(bundle) as archive:
-        return json.loads(archive.read("manifest.json"))
-
-
-def _manifest_paths(manifest: dict[str, object]) -> list[str]:
-    files = manifest.get("files")
-    if not isinstance(files, list):
-        raise AssertionError("manifest files missing")
-    paths: list[str] = []
-    for item in files:
-        if not isinstance(item, dict) or not isinstance(item.get("path"), str):
-            raise AssertionError("manifest file entry invalid")
-        paths.append(item["path"])
-    return paths
 
 
 def _source_commit() -> str:
@@ -315,7 +282,6 @@ def _write_requirement_receipts(
             ],
             "evidence": check["evidence"],
             "negative_cases": [
-                "cross_platform_bundle_rejected",
                 "authoritative_sqlite_in_exchange_rejected",
                 "tampered_update_rejected_before_writes",
                 "interrupted_migration_safe_stop_with_backup",

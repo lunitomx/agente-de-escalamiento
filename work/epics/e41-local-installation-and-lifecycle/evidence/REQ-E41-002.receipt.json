@@ -1,5 +1,5 @@
 {
-  "artifact_sha256": "a3bf52a23310bde0586adcaf13a5e545fe6c3b53195217d0be7561dc1fc0d4e4",
+  "artifact_sha256": "0b1f1ecd78e016fe3b5f4e3f8f0e2be88f3c5a3694272a0a3dbe4883426c10f3",
   "command_sha256": "8f7fc33aeb5d3ebcd096ab36c4266bd7129ae0f0a3bb1878959f9d44db18e387",
   "declaration_sha256": "c3817494c19939bb99453b6f8f0a1315c42b1b0089ed1b4e05ce96ea5771450a",
   "gate_results": [
@@ -31,5 +31,5 @@
   "requirement_id": "REQ-E41-002",
   "result": "pass",
   "schema_version": 1,
-  "source_commit": "a8bffc1de8a3e3d1a7a1ce8932a325f7b76504db"
+  "source_commit": "16959c29873db8639c28e950281ba25da8cb2783"
 }

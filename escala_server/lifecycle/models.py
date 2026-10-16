@@ -45,22 +45,6 @@ class InstallRequest(_StrictModel):
         return self.exchange_root or self.install_root / "exchange"
 
 
-class InstallFile(_StrictModel):
-    path: str = Field(min_length=1, max_length=512)
-    sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
-    size: int = Field(ge=0)
-
-
-class InstallManifest(_StrictModel):
-    schema_version: Literal[1] = 1
-    package_version: str = Field(pattern=r"^\d+\.\d+\.\d+(?:[-+][A-Za-z0-9.-]+)?$")
-    platform: Platform
-    entrypoint: str = "escala_server.lifecycle"
-    files: tuple[InstallFile, ...] = ()
-    network_required: Literal[False] = False
-    repository_layout: Literal[False] = False
-
-
 class InstallCheck(_StrictModel):
     id: str = Field(min_length=1, max_length=80)
     status: Literal["pass", "fail"]

@@ -1,21 +1,18 @@
 # E41: instalación local y lifecycle
 
-## Flujo soportado
+## Cómo se instala hoy
 
-1. Obtener el ZIP de la plataforma (`escala-local-macos-<version>.zip` o
-   `escala-local-windows-<version>.zip`) en la máquina del instalador.
-2. Extraerlo en una carpeta local y ejecutar el flujo de `install.sh` o
-   `install.ps1` con Python local disponible.
-3. Configurar `install_root`, `data_root`, `database_path` y, opcionalmente,
-   una carpeta de intercambio de documentos de Google Drive, OneDrive o red.
-4. Verificar estado con `python -m escala_server.lifecycle status ...`.
+El dueño instala con una sola línea, la del `README.md` (`instalar.sh`): clona el
+repo público a `~/ESCALA` y corre `install.sh --platform claude --with-specialists`.
+Actualiza con la misma línea.
 
-El ZIP lifecycle probado aquí instala sólo el runtime local. El paquete
-conversacional completo se genera aparte con el export portable de S10.10: lleva
-skills, catálogo, conocimiento permitido y adaptadores sin depender del
-checkout fuente. SQLite, configuración, runtime marker y backups permanecen en
-`data_root`. La carpeta sincronizada no contiene autoridad ni SQLite; solo
-recibe/entrega documentos ordinarios.
+El paquete por plataforma de E41 se quitó en S86.35: nadie lo usaba. De E41
+queda `prepare_local_install`, que prepara `install_root`, `data_root`, la base
+SQLite y, opcionalmente, una carpeta de intercambio de documentos de Google
+Drive, OneDrive o red. SQLite, configuración, marcador de versión y respaldos
+permanecen en `data_root`. La carpeta sincronizada no contiene autoridad ni
+SQLite; solo recibe y entrega documentos ordinarios. El estado se consulta con
+`python -m escala_server.lifecycle status ...`.
 
 ## Actualizaciones y rollback
 

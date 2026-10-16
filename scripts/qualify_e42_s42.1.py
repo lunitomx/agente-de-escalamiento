@@ -21,10 +21,8 @@ sys.path.insert(0, str(ROOT))
 
 from escala_server.lifecycle import (  # noqa: E402
     InstallRequest,
-    LifecycleError,
     LifecycleRuntime,
-    build_install_bundle,
-    install_package,
+    prepare_local_install,
 )
 from escala_server.business_advisor import BusinessAdvisorHandler  # noqa: E402
 from escala_server.workspace.authority import WorkspaceConfig, validate_workspace  # noqa: E402
@@ -129,10 +127,8 @@ def main() -> int:
 
         # Negative / safe-failure cases.
         negative_cases: list[dict[str, Any]] = []
-        negative_cases.extend(_run_negative_install_cases(root))
         negative_cases.extend(_run_negative_authority_cases())
         negative_cases.extend(_run_negative_advisor_cases(advisor))
-        negative_cases.append(_run_negative_corrupted_bundle(root))
 
         # Blockers are any positive step that did not pass or any negative case
         # that did not reject the bad input as expected.
@@ -195,7 +191,6 @@ def _run_install_and_runtime(
     source_commit: str,
 ) -> dict[str, Any]:
     """Install, start and stop one platform, recording matrix and steps."""
-    bundle = build_install_bundle(ROOT, root / "packages", VERSION, platform)
     request = InstallRequest(
         platform=platform,  # type: ignore[arg-type]
         version=VERSION,
@@ -204,7 +199,7 @@ def _run_install_and_runtime(
         database_path=root / f"data-{platform}" / "escala.sqlite",
         exchange_root=root / f"exchange-{platform}",
     )
-    receipt = install_package(bundle, request)
+    receipt = prepare_local_install(request)
     runtime = LifecycleRuntime(request)
     start_result = runtime.start()
     stop_result = runtime.stop()
@@ -219,7 +214,7 @@ def _run_install_and_runtime(
         f"install_{platform}",
         f"Instalación local en {platform}",
         platform,
-        "Paquete instala sin layout de repositorio ni red",
+        "Carpetas locales preparadas sin red",
         f"receipt={receipt.status}, checks={len(receipt.checks)}",
         "pass" if install_ok else "fail",
     )
@@ -313,51 +308,6 @@ def _run_advisor_debate(
     )
 
 
-def _run_negative_install_cases(root: Path) -> list[dict[str, Any]]:
-    """Negative cases that exercise the installer rejection paths."""
-    cases: list[dict[str, Any]] = []
-
-    # Cross-platform mismatch: Windows bundle + macOS request.
-    windows_bundle = build_install_bundle(ROOT, root / "packages", VERSION, "windows")
-    macos_request = InstallRequest(
-        platform="macos",  # type: ignore[arg-type]
-        version=VERSION,
-        install_root=root / "bad-install-macos",
-        data_root=root / "bad-data-macos",
-        database_path=root / "bad-data-macos" / "escala.sqlite",
-        exchange_root=root / "bad-exchange-macos",
-    )
-    cases.append(
-        _expect_lifecycle_error(
-            "platform_mismatch_rejected",
-            "Bundle de Windows rechazado cuando se solicita instalar en macOS",
-            lambda: install_package(windows_bundle, macos_request),
-            "platform_mismatch",
-        )
-    )
-
-    # Version mismatch: correct platform, wrong requested version.
-    macos_bundle = build_install_bundle(ROOT, root / "packages", VERSION, "macos")
-    bad_version_request = InstallRequest(
-        platform="macos",  # type: ignore[arg-type]
-        version="9.9.9",
-        install_root=root / "bad-version-install",
-        data_root=root / "bad-version-data",
-        database_path=root / "bad-version-data" / "escala.sqlite",
-        exchange_root=root / "bad-version-exchange",
-    )
-    cases.append(
-        _expect_lifecycle_error(
-            "version_mismatch_rejected",
-            "Versión solicitada distinta a la del bundle es rechazada",
-            lambda: install_package(macos_bundle, bad_version_request),
-            "version_mismatch",
-        )
-    )
-
-    return cases
-
-
 def _run_negative_authority_cases() -> list[dict[str, Any]]:
     """Negative cases for workspace authority boundaries."""
     cases: list[dict[str, Any]] = []
@@ -446,64 +396,6 @@ def _run_negative_advisor_cases(
     )
 
     return cases
-
-
-def _run_negative_corrupted_bundle(root: Path) -> dict[str, Any]:
-    """A corrupted archive must be rejected before any installation."""
-    corrupted = root / "corrupted.zip"
-    corrupted.write_bytes(b"this is not a zip file")
-    request = InstallRequest(
-        platform="macos",  # type: ignore[arg-type]
-        version=VERSION,
-        install_root=root / "corrupted-install",
-        data_root=root / "corrupted-data",
-        database_path=root / "corrupted-data" / "escala.sqlite",
-        exchange_root=root / "corrupted-exchange",
-    )
-    try:
-        install_package(corrupted, request)
-    except LifecycleError as exc:
-        return {
-            "id": "corrupted_bundle_rejected",
-            "description": "Bundle corrupto o inválido rechazado antes de escribir en disco",
-            "expected": "LifecycleError con código bundle_invalid o bundle_manifest_invalid",
-            "observed": f"LifecycleError code={exc.code}",
-            "status": "pass"
-            if exc.code in {"bundle_invalid", "bundle_manifest_invalid"}
-            else "fail",
-        }
-    return {
-        "id": "corrupted_bundle_rejected",
-        "description": "Bundle corrupto o inválido rechazado antes de escribir en disco",
-        "expected": "LifecycleError con código bundle_invalid o bundle_manifest_invalid",
-        "observed": "install_package aceptó el bundle corrupto",
-        "status": "fail",
-    }
-
-
-def _expect_lifecycle_error(
-    case_id: str,
-    description: str,
-    callable_: Any,
-    expected_code: str,
-) -> dict[str, Any]:
-    try:
-        callable_()
-    except LifecycleError as exc:
-        return {
-            "id": case_id,
-            "description": description,
-            "expected": f"LifecycleError code={expected_code}",
-            "observed": f"LifecycleError code={exc.code}",
-            "status": "pass" if exc.code == expected_code else "fail",
-        }
-    return {
-        "id": case_id,
-        "description": description,
-        "expected": f"LifecycleError code={expected_code}",
-        "observed": "no se lanzó LifecycleError",
-        "status": "fail",
-    }
 
 
 def _record_step(

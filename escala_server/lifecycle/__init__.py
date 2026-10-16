@@ -1,11 +1,9 @@
 """Installer-local lifecycle public API."""
 
-from .installer import build_install_bundle, install_package
+from .installer import prepare_local_install
 from .models import (
     BackupRecord,
     InstallCheck,
-    InstallFile,
-    InstallManifest,
     InstallReceipt,
     InstallRequest,
     LifecycleError,
@@ -34,8 +32,6 @@ from .updates import (
 __all__ = [
     "BackupRecord",
     "InstallCheck",
-    "InstallFile",
-    "InstallManifest",
     "InstallReceipt",
     "InstallRequest",
     "LifecycleError",
@@ -48,10 +44,9 @@ __all__ = [
     "UpdateArtifact",
     "UpdateManager",
     "UpdateReceipt",
-    "build_install_bundle",
     "build_native_schedule",
     "create_backup",
-    "install_package",
+    "prepare_local_install",
     "make_update_artifact",
     "migrate_local_state",
     "render_native_schedule",

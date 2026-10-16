@@ -23,11 +23,10 @@ from escala_server.lifecycle import (  # noqa: E402
     LifecycleError,
     LifecycleRuntime,
     ScheduleRequest,
-    build_install_bundle,
     build_native_schedule,
-    install_package,
     make_update_artifact,
     migrate_local_state,
+    prepare_local_install,
     render_native_schedule,
     verify_update_artifact,
 )
@@ -66,7 +65,6 @@ def main() -> int:
         root = Path(temporary)
         request = _install_base(root, "macos")
 
-        scenarios.append(_scenario_damaged_file(root, request))
         scenarios.append(_scenario_stale_evidence(root, source_commit))
         scenarios.append(_scenario_tampered_package(root, request))
         scenarios.append(_scenario_interrupted_update(request))
@@ -96,7 +94,6 @@ def main() -> int:
 def _install_base(root: Path, platform: str) -> InstallRequest:
     """Install a baseline package so scenarios have a local instance to test."""
 
-    bundle = build_install_bundle(ROOT, root / "packages", "1.0.0", platform)
     request = InstallRequest(
         platform=platform,  # type: ignore[arg-type]
         version="1.0.0",
@@ -105,36 +102,10 @@ def _install_base(root: Path, platform: str) -> InstallRequest:
         database_path=root / f"data-{platform}" / "escala.sqlite",
         exchange_root=root / f"exchange-{platform}",
     )
-    receipt = install_package(bundle, request)
+    receipt = prepare_local_install(request)
     if receipt.status != "pass":
         raise RuntimeError(f"baseline install failed: {receipt.status}")
     return request
-
-
-def _scenario_damaged_file(root: Path, request: InstallRequest) -> dict[str, object]:
-    """A corrupted install bundle must be rejected before any local mutation."""
-
-    damaged_bundle = root / "damaged-bundle.zip"
-    damaged_bundle.write_bytes(b"this is not a valid zip archive")
-    observed: str
-    try:
-        install_package(damaged_bundle, request)
-        observed = "accepted"
-    except LifecycleError as exc:
-        observed = exc.code
-
-    return {
-        "id": "damaged_file",
-        "status": "pass" if observed == "bundle_invalid" else "fail",
-        "expected": "install_package rejects a damaged bundle with code bundle_invalid",
-        "observed": observed,
-        "business_message": (
-            "El paquete de instalación está dañado y ESCALA no lo abrió. "
-            "No se modificó ninguna carpeta local."
-        ),
-        "next_step": "Descargue el paquete nuevamente desde la fuente confiable.",
-        "preserved_data": True,
-    }
 
 
 def _scenario_stale_evidence(root: Path, current_commit: str) -> dict[str, object]:
@@ -266,10 +237,9 @@ def _scenario_interrupted_update(request: InstallRequest) -> dict[str, object]:
 def _scenario_no_network(request: InstallRequest) -> dict[str, object]:
     """The product must remain fully offline in install, schedule and runtime."""
 
-    bundle = build_install_bundle(
-        ROOT, request.install_root / "offline-packages", "1.0.0", "macos"
+    marker = json.loads(
+        (request.install_root / "install.json").read_text(encoding="utf-8")
     )
-    manifest = _read_bundle_manifest(bundle)
     schedule = build_native_schedule(
         ScheduleRequest(
             platform="macos",
@@ -300,7 +270,7 @@ def _scenario_no_network(request: InstallRequest) -> dict[str, object]:
         else True
     )
     no_network = (
-        manifest.get("network_required") is False
+        marker.get("network_required") is False
         and schedule.network_required is False
         and "https://" not in rendered
         and not has_network_action
@@ -312,9 +282,9 @@ def _scenario_no_network(request: InstallRequest) -> dict[str, object]:
     return {
         "id": "no_network",
         "status": "pass" if no_network else "fail",
-        "expected": "bundle, schedule and runtime declare no network access",
+        "expected": "local install marker, schedule and runtime declare no network access",
         "observed": {
-            "bundle_network_required": manifest.get("network_required"),
+            "install_network_required": marker.get("network_required"),
             "schedule_network_required": schedule.network_required,
             "schedule_has_https": "https://" in rendered,
             "schedule_has_network_action": has_network_action,
@@ -393,8 +363,7 @@ def _scenario_shared_folder_authority(
     exchange = root / "team-drive"
     exchange.mkdir()
     good_request = request.model_copy(update={"exchange_root": exchange})
-    bundle = build_install_bundle(ROOT, root / "shared-packages", "1.0.0", "macos")
-    receipt = install_package(bundle, good_request)
+    receipt = prepare_local_install(good_request)
 
     config_text = good_request.data_root / "config.json"
     config = json.loads(config_text.read_text(encoding="utf-8"))
@@ -446,13 +415,6 @@ def _read_installed_version(request: InstallRequest) -> str:
         return str(json.loads(path.read_text(encoding="utf-8")).get("version", ""))
     except (OSError, json.JSONDecodeError):
         return ""
-
-
-def _read_bundle_manifest(bundle: Path) -> dict[str, object]:
-    import zipfile
-
-    with zipfile.ZipFile(bundle) as archive:
-        return json.loads(archive.read("manifest.json"))
 
 
 def _source_commit() -> str:

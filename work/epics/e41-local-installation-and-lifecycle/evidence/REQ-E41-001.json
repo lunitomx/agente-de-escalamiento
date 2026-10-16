@@ -1,7 +1,6 @@
 {
-  "evidence": "A clean macOS target installed the archive into app/data roots without repository layout or network access.",
+  "evidence": "A clean macOS target prepared local install/data roots, version marker and SQLite without network access; the owner installs with the documented one-line flow (instalar.sh). The E41 zip archive was retired in S86.35.",
   "negative_cases": [
-    "cross_platform_bundle_rejected",
     "authoritative_sqlite_in_exchange_rejected",
     "tampered_update_rejected_before_writes",
     "interrupted_migration_safe_stop_with_backup"
