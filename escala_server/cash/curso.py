@@ -23,7 +23,7 @@ Entrada interna: ``python -m escala_server.cash.curso <estados-revisados.json>``
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import date
 from decimal import ROUND_HALF_UP, Decimal
 import json
@@ -43,7 +43,7 @@ from escala_server.cash import (
 from escala_server.financial.cajas import Caja, CuentaEnCaja, TotalesPorCaja, con_signo
 from escala_server.financial.formatos import fecha_corta, formato_monto
 from escala_server.financial.lector import LecturaEstados
-from escala_server.financial.revisiones import PeriodoDelEstado, RevisionDeEstados
+from escala_server.financial.revisiones import PeriodoDelEstado, Respuestas, RevisionDeEstados
 
 CENTAVO = Decimal("0.01")
 DIEZMILESIMO = Decimal("0.0001")
@@ -210,6 +210,8 @@ class EstadosRevisados(_Modelo):
     revision: RevisionDeEstados
     resultados: LecturaEstados
     del_dueno: DatosDelDueno | None = None
+    # Lo que contestó el dueño (C1, C9…). Opcional: los archivos de antes no lo traen (S86.19).
+    respuestas: Respuestas | None = None
 
 
 class ResultadoDelCurso(_Modelo):
@@ -803,6 +805,463 @@ def _flujos(inicial: _Fecha | None, final: _Fecha) -> list[Indicador]:
             )
         )
     return indicadores
+
+
+# ---------------------------------------------------------------------------
+# Días y ciclo del dinero (S86.19): dos años, con o sin IVA, ventas a crédito
+# ---------------------------------------------------------------------------
+
+Iva = Literal["con IVA", "sin IVA", "como vienen"]
+Veredicto = Literal["mejoró", "empeoró", "igual", "no comparable"]
+LAMINA_CRONOGRAMA = "L52 y L53"
+UNO = Decimal("1")
+
+
+class BaseDeDias(_Modelo):
+    """En qué base se miden los días: IVA en los saldos (C9), su tasa y ventas a crédito (C1).
+
+    La tasa de IVA es dato del dueño: ESCALA no supone 16%.
+    """
+
+    iva_incluido: bool | None = None
+    tasa_iva: Decimal | None = Field(default=None, gt=0, le=100)  # en %
+    ventas_a_credito: Decimal | None = Field(default=None, ge=0, le=100)  # en %
+
+    @classmethod
+    def de(cls, respuestas: Respuestas | None, *, tasa_iva: Decimal | None = None) -> BaseDeDias:
+        """La base con lo que el dueño ya contestó en la revisión (C1 y C9)."""
+        if respuestas is None:
+            return cls(tasa_iva=tasa_iva)
+        return cls(
+            iva_incluido=respuestas.iva_incluido,
+            tasa_iva=tasa_iva,
+            ventas_a_credito=respuestas.ventas_a_credito,
+        )
+
+
+class Cronograma(_Modelo):
+    """Compra día 0 → pago al proveedor → venta → cobro (F2.3)."""
+
+    fecha: date
+    pago: Decimal
+    venta: Decimal
+    cobro: Decimal
+    financiados: Decimal
+    origen: str
+    lamina: str = LAMINA_CRONOGRAMA
+
+
+class DiasDelAnio(_Modelo):
+    fecha: date
+    clientes: Indicador
+    inventario: Indicador
+    proveedores: Indicador
+    ciclo: Indicador
+    cronograma: Cronograma | None = None
+    sin_cronograma: str | None = None
+    nota: str | None = None
+
+
+class Cambio(_Modelo):
+    """Año anterior contra año actual. El veredicto usa los valores sin redondear."""
+
+    clave: str
+    nombre: str
+    anterior: Decimal | None = None
+    actual: Decimal | None = None
+    diferencia: Decimal | None = None
+    veredicto: Veredicto
+    texto: str
+
+
+class DiasDelDinero(_Modelo):
+    no_calculable: str | None = None
+    periodo: PeriodoDelEstado | None = None
+    dias_del_periodo: int | None = None
+    iva: Iva = "como vienen"
+    rotulo: str = ""
+    tasa_iva: Decimal | None = None
+    base_de_ventas: Literal["ventas a crédito", "ventas totales"] = "ventas totales"
+    avisos: tuple[str, ...] = ()
+    preguntas: tuple[str, ...] = ()
+    anios: tuple[DiasDelAnio, ...] = ()
+    cambios: tuple[Cambio, ...] = ()
+
+    def anio(self, fecha: date) -> DiasDelAnio:
+        for anio in self.anios:
+            if anio.fecha == fecha:
+                return anio
+        raise KeyError(fecha.isoformat())
+
+    def cambio(self, clave: str) -> Cambio:
+        for cambio in self.cambios:
+            if cambio.clave == clave:
+                return cambio
+        raise KeyError(clave)
+
+
+ROTULOS: dict[Iva, str] = {
+    "con IVA": "días de cobro calculados con IVA",
+    "sin IVA": "días de cobro calculados sin IVA",
+    "como vienen": (
+        "días de cobro calculados con los saldos como vienen "
+        "(no me has dicho si clientes y proveedores traen IVA)"
+    ),
+}
+PREGUNTA_IVA = (
+    "¿Tus saldos de clientes y proveedores incluyen IVA? Tus ventas y tu costo no lo "
+    "traen; si los saldos sí, tus días de cobro y de pago salen de más."
+)
+PREGUNTA_TASA = (
+    "¿Qué tasa de IVA traen tus saldos de clientes y proveedores (por ejemplo, 16%)? "
+    "No la supongo: con tu tasa calculo los días sin IVA."
+)
+AVISO_SIN_CREDITO = (
+    "Calculé los días de cobro sobre tus ventas totales: no sé qué parte vendes a "
+    "crédito. Si una parte es de contado, tus clientes tardan más en pagarte de lo "
+    "que dice aquí."
+)
+AVISO_CERO_CREDITO = (
+    "Me dijiste que no vendes a crédito, pero tu balance trae clientes. Calculé los "
+    "días de cobro sobre tus ventas totales."
+)
+SIN_COSTO = (
+    "tu estado de resultados no trae costo de ventas (por ejemplo, un negocio de "
+    "servicios): los días de inventario y de proveedores se miden contra el costo"
+)
+
+# clave → (nombre, sujeto del cambio, ¿mejora si sube?)
+_CAMBIOS: tuple[tuple[str, str, str, bool], ...] = (
+    ("clientes", "Días de clientes", "Tus días de clientes pasaron", False),
+    ("inventario", "Días de inventario", "Tus días de inventario pasaron", False),
+    ("proveedores", "Días de proveedores", "Tus días de proveedores pasaron", True),
+    ("ciclo", "Ciclo del efectivo", "Tu ciclo pasó", False),
+)
+
+
+def _numero(valor: Decimal) -> str:
+    """60 → «60»; 1.16 → «1.16»; 100 → «100» (sin notación científica)."""
+    return format(valor.normalize(), "f")
+
+
+def _sin_iva(cifra: _Cifra, divisor: Decimal) -> _Cifra:
+    if not cifra.existe or cifra.valor == 0:
+        return cifra
+    etiqueta = cifra.texto.split(" ")[0]
+    valor = cifra.valor / divisor
+    return _Cifra(
+        valor,
+        f"{etiqueta} sin IVA ({cifra.texto} ÷ {_numero(divisor)} = {_dinero(valor)})",
+    )
+
+
+def _a_credito(ventas: _Cifra | None, porcentaje: Decimal | None) -> _Cifra | None:
+    if ventas is None or porcentaje is None or porcentaje in (CERO, CIEN):
+        return ventas
+    valor = ventas.valor * porcentaje / CIEN
+    return _Cifra(
+        valor, f"ventas a crédito {_dinero(valor)} ({_numero(porcentaje)}% de {ventas.texto})"
+    )
+
+
+def _con_crudo(
+    definicion: _Definicion,
+    cuenta: _Cifra,
+    base: _Cifra | None,
+    fecha: date,
+    dias: int | None,
+    etiqueta: str,
+) -> tuple[Indicador, Decimal | None]:
+    indicador = _dias(definicion, cuenta, base, fecha, dias, etiqueta)
+    if isinstance(indicador, Calculado) and base is not None and dias is not None:
+        return indicador, cuenta.valor / (base.valor / dias)
+    return indicador, None
+
+
+def _ciclo_del_dinero(
+    fecha: date, partes: list[tuple[str, str, Indicador, Decimal | None]]
+) -> tuple[Indicador, Decimal | None]:
+    for _, _, parte, _ in partes:
+        if isinstance(parte, NoCalculable):
+            razon = f"no se pueden calcular los {parte.nombre.lower()}: {parte.no_calculable}"
+            return _no_calculable(CICLO, fecha, razon), None
+    if all(isinstance(parte, NoAplica) for _, _, parte, _ in partes):
+        return _no_aplica(CICLO, fecha, "no tienes clientes, inventario ni proveedores en el balance"), None
+    # Como la calculadora del curso: la suma de los días ya redondeados (se lee y cuadra).
+    total = CERO
+    crudo = CERO
+    textos: list[str] = []
+    for signo, nombre, parte, sin_redondear in partes:
+        prefijo = "" if not textos else f"{signo} "
+        if isinstance(parte, Calculado):
+            total += parte.valor if signo == "+" else -parte.valor
+            de_la_parte = sin_redondear if sin_redondear is not None else parte.valor
+            crudo += de_la_parte if signo == "+" else -de_la_parte
+            textos.append(f"{prefijo}{nombre} {formato_monto(parte.valor)}")
+        else:
+            textos.append(f"{prefijo}{nombre} no aplica")
+    return _calculado(CICLO, fecha, total, " ".join(textos)), crudo
+
+
+def _dia(indicador: Indicador) -> Decimal:
+    return indicador.valor if isinstance(indicador, Calculado) else CERO
+
+
+def _cronograma(anio: DiasDelAnio) -> tuple[Cronograma | None, str | None]:
+    partes = (anio.clientes, anio.inventario, anio.proveedores)
+    for parte in partes:
+        if isinstance(parte, NoCalculable):
+            return None, f"no calculable: {parte.no_calculable}"
+    if not isinstance(anio.ciclo, Calculado):
+        return None, "no aplica: no tienes clientes, inventario ni proveedores en el balance"
+    pago, venta = _dia(anio.proveedores), _dia(anio.inventario)
+    cobro = venta + _dia(anio.clientes)
+
+    def de(parte: Indicador, nombre: str) -> str:
+        valor = f"{nombre} {formato_monto(parte.valor)}" if isinstance(parte, Calculado) else f"{nombre} no aplica"
+        return valor
+
+    origen = (
+        f"sale de: pago día {formato_monto(pago)} ({de(anio.proveedores, 'días de proveedores')}); "
+        f"venta día {formato_monto(venta)} ({de(anio.inventario, 'días de inventario')}); "
+        f"cobro día {formato_monto(cobro)} (venta {formato_monto(venta)} + "
+        f"{de(anio.clientes, 'días de clientes')}); "
+        f"financiados {formato_monto(cobro - pago)} (cobro − pago)"
+    )
+    return (
+        Cronograma(
+            fecha=anio.fecha,
+            pago=pago,
+            venta=venta,
+            cobro=cobro,
+            financiados=cobro - pago,
+            origen=origen,
+        ),
+        None,
+    )
+
+
+@dataclass(frozen=True)
+class _DelAnio:
+    anio: DiasDelAnio
+    crudos: dict[str, Decimal | None]
+
+
+def _dias_del_anio(
+    d: _Fecha, dias: int | None, divisor: Decimal | None, credito: Decimal | None
+) -> _DelAnio:
+    fecha = d.fecha
+    clientes = _sin_iva(d.clientes, divisor) if divisor is not None else d.clientes
+    proveedores = _sin_iva(d.proveedores, divisor) if divisor is not None else d.proveedores
+    ventas = _a_credito(d.ventas, credito)
+    sufijo = " sin IVA" if divisor is not None else ""
+    def_clientes = replace(
+        DIAS_CLIENTES,
+        formula=(
+            f"clientes{sufijo} ÷ "
+            f"({'ventas a crédito' if ventas is not d.ventas else 'ventas'} ÷ días del periodo)"
+        ),
+    )
+    def_proveedores = replace(
+        DIAS_PROVEEDORES, formula=f"proveedores{sufijo} ÷ (costo de ventas ÷ días del periodo)"
+    )
+    de_clientes = _con_crudo(def_clientes, clientes, ventas, fecha, dias, "ventas")
+    if d.ventas is not None and (not d.costo.existe or d.costo.valor <= 0):
+        de_inventario: tuple[Indicador, Decimal | None] = (
+            _no_aplica(DIAS_INVENTARIO, fecha, SIN_COSTO),
+            None,
+        )
+        de_proveedores: tuple[Indicador, Decimal | None] = (
+            _no_aplica(def_proveedores, fecha, SIN_COSTO),
+            None,
+        )
+    else:
+        de_inventario = _con_crudo(DIAS_INVENTARIO, d.inventario, d.costo, fecha, dias, "costo de ventas")
+        de_proveedores = _con_crudo(def_proveedores, proveedores, d.costo, fecha, dias, "costo de ventas")
+    ciclo, ciclo_crudo = _ciclo_del_dinero(
+        fecha,
+        [
+            ("+", "días de clientes", de_clientes[0], de_clientes[1]),
+            ("+", "días de inventario", de_inventario[0], de_inventario[1]),
+            ("−", "días de proveedores", de_proveedores[0], de_proveedores[1]),
+        ],
+    )
+    anio = DiasDelAnio(
+        fecha=fecha,
+        clientes=de_clientes[0],
+        inventario=de_inventario[0],
+        proveedores=de_proveedores[0],
+        ciclo=ciclo,
+    )
+    cronograma, sin_cronograma = _cronograma(anio)
+    return _DelAnio(
+        anio.model_copy(update={"cronograma": cronograma, "sin_cronograma": sin_cronograma}),
+        {
+            "clientes": de_clientes[1],
+            "inventario": de_inventario[1],
+            "proveedores": de_proveedores[1],
+            "ciclo": ciclo_crudo,
+        },
+    )
+
+
+def _nota_con_iva(con_iva: DiasDelAnio) -> str | None:
+    partes = [
+        f"{nombre} {formato_monto(indicador.valor)}"
+        for nombre, indicador in (
+            ("clientes", con_iva.clientes),
+            ("proveedores", con_iva.proveedores),
+            ("ciclo", con_iva.ciclo),
+        )
+        if isinstance(indicador, Calculado)
+    ]
+    if not partes:
+        return None
+    return "Con IVA, como los mide el curso: " + ", ".join(partes) + " días."
+
+
+def _cambio(
+    clave: str,
+    nombre: str,
+    sujeto: str,
+    mejora_si_sube: bool,
+    anterior: _DelAnio | None,
+    actual: _DelAnio,
+) -> Cambio:
+    if anterior is None:
+        return Cambio(
+            clave=clave,
+            nombre=nombre,
+            veredicto="no comparable",
+            texto="no comparable: falta el balance del año anterior",
+        )
+    antes = getattr(anterior.anio, clave)
+    ahora = getattr(actual.anio, clave)
+    crudo_antes, crudo_ahora = anterior.crudos[clave], actual.crudos[clave]
+    if (
+        not isinstance(antes, Calculado)
+        or not isinstance(ahora, Calculado)
+        or crudo_antes is None
+        or crudo_ahora is None
+    ):
+        razones = [
+            f"{'año anterior' if parte is antes else 'año actual'}: "
+            f"{parte.no_calculable if isinstance(parte, NoCalculable) else parte.no_aplica}"
+            for parte in (antes, ahora)
+            if isinstance(parte, NoCalculable | NoAplica)
+        ]
+        return Cambio(
+            clave=clave,
+            nombre=nombre,
+            veredicto="no comparable",
+            texto="no comparable: " + "; ".join(razones),
+        )
+    diferencia = ahora.valor - antes.valor
+    cambio_crudo = crudo_ahora - crudo_antes
+    veredicto: Veredicto
+    if cambio_crudo == 0:
+        veredicto = "igual"
+    elif (cambio_crudo > 0) == mejora_si_sube:
+        veredicto = "mejoró"
+    else:
+        veredicto = "empeoró"
+    cuanto = (
+        ""
+        if diferencia == 0
+        else f" ({formato_monto(abs(diferencia))} días {'más' if diferencia > 0 else 'menos'})"
+    )
+    return Cambio(
+        clave=clave,
+        nombre=nombre,
+        anterior=antes.valor,
+        actual=ahora.valor,
+        diferencia=diferencia,
+        veredicto=veredicto,
+        texto=(
+            f"{sujeto} de {formato_monto(antes.valor)} a {formato_monto(ahora.valor)} días: "
+            f"{veredicto}{cuanto}."
+        ),
+    )
+
+
+def dias_del_dinero(estados: EstadosRevisados, base: BaseDeDias) -> DiasDelDinero:
+    """Días de clientes, inventario y proveedores, ciclo y cronograma, para los dos años.
+
+    Según el curso de cash que vimos (F2.2, F2.3). Los días son los del periodo
+    revisado; el año anterior usa los mismos, como el curso.
+    """
+    revision = estados.revision
+    resultados = estados.resultados
+    if not revision.puede_calcular:
+        return DiasDelDinero(no_calculable=_por_que_no(revision), periodo=revision.periodo)
+    final = (
+        _datos(revision, resultados, revision.balance_final)
+        if revision.balance_final is not None
+        else None
+    )
+    if final is None:
+        return DiasDelDinero(no_calculable="falta el balance al final del periodo", periodo=revision.periodo)
+    inicial = (
+        _datos(revision, resultados, revision.balance_inicial)
+        if revision.balance_inicial is not None
+        else None
+    )
+    dias = revision.periodo.dias if revision.periodo is not None else None
+
+    iva: Iva
+    divisor: Decimal | None = None
+    preguntas: list[str] = []
+    if base.iva_incluido is None:
+        iva = "como vienen"
+        preguntas.append(PREGUNTA_IVA)
+    elif not base.iva_incluido:
+        iva = "sin IVA"
+    elif base.tasa_iva is None:
+        iva = "con IVA"
+        preguntas.append(PREGUNTA_TASA)
+    else:
+        iva = "sin IVA"
+        divisor = UNO + base.tasa_iva / CIEN
+
+    credito = base.ventas_a_credito
+    avisos: list[str] = []
+    if credito is None:
+        avisos.append(AVISO_SIN_CREDITO)
+    elif credito == 0:
+        avisos.append(AVISO_CERO_CREDITO)
+    a_credito = credito if credito is not None and credito > 0 else None
+
+    por_anio: list[_DelAnio] = []
+    for d in (inicial, final):
+        if d is None:
+            continue
+        del_anio = _dias_del_anio(d, dias, divisor, a_credito)
+        nota: str | None = None
+        if divisor is not None:
+            nota = _nota_con_iva(_dias_del_anio(d, dias, None, a_credito).anio)
+        elif iva == "con IVA":
+            nota = "Sin IVA: no calculable: falta confirmar tu tasa de IVA."
+        if nota is not None:
+            del_anio = _DelAnio(del_anio.anio.model_copy(update={"nota": nota}), del_anio.crudos)
+        por_anio.append(del_anio)
+
+    anterior = por_anio[0] if inicial is not None else None
+    actual = por_anio[-1]
+    return DiasDelDinero(
+        periodo=revision.periodo,
+        dias_del_periodo=dias,
+        iva=iva,
+        rotulo=ROTULOS[iva],
+        tasa_iva=base.tasa_iva if divisor is not None else None,
+        base_de_ventas="ventas a crédito" if a_credito is not None else "ventas totales",
+        avisos=tuple(avisos),
+        preguntas=tuple(preguntas),
+        anios=tuple(a.anio for a in por_anio),
+        cambios=tuple(
+            _cambio(clave, nombre, sujeto, sube, anterior, actual)
+            for clave, nombre, sujeto, sube in _CAMBIOS
+        ),
+    )
 
 
 # ---------------------------------------------------------------------------
