@@ -82,3 +82,6 @@ Thumbs.db
 
 
 !.env.example
+
+# Material de cursos (audios, transcripciones, PDF con nombres): fuera del repo
+sources/curso-cash/
