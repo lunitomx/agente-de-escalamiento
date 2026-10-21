@@ -626,14 +626,6 @@
     },
     {
       "canonical_id": null,
-      "disposition": "support-contract-not-node",
-      "legacy_id": null,
-      "legacy_path": "conocimiento/strategy/workbook-coverage.yaml",
-      "legacy_type": null,
-      "sha256": "8a6e99bf192b3c70e7b89ff2cadea1bd791b7802355c8627b3e3170d8ae0c4c9"
-    },
-    {
-      "canonical_id": null,
       "disposition": "await-domain-evidence",
       "legacy_id": "worksheet-7-strata",
       "legacy_path": "conocimiento/strategy/worksheets/7-strata.yaml",

@@ -1,7 +1,9 @@
 # E87 · Mapa de cobertura del Strategy Workbook (S87.1).
 # Cada página es `tool` (vive en uno o más nodos de conocimiento/) o `no_tool` (con reason).
-# `pending`: páginas tool que aún no citan su nodo. Solo puede encoger:
-# cada historia (S87.4-S87.9) borra solo sus líneas al cubrir la página.
+# `pending`: páginas tool cuya entrada aún no nombra nodos. Solo puede encoger:
+# cada historia (S87.4-S87.9) borra solo sus líneas cuando la entrada de la página
+# nombra nodos que existen en conocimiento/ (hojas: también en el registro).
+# Vive en tests/ porque es procedencia del workbook: no es contenido público.
 # Prueba: tests/test_e87_workbook_coverage.py
 workbook: strategy-2025
 total_pages: 38
