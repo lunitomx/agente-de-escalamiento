@@ -129,6 +129,7 @@ def test_html_and_markdown_share_labels_in_order() -> None:
         "Tus mejores clientes",
         "Tu Cliente central",
         "Revisión de la promesa",
+        "Lo que ve tu Cliente central",
     ]
 
 
@@ -162,7 +163,8 @@ def test_save_view_writes_html_and_md(tmp_path: Path) -> None:
 def _bridged() -> dict[str, Any]:
     content = _core_customer()
     steps = [dict(s) for s in content["guide"]["steps"]]
-    steps[3]["next_sheet"] = {"id": "worksheet-sandbox", "title": "Caja de arena"}
+    quien = next(s for s in steps if s["id"] == "quien-es")
+    quien["next_sheet"] = {"id": "worksheet-sandbox", "title": "Caja de arena"}
     return {**content, "guide": {"steps": steps}}
 
 

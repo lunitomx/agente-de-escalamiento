@@ -40,10 +40,18 @@ guide:
       question: "¿Cuáles son los 3 a 5 atributos que más comparten, en orden de importancia?"
       how: "Marca lo que se repite en la lista anterior y ordénalo del más importante al menos importante."
       example: "Tortillería El Sol: 1) entrega antes de las 13:00, 2) tortilla caliente y suave, 3) pedido fijo sin tener que llamar."
+    - id: persona-ejemplo
+      question: "¿Cómo es una persona real de tu Cliente central?"
+      how: "Ponle nombre, edad y trabajo. Escribe qué quiere lograr, qué teme y cómo te compra."
+      example: "Tortillería El Sol: Doña Mari, 52 años, dueña de Fonda La Esquina; quiere servir a las 13:00 sin correr, teme quedarse sin tortilla con el local lleno, pide por WhatsApp a las 7. Ferretería La Llave: Ing. Ramírez, 38 años, contratista; quiere terminar la obra a tiempo, teme parar la cuadrilla por una pieza, compra a crédito."
     - id: quien-es
       question: "¿Quién es tu Cliente central, en 10 a 20 palabras?"
       how: "Una frase que describa a un grupo de personas reales: qué quieren lograr y qué temen."
       example: "Tortillería El Sol: dueños de fondas y comedores a 3 km que no pueden quedarse sin tortilla caliente en la hora pico."
+    - id: prueba-quien
+      question: "¿Está claro tu QUIÉN? ¿Tu equipo sabe a quién decirle que no con tu descripción?"
+      how: "Lee tu descripción y pregunta: ¿cabe aquí cualquier cliente? Si sí, hazla más precisa hasta que deje gente fuera."
+      example: "Tortillería El Sol: 'familias de la colonia' no pasa; 'mamás que compran 2 kg antes de las 8 am camino a la escuela' sí pasa."
     - id: necesidad
       question: "¿Qué necesidad de tu Cliente central llena tu producto o servicio?"
       how: "Una frase: el problema que tiene y qué cambia cuando te compra."
@@ -52,6 +60,18 @@ guide:
       question: "¿Tu promesa de marca llena esa necesidad, o solo un deseo?"
       how: "Compara tu promesa actual con la necesidad del paso anterior. Si solo cubre un deseo, anota qué le falta."
       example: "Tortillería El Sol: la promesa decía 'la tortilla más rica'; eso es un deseo. La necesidad es 'a tiempo, todos los días', y la promesa se ajusta a eso."
+    - id: mejor-en
+      question: "Según tu Cliente central, ¿en qué eres mejor que las otras opciones?"
+      how: "Usa lo que dicen tus clientes, no lo que crees tú. Si no lo sabes, pregúntale a 3."
+      example: "Tortillería El Sol: 'la tortilla llega caliente y nunca se rompe al doblarla'."
+    - id: diferente-en
+      question: "Según tu Cliente central, ¿en qué eres diferente?"
+      how: "No es 'mejor', es 'distinto': algo que haces y los demás no."
+      example: "Tortillería El Sol: 'te mandan el pedido fijo sin que llames'."
+    - id: raro-o-malo
+      question: "¿Qué le parece raro o malo de ti a tu Cliente central?"
+      how: "Anota la queja o la rareza que más se repite. Decide si la corriges o si es parte de lo que te hace distinto."
+      example: "Tortillería El Sol: 'no venden por kilo después de las 14:00'. Se queda: es lo que permite entregar temprano."
 tips:
   - text: "Describe a tu Cliente central como una persona real: qué quiere lograr y qué teme. 'Hombres de 30 a 50' no te dice qué venderle ni cómo hablarle."
     source: "work/research/e87-tips/core-customer.md#f1"
@@ -65,12 +85,19 @@ tips:
   - text: "Antes de dar por buena tu descripción, platica con 3 a 5 clientes de ese grupo y revisa sus compras. La opinión del equipo sola trae sesgos."
     source: "work/research/e87-tips/core-customer.md#f4"
     step: null
+  - text: "Tu Cliente central cambia cuando cambia tu mercado. Revisa la descripción al menos una vez al año, en la planeación anual."
+    source: "work/research/e87-tips/core-customer.md#f5"
+    step: prueba-quien
+ai_prompt:
+  text: "Con mis 5 mejores clientes y lo que comparten, ayúdame a describir a mi Cliente central en 10 a 20 palabras: qué quiere lograr, qué necesita y qué teme. Dime también a quién no debo atender."
 view:
   layout: cards
   sections:
     - title: "Tus mejores clientes"
-      steps: [top-5-clientes, atributos, top-atributos]
+      steps: [top-5-clientes, atributos, top-atributos, persona-ejemplo]
     - title: "Tu Cliente central"
-      steps: [quien-es, necesidad]
+      steps: [quien-es, prueba-quien, necesidad]
     - title: "Revisión de la promesa"
       steps: [chequeo-promesa]
+    - title: "Lo que ve tu Cliente central"
+      steps: [mejor-en, diferente-en, raro-o-malo]

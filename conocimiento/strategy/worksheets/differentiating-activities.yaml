@@ -1,0 +1,75 @@
+id: worksheet-differentiating-activities
+type: worksheet
+name: Differentiating Activities Worksheet
+name_es: Hoja de Actividades Diferenciadoras
+decision: strategy
+summary: >
+  Compara tu empresa con 2 o 3 competidores en personas, producto, operaciones y
+  términos, y elige de 3 a 5 actividades que se refuerzan entre sí y que tu
+  competencia no copia fácil.
+relationships:
+  - type: belongs-to
+    target: decision-strategy
+  - type: implements
+    target: concept-differentiating-activities
+tags: [strategy, worksheet, differentiation, competitors, 7-strata]
+metadata:
+  output: "3 a 5 actividades diferenciadoras que se refuerzan entre sí, comparadas contra 2 o 3 competidores"
+  difficulty: advanced
+  time_estimate: "1-2 hours"
+  frequency: annually
+guide:
+  steps:
+    - id: competidores
+      question: "¿Contra quién te compara tu Cliente central? Nombra 2 o 3 competidores."
+      how: "Piensa en dónde compraría tu cliente si no te compra a ti. Incluye uno grande y uno chico."
+      example: "Ferretería La Llave: Home Depot y la tlapalería de la esquina."
+    - id: eje-personas
+      question: "En personas, ¿qué haces distinto a cada competidor?"
+      how: "Una línea por competidor: tú contra él. Piensa en quién atiende, qué sabe y cómo trata al cliente."
+      example: "Ferretería La Llave: asesora un maestro de obra; en Home Depot cobra un cajero; en la esquina atiende el dueño solo."
+    - id: eje-producto
+      question: "En producto, ¿qué ofreces distinto a cada competidor?"
+      how: "Una línea por competidor. Piensa en surtido, marcas y piezas difíciles de conseguir."
+      example: "Ferretería La Llave: refacciones de llaves y bombas viejas; Home Depot solo vende modelos nuevos; la esquina tiene poco surtido."
+    - id: eje-operaciones
+      question: "En operaciones, ¿qué haces distinto a cada competidor?"
+      how: "Una línea por competidor. Piensa en tiempos de entrega, horarios y logística."
+      example: "Ferretería La Llave: entrega el mismo día a 5 km; Home Depot tarda 48 horas; la esquina no entrega."
+    - id: eje-terminos
+      question: "En términos de venta, ¿qué ofreces distinto a cada competidor?"
+      how: "Una línea por competidor. Piensa en crédito, garantías, precios y formas de pago."
+      example: "Ferretería La Llave: crédito a 30 días a constructores; Home Depot y la esquina venden de contado."
+    - id: actividades-elegidas
+      question: "¿Cuáles 3 a 5 actividades te hacen distinto y tu competencia no copia fácil?"
+      how: "De los 4 ejes, quédate con lo que solo tú haces. Tacha lo que también hace un competidor."
+      example: "Ferretería La Llave: 1) entrega el mismo día, 2) asesoría de maestro, 3) crédito a constructores, 4) surtido de refacciones."
+    - id: como-se-refuerzan
+      question: "¿Cómo se apoya cada actividad en las otras?"
+      how: "Para cada par, escribe cómo mejorar una ayuda a la otra."
+      example: "Ferretería La Llave: el maestro sabe qué refacción pide la obra; el crédito trae a los constructores; la entrega el mismo día evita que paren la cuadrilla."
+    - id: que-dejas-de-hacer
+      question: "¿Qué dejas de hacer para sostener esas actividades?"
+      how: "Para cada actividad, escribe una cosa que no haces por ella."
+      example: "Ferretería La Llave: no vende jardinería ni decoración; no compite en precio de pintura."
+tips:
+  - text: "Una actividad sola se copia en meses. Elige 3 a 5 que se apoyen entre sí: si mejoras una, mejora otra. Copiar el conjunto completo es lo difícil."
+    source: "work/research/e87-tips/differentiating-activities.md#f1"
+    step: como-se-refuerzan
+  - text: "Para cada actividad diferenciadora, escribe qué dejas de hacer por ella. Revisa también qué haces que no ayuda a ninguna; esas actividades se pueden recortar."
+    source: "work/research/e87-tips/differentiating-activities.md#f2"
+    step: que-dejas-de-hacer
+  - text: "'Buen servicio' o 'calidad' no cuentan: tu competencia también los dice y los copia. Escribe algo que haces distinto, no solo mejor."
+    source: "work/research/e87-tips/differentiating-activities.md#f4"
+    step: actividades-elegidas
+ai_prompt:
+  text: "Con mi Cliente central, mi Promesa de marca y mis 2 o 3 competidores, propón 5 actividades en personas, producto, operaciones y términos que me hagan distinto. Explica cómo se refuerzan entre sí y qué tendría que dejar de hacer."
+view:
+  layout: cards
+  sections:
+    - title: "Tu competencia"
+      steps: [competidores]
+    - title: "En qué eres distinto"
+      steps: [eje-personas, eje-producto, eje-operaciones, eje-terminos]
+    - title: "Tus actividades diferenciadoras"
+      steps: [actividades-elegidas, como-se-refuerzan, que-dejas-de-hacer]
