@@ -30,3 +30,14 @@
 - Sorpresa: `raise_task_complete` no puede preparar `work/` (lo ignora `.gitignore`); el journal se prepara antes con `git add -f`. Con `gate_scope` en un directorio `tests/`, la puerta de tipos busca un `src/` que no existe; usar el directorio del paquete (`coaching/worksheet`).
 - T5: p. 34, 35 y 36 nombran `worksheet-vision-summary`; `pending: []` (la épica ya no tiene páginas pendientes). Mapa E6 regenerado con `scripts/build_e6_migration_map.py` en el scratchpad y copiado: 88 entradas, 84 en espera de evidencia (+1 hoja, sha del registro). **Desviación:** `test_real_pending_is_one_page_per_line` buscaba la línea literal `pending:`; con la lista vacía se escribe `pending: []`, y la guarda ahora acepta esa forma.
 - Puertas: suite completa 3797 pasan + 1 corregida (ver arriba), 5 omitidas; ruff check, ruff format y pyright en verde.
+
+## Phase: verify (2026-10-21)
+
+- Quality review en `stories/s87.8-qr.md`: **PASS**, 0 Critical, 2 Recommended.
+- Suite completa 3798 pasan, 5 omitidas; ruff, formato y pyright limpios.
+- Recorrido del dueño en las 21 hojas: resumen y tiempo propios en el paso 1 (21 de 21); varias líneas en md y html (21 de 21).
+- Mapa E6 regenerado en el scratchpad: igual byte a byte (88/84).
+- Mutaciones: 10 de 10 detectadas, todas revertidas.
+- Las 3 desviaciones (`FieldName` snake_case, `summary_es`, guarda de `pending: []`) se aceptan.
+- R1: `FROZEN_PENDING` sigue en 7..36. La prueba general de cobertura pasa con una página en `pending`; solo la atrapa la prueba de esta hoja (PAT-239). Arreglo de una línea.
+- R2 (previo, fuera del diff): 13 hojas sin `guide` muestran preguntas en inglés; la de ciclo de efectivo muestra un dict crudo.
