@@ -26,6 +26,8 @@ def _registry() -> list[dict[str, Any]]:
         ("Plan estratégico de una página", "worksheet-opsp"),
         ("worksheet-brand-promise", "worksheet-brand-promise"),
         ("Brand Promise", "worksheet-brand-promise"),
+        ("resumen de vision", "worksheet-vision-summary"),
+        ("Resumen de visión", "worksheet-vision-summary"),
     ],
 )
 def test_find_by_spanish_name_without_accents(query: str, sheet_id: str) -> None:
