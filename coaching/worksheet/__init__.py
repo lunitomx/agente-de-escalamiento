@@ -10,8 +10,21 @@ from typing import Any
 from pydantic import ValidationError
 
 from ..core import read_yaml, write_yaml, ensure_dir
+from . import engine
 from .guide import GuideStep, Tip, parse_guide, source_label
-from .view import answer_text, build_view, markdown_lines, open_command, save_view
+from .view import (
+    AI_PROMPT_TITLE,
+    DerivedSources,
+    ViewBlock,
+    answer_text,
+    build_view,
+    derived_blocks,
+    label_heading,
+    markdown_blocks,
+    markdown_lines,
+    open_command,
+    save_view,
+)
 
 
 PACKAGE_ROOT = Path(__file__).resolve().parents[2]
@@ -53,15 +66,55 @@ def find_worksheet(
     name_or_id: str,
     base_path: Path | None = None,
 ) -> dict[str, Any] | None:
-    """Find a worksheet by name or ID (case-insensitive)."""
+    """Find a worksheet by id, English name or Spanish name (``engine`` rule)."""
     registry = read_yaml(registry_path(base_path))
-    name_lower = name_or_id.lower()
-    for w in registry.get("worksheets", []):
-        if w["id"].lower() == name_lower:
-            return w
-        if name_lower in w["name"].lower():
-            return w
-    return None
+    return engine.find_worksheet(registry.get("worksheets", []), name_or_id)
+
+
+_DECISION_ES = {
+    "people": "Personas",
+    "strategy": "Estrategia",
+    "execution": "Ejecución",
+    "cash": "Efectivo",
+}
+_DIFFICULTY_ES = {
+    "beginner": "Básico",
+    "intermediate": "Intermedio",
+    "advanced": "Avanzado",
+}
+
+
+def name_es(worksheet: dict[str, Any]) -> str:
+    """The short Spanish name the owner reads; the English name as fallback."""
+    return str(worksheet.get("name_es") or worksheet.get("name") or worksheet["id"])
+
+
+def _decision_es(worksheet: dict[str, Any]) -> str:
+    decision = str(worksheet.get("decision") or "")
+    return _DECISION_ES.get(decision, decision or "—")
+
+
+def _difficulty_es(worksheet: dict[str, Any]) -> str:
+    difficulty = str(worksheet.get("difficulty") or "")
+    return _DIFFICULTY_ES.get(difficulty, difficulty or "—")
+
+
+def _time_es(worksheet: dict[str, Any]) -> str:
+    return str(worksheet.get("time_es") or worksheet.get("time_estimate") or "—")
+
+
+def _summary_es(worksheet: dict[str, Any], content: dict[str, Any]) -> str:
+    """The Spanish summary of the registry; the sheet's own summary as fallback."""
+    return str(worksheet.get("summary_es") or content.get("summary") or "").strip()
+
+
+def _prerequisite_names(worksheet: dict[str, Any], base_path: Path) -> list[str]:
+    registry = list_worksheets(base_path=base_path)
+    names: list[str] = []
+    for prereq in worksheet.get("prerequisites", []):
+        found = engine.find_worksheet(registry, str(prereq))
+        names.append(name_es(found) if found else str(prereq))
+    return names
 
 
 def get_completed_ids(base_path: Path | None = None) -> list[str]:
@@ -98,12 +151,78 @@ def load_worksheet_content(
     return {**worksheet, **content}
 
 
+def _step_ids(content: dict[str, Any]) -> set[str]:
+    guide: Any = content.get("guide")
+    steps: Any = guide.get("steps") if isinstance(guide, dict) else None
+    if not isinstance(steps, list):
+        return set()
+    return {str(s.get("id")) for s in steps if isinstance(s, dict)}
+
+
+def derived_errors(content: dict[str, Any], base_path: Path | None = None) -> list[str]:
+    """Each ``derived_from`` sheet is registered and each field is one of its steps.
+
+    The shape and self-derivation are checked by ``ToolGuide`` (S87.7 D3).
+    """
+    guide = parse_guide(content)
+    if guide is None:
+        return []
+    registry = list_worksheets(base_path=base_path)
+    errors: list[str] = []
+    for source in guide.derived_from:
+        sheet = next((w for w in registry if w.get("id") == source.sheet), None)
+        if sheet is None:
+            errors.append(
+                f"derived_from nombra una hoja que no está en el registro: {source.sheet}"
+            )
+            continue
+        known = _step_ids(load_worksheet_content(sheet, base_path))
+        errors += [
+            f"derived_from pide el campo {field}, que no es un paso de {source.sheet}"
+            for field in source.fields
+            if field not in known
+        ]
+    return errors
+
+
+def _derived_sources(content: dict[str, Any], base: Path) -> DerivedSources:
+    """Read each source sheet and its answers when saved as completed (D4).
+
+    Only reads: the source sheets are never written.
+    """
+    guide = parse_guide(content)
+    if guide is None:
+        return {}
+    registry = list_worksheets(base_path=base)
+    folder = base / ".escala" / "my-company" / "worksheets"
+    sources: DerivedSources = {}
+    for source in guide.derived_from:
+        sheet = engine.find_worksheet(registry, source.sheet)
+        sheet_content = load_worksheet_content(sheet, base) if sheet else {}
+        saved = read_yaml(folder / f"{source.sheet}.yaml")
+        answers: Any = (
+            saved.get("fields") if saved.get("status") == "completed" else None
+        )
+        sources[source.sheet] = (
+            sheet_content,
+            dict(answers) if isinstance(answers, dict) else None,
+        )
+    return sources
+
+
+def _derived_view_blocks(content: dict[str, Any], base: Path) -> list[ViewBlock]:
+    guide = parse_guide(content)
+    if guide is None or not guide.derived_from:
+        return []
+    return derived_blocks(guide, _derived_sources(content, base))
+
+
 class _GuideError(Exception):
     """The sheet carries a guide that breaks the ToolGuide contract."""
 
 
 def _steps_and_tips(
-    worksheet: dict[str, Any], content: dict[str, Any]
+    worksheet: dict[str, Any], content: dict[str, Any], base_path: Path | None = None
 ) -> tuple[list[GuideStep], list[Tip]]:
     """Guided steps and tips, or one plain step per legacy ``metadata.fields`` text."""
     try:
@@ -113,6 +232,11 @@ def _steps_and_tips(
         raise _GuideError(
             f"La hoja {worksheet['id']} no cumple el contrato: {message}"
         ) from exc
+    errors = derived_errors(content, base_path)
+    if errors:
+        raise _GuideError(
+            f"La hoja {worksheet['id']} no cumple el contrato: {'; '.join(errors)}"
+        )
     if guide is not None:
         return list(guide.guide.steps), list(guide.tips)
     fields = content.get("metadata", {}).get("fields", [])
@@ -139,7 +263,17 @@ def _step_lines(
     return lines
 
 
-def _review_lines(steps: list[GuideStep], answers: dict[str, Any]) -> list[str]:
+def _ai_prompt_text(content: dict[str, Any]) -> str | None:
+    """The sheet's AI prompt; call after ``_steps_and_tips`` validated it."""
+    guide = parse_guide(content)
+    if guide is None or guide.ai_prompt is None:
+        return None
+    return guide.ai_prompt.text
+
+
+def _review_lines(
+    steps: list[GuideStep], answers: dict[str, Any], ai_prompt: str | None = None
+) -> list[str]:
     """Final review: each question with its answer, then ask to confirm.
 
     Nothing is completed here; only ``save`` marks the sheet and writes the view.
@@ -154,7 +288,9 @@ def _review_lines(steps: list[GuideStep], answers: dict[str, Any]) -> list[str]:
         shown = (
             markdown_lines(answer_text(answers.get(step.id)) or "") or "(sin respuesta)"
         )
-        lines.append(f"- **{step.question}:** {shown}")
+        lines.append(f"- {label_heading(step.question)} {shown}")
+    if ai_prompt is not None:
+        lines += ["", f"**{AI_PROMPT_TITLE}:** {ai_prompt}"]
     lines += [
         "",
         "Responde 'confirmar' para guardar la hoja y abrir tu vista.",
@@ -192,18 +328,18 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
         completed = get_completed_ids(base)
 
         lines = [
-            "## Worksheets Disponibles",
+            "## Hojas disponibles",
             "",
-            "| Worksheet | Decisión | Dificultad | Tiempo | Estado |",
+            "| Hoja | Decisión | Dificultad | Tiempo | Estado |",
             "|-----------|----------|-----------|--------|--------|",
         ]
         for w in all_ws:
             status = "✅" if w["id"] in completed else "⬜"
             lines.append(
-                f"| {w['name']} (`{w['id']}`) | "
-                f"{w.get('decision', '—')} | "
-                f"{w.get('difficulty', '—')} | "
-                f"{w.get('time_estimate', '—')} | {status} |"
+                f"| {name_es(w)} (`{w['id']}`) | "
+                f"{_decision_es(w)} | "
+                f"{_difficulty_es(w)} | "
+                f"{_time_es(w)} | {status} |"
             )
         lines.extend(
             [
@@ -223,9 +359,7 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
         ws_name = str(context.get("worksheet_name", ""))
         worksheet = find_worksheet(ws_name, base)
         if not worksheet:
-            available = [
-                w["name"] for w in list_worksheets(decision=None, base_path=base)
-            ]
+            available = [name_es(w) for w in list_worksheets(base_path=base)]
             return {
                 "output": "",
                 "artifacts": {},
@@ -237,7 +371,7 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
         completed = get_completed_ids(base)
         if worksheet["id"] in completed:
             return {
-                "output": f"Worksheet **{worksheet['name']}** ya está completado. Usa `/escala-worksheet list` para ver otros.",
+                "output": f"La hoja **{name_es(worksheet)}** ya está completada. Usa `/escala-worksheet list` para ver otros.",
                 "artifacts": {"worksheet": worksheet, "status": "completed"},
                 "errors": [],
             }
@@ -255,19 +389,19 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
 
         content = load_worksheet_content(worksheet, base)
         try:
-            steps, tips = _steps_and_tips(worksheet, content)
+            steps, tips = _steps_and_tips(worksheet, content, base)
         except _GuideError as exc:
             return _contract_error(str(exc))
         total_steps = len(steps) + 2  # information + steps + final review
 
         lines = [
-            f"## {worksheet['name']}",
+            f"## {name_es(worksheet)}",
             "",
-            f"**Decisión:** {worksheet.get('decision', '—')}",
-            f"**Dificultad:** {worksheet.get('difficulty', '—')}",
-            f"**Tiempo estimado:** {worksheet.get('time_estimate', '—')}",
+            f"**Decisión:** {_decision_es(worksheet)}",
+            f"**Dificultad:** {_difficulty_es(worksheet)}",
+            f"**Tiempo estimado:** {_time_es(worksheet)}",
             "",
-            f"{content.get('summary', '')}",
+            _summary_es(worksheet, content),
             "",
         ]
 
@@ -276,18 +410,27 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
                 [
                     "### Paso 1: Información General",
                     "",
-                    "Antes de empezar, confirma que tienes:",
                 ]
             )
+            derived = _derived_view_blocks(content, base)
+            if derived:
+                filled = any(i.answer is not None for b in derived for i in b.items)
+                intro = (
+                    "Esto ya llenaste:"
+                    if filled
+                    else "Todavía no llenas ninguna de estas piezas:"
+                )
+                lines += [intro, "", *markdown_blocks(derived, heading="####")]
+            lines.append("Antes de empezar, confirma que tienes:")
             if worksheet.get("prerequisites"):
                 lines.append(
                     "- [ ] Prerrequisitos completados: "
-                    + ", ".join(worksheet["prerequisites"])
+                    + ", ".join(_prerequisite_names(worksheet, base))
                 )
             lines.extend(
                 [
                     "- [ ] Datos actualizados de tu empresa",
-                    "- [ ] 1-2 horas sin interrupciones",
+                    f"- [ ] {_time_es(worksheet)} sin interrupciones",
                     "",
                     "Responde con 'listo' para empezar.",
                 ]
@@ -304,7 +447,9 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
                     )
                 )
             else:
-                lines.extend(_review_lines(steps, saved_fields))
+                lines.extend(
+                    _review_lines(steps, saved_fields, _ai_prompt_text(content))
+                )
 
         write_yaml(
             state_path,
@@ -362,7 +507,7 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
 
         content = load_worksheet_content(worksheet, base)
         try:
-            steps, tips = _steps_and_tips(worksheet, content)
+            steps, tips = _steps_and_tips(worksheet, content, base)
         except _GuideError as exc:
             return _contract_error(str(exc))
 
@@ -387,7 +532,7 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
                 "Completa este campo con tu información.",
             )
         else:
-            lines = _review_lines(steps, saved_fields)
+            lines = _review_lines(steps, saved_fields, _ai_prompt_text(content))
 
         return {
             "output": "\n".join(lines),
@@ -415,7 +560,7 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
         )
         content = load_worksheet_content(worksheet, base)
         try:
-            _steps_and_tips(worksheet, content)
+            _steps_and_tips(worksheet, content, base)
         except _GuideError as exc:
             return _contract_error(str(exc))
 
@@ -448,12 +593,17 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
 
         write_yaml(state_path, completed_data)
 
-        view = build_view(content, fields, made_on=date.today())
+        view = build_view(
+            content,
+            fields,
+            made_on=date.today(),
+            derived=_derived_view_blocks(content, base),
+        )
         html_path, md_path = save_view(base, view)
 
         return {
             "output": (
-                f"✅ **{worksheet['name']}** guardado como completado.\n"
+                f"✅ **{name_es(worksheet)}** guardada como completada.\n"
                 f"Vista lista: {html_path}"
             ),
             "artifacts": {

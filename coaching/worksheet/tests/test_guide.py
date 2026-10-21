@@ -140,7 +140,12 @@ def test_unknown_layout_is_rejected() -> None:
 
 def test_derived_from_shape_is_accepted() -> None:
     derived = [
-        {"sheet": "worksheet-core-customer", "fields": ["quien-es"], "into": "x"}
+        {
+            "sheet": "worksheet-core-customer",
+            "fields": ["quien-es"],
+            "into": "x",
+            "title": "Cliente central",
+        }
     ]
     guide = parse_guide(_sheet(derived_from=derived))
     assert guide is not None and guide.derived_from[0].required is True
@@ -184,7 +189,7 @@ def test_bad_next_sheet_is_rejected(bad: dict[str, Any]) -> None:
 
 def test_every_registered_sheet_loads_and_passes_the_contract() -> None:
     sheets = list_worksheets()
-    assert len(sheets) == 18
+    assert len(sheets) == 20
     for sheet in sheets:
         content = load_worksheet_content(sheet)
         assert content.get("metadata") or content.get("guide"), sheet["id"]

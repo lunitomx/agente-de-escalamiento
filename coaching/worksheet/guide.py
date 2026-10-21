@@ -107,13 +107,19 @@ class ViewSpec(BaseModel):
 
 
 class DerivedSource(BaseModel):
-    """Shape only: S87.7 validates it against the registry."""
+    """A saved sheet whose answers a canvas shows without asking again.
+
+    Here only the shape and self-derivation are checked; the registry and the
+    step ids are checked by ``coaching.worksheet.derived_errors`` (S87.7 D3),
+    because this module reads no files.
+    """
 
     model_config = ConfigDict(extra="forbid")
 
-    sheet: Text
-    fields: list[str]
-    into: Text
+    sheet: WorksheetId
+    fields: list[Slug] = Field(min_length=1)
+    into: Slug
+    title: Text
     required: bool = True
 
 
@@ -122,6 +128,7 @@ class ToolGuide(BaseModel):
 
     model_config = ConfigDict(extra="ignore")
 
+    id: str | None = None
     guide: Guide
     tips: list[Tip] = Field(min_length=3)
     ai_prompt: AiPrompt | None = None
@@ -132,6 +139,11 @@ class ToolGuide(BaseModel):
 
     @model_validator(mode="after")
     def _references_exist(self) -> ToolGuide:
+        for source in self.derived_from:
+            if source.sheet == self.id:
+                raise ValueError(
+                    f"una hoja no puede derivar de sí misma: {source.sheet}"
+                )
         step_ids = [step.id for step in self.guide.steps]
         known = set(step_ids)
         for tip in self.tips:

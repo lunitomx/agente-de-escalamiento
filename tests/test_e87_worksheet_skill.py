@@ -34,3 +34,10 @@ def test_skill_has_no_stale_paths() -> None:
     text = _text()
     assert ".escala/agent/validators/" not in text
     assert ".escala/coaching/" not in text
+
+
+def test_skill_says_the_canvas_reads_saved_sheets_and_shows_the_prompt() -> None:
+    text = _text()
+    assert "worksheet-strategy-canvas" in text
+    assert "lee las hojas guardadas" in text
+    assert "Prompt para tu asistente de IA" in text

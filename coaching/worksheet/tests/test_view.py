@@ -192,7 +192,7 @@ def test_next_sheet_shows_after_the_answer() -> None:
     assert page.index(answer) < page.index(bridge)
     md = render_markdown(view)
     assert (
-        "- **¿Quién es tu Cliente central, en 10 a 20 palabras?**: "
+        "- **¿Quién es tu Cliente central, en 10 a 20 palabras?** "
         "Dueños de fondas a 3 km que no pueden quedarse sin tortilla.\n"
         "- Siguiente paso: llena Caja de arena\n"
     ) in md
@@ -238,3 +238,37 @@ def test_bmc_canvas_has_ten_sections_and_four_bridges() -> None:
     md_order = [md.index(step) for _, step in bridges if step]
     assert html_order == sorted(html_order)
     assert md_order == sorted(md_order)
+
+
+def test_derived_blocks_missing_and_optional() -> None:
+    from coaching.worksheet.guide import parse_guide
+    from coaching.worksheet.view import DerivedSources, derived_blocks
+
+    canvas = find_worksheet("worksheet-strategy-canvas")
+    assert canvas is not None
+    guide = parse_guide(load_worksheet_content(canvas))
+    assert guide is not None
+    core = find_worksheet("worksheet-core-customer")
+    assert core is not None
+    sources: DerivedSources = {
+        "worksheet-core-customer": (
+            load_worksheet_content(core),
+            {"quien-es": "Fondas", "necesidad": ""},
+        )
+    }
+    blocks = derived_blocks(guide, sources)
+    assert [b.title for b in blocks] == [
+        "Cliente central",
+        "Promesa de marca",
+        "Actividades diferenciadoras",
+        "Caja de arena",
+    ]
+    first = blocks[0].items
+    assert first[0].label.startswith("¿Quién es tu Cliente central")
+    assert first[0].answer == "Fondas"
+    assert first[1].answer is None
+    assert first[1].missing == (
+        "Falta: ¿Qué necesidad de tu Cliente central llena tu producto o servicio? "
+        "Llena la hoja Cliente central con /escala-worksheet worksheet-core-customer"
+    )
+    assert blocks[1].items[0].label == "promesa-principal"

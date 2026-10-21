@@ -33,7 +33,7 @@ Muestra la tabla de `output`. Si el dueño ya nombró una hoja, salta al paso 2.
 
 ### Step 2: Empezar o reanudar
 
-Usa el `id` de la hoja que aparece en la tabla de `list`.
+Usa el `id` de la hoja que aparece en la tabla de `list`. También sirve su nombre en español, con o sin acentos (ej. `"promesa de marca"`).
 
 - Nueva: `{"action": "start", "worksheet_name": "worksheet-core-customer", "base_path": "."}`
 - En progreso: `{"action": "resume", "worksheet_name": "worksheet-core-customer", "base_path": "."}`
@@ -47,6 +47,8 @@ Muestra `output` tal como viene. En una hoja guiada cada paso trae:
 
 Si `errors` dice que la hoja no cumple el contrato, muéstralo y detente.
 
+El Lienzo de estrategia (`worksheet-strategy-canvas`) lee las hojas guardadas del dueño y no las cambia. Su paso 1 muestra "Esto ya llenaste:" y cada pieza que falta con el comando para llenarla.
+
 ### Step 3: Avanzar un paso
 
 Después de cada respuesta del dueño, guárdala con el id del paso:
@@ -55,7 +57,7 @@ JSON: `{"action": "step", "worksheet_name": "worksheet-core-customer", "fields":
 
 El primer `step` (después de "listo") no lleva `fields`. Muestra el siguiente paso de `output`.
 
-Después de la última respuesta, `output` trae la **Revisión Final**: cada pregunta con su respuesta. La hoja sigue en progreso. Muéstrala y espera:
+Después de la última respuesta, `output` trae la **Revisión Final**: cada pregunta con su respuesta y, si la hoja lo tiene, el **Prompt para tu asistente de IA**. La hoja sigue en progreso. Muéstrala completa, con el prompt, y espera:
 
 - Si el dueño quiere cambiar algo, manda un `step` con ese id en `fields`.
 - Si responde "confirmar", pasa al paso 4.

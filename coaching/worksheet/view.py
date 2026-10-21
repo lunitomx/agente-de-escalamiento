@@ -27,7 +27,7 @@ from coaching.dashboard.boards.render import (
     safe_text,
 )
 from coaching.journey.view import spanish_date
-from coaching.worksheet.guide import GuideStep, parse_guide
+from coaching.worksheet.guide import GuideStep, ToolGuide, parse_guide
 
 VIEWS_DIR = Path(".escala") / "my-company" / "vistas"
 
@@ -52,6 +52,7 @@ class ViewItem(BaseModel):
     answer: str | None
     how: str
     next_step: str | None = None
+    missing: str | None = None
 
 
 class ViewBlock(BaseModel):
@@ -73,6 +74,10 @@ class SheetView(BaseModel):
     layout: Literal["cards", "canvas"]
     made_on: date
     blocks: list[ViewBlock]
+    ai_prompt: str | None = None
+
+
+AI_PROMPT_TITLE = "Prompt para tu asistente de IA"
 
 
 def answer_text(value: Any) -> str | None:
@@ -120,10 +125,69 @@ def _item(step: GuideStep, answers: dict[str, Any]) -> ViewItem:
     )
 
 
+def missing_source_text(question: str, sheet_name: str, sheet_id: str) -> str:
+    """What the canvas says when a field of a source sheet is not saved (D4).
+
+    The owner reads the step's question and the sheet's Spanish name; the id
+    appears only inside the command.
+    """
+    ask = question if question.endswith(("?", ".", "!")) else f"{question}."
+    return f"Falta: {ask} Llena la hoja {sheet_name} con /escala-worksheet {sheet_id}"
+
+
+DerivedSources = dict[str, tuple[dict[str, Any], dict[str, Any] | None]]
+
+
+def derived_blocks(guide: ToolGuide, sources: DerivedSources) -> list[ViewBlock]:
+    """One block per ``derived_from`` entry, from the source sheets' answers (D5).
+
+    ``sources`` maps a sheet id to (its content, its saved answers or None when
+    it is not saved as completed). An optional sheet that is not saved is left
+    out; a required one shows one "Falta" line per field.
+    """
+    blocks: list[ViewBlock] = []
+    for source in guide.derived_from:
+        content, answers = sources.get(source.sheet, ({}, None))
+        if answers is None and not source.required:
+            continue
+        source_guide = parse_guide(content) if content else None
+        questions = (
+            {step.id: step.question for step in source_guide.guide.steps}
+            if source_guide is not None
+            else {}
+        )
+        items: list[ViewItem] = []
+        for field in source.fields:
+            answer = answer_text((answers or {}).get(field))
+            label = safe_text(questions.get(field, field))
+            items.append(
+                ViewItem(
+                    label=label,
+                    answer=answer,
+                    how="",
+                    missing=(
+                        missing_source_text(
+                            label, safe_text(source.title), source.sheet
+                        )
+                        if answer is None
+                        else None
+                    ),
+                )
+            )
+        blocks.append(ViewBlock(title=safe_text(source.title), items=items))
+    return blocks
+
+
 def build_view(
-    content: dict[str, Any], answers: dict[str, Any], made_on: date
+    content: dict[str, Any],
+    answers: dict[str, Any],
+    made_on: date,
+    derived: list[ViewBlock] | None = None,
 ) -> SheetView:
-    """Arrange a sheet and its answers into blocks; sections or one per step."""
+    """Arrange a sheet and its answers into blocks; sections or one per step.
+
+    ``derived`` blocks (a canvas reading other sheets) go before its own.
+    """
     guide = parse_guide(content)
     steps = guide.guide.steps if guide is not None else _legacy_steps(content)
     by_id = {step.id: step for step in steps}
@@ -140,14 +204,24 @@ def build_view(
             ViewBlock(title=safe_text(step.question), items=[_item(step, answers)])
             for step in steps
         ]
+    blocks = [*(derived or []), *blocks]
     title = str(content.get("name_es") or content.get("name") or content.get("id", ""))
+    prompt = guide.ai_prompt if guide is not None else None
     return SheetView(
         sheet_id=str(content.get("id", "")),
         title=safe_text(title),
         layout=guide.view.layout if guide is not None else "cards",
         made_on=made_on,
         blocks=blocks,
+        ai_prompt=safe_text(prompt.text) if prompt is not None else None,
     )
+
+
+def label_heading(label: str) -> str:
+    """A label in bold; adds ":" only when it does not end in ? . ! or : (D9)."""
+    if label.rstrip().endswith(("?", ".", "!", ":")):
+        return f"**{label}**"
+    return f"**{label}:**"
 
 
 def markdown_lines(text: str) -> str:
@@ -161,6 +235,8 @@ def markdown_lines(text: str) -> str:
 
 
 def _missing_text(item: ViewItem) -> str:
+    if item.missing is not None:
+        return item.missing
     label = item.label if item.label.endswith(("?", ".", "!")) else f"{item.label}."
     if item.how:
         return f"Falta: {label} Cómo llenarlo: {item.how}"
@@ -191,6 +267,12 @@ def render_html(view: SheetView) -> str:
     """Self-contained HTML: inline CSS, no script, no external reference."""
     e = html.escape
     blocks = "".join(_html_block(block) for block in view.blocks)
+    prompt = (
+        f"<section class='card prompt'><h2>{e(AI_PROMPT_TITLE)}</h2>"
+        f"<p class='answer'>{e(view.ai_prompt)}</p></section>"
+        if view.ai_prompt is not None
+        else ""
+    )
     if view.layout == "canvas":
         main_open, body = "<main class='wide'>", f"<div class='canvas'>{blocks}</div>"
     else:
@@ -202,25 +284,43 @@ def render_html(view: SheetView) -> str:
         f"</head><body>{main_open}"
         f"<p class='local'>{e(LOCAL_ONLY)}</p>"
         f"<h1>{e(view.title)}</h1><p class='muted'>{e(_subtitle(view))}</p>"
-        f"{body}"
+        f"{body}{prompt}"
         "</main></body></html>\n"
     )
 
 
-def render_markdown(view: SheetView) -> str:
-    """The same content as the HTML, for the chat and the ``.md`` twin."""
-    lines = [f"> {LOCAL_ONLY}", "", f"# {view.title}", "", _subtitle(view), ""]
-    for block in view.blocks:
-        lines += [f"## {block.title}", ""]
+def markdown_blocks(blocks: list[ViewBlock], heading: str = "##") -> list[str]:
+    """Markdown lines for blocks; shared by the view and the canvas step 1 (D6).
+
+    ``heading`` is the block title's level: ``##`` in the view, ``####`` under
+    the ``### Paso 1`` of the chat.
+    """
+    lines: list[str] = []
+    for block in blocks:
+        lines += [f"{heading} {block.title}", ""]
         for item in block.items:
             if item.answer is None:
                 lines.append(f"- {_missing_text(item)}")
             else:
                 answer = markdown_lines(html.escape(item.answer, quote=False))
-                lines.append(f"- **{item.label}**: {answer}")
+                lines.append(f"- {label_heading(item.label)} {answer}")
             if item.next_step is not None:
                 lines.append(f"- {item.next_step}")
         lines.append("")
+    return lines
+
+
+def render_markdown(view: SheetView) -> str:
+    """The same content as the HTML, for the chat and the ``.md`` twin."""
+    lines = [f"> {LOCAL_ONLY}", "", f"# {view.title}", "", _subtitle(view), ""]
+    lines += markdown_blocks(view.blocks)
+    if view.ai_prompt is not None:
+        lines += [
+            f"## {AI_PROMPT_TITLE}",
+            "",
+            html.escape(view.ai_prompt, quote=False),
+            "",
+        ]
     return "\n".join(lines)
 
 
