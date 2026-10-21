@@ -191,3 +191,33 @@ def test_missing_node_is_reported_even_in_pending() -> None:
     assert check_coverage(_map(pages), {}, FROZEN) == [
         "p. 9: nodo inexistente worksheet-x"
     ]
+
+
+# --- Tarea 4 · mapa real --------------------------------------------------
+
+COVERAGE_FILE = KNOWLEDGE / "strategy" / "workbook-coverage.yaml"
+
+# Solo puede encoger: las historias S87.4-S87.9 quitan páginas del archivo,
+# nunca se agregan aquí.
+FROZEN_PENDING: frozenset[int] = frozenset([*range(7, 27), *range(28, 37)])
+
+
+def _load_coverage() -> dict[str, Any]:
+    data: Any = yaml.safe_load(COVERAGE_FILE.read_text(encoding="utf-8"))
+    assert isinstance(data, dict)
+    return data
+
+
+def test_real_map_is_clean() -> None:
+    coverage = _load_coverage()
+    assert coverage["total_pages"] == 38
+    assert len(coverage["pages"]) == 38
+    errors = check_coverage(coverage, build_node_index(KNOWLEDGE), FROZEN_PENDING)
+    assert errors == []
+
+
+def test_real_pending_is_one_page_per_line() -> None:
+    lines = COVERAGE_FILE.read_text(encoding="utf-8").splitlines()
+    start = lines.index("pending:")
+    items = [line for line in lines[start + 1 :] if line.startswith("  - ")]
+    assert len(items) == len(_load_coverage()["pending"])
