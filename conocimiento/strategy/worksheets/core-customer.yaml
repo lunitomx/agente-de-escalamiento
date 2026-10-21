@@ -26,3 +26,51 @@ metadata:
   difficulty: intermediate
   time_estimate: "1-2 hours"
   frequency: annually
+guide:
+  steps:
+    - id: top-5-clientes
+      question: "¿Quiénes son tus 5 mejores clientes, con nombre, puesto y empresa?"
+      how: "Ordena tu lista de clientes por utilidad, no por ventas, y escribe los 5 de arriba como personas reales."
+      example: "Tortillería El Sol: Doña Mari (dueña, Fonda La Esquina), Don Beto (cocinero, Taquería El Güero), Laura (gerente, Comedor Industrial Norte), Pedro (dueño, Cocina Económica Lupita), Sofía (compras, Restaurante Los Arcos)."
+    - id: atributos
+      question: "¿Qué quieren, qué necesitan y qué temen esos clientes?"
+      how: "Para cada cliente anota un deseo, una necesidad y un miedo. Usa sus palabras, no las tuyas."
+      example: "Tortillería El Sol: quieren servir tortilla caliente a la hora de la comida; necesitan entrega puntual diaria; temen quedarse sin tortilla con el local lleno."
+    - id: top-atributos
+      question: "¿Cuáles son los 3 a 5 atributos que más comparten, en orden de importancia?"
+      how: "Marca lo que se repite en la lista anterior y ordénalo del más importante al menos importante."
+      example: "Tortillería El Sol: 1) entrega antes de las 13:00, 2) tortilla caliente y suave, 3) pedido fijo sin tener que llamar."
+    - id: quien-es
+      question: "¿Quién es tu Cliente central, en 10 a 20 palabras?"
+      how: "Una frase que describa a un grupo de personas reales: qué quieren lograr y qué temen."
+      example: "Tortillería El Sol: dueños de fondas y comedores a 3 km que no pueden quedarse sin tortilla caliente en la hora pico."
+    - id: necesidad
+      question: "¿Qué necesidad de tu Cliente central llena tu producto o servicio?"
+      how: "Una frase: el problema que tiene y qué cambia cuando te compra."
+      example: "Tortillería El Sol: la fonda de la esquina necesita tortilla caliente a las 13:00 todos los días, sin ir a buscarla."
+    - id: chequeo-promesa
+      question: "¿Tu promesa de marca llena esa necesidad, o solo un deseo?"
+      how: "Compara tu promesa actual con la necesidad del paso anterior. Si solo cubre un deseo, anota qué le falta."
+      example: "Tortillería El Sol: la promesa decía 'la tortilla más rica'; eso es un deseo. La necesidad es 'a tiempo, todos los días', y la promesa se ajusta a eso."
+tips:
+  - text: "Describe a tu Cliente central como una persona real: qué quiere lograr y qué teme. 'Hombres de 30 a 50' no te dice qué venderle ni cómo hablarle."
+    source: "work/research/e87-tips/core-customer.md#f1"
+    step: quien-es
+  - text: "Saca tu lista de clientes y ordénala por utilidad, no por ventas. Tu Cliente central se parece a los de arriba, no al cliente famoso que te gustaría tener."
+    source: "work/research/e87-tips/core-customer.md#f2"
+    step: top-5-clientes
+  - text: "Si tu descripción le queda igual a una panadería que a un despacho, es muy amplia. Escribe a quién NO atiendes; así tu equipo sabe a qué decir que no."
+    source: "work/research/e87-tips/core-customer.md#f3"
+    step: quien-es
+  - text: "Antes de dar por buena tu descripción, platica con 3 a 5 clientes de ese grupo y revisa sus compras. La opinión del equipo sola trae sesgos."
+    source: "work/research/e87-tips/core-customer.md#f4"
+    step: null
+view:
+  layout: cards
+  sections:
+    - title: "Tus mejores clientes"
+      steps: [top-5-clientes, atributos, top-atributos]
+    - title: "Tu Cliente central"
+      steps: [quien-es, necesidad]
+    - title: "Revisión de la promesa"
+      steps: [chequeo-promesa]
