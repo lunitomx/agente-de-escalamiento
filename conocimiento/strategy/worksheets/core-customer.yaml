@@ -55,7 +55,7 @@ guide:
 tips:
   - text: "Describe a tu Cliente central como una persona real: qué quiere lograr y qué teme. 'Hombres de 30 a 50' no te dice qué venderle ni cómo hablarle."
     source: "work/research/e87-tips/core-customer.md#f1"
-    step: quien-es
+    step: null
   - text: "Saca tu lista de clientes y ordénala por utilidad, no por ventas. Tu Cliente central se parece a los de arriba, no al cliente famoso que te gustaría tener."
     source: "work/research/e87-tips/core-customer.md#f2"
     step: top-5-clientes

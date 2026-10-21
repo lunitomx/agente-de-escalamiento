@@ -2,10 +2,16 @@
 Worksheet module — load from ontology, guide step by step, validate, save.
 """
 
+import sys
+from datetime import date
 from pathlib import Path
 from typing import Any
 
+from pydantic import ValidationError
+
 from ..core import read_yaml, write_yaml, ensure_dir
+from .guide import GuideStep, Tip, parse_guide
+from .view import build_view, open_command, save_view
 
 
 PACKAGE_ROOT = Path(__file__).resolve().parents[2]
@@ -59,7 +65,10 @@ def find_worksheet(
 
 
 def get_completed_ids(base_path: Path | None = None) -> list[str]:
-    """Get list of completed worksheet IDs from saved files."""
+    """Get IDs of worksheets saved with ``status: completed``.
+
+    An in-progress state file is not completed; counting it blocked ``resume``.
+    """
     wdir = (
         (base_path / ".escala" / "my-company" / "worksheets")
         if base_path
@@ -67,14 +76,11 @@ def get_completed_ids(base_path: Path | None = None) -> list[str]:
     )
     if not wdir.exists():
         return []
-    completed = []
+    completed: list[str] = []
     for f in wdir.glob("*.yaml"):
         data = read_yaml(f)
-        wid = data.get("worksheet_id") if data else f.stem
-        if wid:
-            completed.append(wid)
-        else:
-            completed.append(f.stem)
+        if data.get("status") == "completed":
+            completed.append(str(data.get("worksheet_id") or f.stem))
     return completed
 
 
@@ -89,6 +95,51 @@ def load_worksheet_content(
     full_path = knowledge_root(base_path) / node_path
     content = read_yaml(full_path)
     return {**worksheet, **content}
+
+
+class _GuideError(Exception):
+    """The sheet carries a guide that breaks the ToolGuide contract."""
+
+
+def _steps_and_tips(
+    worksheet: dict[str, Any], content: dict[str, Any]
+) -> tuple[list[GuideStep], list[Tip]]:
+    """Guided steps and tips, or one plain step per legacy ``metadata.fields`` text."""
+    try:
+        guide = parse_guide(content)
+    except ValidationError as exc:
+        message = "; ".join(str(err["msg"]) for err in exc.errors())
+        raise _GuideError(
+            f"La hoja {worksheet['id']} no cumple el contrato: {message}"
+        ) from exc
+    if guide is not None:
+        return list(guide.guide.steps), list(guide.tips)
+    fields = content.get("metadata", {}).get("fields", [])
+    steps = [
+        GuideStep.model_construct(id=str(f), question=str(f), how="", example="")
+        for f in fields
+    ]
+    return steps, []
+
+
+def _step_lines(
+    steps: list[GuideStep], tips: list[Tip], index: int, plain_hint: str
+) -> list[str]:
+    """Markdown for step ``index`` (0-based), shown as ``Paso index+2``."""
+    step = steps[index]
+    lines = [f"### Paso {index + 2}: {step.question}", ""]
+    if not step.how:
+        return [*lines, plain_hint]
+    lines += [f"**Cómo llenarlo:** {step.how}", f"**Ejemplo:** {step.example}"]
+    shown = [t for t in tips if t.step == step.id or (t.step is None and index == 0)]
+    if shown:
+        lines += ["**Tips:**"]
+        lines += [f"- {t.text} (fuente: {t.source})" for t in shown]
+    return lines
+
+
+def _contract_error(message: str) -> dict[str, Any]:
+    return {"output": "", "artifacts": {}, "errors": [message]}
 
 
 def run(context: dict[str, Any]) -> dict[str, Any]:
@@ -179,8 +230,11 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
             saved_fields = {}
 
         content = load_worksheet_content(worksheet, base)
-        fields = content.get("metadata", {}).get("fields", [])
-        total_steps = len(fields) + 1  # fields + confirmation step
+        try:
+            steps, tips = _steps_and_tips(worksheet, content)
+        except _GuideError as exc:
+            return _contract_error(str(exc))
+        total_steps = len(steps) + 1  # steps + confirmation step
 
         lines = [
             f"## {worksheet['name']}",
@@ -216,13 +270,14 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
             )
         else:
             step_idx = current_step - 1
-            if step_idx < len(fields):
+            if step_idx < len(steps):
                 lines.extend(
-                    [
-                        f"### Paso {current_step + 1}: {fields[step_idx]}",
-                        "",
+                    _step_lines(
+                        steps,
+                        tips,
+                        step_idx,
                         "Completa este campo. Responde con tu información.",
-                    ]
+                    )
                 )
             else:
                 lines.extend(
@@ -289,7 +344,10 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
         current_step += 1
 
         content = load_worksheet_content(worksheet, base)
-        fields = content.get("metadata", {}).get("fields", [])
+        try:
+            steps, tips = _steps_and_tips(worksheet, content)
+        except _GuideError as exc:
+            return _contract_error(str(exc))
 
         if current_step >= total_steps:
             completed_data = {
@@ -342,13 +400,13 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
                 },
             )
 
-            if current_step < len(fields):
-                next_field = fields[current_step]
-                lines = [
-                    f"### Paso {current_step + 1}: {next_field}",
-                    "",
+            if current_step <= len(steps):
+                lines = _step_lines(
+                    steps,
+                    tips,
+                    current_step - 1,
                     "Completa este campo con tu información.",
-                ]
+                )
             else:
                 lines = [
                     "### Revisión Final",
@@ -387,6 +445,12 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
         state_path = (
             base / ".escala" / "my-company" / "worksheets" / f"{worksheet['id']}.yaml"
         )
+        content = load_worksheet_content(worksheet, base)
+        try:
+            _steps_and_tips(worksheet, content)
+        except _GuideError as exc:
+            return _contract_error(str(exc))
+
         state = read_yaml(state_path)
         fields = state.get("fields", {})
 
@@ -416,13 +480,24 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
 
         write_yaml(state_path, completed_data)
 
+        view = build_view(content, fields, made_on=date.today())
+        html_path, md_path = save_view(base, view)
+
         return {
-            "output": f"✅ **{worksheet['name']}** guardado como completado.",
+            "output": (
+                f"✅ **{worksheet['name']}** guardado como completado.\n"
+                f"Vista lista: {html_path}"
+            ),
             "artifacts": {
                 "worksheet": worksheet,
                 "completed_data": completed_data,
                 "state_path": str(state_path),
                 "backup_path": str(backup_path) if backup_path else None,
+                "view": {
+                    "html": str(html_path),
+                    "md": str(md_path),
+                    "open_cmd": open_command(html_path, sys.platform),
+                },
             },
             "errors": [],
         }
