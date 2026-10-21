@@ -27,10 +27,12 @@ sources:
   - title: "Sharpen Your Customer Focus (Verne Harnish, 2010)"
     url: https://scalingup.com/blog/sharpen-your-customer-focus
     origin: scaling-up
+    family: scaling-up
     kind: article
   - title: "Documenting Your Core Customer (Rhythm Systems)"
     url: https://www.rhythmsystems.com/knowledge/documenting-your-core-customer
     origin: rhythm-systems
+    family: scaling-up
     kind: practitioner
   - title: "7 Mistakes to Avoid When Building Your Ideal Customer Profile (AdRoll)"
     url: https://www.adroll.com/blog/7-mistakes-to-avoid-when-building-an-ideal-customer-profile
@@ -61,6 +63,7 @@ sources:
   - title: "How to get total clarity on the identity of your core customer (Monkhouse & Company)"
     url: https://www.monkhouseandcompany.com/blog/how-to-get-total-clarity-on-the-identity-of-your-core-customer/
     origin: monkhouse
+    family: scaling-up
     kind: practitioner
   - title: "5 Big Mistakes to Avoid When Creating an Ideal Customer Profile (HubSpot)"
     url: https://blog.hubspot.com/sales/5-big-mistakes-to-avoid-when-creating-an-ideal-customer-profile
@@ -73,6 +76,7 @@ sources:
   - title: "Core Customer Value: 3 Steps to Identify and Define Your Core Customers (Rhythm Systems)"
     url: https://www.rhythmsystems.com/blog/bid/117791/Execute-For-Your-Core-Customer
     origin: rhythm-systems
+    family: scaling-up
     kind: practitioner
 ```
 
@@ -103,6 +107,7 @@ sources:
   - title: "Core Customer Value: 3 Steps to Identify and Define Your Core Customers (Rhythm Systems)"
     url: https://www.rhythmsystems.com/blog/bid/117791/Execute-For-Your-Core-Customer
     origin: rhythm-systems
+    family: scaling-up
     kind: practitioner
 ```
 
@@ -136,6 +141,7 @@ sources:
   - title: "How to get total clarity on the identity of your core customer (Monkhouse & Company)"
     url: https://www.monkhouseandcompany.com/blog/how-to-get-total-clarity-on-the-identity-of-your-core-customer/
     origin: monkhouse
+    family: scaling-up
     kind: practitioner
 ```
 
@@ -185,11 +191,13 @@ workbook_pages: [15]
 sources:
   - title: "How to Write an Annual Plan for Growth (Dominic Monkhouse, Scaling Up Coaches)"
     url: https://coaches.scalingup.com/blog/blog-post-title-one-lpc9d-ewsb7-kgcg3
-    origin: monkhouse
+    origin: scaling-up
+    family: scaling-up
     kind: practitioner
   - title: "Core Customer Value: 3 Steps to Identify and Define Your Core Customers (Rhythm Systems)"
     url: https://www.rhythmsystems.com/blog/bid/117791/Execute-For-Your-Core-Customer
     origin: rhythm-systems
+    family: scaling-up
     kind: practitioner
 ```
 

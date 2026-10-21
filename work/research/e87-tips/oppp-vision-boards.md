@@ -31,14 +31,17 @@ sources:
   - title: "Introducing the One Page Personal Plan (Monkhouse & Company)"
     url: https://monkhouseandcompany.com/blog/introducing-the-one-page-personal-plan
     origin: monkhouse
+    family: scaling-up
     kind: practitioner
   - title: "Goals Research Summary (Gail Matthews, Dominican University of California)"
     url: https://www.dominican.edu/sites/default/files/2020-02/gailmatthews-harvard-goals-researchsummary.pdf
     origin: dominican-university
+    family: matthews-study
     kind: academic
   - title: "Make Rocks Rock (Martin Quinn, EOS Worldwide)"
     url: https://www.eosworldwide.com/blog/make-rocks-rock
     origin: eos
+    family: eos
     kind: practitioner
 ```
 
@@ -54,20 +57,23 @@ empresa, pero aplica igual a las personales.
 id: f2
 tip: "Comparte tu plan con una persona de confianza y mándale un avance corto cada semana. Escribir y rendir cuentas sube mucho lo que logras."
 step: null
-triangulated: true
+triangulated: false  # S87.3 review: <3 familias independientes (campo family)
 workbook_pages: [32]
 sources:
   - title: "Goals Research Summary (Gail Matthews, Dominican University of California)"
     url: https://www.dominican.edu/sites/default/files/2020-02/gailmatthews-harvard-goals-researchsummary.pdf
     origin: dominican-university
+    family: matthews-study
     kind: academic
   - title: "The 3 Things That 'Really' Make Goals a Reality (Stacey Tisdale, Black Enterprise, 2016)"
     url: https://blackenterprise.com/money/the-3-things-that-really-make-goals-reality/
     origin: black-enterprise
+    family: matthews-study
     kind: article
   - title: "Introducing the One Page Personal Plan (Monkhouse & Company)"
     url: https://monkhouseandcompany.com/blog/introducing-the-one-page-personal-plan
     origin: monkhouse
+    family: scaling-up
     kind: practitioner
 ```
 
@@ -90,10 +96,12 @@ sources:
   - title: "Best New Year's Resolution? (Jim Collins, USA Today, 2003)"
     url: https://www.jimcollins.com/article_topics/articles/best-new-years.html
     origin: jim-collins
+    family: collins
     kind: article
   - title: "Introducing the One Page Personal Plan (Monkhouse & Company)"
     url: https://monkhouseandcompany.com/blog/introducing-the-one-page-personal-plan
     origin: monkhouse
+    family: scaling-up
     kind: practitioner
   - title: "Stop Doing That! (Dan Miller, 48 Days)"
     url: https://www.48days.com/stop-doing-that-3/
@@ -114,20 +122,23 @@ cerca del 15% de lo que hace para abrir espacio.
 id: f4
 tip: "No te quedes solo con la foto del sueño. Junto a cada imagen anota el obstáculo principal y un plan: 'Si pasa X, entonces haré Y'."
 step: null
-triangulated: true
+triangulated: false  # S87.3 review: <3 familias independientes (campo family)
 workbook_pages: [33]
 sources:
   - title: "Why positive fantasies make your dreams less likely to come true (Christian Jarrett, BPS Research Digest, 2011)"
     url: https://bps.org.uk/research-digest/why-positive-fantasies-make-your-dreams-less-likely-come-true
     origin: bps
+    family: oettingen
     kind: academic
   - title: "Can Positive Thinking Really Make Dreams Come True? (Jill Suttie, Greater Good Magazine, 2014)"
     url: https://greatergood.berkeley.edu/article/item/can_positive_thinking_really_make_dreams_come_true
     origin: greater-good
+    family: oettingen
     kind: article
   - title: "WOOP: Practice (WOOP my life)"
     url: https://woopmylife.org/en/practice
     origin: woop
+    family: oettingen
     kind: practitioner
 ```
 
@@ -156,6 +167,7 @@ sources:
   - title: "Introducing the One Page Personal Plan (Monkhouse & Company)"
     url: https://monkhouseandcompany.com/blog/introducing-the-one-page-personal-plan
     origin: monkhouse
+    family: scaling-up
     kind: practitioner
 ```
 
@@ -163,3 +175,10 @@ Dos orígenes. El estudio de Harvard siguió a personas casi 80 años: la calida
 de sus relaciones a los 50 predijo su salud a los 80 mejor que el colesterol.
 Monkhouse arranca su plan con la prueba del funeral: qué quieres que digan de
 ti. Falta un tercer origen.
+
+## Nota de revisión (S87.3)
+
+La prueba cuenta orígenes por familia (`family`). f2 tiene dos textos del mismo
+estudio de Matthews más Monkhouse (2 familias). f4 tiene tres textos de la línea
+de investigación de Oettingen (1 familia). Los dos pasan a no triangulados.
+Falta una tercera fuente independiente antes de que S87.9 copie estos tips.

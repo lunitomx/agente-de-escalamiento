@@ -12,8 +12,8 @@ question: "¿Cómo se llena bien la Caja de arena (dónde, qué 3-5 categorías,
 Sigue al workbook (p. 28), no a la tarjeta vieja `tools/sandbox.yaml`. Son cuatro
 preguntas: DÓNDE vendes (zonas), QUÉ vendes (3 a 5 categorías), por qué CANALES
 y qué CAMBIOS esperas a 3-5 años. Fuentes: familia Scaling Up (Harnish en
-scalingup.com; Rhythm Systems como origen aparte), "Playing to Win" (Lafley y
-Martin) por medio de dos resúmenes independientes, BCG y literatura de
+scalingup.com; Rhythm Systems en la misma familia), "Playing to Win" (Lafley y
+Martin) por medio de dos resúmenes que cuentan como una familia, BCG y literatura de
 planeación por escenarios. Cada URL se abrió al investigar (2026-10-20).
 
 <a id="f1"></a>
@@ -23,20 +23,23 @@ planeación por escenarios. Cada URL se abrió al investigar (2026-10-20).
 id: f1
 tip: "Tu Caja de arena debe alcanzar para tu meta de 3 a 5 años, pero ser lo bastante chica para decir que no. Si cabe todo, no estás eligiendo."
 step: null
-triangulated: true
+triangulated: false  # S87.3 review: <3 familias independientes (campo family)
 workbook_pages: [28]
 sources:
   - title: "Determining Your Sandbox (Rhythm Systems)"
     url: https://www.rhythmsystems.com/knowledge/determining-your-sandbox
     origin: rhythm-systems
+    family: scaling-up
     kind: practitioner
   - title: "Playing to Win: How Strategy Really Works (Farnam Street)"
     url: https://fs.blog/playing-to-win-how-strategy-really-works/
     origin: farnam-street
+    family: playing-to-win
     kind: book
   - title: "Playing to Win - Book summary (Readingraphics)"
     url: https://readingraphics.com/book-summary-playing-to-win/
     origin: readingraphics
+    family: playing-to-win
     kind: book
 ```
 
@@ -87,6 +90,7 @@ sources:
   - title: "More Sales Channels, More Sales (Verne Harnish, 2012)"
     url: https://scalingup.com/blog/more-sales-channels-more-sales
     origin: scaling-up
+    family: scaling-up
     kind: article
   - title: "Don't Let Channel Conflicts Limit E-Commerce Sales (BCG, 2021)"
     url: https://www.bcg.com/publications/2021/mitigating-e-commerce-channel-conflicts

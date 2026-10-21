@@ -11,7 +11,7 @@ question: "¿Qué distingue una Promesa de marca que se cumple de una que es esl
 
 Pregunta: ¿qué hacen bien las empresas cuya promesa se cumple, y qué error es
 común? Fuentes: familia Scaling Up (blog de scalingup.com y su red de coaches),
-Monkhouse (coach de Scaling Up, origen aparte), literatura de garantías de
+Monkhouse (coach de Scaling Up, misma familia: `family: scaling-up`), literatura de garantías de
 servicio (Hart, HBR) y de servicio (Frei y Morriss, HBS). Cada URL se abrió al
 investigar (2026-10-20).
 
@@ -28,6 +28,7 @@ sources:
   - title: "3 Steps to Creating a Brand Promise that Attracts Customers and Cements Loyalty (Mark Fenner, Scaling Up Coaches)"
     url: https://coaches.scalingup.com/blog/brand-promise-that-attracts-customers
     origin: scaling-up
+    family: scaling-up
     kind: practitioner
   - title: "Building Your Company's Brand Promise (Gary Elekes, Contractor Magazine, 2019)"
     url: https://www.contractormag.com/best-practices/building-your-company-s-brand-promise
@@ -61,10 +62,12 @@ sources:
   - title: "3 Steps to Creating a Brand Promise that Attracts Customers and Cements Loyalty (Mark Fenner, Scaling Up Coaches)"
     url: https://coaches.scalingup.com/blog/brand-promise-that-attracts-customers
     origin: scaling-up
+    family: scaling-up
     kind: practitioner
   - title: "How brand promises can guarantee unparalleled growth (Dominic Monkhouse)"
     url: https://www.monkhouseandcompany.com/resources/blog/how-brand-promises-can-guarantee-unparalleled-growth/
     origin: monkhouse
+    family: scaling-up
     kind: practitioner
   - title: "Promises of Brand Strategy and Design for Six Sigma (G. Pincus, iSixSigma)"
     url: https://www.isixsigma.com/dfss/promises-brand-strategy-and-design-six-sigma/
@@ -88,24 +91,28 @@ de verificación medida. Leifer sugiere cliente misterioso y encuestas.
 id: f3
 tip: "Garantiza al menos una promesa y que te duela si fallas: descuento o reposición automática, sin que el cliente tenga que pelear para cobrarla."
 step: null
-triangulated: true
+triangulated: false  # S87.3 review: <3 familias independientes (campo family)
 workbook_pages: [19]
 sources:
   - title: "Power of Unconditional Service Guarantees (Christopher W.L. Hart, HBR, 1988)"
     url: https://store.hbr.org/product/power-of-unconditional-service-guarantees/88405
     origin: hbr
+    family: hart
     kind: academic
   - title: "Service guarantee (Wikipedia; criterios de Hart)"
     url: https://en.wikipedia.org/wiki/Service_guarantee
     origin: wikipedia
+    family: hart
     kind: article
   - title: "How brand promises can guarantee unparalleled growth (Dominic Monkhouse)"
     url: https://www.monkhouseandcompany.com/resources/blog/how-brand-promises-can-guarantee-unparalleled-growth/
     origin: monkhouse
+    family: scaling-up
     kind: practitioner
   - title: "3 Steps to Creating a Brand Promise that Attracts Customers and Cements Loyalty (Mark Fenner, Scaling Up Coaches)"
     url: https://coaches.scalingup.com/blog/brand-promise-that-attracts-customers
     origin: scaling-up
+    family: scaling-up
     kind: practitioner
 ```
 
@@ -122,25 +129,28 @@ garantizada.
 id: f4
 tip: "No puedes ser el más rápido, el más barato y el más personal a la vez. Decide qué sacrificas (ej. horario corto) para cumplir tu promesa principal."
 step: null
-triangulated: true
+triangulated: false  # S87.3 review: <3 familias independientes (campo family)
 workbook_pages: [19]
 sources:
   - title: "Why is Great Service So Rare? (Dorie Clark, entrevista a Frances Frei)"
     url: https://dorieclark.com/blog/great-service/
     origin: dorie-clark
+    family: frei
     kind: article
   - title: "Uncommon Service (Mind Tools, resumen del libro de Frei y Morriss)"
     url: https://www.mindtools.com/a9mnh3c/uncommon-service/
     origin: mindtools
+    family: frei
     kind: article
   - title: "Uncommon Service (getAbstract, resumen en español)"
     url: https://www.getabstract.com/es/resumen/uncommon-service/20149
     origin: getabstract
+    family: frei
     kind: book
 ```
 
 Los tres orígenes resumen el mismo libro (Frei y Morriss, HBR Press, 2012), así
-que la independencia es de lectura, no de idea. La idea encaja con las
+que cuentan como una sola familia (`family: frei`) y el hallazgo queda no triangulado. La idea encaja con las
 compensaciones que pide el workbook (p. 19). Ejemplo de Frei: un hospital puede
 dar cita el mismo día o dar al especialista famoso, pero no ambas cosas.
 
@@ -157,6 +167,7 @@ sources:
   - title: "The Simple Words On These Wrist Bands Raised One Company's Profits By 31% (Scaling Up)"
     url: https://scalingup.com/blog/the-simple-words-on-these-wrist-bands-raised-one-companys-profits-by-31-in-one-year
     origin: scaling-up
+    family: scaling-up
     kind: case
   - title: "The Best Brand Promise Examples We've Seen (Kevin Leifer, CustomerThink, 2016)"
     url: https://customerthink.com/the-best-brand-promise-examples-weve-seen/
@@ -187,6 +198,7 @@ sources:
   - title: "How brand promises can guarantee unparalleled growth (Dominic Monkhouse)"
     url: https://www.monkhouseandcompany.com/resources/blog/how-brand-promises-can-guarantee-unparalleled-growth/
     origin: monkhouse
+    family: scaling-up
     kind: practitioner
   - title: "Brand promise: What it is, why it matters, and how to make it real (Fabrik)"
     url: https://fabrikbrands.com/insights/strategy/brand-promise

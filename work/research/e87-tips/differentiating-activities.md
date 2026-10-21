@@ -30,6 +30,7 @@ sources:
   - title: "How an activity fit map will set your business apart from your competitors (Monkhouse & Company)"
     url: https://monkhouseandcompany.com/blog/how-an-activity-fit-map-will-set-your-business-apart-from-your-competitors
     origin: monkhouse
+    family: scaling-up
     kind: practitioner
   - title: "Strategic Fit: What It Is and How to Achieve It (Rework)"
     url: https://resources.rework.com/vi/libraries/strategic-management/strategic-fit
@@ -42,6 +43,7 @@ sources:
   - title: "Competitive Strategy (Farnam Street, extracto de Playing to Win)"
     url: https://fs.blog/competitive-strategy/
     origin: farnam-street
+    family: playing-to-win
     kind: book
 ```
 
@@ -72,6 +74,7 @@ sources:
   - title: "How an activity fit map will set your business apart from your competitors (Monkhouse & Company)"
     url: https://monkhouseandcompany.com/blog/how-an-activity-fit-map-will-set-your-business-apart-from-your-competitors
     origin: monkhouse
+    family: scaling-up
     kind: practitioner
 ```
 
@@ -88,20 +91,23 @@ cobrar de menos y entregar de más.
 id: f3
 tip: "Pregunta qué actividades valora tu Cliente central y cuáles hacen posible tu Promesa de marca. Si una actividad no sirve a ninguna de las dos, no es diferenciadora."
 step: null
-triangulated: true
+triangulated: false  # S87.3 review: <3 familias independientes (campo family)
 workbook_pages: [22, 25]
 sources:
   - title: "How an activity fit map will set your business apart from your competitors (Monkhouse & Company)"
     url: https://monkhouseandcompany.com/blog/how-an-activity-fit-map-will-set-your-business-apart-from-your-competitors
     origin: monkhouse
+    family: scaling-up
     kind: practitioner
   - title: "3 Steps to Creating a Brand Promise that Attracts Customers and Cements Loyalty (Mark Fenner, Scaling Up Coaches)"
     url: https://coaches.scalingup.com/blog/brand-promise-that-attracts-customers
     origin: scaling-up
+    family: scaling-up
     kind: practitioner
   - title: "Competitive Strategy (Farnam Street, extracto de Playing to Win)"
     url: https://fs.blog/competitive-strategy/
     origin: farnam-street
+    family: playing-to-win
     kind: book
 ```
 
@@ -128,6 +134,7 @@ sources:
   - title: "Competitive Strategy (Farnam Street, extracto de Playing to Win)"
     url: https://fs.blog/competitive-strategy/
     origin: farnam-street
+    family: playing-to-win
     kind: book
   - title: "Strategic Fit: What It Is and How to Achieve It (Rework)"
     url: https://resources.rework.com/vi/libraries/strategic-management/strategic-fit
@@ -162,6 +169,7 @@ sources:
   - title: "How an activity fit map will set your business apart from your competitors (Monkhouse & Company)"
     url: https://monkhouseandcompany.com/blog/how-an-activity-fit-map-will-set-your-business-apart-from-your-competitors
     origin: monkhouse
+    family: scaling-up
     kind: practitioner
 ```
 

@@ -13,7 +13,7 @@ Pregunta: ¿qué separa un Resumen de visión que guía decisiones de una hoja d
 frases bonitas? La hoja junta valores, propósito, promesas, meta grande a 10-25
 años (BHAG), prioridades a 3-5 años, a 1 año y del trimestre, y KPIs (workbook
 p. 36). Fuentes: Jim Collins (creador del BHAG, con Porras), familia Scaling Up
-(Harnish en scalingup.com; Rhythm Systems como origen aparte), Lencioni (HBR,
+(Harnish en scalingup.com; Rhythm Systems en la misma familia), Lencioni (HBR,
 2002) y literatura de prioridades trimestrales de EOS. Cada URL se abrió al
 investigar (2026-10-20).
 
@@ -30,14 +30,17 @@ sources:
   - title: "Vision Framework, Core Ideology Breakout Session (Jim Collins)"
     url: https://www.jimcollins.com/pdf/Vision_Framework.pdf
     origin: jim-collins
+    family: collins
     kind: practitioner
   - title: "7 Steps To Fine-Tune Your Core Values (Rhythm Systems)"
     url: https://www.rhythmsystems.com/blog/core-values-steps
     origin: rhythm-systems
+    family: scaling-up
     kind: practitioner
   - title: "One Powerful Corporate Culture (Verne Harnish, 2010)"
     url: https://scalingup.com/blog/one-powerful-corporate-culture
     origin: scaling-up
+    family: scaling-up
     kind: article
   - title: "Make Your Values Mean Something (Patrick Lencioni, HBR 2002, en The Table Group)"
     url: https://www.tablegroup.com/harvard-business-review_-make-your-values-mean-something/
@@ -58,20 +61,23 @@ de Enron (comunicación, respeto, integridad, excelencia) no significaba nada.
 id: f2
 tip: "Escribe qué haces y pregunta '¿por qué importa?' hasta cinco veces. Tu propósito debe seguir vigente aunque mañana cambies de productos."
 step: null
-triangulated: true
+triangulated: false  # S87.3 review: <3 familias independientes (campo family)
 workbook_pages: [36]
 sources:
   - title: "Have You Defined Your Company Core Purpose Statement? (Rhythm Systems)"
     url: https://www.rhythmsystems.com/blog/define-core-purpose
     origin: rhythm-systems
+    family: scaling-up
     kind: practitioner
   - title: "Vision Framework, Core Ideology Breakout Session (Jim Collins)"
     url: https://www.jimcollins.com/pdf/Vision_Framework.pdf
     origin: jim-collins
+    family: collins
     kind: practitioner
   - title: "Building Your Company's Vision, resumen (Lytle Center, Abilene Christian University, 2021)"
     url: https://blogs.acu.edu/lytlecenter/?p=1371
     origin: acu
+    family: collins
     kind: academic
 ```
 
@@ -88,20 +94,23 @@ persigue y nunca se alcanza. Matiz: ACU resume el mismo artículo de Collins.
 id: f3
 tip: "Escribe tu meta a 10-25 años como un número con fecha y en la unidad que mueve tu negocio (ej. sucursales, clientes, pedidos). Así sabes si ya llegaste."
 step: null
-triangulated: true
+triangulated: false  # S87.3 review: <3 familias independientes (campo family)
 workbook_pages: [36]
 sources:
   - title: "2 Critical Vision Decisions: Profit Per X and BHAG (Verne Harnish, 2013)"
     url: https://scalingup.com/growth-guy-articles/2-critical-vision-decisions-profit-per-x-and-bhag/
     origin: scaling-up
+    family: scaling-up
     kind: article
   - title: "What Drives Your BHAG's Economic Engine? Profit per X Examples (Rhythm Systems)"
     url: https://www.rhythmsystems.com/blog/bhag-profit-examples
     origin: rhythm-systems
+    family: scaling-up
     kind: practitioner
   - title: "BHAG (Jim Collins)"
     url: https://www.jimcollins.com/concepts/bhag.html
     origin: jim-collins
+    family: collins
     kind: practitioner
 ```
 
@@ -118,20 +127,23 @@ decirse fácil.
 id: f4
 tip: "Escoge de 3 a 5 prioridades del trimestre y una que manda. Cada una con un solo dueño y una medida de 'hecho'. Si todo es prioridad, nada lo es."
 step: null
-triangulated: true
+triangulated: false  # S87.3 review: <3 familias independientes (campo family)
 workbook_pages: [34, 35, 36]
 sources:
   - title: "One-Page Strategic Plan (OPSP): The Rockefeller Habits Framework (Rhythm Systems)"
     url: https://www.rhythmsystems.com/blog/4-pitfalls-to-avoid-when-implementing-the-rockefeller-habits-priorities
     origin: rhythm-systems
+    family: scaling-up
     kind: practitioner
   - title: "EOS Rocks Explained: How to Set and Implement Quarterly Priorities (Ninety)"
     url: https://www.ninety.io/blog/how-to-implement-eos-rocks-for-business-success
     origin: ninety
+    family: eos
     kind: article
   - title: "Make Rocks Rock (Martin Quinn, EOS Worldwide)"
     url: https://www.eosworldwide.com/blog/make-rocks-rock
     origin: eos
+    family: eos
     kind: practitioner
 ```
 
@@ -147,20 +159,23 @@ se puso veinte y terminó una; "si hay más de un dueño, no hay dueño".
 id: f5
 tip: "Define antes cuándo un KPI está en verde, amarillo o rojo. Revísalo cada semana en tu junta; si está en rojo, dilo ahí mismo y no al cierre del trimestre."
 step: null
-triangulated: true
+triangulated: false  # S87.3 review: <3 familias independientes (campo family)
 workbook_pages: [36]
 sources:
   - title: "One-Page Strategic Plan (OPSP): The Rockefeller Habits Framework (Rhythm Systems)"
     url: https://www.rhythmsystems.com/blog/4-pitfalls-to-avoid-when-implementing-the-rockefeller-habits-priorities
     origin: rhythm-systems
+    family: scaling-up
     kind: practitioner
   - title: "EOS Rocks Explained: How to Set and Implement Quarterly Priorities (Ninety)"
     url: https://www.ninety.io/blog/how-to-implement-eos-rocks-for-business-success
     origin: ninety
+    family: eos
     kind: article
   - title: "Make Rocks Rock (Martin Quinn, EOS Worldwide)"
     url: https://www.eosworldwide.com/blog/make-rocks-rock
     origin: eos
+    family: eos
     kind: practitioner
 ```
 
@@ -169,3 +184,11 @@ KPIs cada semana si se puede. Ninety y Quinn reportan avance en la junta
 semanal para que los problemas salgan pronto. Quinn cuenta como error ocultar
 que una prioridad va atrasada. Matiz: Ninety y EOS hablan del mismo método
 (EOS), aunque son empresas distintas.
+
+## Nota de revisión (S87.3)
+
+La prueba cuenta orígenes por familia (`family`): la red Scaling Up
+(scalingup.com, Rhythm Systems, Monkhouse) es una familia; EOS y Ninety, otra;
+Collins y los resúmenes de su artículo, otra. Con esa regla, f2 a f5 quedan con
+2 familias y pasan a no triangulados. Falta buscar una tercera fuente
+independiente para cada uno antes de que S87.8 copie estos tips.

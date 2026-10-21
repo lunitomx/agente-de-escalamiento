@@ -23,24 +23,28 @@ abrió al investigar (2026-10-20).
 id: f1
 tip: "Llena en orden: Caja de arena y Cliente central primero, luego la Promesa de marca y al final las Actividades diferenciadoras que la hacen posible."
 step: null
-triangulated: true
+triangulated: false  # S87.3 review: <3 familias independientes (campo family)
 workbook_pages: [7, 12]
 sources:
   - title: "Determining Your Sandbox (Rhythm Systems)"
     url: https://www.rhythmsystems.com/knowledge/determining-your-sandbox
     origin: rhythm-systems
+    family: scaling-up
     kind: practitioner
   - title: "How brand promises can guarantee unparalleled growth (Dominic Monkhouse)"
     url: https://www.monkhouseandcompany.com/resources/blog/how-brand-promises-can-guarantee-unparalleled-growth/
     origin: monkhouse
+    family: scaling-up
     kind: practitioner
   - title: "3 Steps to Creating a Brand Promise that Attracts Customers and Cements Loyalty (Mark Fenner, Scaling Up Coaches)"
     url: https://coaches.scalingup.com/blog/brand-promise-that-attracts-customers
     origin: scaling-up
+    family: scaling-up
     kind: practitioner
   - title: "Playing to Win: How Strategy Really Works (Farnam Street)"
     url: https://fs.blog/playing-to-win-how-strategy-really-works/
     origin: farnam-street
+    family: playing-to-win
     kind: book
 ```
 
@@ -62,10 +66,12 @@ sources:
   - title: "How an activity fit map will set your business apart from your competitors (Monkhouse & Company)"
     url: https://monkhouseandcompany.com/blog/how-an-activity-fit-map-will-set-your-business-apart-from-your-competitors
     origin: monkhouse
+    family: scaling-up
     kind: practitioner
   - title: "3 Steps to Creating a Brand Promise that Attracts Customers and Cements Loyalty (Mark Fenner, Scaling Up Coaches)"
     url: https://coaches.scalingup.com/blog/brand-promise-that-attracts-customers
     origin: scaling-up
+    family: scaling-up
     kind: practitioner
   - title: "#46 Fit, Understanding Michael Porter (Pandith Jantakahalli, 2020)"
     url: https://jppandith.substack.com/p/46-fit-understanding-michael-porter
@@ -95,10 +101,12 @@ sources:
   - title: "Playing to Win - Book summary (Readingraphics)"
     url: https://readingraphics.com/book-summary-playing-to-win/
     origin: readingraphics
+    family: playing-to-win
     kind: book
   - title: "Playing to Win: How Strategy Really Works (Farnam Street)"
     url: https://fs.blog/playing-to-win-how-strategy-really-works/
     origin: farnam-street
+    family: playing-to-win
     kind: book
   - title: "Strategic Fit: What It Is and How to Achieve It (Rework)"
     url: https://resources.rework.com/vi/libraries/strategic-management/strategic-fit
@@ -107,6 +115,7 @@ sources:
   - title: "How an activity fit map will set your business apart from your competitors (Monkhouse & Company)"
     url: https://monkhouseandcompany.com/blog/how-an-activity-fit-map-will-set-your-business-apart-from-your-competitors
     origin: monkhouse
+    family: scaling-up
     kind: practitioner
 ```
 
@@ -132,10 +141,12 @@ sources:
   - title: "Playing to Win - Book summary (Readingraphics)"
     url: https://readingraphics.com/book-summary-playing-to-win/
     origin: readingraphics
+    family: playing-to-win
     kind: book
   - title: "Why is Great Service So Rare? (Dorie Clark, entrevista a Frances Frei)"
     url: https://dorieclark.com/blog/great-service/
     origin: dorie-clark
+    family: frei
     kind: article
   - title: "The Great Repeatable Business Model (Zook y Allen, Bain / HBR, 2011)"
     url: https://www.bain.com/de/insights/the-great-repeatable-business-model-hbr/
