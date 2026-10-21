@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from ..core import read_yaml
+from ..worksheet import registry_path
 
 DECISIONS = ["people", "strategy", "execution", "cash"]
 
@@ -21,8 +22,7 @@ _CONFIRMED_ASSESSMENTS = {"confirmed", "corrected"}
 
 def _get_worksheets(base_path: Path) -> tuple[list[dict], dict[str, dict]]:
     """Load all worksheets and completed ones."""
-    registry_path = base_path / ".escala" / "knowledge" / "registry" / "worksheets.yaml"
-    registry = read_yaml(registry_path)
+    registry = read_yaml(registry_path(base_path))
     all_ws = registry.get("worksheets", [])
 
     wdir = base_path / ".escala" / "my-company" / "worksheets"

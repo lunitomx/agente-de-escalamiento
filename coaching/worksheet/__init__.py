@@ -8,14 +8,27 @@ from typing import Any
 from ..core import read_yaml, write_yaml, ensure_dir
 
 
-REGISTRY_PATH = (
-    Path(__file__).parent.parent.parent
-    / ".escala"
-    / "knowledge"
-    / "registry"
-    / "worksheets.yaml"
-)
+PACKAGE_ROOT = Path(__file__).resolve().parents[2]
+PACKAGE_KNOWLEDGE = PACKAGE_ROOT / "conocimiento"
+CLIENT_KNOWLEDGE = Path(".escala") / "knowledge"
+REGISTRY_FILE = Path("registry") / "worksheets.yaml"
 COMPLETED_DIR = Path(".escala/my-company/worksheets")
+
+
+def knowledge_root(base_path: Path | None = None) -> Path:
+    """Return the one knowledge root for registry and sheet content.
+
+    The client's own ``.escala/knowledge`` wins only when its registry FILE
+    exists; otherwise the package's ``conocimiento/`` is used.
+    """
+    base = base_path if base_path is not None else PACKAGE_ROOT
+    client = base / CLIENT_KNOWLEDGE
+    return client if (client / REGISTRY_FILE).is_file() else PACKAGE_KNOWLEDGE
+
+
+def registry_path(base_path: Path | None = None) -> Path:
+    """Return the worksheet registry file under :func:`knowledge_root`."""
+    return knowledge_root(base_path) / REGISTRY_FILE
 
 
 def list_worksheets(
@@ -23,12 +36,7 @@ def list_worksheets(
     base_path: Path | None = None,
 ) -> list[dict[str, Any]]:
     """List all worksheets, optionally filtered by decision."""
-    registry_path = (
-        (base_path / ".escala" / "knowledge" / "registry" / "worksheets.yaml")
-        if base_path
-        else REGISTRY_PATH
-    )
-    registry = read_yaml(registry_path)
+    registry = read_yaml(registry_path(base_path))
     worksheets = registry.get("worksheets", [])
     if decision:
         return [w for w in worksheets if w.get("decision") == decision]
@@ -40,12 +48,7 @@ def find_worksheet(
     base_path: Path | None = None,
 ) -> dict[str, Any] | None:
     """Find a worksheet by name or ID (case-insensitive)."""
-    registry_path = (
-        (base_path / ".escala" / "knowledge" / "registry" / "worksheets.yaml")
-        if base_path
-        else REGISTRY_PATH
-    )
-    registry = read_yaml(registry_path)
+    registry = read_yaml(registry_path(base_path))
     name_lower = name_or_id.lower()
     for w in registry.get("worksheets", []):
         if w["id"].lower() == name_lower:
@@ -83,8 +86,7 @@ def load_worksheet_content(
     node_path = worksheet.get("node_path", "")
     if not node_path:
         return worksheet
-    base = base_path or Path(__file__).parent.parent.parent
-    full_path = base / ".escala" / "knowledge" / node_path
+    full_path = knowledge_root(base_path) / node_path
     content = read_yaml(full_path)
     return {**worksheet, **content}
 
