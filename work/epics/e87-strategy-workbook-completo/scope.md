@@ -13,6 +13,10 @@ change_mode: additive
 
 # Scope E87
 
+## Jira
+
+Epic: ESCALA-107
+
 ## Objetivo
 
 Que ESCALA cubra todas las herramientas del workbook de Strategy (38 páginas). Cada herramienta lleva una guía de llenado paso a paso con un ejemplo real, tips profesionales investigados y, al terminar, una vista HTML que se abre sola más su gemelo Markdown. Cierra la brecha que dejó E6 (prometió 34 hojas, cerró con 15).
@@ -39,17 +43,17 @@ Que ESCALA cubra todas las herramientas del workbook de Strategy (38 páginas). 
 
 ## Historias
 
-| Historia | Jira | Entrega | Tamaño | Depende de |
-|---|---|---|---|---|
-| S87.1 | ESCALA-108 | Mapa versionado de las 38 páginas y prueba de cobertura. Lista de pendientes que solo puede encoger. Corrige la tarjeta de Caja de arena (p. 28). Prueba "E87 no agrega archivos bajo `.scaleup/`". Prueba de cero imágenes. | 3 | — |
-| S87.2 | ESCALA-109 | Raíz única del conocimiento (mira el archivo del registro, no el directorio). Contrato de herramienta (`ToolGuide`). Vista HTML + MD con `open_cmd`. Reescritura del skill `escala-worksheet` con el paso de abrir. Se valida con la hoja existente de Cliente central. | 8 | S87.1 |
-| S87.3 | ESCALA-110 | `/rai-research` para 8 herramientas: BMC, Strategy Canvas de Scaling Up (4 piezas), Promesa de marca, Cliente central, Actividades diferenciadoras, Caja de arena, Vision Summary, Plan Personal y tableros de visión. Al menos 3 hallazgos triangulados por herramienta. | 5 | — |
-| S87.4 | ESCALA-111 | BMC de 9 bloques, puente a Scaling Up (p. 8), prompt (p. 9), lienzo (p. 10), lista de verificación (p. 11). | 5 | S87.2, S87.3 |
-| S87.5 | ESCALA-112 | Promesa de marca: 1 principal + 2 de apoyo con medida, Count On / Expect / Unique, 3 pruebas, antipromesas y compensaciones, prompt (p. 20). | 3 | S87.2, S87.3 |
-| S87.6 | ESCALA-113 | Cliente central: gráfica "¿Está claro tu QUIÉN?" y personas ejemplo (p. 13-14), las 3 preguntas (p. 20) y el prompt (p. 16). Hoja nueva de Actividades diferenciadoras con competidores y 4 ejes (p. 25) y prompt (p. 26). | 5 | S87.2, S87.3 |
-| S87.7 | ESCALA-114 | Hoja de Caja de arena con pronóstico a 3-5 años y prompt (p. 28-29). Strategy Canvas de una hoja (p. 7, 12) que lee las 4 piezas con el contrato `derived_from` y muestra "Falta: …" si una hoja origen no está llena. | 5 | S87.4, S87.5, S87.6 |
-| S87.8 | ESCALA-115 | Hoja de Vision Summary (p. 36) con `ontology_ref: tool.vision-summary`, probada contra `s64.1.json` y los campos de E65. Prompt de 10 tareas y compromiso (p. 34-35). | 3 | S87.7 |
-| S87.9 | ESCALA-116 | Extiende `worksheet-oppp`: 8 columnas × 4 filas de la p. 32 (p. 30-32) y tableros de visión con su prompt (p. 33). Corrige la tarjeta `people/tools/oppp.yaml`. | 3 | S87.2, S87.3 |
+| Historia | Jira | Entrega | Tamaño | Depende de | Estado |
+|---|---|---|---|---|---|
+| S87.1 | ESCALA-108 | Mapa versionado de las 38 páginas y prueba de cobertura. Lista de pendientes que solo puede encoger. Corrige la tarjeta de Caja de arena (p. 28). Prueba "E87 no agrega archivos bajo `.scaleup/`". Prueba de cero imágenes. | 3 | — | pendiente |
+| S87.2 | ESCALA-109 | Raíz única del conocimiento (mira el archivo del registro, no el directorio). Contrato de herramienta (`ToolGuide`). Vista HTML + MD con `open_cmd`. Reescritura del skill `escala-worksheet` con el paso de abrir. Se valida con la hoja existente de Cliente central. | 8 | S87.1 | pendiente |
+| S87.3 | ESCALA-110 | `/rai-research` para 8 herramientas: BMC, Strategy Canvas de Scaling Up (4 piezas), Promesa de marca, Cliente central, Actividades diferenciadoras, Caja de arena, Vision Summary, Plan Personal y tableros de visión. Al menos 3 hallazgos triangulados por herramienta. | 5 | — | pendiente |
+| S87.4 | ESCALA-111 | BMC de 9 bloques, puente a Scaling Up (p. 8), prompt (p. 9), lienzo (p. 10), lista de verificación (p. 11). | 5 | S87.2, S87.3 | pendiente |
+| S87.5 | ESCALA-112 | Promesa de marca: 1 principal + 2 de apoyo con medida, Count On / Expect / Unique, 3 pruebas, antipromesas y compensaciones, prompt (p. 20). | 3 | S87.2, S87.3 | pendiente |
+| S87.6 | ESCALA-113 | Cliente central: gráfica "¿Está claro tu QUIÉN?" y personas ejemplo (p. 13-14), las 3 preguntas (p. 20) y el prompt (p. 16). Hoja nueva de Actividades diferenciadoras con competidores y 4 ejes (p. 25) y prompt (p. 26). | 5 | S87.2, S87.3 | pendiente |
+| S87.7 | ESCALA-114 | Hoja de Caja de arena con pronóstico a 3-5 años y prompt (p. 28-29). Strategy Canvas de una hoja (p. 7, 12) que lee las 4 piezas con el contrato `derived_from` y muestra "Falta: …" si una hoja origen no está llena. | 5 | S87.4, S87.5, S87.6 | pendiente |
+| S87.8 | ESCALA-115 | Hoja de Vision Summary (p. 36) con `ontology_ref: tool.vision-summary`, probada contra `s64.1.json` y los campos de E65. Prompt de 10 tareas y compromiso (p. 34-35). | 3 | S87.7 | pendiente |
+| S87.9 | ESCALA-116 | Extiende `worksheet-oppp`: 8 columnas × 4 filas de la p. 32 (p. 30-32) y tableros de visión con su prompt (p. 33). Corrige la tarjeta `people/tools/oppp.yaml`. | 3 | S87.2, S87.3 | pendiente |
 
 Total: 9 historias, 40 puntos (antes 34: S87.2 sube de 5 a 8, S87.3 de 3 a 5, S87.8 de 2 a 3).
 
