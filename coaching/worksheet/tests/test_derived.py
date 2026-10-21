@@ -129,10 +129,19 @@ SAVED: dict[str, dict[str, str]] = {
         "actividades-elegidas": "Reparto propio en moto; molino de piedra",
     },
 }
-MISSING_SANDBOX = (
-    "Falta: {field} de worksheet-sandbox. "
-    "Llénala con /escala-worksheet worksheet-sandbox"
-)
+SANDBOX_QUESTIONS = {
+    "donde": "¿En qué zonas vas a competir y en cuáles no?",
+    "que": "¿Cuáles son tus 3 a 5 categorías de producto o servicio?",
+    "canales": "¿A quién le vendes y por qué canales?",
+}
+
+
+def _missing_sandbox(field: str) -> str:
+    """The "Falta" line for a sandbox field: its question and the sheet's name."""
+    return (
+        f"Falta: {SANDBOX_QUESTIONS[field]} Llena la hoja Caja de arena "
+        "con /escala-worksheet worksheet-sandbox"
+    )
 
 
 def _seed_saved(base: Path, saved: dict[str, dict[str, str]]) -> dict[Path, bytes]:
@@ -174,7 +183,9 @@ def test_canvas_start_shows_three_blocks_and_missing_sandbox(tmp_path: Path) -> 
     assert "Reparto propio en moto" in out
     assert "## Caja de arena" in out
     for field in ("donde", "que", "canales"):
-        assert MISSING_SANDBOX.format(field=field) in out
+        assert _missing_sandbox(field) in out
+    assert "de worksheet-sandbox" not in out
+    assert "Falta: donde" not in out
     assert "Contexto del modelo de negocio" not in out
 
 
@@ -190,7 +201,7 @@ def test_canvas_in_progress_source_counts_as_missing(tmp_path: Path) -> None:
         },
     )
     out = _canvas(tmp_path, "start")["output"]
-    assert MISSING_SANDBOX.format(field="donde") in out
+    assert _missing_sandbox("donde") in out
 
 
 def test_canvas_saved_view_has_derived_blocks_then_own_section(
@@ -221,8 +232,8 @@ def test_canvas_saved_view_has_derived_blocks_then_own_section(
     html_order = [page.index(f"<h2>{t}</h2>") for t in titles]
     assert md_order == sorted(md_order)
     assert html_order == sorted(html_order)
-    assert MISSING_SANDBOX.format(field="donde") in md
-    assert MISSING_SANDBOX.format(field="donde") in page
+    assert _missing_sandbox("donde") in md
+    assert _missing_sandbox("donde") in page
     assert "Contexto del modelo de negocio" not in md
     assert "No a surtir a un súper de Monterrey" in md
     for path, data in written.items():

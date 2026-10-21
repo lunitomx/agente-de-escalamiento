@@ -125,9 +125,14 @@ def _item(step: GuideStep, answers: dict[str, Any]) -> ViewItem:
     )
 
 
-def missing_source_text(field: str, sheet_id: str) -> str:
-    """What the canvas says when a field of a source sheet is not saved (D4)."""
-    return f"Falta: {field} de {sheet_id}. Llénala con /escala-worksheet {sheet_id}"
+def missing_source_text(question: str, sheet_name: str, sheet_id: str) -> str:
+    """What the canvas says when a field of a source sheet is not saved (D4).
+
+    The owner reads the step's question and the sheet's Spanish name; the id
+    appears only inside the command.
+    """
+    ask = question if question.endswith(("?", ".", "!")) else f"{question}."
+    return f"Falta: {ask} Llena la hoja {sheet_name} con /escala-worksheet {sheet_id}"
 
 
 DerivedSources = dict[str, tuple[dict[str, Any], dict[str, Any] | None]]
@@ -154,13 +159,16 @@ def derived_blocks(guide: ToolGuide, sources: DerivedSources) -> list[ViewBlock]
         items: list[ViewItem] = []
         for field in source.fields:
             answer = answer_text((answers or {}).get(field))
+            label = safe_text(questions.get(field, field))
             items.append(
                 ViewItem(
-                    label=safe_text(questions.get(field, field)),
+                    label=label,
                     answer=answer,
                     how="",
                     missing=(
-                        missing_source_text(field, source.sheet)
+                        missing_source_text(
+                            label, safe_text(source.title), source.sheet
+                        )
                         if answer is None
                         else None
                     ),
