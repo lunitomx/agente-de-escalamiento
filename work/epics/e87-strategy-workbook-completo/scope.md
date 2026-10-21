@@ -1,7 +1,8 @@
 ---
 epic_id: E87
 title: Strategy workbook completo — todas las herramientas del workbook, con guía, tips y vista visual
-status: designed
+status: cerrada
+closed: 2026-10-21
 jira_key: "ESCALA-107"
 created: 2026-10-20
 designed: 2026-10-20
