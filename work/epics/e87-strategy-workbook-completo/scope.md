@@ -46,7 +46,7 @@ Que ESCALA cubra todas las herramientas del workbook de Strategy (38 páginas). 
 | Historia | Jira | Entrega | Tamaño | Depende de | Estado |
 |---|---|---|---|---|---|
 | S87.1 | ESCALA-108 | Mapa versionado de las 38 páginas y prueba de cobertura. Lista de pendientes que solo puede encoger. Corrige la tarjeta de Caja de arena (p. 28). Prueba "E87 no agrega archivos bajo `.scaleup/`". Prueba de cero imágenes. | 3 | — | cerrada |
-| S87.2 | ESCALA-109 | Raíz única del conocimiento (mira el archivo del registro, no el directorio). Contrato de herramienta (`ToolGuide`). Vista HTML + MD con `open_cmd`. Reescritura del skill `escala-worksheet` con el paso de abrir. Se valida con la hoja existente de Cliente central. | 8 | S87.1 | pendiente |
+| S87.2 | ESCALA-109 | Raíz única del conocimiento (mira el archivo del registro, no el directorio). Contrato de herramienta (`ToolGuide`). Vista HTML + MD con `open_cmd`. Reescritura del skill `escala-worksheet` con el paso de abrir. Se valida con la hoja existente de Cliente central. | 8 | S87.1 | cerrada |
 | S87.3 | ESCALA-110 | `/rai-research` para 8 herramientas: BMC, Strategy Canvas de Scaling Up (4 piezas), Promesa de marca, Cliente central, Actividades diferenciadoras, Caja de arena, Vision Summary, Plan Personal y tableros de visión. Al menos 3 hallazgos triangulados por herramienta. | 5 | — | cerrada |
 | S87.4 | ESCALA-111 | BMC de 9 bloques, puente a Scaling Up (p. 8), prompt (p. 9), lienzo (p. 10), lista de verificación (p. 11). | 5 | S87.2, S87.3 | pendiente |
 | S87.5 | ESCALA-112 | Promesa de marca: 1 principal + 2 de apoyo con medida, Count On / Expect / Unique, 3 pruebas, antipromesas y compensaciones, prompt (p. 20). | 3 | S87.2, S87.3 | pendiente |
