@@ -461,3 +461,134 @@ def test_sandbox_end_to_end(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> 
     assert "<div class='canvas'>" in page
     assert "Zona metropolitana de Guadalajara" in text
     assert "Prompt para tu asistente de IA" in page
+
+
+# --- S87.8: Resumen de visión, end to end -------------------------------------
+
+VISION = "worksheet-vision-summary"
+VISION_ANSWERS: dict[str, str] = {
+    "valores": "La masa sale antes de las 7\nEl que ve el problema lo arregla",
+    "proposito": "Que ninguna fonda se quede sin comida caliente",
+    "promesas": "Masa antes de las 7 o no la pagas",
+    "meta-grande": "400 fondas surtidas cada día para 2040",
+    "prioridades-3-5-anos": "6 sucursales; 120 fondas con pedido fijo",
+    "prioridades-ano": "Abrir la sucursal 4",
+    "prioridades-trimestre": "Firmar el local, Ana, 30 de junio",
+    "kpis": "Entregas antes de las 7: verde 98 %",
+    "prioridades-personales": "Dejar de repartir yo los lunes",
+    "compromiso": "Cada lunes reviso los números con Ana\nSi el local se atrasa, busco otro",
+}
+CORE_CUSTOMER_SAVED = {
+    "quien-es": "Dueños de fondas a 3 km de la sucursal",
+    "necesidad": "Tortilla caliente a las 13:00",
+}
+MISSING_CORE_CUSTOMER = (
+    "Falta: ¿Quién es tu Cliente central, en 10 a 20 palabras? "
+    "Llena la hoja Cliente central con /escala-worksheet worksheet-core-customer"
+)
+
+
+def _vision(base: Path, action: str, **extra: Any) -> dict[str, Any]:
+    return run(
+        {"action": action, "worksheet_name": VISION, "base_path": str(base), **extra}
+    )
+
+
+def _seed_core_customer(base: Path) -> Path:
+    path = base / ".escala" / "my-company" / "worksheets" / f"{SHEET}.yaml"
+    write_yaml(
+        path,
+        {"worksheet_id": SHEET, "fields": CORE_CUSTOMER_SAVED, "status": "completed"},
+    )
+    return path
+
+
+def _fill_vision(base: Path) -> dict[str, Any]:
+    _vision(base, "step")
+    last: dict[str, Any] = {}
+    for step_id, answer in VISION_ANSWERS.items():
+        last = _vision(base, "step", fields={step_id: answer})
+    return last
+
+
+def test_vision_summary_end_to_end_with_core_customer(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(sys, "platform", "darwin")
+    seeded = _seed_core_customer(tmp_path)
+    before = seeded.read_bytes()
+    started = run(
+        {
+            "action": "start",
+            "worksheet_name": "resumen de vision",
+            "base_path": str(tmp_path),
+        }
+    )
+    assert started["errors"] == []
+    assert started["artifacts"]["worksheet"]["id"] == VISION
+    assert started["artifacts"]["total_steps"] == len(VISION_ANSWERS) + 2
+    out = started["output"]
+    assert "## Resumen de visión" in out
+    assert "**Tiempo estimado:** 1-2 horas" in out
+    assert "- [ ] 1-2 horas sin interrupciones" in out
+    assert "Esto ya llenaste:" in out
+    assert "#### Cliente central" in out
+    assert "Dueños de fondas a 3 km de la sucursal" in out
+    assert "Tortilla caliente a las 13:00" in out
+    assert "Falta:" not in out
+
+    review = _fill_vision(tmp_path)
+    assert review["errors"] == []
+    text = review["output"]
+    assert "### Revisión Final" in text
+    assert "**¿A qué te comprometes en las próximas 10 semanas?**" in text
+    assert "**Prompt para tu asistente de IA:** Con mi resumen de visión" in text
+    assert "confirmar" in text
+    assert get_completed_ids(tmp_path) == [SHEET]
+
+    result = _vision(tmp_path, "save")
+    assert result["errors"] == []
+    assert sorted(get_completed_ids(tmp_path)) == sorted([SHEET, VISION])
+    company = tmp_path / ".escala" / "my-company"
+    state = read_yaml(company / "worksheets" / f"{VISION}.yaml")
+    assert state["status"] == "completed"
+    stamp = date.today().isoformat()
+    html = company / "vistas" / f"{stamp}-{VISION}.html"
+    md = company / "vistas" / f"{stamp}-{VISION}.md"
+    view = result["artifacts"]["view"]
+    assert view == {"html": str(html), "md": str(md), "open_cmd": ["open", str(html)]}
+    page = html.read_text(encoding="utf-8")
+    markdown = md.read_text(encoding="utf-8")
+    titles = [
+        "Cliente central",
+        "Quiénes somos",
+        "Hacia dónde vamos",
+        "Este año y este trimestre",
+        "Tus prioridades personales",
+        "Tu compromiso de 10 semanas",
+    ]
+    md_order = [markdown.index(f"## {t}") for t in titles]
+    html_order = [page.index(f"<h2>{t}</h2>") for t in titles]
+    assert md_order == sorted(md_order)
+    assert html_order == sorted(html_order)
+    assert "class='canvas'" not in page
+    assert "Dueños de fondas a 3 km de la sucursal" in markdown
+    assert markdown.index("10 tareas") > markdown.index("## Tu compromiso")
+    assert "Cada lunes reviso los números con Ana  \n  Si el local se atrasa" in (
+        markdown
+    )
+    assert "Cada lunes reviso los números con Ana\nSi el local se atrasa" in page
+    assert seeded.read_bytes() == before
+
+
+def test_vision_summary_shows_missing_core_customer(tmp_path: Path) -> None:
+    out = _vision(tmp_path, "start")["output"]
+    assert "Esto ya llenaste:" not in out
+    assert "#### Cliente central" in out
+    assert MISSING_CORE_CUSTOMER in out
+    _fill_vision(tmp_path)
+    result = _vision(tmp_path, "save")
+    assert result["errors"] == []
+    md = Path(result["artifacts"]["view"]["md"]).read_text(encoding="utf-8")
+    assert MISSING_CORE_CUSTOMER in md
+    assert "Que ninguna fonda se quede sin comida caliente" in md

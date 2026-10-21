@@ -391,3 +391,137 @@ def test_strategy_canvas_passes_the_contract() -> None:
     ]
     assert set(content["ai_prompt"]) == {"text"}
     assert guide.view.layout == "canvas"
+
+
+VISION_SUMMARY = KNOWLEDGE / "strategy" / "worksheets" / "vision-summary.yaml"
+VISION_SUMMARY_STEPS = [
+    "valores",
+    "proposito",
+    "promesas",
+    "meta-grande",
+    "prioridades-3-5-anos",
+    "prioridades-ano",
+    "prioridades-trimestre",
+    "kpis",
+    "prioridades-personales",
+    "compromiso",
+]
+ONTOLOGY_RELEASE = ROOT / "ontology" / "v2" / "releases" / "s64.1.json"
+WORKBOOK = ROOT / "metodologias_parsed" / "strategy_workbook.md"
+WORD_RE = re.compile(r"[a-záéíóúñü0-9]+")
+
+
+def _e65_vision_fields() -> set[str]:
+    from validators.oppp_vision_artifacts import (
+        _ARTIFACT_SPECS,  # pyright: ignore[reportPrivateUsage]
+    )
+
+    return set(_ARTIFACT_SPECS["procedure.build-vision-summary"][1])
+
+
+def test_vision_summary_passes_the_contract() -> None:
+    content = _load(VISION_SUMMARY)
+    assert content["id"] == "worksheet-vision-summary"
+    assert content["decision"] == "strategy"
+    guide = parse_guide(content)
+    assert guide is not None
+    steps = guide.guide.steps
+    assert all(s.example.startswith("Tortillería El Sol:") for s in steps)
+    assert sorted(t.source for t in guide.tips) == [
+        "work/research/e87-tips/oppp-vision-boards.md#f4",
+        "work/research/e87-tips/vision-summary.md#f1",
+        "work/research/e87-tips/vision-summary.md#f2",
+        "work/research/e87-tips/vision-summary.md#f3",
+        "work/research/e87-tips/vision-summary.md#f4",
+        "work/research/e87-tips/vision-summary.md#f5",
+    ]
+    assert guide.view.layout == "cards"
+    assert [s.title for s in guide.view.sections] == [
+        "Quiénes somos",
+        "Hacia dónde vamos",
+        "Este año y este trimestre",
+        "Tus prioridades personales",
+        "Tu compromiso de 10 semanas",
+    ]
+    assert set(content["ai_prompt"]) == {"text"}
+    assert content["metadata"]["fields"] == VISION_SUMMARY_STEPS
+    assert [
+        (d.sheet, d.fields, d.into, d.title, d.required) for d in guide.derived_from
+    ] == [
+        (
+            "worksheet-core-customer",
+            ["quien-es", "necesidad"],
+            "customer",
+            "Cliente central",
+            True,
+        )
+    ]
+
+
+def test_vision_summary_steps_cover_page_blocks() -> None:
+    guide = parse_guide(_load(VISION_SUMMARY))
+    assert guide is not None
+    assert [s.id for s in guide.guide.steps] == VISION_SUMMARY_STEPS
+
+
+def test_vision_summary_ontology_ref_exists() -> None:
+    import json
+
+    release = json.loads(ONTOLOGY_RELEASE.read_text(encoding="utf-8"))
+    ids = {str(n["canonical_id"]) for n in release["nodes"]}
+    assert _load(VISION_SUMMARY)["ontology_ref"] == "tool.vision-summary"
+    assert "tool.vision-summary" in ids
+
+
+def test_vision_summary_covers_e65_fields() -> None:
+    guide = parse_guide(_load(VISION_SUMMARY))
+    assert guide is not None
+    e65 = _e65_vision_fields()
+    assert e65 == {"purpose", "customer", "differentiator", "future_direction"}
+    mapped = {f for s in guide.guide.steps for f in s.maps_to}
+    derived = {d.into for d in guide.derived_from}
+    assert mapped <= e65, mapped - e65
+    assert e65 <= mapped | derived, e65 - (mapped | derived)
+    by_step = {s.id: s.maps_to for s in guide.guide.steps}
+    assert by_step["proposito"] == ["purpose"]
+    assert by_step["promesas"] == ["differentiator"]
+    assert by_step["meta-grande"] == ["future_direction"]
+
+
+def test_vision_summary_ends_in_commitment_and_ten_week_prompt() -> None:
+    content = _load(VISION_SUMMARY)
+    guide = parse_guide(content)
+    assert guide is not None
+    last = guide.guide.steps[-1]
+    assert last.id == "compromiso"
+    assert "comprometes" in last.question.lower()
+    prompt = guide.ai_prompt
+    assert prompt is not None
+    assert "10 tareas" in prompt.text
+    assert "semana" in prompt.text
+    assert not re.search(r"p[aá]g", prompt.text.lower())
+
+
+def test_vision_summary_uses_plain_spanish_names() -> None:
+    text = VISION_SUMMARY.read_text(encoding="utf-8")
+    for term in ("BHAG", "Rocks", "OPSP", *_forbidden_terms()):
+        assert term.lower() not in text.lower(), term
+
+
+def test_vision_summary_does_not_copy_the_workbook() -> None:
+    def shingles(text: str) -> set[tuple[str, ...]]:
+        words = WORD_RE.findall(text.lower())
+        return {tuple(words[i : i + 10]) for i in range(len(words) - 9)}
+
+    copied = shingles(VISION_SUMMARY.read_text(encoding="utf-8")) & shingles(
+        WORKBOOK.read_text(encoding="utf-8")
+    )
+    assert not copied, sorted(" ".join(s) for s in copied)[:3]
+
+
+def test_vision_summary_pages_are_covered_and_nothing_is_pending() -> None:
+    coverage = _load(COVERAGE)
+    pages = {int(e["page"]): e for e in coverage["pages"]}
+    for number in (34, 35, 36):
+        assert "worksheet-vision-summary" in pages[number].get("nodes", []), number
+    assert not coverage.get("pending")

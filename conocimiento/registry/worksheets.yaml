@@ -3,9 +3,9 @@ type: registry
 name: Worksheet Registry
 name_es: Registro de Hojas de Trabajo
 description: >
-  Central index of all 20 worksheets across the 4 ESCALA decisions.
+  Central index of all 21 worksheets across the 4 ESCALA decisions.
   Enables deterministic lookup by decision, prerequisite, or output type.
-total_worksheets: 20
+total_worksheets: 21
 worksheets:
 
   # ── PEOPLE (4) ─────────────────────────────────────────────────────────────
@@ -74,7 +74,7 @@ worksheets:
     frequency: annual
     tags: [people, team, growth, hiring]
 
-  # ── STRATEGY (9) ───────────────────────────────────────────────────────────
+  # ── STRATEGY (10) ──────────────────────────────────────────────────────────
 
   - id: worksheet-opsp
     decision: strategy
@@ -231,6 +231,23 @@ worksheets:
     summary_es: "Junta en una página las 4 piezas de tu estrategia que ya llenaste y decide a qué le vas a decir que no."
     frequency: quarterly
     tags: [strategy, canvas, focus, alignment]
+
+  - id: worksheet-vision-summary
+    decision: strategy
+    name: Vision Summary Worksheet
+    name_es: "Resumen de visión"
+    node_path: strategy/worksheets/vision-summary.yaml
+    prerequisites:
+      - worksheet-core-customer
+    outputs:
+      - one-page vision summary
+      - 10-week commitment
+    difficulty: intermediate
+    time_estimate: "1-2 hours"
+    time_es: "1-2 horas"
+    summary_es: "Junta en una página tus valores, propósito, promesas, meta grande, prioridades y números de cada semana, y cierra con un compromiso para las próximas 10 semanas."
+    frequency: quarterly
+    tags: [strategy, vision-summary, one-page]
 
   # ── EXECUTION (4) ──────────────────────────────────────────────────────────
 

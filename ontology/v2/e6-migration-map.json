@@ -502,7 +502,7 @@
       "legacy_id": null,
       "legacy_path": "conocimiento/registry/worksheets.yaml",
       "legacy_type": null,
-      "sha256": "146413a6b8711a92d0ae55d1a6652caac0bdd5e8379014cffa609109dccfc69e"
+      "sha256": "351110b5437af0723ced5e8c685dfcb859274924bea8bbf4e5e27920053a7f21"
     },
     {
       "canonical_id": null,
@@ -695,6 +695,14 @@
       "legacy_path": "conocimiento/strategy/worksheets/swt.yaml",
       "legacy_type": "worksheet",
       "sha256": "03b1e4d7effa380ecdda902485ee8e070dbfd94c00a4851b625bcf2377c63c24"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "worksheet-vision-summary",
+      "legacy_path": "conocimiento/strategy/worksheets/vision-summary.yaml",
+      "legacy_type": "worksheet",
+      "sha256": "28eb790405c04dd1eafe2f3ea9c3dd8753a0aa987453f1727d70cc04e992dec1"
     }
   ],
   "legacy_root": "conocimiento",
