@@ -10,7 +10,7 @@ from typing import Any
 
 import pytest
 
-from coaching.dashboard.boards.render import FORBIDDEN, LOCAL_ONLY
+from coaching.dashboard.boards.render import LOCAL_ONLY
 from coaching.worksheet import find_worksheet, load_worksheet_content
 from coaching.worksheet.view import (
     build_view,
@@ -62,10 +62,21 @@ def test_empty_answer_says_what_is_missing_and_how() -> None:
     assert "Falta: ¿Qué necesidad" in render_html(view)
 
 
-def test_links_never_reach_the_html() -> None:
-    page = render_html(build_view(_core_customer(), _answers(), DAY)).lower()
-    for token in FORBIDDEN:
-        assert token not in page, token
+def test_answer_with_a_link_or_markup_is_shown_as_plain_text() -> None:
+    answers = {
+        **_answers(),
+        "quien-es": "<script>alert(1)</script> fondas",
+    }
+    view = build_view(_core_customer(), answers, DAY)
+    page = render_html(view)
+    md = render_markdown(view)
+    assert "ver http://ejemplo.mx/lista" in page
+    assert "ver http://ejemplo.mx/lista" in md
+    assert "&lt;script&gt;alert(1)&lt;/script&gt; fondas" in page
+    assert "&lt;script&gt;alert(1)&lt;/script&gt; fondas" in md
+    lowered = page.lower()
+    for tag in ("<script", "<a ", "<link", "<img", "@import", "url("):
+        assert tag not in lowered, tag
 
 
 def test_same_data_gives_same_bytes() -> None:

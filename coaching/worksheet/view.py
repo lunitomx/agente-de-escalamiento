@@ -5,6 +5,8 @@ Pattern of the E84 board (``coaching/dashboard/boards/render.py``):
 ``build_view`` decides what is shown, ``render_html`` and ``render_markdown``
 only draw it, so both outputs carry the same labels in the same order.
 Deterministic: same content, answers and date give the same bytes.
+The owner's answers are always shown, escaped as plain text in both outputs;
+a link is text, never a tag.
 
 ``open_command`` is pure: it returns the command; the skill runs it.
 """
@@ -78,7 +80,9 @@ def _answer_text(value: Any) -> str | None:
         text = "; ".join(p for p in (str(i).strip() for i in items) if p)
     else:
         text = str(value).strip()
-    return safe_text(text) if text else None
+    # The owner's answer is never dropped: a link or markup stays as plain
+    # text, escaped by each renderer (R1 of the S87.2 quality review).
+    return text or None
 
 
 def _legacy_steps(content: dict[str, Any]) -> list[GuideStep]:
@@ -189,7 +193,8 @@ def render_markdown(view: SheetView) -> str:
             if item.answer is None:
                 lines.append(f"- {_missing_text(item)}")
             else:
-                lines.append(f"- **{item.label}**: {item.answer}")
+                answer = html.escape(item.answer, quote=False)
+                lines.append(f"- **{item.label}**: {answer}")
         lines.append("")
     return "\n".join(lines)
 
