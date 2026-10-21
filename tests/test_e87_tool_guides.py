@@ -106,6 +106,16 @@ def test_oppp_row_steps_name_the_eight_areas() -> None:
         assert not missing, f"{step_id}: faltan {missing}"
 
 
+@pytest.mark.parametrize("part", ["imagen", "obstáculo", "si pasa"])
+def test_oppp_vision_board_step_asks_image_obstacle_and_if_then_plan(
+    part: str,
+) -> None:
+    guide = parse_guide(_load(OPPP_SHEET))
+    assert guide is not None
+    step = {s.id: s for s in guide.guide.steps}["tablero-de-vision"]
+    assert part in step.how.lower(), f"el tablero ya no pide '{part}'"
+
+
 @pytest.mark.parametrize("path", [OPPP_SHEET, OPPP_CARD], ids=["sheet", "card"])
 def test_oppp_card_matches_the_sheet(path: Path) -> None:
     data = _load(path)
