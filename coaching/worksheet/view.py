@@ -73,6 +73,10 @@ class SheetView(BaseModel):
     layout: Literal["cards", "canvas"]
     made_on: date
     blocks: list[ViewBlock]
+    ai_prompt: str | None = None
+
+
+AI_PROMPT_TITLE = "Prompt para tu asistente de IA"
 
 
 def answer_text(value: Any) -> str | None:
@@ -141,13 +145,22 @@ def build_view(
             for step in steps
         ]
     title = str(content.get("name_es") or content.get("name") or content.get("id", ""))
+    prompt = guide.ai_prompt if guide is not None else None
     return SheetView(
         sheet_id=str(content.get("id", "")),
         title=safe_text(title),
         layout=guide.view.layout if guide is not None else "cards",
         made_on=made_on,
         blocks=blocks,
+        ai_prompt=safe_text(prompt.text) if prompt is not None else None,
     )
+
+
+def label_heading(label: str) -> str:
+    """A label in bold; adds ":" only when it does not end in ? . ! or : (D9)."""
+    if label.rstrip().endswith(("?", ".", "!", ":")):
+        return f"**{label}**"
+    return f"**{label}:**"
 
 
 def markdown_lines(text: str) -> str:
@@ -191,6 +204,12 @@ def render_html(view: SheetView) -> str:
     """Self-contained HTML: inline CSS, no script, no external reference."""
     e = html.escape
     blocks = "".join(_html_block(block) for block in view.blocks)
+    prompt = (
+        f"<section class='card prompt'><h2>{e(AI_PROMPT_TITLE)}</h2>"
+        f"<p class='answer'>{e(view.ai_prompt)}</p></section>"
+        if view.ai_prompt is not None
+        else ""
+    )
     if view.layout == "canvas":
         main_open, body = "<main class='wide'>", f"<div class='canvas'>{blocks}</div>"
     else:
@@ -202,7 +221,7 @@ def render_html(view: SheetView) -> str:
         f"</head><body>{main_open}"
         f"<p class='local'>{e(LOCAL_ONLY)}</p>"
         f"<h1>{e(view.title)}</h1><p class='muted'>{e(_subtitle(view))}</p>"
-        f"{body}"
+        f"{body}{prompt}"
         "</main></body></html>\n"
     )
 
@@ -217,10 +236,17 @@ def render_markdown(view: SheetView) -> str:
                 lines.append(f"- {_missing_text(item)}")
             else:
                 answer = markdown_lines(html.escape(item.answer, quote=False))
-                lines.append(f"- **{item.label}**: {answer}")
+                lines.append(f"- {label_heading(item.label)} {answer}")
             if item.next_step is not None:
                 lines.append(f"- {item.next_step}")
         lines.append("")
+    if view.ai_prompt is not None:
+        lines += [
+            f"## {AI_PROMPT_TITLE}",
+            "",
+            html.escape(view.ai_prompt, quote=False),
+            "",
+        ]
     return "\n".join(lines)
 
 

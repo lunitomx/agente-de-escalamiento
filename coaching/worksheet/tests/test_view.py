@@ -192,7 +192,7 @@ def test_next_sheet_shows_after_the_answer() -> None:
     assert page.index(answer) < page.index(bridge)
     md = render_markdown(view)
     assert (
-        "- **¿Quién es tu Cliente central, en 10 a 20 palabras?**: "
+        "- **¿Quién es tu Cliente central, en 10 a 20 palabras?** "
         "Dueños de fondas a 3 km que no pueden quedarse sin tortilla.\n"
         "- Siguiente paso: llena Caja de arena\n"
     ) in md

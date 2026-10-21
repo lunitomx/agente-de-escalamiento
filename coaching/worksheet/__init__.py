@@ -12,7 +12,15 @@ from pydantic import ValidationError
 from ..core import read_yaml, write_yaml, ensure_dir
 from . import engine
 from .guide import GuideStep, Tip, parse_guide, source_label
-from .view import answer_text, build_view, markdown_lines, open_command, save_view
+from .view import (
+    AI_PROMPT_TITLE,
+    answer_text,
+    build_view,
+    label_heading,
+    markdown_lines,
+    open_command,
+    save_view,
+)
 
 
 PACKAGE_ROOT = Path(__file__).resolve().parents[2]
@@ -175,7 +183,17 @@ def _step_lines(
     return lines
 
 
-def _review_lines(steps: list[GuideStep], answers: dict[str, Any]) -> list[str]:
+def _ai_prompt_text(content: dict[str, Any]) -> str | None:
+    """The sheet's AI prompt; call after ``_steps_and_tips`` validated it."""
+    guide = parse_guide(content)
+    if guide is None or guide.ai_prompt is None:
+        return None
+    return guide.ai_prompt.text
+
+
+def _review_lines(
+    steps: list[GuideStep], answers: dict[str, Any], ai_prompt: str | None = None
+) -> list[str]:
     """Final review: each question with its answer, then ask to confirm.
 
     Nothing is completed here; only ``save`` marks the sheet and writes the view.
@@ -190,7 +208,9 @@ def _review_lines(steps: list[GuideStep], answers: dict[str, Any]) -> list[str]:
         shown = (
             markdown_lines(answer_text(answers.get(step.id)) or "") or "(sin respuesta)"
         )
-        lines.append(f"- **{step.question}:** {shown}")
+        lines.append(f"- {label_heading(step.question)} {shown}")
+    if ai_prompt is not None:
+        lines += ["", f"**{AI_PROMPT_TITLE}:** {ai_prompt}"]
     lines += [
         "",
         "Responde 'confirmar' para guardar la hoja y abrir tu vista.",
@@ -338,7 +358,9 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
                     )
                 )
             else:
-                lines.extend(_review_lines(steps, saved_fields))
+                lines.extend(
+                    _review_lines(steps, saved_fields, _ai_prompt_text(content))
+                )
 
         write_yaml(
             state_path,
@@ -421,7 +443,7 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
                 "Completa este campo con tu información.",
             )
         else:
-            lines = _review_lines(steps, saved_fields)
+            lines = _review_lines(steps, saved_fields, _ai_prompt_text(content))
 
         return {
             "output": "\n".join(lines),
