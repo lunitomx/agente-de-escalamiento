@@ -160,6 +160,20 @@ def test_save_view_writes_html_and_md(tmp_path: Path) -> None:
     assert str(tmp_path) not in paths[0].read_text(encoding="utf-8")
 
 
+def test_multi_line_answer_keeps_its_lines_in_html_and_markdown() -> None:
+    answers = {**_answers(), "quien-es": "Fondas a 3 km\n<b>Taquerías</b> del mercado"}
+    view = build_view(_core_customer(), answers, DAY)
+    page = render_html(view)
+    assert ".answer{margin:2px 0 10px;white-space:pre-line}" in page
+    assert (
+        "<p class='answer'>Fondas a 3 km\n&lt;b&gt;Taquerías&lt;/b&gt; del mercado</p>"
+        in page
+    )
+    md = render_markdown(view)
+    assert "Fondas a 3 km  \n  &lt;b&gt;Taquerías&lt;/b&gt; del mercado\n" in md
+    assert "\n&lt;b&gt;Taquerías" not in md
+
+
 def _bridged() -> dict[str, Any]:
     content = _core_customer()
     steps = [dict(s) for s in content["guide"]["steps"]]

@@ -3,9 +3,9 @@ type: registry
 name: Worksheet Registry
 name_es: Registro de Hojas de Trabajo
 description: >
-  Central index of all 17 worksheets across the 4 ESCALA decisions.
+  Central index of all 18 worksheets across the 4 ESCALA decisions.
   Enables deterministic lookup by decision, prerequisite, or output type.
-total_worksheets: 17
+total_worksheets: 18
 worksheets:
 
   # ── PEOPLE (4) ─────────────────────────────────────────────────────────────
@@ -62,7 +62,7 @@ worksheets:
     frequency: annual
     tags: [people, team, growth, hiring]
 
-  # ── STRATEGY (6) ───────────────────────────────────────────────────────────
+  # ── STRATEGY (7) ───────────────────────────────────────────────────────────
 
   - id: worksheet-opsp
     decision: strategy
@@ -120,6 +120,20 @@ worksheets:
     time_estimate: "2-3 hours"
     frequency: annual
     tags: [strategy, customer, segmentation, targeting]
+
+  - id: worksheet-brand-promise
+    decision: strategy
+    name: Brand Promise Worksheet
+    node_path: strategy/worksheets/brand-promise.yaml
+    prerequisites: [worksheet-core-customer]
+    outputs:
+      - main brand promise with weekly measure
+      - 2 supporting promises with weekly measures
+      - guarantee and anti-promises
+    difficulty: intermediate
+    time_estimate: "1-2 hours"
+    frequency: annual
+    tags: [strategy, brand-promise, guarantee, measurement]
 
   - id: worksheet-bmc
     decision: strategy

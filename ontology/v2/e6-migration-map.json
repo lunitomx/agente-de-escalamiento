@@ -502,7 +502,7 @@
       "legacy_id": null,
       "legacy_path": "conocimiento/registry/worksheets.yaml",
       "legacy_type": null,
-      "sha256": "cab6885f70ec42cb17b2a8dc05c90c1fcbd013d52fc85d077d808e6b9f132db6"
+      "sha256": "d51793de21cc12dca50ff84cb7682a13845ab5b4b2bea673bb3e9293cbe22a8d"
     },
     {
       "canonical_id": null,
@@ -526,7 +526,7 @@
       "legacy_id": "concept-brand-promise",
       "legacy_path": "conocimiento/strategy/concepts/brand-promise.yaml",
       "legacy_type": "concept",
-      "sha256": "cb1775ed7459a28a57fc3130efebf10ba6f4403f9da490dbbd65bb7c841ae73c"
+      "sha256": "1a0c4727dbbb9b401ee27be7a5c4623f9024fcb95e1091ceebf7cd9e0a393056"
     },
     {
       "canonical_id": null,
@@ -639,6 +639,14 @@
       "legacy_path": "conocimiento/strategy/worksheets/bmc.yaml",
       "legacy_type": "worksheet",
       "sha256": "37c5e05ff9318b3d857e3135a860ca1ca2f94d1392ddba2d365c2125b569e8f1"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "worksheet-brand-promise",
+      "legacy_path": "conocimiento/strategy/worksheets/brand-promise.yaml",
+      "legacy_type": "worksheet",
+      "sha256": "ef7cbf8f248e33f428c350d62d286652a13366b6b643140c8958df1ed4129e8c"
     },
     {
       "canonical_id": null,

@@ -34,7 +34,7 @@ VIEWS_DIR = Path(".escala") / "my-company" / "vistas"
 _SHEET_CSS = (
     "main.wide{max-width:1100px}"
     "h2{font-size:1.1rem;margin:0 0 8px}"
-    ".answer{margin:2px 0 10px}"
+    ".answer{margin:2px 0 10px;white-space:pre-line}"
     ".next{margin:2px 0 10px;font-weight:600}"
     ".canvas{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));"
     "gap:12px}"
@@ -150,6 +150,16 @@ def build_view(
     )
 
 
+def markdown_lines(text: str) -> str:
+    """One answer line per Markdown line inside a list item.
+
+    A hard break (two spaces) ends each line and the next one is indented, so
+    "Uno por línea" answers do not collapse into one line.
+    """
+    lines = [line.rstrip() for line in text.splitlines() if line.strip()]
+    return "  \n  ".join(lines)
+
+
 def _missing_text(item: ViewItem) -> str:
     label = item.label if item.label.endswith(("?", ".", "!")) else f"{item.label}."
     if item.how:
@@ -206,7 +216,7 @@ def render_markdown(view: SheetView) -> str:
             if item.answer is None:
                 lines.append(f"- {_missing_text(item)}")
             else:
-                answer = html.escape(item.answer, quote=False)
+                answer = markdown_lines(html.escape(item.answer, quote=False))
                 lines.append(f"- **{item.label}**: {answer}")
             if item.next_step is not None:
                 lines.append(f"- {item.next_step}")

@@ -67,19 +67,23 @@ pages:
   - page: 17
     class: tool
     content: "Promesa de marca: ejemplos con medida · S87.5"
+    nodes: [worksheet-brand-promise]
   - page: 18
     class: tool
     content: "Promesa de marca: NPS · S87.5"
+    nodes: [worksheet-brand-promise]
   - page: 19
     class: tool
     content: "Promesa de marca: antipromesas y compensaciones · S87.5"
+    nodes: [worksheet-brand-promise]
   - page: 20
     class: tool
-    nodes: [worksheet-core-customer]
+    nodes: [worksheet-brand-promise, worksheet-core-customer]
     content: "Promesa de marca (3 preguntas y prompt); preguntas del Cliente central · S87.5 y S87.6"
   - page: 21
     class: tool
     content: "Hoja de Promesa de marca (Count On / Expect / Unique) · S87.5"
+    nodes: [worksheet-brand-promise]
   - page: 22
     class: tool
     nodes: [worksheet-differentiating-activities, concept-differentiating-activities]
@@ -144,11 +148,6 @@ pages:
 pending:
   - 7
   - 12
-  - 17
-  - 18
-  - 19
-  - 20
-  - 21
   - 28
   - 29
   - 34

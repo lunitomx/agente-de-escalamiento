@@ -11,7 +11,7 @@ from pydantic import ValidationError
 
 from ..core import read_yaml, write_yaml, ensure_dir
 from .guide import GuideStep, Tip, parse_guide, source_label
-from .view import answer_text, build_view, open_command, save_view
+from .view import answer_text, build_view, markdown_lines, open_command, save_view
 
 
 PACKAGE_ROOT = Path(__file__).resolve().parents[2]
@@ -151,8 +151,10 @@ def _review_lines(steps: list[GuideStep], answers: dict[str, Any]) -> list[str]:
         "",
     ]
     for step in steps:
-        shown = answer_text(answers.get(step.id))
-        lines.append(f"- **{step.question}:** {shown or '(sin respuesta)'}")
+        shown = (
+            markdown_lines(answer_text(answers.get(step.id)) or "") or "(sin respuesta)"
+        )
+        lines.append(f"- **{step.question}:** {shown}")
     lines += [
         "",
         "Responde 'confirmar' para guardar la hoja y abrir tu vista.",

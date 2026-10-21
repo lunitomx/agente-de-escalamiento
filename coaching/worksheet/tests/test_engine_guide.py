@@ -219,6 +219,65 @@ def test_a_backup_does_not_count_the_sheet_twice(tmp_path: Path) -> None:
     assert get_completed_ids(tmp_path) == [SHEET]
 
 
+BP = "worksheet-brand-promise"
+BP_ANSWERS: dict[str, str] = {
+    "cuentan-esperan-solo-tu": "Solo nosotros entregamos antes de las 7:00",
+    "promesa-principal": "Tu pedido llega antes de las 7:00 o no lo pagas",
+    "promesas-de-apoyo": "Masa del día; un solo WhatsApp",
+    "medidas": "% pedidos antes de las 7:00",
+    "prueba-de-promesa": "3 de 3",
+    "lealtad": "NPS mensual a 20 fondas",
+    "garantia": "Si llega tarde, no se cobra",
+    "antipromesas": "No entregamos después de las 10:00",
+}
+
+
+def _run_bp(base: Path, action: str, **extra: Any) -> dict[str, Any]:
+    return run(
+        {"action": action, "worksheet_name": BP, "base_path": str(base), **extra}
+    )
+
+
+def test_brand_promise_owner_path_saves_and_opens_the_view(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(sys, "platform", "darwin")
+    started = _run_bp(tmp_path, "start")
+    assert started["errors"] == []
+    assert started["artifacts"]["total_steps"] == len(BP_ANSWERS) + 2
+    first = _run_bp(tmp_path, "step")["output"]
+    assert "**Ejemplo:** Tortillería El Sol" in first
+    assert "(fuente: Investigación ESCALA (nota interna f5))" in first
+    last: dict[str, Any] = {}
+    for step_id, answer in BP_ANSWERS.items():
+        last = _run_bp(tmp_path, "step", fields={step_id: answer})
+    assert last["errors"] == []
+    assert "### Revisión Final" in last["output"]
+    assert get_completed_ids(tmp_path) == []
+    saved = _run_bp(tmp_path, "save")
+    assert saved["errors"] == []
+    view = saved["artifacts"]["view"]
+    assert Path(view["html"]).is_file() and Path(view["md"]).is_file()
+    assert view["open_cmd"] == ["open", view["html"]]
+    state = tmp_path / ".escala/my-company/worksheets" / f"{BP}.yaml"
+    assert read_yaml(state)["fields"] == BP_ANSWERS
+    assert get_completed_ids(tmp_path) == [BP]
+    md = Path(view["md"]).read_text(encoding="utf-8")
+    assert "Tu pedido llega antes de las 7:00" in md
+
+
+def test_final_review_shows_each_line_of_a_multi_line_answer(tmp_path: Path) -> None:
+    answers = {**BP_ANSWERS, "promesas-de-apoyo": "Masa del día\nUn solo WhatsApp"}
+    _run_bp(tmp_path, "start")
+    _run_bp(tmp_path, "step")
+    last: dict[str, Any] = {}
+    for step_id, answer in answers.items():
+        last = _run_bp(tmp_path, "step", fields={step_id: answer})
+    out = last["output"]
+    assert "### Revisión Final" in out
+    assert "Masa del día  \n  Un solo WhatsApp\n" in out
+
+
 BMC = "worksheet-bmc"
 BMC_ANSWERS: dict[str, str] = {
     "segmentos": "Fondas y taquerías a 3 km; familias del barrio",

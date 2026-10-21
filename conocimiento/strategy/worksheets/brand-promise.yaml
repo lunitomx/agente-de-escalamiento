@@ -1,0 +1,88 @@
+id: worksheet-brand-promise
+type: worksheet
+name: Brand Promise Worksheet
+name_es: Hoja de Trabajo de Promesa de Marca
+decision: strategy
+summary: >
+  A guided worksheet to write 1 main brand promise and 2 supporting promises,
+  each with a weekly measure; test them with 3 questions; pick a loyalty measure;
+  back one promise with a guarantee; and name the anti-promises that make them possible.
+relationships:
+  - type: belongs-to
+    target: decision-strategy
+  - type: implements
+    target: concept-brand-promise
+  - type: requires
+    target: concept-core-customer
+tags: [strategy, worksheet, brand-promise, guarantee, 7-strata]
+metadata:
+  fields:
+    - "What your Core Customer counts on, expects, and gets only from you"
+    - "Main brand promise"
+    - "2 supporting brand promises"
+    - "Weekly measure for each promise"
+    - "3-question promise test"
+    - "Loyalty measure (NPS or similar)"
+    - "Guarantee for one promise"
+    - "Anti-promises and trade-offs"
+  output: "1 main + 2 supporting brand promises, each with a weekly measure, ready for 7 Strata and OPSP"
+  difficulty: intermediate
+  time_estimate: "1-2 hours"
+  frequency: annually
+guide:
+  steps:
+    - id: cuentan-esperan-solo-tu
+      question: "¿Con qué cuenta tu Cliente central, qué espera de ti y qué solo tú le das?"
+      how: "Haz 3 listas cortas. Cuentan con: lo mínimo para comprarte. Esperan: lo que dan todos en tu ramo. Solo tú: lo que nadie más le da."
+      example: "Tortillería El Sol: cuentan con tortilla de maíz limpia; esperan precio justo; solo nosotros entregamos en la puerta antes de las 7:00."
+    - id: promesa-principal
+      question: "¿Cuál es tu promesa principal, en una frase que tu cliente pueda comprobar?"
+      how: "Toma un punto de 'Solo tú' y escríbelo como compromiso. Tu cliente debe poder decir si lo cumpliste o no."
+      example: "Tortillería El Sol: \"Tu pedido llega antes de las 7:00 o no lo pagas.\""
+    - id: promesas-de-apoyo
+      question: "¿Cuáles son tus 2 promesas de apoyo?"
+      how: "Escribe dos compromisos más que hacen creíble la promesa principal. Uno por línea."
+      example: "Tortillería El Sol: 1) \"Masa del día, nunca recalentada.\" 2) \"Un solo WhatsApp y tu pedido queda.\""
+    - id: medidas
+      question: "¿Con qué número mides cada promesa cada semana?"
+      how: "Pon una medida por promesa, en porcentaje o conteo. Escribe quién la revisa y en qué junta."
+      example: "Tortillería El Sol: % de pedidos antes de las 7:00; % de lotes con hora de molienda; % de pedidos confirmados en 1 mensaje. Las revisa Don Rafa en la junta del lunes."
+    - id: prueba-de-promesa
+      question: "¿Tu promesa principal pasa las 3 preguntas de prueba?"
+      how: "Contesta sí o no: ¿Lo necesita tu Cliente central? ¿Se puede medir? ¿A tu competencia le cuesta igualarla? Si hay un no, ajusta la promesa."
+      example: "Tortillería El Sol: necesidad, sí (las fondas abren a las 8:00); se mide, sí; la competencia no reparte antes de las 9:00, sí. 3 de 3."
+    - id: lealtad
+      question: "¿Cómo vas a medir si tus clientes te recomiendan?"
+      how: "Elige una medida de lealtad, como el NPS (del 0 al 10, ¿nos recomendarías?). Di cada cuándo la preguntas y a quién."
+      example: "Tortillería El Sol: cada mes, a las 20 fondas con pedido fijo, por WhatsApp. Hoy 7 de 20 dan 9 o 10."
+    - id: garantia
+      question: "¿Qué garantía respalda tu promesa principal si fallas?"
+      how: "Di qué recibe el cliente si no cumples, sin que tenga que pedirlo dos veces. Que te cueste a ti."
+      example: "Tortillería El Sol: si el pedido llega después de las 7:00, ese día no se cobra. El repartidor lo anota en la nota."
+    - id: antipromesas
+      question: "¿Qué NO vas a prometer, y qué ganas al no hacerlo?"
+      how: "Lista lo que dejas fuera para poder cumplir. Junto a cada punto, escribe la compensación que recibe el cliente."
+      example: "Tortillería El Sol: no entregamos después de las 10:00. Compensación: rutas fijas tempranas y precio más bajo que la competencia."
+tips:
+  - text: "Una promesa sin medida no se puede cumplir ni romper. 'Llega antes de las 7:00' sí; 'el mejor servicio' no."
+    source: "work/research/e87-tips/brand-promise.md#f1"
+    step: promesa-principal
+  - text: "Ponle a cada promesa un indicador y revísalo en la junta semanal. Si nadie lo mide, la promesa se olvida en un mes."
+    source: "work/research/e87-tips/brand-promise.md#f2"
+    step: medidas
+  - text: "Pon la promesa donde tu equipo la vea cada día y úsala como pregunta: '¿Esto nos hace cumplirle al cliente?'."
+    source: "work/research/e87-tips/brand-promise.md#f5"
+    step: null
+ai_prompt:
+  text: "Con la descripción de mi Cliente central, propón 3 promesas de marca: 1 principal y 2 de apoyo. Para cada una da un indicador semanal, revisa si pasa las 3 preguntas de prueba y di qué tendría que dejar de hacer para cumplirla."
+view:
+  layout: cards
+  sections:
+    - title: "De dónde sale tu promesa"
+      steps: [cuentan-esperan-solo-tu]
+    - title: "Tus 3 promesas y su medida"
+      steps: [promesa-principal, promesas-de-apoyo, medidas]
+    - title: "Prueba y lealtad"
+      steps: [prueba-de-promesa, lealtad]
+    - title: "Lo que la respalda y lo que no prometes"
+      steps: [garantia, antipromesas]
