@@ -18,3 +18,8 @@
 - D2: `customer` por `derived_from` con `into: customer`, campos `quien-es` y `necesidad` de `worksheet-core-customer`.
 - D3: solo el Cliente central se deriva; valores, meta grande y prioridades viven en hojas sin `guide`.
 - Choques con S87.7 listados en el diseño. Registro esperado: 21. Mapa E6 esperado: 88 y 84.
+
+## Phase: implement (2026-10-21)
+
+- T0: `origin/main` (S87.7, 6bca96fc) fusionada sin conflictos. Suite completa: 3776 pasan, 5 omitidas.
+- T1: `GuideStep.maps_to` agregado. **Desviación:** el diseño decía `list[Slug]`, pero el campo de E65 es `future_direction` (guion bajo) y `Slug` lo rechaza. Se usa `FieldName` en snake_case (`^[a-z0-9]+(_[a-z0-9]+)*$`). `future-direction`, `Purpose` y vacío se rechazan.

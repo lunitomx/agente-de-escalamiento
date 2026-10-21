@@ -187,6 +187,31 @@ def test_bad_next_sheet_is_rejected(bad: dict[str, Any]) -> None:
         parse_guide(_with_next(bad))
 
 
+def test_maps_to_defaults_to_empty() -> None:
+    guide = parse_guide(_sheet())
+    assert guide is not None
+    assert all(step.maps_to == [] for step in guide.guide.steps)
+
+
+def _with_maps_to(maps_to: list[str]) -> dict[str, Any]:
+    step = {**_step("quien-es"), "maps_to": maps_to}
+    return _sheet(guide={"steps": [step, _step("necesidad")]})
+
+
+def test_maps_to_accepts_snake_case_field_names() -> None:
+    guide = parse_guide(_with_maps_to(["purpose", "future_direction"]))
+    assert guide is not None
+    assert guide.guide.steps[0].maps_to == ["purpose", "future_direction"]
+
+
+@pytest.mark.parametrize(
+    "bad", ["", "future direction", "Purpose", "future-direction", "_purpose"]
+)
+def test_maps_to_rejects_bad_names(bad: str) -> None:
+    with pytest.raises(ValidationError, match="maps_to"):
+        parse_guide(_with_maps_to([bad]))
+
+
 def test_every_registered_sheet_loads_and_passes_the_contract() -> None:
     sheets = list_worksheets()
     assert len(sheets) == 20

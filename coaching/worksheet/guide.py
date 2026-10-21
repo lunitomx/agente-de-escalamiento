@@ -24,6 +24,7 @@ from pydantic import (
 
 Text = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
 Slug = Annotated[str, StringConstraints(pattern=r"^[a-z0-9]+(-[a-z0-9]+)*$")]
+FieldName = Annotated[str, StringConstraints(pattern=r"^[a-z0-9]+(_[a-z0-9]+)*$")]
 WorksheetId = Annotated[
     str, StringConstraints(pattern=r"^worksheet-[a-z0-9]+(-[a-z0-9]+)*$")
 ]
@@ -43,7 +44,12 @@ class NextSheet(BaseModel):
 
 
 class GuideStep(BaseModel):
-    """One guided step: question, how to fill it, and a real example."""
+    """One guided step: question, how to fill it, and a real example.
+
+    ``maps_to`` names the ontology fields this step fills (snake_case, as the
+    ontology writes them). Shape only: the alignment check lives in ``tests/``
+    so that ``coaching/`` does not depend on ``validators/`` (S87.8 D1).
+    """
 
     model_config = ConfigDict(extra="forbid")
 
@@ -52,6 +58,7 @@ class GuideStep(BaseModel):
     how: Text
     example: Text
     next_sheet: NextSheet | None = None
+    maps_to: list[FieldName] = Field(default_factory=lambda: list[str]())
 
 
 class Guide(BaseModel):
