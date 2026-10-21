@@ -74,3 +74,12 @@
 - 139 pruebas de worksheet y 247 de suites relacionadas pasan. ruff y pyright limpios.
 - Mapa E6 idéntico al del generador. Mutaciones: 5 de 5 muertas.
 - Resúmenes en español originales y sin vocabulario prohibido.
+
+## Phase: review (S87.7 · ESCALA-114) — 2026-10-21
+
+- Pruebas: la señal de implement apunta a 161b9a08; desde ahí solo cambiaron docs. `coaching/worksheet`: 139 pasan.
+- Revisión de arquitectura: drift de `coaching/worksheet` sin alarmas nuevas (loc_slope OK; hist/clones WARN previos). Sin abstracciones de sobra. Marca `gate-ar-story` escrita.
+- Retrospectiva: `work/epics/e87-strategy-workbook-completo/stories/s87.7-retrospective.md`; artefacto retro en sqlite (ESCALA-114).
+- Lección: verify falló a la primera (resumen en inglés en 17 de 20 hojas; "1-2 horas" fijo). Un cambio del motor pide recorrer cada hoja, no una muestra.
+- Patrones nuevos: PAT-241, PAT-242, PAT-243. Reforzados: PAT-235, PAT-229, PAT-236 (+1); PAT-232 (0).
+- Pendientes: casilla de tiempo larga en el paso 1; `_ENGLISH_MARKERS` es guarda gruesa.
