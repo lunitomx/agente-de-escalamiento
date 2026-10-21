@@ -281,3 +281,26 @@ def test_no_new_files_under_scaleup() -> None:
         pytest.skip(f"git no disponible para listar .scaleup/: {exc}")
     frozen = set(SCALEUP_FROZEN.read_text(encoding="utf-8").split())
     assert new_files(result.stdout.split(), frozen) == []
+
+
+# --- Tarea 7 · tarjeta de Caja de arena (p. 28) ---------------------------
+
+SANDBOX = KNOWLEDGE / "strategy" / "tools" / "sandbox.yaml"
+
+
+def test_sandbox_card_matches_page_28() -> None:
+    card: Any = yaml.safe_load(SANDBOX.read_text(encoding="utf-8"))
+    assert card["id"] == "tool-sandbox"
+    # governance/public-boundary.yaml prohíbe la llave raíz `source` en conocimiento/.
+    assert "source" not in card
+    questions: list[str] = [str(q) for q in card["questions"]]
+    assert len(questions) == 4
+    text = " ".join([str(card["summary"]), *questions]).upper()
+    for word in ("DÓNDE", "QUÉ", "CANALES", "PRONÓSTICO"):
+        assert word in text, word
+    assert "WHO/WHERE" not in text
+
+
+def test_page_28_lists_sandbox_tool() -> None:
+    page = next(p for p in _load_coverage()["pages"] if p["page"] == 28)
+    assert "tool-sandbox" in page["nodes"]

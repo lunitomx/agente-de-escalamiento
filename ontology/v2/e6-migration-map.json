@@ -606,7 +606,7 @@
       "legacy_id": "tool-sandbox",
       "legacy_path": "conocimiento/strategy/tools/sandbox.yaml",
       "legacy_type": "tool",
-      "sha256": "04a3c0dae4a369f0ea0acd7ee7c84899e975adf0d7ca921a8685283e05049290"
+      "sha256": "da174fe277ff3a4309c8afd59a204f11d37f7dc0e923ac50c7813bbb7cf0ce71"
     },
     {
       "canonical_id": null,
@@ -630,7 +630,7 @@
       "legacy_id": null,
       "legacy_path": "conocimiento/strategy/workbook-coverage.yaml",
       "legacy_type": null,
-      "sha256": "5e491eb2c1dd7461c489c58cf3aae5ac48bb8fe77b7fbcaa12836630aba46bfd"
+      "sha256": "8a6e99bf192b3c70e7b89ff2cadea1bd791b7802355c8627b3e3170d8ae0c4c9"
     },
     {
       "canonical_id": null,

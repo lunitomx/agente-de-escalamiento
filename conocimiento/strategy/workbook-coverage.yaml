@@ -1,9 +1,9 @@
 # E87 · Mapa de cobertura del Strategy Workbook (S87.1).
 # Cada página es `tool` (vive en uno o más nodos de conocimiento/) o `no_tool` (con reason).
 # `pending`: páginas tool que aún no citan su nodo. Solo puede encoger:
-# cada historia (S87.4-S87.9) borra solo sus líneas al citar la página en source.pages.
+# cada historia (S87.4-S87.9) borra solo sus líneas al cubrir la página.
 # Prueba: tests/test_e87_workbook_coverage.py
-source: "EOA Strategy 2025 Participant Workbook"
+workbook: strategy-2025
 total_pages: 38
 pages:
   - page: 1
@@ -29,7 +29,7 @@ pages:
     content: "Strategy Canvas (4 piezas) y vista previa del Vision Summary · S87.7"
   - page: 8
     class: tool
-    content: "BMC: resumen y puente a Scaling Up · S87.4"
+    content: "BMC: resumen y puente al Strategy Canvas · S87.4"
   - page: 9
     class: tool
     content: "BMC: prompt · S87.4"
@@ -41,7 +41,7 @@ pages:
     content: "BMC: lista de verificación · S87.4"
   - page: 12
     class: tool
-    content: "Strategy Canvas de Scaling Up · S87.7"
+    content: "Strategy Canvas del método (4 piezas) · S87.7"
   - page: 13
     class: tool
     content: "Cliente central: gráfica '¿Está claro tu QUIÉN?' · S87.6"
@@ -89,6 +89,7 @@ pages:
     reason: "repite el ejemplo de la p. 23 (abogados); la Caja de arena vive en p. 28-29"
   - page: 28
     class: tool
+    nodes: [tool-sandbox]
     content: "Caja de arena: DÓNDE, QUÉ, canales, pronóstico · S87.7"
   - page: 29
     class: tool

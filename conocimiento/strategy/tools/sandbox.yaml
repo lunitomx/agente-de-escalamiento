@@ -4,12 +4,20 @@ name: Sandbox
 name_es: Caja de Arena Estrategica
 decision: strategy
 summary: >
-  Defines the geographic and demographic boundaries within which the company will
-  compete — WHO you will sell to and WHERE. The Sandbox prevents strategic overreach:
-  companies that try to serve everyone end up serving no one well. A well-defined
-  sandbox is specific enough to be winnable (e.g., "B2B SaaS companies in Mexico City
-  with 50-200 employees") and large enough to achieve the BHAG. In the 7 Strata,
-  sandbox appears in the fourth column of the OPSP alongside differentiating activities.
+  Define los límites dentro de los que la empresa compite. Responde cuatro
+  preguntas: DÓNDE juegas (zonas geográficas), QUÉ vendes (3 a 5 categorías de
+  producto o servicio), a quién le vendes por qué canales de venta (socios,
+  directo, en línea, menudeo, mayoreo) y el pronóstico de cómo cambiará esa caja
+  en 3 a 5 años. La Caja de arena evita la sobreextensión: la empresa que quiere
+  atender a todos no atiende bien a nadie. Ejemplo: "Tortillería El Sol: zona
+  metropolitana de Guadalajara; tortilla, totopo y masa; venta directa y
+  mayoreo a fondas; en 5 años, tiendas de conveniencia". Vive en la cuarta
+  columna del OPSP junto a las actividades diferenciadoras.
+questions:
+  - "DÓNDE: ¿en qué zonas geográficas vas a competir?"
+  - "QUÉ: ¿cuáles son las 3 a 5 categorías de producto o servicio que vendes?"
+  - "Canales: ¿a quién le vendes y por qué canales (socios, directo, en línea, menudeo, mayoreo)?"
+  - "Pronóstico: ¿cómo cambiarán tus zonas, categorías y canales en 3 a 5 años?"
 relationships:
   - type: belongs-to
     target: decision-strategy
