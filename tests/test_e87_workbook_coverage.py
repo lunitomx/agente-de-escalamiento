@@ -34,6 +34,53 @@ def build_node_index(root: Path) -> dict[str, list[int]]:
     return index
 
 
+def check_coverage(
+    coverage: dict[str, Any],
+    index: dict[str, list[int]],
+    frozen_pending: frozenset[int],
+) -> list[str]:
+    """Reglas del mapa de cobertura. Devuelve errores `p. N: ...`; vacío = verde."""
+    errors: list[str] = []
+    total = int(coverage.get("total_pages", 38))
+    pages: list[dict[str, Any]] = list(coverage.get("pages") or [])
+    pending: list[int] = [int(p) for p in coverage.get("pending") or []]
+
+    seen: set[int] = set()
+    by_page: dict[int, dict[str, Any]] = {}
+    for entry in pages:
+        number = int(entry["page"])
+        if number in seen:
+            errors.append(f"página repetida: {number}")
+        seen.add(number)
+        by_page[number] = entry
+    missing = sorted(set(range(1, total + 1)) - seen)
+    if missing:
+        errors.append(f"faltan páginas: {missing}")
+
+    for number in pending:
+        if number not in frozen_pending:
+            errors.append(f"p. {number}: fuera de la lista congelada")
+        entry = by_page.get(number)
+        if entry is not None and entry.get("class") != "tool":
+            errors.append(f"p. {number}: en pending pero es no_tool")
+
+    for number, entry in sorted(by_page.items()):
+        nodes: list[str] = [str(n) for n in entry.get("nodes") or []]
+        if entry.get("class") == "no_tool" and not entry.get("reason"):
+            errors.append(f"p. {number}: no_tool sin reason")
+        for node in nodes:
+            if node not in index:
+                errors.append(f"p. {number}: nodo inexistente {node}")
+        if entry.get("class") != "tool" or number in pending:
+            continue
+        if not nodes:
+            errors.append(f"p. {number}: tool fuera de pending sin nodos")
+        for node in nodes:
+            if node in index and number not in index[node]:
+                errors.append(f"p. {number}: {node} no cita la página")
+    return errors
+
+
 # --- Tarea 1 · índice de nodos -------------------------------------------
 
 
@@ -43,11 +90,104 @@ def test_build_node_index_reads_ids_and_pages(tmp_path: Path) -> None:
         "id: worksheet-bmc\nsource:\n  workbook: strategy-2025\n  pages: [8, 10]\n",
         encoding="utf-8",
     )
-    (tmp_path / "sandbox.yaml").write_text("id: tool-sandbox\nname: Sandbox\n", encoding="utf-8")
-    (tmp_path / "registry.yaml").write_text("worksheets:\n  - id: x\n", encoding="utf-8")
+    (tmp_path / "sandbox.yaml").write_text(
+        "id: tool-sandbox\nname: Sandbox\n", encoding="utf-8"
+    )
+    (tmp_path / "registry.yaml").write_text(
+        "worksheets:\n  - id: x\n", encoding="utf-8"
+    )
     (tmp_path / "list.yaml").write_text("- 1\n- 2\n", encoding="utf-8")
 
     assert build_node_index(tmp_path) == {
         "worksheet-bmc": [8, 10],
         "tool-sandbox": [],
     }
+
+
+# --- Tarea 2 · reglas de estructura ---------------------------------------
+
+TOOL_PAGES = [*range(7, 27), *range(28, 37)]
+
+
+def _page(n: int) -> dict[str, Any]:
+    if n in TOOL_PAGES:
+        return {"page": n, "class": "tool"}
+    return {"page": n, "class": "no_tool", "reason": "portada o notas"}
+
+
+def _map(
+    pages: list[dict[str, Any]] | None = None, pending: list[int] | None = None
+) -> dict[str, Any]:
+    return {
+        "total_pages": 38,
+        "pages": pages if pages is not None else [_page(n) for n in range(1, 39)],
+        "pending": pending if pending is not None else list(TOOL_PAGES),
+    }
+
+
+FROZEN = frozenset(TOOL_PAGES)
+
+
+def test_synthetic_full_map_is_clean() -> None:
+    assert check_coverage(_map(), {}, FROZEN) == []
+
+
+def test_missing_page_is_reported() -> None:
+    pages = [_page(n) for n in range(1, 39) if n != 12]
+    pending = [p for p in TOOL_PAGES if p != 12]
+    assert "faltan páginas: [12]" in check_coverage(_map(pages, pending), {}, FROZEN)
+
+
+def test_repeated_page_is_reported() -> None:
+    pages = [_page(n) for n in range(1, 39)] + [_page(3)]
+    assert "página repetida: 3" in check_coverage(_map(pages), {}, FROZEN)
+
+
+def test_no_tool_without_reason_is_reported() -> None:
+    pages = [_page(n) for n in range(1, 39)]
+    pages[36] = {"page": 37, "class": "no_tool"}
+    assert "p. 37: no_tool sin reason" in check_coverage(_map(pages), {}, FROZEN)
+
+
+# --- Tarea 3 · reglas de pending y nodos ----------------------------------
+
+
+def test_pending_no_tool_page_is_reported() -> None:
+    errors = check_coverage(_map(pending=[*TOOL_PAGES, 5]), {}, FROZEN | {5})
+    assert "p. 5: en pending pero es no_tool" in errors
+
+
+def test_pending_outside_frozen_list_is_reported() -> None:
+    errors = check_coverage(_map(pending=[*TOOL_PAGES, 40]), {}, FROZEN)
+    assert "p. 40: fuera de la lista congelada" in errors
+
+
+def test_tool_outside_pending_without_nodes_is_reported() -> None:
+    pending = [p for p in TOOL_PAGES if p != 10]
+    errors = check_coverage(_map(pending=pending), {}, FROZEN)
+    assert "p. 10: tool fuera de pending sin nodos" in errors
+
+
+def test_node_that_does_not_cite_page_is_reported() -> None:
+    pages = [_page(n) for n in range(1, 39)]
+    pages[9] = {"page": 10, "class": "tool", "nodes": ["worksheet-bmc"]}
+    pending = [p for p in TOOL_PAGES if p != 10]
+    errors = check_coverage(_map(pages, pending), {"worksheet-bmc": [8]}, FROZEN)
+    assert errors == ["p. 10: worksheet-bmc no cita la página"]
+
+
+def test_node_that_cites_page_leaves_pending_cleanly() -> None:
+    pages = [_page(n) for n in range(1, 39)]
+    pages[9] = {"page": 10, "class": "tool", "nodes": ["worksheet-bmc"]}
+    pending = [p for p in TOOL_PAGES if p != 10]
+    assert (
+        check_coverage(_map(pages, pending), {"worksheet-bmc": [8, 10]}, FROZEN) == []
+    )
+
+
+def test_missing_node_is_reported_even_in_pending() -> None:
+    pages = [_page(n) for n in range(1, 39)]
+    pages[8] = {"page": 9, "class": "tool", "nodes": ["worksheet-x"]}
+    assert check_coverage(_map(pages), {}, FROZEN) == [
+        "p. 9: nodo inexistente worksheet-x"
+    ]
