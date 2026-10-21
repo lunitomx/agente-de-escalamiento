@@ -189,7 +189,7 @@ def test_bad_next_sheet_is_rejected(bad: dict[str, Any]) -> None:
 
 def test_every_registered_sheet_loads_and_passes_the_contract() -> None:
     sheets = list_worksheets()
-    assert len(sheets) == 18
+    assert len(sheets) == 19
     for sheet in sheets:
         content = load_worksheet_content(sheet)
         assert content.get("metadata") or content.get("guide"), sheet["id"]

@@ -3,9 +3,9 @@ type: registry
 name: Worksheet Registry
 name_es: Registro de Hojas de Trabajo
 description: >
-  Central index of all 18 worksheets across the 4 ESCALA decisions.
+  Central index of all 19 worksheets across the 4 ESCALA decisions.
   Enables deterministic lookup by decision, prerequisite, or output type.
-total_worksheets: 18
+total_worksheets: 19
 worksheets:
 
   # ── PEOPLE (4) ─────────────────────────────────────────────────────────────
@@ -70,7 +70,7 @@ worksheets:
     frequency: annual
     tags: [people, team, growth, hiring]
 
-  # ── STRATEGY (7) ───────────────────────────────────────────────────────────
+  # ── STRATEGY (8) ───────────────────────────────────────────────────────────
 
   - id: worksheet-opsp
     decision: strategy
@@ -182,6 +182,23 @@ worksheets:
     time_es: "1-2 horas"
     frequency: annual
     tags: [strategy, differentiation, competitors]
+
+  - id: worksheet-sandbox
+    decision: strategy
+    name: Sandbox Worksheet
+    name_es: "Caja de arena"
+    node_path: strategy/worksheets/sandbox.yaml
+    prerequisites: [worksheet-core-customer]
+    outputs:
+      - zones where you compete and where you do not
+      - 3 to 5 product or service categories
+      - channels by customer type
+      - 3 to 5 possible changes in 3 to 5 years
+    difficulty: intermediate
+    time_estimate: "1-2 hours"
+    time_es: "1-2 horas"
+    frequency: annual
+    tags: [strategy, sandbox, focus, market]
 
   # ── EXECUTION (4) ──────────────────────────────────────────────────────────
 

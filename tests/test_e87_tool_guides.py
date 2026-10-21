@@ -334,3 +334,25 @@ def test_bmc_keeps_the_fields_the_strategy_canvas_reads() -> None:
     assert guide is not None
     ids = {s.id for s in guide.guide.steps}
     assert {"segmentos", "propuesta-de-valor"} <= ids
+
+
+SANDBOX = KNOWLEDGE / "strategy" / "worksheets" / "sandbox.yaml"
+
+
+def test_sandbox_passes_the_contract() -> None:
+    content = _load(SANDBOX)
+    assert content["id"] == "worksheet-sandbox"
+    assert content["decision"] == "strategy"
+    guide = parse_guide(content)
+    assert guide is not None
+    steps = guide.guide.steps
+    assert [s.id for s in steps] == ["donde", "que", "canales", "pronostico"]
+    assert all(s.example.startswith("Tortillería El Sol:") for s in steps)
+    assert sorted(t.source for t in guide.tips) == [
+        "work/research/e87-tips/sandbox.md#f2",
+        "work/research/e87-tips/sandbox.md#f3",
+        "work/research/e87-tips/sandbox.md#f4",
+    ]
+    assert set(content["ai_prompt"]) == {"text"}
+    assert guide.view.layout == "canvas"
+    assert content["metadata"]["fields"] == ["donde", "que", "canales", "pronostico"]
