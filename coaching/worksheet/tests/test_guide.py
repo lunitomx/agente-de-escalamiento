@@ -140,7 +140,12 @@ def test_unknown_layout_is_rejected() -> None:
 
 def test_derived_from_shape_is_accepted() -> None:
     derived = [
-        {"sheet": "worksheet-core-customer", "fields": ["quien-es"], "into": "x"}
+        {
+            "sheet": "worksheet-core-customer",
+            "fields": ["quien-es"],
+            "into": "x",
+            "title": "Cliente central",
+        }
     ]
     guide = parse_guide(_sheet(derived_from=derived))
     assert guide is not None and guide.derived_from[0].required is True

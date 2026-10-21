@@ -142,12 +142,46 @@ def load_worksheet_content(
     return {**worksheet, **content}
 
 
+def _step_ids(content: dict[str, Any]) -> set[str]:
+    guide: Any = content.get("guide")
+    steps: Any = guide.get("steps") if isinstance(guide, dict) else None
+    if not isinstance(steps, list):
+        return set()
+    return {str(s.get("id")) for s in steps if isinstance(s, dict)}
+
+
+def derived_errors(content: dict[str, Any], base_path: Path | None = None) -> list[str]:
+    """Each ``derived_from`` sheet is registered and each field is one of its steps.
+
+    The shape and self-derivation are checked by ``ToolGuide`` (S87.7 D3).
+    """
+    guide = parse_guide(content)
+    if guide is None:
+        return []
+    registry = list_worksheets(base_path=base_path)
+    errors: list[str] = []
+    for source in guide.derived_from:
+        sheet = next((w for w in registry if w.get("id") == source.sheet), None)
+        if sheet is None:
+            errors.append(
+                f"derived_from nombra una hoja que no está en el registro: {source.sheet}"
+            )
+            continue
+        known = _step_ids(load_worksheet_content(sheet, base_path))
+        errors += [
+            f"derived_from pide el campo {field}, que no es un paso de {source.sheet}"
+            for field in source.fields
+            if field not in known
+        ]
+    return errors
+
+
 class _GuideError(Exception):
     """The sheet carries a guide that breaks the ToolGuide contract."""
 
 
 def _steps_and_tips(
-    worksheet: dict[str, Any], content: dict[str, Any]
+    worksheet: dict[str, Any], content: dict[str, Any], base_path: Path | None = None
 ) -> tuple[list[GuideStep], list[Tip]]:
     """Guided steps and tips, or one plain step per legacy ``metadata.fields`` text."""
     try:
@@ -157,6 +191,11 @@ def _steps_and_tips(
         raise _GuideError(
             f"La hoja {worksheet['id']} no cumple el contrato: {message}"
         ) from exc
+    errors = derived_errors(content, base_path)
+    if errors:
+        raise _GuideError(
+            f"La hoja {worksheet['id']} no cumple el contrato: {'; '.join(errors)}"
+        )
     if guide is not None:
         return list(guide.guide.steps), list(guide.tips)
     fields = content.get("metadata", {}).get("fields", [])
@@ -309,7 +348,7 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
 
         content = load_worksheet_content(worksheet, base)
         try:
-            steps, tips = _steps_and_tips(worksheet, content)
+            steps, tips = _steps_and_tips(worksheet, content, base)
         except _GuideError as exc:
             return _contract_error(str(exc))
         total_steps = len(steps) + 2  # information + steps + final review
@@ -418,7 +457,7 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
 
         content = load_worksheet_content(worksheet, base)
         try:
-            steps, tips = _steps_and_tips(worksheet, content)
+            steps, tips = _steps_and_tips(worksheet, content, base)
         except _GuideError as exc:
             return _contract_error(str(exc))
 
@@ -471,7 +510,7 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
         )
         content = load_worksheet_content(worksheet, base)
         try:
-            _steps_and_tips(worksheet, content)
+            _steps_and_tips(worksheet, content, base)
         except _GuideError as exc:
             return _contract_error(str(exc))
 
