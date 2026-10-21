@@ -24,3 +24,18 @@
   strategy-canvas f2 (HBR Coherence Premium) y f3 (Umbrex); `added_by: S87.7`. test_e87_research_tips: 44 de 44.
 - Hotspots listados: registro 18→20, test_root, test_guide:187, test_view, cobertura pending 7/12/28/29, E6 85/81 regenerar.
 - Grafo sin patrones útiles; sin drift-hotspots.json; portafolio additive.
+
+## Phase: implement (S87.7 · ESCALA-114) — 2026-10-20
+
+- T1 721fd2d7: búsqueda por nombre en español (`engine.find_worksheet`, sin acentos) y paso 1 en español; `name_es`/`time_es` en 20 entradas.
+- T2 906f25e3: `label_heading` (sin "?:" ni "?.:") y prompt de IA en Revisión Final, HTML y .md.
+- T3 da731833: `DerivedSource.title`, autoderivación rechazada, `derived_errors` contra registro y pasos.
+- T4 7408ba1b: hoja Caja de arena (4 pasos, 3 tips, prompt, lienzo).
+- T5 e06744fa: lienzo de estrategia (5 fuentes, BMC opcional, paso `decision`); lee solo hojas `completed`.
+- T6 e80088d9: cobertura del workbook (7/12/28/29; pending solo 34), mapa E6 regenerado con su generador 87/83, SKILL.md.
+- Pruebas: 3750 passed, 5 skipped (base 3709). ruff, format y pyright de coaching/worksheet: limpios.
+- `rai gate check --all`: 4 de 51 fallan, las mismas de la línea base (domain-model, last-diff, graph, skill-cli-refint).
+- Prueba del dueño en carpeta temporal: "promesa de marca" encuentra la hoja; encabezado en español;
+  Caja de arena llena y guardada; Revisión con prompt; HTML y .md sin "?:"; el lienzo muestra Caja de arena y líneas "Falta".
+- Observaciones: el resumen de Promesa de marca sigue en inglés (previo, fuera de alcance). Las líneas "Falta" muestran
+  slug e id, como pide el diseño. El paso 1 dice "1-2 horas sin interrupciones" para toda hoja, incluso el lienzo (30-60 min).
