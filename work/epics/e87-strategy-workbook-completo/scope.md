@@ -53,7 +53,7 @@ Que ESCALA cubra todas las herramientas del workbook de Strategy (38 páginas). 
 | S87.6 | ESCALA-113 | Cliente central: gráfica "¿Está claro tu QUIÉN?" y personas ejemplo (p. 13-14), las 3 preguntas (p. 20) y el prompt (p. 16). Hoja nueva de Actividades diferenciadoras con competidores y 4 ejes (p. 25) y prompt (p. 26). | 5 | S87.2, S87.3 | pendiente |
 | S87.7 | ESCALA-114 | Hoja de Caja de arena con pronóstico a 3-5 años y prompt (p. 28-29). Strategy Canvas de una hoja (p. 7, 12) que lee las 4 piezas con el contrato `derived_from` y muestra "Falta: …" si una hoja origen no está llena. | 5 | S87.4, S87.5, S87.6 | pendiente |
 | S87.8 | ESCALA-115 | Hoja de Vision Summary (p. 36) con `ontology_ref: tool.vision-summary`, probada contra `s64.1.json` y los campos de E65. Prompt de 10 tareas y compromiso (p. 34-35). | 3 | S87.7 | pendiente |
-| S87.9 | ESCALA-116 | Extiende `worksheet-oppp`: 8 columnas × 4 filas de la p. 32 (p. 30-32) y tableros de visión con su prompt (p. 33). Corrige la tarjeta `people/tools/oppp.yaml`. | 3 | S87.2, S87.3 | pendiente |
+| S87.9 | ESCALA-116 | Extiende `worksheet-oppp`: 8 columnas × 4 filas de la p. 32 (p. 30-32) y tableros de visión con su prompt (p. 33). Corrige la tarjeta `people/tools/oppp.yaml`. | 3 | S87.2, S87.3 | cerrada |
 
 Tips S87.3: 24 de 42 trianguladas por familia. Faltan fuentes para Vision Summary (1) y Plan personal/OPPP (2): S87.8 y S87.9 investigan fuentes fuera de las familias Scaling Up y EOS hasta llegar a 3 y quitan su SHORTFALL.
 
