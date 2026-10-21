@@ -1,6 +1,6 @@
 # E87 · Diseño — Strategy workbook completo
 
-Jira: ESCALA-107 · Fecha: 2026-10-20 · Revisión 2 (después de la revisión adversaria, `adversarial-review.md`).
+Jira: ESCALA-107 · Fecha: 2026-10-20 · Revisión 3 (revisión adversaria aplicada, `adversarial-review.md`; consistencia final en write-design).
 Entradas: brief.md, scope.md, capability-map.md, evidence/predesign.json, adversarial-review.md.
 
 ## Flujo en una pantalla
@@ -266,8 +266,8 @@ Pruebas en S87.8:
   - `SKILL.md` contiene el paso de abrir con `open_cmd` y el plan B del `.md`; no cita `.escala/agent/validators/` ni `.escala/coaching/`.
   - Las 15 hojas viejas siguen cargando; `test_render.py` sin cambios de expectativa.
 - **S87.3:** 8 archivos en `work/research/e87-tips/`, cada uno con al menos 3 hallazgos con 3 fuentes.
-- **S87.4 a S87.9:** cada hoja nueva o extendida pasa `ToolGuide`; sus páginas salen de `pending`; un guardado de ejemplo produce la vista con todas sus secciones y `open_cmd`.
-- **S87.7 además:** `derived_from` con hojas llenas, a medias y vacías; validación de `sheet` y `field`.
+- **S87.4 a S87.9:** cada hoja nueva o extendida pasa `ToolGuide`; sus páginas salen de `pending`; un guardado de ejemplo escribe los tres archivos (YAML de respuestas, HTML y MD de la vista) y devuelve `open_cmd` con la ruta del HTML escrito; la vista muestra todas sus secciones; `ai_prompt`, cuando existe, cita una página de `source.pages`.
+- **S87.7 además:** `derived_from` con hojas llenas, a medias y vacías; validación de `sheet` y `field`. Depende de S87.4 porque `worksheet-bmc` debe existir en el registro.
 - **S87.8 además:** pruebas de C7.
 
 ## Riesgos
@@ -305,10 +305,12 @@ modules_affected:
     change: create
   - path: coaching/worksheet/view.py
     change: create
+  - path: coaching/worksheet/tests/
+    change: modify
   - path: coaching/dashboard/boards/render.py
     change: modify
   - path: escala-skills/escala-worksheet/SKILL.md
-    change: rewrite
+    change: modify   # reescritura completa; los pasos actuales citan rutas que no existen
   - path: work/research/e87-tips/
     change: create
   - path: tests/test_e87_workbook_coverage.py
