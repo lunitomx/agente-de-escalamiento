@@ -39,3 +39,15 @@
   Caja de arena llena y guardada; Revisión con prompt; HTML y .md sin "?:"; el lienzo muestra Caja de arena y líneas "Falta".
 - Observaciones: el resumen de Promesa de marca sigue en inglés (previo, fuera de alcance). Las líneas "Falta" muestran
   slug e id, como pide el diseño. El paso 1 dice "1-2 horas sin interrupciones" para toda hoja, incluso el lienzo (30-60 min).
+
+## Phase: verify · quality-review (S87.7 · ESCALA-114) — 2026-10-21
+
+- Veredicto: FAIL, 2 Critical. Artefacto: `work/epics/e87-strategy-workbook-completo/stories/s87.7-qr.md`.
+- C1: el resumen del paso 1 sigue en inglés en 17 de 20 hojas (incluye Promesa de marca, el caso del seguimiento 1);
+  la lista dice "Worksheets Disponibles"/"Worksheet". Arreglo: `summary_es` en el registro (patrón D7) + prueba de 20.
+- C2: el paso 1 fija "1-2 horas sin interrupciones"; el lienzo dice 30-60 minutos arriba (15 de 20 hojas se contradicen).
+  Arreglo: usar `_time_es(worksheet)`.
+- Pasa: búsqueda en español (engine e __init__), sin "?:"/"?.:"/".:" en 20 de 20, prompt de IA en Revisión/md/html
+  en 7 de 7, derived_from (solo completed, Falta por campo, no escribe origen, validaciones), mapa E6 regenerado
+  idéntico 87/83, registro 20, tips ≥3 familias. 198 pruebas, ruff y pyright limpios; 7 de 7 mutaciones muertas.
+- Recommended: "Falta" con claves (R1, diseño D4), "Esto ya llenaste:" con 0 llenas (R2), `##` bajo `###` (R3).
