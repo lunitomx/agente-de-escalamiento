@@ -19,6 +19,9 @@ ROOT = Path(__file__).resolve().parents[1]
 KNOWLEDGE = ROOT / "conocimiento"
 POLICY = ROOT / "governance" / "public-boundary.yaml"
 CORE_CUSTOMER = KNOWLEDGE / "strategy" / "worksheets" / "core-customer.yaml"
+DIFF_ACTIVITIES = (
+    KNOWLEDGE / "strategy" / "worksheets" / "differentiating-activities.yaml"
+)
 ANCHOR_SOURCE_RE = re.compile(r"^(work/research/e87-tips/[a-z0-9-]+\.md)#(f\d+)$")
 YAML_BLOCK_RE = re.compile(r"```yaml\n(.*?)\n```", re.DOTALL)
 
@@ -70,6 +73,35 @@ def test_core_customer_passes_the_contract() -> None:
     assert len(guide.tips) == 5
     assert guide.view.layout == "cards"
     assert len(guide.view.sections) == 4
+    assert guide.ai_prompt is not None and guide.ai_prompt.text
+
+
+def test_differentiating_activities_passes_the_contract() -> None:
+    content = _load(DIFF_ACTIVITIES)
+    guide = parse_guide(content)
+    assert guide is not None
+    assert content["id"] == "worksheet-differentiating-activities"
+    assert [s.id for s in guide.guide.steps] == [
+        "competidores",
+        "eje-personas",
+        "eje-producto",
+        "eje-operaciones",
+        "eje-terminos",
+        "actividades-elegidas",
+        "como-se-refuerzan",
+        "que-dejas-de-hacer",
+    ]
+    assert sorted(t.source.rsplit("#", 1)[1] for t in guide.tips) == [
+        "f1",
+        "f2",
+        "f4",
+    ]
+    assert guide.view.layout == "cards"
+    assert [sec.title for sec in guide.view.sections] == [
+        "Tu competencia",
+        "En qué eres distinto",
+        "Tus actividades diferenciadoras",
+    ]
     assert guide.ai_prompt is not None and guide.ai_prompt.text
 
 

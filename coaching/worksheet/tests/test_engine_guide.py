@@ -217,3 +217,72 @@ def test_a_backup_does_not_count_the_sheet_twice(tmp_path: Path) -> None:
     second = _run(tmp_path, "save")
     assert second["artifacts"]["backup_path"] is not None
     assert get_completed_ids(tmp_path) == [SHEET]
+
+
+SHEET_DA = "worksheet-differentiating-activities"
+ANSWERS_DA: dict[str, str] = {
+    "competidores": "Home Depot, tlapalería de la esquina",
+    "eje-personas": "Maestro asesora; HD cajero; esquina dueño solo",
+    "eje-producto": "Refacciones viejas; HD solo nuevo",
+    "eje-operaciones": "Entrega mismo día; HD 48 h",
+    "eje-terminos": "Crédito 30 días; los demás contado",
+    "actividades-elegidas": "Entrega mismo día, asesoría, crédito",
+    "como-se-refuerzan": "El crédito trae constructores que piden entrega",
+    "que-dejas-de-hacer": "No vendemos jardinería",
+}
+
+
+def _run_da(base: Path, action: str, **extra: Any) -> dict[str, Any]:
+    return run(
+        {"action": action, "worksheet_name": SHEET_DA, "base_path": str(base), **extra}
+    )
+
+
+def test_differentiating_activities_end_to_end(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(sys, "platform", "darwin")
+    started = _run_da(tmp_path, "start")
+    assert started["errors"] == []
+    assert started["artifacts"]["total_steps"] == len(ANSWERS_DA) + 2 == 10
+    first = _run_da(tmp_path, "step")["output"]
+    assert "### Paso 2: ¿Contra quién te compara tu Cliente central?" in first
+    assert "**Ejemplo:** Ferretería La Llave" in first
+    last: dict[str, Any] = {}
+    for step_id, answer in ANSWERS_DA.items():
+        last = _run_da(tmp_path, "step", fields={step_id: answer})
+    assert last["errors"] == []
+    assert "### Revisión Final" in last["output"]
+    worksheets = tmp_path / ".escala/my-company/worksheets"
+    assert read_yaml(worksheets / f"{SHEET_DA}.yaml")["status"] == "in_progress"
+    assert get_completed_ids(tmp_path) == []
+
+    result = _run_da(tmp_path, "save")
+    assert result["errors"] == []
+    assert result["artifacts"]["backup_path"] is None
+    assert read_yaml(worksheets / f"{SHEET_DA}.yaml")["fields"] == ANSWERS_DA
+    assert get_completed_ids(tmp_path) == [SHEET_DA]
+    stamp = date.today().isoformat()
+    vistas = tmp_path / ".escala" / "my-company" / "vistas"
+    html = vistas / f"{stamp}-{SHEET_DA}.html"
+    md = vistas / f"{stamp}-{SHEET_DA}.md"
+    assert html.is_file() and md.is_file()
+    assert result["artifacts"]["view"]["open_cmd"] == ["open", str(html)]
+    text = md.read_text(encoding="utf-8")
+    assert "Home Depot" in text
+    assert "En qué eres distinto" in text
+
+
+def test_core_customer_end_to_end_writes_view_and_open_cmd(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(sys, "platform", "darwin")
+    _fill_all(tmp_path)
+    result = _run(tmp_path, "save")
+    assert result["errors"] == []
+    view = result["artifacts"]["view"]
+    assert Path(view["html"]).is_file() and Path(view["md"]).is_file()
+    assert view["open_cmd"] == ["open", view["html"]]
+    md = Path(view["md"]).read_text(encoding="utf-8")
+    assert "Lo que ve tu Cliente central" in md
+    assert "No venden por kilo después de las 14:00" in md
