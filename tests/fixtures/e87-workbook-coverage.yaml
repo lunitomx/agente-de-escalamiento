@@ -108,15 +108,19 @@ pages:
     content: "Caja de arena: prompt y ejercicio · S87.7"
   - page: 30
     class: tool
+    nodes: [worksheet-oppp, tool-oppp]
     content: "Plan Personal de Una Página · S87.9"
   - page: 31
     class: tool
+    nodes: [worksheet-oppp, tool-oppp]
     content: "Plan Personal de Una Página · S87.9"
   - page: 32
     class: tool
-    content: "Plan Personal de Una Página (8 columnas × 4 filas) · S87.9"
+    nodes: [worksheet-oppp]
+    content: "Plan Personal de Una Página (8 áreas × 4 filas) · S87.9"
   - page: 33
     class: tool
+    nodes: [worksheet-oppp]
     content: "Tableros de visión y su prompt · S87.9"
   - page: 34
     class: tool
@@ -147,10 +151,6 @@ pending:
   - 21
   - 28
   - 29
-  - 30
-  - 31
-  - 32
-  - 33
   - 34
   - 35
   - 36

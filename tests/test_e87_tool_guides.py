@@ -22,6 +22,19 @@ CORE_CUSTOMER = KNOWLEDGE / "strategy" / "worksheets" / "core-customer.yaml"
 DIFF_ACTIVITIES = (
     KNOWLEDGE / "strategy" / "worksheets" / "differentiating-activities.yaml"
 )
+OPPP_SHEET = KNOWLEDGE / "people" / "worksheets" / "oppp.yaml"
+OPPP_CARD = KNOWLEDGE / "people" / "tools" / "oppp.yaml"
+OPPP_ROW_STEPS = ("vision-10-25-anos", "metas-un-ano", "empezar", "dejar")
+EIGHT_AREAS = (
+    "relación",
+    "familia",
+    "amigos",
+    "salud",
+    "trabajo",
+    "dinero",
+    "diversión",
+    "espiritual",
+)
 ANCHOR_SOURCE_RE = re.compile(r"^(work/research/e87-tips/[a-z0-9-]+\.md)#(f\d+)$")
 YAML_BLOCK_RE = re.compile(r"```yaml\n(.*?)\n```", re.DOTALL)
 
@@ -107,6 +120,68 @@ def test_differentiating_activities_passes_the_contract() -> None:
 
 def test_core_customer_keeps_legacy_fields() -> None:
     assert len(_load(CORE_CUSTOMER)["metadata"]["fields"]) == 6
+
+
+def test_oppp_passes_the_contract() -> None:
+    guide = parse_guide(_load(OPPP_SHEET))
+    assert guide is not None
+    assert [s.id for s in guide.guide.steps] == [*OPPP_ROW_STEPS, "tablero-de-vision"]
+    assert len(guide.tips) >= 3
+    assert guide.view.layout == "canvas"
+    assert len(guide.view.sections) == 5
+    assert guide.ai_prompt is not None
+    assert guide.ai_prompt.text.strip()
+    assert not re.search(r"\bp\.|\d", guide.ai_prompt.text)
+
+
+def test_oppp_row_steps_name_the_eight_areas() -> None:
+    guide = parse_guide(_load(OPPP_SHEET))
+    assert guide is not None
+    steps = {s.id: s for s in guide.guide.steps}
+    for step_id in OPPP_ROW_STEPS:
+        how = steps[step_id].how.lower()
+        missing = [area for area in EIGHT_AREAS if area not in how]
+        assert not missing, f"{step_id}: faltan {missing}"
+
+
+@pytest.mark.parametrize("part", ["imagen", "obstáculo", "si pasa"])
+def test_oppp_vision_board_step_asks_image_obstacle_and_if_then_plan(
+    part: str,
+) -> None:
+    guide = parse_guide(_load(OPPP_SHEET))
+    assert guide is not None
+    step = {s.id: s for s in guide.guide.steps}["tablero-de-vision"]
+    assert part in step.how.lower(), f"el tablero ya no pide '{part}'"
+
+
+ONE_PAGE_PLANS = (
+    OPPP_SHEET,
+    OPPP_CARD,
+    KNOWLEDGE / "strategy" / "worksheets" / "opsp.yaml",
+    KNOWLEDGE / "strategy" / "tools" / "opsp.yaml",
+)
+
+
+@pytest.mark.parametrize(
+    "path", ONE_PAGE_PLANS, ids=["oppp-sheet", "oppp-card", "opsp-sheet", "opsp-card"]
+)
+def test_one_page_plan_names_carry_their_accents(path: Path) -> None:
+    name = str(_load(path)["name_es"])
+    assert "Una Página" in name
+    assert "Pagina" not in name
+    assert "Estrategico" not in name
+
+
+@pytest.mark.parametrize("path", [OPPP_SHEET, OPPP_CARD], ids=["sheet", "card"])
+def test_oppp_card_matches_the_sheet(path: Path) -> None:
+    data = _load(path)
+    summary = str(data["summary"]).lower()
+    assert "eight" in summary
+    assert "vision board" in summary
+    assert "four columns" not in summary
+    assert "5f" not in summary
+    assert "5Fs" not in data["tags"]
+    assert "vision-board" in data["tags"]
 
 
 def test_at_least_one_guided_sheet_exists() -> None:
