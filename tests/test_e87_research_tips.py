@@ -136,9 +136,7 @@ def test_triangulated_rule(tool: str) -> None:
 
 # Known shortfalls after the family rule (S87.3 review). Each needs a third
 # independent family before S87.8/S87.9 copy its tips; remove it when fixed.
-SHORTFALL: dict[str, int] = {
-    "vision-summary": 1,
-}
+SHORTFALL: dict[str, int] = {}
 
 
 @pytest.mark.parametrize("tool", TOOLS)
