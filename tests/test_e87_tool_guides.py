@@ -116,6 +116,24 @@ def test_oppp_vision_board_step_asks_image_obstacle_and_if_then_plan(
     assert part in step.how.lower(), f"el tablero ya no pide '{part}'"
 
 
+ONE_PAGE_PLANS = (
+    OPPP_SHEET,
+    OPPP_CARD,
+    KNOWLEDGE / "strategy" / "worksheets" / "opsp.yaml",
+    KNOWLEDGE / "strategy" / "tools" / "opsp.yaml",
+)
+
+
+@pytest.mark.parametrize(
+    "path", ONE_PAGE_PLANS, ids=["oppp-sheet", "oppp-card", "opsp-sheet", "opsp-card"]
+)
+def test_one_page_plan_names_carry_their_accents(path: Path) -> None:
+    name = str(_load(path)["name_es"])
+    assert "Una Página" in name
+    assert "Pagina" not in name
+    assert "Estrategico" not in name
+
+
 @pytest.mark.parametrize("path", [OPPP_SHEET, OPPP_CARD], ids=["sheet", "card"])
 def test_oppp_card_matches_the_sheet(path: Path) -> None:
     data = _load(path)
