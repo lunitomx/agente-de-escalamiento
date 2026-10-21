@@ -1,0 +1,127 @@
+id: worksheet-bmc
+type: worksheet
+name: Business Model Canvas Worksheet
+name_es: Lienzo de modelo de negocio
+decision: strategy
+summary: >
+  A nine-block canvas of how the business works today, filled customer first:
+  who you serve, what you solve for them, how you reach them and how they pay.
+  A final check tests that every block connects. Four blocks point to the next
+  strategy sheet, the 4 pieces of your strategy: core customer, brand promise,
+  differentiating activities and sandbox.
+relationships:
+  - type: belongs-to
+    target: decision-strategy
+tags: [strategy, worksheet, business-model, canvas]
+metadata:
+  fields:
+    - "Customer segments: who you sell to"
+    - "Value proposition: what problem you solve for them"
+    - "Channels: how customers find you, buy and receive"
+    - "Customer relationships: how you win and keep them"
+    - "Revenue streams: how and how much each segment pays"
+    - "Key resources: what you need to deliver the proposition"
+    - "Key activities: what you do every day to keep the promise"
+    - "Key partners: who helps you and what they supply"
+    - "Cost structure: the biggest costs and what drives them"
+    - "Checklist: every block connects, notes are precise, assumptions are marked"
+  output: "Una hoja con los 9 bloques del negocio y la hoja de estrategia que sigue"
+  difficulty: intermediate
+  time_estimate: "1-2 hours"
+  frequency: annually
+guide:
+  steps:
+    - id: segmentos
+      question: "¿A quién le vendes? Escribe tus segmentos de clientes."
+      how: "Pocos segmentos, con nombre concreto. Si dos son muy distintos, anótalos por separado."
+      example: "Tortillería El Sol: fondas y taquerías a 3 km; familias del barrio."
+      next_sheet:
+        id: worksheet-core-customer
+        title: "Cliente central"
+    - id: propuesta-de-valor
+      question: "¿Qué problema les resuelves a esos clientes?"
+      how: "Una frase por segmento: qué obtienen contigo que no obtienen en otro lado."
+      example: "Tortillería El Sol: tortilla de nixtamal del día, entregada antes de las 9:00."
+      next_sheet:
+        id: worksheet-brand-promise
+        title: "Promesa de marca"
+    - id: canales
+      question: "¿Cómo llegas a tus clientes y cómo te compran?"
+      how: "Anota dónde te conocen, dónde compran y cómo les entregas."
+      example: "Tortillería El Sol: mostrador en el local y reparto en motocicleta a las fondas."
+      next_sheet:
+        id: worksheet-sandbox
+        title: "Caja de arena"
+    - id: relaciones
+      question: "¿Cómo consigues y conservas a cada segmento?"
+      how: "Para cada segmento, una frase: cómo lo atiendes y qué hace que vuelva."
+      example: "Tortillería El Sol: a las fondas, pedido fijo por WhatsApp y el mismo repartidor; a las familias, trato en mostrador."
+    - id: ingresos
+      question: "¿Cómo te pagan y cuánto?"
+      how: "Cada ingreso con el segmento que lo paga. Escribe 'venta por kilo', no solo 'ventas'."
+      example: "Tortillería El Sol: venta por kilo en mostrador; cuenta semanal a fondas."
+    - id: recursos-clave
+      question: "¿Qué necesitas tener para cumplir tu propuesta?"
+      how: "Lo que no puede faltar: equipo, personas, permisos, local o relaciones."
+      example: "Tortillería El Sol: máquina tortilladora, molino, dos motocicletas y un maestro tortillero."
+    - id: actividades-clave
+      question: "¿Qué haces tú, todos los días, para cumplir tu propuesta?"
+      how: "Las 3 a 5 actividades sin las que la propuesta no se cumple."
+      example: "Tortillería El Sol: nixtamalizar de madrugada; ruta de reparto fija antes de las 9:00."
+      next_sheet:
+        id: worksheet-differentiating-activities
+        title: "Actividades diferenciadoras"
+    - id: socios-clave
+      question: "¿Quién te ayuda a cumplir y qué te da?"
+      how: "Proveedores y aliados de los que dependes, con lo que te dan cada uno."
+      example: "Tortillería El Sol: productor de maíz de Jalisco; proveedor de gas con entrega diaria."
+    - id: costos
+      question: "¿Cuáles son tus costos más grandes y de dónde salen?"
+      how: "Los 3 a 5 costos más altos, cada uno ligado a una actividad o un recurso."
+      example: "Tortillería El Sol: maíz (nixtamal), gas (cocción), sueldos (turno de madrugada) y gasolina (reparto)."
+    - id: lista-de-verificacion
+      question: "¿Tu lienzo cuenta una historia completa?"
+      how: "Revisa tres cosas: cada bloque conecta con otro, cada nota es precisa y marcaste lo que solo supones."
+      example: "Tortillería El Sol: la cuenta semanal a fondas (ingreso) conecta con el segmento fondas; 'familias quieren reparto' es suposición, falta preguntar a 10."
+tips:
+  - text: "Llena primero a quién le vendes y qué problema le resuelves. Precios, socios y costos salen de esas dos respuestas."
+    source: "work/research/e87-tips/bmc.md#f1"
+    step: null
+  - text: "No anotes a todos tus clientes posibles. Elige pocos segmentos; si dos son muy distintos, sepáralos."
+    source: "work/research/e87-tips/bmc.md#f4"
+    step: segmentos
+  - text: "Revisa que cada ingreso tenga un segmento que paga y una propuesta que lo justifica."
+    source: "work/research/e87-tips/bmc.md#f2"
+    step: lista-de-verificacion
+  - text: "Marca lo que ya confirmaste con clientes y lo que solo supones. Cada semana prueba una suposición."
+    source: "work/research/e87-tips/bmc.md#f3"
+    step: lista-de-verificacion
+ai_prompt:
+  text: >
+    Describe tu negocio a la IA: quiénes son tus clientes, qué haces por ellos,
+    dónde están, qué es distinto en tu operación, cómo llegas a ellos (canales
+    y socios), tus costos y tus ingresos, y 2 o 3 competidores. Pídele que arme
+    tu lienzo de 9 bloques y 3 ideas para mejorarlo.
+view:
+  layout: canvas
+  sections:
+    - title: "Socios clave"
+      steps: [socios-clave]
+    - title: "Actividades clave"
+      steps: [actividades-clave]
+    - title: "Recursos clave"
+      steps: [recursos-clave]
+    - title: "Propuesta de valor"
+      steps: [propuesta-de-valor]
+    - title: "Relaciones con clientes"
+      steps: [relaciones]
+    - title: "Canales"
+      steps: [canales]
+    - title: "Segmentos de clientes"
+      steps: [segmentos]
+    - title: "Estructura de costos"
+      steps: [costos]
+    - title: "Fuentes de ingreso"
+      steps: [ingresos]
+    - title: "Lista de verificación"
+      steps: [lista-de-verificacion]

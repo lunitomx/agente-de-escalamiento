@@ -17,6 +17,7 @@ from coaching.worksheet import (
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
+EXPECTED_WORKSHEETS = 16
 
 
 def _seed_client(base: Path) -> None:
@@ -45,17 +46,17 @@ def test_package_registry_file_exists() -> None:
     assert PACKAGE_KNOWLEDGE == PACKAGE_ROOT / "conocimiento"
 
 
-def test_repo_lists_fifteen_worksheets() -> None:
-    assert len(list_worksheets(base_path=REPO_ROOT)) == 15
+def test_repo_lists_all_worksheets() -> None:
+    assert len(list_worksheets(base_path=REPO_ROOT)) == EXPECTED_WORKSHEETS
 
 
-def test_none_base_lists_fifteen_worksheets() -> None:
-    assert len(list_worksheets()) == 15
+def test_none_base_lists_all_worksheets() -> None:
+    assert len(list_worksheets()) == EXPECTED_WORKSHEETS
 
 
 def test_empty_base_falls_back_to_package(tmp_path: Path) -> None:
     assert knowledge_root(tmp_path) == PACKAGE_KNOWLEDGE
-    assert len(list_worksheets(base_path=tmp_path)) == 15
+    assert len(list_worksheets(base_path=tmp_path)) == EXPECTED_WORKSHEETS
 
 
 def test_client_knowledge_dir_without_registry_falls_back(tmp_path: Path) -> None:
@@ -89,7 +90,7 @@ def test_registry_total_matches_list() -> None:
     assert registry["total_worksheets"] == len(registry["worksheets"])
 
 
-def test_progress_counts_fifteen_on_empty_base(tmp_path: Path) -> None:
+def test_progress_counts_all_on_empty_base(tmp_path: Path) -> None:
     all_ws, completed = _get_worksheets(tmp_path)
-    assert len(all_ws) == 15
+    assert len(all_ws) == EXPECTED_WORKSHEETS
     assert completed == {}

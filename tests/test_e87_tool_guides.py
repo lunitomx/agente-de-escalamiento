@@ -101,3 +101,69 @@ def test_tip_sources_are_triangulated_anchors_or_clean(sheet: Path) -> None:
 def test_guided_sheet_has_no_root_source_key() -> None:
     for sheet in _guided_sheets():
         assert "source" not in _load(sheet), sheet.name
+
+
+BMC = KNOWLEDGE / "strategy" / "worksheets" / "bmc.yaml"
+BMC_BRIDGES = {
+    "segmentos": ("worksheet-core-customer", "Cliente central"),
+    "propuesta-de-valor": ("worksheet-brand-promise", "Promesa de marca"),
+    "canales": ("worksheet-sandbox", "Caja de arena"),
+    "actividades-clave": (
+        "worksheet-differentiating-activities",
+        "Actividades diferenciadoras",
+    ),
+}
+
+
+def test_bmc_passes_the_contract() -> None:
+    content = _load(BMC)
+    assert content["id"] == "worksheet-bmc"
+    assert content["decision"] == "strategy"
+    guide = parse_guide(content)
+    assert guide is not None
+    steps = guide.guide.steps
+    assert [s.id for s in steps] == [
+        "segmentos",
+        "propuesta-de-valor",
+        "canales",
+        "relaciones",
+        "ingresos",
+        "recursos-clave",
+        "actividades-clave",
+        "socios-clave",
+        "costos",
+        "lista-de-verificacion",
+    ]
+    assert all(s.example.startswith("Tortillería El Sol:") for s in steps)
+    bridges = {
+        s.id: (s.next_sheet.id, s.next_sheet.title)
+        for s in steps
+        if s.next_sheet is not None
+    }
+    assert bridges == BMC_BRIDGES
+    assert len(guide.tips) >= 3
+    sources = {t.source.rsplit("#", 1)[1] for t in guide.tips}
+    assert sources <= {"f1", "f2", "f3", "f4"}
+    assert guide.ai_prompt is not None
+    assert guide.view.layout == "canvas"
+    assert [s.title for s in guide.view.sections] == [
+        "Socios clave",
+        "Actividades clave",
+        "Recursos clave",
+        "Propuesta de valor",
+        "Relaciones con clientes",
+        "Canales",
+        "Segmentos de clientes",
+        "Estructura de costos",
+        "Fuentes de ingreso",
+        "Lista de verificación",
+    ]
+    assert len(content["metadata"]["fields"]) == 10
+
+
+def test_bmc_keeps_the_fields_the_strategy_canvas_reads() -> None:
+    """S87.7 reads these two ids through ``derived_from``; they must not change."""
+    guide = parse_guide(_load(BMC))
+    assert guide is not None
+    ids = {s.id for s in guide.guide.steps}
+    assert {"segmentos", "propuesta-de-valor"} <= ids

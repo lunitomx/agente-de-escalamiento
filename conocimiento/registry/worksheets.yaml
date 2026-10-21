@@ -3,9 +3,9 @@ type: registry
 name: Worksheet Registry
 name_es: Registro de Hojas de Trabajo
 description: >
-  Central index of all 15 worksheets across the 4 ESCALA decisions.
+  Central index of all 16 worksheets across the 4 ESCALA decisions.
   Enables deterministic lookup by decision, prerequisite, or output type.
-total_worksheets: 15
+total_worksheets: 16
 worksheets:
 
   # ── PEOPLE (4) ─────────────────────────────────────────────────────────────
@@ -62,7 +62,7 @@ worksheets:
     frequency: annual
     tags: [people, team, growth, hiring]
 
-  # ── STRATEGY (4) ───────────────────────────────────────────────────────────
+  # ── STRATEGY (5) ───────────────────────────────────────────────────────────
 
   - id: worksheet-opsp
     decision: strategy
@@ -120,6 +120,19 @@ worksheets:
     time_estimate: "2-3 hours"
     frequency: annual
     tags: [strategy, customer, segmentation, targeting]
+
+  - id: worksheet-bmc
+    decision: strategy
+    name: Business Model Canvas Worksheet
+    node_path: strategy/worksheets/bmc.yaml
+    prerequisites: []
+    outputs:
+      - nine-block business model
+      - next strategy sheet per block
+    difficulty: intermediate
+    time_estimate: "1-2 hours"
+    frequency: annual
+    tags: [strategy, business-model, canvas]
 
   # ── EXECUTION (4) ──────────────────────────────────────────────────────────
 
