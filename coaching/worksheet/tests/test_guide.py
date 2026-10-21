@@ -8,7 +8,7 @@ import pytest
 from pydantic import ValidationError
 
 from coaching.worksheet import list_worksheets, load_worksheet_content
-from coaching.worksheet.guide import ToolGuide, parse_guide
+from coaching.worksheet.guide import ToolGuide, parse_guide, source_label
 
 
 def _step(step_id: str) -> dict[str, str]:
@@ -153,3 +153,11 @@ def test_every_registered_sheet_loads_and_passes_the_contract() -> None:
         content = load_worksheet_content(sheet)
         assert content.get("metadata") or content.get("guide"), sheet["id"]
         parse_guide(content)
+
+
+def test_source_label_hides_the_internal_path() -> None:
+    assert (
+        source_label("work/research/e87-tips/core-customer.md#f3")
+        == "Investigación ESCALA (nota interna f3)"
+    )
+    assert source_label("Libro de trabajo, p. 13") == "Libro de trabajo, p. 13"

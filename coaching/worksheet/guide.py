@@ -11,6 +11,7 @@ test under ``tests/`` that reads the terms from the governance file.
 
 from __future__ import annotations
 
+import re
 from typing import Annotated, Any, Literal
 
 from pydantic import (
@@ -132,6 +133,21 @@ class ToolGuide(BaseModel):
             if missing:
                 raise ValueError(f"pasos sin sección en la vista: {', '.join(missing)}")
         return self
+
+
+_INTERNAL_SOURCE = re.compile(r"^work/research/[^#]+#(f\d+)$")
+
+
+def source_label(source: str) -> str:
+    """What the owner reads as a tip's source.
+
+    An internal research anchor (``work/research/...#f1``) stays in the YAML
+    as metadata; the owner sees a neutral label without the repo path.
+    """
+    match = _INTERNAL_SOURCE.match(source)
+    if match:
+        return f"Investigación ESCALA (nota interna {match.group(1)})"
+    return source
 
 
 def parse_guide(content: dict[str, Any]) -> ToolGuide | None:

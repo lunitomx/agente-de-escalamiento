@@ -10,7 +10,7 @@ from typing import Any
 from pydantic import ValidationError
 
 from ..core import read_yaml, write_yaml, ensure_dir
-from .guide import GuideStep, Tip, parse_guide
+from .guide import GuideStep, Tip, parse_guide, source_label
 from .view import build_view, open_command, save_view
 
 
@@ -135,7 +135,7 @@ def _step_lines(
     shown = [t for t in tips if t.step == step.id or (t.step is None and index == 0)]
     if shown:
         lines += ["**Tips:**"]
-        lines += [f"- {t.text} (fuente: {t.source})" for t in shown]
+        lines += [f"- {t.text} (fuente: {source_label(t.source)})" for t in shown]
     return lines
 
 
