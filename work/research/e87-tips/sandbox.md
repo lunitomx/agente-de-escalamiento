@@ -100,6 +100,11 @@ sources:
     url: https://distributionstrategy.com/2019/04/2019-state-of-e-business-in-distribution-part-2-half-of-suppliers-in-survey-sell-direct-online/
     origin: distribution-strategy-group
     kind: article
+  - title: "How to Build Direct Sales Alongside Distributor Channels (Frederik Jakobsen, Danish Lead Co., 2026)"
+    url: https://danishleadco.io/blog/how-to-build-direct-sales-alongside-distributor-channels
+    origin: danish-lead-co
+    kind: article
+    added_by: S87.7  # complemento: 3 familias fuera de Scaling Up
 ```
 
 Harnish: un fabricante de toldos que vendía solo con representantes abrió una
@@ -107,7 +112,8 @@ segunda empresa con otro nombre para vender directo. Ese canal fue el que más
 creció. También probó LinkedIn y Facebook; se quedó con el que dio resultado.
 BCG pide productos o precios distintos por canal, pilotos y hablar claro con
 los socios. Bein: hay proveedores que venden en línea más caro que el
-distribuidor.
+distribuidor. Jakobsen (complemento S87.7): separa por zona o producto, documenta
+las reglas con el distribuidor y usa la venta directa para probar mercados nuevos.
 
 <a id="f4"></a>
 ### f4 · Pronóstico: pocas tendencias y señales que vigilas
