@@ -69,7 +69,8 @@ class Board(BaseModel):
         return any(row.value is not None for row in self.rows)
 
 
-def _clean(text: str) -> str:
+def safe_text(text: str) -> str:
+    """Return ``text``, or ``HIDDEN`` when it carries a link or markup token."""
     lowered = text.lower()
     return HIDDEN if any(token in lowered for token in FORBIDDEN) else text
 
@@ -108,14 +109,14 @@ def build_board(proposal: BoardProposal, facts: Sequence[Fact], made_on: date) -
     largest = max(counts, default=0.0)
     rows = [
         BoardRow(
-            name=_clean(metric.metric_definition),
+            name=safe_text(metric.metric_definition),
             value=None
             if metric.metric_definition not in values
-            else _clean(_number(values[metric.metric_definition])),
-            source=_clean(metric.source),
-            period=_clean(metric.period),
+            else safe_text(_number(values[metric.metric_definition])),
+            source=safe_text(metric.source),
+            period=safe_text(metric.period),
             status=metric.status,
-            how_to_get=_clean(metric.how_to_get),
+            how_to_get=safe_text(metric.how_to_get),
             bar=None
             if metric.metric_definition not in values
             else _bar(
@@ -126,10 +127,10 @@ def build_board(proposal: BoardProposal, facts: Sequence[Fact], made_on: date) -
     ]
     return Board(
         board_id=proposal.board_id,
-        title=_clean(proposal.title),
-        decision=_clean(proposal.decision),
-        audience=_clean(proposal.audience),
-        cadence=_clean(proposal.cadence),
+        title=safe_text(proposal.title),
+        decision=safe_text(proposal.decision),
+        audience=safe_text(proposal.audience),
+        cadence=safe_text(proposal.cadence),
         made_on=made_on,
         rows=rows,
     )
@@ -148,7 +149,7 @@ def _subtitle(board: Board) -> str:
     return f"Lo mira: {board.audience}. {board.cadence}. Hecho el {spanish_date(board.made_on)}."
 
 
-_CSS = (
+BASE_CSS = (
     "*{box-sizing:border-box}"
     "body{margin:0;padding:16px;background:#f7f7f5;color:#1d2228;"
     "font:17px/1.5 system-ui,-apple-system,'Segoe UI',sans-serif}"
@@ -196,7 +197,7 @@ def render_html(board: Board) -> str:
     return (
         "<!doctype html>\n<html lang='es'><head><meta charset='utf-8'>"
         '<meta name="viewport" content="width=device-width, initial-scale=1">'
-        f"<title>{e(board.title)}</title><style>{_CSS}</style></head><body><main>"
+        f"<title>{e(board.title)}</title><style>{BASE_CSS}</style></head><body><main>"
         f"<p class='local'>{e(LOCAL_ONLY)}</p>"
         f"<h1>{e(board.title)}</h1><p class='muted'>{e(_subtitle(board))}</p>"
         f"{rows}"
@@ -226,7 +227,8 @@ def board_path(base: Path, board: Board, suffix: str) -> Path:
     return base / BOARDS_DIR / f"{board.made_on.isoformat()}-{board.board_id}.{suffix}"
 
 
-def _atomic_write(path: Path, content: str) -> None:
+def atomic_write(path: Path, content: str) -> None:
+    """Write ``content`` through a temp file in the same folder, then replace."""
     path.parent.mkdir(parents=True, exist_ok=True)
     handle, tmp = tempfile.mkstemp(dir=path.parent, prefix=".board-", suffix=".tmp")
     with os.fdopen(handle, "w", encoding="utf-8") as stream:
@@ -239,6 +241,6 @@ def save_board(base: Path, board: Board) -> list[Path]:
     if not board.has_numbers:
         raise ValueError("no_numbers")
     paths = [board_path(base, board, "html"), board_path(base, board, "md")]
-    _atomic_write(paths[0], render_html(board))
-    _atomic_write(paths[1], render_markdown(board))
+    atomic_write(paths[0], render_html(board))
+    atomic_write(paths[1], render_markdown(board))
     return paths

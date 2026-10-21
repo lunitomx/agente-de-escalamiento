@@ -1,5 +1,5 @@
 ---
-description: 'Guía paso a paso de worksheets de Escalamiento de Negocios desde la ontología. Usa core Python cross-platform.'
+description: 'Guía paso a paso de las hojas de trabajo de Escalamiento de Negocios: pregunta, cómo llenarla, ejemplo y tips. Al guardar abre una vista clara. Core Python cross-platform.'
 name: escala-worksheet
 ---
 
@@ -7,77 +7,79 @@ name: escala-worksheet
 
 ## Purpose
 
-Guiar al usuario a través de cualquier worksheet de Escalamiento de Negocios, cargado desde la ontología (E6). Validar campos, guardar progreso, marcar completados.
+Guiar al dueño por una hoja de trabajo, paso a paso. Cada paso trae la pregunta, cómo llenarla, un ejemplo real y tips con su fuente. Al guardar, el dueño ve su hoja en una página clara.
 
 ## Architecture
 
-Adapter delgado. Core logic en `.escala/coaching/worksheet/`.
+Lógica en el paquete `coaching.worksheet` (instalado con `install.sh`). Las hojas salen del registro de conocimiento del paquete, o del registro propio del cliente si existe.
+
+Todas las llamadas usan la misma forma: JSON por `stdin` a `run`.
+
+```bash
+echo '<JSON>' | python3 -c "
+import sys, json; sys.path.insert(0, '.')
+from coaching.worksheet import run
+print(json.dumps(run(json.loads(sys.stdin.read())), indent=2, ensure_ascii=False))
+"
+```
 
 ## Steps
 
-### Step 1: List Worksheets
+### Step 1: Listar las hojas
 
-```bash
-echo '{"action": "list", "base_path": "."}' | python3 -c "
-import sys, json; sys.path.insert(0, '.')
-from coaching.worksheet import run
-print(json.dumps(run(json.loads(sys.stdin.read())), indent=2, ensure_ascii=False))
-"
-```
+JSON: `{"action": "list", "base_path": "."}`
 
-### Step 2: Start Worksheet
+Muestra la tabla de `output`. Si el dueño ya nombró una hoja, salta al paso 2.
 
-```bash
-echo '{"action": "start", "worksheet_name": "face", "base_path": "."}' | python3 -c "
-import sys, json; sys.path.insert(0, '.')
-from coaching.worksheet import run
-print(json.dumps(run(json.loads(sys.stdin.read())), indent=2, ensure_ascii=False))
-"
-```
+### Step 2: Empezar o reanudar
 
-### Step 3: Advance Step
+Usa el `id` de la hoja que aparece en la tabla de `list`.
 
-Después de cada respuesta del usuario:
+- Nueva: `{"action": "start", "worksheet_name": "worksheet-core-customer", "base_path": "."}`
+- En progreso: `{"action": "resume", "worksheet_name": "worksheet-core-customer", "base_path": "."}`
 
-```bash
-echo '{"action": "step", "worksheet_name": "face", "fields": {"funciones": "CEO, Ventas, Operaciones, Finanzas"}, "base_path": "."}' | python3 -c "
-import sys, json; sys.path.insert(0, '.')
-from coaching.worksheet import run
-print(json.dumps(run(json.loads(sys.stdin.read())), indent=2, ensure_ascii=False))
-"
-```
+Muestra `output` tal como viene. En una hoja guiada cada paso trae:
 
-### Step 4: Complete & Save
+- la pregunta,
+- **Cómo llenarlo**,
+- **Ejemplo**,
+- **Tips**, cada uno con su fuente.
 
-```bash
-echo '{"action": "save", "worksheet_name": "face", "base_path": "."}' | python3 -c "
-import sys, json; sys.path.insert(0, '.')
-from coaching.worksheet import run
-print(json.dumps(run(json.loads(sys.stdin.read())), indent=2, ensure_ascii=False))
-"
-```
+Si `errors` dice que la hoja no cumple el contrato, muéstralo y detente.
 
-### Step 5: Quality Gate
+### Step 3: Avanzar un paso
 
-```bash
-python3 .escala/agent/validators/worksheet.py .escala/my-company/worksheets/face.yaml
-```
+Después de cada respuesta del dueño, guárdala con el id del paso:
 
-## Resume Flow
+JSON: `{"action": "step", "worksheet_name": "worksheet-core-customer", "fields": {"quien-es": "Dueños de fondas a 3 km que no pueden quedarse sin tortilla"}, "base_path": "."}`
 
-Si el usuario vuelve a un worksheet en progreso:
+El primer `step` (después de "listo") no lleva `fields`. Muestra el siguiente paso de `output`.
 
-```bash
-echo '{"action": "resume", "worksheet_name": "face", "base_path": "."}' | python3 -c "
-import sys, json; sys.path.insert(0, '.')
-from coaching.worksheet import run
-print(json.dumps(run(json.loads(sys.stdin.read())), indent=2, ensure_ascii=False))
-"
-```
+Después de la última respuesta, `output` trae la **Revisión Final**: cada pregunta con su respuesta. La hoja sigue en progreso. Muéstrala y espera:
+
+- Si el dueño quiere cambiar algo, manda un `step` con ese id en `fields`.
+- Si responde "confirmar", pasa al paso 4.
+
+### Step 4: Guardar (solo después de "confirmar")
+
+JSON: `{"action": "save", "worksheet_name": "worksheet-core-customer", "base_path": "."}`
+
+Solo `save` marca la hoja como completada. Escribe la vista (`.html` y su gemelo `.md`).
+
+### Step 5: Abrir la vista
+
+Lee `artifacts.view` del resultado de `save`: `{html, md, open_cmd}`.
+
+1. Si `open_cmd` no es `null`, córrelo tal cual. En macOS es `open <ruta.html>`; en Linux es `xdg-open <ruta.html>`. El navegador muestra la hoja.
+2. Si `open_cmd` es `null` o el comando falla, muestra en el chat el contenido del `.md` y da su ruta.
+3. Publicar el `.html` como artefacto es opcional; lo decide la sesión.
+
+La vista dice "Falta: …" en cada paso sin respuesta, con cómo llenarlo. Así el dueño ve qué le queda.
 
 ## Output
 
-| Item | Destination |
-|------|-------------|
-| Worksheet state | `.escala/my-company/worksheets/{id}.yaml` |
-| Completed worksheets | Mismo archivo con status: completed |
+| Item | Destino |
+|------|---------|
+| Respuestas de la hoja | `.escala/my-company/worksheets/<id>.yaml` |
+| Vista para el navegador | `.escala/my-company/vistas/AAAA-MM-DD-<id>.html` |
+| Gemelo para el chat | `.escala/my-company/vistas/AAAA-MM-DD-<id>.md` |
