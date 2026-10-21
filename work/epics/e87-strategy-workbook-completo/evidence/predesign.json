@@ -1,0 +1,389 @@
+{
+ "schema_version": "2",
+ "epic": "ESCALA-107",
+ "registry_hash": null,
+ "graph_revision": null,
+ "source_commit": "5172c03e",
+ "note": "Gemba por lectura directa; sin grafo ni vulture (repo sin dominio en packages/). Páginas del PDF leídas con pdftotext por página. Backlog por 'rai backlog search --adapter jira'.",
+ "claims": [
+  {
+   "id": "C1",
+   "capability": "Business Model Canvas y puente a Scaling Up",
+   "queries": [
+    "grep -il 'business model canvas' conocimiento escala-skills coaching ontology",
+    "ontología v2 s64.1"
+   ],
+   "hits": [
+    "sin tarjeta, hoja ni skill; bmc-board.html solo muestra 3 campos"
+   ],
+   "disposition": "new",
+   "jira_refs": []
+  },
+  {
+   "id": "C2",
+   "capability": "Strategy Canvas",
+   "queries": [
+    "grep -i 'strategy canvas' repo"
+   ],
+   "hits": [
+    "sin resultados"
+   ],
+   "disposition": "new",
+   "jira_refs": []
+  },
+  {
+   "id": "C3",
+   "capability": "Vision Summary",
+   "queries": [
+    "ontología v2 s64.1",
+    "E61 scope"
+   ],
+   "hits": [
+    "tool.vision-summary existe; E61 lo audita (en curso)"
+   ],
+   "disposition": "approved_overlap",
+   "jira_refs": [
+    "ESCALA-29"
+   ]
+  },
+  {
+   "id": "C4",
+   "capability": "Promesa de marca completa",
+   "queries": [
+    "conocimiento/strategy/concepts/brand-promise.yaml"
+   ],
+   "hits": [
+    "concepto sin página, sin 3 promesas con medida, sin Count On/Expect/Unique, sin antipromesas"
+   ],
+   "disposition": "extend",
+   "jira_refs": []
+  },
+  {
+   "id": "C5",
+   "capability": "Cliente central y sus preguntas (p. 20)",
+   "queries": [
+    "conocimiento/strategy/worksheets/core-customer.yaml"
+   ],
+   "hits": [
+    "hoja existe (6 campos); faltan las 3 preguntas de p. 20"
+   ],
+   "disposition": "extend",
+   "jira_refs": []
+  },
+  {
+   "id": "C6",
+   "capability": "Actividades diferenciadoras con competidores",
+   "queries": [
+    "conocimiento/strategy/concepts/differentiating-activities.yaml"
+   ],
+   "hits": [
+    "concepto existe; sin hoja ni competidores ni 4 ejes"
+   ],
+   "disposition": "extend",
+   "jira_refs": []
+  },
+  {
+   "id": "C7",
+   "capability": "Caja de arena y pronóstico",
+   "queries": [
+    "conocimiento/strategy/tools/sandbox.yaml"
+   ],
+   "hits": [
+    "define WHO/WHERE; contradice p. 28 (dónde, qué, canales, pronóstico)"
+   ],
+   "disposition": "extend",
+   "jira_refs": []
+  },
+  {
+   "id": "C8",
+   "capability": "Render visual de hojas llenas",
+   "queries": [
+    "coaching/dashboard/boards/render.py",
+    "escala_server/financial/report.py",
+    "escala_server/static/dashboards/strategy/"
+   ],
+   "hits": [
+    "E84 render HTML+MD sin JS reutilizable; 5 tableros web son plantilla clonada"
+   ],
+   "disposition": "reuse",
+   "jira_refs": []
+  },
+  {
+   "id": "C9",
+   "capability": "Motor de hojas y skill",
+   "queries": [
+    "coaching/worksheet/",
+    "escala-skills/escala-worksheet/SKILL.md"
+   ],
+   "hits": [
+    "guía en texto y guardado YAML; sin tips ni vista"
+   ],
+   "disposition": "extend",
+   "jira_refs": []
+  },
+  {
+   "id": "C10",
+   "capability": "Plan Personal de Una Página (p. 30-33)",
+   "queries": [
+    "workbook p. 30-33",
+    "grep personal plan"
+   ],
+   "hits": [
+    "sin dueño; fuera del brief"
+   ],
+   "disposition": "new",
+   "jira_refs": []
+  },
+  {
+   "id": "C11",
+   "capability": "Tarjetas con cita de página",
+   "queries": [
+    "grep page conocimiento/strategy"
+   ],
+   "hits": [
+    "ninguna cita de página"
+   ],
+   "disposition": "new",
+   "jira_refs": []
+  }
+ ],
+ "page_map": [
+  {
+   "page": 1,
+   "class": "no_tool",
+   "topic": "portada y propósito del día",
+   "coverage_today": "n/a"
+  },
+  {
+   "page": 2,
+   "class": "no_tool",
+   "topic": "agenda y preguntas rectoras",
+   "coverage_today": "n/a"
+  },
+  {
+   "page": 3,
+   "class": "no_tool",
+   "topic": "reglas del taller e introducciones",
+   "coverage_today": "n/a"
+  },
+  {
+   "page": 4,
+   "class": "no_tool",
+   "topic": "herramientas del programa; marco de crecimiento",
+   "coverage_today": "n/a"
+  },
+  {
+   "page": 5,
+   "class": "no_tool",
+   "topic": "ejemplos de diferenciación (muebles, abogados)",
+   "coverage_today": "n/a"
+  },
+  {
+   "page": 6,
+   "class": "no_tool",
+   "topic": "estrategia vs ejecución (cita de Jack Welch)",
+   "coverage_today": "n/a"
+  },
+  {
+   "page": 7,
+   "class": "tool",
+   "topic": "Strategy Canvas (lista de 4 piezas) + ejemplo de Vision Summary",
+   "coverage_today": "nueva: Strategy Canvas / Vision Summary"
+  },
+  {
+   "page": 8,
+   "class": "tool",
+   "topic": "BMC y puente a Scaling Up (6 grupos; empieza en Promesa de marca)",
+   "coverage_today": "nueva: BMC y puente"
+  },
+  {
+   "page": 9,
+   "class": "tool",
+   "topic": "prompt de IA: describe tu negocio, crea BMC y 3 ideas",
+   "coverage_today": "nueva: prompt IA"
+  },
+  {
+   "page": 10,
+   "class": "tool",
+   "topic": "plantilla del BMC (9 bloques)",
+   "coverage_today": "nueva: BMC"
+  },
+  {
+   "page": 11,
+   "class": "tool",
+   "topic": "lista de verificación de Strategyzer",
+   "coverage_today": "nueva: BMC checklist"
+  },
+  {
+   "page": 12,
+   "class": "tool",
+   "topic": "hoja Strategy Canvas de una página (cliente, promesa, actividades, caja de arena)",
+   "coverage_today": "nueva: Strategy Canvas"
+  },
+  {
+   "page": 13,
+   "class": "no_tool",
+   "topic": "gráfica 'Is your WHO clear?' (ejemplo)",
+   "coverage_today": "n/a"
+  },
+  {
+   "page": 14,
+   "class": "no_tool",
+   "topic": "ejemplos de perfiles de cliente (Michelle, Sarah)",
+   "coverage_today": "n/a"
+  },
+  {
+   "page": 15,
+   "class": "tool",
+   "topic": "hoja de Cliente central: atributos, top 5, descripción 10-20 palabras",
+   "coverage_today": "extend: core-customer worksheet"
+  },
+  {
+   "page": 16,
+   "class": "tool",
+   "topic": "ejercicio de Cliente central + prompt de IA (ICP)",
+   "coverage_today": "extend + prompt IA"
+  },
+  {
+   "page": 17,
+   "class": "tool",
+   "topic": "ejemplos de Promesa de marca con medida (NPS)",
+   "coverage_today": "extend: brand-promise"
+  },
+  {
+   "page": 18,
+   "class": "tool",
+   "topic": "ejemplos de promesas (3 LFs)",
+   "coverage_today": "extend: brand-promise"
+  },
+  {
+   "page": 19,
+   "class": "tool",
+   "topic": "antipromesas, compensaciones y NPS",
+   "coverage_today": "nueva: antipromesas y compensaciones"
+  },
+  {
+   "page": 20,
+   "class": "tool",
+   "topic": "pruebas de la promesa, preguntas del Cliente central (3), prompt de IA con KPIs",
+   "coverage_today": "nueva: pruebas, preguntas Cliente central, prompt"
+  },
+  {
+   "page": 21,
+   "class": "tool",
+   "topic": "hoja de Promesa de marca (Count On, Expect, Unique)",
+   "coverage_today": "nueva: hoja Promesa"
+  },
+  {
+   "page": 22,
+   "class": "tool",
+   "topic": "concepto de Actividades diferenciadoras",
+   "coverage_today": "extend: differentiating-activities"
+  },
+  {
+   "page": 23,
+   "class": "no_tool",
+   "topic": "ejemplo: abogado de lesiones personales",
+   "coverage_today": "n/a"
+  },
+  {
+   "page": 24,
+   "class": "no_tool",
+   "topic": "ejemplo Dell; criterios de las actividades (3-5, sinergia)",
+   "coverage_today": "n/a"
+  },
+  {
+   "page": 25,
+   "class": "tool",
+   "topic": "hoja de Actividades diferenciadoras con competidores y diferencias en Personas/Producto/Operaciones/Términos",
+   "coverage_today": "nueva: hoja Actividades"
+  },
+  {
+   "page": 26,
+   "class": "tool",
+   "topic": "ejercicio de Actividades + prompt de IA",
+   "coverage_today": "nueva: prompt IA"
+  },
+  {
+   "page": 27,
+   "class": "no_tool",
+   "topic": "ejemplo repetido de abogados",
+   "coverage_today": "n/a"
+  },
+  {
+   "page": 28,
+   "class": "tool",
+   "topic": "hoja de Caja de arena: dónde, qué, a quién (canales), pronóstico 3-5 años",
+   "coverage_today": "extend (corregir): sandbox + pronóstico"
+  },
+  {
+   "page": 29,
+   "class": "tool",
+   "topic": "ejercicio de Caja de arena + prompt de IA",
+   "coverage_today": "nueva: prompt IA"
+  },
+  {
+   "page": 30,
+   "class": "tool",
+   "topic": "Plan Personal de Una Página (fuera del brief; decidir)",
+   "coverage_today": "sin dueño"
+  },
+  {
+   "page": 31,
+   "class": "tool",
+   "topic": "Plan Personal: 2035 (fuera del brief; decidir)",
+   "coverage_today": "sin dueño"
+  },
+  {
+   "page": 32,
+   "class": "tool",
+   "topic": "hoja Plan Personal (fuera del brief; decidir)",
+   "coverage_today": "sin dueño"
+  },
+  {
+   "page": 33,
+   "class": "tool",
+   "topic": "prompt de IA y tableros de visión (fuera del brief; decidir)",
+   "coverage_today": "sin dueño (prompt IA)"
+  },
+  {
+   "page": 34,
+   "class": "tool",
+   "topic": "prompts de IA de 10 semanas y agenda; cierre",
+   "coverage_today": "nueva: prompts IA"
+  },
+  {
+   "page": 35,
+   "class": "tool",
+   "topic": "compromisos y Vision Summary de ejemplo",
+   "coverage_today": "reuse: tool.vision-summary (E61)"
+  },
+  {
+   "page": 36,
+   "class": "tool",
+   "topic": "hoja Scaling Up Vision Summary",
+   "coverage_today": "reuse: tool.vision-summary (E61)"
+  },
+  {
+   "page": 37,
+   "class": "no_tool",
+   "topic": "hoja de notas",
+   "coverage_today": "n/a"
+  },
+  {
+   "page": 38,
+   "class": "no_tool",
+   "topic": "aviso de derechos de Gazelles",
+   "coverage_today": "n/a"
+  }
+ ],
+ "gaps": [
+  "G1 sin mapa página-tarjeta",
+  "G2 sandbox contradice p.28",
+  "G3 tableros web son plantilla clonada",
+  "G4 sin código de artefacto Claude",
+  "G5 conocimiento/ vs .scaleup/ difieren en 18 archivos",
+  "G6 p.30-33 sin dueño",
+  "G7 prompts IA sin tarjeta"
+ ]
+}
