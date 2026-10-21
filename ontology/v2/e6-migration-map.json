@@ -438,7 +438,7 @@
       "legacy_id": "tool-oppp",
       "legacy_path": "conocimiento/people/tools/oppp.yaml",
       "legacy_type": "tool",
-      "sha256": "5bc9881817d95625cd0bb0175ccee6a1f5cce2533cc188c106ee4893bfa783b4"
+      "sha256": "7c607bd62e34a54667b718d425ad428b860cf02dbbb570611488d2f0ca09c5e3"
     },
     {
       "canonical_id": null,
@@ -486,7 +486,7 @@
       "legacy_id": "worksheet-oppp",
       "legacy_path": "conocimiento/people/worksheets/oppp.yaml",
       "legacy_type": "worksheet",
-      "sha256": "0ff7eae9ac914880ce18e20c0f4aa827c49d27c9b1ac3fc11a9c692ce7381403"
+      "sha256": "f217ba0134b0e0a2631db10d4cff3a964f668d0aafd0761a783267a565a9cd30"
     },
     {
       "canonical_id": null,
@@ -502,7 +502,7 @@
       "legacy_id": null,
       "legacy_path": "conocimiento/registry/worksheets.yaml",
       "legacy_type": null,
-      "sha256": "0ba627ba942895566e34c49ffa21a6a4c24e6d062fdc7d1ef22da88d09ddec23"
+      "sha256": "d51793de21cc12dca50ff84cb7682a13845ab5b4b2bea673bb3e9293cbe22a8d"
     },
     {
       "canonical_id": null,
@@ -590,7 +590,7 @@
       "legacy_id": "tool-opsp",
       "legacy_path": "conocimiento/strategy/tools/opsp.yaml",
       "legacy_type": "tool",
-      "sha256": "a1213a0f7d8b2d9f055360ba1cab98b1618ded67c37f7a90e0ad9a79e77904fb"
+      "sha256": "ed656f81793011dc5a4bd7e5b725c3792ac86556558fca8decf5f2afe13dc95f"
     },
     {
       "canonical_id": null,
@@ -635,6 +635,14 @@
     {
       "canonical_id": null,
       "disposition": "await-domain-evidence",
+      "legacy_id": "worksheet-bmc",
+      "legacy_path": "conocimiento/strategy/worksheets/bmc.yaml",
+      "legacy_type": "worksheet",
+      "sha256": "37c5e05ff9318b3d857e3135a860ca1ca2f94d1392ddba2d365c2125b569e8f1"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
       "legacy_id": "worksheet-brand-promise",
       "legacy_path": "conocimiento/strategy/worksheets/brand-promise.yaml",
       "legacy_type": "worksheet",
@@ -646,7 +654,15 @@
       "legacy_id": "worksheet-core-customer",
       "legacy_path": "conocimiento/strategy/worksheets/core-customer.yaml",
       "legacy_type": "worksheet",
-      "sha256": "190c9ba05148c88b447adbad7690d438d7d08de0eb395d7e1ab7b23be0260fb5"
+      "sha256": "023226ec82a0edfb725b6cc11c87d2d75b16123f87fedf1d6d3ebad36c69ee48"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "worksheet-differentiating-activities",
+      "legacy_path": "conocimiento/strategy/worksheets/differentiating-activities.yaml",
+      "legacy_type": "worksheet",
+      "sha256": "edc4d743b8c8f56cca5663bedfcd6fcd2f7fa3c3cfa00d1c634431063ed83c28"
     },
     {
       "canonical_id": null,
@@ -654,7 +670,7 @@
       "legacy_id": "worksheet-opsp",
       "legacy_path": "conocimiento/strategy/worksheets/opsp.yaml",
       "legacy_type": "worksheet",
-      "sha256": "8503e01d3b92419de5a925f3733abc7a9b080d0fd9b1f3ffbd75713bc26a96b9"
+      "sha256": "7366cf6a18e3414513d42fa19e2d3a563a8c27590ac1619a49ced66b82d314f7"
     },
     {
       "canonical_id": null,

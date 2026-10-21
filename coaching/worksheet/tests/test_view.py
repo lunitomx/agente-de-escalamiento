@@ -129,6 +129,7 @@ def test_html_and_markdown_share_labels_in_order() -> None:
         "Tus mejores clientes",
         "Tu Cliente central",
         "Revisión de la promesa",
+        "Lo que ve tu Cliente central",
     ]
 
 
@@ -171,3 +172,69 @@ def test_multi_line_answer_keeps_its_lines_in_html_and_markdown() -> None:
     md = render_markdown(view)
     assert "Fondas a 3 km  \n  &lt;b&gt;Taquerías&lt;/b&gt; del mercado\n" in md
     assert "\n&lt;b&gt;Taquerías" not in md
+
+
+def _bridged() -> dict[str, Any]:
+    content = _core_customer()
+    steps = [dict(s) for s in content["guide"]["steps"]]
+    quien = next(s for s in steps if s["id"] == "quien-es")
+    quien["next_sheet"] = {"id": "worksheet-sandbox", "title": "Caja de arena"}
+    return {**content, "guide": {"steps": steps}}
+
+
+def test_next_sheet_shows_after_the_answer() -> None:
+    view = build_view(_bridged(), _answers(), DAY)
+    item = view.blocks[1].items[0]
+    assert item.next_step == "Siguiente paso: llena Caja de arena"
+    page = render_html(view)
+    answer = "<p class='answer'>Dueños de fondas a 3 km"
+    bridge = "<p class='next'>Siguiente paso: llena Caja de arena</p>"
+    assert page.index(answer) < page.index(bridge)
+    md = render_markdown(view)
+    assert (
+        "- **¿Quién es tu Cliente central, en 10 a 20 palabras?**: "
+        "Dueños de fondas a 3 km que no pueden quedarse sin tortilla.\n"
+        "- Siguiente paso: llena Caja de arena\n"
+    ) in md
+
+
+def test_next_sheet_shows_even_when_the_answer_is_missing() -> None:
+    view = build_view(_bridged(), {}, DAY)
+    page = render_html(view)
+    assert page.index("Falta: ¿Quién es") < page.index("Siguiente paso: llena")
+    assert "- Siguiente paso: llena Caja de arena" in render_markdown(view)
+
+
+def test_step_without_next_sheet_shows_no_bridge() -> None:
+    view = build_view(_core_customer(), _answers(), DAY)
+    assert all(i.next_step is None for b in view.blocks for i in b.items)
+    assert "Siguiente paso" not in render_html(view)
+    assert "Siguiente paso" not in render_markdown(view)
+
+
+def test_bmc_canvas_has_ten_sections_and_four_bridges() -> None:
+    sheet = find_worksheet("worksheet-bmc")
+    assert sheet is not None
+    view = build_view(load_worksheet_content(sheet), {}, DAY)
+    assert view.layout == "canvas"
+    assert len(view.blocks) == 10
+    assert view.blocks[-1].title == "Lista de verificación"
+    bridges = [
+        (block.title, item.next_step)
+        for block in view.blocks
+        for item in block.items
+        if item.next_step is not None
+    ]
+    assert bridges == [
+        ("Actividades clave", "Siguiente paso: llena Actividades diferenciadoras"),
+        ("Propuesta de valor", "Siguiente paso: llena Promesa de marca"),
+        ("Canales", "Siguiente paso: llena Caja de arena"),
+        ("Segmentos de clientes", "Siguiente paso: llena Cliente central"),
+    ]
+    page = render_html(view)
+    md = render_markdown(view)
+    assert "<div class='canvas'>" in page
+    html_order = [page.index(step) for _, step in bridges if step]
+    md_order = [md.index(step) for _, step in bridges if step]
+    assert html_order == sorted(html_order)
+    assert md_order == sorted(md_order)

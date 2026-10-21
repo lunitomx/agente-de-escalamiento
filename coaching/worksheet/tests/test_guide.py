@@ -146,9 +146,45 @@ def test_derived_from_shape_is_accepted() -> None:
     assert guide is not None and guide.derived_from[0].required is True
 
 
+def _with_next(next_sheet: Any) -> dict[str, Any]:
+    step = {**_step("quien-es"), "next_sheet": next_sheet}
+    return _sheet(guide={"steps": [step, _step("necesidad")]})
+
+
+def test_next_sheet_is_accepted() -> None:
+    guide = parse_guide(
+        _with_next({"id": "worksheet-sandbox", "title": "Caja de arena"})
+    )
+    assert guide is not None
+    bridge = guide.guide.steps[0].next_sheet
+    assert bridge is not None
+    assert (bridge.id, bridge.title) == ("worksheet-sandbox", "Caja de arena")
+
+
+def test_next_sheet_is_optional() -> None:
+    guide = parse_guide(_sheet())
+    assert guide is not None
+    assert all(step.next_sheet is None for step in guide.guide.steps)
+
+
+@pytest.mark.parametrize(
+    "bad",
+    [
+        {"id": "Caja de arena", "title": "Caja de arena"},
+        {"id": "sandbox", "title": "Caja de arena"},
+        {"id": "worksheet-sandbox"},
+        {"id": "worksheet-sandbox", "title": "  "},
+        {"id": "worksheet-sandbox", "title": "Caja", "page": 28},
+    ],
+)
+def test_bad_next_sheet_is_rejected(bad: dict[str, Any]) -> None:
+    with pytest.raises(ValidationError):
+        parse_guide(_with_next(bad))
+
+
 def test_every_registered_sheet_loads_and_passes_the_contract() -> None:
     sheets = list_worksheets()
-    assert len(sheets) == 16
+    assert len(sheets) == 18
     for sheet in sheets:
         content = load_worksheet_content(sheet)
         assert content.get("metadata") or content.get("guide"), sheet["id"]

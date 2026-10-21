@@ -35,6 +35,7 @@ _SHEET_CSS = (
     "main.wide{max-width:1100px}"
     "h2{font-size:1.1rem;margin:0 0 8px}"
     ".answer{margin:2px 0 10px;white-space:pre-line}"
+    ".next{margin:2px 0 10px;font-weight:600}"
     ".canvas{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));"
     "gap:12px}"
     ".canvas .card{margin:0}"
@@ -42,13 +43,15 @@ _SHEET_CSS = (
 
 
 class ViewItem(BaseModel):
-    """One step as shown: its question and the answer, or what is missing."""
+    """One step as shown: its question, the answer or what is missing,
+    and the bridge to the next sheet when the step has one."""
 
     model_config = ConfigDict(extra="forbid")
 
     label: str
     answer: str | None
     how: str
+    next_step: str | None = None
 
 
 class ViewBlock(BaseModel):
@@ -72,7 +75,8 @@ class SheetView(BaseModel):
     blocks: list[ViewBlock]
 
 
-def _answer_text(value: Any) -> str | None:
+def answer_text(value: Any) -> str | None:
+    """One line for an answer: a list joins with "; ", empty becomes None."""
     if value is None:
         return None
     if isinstance(value, list):
@@ -102,10 +106,17 @@ def _legacy_steps(content: dict[str, Any]) -> list[GuideStep]:
 
 
 def _item(step: GuideStep, answers: dict[str, Any]) -> ViewItem:
+    bridge = step.next_sheet
     return ViewItem(
         label=safe_text(step.question),
-        answer=_answer_text(answers.get(step.id)),
+        answer=answer_text(answers.get(step.id)),
         how=safe_text(step.how),
+        # Shown always: it maps the canvas, not the owner's answer (D4).
+        next_step=(
+            f"Siguiente paso: llena {safe_text(bridge.title)}"
+            if bridge is not None
+            else None
+        ),
     )
 
 
@@ -171,6 +182,8 @@ def _html_block(block: ViewBlock) -> str:
                 f"<div class='name'>{e(item.label)}</div>"
                 f"<p class='answer'>{e(item.answer)}</p>"
             )
+        if item.next_step is not None:
+            items.append(f"<p class='next'>{e(item.next_step)}</p>")
     return f"<section class='card'><h2>{e(block.title)}</h2>{''.join(items)}</section>"
 
 
@@ -205,6 +218,8 @@ def render_markdown(view: SheetView) -> str:
             else:
                 answer = markdown_lines(html.escape(item.answer, quote=False))
                 lines.append(f"- **{item.label}**: {answer}")
+            if item.next_step is not None:
+                lines.append(f"- {item.next_step}")
         lines.append("")
     return "\n".join(lines)
 

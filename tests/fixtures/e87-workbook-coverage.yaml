@@ -31,30 +31,38 @@ pages:
     content: "Strategy Canvas (4 piezas) y vista previa del Vision Summary · S87.7"
   - page: 8
     class: tool
+    nodes: [worksheet-bmc]
     content: "BMC: resumen y puente al Strategy Canvas · S87.4"
   - page: 9
     class: tool
+    nodes: [worksheet-bmc]
     content: "BMC: prompt · S87.4"
   - page: 10
     class: tool
+    nodes: [worksheet-bmc]
     content: "BMC: lienzo · S87.4"
   - page: 11
     class: tool
+    nodes: [worksheet-bmc]
     content: "BMC: lista de verificación · S87.4"
   - page: 12
     class: tool
     content: "Strategy Canvas del método (4 piezas) · S87.7"
   - page: 13
     class: tool
+    nodes: [worksheet-core-customer]
     content: "Cliente central: gráfica '¿Está claro tu QUIÉN?' · S87.6"
   - page: 14
     class: tool
+    nodes: [worksheet-core-customer]
     content: "Cliente central: personas ejemplo · S87.6"
   - page: 15
     class: tool
+    nodes: [worksheet-core-customer]
     content: "Cliente central: atributos y ejercicio · S87.6"
   - page: 16
     class: tool
+    nodes: [worksheet-core-customer]
     content: "Cliente central: prompt · S87.6"
   - page: 17
     class: tool
@@ -70,26 +78,31 @@ pages:
     nodes: [worksheet-brand-promise]
   - page: 20
     class: tool
+    nodes: [worksheet-brand-promise, worksheet-core-customer]
     content: "Promesa de marca (3 preguntas y prompt); preguntas del Cliente central · S87.5 y S87.6"
-    nodes: [worksheet-brand-promise]
   - page: 21
     class: tool
     content: "Hoja de Promesa de marca (Count On / Expect / Unique) · S87.5"
     nodes: [worksheet-brand-promise]
   - page: 22
     class: tool
+    nodes: [worksheet-differentiating-activities, concept-differentiating-activities]
     content: "Actividades diferenciadoras: modelo · S87.6"
   - page: 23
     class: tool
+    nodes: [worksheet-differentiating-activities]
     content: "Actividades diferenciadoras: ejemplo (abogados) · S87.6"
   - page: 24
     class: tool
+    nodes: [worksheet-differentiating-activities]
     content: "Actividades diferenciadoras: Dell · S87.6"
   - page: 25
     class: tool
+    nodes: [worksheet-differentiating-activities]
     content: "Actividades diferenciadoras: hoja · S87.6"
   - page: 26
     class: tool
+    nodes: [worksheet-differentiating-activities]
     content: "Actividades diferenciadoras: prompt · S87.6"
   - page: 27
     class: no_tool
@@ -103,15 +116,19 @@ pages:
     content: "Caja de arena: prompt y ejercicio · S87.7"
   - page: 30
     class: tool
+    nodes: [worksheet-oppp, tool-oppp]
     content: "Plan Personal de Una Página · S87.9"
   - page: 31
     class: tool
+    nodes: [worksheet-oppp, tool-oppp]
     content: "Plan Personal de Una Página · S87.9"
   - page: 32
     class: tool
-    content: "Plan Personal de Una Página (8 columnas × 4 filas) · S87.9"
+    nodes: [worksheet-oppp]
+    content: "Plan Personal de Una Página (8 áreas × 4 filas) · S87.9"
   - page: 33
     class: tool
+    nodes: [worksheet-oppp]
     content: "Tableros de visión y su prompt · S87.9"
   - page: 34
     class: tool
@@ -130,26 +147,9 @@ pages:
     reason: "aviso de derechos"
 pending:
   - 7
-  - 8
-  - 9
-  - 10
-  - 11
   - 12
-  - 13
-  - 14
-  - 15
-  - 16
-  - 22
-  - 23
-  - 24
-  - 25
-  - 26
   - 28
   - 29
-  - 30
-  - 31
-  - 32
-  - 33
   - 34
   - 35
   - 36

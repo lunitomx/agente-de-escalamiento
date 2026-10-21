@@ -3,9 +3,9 @@ type: registry
 name: Worksheet Registry
 name_es: Registro de Hojas de Trabajo
 description: >
-  Central index of all 16 worksheets across the 4 ESCALA decisions.
+  Central index of all 18 worksheets across the 4 ESCALA decisions.
   Enables deterministic lookup by decision, prerequisite, or output type.
-total_worksheets: 16
+total_worksheets: 18
 worksheets:
 
   # ── PEOPLE (4) ─────────────────────────────────────────────────────────────
@@ -62,7 +62,7 @@ worksheets:
     frequency: annual
     tags: [people, team, growth, hiring]
 
-  # ── STRATEGY (5) ───────────────────────────────────────────────────────────
+  # ── STRATEGY (7) ───────────────────────────────────────────────────────────
 
   - id: worksheet-opsp
     decision: strategy
@@ -134,6 +134,32 @@ worksheets:
     time_estimate: "1-2 hours"
     frequency: annual
     tags: [strategy, brand-promise, guarantee, measurement]
+
+  - id: worksheet-bmc
+    decision: strategy
+    name: Business Model Canvas Worksheet
+    node_path: strategy/worksheets/bmc.yaml
+    prerequisites: []
+    outputs:
+      - nine-block business model
+      - next strategy sheet per block
+    difficulty: intermediate
+    time_estimate: "1-2 hours"
+    frequency: annual
+    tags: [strategy, business-model, canvas]
+
+  - id: worksheet-differentiating-activities
+    decision: strategy
+    name: Differentiating Activities Worksheet
+    node_path: strategy/worksheets/differentiating-activities.yaml
+    prerequisites: [worksheet-core-customer]
+    outputs:
+      - 3 to 5 differentiating activities
+      - competitor comparison on 4 axes
+    difficulty: advanced
+    time_estimate: "1-2 hours"
+    frequency: annual
+    tags: [strategy, differentiation, competitors]
 
   # ── EXECUTION (4) ──────────────────────────────────────────────────────────
 
