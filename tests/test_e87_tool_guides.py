@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 KNOWLEDGE = ROOT / "conocimiento"
 POLICY = ROOT / "governance" / "public-boundary.yaml"
 CORE_CUSTOMER = KNOWLEDGE / "strategy" / "worksheets" / "core-customer.yaml"
+BRAND_PROMISE_CONCEPT = KNOWLEDGE / "strategy" / "concepts" / "brand-promise.yaml"
 BRAND_PROMISE = KNOWLEDGE / "strategy" / "worksheets" / "brand-promise.yaml"
 ANCHOR_SOURCE_RE = re.compile(r"^(work/research/e87-tips/[a-z0-9-]+\.md)#(f\d+)$")
 YAML_BLOCK_RE = re.compile(r"```yaml\n(.*?)\n```", re.DOTALL)
@@ -100,6 +101,14 @@ def test_brand_promise_tips_are_only_f1_f2_f5() -> None:
 def test_brand_promise_ai_prompt_has_no_page() -> None:
     prompt = _load(BRAND_PROMISE)["ai_prompt"]
     assert set(prompt) == {"text"}
+
+
+def test_brand_promise_concept_names_main_supporting_guarantee_anti() -> None:
+    summary = " ".join(_load(BRAND_PROMISE_CONCEPT)["summary"].split()).lower()
+    assert "10-20 word" not in summary
+    for piece in ("1 main", "2 supporting", "weekly measure", "guarantee"):
+        assert piece in summary, piece
+    assert "anti-promise" in summary
 
 
 def test_core_customer_keeps_legacy_fields() -> None:
