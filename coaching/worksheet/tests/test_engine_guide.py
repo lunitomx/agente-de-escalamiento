@@ -24,7 +24,7 @@ def _run(base: Path, action: str, **extra: Any) -> dict[str, Any]:
 def test_step_after_start_shows_the_first_guided_step(tmp_path: Path) -> None:
     started = _run(tmp_path, "start")
     assert started["errors"] == []
-    assert started["artifacts"]["total_steps"] == 8
+    assert started["artifacts"]["total_steps"] == 13
     out = _run(tmp_path, "step")["output"]
     assert "### Paso 2: ¿Quiénes son tus 5 mejores clientes" in out
     assert "**Cómo llenarlo:**" in out
@@ -158,6 +158,11 @@ ANSWERS: dict[str, str] = {
     "quien-es": "Dueños de fondas a 3 km",
     "necesidad": "No quedarse sin tortilla a mediodía",
     "chequeo-promesa": "Tortilla caliente antes de las 11",
+    "persona-ejemplo": "Doña Mari, 52 años, Fonda La Esquina",
+    "prueba-quien": "Mamás que compran 2 kg antes de las 8",
+    "mejor-en": "Tortilla caliente que no se rompe",
+    "diferente-en": "Pedido fijo sin llamar",
+    "raro-o-malo": "No venden por kilo después de las 14:00",
 }
 
 

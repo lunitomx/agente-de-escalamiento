@@ -58,13 +58,19 @@ def test_core_customer_passes_the_contract() -> None:
         "top-5-clientes",
         "atributos",
         "top-atributos",
+        "persona-ejemplo",
         "quien-es",
+        "prueba-quien",
         "necesidad",
         "chequeo-promesa",
+        "mejor-en",
+        "diferente-en",
+        "raro-o-malo",
     ]
-    assert len(guide.tips) >= 3
+    assert len(guide.tips) == 5
     assert guide.view.layout == "cards"
-    assert len(guide.view.sections) == 3
+    assert len(guide.view.sections) == 4
+    assert guide.ai_prompt is not None and guide.ai_prompt.text
 
 
 def test_core_customer_keeps_legacy_fields() -> None:

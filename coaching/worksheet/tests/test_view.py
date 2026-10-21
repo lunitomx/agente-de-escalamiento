@@ -129,6 +129,7 @@ def test_html_and_markdown_share_labels_in_order() -> None:
         "Tus mejores clientes",
         "Tu Cliente central",
         "Revisión de la promesa",
+        "Lo que ve tu Cliente central",
     ]
 
 
