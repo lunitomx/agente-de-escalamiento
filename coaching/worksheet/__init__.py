@@ -10,6 +10,7 @@ from typing import Any
 from pydantic import ValidationError
 
 from ..core import read_yaml, write_yaml, ensure_dir
+from . import engine
 from .guide import GuideStep, Tip, parse_guide, source_label
 from .view import answer_text, build_view, markdown_lines, open_command, save_view
 
@@ -53,15 +54,50 @@ def find_worksheet(
     name_or_id: str,
     base_path: Path | None = None,
 ) -> dict[str, Any] | None:
-    """Find a worksheet by name or ID (case-insensitive)."""
+    """Find a worksheet by id, English name or Spanish name (``engine`` rule)."""
     registry = read_yaml(registry_path(base_path))
-    name_lower = name_or_id.lower()
-    for w in registry.get("worksheets", []):
-        if w["id"].lower() == name_lower:
-            return w
-        if name_lower in w["name"].lower():
-            return w
-    return None
+    return engine.find_worksheet(registry.get("worksheets", []), name_or_id)
+
+
+_DECISION_ES = {
+    "people": "Personas",
+    "strategy": "Estrategia",
+    "execution": "Ejecución",
+    "cash": "Efectivo",
+}
+_DIFFICULTY_ES = {
+    "beginner": "Básico",
+    "intermediate": "Intermedio",
+    "advanced": "Avanzado",
+}
+
+
+def name_es(worksheet: dict[str, Any]) -> str:
+    """The short Spanish name the owner reads; the English name as fallback."""
+    return str(worksheet.get("name_es") or worksheet.get("name") or worksheet["id"])
+
+
+def _decision_es(worksheet: dict[str, Any]) -> str:
+    decision = str(worksheet.get("decision") or "")
+    return _DECISION_ES.get(decision, decision or "—")
+
+
+def _difficulty_es(worksheet: dict[str, Any]) -> str:
+    difficulty = str(worksheet.get("difficulty") or "")
+    return _DIFFICULTY_ES.get(difficulty, difficulty or "—")
+
+
+def _time_es(worksheet: dict[str, Any]) -> str:
+    return str(worksheet.get("time_es") or worksheet.get("time_estimate") or "—")
+
+
+def _prerequisite_names(worksheet: dict[str, Any], base_path: Path) -> list[str]:
+    registry = list_worksheets(base_path=base_path)
+    names: list[str] = []
+    for prereq in worksheet.get("prerequisites", []):
+        found = engine.find_worksheet(registry, str(prereq))
+        names.append(name_es(found) if found else str(prereq))
+    return names
 
 
 def get_completed_ids(base_path: Path | None = None) -> list[str]:
@@ -200,10 +236,10 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
         for w in all_ws:
             status = "✅" if w["id"] in completed else "⬜"
             lines.append(
-                f"| {w['name']} (`{w['id']}`) | "
-                f"{w.get('decision', '—')} | "
-                f"{w.get('difficulty', '—')} | "
-                f"{w.get('time_estimate', '—')} | {status} |"
+                f"| {name_es(w)} (`{w['id']}`) | "
+                f"{_decision_es(w)} | "
+                f"{_difficulty_es(w)} | "
+                f"{_time_es(w)} | {status} |"
             )
         lines.extend(
             [
@@ -223,9 +259,7 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
         ws_name = str(context.get("worksheet_name", ""))
         worksheet = find_worksheet(ws_name, base)
         if not worksheet:
-            available = [
-                w["name"] for w in list_worksheets(decision=None, base_path=base)
-            ]
+            available = [name_es(w) for w in list_worksheets(base_path=base)]
             return {
                 "output": "",
                 "artifacts": {},
@@ -237,7 +271,7 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
         completed = get_completed_ids(base)
         if worksheet["id"] in completed:
             return {
-                "output": f"Worksheet **{worksheet['name']}** ya está completado. Usa `/escala-worksheet list` para ver otros.",
+                "output": f"La hoja **{name_es(worksheet)}** ya está completada. Usa `/escala-worksheet list` para ver otros.",
                 "artifacts": {"worksheet": worksheet, "status": "completed"},
                 "errors": [],
             }
@@ -261,11 +295,11 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
         total_steps = len(steps) + 2  # information + steps + final review
 
         lines = [
-            f"## {worksheet['name']}",
+            f"## {name_es(worksheet)}",
             "",
-            f"**Decisión:** {worksheet.get('decision', '—')}",
-            f"**Dificultad:** {worksheet.get('difficulty', '—')}",
-            f"**Tiempo estimado:** {worksheet.get('time_estimate', '—')}",
+            f"**Decisión:** {_decision_es(worksheet)}",
+            f"**Dificultad:** {_difficulty_es(worksheet)}",
+            f"**Tiempo estimado:** {_time_es(worksheet)}",
             "",
             f"{content.get('summary', '')}",
             "",
@@ -282,7 +316,7 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
             if worksheet.get("prerequisites"):
                 lines.append(
                     "- [ ] Prerrequisitos completados: "
-                    + ", ".join(worksheet["prerequisites"])
+                    + ", ".join(_prerequisite_names(worksheet, base))
                 )
             lines.extend(
                 [
@@ -453,7 +487,7 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
 
         return {
             "output": (
-                f"✅ **{worksheet['name']}** guardado como completado.\n"
+                f"✅ **{name_es(worksheet)}** guardada como completada.\n"
                 f"Vista lista: {html_path}"
             ),
             "artifacts": {

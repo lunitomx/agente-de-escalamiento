@@ -5,10 +5,33 @@ No I/O. Accepts worksheet data and registry, returns structured worksheet dict.
 
 from __future__ import annotations
 
+import unicodedata
 
-def find_worksheet(registry: list[dict], worksheet_id: str) -> dict | None:
+
+def plain(text: str) -> str:
+    """Lowercase ``text`` without accents, so "Página" matches "pagina"."""
+    decomposed = unicodedata.normalize("NFKD", text)
+    return "".join(c for c in decomposed if not unicodedata.combining(c)).lower()
+
+
+def find_worksheet(registry: list[dict], query: str) -> dict | None:
+    """The one lookup rule (S87.7 D8).
+
+    An exact id wins over every entry. Then the id without case, then
+    ``query`` inside ``name`` or ``name_es``, both without case or accents.
+    """
     for w in registry:
-        if w.get("id") == worksheet_id:
+        if w.get("id") == query:
+            return w
+    wanted = plain(query.strip())
+    if not wanted:
+        return None
+    for w in registry:
+        if plain(str(w.get("id", ""))) == wanted:
+            return w
+    for w in registry:
+        names = (str(w.get("name") or ""), str(w.get("name_es") or ""))
+        if any(wanted in plain(name) for name in names):
             return w
     return None
 

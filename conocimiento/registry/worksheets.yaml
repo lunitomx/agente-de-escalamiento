@@ -13,6 +13,7 @@ worksheets:
   - id: worksheet-face
     decision: people
     name: FACE Worksheet
+    name_es: "FACe"
     node_path: people/worksheets/face.yaml
     prerequisites: []
     outputs:
@@ -20,12 +21,14 @@ worksheets:
       - values-alignment-score
     difficulty: intermediate
     time_estimate: "2-4 hours per role"
+    time_es: "2-4 horas por puesto"
     frequency: quarterly
     tags: [people, hiring, fit, accountability]
 
   - id: worksheet-love-loathe
     decision: people
     name: Love/Loathe Worksheet
+    name_es: "Amor/Odio"
     node_path: people/worksheets/love-loathe.yaml
     prerequisites: [worksheet-face]
     outputs:
@@ -33,12 +36,14 @@ worksheets:
       - delegation candidates
     difficulty: beginner
     time_estimate: "1-2 hours per person"
+    time_es: "1-2 horas por persona"
     frequency: semi-annual
     tags: [people, energy, delegation, role-design]
 
   - id: worksheet-oppp
     decision: people
     name: One-Page Personal Plan (OPPP) Worksheet
+    name_es: "Plan personal de una página"
     node_path: people/worksheets/oppp.yaml
     prerequisites: [worksheet-face, worksheet-love-loathe]
     outputs:
@@ -46,12 +51,14 @@ worksheets:
       - quarterly personal rocks
     difficulty: intermediate
     time_estimate: "2-3 hours per employee"
+    time_es: "2-3 horas por colaborador"
     frequency: quarterly
     tags: [people, development, personal-plan, accountability]
 
   - id: worksheet-team-growth
     decision: people
     name: Team Growth Assessment Worksheet
+    name_es: "Crecimiento del equipo"
     node_path: people/worksheets/team-growth.yaml
     prerequisites: [worksheet-face]
     outputs:
@@ -59,6 +66,7 @@ worksheets:
       - hiring priorities
     difficulty: intermediate
     time_estimate: "2 hours"
+    time_es: "2 horas"
     frequency: annual
     tags: [people, team, growth, hiring]
 
@@ -67,6 +75,7 @@ worksheets:
   - id: worksheet-opsp
     decision: strategy
     name: One-Page Strategic Plan (OPSP) Worksheet
+    name_es: "Plan estratégico de una página"
     node_path: strategy/worksheets/opsp.yaml
     prerequisites:
       - worksheet-face
@@ -76,12 +85,14 @@ worksheets:
       - company Rocks for the quarter
     difficulty: advanced
     time_estimate: "4-8 hours first time; 2-4 hours quarterly update"
+    time_es: "4-8 horas la primera vez; 2-4 horas cada trimestre"
     frequency: quarterly
     tags: [strategy, planning, alignment, BHAG, OPSP]
 
   - id: worksheet-swt
     decision: strategy
     name: SWT Analysis Worksheet
+    name_es: "Fortalezas, debilidades y tendencias (SWT)"
     node_path: strategy/worksheets/swt.yaml
     prerequisites: []
     outputs:
@@ -90,12 +101,14 @@ worksheets:
       - trends affecting the business
     difficulty: intermediate
     time_estimate: "2-4 hours"
+    time_es: "2-4 horas"
     frequency: annual
     tags: [strategy, SWT, strengths, weaknesses, trends]
 
   - id: worksheet-7-strata
     decision: strategy
     name: 7 Strata of Strategy Worksheet
+    name_es: "7 estratos de estrategia"
     node_path: strategy/worksheets/7-strata.yaml
     prerequisites: [worksheet-swt]
     outputs:
@@ -104,12 +117,14 @@ worksheets:
       - differentiating activities identified
     difficulty: advanced
     time_estimate: "Full day"
+    time_es: "Un día completo"
     frequency: annual
     tags: [strategy, differentiation, brand-promise, competitive-moat]
 
   - id: worksheet-core-customer
     decision: strategy
     name: Core Customer Worksheet
+    name_es: "Cliente central"
     node_path: strategy/worksheets/core-customer.yaml
     prerequisites: []
     outputs:
@@ -118,12 +133,14 @@ worksheets:
       - key needs and decision drivers
     difficulty: intermediate
     time_estimate: "2-3 hours"
+    time_es: "2-3 horas"
     frequency: annual
     tags: [strategy, customer, segmentation, targeting]
 
   - id: worksheet-brand-promise
     decision: strategy
     name: Brand Promise Worksheet
+    name_es: "Promesa de marca"
     node_path: strategy/worksheets/brand-promise.yaml
     prerequisites: [worksheet-core-customer]
     outputs:
@@ -132,12 +149,14 @@ worksheets:
       - guarantee and anti-promises
     difficulty: intermediate
     time_estimate: "1-2 hours"
+    time_es: "1-2 horas"
     frequency: annual
     tags: [strategy, brand-promise, guarantee, measurement]
 
   - id: worksheet-bmc
     decision: strategy
     name: Business Model Canvas Worksheet
+    name_es: "Lienzo del modelo de negocio"
     node_path: strategy/worksheets/bmc.yaml
     prerequisites: []
     outputs:
@@ -145,12 +164,14 @@ worksheets:
       - next strategy sheet per block
     difficulty: intermediate
     time_estimate: "1-2 hours"
+    time_es: "1-2 horas"
     frequency: annual
     tags: [strategy, business-model, canvas]
 
   - id: worksheet-differentiating-activities
     decision: strategy
     name: Differentiating Activities Worksheet
+    name_es: "Actividades diferenciadoras"
     node_path: strategy/worksheets/differentiating-activities.yaml
     prerequisites: [worksheet-core-customer]
     outputs:
@@ -158,6 +179,7 @@ worksheets:
       - competitor comparison on 4 axes
     difficulty: advanced
     time_estimate: "1-2 hours"
+    time_es: "1-2 horas"
     frequency: annual
     tags: [strategy, differentiation, competitors]
 
@@ -166,6 +188,7 @@ worksheets:
   - id: worksheet-execution-habits
     decision: execution
     name: Execution Habits Checklist Worksheet
+    name_es: "Hábitos de ejecución"
     node_path: execution/worksheets/execution-habits.yaml
     prerequisites: [worksheet-opsp]
     outputs:
@@ -173,12 +196,14 @@ worksheets:
       - priority habit to improve this quarter
     difficulty: beginner
     time_estimate: "30 minutes"
+    time_es: "30 minutos"
     frequency: quarterly
     tags: [execution, habits, alignment, accountability, checklist]
 
   - id: worksheet-quarterly-priorities
     decision: execution
     name: Quarterly Priorities and Rocks Worksheet
+    name_es: "Prioridades y rocas trimestrales"
     node_path: execution/worksheets/quarterly-priorities.yaml
     prerequisites: [worksheet-opsp, worksheet-execution-habits]
     outputs:
@@ -187,12 +212,14 @@ worksheets:
       - Quarterly Theme
     difficulty: intermediate
     time_estimate: "2-4 hours (quarterly planning session)"
+    time_es: "2-4 horas (sesión de planeación trimestral)"
     frequency: quarterly
     tags: [execution, rocks, priorities, critical-number, planning]
 
   - id: worksheet-kpi-development
     decision: execution
     name: KPI Development Worksheet
+    name_es: "Desarrollo de KPIs"
     node_path: execution/worksheets/kpi-development.yaml
     prerequisites: [worksheet-quarterly-priorities]
     outputs:
@@ -200,12 +227,14 @@ worksheets:
       - scoreboard template
     difficulty: intermediate
     time_estimate: "1-2 hours per team"
+    time_es: "1-2 horas por equipo"
     frequency: annual or when roles change
     tags: [execution, KPI, metrics, leading-indicators, scoreboard]
 
   - id: worksheet-meeting-agenda
     decision: execution
     name: Meeting Rhythm Agenda Templates Worksheet
+    name_es: "Agenda de reuniones"
     node_path: execution/worksheets/meeting-agenda.yaml
     prerequisites: [worksheet-execution-habits]
     outputs:
@@ -214,6 +243,7 @@ worksheets:
       - monthly meeting agenda (half day)
     difficulty: beginner
     time_estimate: "1-2 hours to customize"
+    time_es: "1-2 horas para adaptarlas"
     frequency: one-time setup; review quarterly
     tags: [execution, meetings, rhythm, huddle, agenda]
 
@@ -222,6 +252,7 @@ worksheets:
   - id: worksheet-ccc
     decision: cash
     name: Cash Conversion Cycle Worksheet
+    name_es: "Ciclo de conversión de efectivo"
     node_path: cash/worksheets/ccc-worksheet.yaml
     prerequisites: []
     outputs:
@@ -229,12 +260,14 @@ worksheets:
       - breakdown by sub-cycle (sales, delivery, collection)
     difficulty: intermediate
     time_estimate: "1-2 hours"
+    time_es: "1-2 horas"
     frequency: quarterly
     tags: [cash, CCC, cycle, optimization]
 
   - id: worksheet-power-of-one
     decision: cash
     name: Power of One Worksheet
+    name_es: "Poder del uno"
     node_path: cash/worksheets/power-of-one.yaml
     prerequisites: [worksheet-ccc]
     outputs:
@@ -242,12 +275,14 @@ worksheets:
       - selected focus lever for the quarter
     difficulty: intermediate
     time_estimate: "2-3 hours"
+    time_es: "2-3 horas"
     frequency: quarterly
     tags: [cash, power-of-one, levers, EBIT, impact]
 
   - id: worksheet-cash-flow-forecast
     decision: cash
     name: 13-Week Cash Flow Forecast Worksheet
+    name_es: "Flujo de efectivo a 13 semanas"
     node_path: cash/worksheets/cash-flow-forecast.yaml
     prerequisites: [worksheet-ccc, worksheet-power-of-one]
     outputs:
@@ -256,5 +291,6 @@ worksheets:
       - action plan for low-cash periods
     difficulty: advanced
     time_estimate: "3-4 hours initial; 30 min weekly update"
+    time_es: "3-4 horas la primera vez; 30 minutos cada semana"
     frequency: weekly
     tags: [cash, forecast, cash-flow, planning, 13-week]
