@@ -17,6 +17,7 @@ from coaching.worksheet.guide import parse_guide
 
 ROOT = Path(__file__).resolve().parents[1]
 KNOWLEDGE = ROOT / "conocimiento"
+COVERAGE = ROOT / "tests" / "fixtures" / "e87-workbook-coverage.yaml"
 POLICY = ROOT / "governance" / "public-boundary.yaml"
 CORE_CUSTOMER = KNOWLEDGE / "strategy" / "worksheets" / "core-customer.yaml"
 BRAND_PROMISE_CONCEPT = KNOWLEDGE / "strategy" / "concepts" / "brand-promise.yaml"
@@ -109,6 +110,15 @@ def test_brand_promise_concept_names_main_supporting_guarantee_anti() -> None:
     for piece in ("1 main", "2 supporting", "weekly measure", "guarantee"):
         assert piece in summary, piece
     assert "anti-promise" in summary
+
+
+def test_brand_promise_pages_are_covered_and_not_pending() -> None:
+    coverage = _load(COVERAGE)
+    pages = {int(e["page"]): e for e in coverage["pages"]}
+    pending = {int(p) for p in coverage["pending"]}
+    for number in range(17, 22):
+        assert "worksheet-brand-promise" in pages[number].get("nodes", []), number
+        assert number not in pending, number
 
 
 def test_core_customer_keeps_legacy_fields() -> None:
