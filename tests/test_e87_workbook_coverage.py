@@ -234,9 +234,9 @@ def test_missing_node_is_reported_even_in_pending() -> None:
 COVERAGE_FILE = ROOT / "tests" / "fixtures" / "e87-workbook-coverage.yaml"
 REGISTRY = KNOWLEDGE / "registry" / "worksheets.yaml"
 
-# Solo puede encoger: las historias S87.4-S87.9 quitan páginas del archivo,
-# nunca se agregan aquí.
-FROZEN_PENDING: frozenset[int] = frozenset([*range(7, 27), *range(28, 37)])
+# Vacía desde S87.8: todas las páginas tool nombran nodos. Si una página vuelve
+# a `pending`, test_real_map_is_clean falla (PAT-239).
+FROZEN_PENDING: frozenset[int] = frozenset()
 
 
 def _load_coverage() -> dict[str, Any]:
