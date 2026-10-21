@@ -55,11 +55,16 @@ JSON: `{"action": "step", "worksheet_name": "worksheet-core-customer", "fields":
 
 El primer `step` (después de "listo") no lleva `fields`. Muestra el siguiente paso de `output`.
 
-### Step 4: Guardar
+Después de la última respuesta, `output` trae la **Revisión Final**: cada pregunta con su respuesta. La hoja sigue en progreso. Muéstrala y espera:
+
+- Si el dueño quiere cambiar algo, manda un `step` con ese id en `fields`.
+- Si responde "confirmar", pasa al paso 4.
+
+### Step 4: Guardar (solo después de "confirmar")
 
 JSON: `{"action": "save", "worksheet_name": "worksheet-core-customer", "base_path": "."}`
 
-Guarda las respuestas y escribe la vista (`.html` y su gemelo `.md`).
+Solo `save` marca la hoja como completada. Escribe la vista (`.html` y su gemelo `.md`).
 
 ### Step 5: Abrir la vista
 
