@@ -31,15 +31,19 @@ pages:
     content: "Strategy Canvas (4 piezas) y vista previa del Vision Summary · S87.7"
   - page: 8
     class: tool
+    nodes: [worksheet-bmc]
     content: "BMC: resumen y puente al Strategy Canvas · S87.4"
   - page: 9
     class: tool
+    nodes: [worksheet-bmc]
     content: "BMC: prompt · S87.4"
   - page: 10
     class: tool
+    nodes: [worksheet-bmc]
     content: "BMC: lienzo · S87.4"
   - page: 11
     class: tool
+    nodes: [worksheet-bmc]
     content: "BMC: lista de verificación · S87.4"
   - page: 12
     class: tool
@@ -139,10 +143,6 @@ pages:
     reason: "aviso de derechos"
 pending:
   - 7
-  - 8
-  - 9
-  - 10
-  - 11
   - 12
   - 17
   - 18

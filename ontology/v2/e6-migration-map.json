@@ -502,7 +502,7 @@
       "legacy_id": null,
       "legacy_path": "conocimiento/registry/worksheets.yaml",
       "legacy_type": null,
-      "sha256": "49a182330afa593e9641c195f989c183c6fab3101febd728daef2729a37d7909"
+      "sha256": "cab6885f70ec42cb17b2a8dc05c90c1fcbd013d52fc85d077d808e6b9f132db6"
     },
     {
       "canonical_id": null,
@@ -631,6 +631,14 @@
       "legacy_path": "conocimiento/strategy/worksheets/7-strata.yaml",
       "legacy_type": "worksheet",
       "sha256": "0177bca0a78cf8a96b13dc3cf5dfd56ce6cbecad186ee59a7a01f94c0ecbf4dd"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "worksheet-bmc",
+      "legacy_path": "conocimiento/strategy/worksheets/bmc.yaml",
+      "legacy_type": "worksheet",
+      "sha256": "37c5e05ff9318b3d857e3135a860ca1ca2f94d1392ddba2d365c2125b569e8f1"
     },
     {
       "canonical_id": null,

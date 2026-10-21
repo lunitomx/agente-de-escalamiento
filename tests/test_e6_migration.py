@@ -16,10 +16,10 @@ RELEASE = ROOT / "ontology/v2/releases/s64.1.json"
 
 def test_map_covers_every_legacy_yaml_with_explicit_disposition() -> None:
     migration_map = load_and_validate_e6_migration_map(ROOT, MAP)
-    assert len(migration_map.entries) == 83
+    assert len(migration_map.entries) == 84
     assert (
         sum(e.disposition == "await-domain-evidence" for e in migration_map.entries)
-        == 79
+        == 80
     )
     assert (
         sum(e.disposition == "support-contract-not-node" for e in migration_map.entries)
@@ -49,7 +49,7 @@ def test_cli_emits_count_only_receipt() -> None:
         check=False,
     )
     assert result.returncode == 0
-    assert "Legacy assets: 83" in result.stdout
+    assert "Legacy assets: 84" in result.stdout
     assert "cash-acceleration" not in result.stdout
 
 
@@ -58,6 +58,6 @@ def test_s64_1_release_coexists_without_promoting_e6_entries() -> None:
     release = load_canonical_release(RELEASE)
     legacy_ids = {entry.legacy_id for entry in migration_map.entries}
     promoted = {node.canonical_id for node in release.nodes}
-    assert len(migration_map.entries) == 83
+    assert len(migration_map.entries) == 84
     assert all(entry.canonical_id is None for entry in migration_map.entries)
     assert legacy_ids.isdisjoint(promoted)
