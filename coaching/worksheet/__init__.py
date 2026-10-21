@@ -414,7 +414,13 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
             )
             derived = _derived_view_blocks(content, base)
             if derived:
-                lines += ["Esto ya llenaste:", "", *markdown_blocks(derived)]
+                filled = any(i.answer is not None for b in derived for i in b.items)
+                intro = (
+                    "Esto ya llenaste:"
+                    if filled
+                    else "Todavía no llenas ninguna de estas piezas:"
+                )
+                lines += [intro, "", *markdown_blocks(derived, heading="####")]
             lines.append("Antes de empezar, confirma que tienes:")
             if worksheet.get("prerequisites"):
                 lines.append(

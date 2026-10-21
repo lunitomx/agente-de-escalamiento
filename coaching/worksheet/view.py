@@ -289,11 +289,15 @@ def render_html(view: SheetView) -> str:
     )
 
 
-def markdown_blocks(blocks: list[ViewBlock]) -> list[str]:
-    """Markdown lines for blocks; shared by the view and the canvas step 1 (D6)."""
+def markdown_blocks(blocks: list[ViewBlock], heading: str = "##") -> list[str]:
+    """Markdown lines for blocks; shared by the view and the canvas step 1 (D6).
+
+    ``heading`` is the block title's level: ``##`` in the view, ``####`` under
+    the ``### Paso 1`` of the chat.
+    """
     lines: list[str] = []
     for block in blocks:
-        lines += [f"## {block.title}", ""]
+        lines += [f"{heading} {block.title}", ""]
         for item in block.items:
             if item.answer is None:
                 lines.append(f"- {_missing_text(item)}")

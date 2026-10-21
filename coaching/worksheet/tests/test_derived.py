@@ -178,10 +178,10 @@ def test_canvas_start_shows_three_blocks_and_missing_sandbox(tmp_path: Path) -> 
     out = started["output"]
     assert "Esto ya llenaste:" in out
     for title in ("Cliente central", "Promesa de marca", "Actividades diferenciadoras"):
-        assert f"## {title}" in out
+        assert f"#### {title}" in out
     assert "Masa antes de las 7 o no la pagas" in out
     assert "Reparto propio en moto" in out
-    assert "## Caja de arena" in out
+    assert "#### Caja de arena" in out
     for field in ("donde", "que", "canales"):
         assert _missing_sandbox(field) in out
     assert "de worksheet-sandbox" not in out
@@ -249,5 +249,41 @@ def test_canvas_shows_optional_bmc_when_saved(tmp_path: Path) -> None:
         },
     )
     out = _canvas(tmp_path, "start")["output"]
-    assert "## Contexto del modelo de negocio" in out
+    assert "#### Contexto del modelo de negocio" in out
     assert "Fondas" in out
+
+
+# --- retry 1 (R2, R3): step 1 of the canvas reads right ---------------------
+
+BLOCK_TITLES = (
+    "Cliente central",
+    "Promesa de marca",
+    "Actividades diferenciadoras",
+    "Caja de arena",
+)
+
+
+def test_canvas_step_one_with_nothing_saved_does_not_say_filled(
+    tmp_path: Path,
+) -> None:
+    out = _canvas(tmp_path, "start")["output"]
+    assert "Esto ya llenaste:" not in out
+    assert "Todavía no llenas ninguna de estas piezas:" in out
+
+
+def test_canvas_step_one_with_something_saved_says_filled(tmp_path: Path) -> None:
+    _seed_saved(tmp_path, SAVED)
+    out = _canvas(tmp_path, "start")["output"]
+    assert "Esto ya llenaste:" in out
+    assert "Todavía no llenas" not in out
+
+
+def test_canvas_blocks_in_step_one_sit_under_the_step_heading(
+    tmp_path: Path,
+) -> None:
+    _seed_saved(tmp_path, SAVED)
+    out = _canvas(tmp_path, "start")["output"]
+    assert "### Paso 1: Información General" in out
+    for title in BLOCK_TITLES:
+        assert f"\n#### {title}\n" in out
+        assert f"\n## {title}\n" not in out
