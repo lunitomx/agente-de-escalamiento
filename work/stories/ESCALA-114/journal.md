@@ -67,3 +67,10 @@
 - Gates: 3776 pasan, 5 omitidas; ruff, format y pyright de `coaching/worksheet` limpios; mapa E6 idéntico al generado.
 - Revisión del dueño (carpeta temporal): Promesa de marca y lienzo con encabezado en español, tiempo correcto
   (1-2 horas / 30-60 minutos) y líneas "Falta" legibles.
+
+## Verify (re-verify tras retry 1) — 2026-10-21
+
+- Quality review: PASS. C1, C2, R1, R2 y R3 confirmados en las 20 hojas.
+- 139 pruebas de worksheet y 247 de suites relacionadas pasan. ruff y pyright limpios.
+- Mapa E6 idéntico al del generador. Mutaciones: 5 de 5 muertas.
+- Resúmenes en español originales y sin vocabulario prohibido.
