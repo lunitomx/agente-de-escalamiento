@@ -194,3 +194,31 @@ def test_step_without_next_sheet_shows_no_bridge() -> None:
     assert all(i.next_step is None for b in view.blocks for i in b.items)
     assert "Siguiente paso" not in render_html(view)
     assert "Siguiente paso" not in render_markdown(view)
+
+
+def test_bmc_canvas_has_ten_sections_and_four_bridges() -> None:
+    sheet = find_worksheet("worksheet-bmc")
+    assert sheet is not None
+    view = build_view(load_worksheet_content(sheet), {}, DAY)
+    assert view.layout == "canvas"
+    assert len(view.blocks) == 10
+    assert view.blocks[-1].title == "Lista de verificación"
+    bridges = [
+        (block.title, item.next_step)
+        for block in view.blocks
+        for item in block.items
+        if item.next_step is not None
+    ]
+    assert bridges == [
+        ("Actividades clave", "Siguiente paso: llena Actividades diferenciadoras"),
+        ("Propuesta de valor", "Siguiente paso: llena Promesa de marca"),
+        ("Canales", "Siguiente paso: llena Caja de arena"),
+        ("Segmentos de clientes", "Siguiente paso: llena Cliente central"),
+    ]
+    page = render_html(view)
+    md = render_markdown(view)
+    assert "<div class='canvas'>" in page
+    html_order = [page.index(step) for _, step in bridges if step]
+    md_order = [md.index(step) for _, step in bridges if step]
+    assert html_order == sorted(html_order)
+    assert md_order == sorted(md_order)

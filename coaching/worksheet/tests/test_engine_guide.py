@@ -212,3 +212,66 @@ def test_a_backup_does_not_count_the_sheet_twice(tmp_path: Path) -> None:
     second = _run(tmp_path, "save")
     assert second["artifacts"]["backup_path"] is not None
     assert get_completed_ids(tmp_path) == [SHEET]
+
+
+BMC = "worksheet-bmc"
+BMC_ANSWERS: dict[str, str] = {
+    "segmentos": "Fondas y taquerías a 3 km; familias del barrio",
+    "propuesta-de-valor": "Tortilla de nixtamal del día antes de las 9:00",
+    "canales": "Mostrador y reparto en motocicleta",
+    "relaciones": "Pedido fijo por WhatsApp con el mismo repartidor",
+    "ingresos": "Venta por kilo; cuenta semanal a fondas",
+    "recursos-clave": "Tortilladora, molino y dos motocicletas",
+    "actividades-clave": "Nixtamalizar de madrugada; ruta fija",
+    "socios-clave": "Productor de maíz; proveedor de gas",
+    "costos": "Maíz, gas, sueldos y gasolina",
+    "lista-de-verificacion": "Cada ingreso tiene su segmento; reparto a familias es suposición",
+}
+
+
+def _bmc(base: Path, action: str, **extra: Any) -> dict[str, Any]:
+    return run(
+        {"action": action, "worksheet_name": BMC, "base_path": str(base), **extra}
+    )
+
+
+def test_bmc_owner_path_saves_and_shows_the_bridge(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(sys, "platform", "darwin")
+    started = _bmc(tmp_path, "start")
+    assert started["errors"] == []
+    assert started["artifacts"]["total_steps"] == len(BMC_ANSWERS) + 2
+    first = _bmc(tmp_path, "step")["output"]
+    assert "### Paso 2: ¿A quién le vendes?" in first
+    assert "**Ejemplo:** Tortillería El Sol" in first
+    assert "Siguiente paso" not in first
+    last: dict[str, Any] = {}
+    for step_id, answer in BMC_ANSWERS.items():
+        last = _bmc(tmp_path, "step", fields={step_id: answer})
+    assert last["errors"] == []
+    assert "### Revisión Final" in last["output"]
+    state_path = tmp_path / ".escala/my-company/worksheets" / f"{BMC}.yaml"
+    assert read_yaml(state_path)["status"] == "in_progress"
+
+    result = _bmc(tmp_path, "save")
+    assert result["errors"] == []
+    assert result["artifacts"]["backup_path"] is None
+    assert read_yaml(state_path)["fields"] == BMC_ANSWERS
+    assert get_completed_ids(tmp_path) == [BMC]
+    view = result["artifacts"]["view"]
+    html, md = Path(view["html"]), Path(view["md"])
+    assert html.is_file() and md.is_file()
+    assert view["open_cmd"] == ["open", view["html"]]
+    page = html.read_text(encoding="utf-8")
+    text = md.read_text(encoding="utf-8")
+    assert "class='canvas'" in page
+    for title in (
+        "Cliente central",
+        "Promesa de marca",
+        "Actividades diferenciadoras",
+        "Caja de arena",
+    ):
+        assert f"Siguiente paso: llena {title}" in text
+        assert f"<p class='next'>Siguiente paso: llena {title}</p>" in page
+    assert "Fondas y taquerías a 3 km" in text
