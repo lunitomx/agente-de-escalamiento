@@ -14,9 +14,13 @@ from . import engine
 from .guide import GuideStep, Tip, parse_guide, source_label
 from .view import (
     AI_PROMPT_TITLE,
+    DerivedSources,
+    ViewBlock,
     answer_text,
     build_view,
+    derived_blocks,
     label_heading,
+    markdown_blocks,
     markdown_lines,
     open_command,
     save_view,
@@ -174,6 +178,38 @@ def derived_errors(content: dict[str, Any], base_path: Path | None = None) -> li
             if field not in known
         ]
     return errors
+
+
+def _derived_sources(content: dict[str, Any], base: Path) -> DerivedSources:
+    """Read each source sheet and its answers when saved as completed (D4).
+
+    Only reads: the source sheets are never written.
+    """
+    guide = parse_guide(content)
+    if guide is None:
+        return {}
+    registry = list_worksheets(base_path=base)
+    folder = base / ".escala" / "my-company" / "worksheets"
+    sources: DerivedSources = {}
+    for source in guide.derived_from:
+        sheet = engine.find_worksheet(registry, source.sheet)
+        sheet_content = load_worksheet_content(sheet, base) if sheet else {}
+        saved = read_yaml(folder / f"{source.sheet}.yaml")
+        answers: Any = (
+            saved.get("fields") if saved.get("status") == "completed" else None
+        )
+        sources[source.sheet] = (
+            sheet_content,
+            dict(answers) if isinstance(answers, dict) else None,
+        )
+    return sources
+
+
+def _derived_view_blocks(content: dict[str, Any], base: Path) -> list[ViewBlock]:
+    guide = parse_guide(content)
+    if guide is None or not guide.derived_from:
+        return []
+    return derived_blocks(guide, _derived_sources(content, base))
 
 
 class _GuideError(Exception):
@@ -369,9 +405,12 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
                 [
                     "### Paso 1: Información General",
                     "",
-                    "Antes de empezar, confirma que tienes:",
                 ]
             )
+            derived = _derived_view_blocks(content, base)
+            if derived:
+                lines += ["Esto ya llenaste:", "", *markdown_blocks(derived)]
+            lines.append("Antes de empezar, confirma que tienes:")
             if worksheet.get("prerequisites"):
                 lines.append(
                     "- [ ] Prerrequisitos completados: "
@@ -543,7 +582,12 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
 
         write_yaml(state_path, completed_data)
 
-        view = build_view(content, fields, made_on=date.today())
+        view = build_view(
+            content,
+            fields,
+            made_on=date.today(),
+            derived=_derived_view_blocks(content, base),
+        )
         html_path, md_path = save_view(base, view)
 
         return {

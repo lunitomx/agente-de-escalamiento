@@ -356,3 +356,38 @@ def test_sandbox_passes_the_contract() -> None:
     assert set(content["ai_prompt"]) == {"text"}
     assert guide.view.layout == "canvas"
     assert content["metadata"]["fields"] == ["donde", "que", "canales", "pronostico"]
+
+
+STRATEGY_CANVAS = KNOWLEDGE / "strategy" / "worksheets" / "strategy-canvas.yaml"
+
+
+def test_strategy_canvas_passes_the_contract() -> None:
+    content = _load(STRATEGY_CANVAS)
+    assert content["id"] == "worksheet-strategy-canvas"
+    guide = parse_guide(content)
+    assert guide is not None
+    assert [s.id for s in guide.guide.steps] == ["decision"]
+    assert [(d.sheet, d.fields, d.title, d.required) for d in guide.derived_from] == [
+        ("worksheet-core-customer", ["quien-es", "necesidad"], "Cliente central", True),
+        ("worksheet-brand-promise", ["promesa-principal"], "Promesa de marca", True),
+        (
+            "worksheet-differentiating-activities",
+            ["actividades-elegidas"],
+            "Actividades diferenciadoras",
+            True,
+        ),
+        ("worksheet-sandbox", ["donde", "que", "canales"], "Caja de arena", True),
+        (
+            "worksheet-bmc",
+            ["segmentos", "propuesta-de-valor"],
+            "Contexto del modelo de negocio",
+            False,
+        ),
+    ]
+    assert sorted(t.source for t in guide.tips) == [
+        "work/research/e87-tips/strategy-canvas.md#f2",
+        "work/research/e87-tips/strategy-canvas.md#f3",
+        "work/research/e87-tips/strategy-canvas.md#f4",
+    ]
+    assert set(content["ai_prompt"]) == {"text"}
+    assert guide.view.layout == "canvas"

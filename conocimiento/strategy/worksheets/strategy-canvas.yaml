@@ -1,0 +1,70 @@
+id: worksheet-strategy-canvas
+type: worksheet
+name: Strategy Canvas Worksheet
+name_es: Lienzo de estrategia
+decision: strategy
+summary: >
+  Junta en una hoja las 4 piezas de tu estrategia que ya llenaste: Cliente
+  central, Promesa de marca, Actividades diferenciadoras y Caja de arena. No
+  vuelve a preguntar nada; solo te pide decidir a qué le dices que no.
+relationships:
+  - type: belongs-to
+    target: decision-strategy
+  - type: requires
+    target: concept-core-customer
+  - type: requires
+    target: concept-brand-promise
+  - type: requires
+    target: concept-differentiating-activities
+tags: [strategy, worksheet, canvas, focus, alignment]
+metadata:
+  fields: [decision]
+  output: "Las 4 piezas de la estrategia en una hoja y una decisión de a qué decir que no"
+  difficulty: intermediate
+  time_estimate: "30-60 minutes"
+  frequency: quarterly
+derived_from:
+  - sheet: worksheet-core-customer
+    fields: [quien-es, necesidad]
+    into: cliente-central
+    title: "Cliente central"
+  - sheet: worksheet-brand-promise
+    fields: [promesa-principal]
+    into: promesa
+    title: "Promesa de marca"
+  - sheet: worksheet-differentiating-activities
+    fields: [actividades-elegidas]
+    into: actividades
+    title: "Actividades diferenciadoras"
+  - sheet: worksheet-sandbox
+    fields: [donde, que, canales]
+    into: caja-de-arena
+    title: "Caja de arena"
+  - sheet: worksheet-bmc
+    fields: [segmentos, propuesta-de-valor]
+    into: contexto
+    title: "Contexto del modelo de negocio"
+    required: false
+guide:
+  steps:
+    - id: decision
+      question: "Al ver las 4 piezas juntas, ¿qué oportunidad o actividad vas a decir que no?"
+      how: "Pasa cada oportunidad por la hoja: ¿es tu Cliente central, cabe en tu Caja de arena y cumple tu promesa? Si falla una, es un no."
+      example: "Tortillería El Sol: no a surtir a un supermercado de Monterrey; está fuera de su Caja de arena y no puede entregar antes de las 7:00."
+tips:
+  - text: "Revisa la hoja completa: ¿tu Cliente central valora la promesa? ¿Cada actividad ayuda a cumplirla? Lo que no sirve a ninguna pieza, sobra."
+    source: "work/research/e87-tips/strategy-canvas.md#f2"
+    step: null
+  - text: "Si cambias tu Cliente central o tu Caja de arena, revisa en la misma junta la Promesa de marca y las actividades. Las 4 piezas cambian juntas."
+    source: "work/research/e87-tips/strategy-canvas.md#f3"
+    step: null
+  - text: "Cuando llegue una oportunidad nueva, pásala por la hoja: ¿es tu Cliente central, cabe en tu Caja de arena y cumple tu promesa? Si no, es un no."
+    source: "work/research/e87-tips/strategy-canvas.md#f4"
+    step: null
+ai_prompt:
+  text: "Con mi Cliente central, mi Promesa de marca, mis Actividades diferenciadoras y mi Caja de arena, dime qué pieza no ayuda a las otras y qué oportunidad de este año debería rechazar."
+view:
+  layout: canvas
+  sections:
+    - title: "Lo que decides"
+      steps: [decision]
