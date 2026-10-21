@@ -22,6 +22,7 @@ worksheets:
     difficulty: intermediate
     time_estimate: "2-4 hours per role"
     time_es: "2-4 horas por puesto"
+    summary_es: "Pon un solo nombre al frente de cada función del negocio, con los indicadores que sigue y las cuentas de resultados que le tocan."
     frequency: quarterly
     tags: [people, hiring, fit, accountability]
 
@@ -37,6 +38,7 @@ worksheets:
     difficulty: beginner
     time_estimate: "1-2 hours per person"
     time_es: "1-2 horas por persona"
+    summary_es: "Cada persona anota sus 5 tareas semanales más importantes y marca cuáles le dan energía y cuáles se la quitan. Las que se la quitan son candidatas a delegar."
     frequency: semi-annual
     tags: [people, energy, delegation, role-design]
 
@@ -52,6 +54,7 @@ worksheets:
     difficulty: intermediate
     time_estimate: "2-3 hours per employee"
     time_es: "2-3 horas por colaborador"
+    summary_es: "Tu plan personal en una página: ocho áreas de tu vida, qué quieres lograr en cada una y qué vas a empezar y dejar de hacer."
     frequency: quarterly
     tags: [people, development, personal-plan, accountability]
 
@@ -67,6 +70,7 @@ worksheets:
     difficulty: intermediate
     time_estimate: "2 hours"
     time_es: "2 horas"
+    summary_es: "Califica del 1 al 5 a la empresa y a ti en tres temas: cómo recibes a la gente nueva, cómo la acompañas cada semana y cómo la sigues formando. El promedio más bajo dice dónde empezar."
     frequency: annual
     tags: [people, team, growth, hiring]
 
@@ -86,6 +90,7 @@ worksheets:
     difficulty: advanced
     time_estimate: "4-8 hours first time; 2-4 hours quarterly update"
     time_es: "4-8 horas la primera vez; 2-4 horas cada trimestre"
+    summary_es: "Tu plan estratégico completo en una sola página: lo que te define, a dónde quieres llegar en varios años y qué harás este año y este trimestre para lograrlo."
     frequency: quarterly
     tags: [strategy, planning, alignment, BHAG, OPSP]
 
@@ -102,6 +107,7 @@ worksheets:
     difficulty: intermediate
     time_estimate: "2-4 hours"
     time_es: "2-4 horas"
+    summary_es: "El equipo directivo anota las fortalezas y debilidades de la empresa y las tendencias de afuera que la van a afectar."
     frequency: annual
     tags: [strategy, SWT, strengths, weaknesses, trends]
 
@@ -118,6 +124,7 @@ worksheets:
     difficulty: advanced
     time_estimate: "Full day"
     time_es: "Un día completo"
+    summary_es: "Revisa capa por capa tu estrategia, desde a quién le vendes hasta tu meta de largo plazo, para ver si de verdad te distingue de la competencia."
     frequency: annual
     tags: [strategy, differentiation, brand-promise, competitive-moat]
 
@@ -134,6 +141,7 @@ worksheets:
     difficulty: intermediate
     time_estimate: "2-3 hours"
     time_es: "2-3 horas"
+    summary_es: "Describe a tu mejor cliente con casos reales: qué quiere, qué necesita y qué teme. Termina en una frase corta que todo tu equipo entienda."
     frequency: annual
     tags: [strategy, customer, segmentation, targeting]
 
@@ -150,6 +158,7 @@ worksheets:
     difficulty: intermediate
     time_estimate: "1-2 hours"
     time_es: "1-2 horas"
+    summary_es: "Escribe la promesa principal a tu cliente y dos promesas de apoyo, cada una con una medida semanal. Respalda una con una garantía y nombra lo que no vas a prometer."
     frequency: annual
     tags: [strategy, brand-promise, guarantee, measurement]
 
@@ -165,6 +174,7 @@ worksheets:
     difficulty: intermediate
     time_estimate: "1-2 hours"
     time_es: "1-2 horas"
+    summary_es: "Dibuja en nueve bloques cómo funciona hoy tu negocio, empezando por el cliente: a quién sirves, qué le resuelves, cómo le llegas y cómo te paga."
     frequency: annual
     tags: [strategy, business-model, canvas]
 
@@ -180,6 +190,7 @@ worksheets:
     difficulty: advanced
     time_estimate: "1-2 hours"
     time_es: "1-2 horas"
+    summary_es: "Compárate con 2 o 3 competidores y elige de 3 a 5 actividades que se apoyan entre sí y que a ellos les cuesta copiar."
     frequency: annual
     tags: [strategy, differentiation, competitors]
 
@@ -197,6 +208,7 @@ worksheets:
     difficulty: intermediate
     time_estimate: "1-2 hours"
     time_es: "1-2 horas"
+    summary_es: "Decide dónde compites y dónde no: zonas, categorías de producto o servicio, clientes y canales, y cómo cambiará eso en 3 a 5 años."
     frequency: annual
     tags: [strategy, sandbox, focus, market]
 
@@ -216,6 +228,7 @@ worksheets:
     difficulty: intermediate
     time_estimate: "30-60 minutes"
     time_es: "30-60 minutos"
+    summary_es: "Junta en una página las 4 piezas de tu estrategia que ya llenaste y decide a qué le vas a decir que no."
     frequency: quarterly
     tags: [strategy, canvas, focus, alignment]
 
@@ -233,6 +246,7 @@ worksheets:
     difficulty: beginner
     time_estimate: "30 minutes"
     time_es: "30 minutos"
+    summary_es: "Una lista de 10 hábitos que el equipo directivo califica cada trimestre. El hábito con la calificación más baja se vuelve el foco de los siguientes 90 días."
     frequency: quarterly
     tags: [execution, habits, alignment, accountability, checklist]
 
@@ -249,6 +263,7 @@ worksheets:
     difficulty: intermediate
     time_estimate: "2-4 hours (quarterly planning session)"
     time_es: "2-4 horas (sesión de planeación trimestral)"
+    summary_es: "Revisa cómo te fue el trimestre pasado. Luego elige el número que más importa este trimestre, de 3 a 5 prioridades con responsable y fecha, y un tema que motive a tu equipo."
     frequency: quarterly
     tags: [execution, rocks, priorities, critical-number, planning]
 
@@ -264,6 +279,7 @@ worksheets:
     difficulty: intermediate
     time_estimate: "1-2 hours per team"
     time_es: "1-2 horas por equipo"
+    summary_es: "Encuentra 1 o 2 indicadores por puesto: uno que anticipa el resultado y otro que lo confirma. Cada persona termina con su tarjeta de indicadores."
     frequency: annual or when roles change
     tags: [execution, KPI, metrics, leading-indicators, scoreboard]
 
@@ -280,6 +296,7 @@ worksheets:
     difficulty: beginner
     time_estimate: "1-2 hours to customize"
     time_es: "1-2 horas para adaptarlas"
+    summary_es: "Agendas fijas para la junta diaria de 15 minutos, la semanal y la mensual, para que empiecen a tiempo y terminen con acuerdos claros."
     frequency: one-time setup; review quarterly
     tags: [execution, meetings, rhythm, huddle, agenda]
 
@@ -297,6 +314,7 @@ worksheets:
     difficulty: intermediate
     time_estimate: "1-2 hours"
     time_es: "1-2 horas"
+    summary_es: "Mide en días cuánto tarda en regresar cada peso que gastas: lo que tardas en vender, en producir y entregar, y en cobrar."
     frequency: quarterly
     tags: [cash, CCC, cycle, optimization]
 
@@ -312,6 +330,7 @@ worksheets:
     difficulty: intermediate
     time_estimate: "2-3 hours"
     time_es: "2-3 horas"
+    summary_es: "Calcula cuánto efectivo y utilidad ganas si mejoras 1% cada una de siete palancas, como precio, volumen, costos y días de cobro, y ordénalas de mayor a menor efecto."
     frequency: quarterly
     tags: [cash, power-of-one, levers, EBIT, impact]
 
@@ -328,5 +347,6 @@ worksheets:
     difficulty: advanced
     time_estimate: "3-4 hours initial; 30 min weekly update"
     time_es: "3-4 horas la primera vez; 30 minutos cada semana"
+    summary_es: "Proyecta semana por semana, 13 semanas adelante, cuánto efectivo entra, cuánto sale y con cuánto cierras. Así ves una falta de efectivo antes de que llegue."
     frequency: weekly
     tags: [cash, forecast, cash-flow, planning, 13-week]

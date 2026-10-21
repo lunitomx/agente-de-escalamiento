@@ -103,6 +103,11 @@ def _time_es(worksheet: dict[str, Any]) -> str:
     return str(worksheet.get("time_es") or worksheet.get("time_estimate") or "—")
 
 
+def _summary_es(worksheet: dict[str, Any], content: dict[str, Any]) -> str:
+    """The Spanish summary of the registry; the sheet's own summary as fallback."""
+    return str(worksheet.get("summary_es") or content.get("summary") or "").strip()
+
+
 def _prerequisite_names(worksheet: dict[str, Any], base_path: Path) -> list[str]:
     registry = list_worksheets(base_path=base_path)
     names: list[str] = []
@@ -323,9 +328,9 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
         completed = get_completed_ids(base)
 
         lines = [
-            "## Worksheets Disponibles",
+            "## Hojas disponibles",
             "",
-            "| Worksheet | Decisión | Dificultad | Tiempo | Estado |",
+            "| Hoja | Decisión | Dificultad | Tiempo | Estado |",
             "|-----------|----------|-----------|--------|--------|",
         ]
         for w in all_ws:
@@ -396,7 +401,7 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
             f"**Dificultad:** {_difficulty_es(worksheet)}",
             f"**Tiempo estimado:** {_time_es(worksheet)}",
             "",
-            f"{content.get('summary', '')}",
+            _summary_es(worksheet, content),
             "",
         ]
 
@@ -419,7 +424,7 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
             lines.extend(
                 [
                     "- [ ] Datos actualizados de tu empresa",
-                    "- [ ] 1-2 horas sin interrupciones",
+                    f"- [ ] {_time_es(worksheet)} sin interrupciones",
                     "",
                     "Responde con 'listo' para empezar.",
                 ]

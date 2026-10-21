@@ -86,3 +86,52 @@ def test_client_registry_without_spanish_fields_falls_back(tmp_path: Path) -> No
     registry = [{"id": "client-ws", "name": "Client Worksheet", "decision": "cash"}]
     found = engine.find_worksheet(registry, "client worksheet")
     assert found is not None and found["id"] == "client-ws"
+
+
+# --- retry 1 (C1, C2): the whole step-1 header is Spanish and agrees --------
+
+_IDS = [str(entry["id"]) for entry in _registry()]
+_ENGLISH_MARKERS = (" the ", " and ", "worksheet", "template")
+
+
+def test_every_registry_entry_has_a_spanish_summary() -> None:
+    for entry in _registry():
+        summary = str(entry.get("summary_es", "")).strip()
+        assert summary, entry["id"]
+        lowered = f" {summary.lower()} "
+        for marker in _ENGLISH_MARKERS:
+            assert marker not in lowered, (entry["id"], marker)
+
+
+@pytest.mark.parametrize("sheet_id", _IDS)
+def test_step_one_header_uses_the_spanish_summary_and_its_own_time(
+    sheet_id: str, tmp_path: Path
+) -> None:
+    entry = next(e for e in _registry() if e["id"] == sheet_id)
+    result = run(
+        {"action": "start", "worksheet_name": sheet_id, "base_path": str(tmp_path)}
+    )
+    assert result["errors"] == []
+    out = result["output"]
+    assert str(entry["summary_es"]).strip() in out
+    assert f"- [ ] {entry['time_es']} sin interrupciones" in out
+    assert out.count(" sin interrupciones") == 1
+
+
+def test_canvas_step_one_does_not_contradict_its_time(tmp_path: Path) -> None:
+    out = run(
+        {
+            "action": "start",
+            "worksheet_name": "lienzo de estrategia",
+            "base_path": str(tmp_path),
+        }
+    )["output"]
+    assert "**Tiempo estimado:** 30-60 minutos" in out
+    assert "1-2 horas" not in out
+
+
+def test_list_title_and_column_are_spanish(tmp_path: Path) -> None:
+    out = run({"action": "list", "base_path": str(tmp_path)})["output"]
+    assert out.startswith("## Hojas disponibles\n")
+    assert "| Hoja | Decisión | Dificultad | Tiempo | Estado |" in out
+    assert "Worksheet" not in out
