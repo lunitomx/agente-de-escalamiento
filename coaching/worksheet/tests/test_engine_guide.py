@@ -10,7 +10,7 @@ from typing import Any
 import pytest
 
 from coaching.core import read_yaml, write_yaml
-from coaching.worksheet import run
+from coaching.worksheet import get_completed_ids, run
 
 SHEET = "worksheet-core-customer"
 
@@ -24,12 +24,11 @@ def _run(base: Path, action: str, **extra: Any) -> dict[str, Any]:
 def test_step_after_start_shows_the_first_guided_step(tmp_path: Path) -> None:
     started = _run(tmp_path, "start")
     assert started["errors"] == []
-    assert started["artifacts"]["total_steps"] == 7
+    assert started["artifacts"]["total_steps"] == 8
     out = _run(tmp_path, "step")["output"]
     assert "### Paso 2: ¿Quiénes son tus 5 mejores clientes" in out
     assert "**Cómo llenarlo:**" in out
     assert "**Ejemplo:** Tortillería El Sol" in out
-    assert "(fuente: work/research/e87-tips/core-customer.md#f1)" in out
 
 
 def test_resume_shows_the_same_guided_step(tmp_path: Path) -> None:
@@ -140,3 +139,76 @@ def test_save_on_other_platform_has_no_open_cmd(
     monkeypatch.setattr(sys, "platform", "win32")
     _run(tmp_path, "start")
     assert _run(tmp_path, "save")["artifacts"]["view"]["open_cmd"] is None
+
+
+def _fill_all(base: Path) -> dict[str, Any]:
+    """start, 'listo', then one answer per guided step; returns the last step."""
+    _run(base, "start")
+    _run(base, "step")
+    last: dict[str, Any] = {}
+    for step_id, answer in ANSWERS.items():
+        last = _run(base, "step", fields={step_id: answer})
+    return last
+
+
+ANSWERS: dict[str, str] = {
+    "top-5-clientes": "Doña Mari, Don Beto",
+    "atributos": "Pagan a tiempo y piden diario",
+    "top-atributos": "Piden diario",
+    "quien-es": "Dueños de fondas a 3 km",
+    "necesidad": "No quedarse sin tortilla a mediodía",
+    "chequeo-promesa": "Tortilla caliente antes de las 11",
+}
+
+
+def test_last_answer_shows_final_review_and_does_not_complete(
+    tmp_path: Path,
+) -> None:
+    content_steps = run(
+        {"action": "start", "worksheet_name": SHEET, "base_path": str(tmp_path)}
+    )["artifacts"]["total_steps"]
+    assert content_steps == len(ANSWERS) + 2
+    last = _fill_all(tmp_path)
+    out = last["output"]
+    assert last["errors"] == []
+    assert "### Revisión Final" in out
+    assert "**¿Quiénes son tus 5 mejores clientes" in out
+    assert "Doña Mari, Don Beto" in out
+    assert "top-5-clientes" not in out
+    assert "confirmar" in out
+    state = read_yaml(tmp_path / ".escala/my-company/worksheets" / f"{SHEET}.yaml")
+    assert state["status"] == "in_progress"
+    assert get_completed_ids(tmp_path) == []
+    again = _run(tmp_path, "step")["output"]
+    assert "### Revisión Final" in again
+    assert get_completed_ids(tmp_path) == []
+
+
+def test_confirm_save_completes_once_with_view_and_no_backup(
+    tmp_path: Path,
+) -> None:
+    _fill_all(tmp_path)
+    result = _run(tmp_path, "save")
+    assert result["errors"] == []
+    assert result["artifacts"]["backup_path"] is None
+    worksheets = tmp_path / ".escala/my-company/worksheets"
+    assert sorted(p.name for p in worksheets.glob("*.yaml")) == [f"{SHEET}.yaml"]
+    assert get_completed_ids(tmp_path) == [SHEET]
+    assert read_yaml(worksheets / f"{SHEET}.yaml")["fields"] == ANSWERS
+    md = Path(result["artifacts"]["view"]["md"]).read_text(encoding="utf-8")
+    assert "Tortilla caliente antes de las 11" in md
+
+
+def test_tip_source_shows_a_readable_label_not_a_repo_path(tmp_path: Path) -> None:
+    _run(tmp_path, "start")
+    out = _run(tmp_path, "step")["output"]
+    assert "work/research" not in out
+    assert "(fuente: Investigación ESCALA (nota interna f1))" in out
+
+
+def test_a_backup_does_not_count_the_sheet_twice(tmp_path: Path) -> None:
+    _fill_all(tmp_path)
+    _run(tmp_path, "save")
+    second = _run(tmp_path, "save")
+    assert second["artifacts"]["backup_path"] is not None
+    assert get_completed_ids(tmp_path) == [SHEET]

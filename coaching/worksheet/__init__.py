@@ -77,10 +77,11 @@ def get_completed_ids(base_path: Path | None = None) -> list[str]:
     if not wdir.exists():
         return []
     completed: list[str] = []
-    for f in wdir.glob("*.yaml"):
+    for f in sorted(wdir.glob("*.yaml")):
         data = read_yaml(f)
-        if data.get("status") == "completed":
-            completed.append(str(data.get("worksheet_id") or f.stem))
+        sheet_id = str(data.get("worksheet_id") or f.stem)
+        if data.get("status") == "completed" and sheet_id not in completed:
+            completed.append(sheet_id)
     return completed
 
 
@@ -135,6 +136,28 @@ def _step_lines(
     if shown:
         lines += ["**Tips:**"]
         lines += [f"- {t.text} (fuente: {t.source})" for t in shown]
+    return lines
+
+
+def _review_lines(steps: list[GuideStep], answers: dict[str, Any]) -> list[str]:
+    """Final review: each question with its answer, then ask to confirm.
+
+    Nothing is completed here; only ``save`` marks the sheet and writes the view.
+    """
+    lines = [
+        "### Revisión Final",
+        "",
+        "Revisa tus respuestas antes de guardar:",
+        "",
+    ]
+    for step in steps:
+        answer = answers.get(step.id)
+        shown = str(answer).strip() if answer not in (None, "", []) else ""
+        lines.append(f"- **{step.question}:** {shown or '(sin respuesta)'}")
+    lines += [
+        "",
+        "Responde 'confirmar' para guardar la hoja y abrir tu vista.",
+    ]
     return lines
 
 
@@ -234,7 +257,7 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
             steps, tips = _steps_and_tips(worksheet, content)
         except _GuideError as exc:
             return _contract_error(str(exc))
-        total_steps = len(steps) + 1  # steps + confirmation step
+        total_steps = len(steps) + 2  # information + steps + final review
 
         lines = [
             f"## {worksheet['name']}",
@@ -280,13 +303,7 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
                     )
                 )
             else:
-                lines.extend(
-                    [
-                        "### Revisión Final",
-                        "",
-                        "Has completado todos los pasos. Revisa tus respuestas y confirma para guardar.",
-                    ]
-                )
+                lines.extend(_review_lines(steps, saved_fields))
 
         write_yaml(
             state_path,
@@ -336,7 +353,6 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
             }
 
         current_step = state.get("current_step", 0)
-        total_steps = state.get("total_steps", 0)
         saved_fields = state.get("fields", {})
 
         step_fields = context.get("fields", {})
@@ -349,88 +365,39 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
         except _GuideError as exc:
             return _contract_error(str(exc))
 
-        if current_step >= total_steps:
-            completed_data = {
-                "worksheet_id": worksheet["id"],
-                "worksheet_name": worksheet["name"],
-                "decision": worksheet.get("decision"),
+        review_step = len(steps) + 1
+        current_step = min(current_step, review_step)
+        write_yaml(
+            state_path,
+            {
+                **state,
+                "current_step": current_step,
+                "total_steps": len(steps) + 2,
                 "fields": saved_fields,
-                "completed": str(__import__("datetime").datetime.now().date()),
-                "status": "completed",
-            }
-            ensure_dir(state_path.parent)
-            write_yaml(state_path, completed_data)
+                "status": "in_progress",
+            },
+        )
 
-            lines = [
-                f"## ✅ {worksheet['name']} — Completado",
-                "",
-                "¡Excelente! Has completado este worksheet.",
-                "",
-                "### Resumen de tus respuestas:",
-                "",
-            ]
-            for field_name, value in saved_fields.items():
-                lines.append(f"- **{field_name}:** {value}")
-            lines.extend(
-                [
-                    "",
-                    "Próximos pasos sugeridos:",
-                    "- `/escala-progress` para ver tu avance general",
-                    "- `/escala-worksheet list` para ver otros worksheets",
-                ]
+        if current_step < review_step:
+            lines = _step_lines(
+                steps,
+                tips,
+                current_step - 1,
+                "Completa este campo con tu información.",
             )
-
-            return {
-                "output": "\n".join(lines),
-                "artifacts": {
-                    "worksheet": worksheet,
-                    "completed_data": completed_data,
-                    "state_path": str(state_path),
-                },
-                "errors": [],
-            }
         else:
-            write_yaml(
-                state_path,
-                {
-                    **state,
-                    "current_step": current_step,
-                    "fields": saved_fields,
-                    "status": "in_progress",
-                },
-            )
+            lines = _review_lines(steps, saved_fields)
 
-            if current_step <= len(steps):
-                lines = _step_lines(
-                    steps,
-                    tips,
-                    current_step - 1,
-                    "Completa este campo con tu información.",
-                )
-            else:
-                lines = [
-                    "### Revisión Final",
-                    "",
-                    "Has completado todos los campos. Revisa y confirma:",
-                    "",
-                ]
-                for field_name, value in saved_fields.items():
-                    lines.append(f"- **{field_name}:** {value}")
-                lines.append("")
-                lines.append(
-                    "Responde 'confirmar' para guardar el worksheet como completado."
-                )
-
-            return {
-                "output": "\n".join(lines),
-                "artifacts": {
-                    "worksheet": worksheet,
-                    "current_step": current_step,
-                    "total_steps": total_steps,
-                    "state_path": str(state_path),
-                },
-                "errors": [],
-            }
+        return {
+            "output": "\n".join(lines),
+            "artifacts": {
+                "worksheet": worksheet,
+                "current_step": current_step,
+                "total_steps": len(steps) + 2,
+                "state_path": str(state_path),
+            },
+            "errors": [],
+        }
 
     elif action == "save":
         ws_name = context.get("worksheet_name", "")
