@@ -72,7 +72,8 @@ class SheetView(BaseModel):
     blocks: list[ViewBlock]
 
 
-def _answer_text(value: Any) -> str | None:
+def answer_text(value: Any) -> str | None:
+    """One line for an answer: a list joins with "; ", empty becomes None."""
     if value is None:
         return None
     if isinstance(value, list):
@@ -104,7 +105,7 @@ def _legacy_steps(content: dict[str, Any]) -> list[GuideStep]:
 def _item(step: GuideStep, answers: dict[str, Any]) -> ViewItem:
     return ViewItem(
         label=safe_text(step.question),
-        answer=_answer_text(answers.get(step.id)),
+        answer=answer_text(answers.get(step.id)),
         how=safe_text(step.how),
     )
 

@@ -100,6 +100,19 @@ def test_last_row_shows_final_review_and_nothing_is_completed(
     assert get_completed_ids(base) == []
 
 
+def test_final_review_joins_list_answers_like_the_saved_view(
+    filled: tuple[Path, dict[str, Any]],
+) -> None:
+    _, last = filled
+    review = last["output"]
+    assert (
+        "Relación: viajamos juntos dos veces al año; "
+        "Familia: mis hijos dirigen dos sucursales" in review
+    )
+    assert "['" not in review
+    assert "']" not in review
+
+
 def test_save_writes_the_plan_and_opens_a_grid_of_five_cards(
     filled: tuple[Path, dict[str, Any]], monkeypatch: pytest.MonkeyPatch
 ) -> None:
