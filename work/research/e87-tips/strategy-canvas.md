@@ -81,12 +81,18 @@ sources:
     url: https://resources.rework.com/vi/libraries/strategic-management/strategic-fit
     origin: rework
     kind: article
+  - title: "The Coherence Premium (Paul Leinwand y Cesare Mainardi, Harvard Business Review, 2010)"
+    url: https://hbr.org/2010/06/the-coherence-premium
+    origin: hbr
+    kind: article
+    added_by: S87.7  # complemento: 3 familias fuera de Scaling Up
 ```
 
 Porter llama a esto "ajuste": cada actividad es consistente con la propuesta y
 las actividades se refuerzan entre sí. Monkhouse usa el mapa para encontrar
 actividades huérfanas. Fenner revisa si la promesa mueve al Cliente central a
-actuar.
+actuar. Leinwand y Mainardi (complemento S87.7): rinden más las empresas que alinean
+lo que mejor hacen con el mercado que eligen.
 
 <a id="f3"></a>
 ### f3 · Si cambias una pieza, revisa las otras tres
@@ -117,12 +123,18 @@ sources:
     origin: monkhouse
     family: scaling-up
     kind: practitioner
+  - title: "Porter's Value Chain (Umbrex)"
+    url: https://umbrex.com/?p=241127
+    origin: umbrex
+    kind: article
+    added_by: S87.7  # complemento: 3 familias fuera de Scaling Up
 ```
 
 Rework: en un sistema de actividades ligadas, mover una pieza mueve a las que
 dependen de ella. Readingraphics: dónde jugar y cómo ganar son el centro de la
 estrategia y se eligen juntos. Monkhouse: el despacho que cambió de Cliente
 central agregó una actividad nueva (contratar personas que crean relación).
+Umbrex (complemento S87.7): una decisión en un área cambia costos y valor en otras.
 
 <a id="f4"></a>
 ### f4 · Usa la hoja para decir que no

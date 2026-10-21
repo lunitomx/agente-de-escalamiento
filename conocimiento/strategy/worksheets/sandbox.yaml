@@ -1,0 +1,64 @@
+id: worksheet-sandbox
+type: worksheet
+name: Sandbox Worksheet
+name_es: Hoja de Caja de arena
+decision: strategy
+summary: >
+  Define dónde compites y dónde no: tus zonas, tus 3 a 5 categorías de producto
+  o servicio, a quién le vendes y por qué canales, y cómo cambiará tu caja en
+  3 a 5 años.
+relationships:
+  - type: belongs-to
+    target: decision-strategy
+  - type: implements
+    target: tool-sandbox
+  - type: requires
+    target: concept-core-customer
+tags: [strategy, worksheet, sandbox, focus, market]
+metadata:
+  fields: [donde, que, canales, pronostico]
+  output: "Zonas, 3 a 5 categorías, canales y 3 a 5 cambios posibles en 3 a 5 años"
+  difficulty: intermediate
+  time_estimate: "1-2 hours"
+  frequency: annually
+guide:
+  steps:
+    - id: donde
+      question: "¿En qué zonas vas a competir y en cuáles no?"
+      how: "Nombra ciudades, estados o colonias. Di también dónde no vendes."
+      example: "Tortillería El Sol: zona metropolitana de Guadalajara; no fuera de Jalisco."
+    - id: que
+      question: "¿Cuáles son tus 3 a 5 categorías de producto o servicio?"
+      how: "Ordena tus ventas de los últimos 12 meses por venta y por utilidad. Quédate con las de arriba. Una por línea."
+      example: "Tortillería El Sol: tortilla de maíz, totopo y masa para fondas."
+    - id: canales
+      question: "¿A quién le vendes y por qué canales?"
+      how: "Directo, en línea, mayoreo, menudeo o socios. Un canal por línea, con su tipo de cliente."
+      example: "Tortillería El Sol: venta directa en 3 sucursales a familias; mayoreo a fondas."
+    - id: pronostico
+      question: "¿Cómo cambiará tu caja en 3 a 5 años?"
+      how: "Escribe 3 a 5 cambios posibles en tus zonas, categorías o canales. Cada uno con una señal que puedas medir."
+      example: "Tortillería El Sol: entrar a tiendas de conveniencia si 2 cadenas piden muestra; dejar el totopo si su utilidad sigue abajo del 10 %."
+tips:
+  - text: "Ordena tus productos de los últimos 12 meses por venta y por utilidad. Tus 3 a 5 categorías salen de arriba; lo de abajo cuesta más de lo que deja."
+    source: "work/research/e87-tips/sandbox.md#f2"
+    step: que
+  - text: "Si abres venta directa o en línea, cuida a tus distribuidores: otro precio, otra marca o productos distintos. Pruébalo en pequeño y mide antes de crecerlo."
+    source: "work/research/e87-tips/sandbox.md#f3"
+    step: canales
+  - text: "Para cada cambio, anota una señal que puedas medir y revísala en tu planeación trimestral."
+    source: "work/research/e87-tips/sandbox.md#f4"
+    step: pronostico
+ai_prompt:
+  text: "Con mis zonas, mis categorías y mis canales, dime qué categoría me deja menos utilidad, qué canal puede chocar con otro y qué cambio a 3-5 años debo vigilar primero."
+view:
+  layout: canvas
+  sections:
+    - title: "Dónde compites"
+      steps: [donde]
+    - title: "Qué vendes"
+      steps: [que]
+    - title: "A quién y por qué canales"
+      steps: [canales]
+    - title: "Pronóstico a 3-5 años"
+      steps: [pronostico]

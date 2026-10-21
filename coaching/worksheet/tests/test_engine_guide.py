@@ -408,3 +408,56 @@ def test_core_customer_end_to_end_writes_view_and_open_cmd(
     md = Path(view["md"]).read_text(encoding="utf-8")
     assert "Lo que ve tu Cliente central" in md
     assert "No venden por kilo después de las 14:00" in md
+
+
+SANDBOX = "worksheet-sandbox"
+SANDBOX_ANSWERS: dict[str, str] = {
+    "donde": "Zona metropolitana de Guadalajara; no fuera de Jalisco",
+    "que": "Tortilla de maíz\nTotopo\nMasa para fondas",
+    "canales": "Venta directa en 3 sucursales; mayoreo a fondas",
+    "pronostico": "Entrar a tiendas de conveniencia",
+}
+
+
+def _sb(base: Path, action: str, **extra: Any) -> dict[str, Any]:
+    return run(
+        {"action": action, "worksheet_name": SANDBOX, "base_path": str(base), **extra}
+    )
+
+
+def test_sandbox_end_to_end(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(sys, "platform", "darwin")
+    started = run(
+        {
+            "action": "start",
+            "worksheet_name": "caja de arena",
+            "base_path": str(tmp_path),
+        }
+    )
+    assert started["errors"] == []
+    assert started["artifacts"]["worksheet"]["id"] == SANDBOX
+    assert started["artifacts"]["total_steps"] == 6
+    assert started["output"].startswith("## Caja de arena\n")
+    assert "Prerrequisitos completados: Cliente central" in started["output"]
+    first = _sb(tmp_path, "step")["output"]
+    assert "### Paso 2: ¿En qué zonas vas a competir y en cuáles no?" in first
+    assert "**Ejemplo:** Tortillería El Sol" in first
+    last: dict[str, Any] = {}
+    for step_id, answer in SANDBOX_ANSWERS.items():
+        last = _sb(tmp_path, "step", fields={step_id: answer})
+    assert last["errors"] == []
+    assert "### Revisión Final" in last["output"]
+    assert "**Prompt para tu asistente de IA:**" in last["output"]
+    state_path = tmp_path / ".escala/my-company/worksheets" / f"{SANDBOX}.yaml"
+    assert read_yaml(state_path)["status"] == "in_progress"
+
+    result = _sb(tmp_path, "save")
+    assert result["errors"] == []
+    assert get_completed_ids(tmp_path) == [SANDBOX]
+    view = result["artifacts"]["view"]
+    page = Path(view["html"]).read_text(encoding="utf-8")
+    text = Path(view["md"]).read_text(encoding="utf-8")
+    assert view["open_cmd"] == ["open", view["html"]]
+    assert "<div class='canvas'>" in page
+    assert "Zona metropolitana de Guadalajara" in text
+    assert "Prompt para tu asistente de IA" in page
