@@ -19,6 +19,9 @@ ROOT = Path(__file__).resolve().parents[1]
 KNOWLEDGE = ROOT / "conocimiento"
 POLICY = ROOT / "governance" / "public-boundary.yaml"
 CORE_CUSTOMER = KNOWLEDGE / "strategy" / "worksheets" / "core-customer.yaml"
+DIFF_ACTIVITIES = (
+    KNOWLEDGE / "strategy" / "worksheets" / "differentiating-activities.yaml"
+)
 OPPP_SHEET = KNOWLEDGE / "people" / "worksheets" / "oppp.yaml"
 OPPP_CARD = KNOWLEDGE / "people" / "tools" / "oppp.yaml"
 OPPP_ROW_STEPS = ("vision-10-25-anos", "metas-un-ano", "empezar", "dejar")
@@ -71,13 +74,48 @@ def test_core_customer_passes_the_contract() -> None:
         "top-5-clientes",
         "atributos",
         "top-atributos",
+        "persona-ejemplo",
         "quien-es",
+        "prueba-quien",
         "necesidad",
         "chequeo-promesa",
+        "mejor-en",
+        "diferente-en",
+        "raro-o-malo",
     ]
-    assert len(guide.tips) >= 3
+    assert len(guide.tips) == 5
     assert guide.view.layout == "cards"
-    assert len(guide.view.sections) == 3
+    assert len(guide.view.sections) == 4
+    assert guide.ai_prompt is not None and guide.ai_prompt.text
+
+
+def test_differentiating_activities_passes_the_contract() -> None:
+    content = _load(DIFF_ACTIVITIES)
+    guide = parse_guide(content)
+    assert guide is not None
+    assert content["id"] == "worksheet-differentiating-activities"
+    assert [s.id for s in guide.guide.steps] == [
+        "competidores",
+        "eje-personas",
+        "eje-producto",
+        "eje-operaciones",
+        "eje-terminos",
+        "actividades-elegidas",
+        "como-se-refuerzan",
+        "que-dejas-de-hacer",
+    ]
+    assert sorted(t.source.rsplit("#", 1)[1] for t in guide.tips) == [
+        "f1",
+        "f2",
+        "f4",
+    ]
+    assert guide.view.layout == "cards"
+    assert [sec.title for sec in guide.view.sections] == [
+        "Tu competencia",
+        "En qué eres distinto",
+        "Tus actividades diferenciadoras",
+    ]
+    assert guide.ai_prompt is not None and guide.ai_prompt.text
 
 
 def test_core_customer_keeps_legacy_fields() -> None:

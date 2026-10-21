@@ -148,7 +148,7 @@ def test_derived_from_shape_is_accepted() -> None:
 
 def test_every_registered_sheet_loads_and_passes_the_contract() -> None:
     sheets = list_worksheets()
-    assert len(sheets) == 15
+    assert len(sheets) == 16
     for sheet in sheets:
         content = load_worksheet_content(sheet)
         assert content.get("metadata") or content.get("guide"), sheet["id"]
