@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 KNOWLEDGE = ROOT / "conocimiento"
 POLICY = ROOT / "governance" / "public-boundary.yaml"
 CORE_CUSTOMER = KNOWLEDGE / "strategy" / "worksheets" / "core-customer.yaml"
+BRAND_PROMISE = KNOWLEDGE / "strategy" / "worksheets" / "brand-promise.yaml"
 ANCHOR_SOURCE_RE = re.compile(r"^(work/research/e87-tips/[a-z0-9-]+\.md)#(f\d+)$")
 YAML_BLOCK_RE = re.compile(r"```yaml\n(.*?)\n```", re.DOTALL)
 
@@ -65,6 +66,40 @@ def test_core_customer_passes_the_contract() -> None:
     assert len(guide.tips) >= 3
     assert guide.view.layout == "cards"
     assert len(guide.view.sections) == 3
+
+
+def test_brand_promise_passes_the_contract() -> None:
+    guide = parse_guide(_load(BRAND_PROMISE))
+    assert guide is not None
+    assert [s.id for s in guide.guide.steps] == [
+        "cuentan-esperan-solo-tu",
+        "promesa-principal",
+        "promesas-de-apoyo",
+        "medidas",
+        "prueba-de-promesa",
+        "lealtad",
+        "garantia",
+        "antipromesas",
+    ]
+    assert all(s.example.startswith("Tortillería El Sol:") for s in guide.guide.steps)
+    assert len(guide.tips) >= 3
+    assert guide.view.layout == "cards"
+    assert len(guide.view.sections) == 4
+
+
+def test_brand_promise_tips_are_only_f1_f2_f5() -> None:
+    guide = parse_guide(_load(BRAND_PROMISE))
+    assert guide is not None
+    assert sorted(t.source for t in guide.tips) == [
+        "work/research/e87-tips/brand-promise.md#f1",
+        "work/research/e87-tips/brand-promise.md#f2",
+        "work/research/e87-tips/brand-promise.md#f5",
+    ]
+
+
+def test_brand_promise_ai_prompt_has_no_page() -> None:
+    prompt = _load(BRAND_PROMISE)["ai_prompt"]
+    assert set(prompt) == {"text"}
 
 
 def test_core_customer_keeps_legacy_fields() -> None:
