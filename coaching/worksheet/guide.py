@@ -24,6 +24,22 @@ from pydantic import (
 
 Text = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
 Slug = Annotated[str, StringConstraints(pattern=r"^[a-z0-9]+(-[a-z0-9]+)*$")]
+WorksheetId = Annotated[
+    str, StringConstraints(pattern=r"^worksheet-[a-z0-9]+(-[a-z0-9]+)*$")
+]
+
+
+class NextSheet(BaseModel):
+    """Bridge to the sheet the owner fills next.
+
+    Shape only: the target is not checked against the registry, because some
+    targets are written by later stories (S87.4 decision D2).
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: WorksheetId
+    title: Text
 
 
 class GuideStep(BaseModel):
@@ -35,6 +51,7 @@ class GuideStep(BaseModel):
     question: Text
     how: Text
     example: Text
+    next_sheet: NextSheet | None = None
 
 
 class Guide(BaseModel):
