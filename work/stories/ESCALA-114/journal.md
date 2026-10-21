@@ -51,3 +51,19 @@
   en 7 de 7, derived_from (solo completed, Falta por campo, no escribe origen, validaciones), mapa E6 regenerado
   idéntico 87/83, registro 20, tips ≥3 familias. 198 pruebas, ruff y pyright limpios; 7 de 7 mutaciones muertas.
 - Recommended: "Falta" con claves (R1, diseño D4), "Esto ya llenaste:" con 0 llenas (R2), `##` bajo `###` (R3).
+
+## Phase: implement · retry 1 tras VERIFY FAIL (S87.7 · ESCALA-114) — 2026-10-21
+
+- C1 + C2 (e5c3fc11): `summary_es` propio, en español llano, en las 20 hojas del registro; el paso 1 lo usa
+  (respaldo: `summary`). Lista: "Hojas disponibles", columna "Hoja". El paso 1 usa `_time_es` en lugar de "1-2 horas".
+  Pruebas: 20 de 20 con resumen y tiempo propios; el lienzo no dice "1-2 horas". Un solo commit para los dos: ambos
+  son el encabezado del paso 1 y la prueba parametrizada cubre los dos.
+- Mapa E6: el sha del registro cambió; regenerado con `scripts/build_e6_migration_map.py` (solo esa línea).
+- R1 (d76e3051): "Falta" muestra la pregunta del paso y "Llena la hoja <nombre> con /escala-worksheet <id>".
+  `missing_source_text(question, sheet_name, sheet_id)`. Pruebas que fijaban el texto viejo actualizadas.
+- R2 + R3 (86e43d55): con 0 piezas, "Todavía no llenas ninguna de estas piezas:". Bloques del paso 1 en `####`
+  (`markdown_blocks(..., heading=)`); la vista y el `.md` siguen en `##`.
+- Sorpresa: el generador del mapa E6 falla con "unable to produce a safe map" si el archivo de salida ya existe.
+- Gates: 3776 pasan, 5 omitidas; ruff, format y pyright de `coaching/worksheet` limpios; mapa E6 idéntico al generado.
+- Revisión del dueño (carpeta temporal): Promesa de marca y lienzo con encabezado en español, tiempo correcto
+  (1-2 horas / 30-60 minutos) y líneas "Falta" legibles.
