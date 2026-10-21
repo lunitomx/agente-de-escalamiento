@@ -63,7 +63,11 @@ def check_coverage(
     if missing:
         errors.append(f"faltan páginas: {missing}")
 
+    seen_pending: set[int] = set()
     for number in pending:
+        if number in seen_pending:
+            errors.append(f"p. {number}: repetida en pending")
+        seen_pending.add(number)
         if number not in frozen_pending:
             errors.append(f"p. {number}: fuera de la lista congelada")
         entry = by_page.get(number)
@@ -187,6 +191,11 @@ def test_pending_no_tool_page_is_reported() -> None:
 def test_pending_outside_frozen_list_is_reported() -> None:
     errors = check_coverage(_map(pending=[*TOOL_PAGES, 40]), set(), set(), FROZEN)
     assert "p. 40: fuera de la lista congelada" in errors
+
+
+def test_page_repeated_in_pending_is_reported() -> None:
+    errors = check_coverage(_map(pending=[*TOOL_PAGES, 10]), set(), set(), FROZEN)
+    assert "p. 10: repetida en pending" in errors
 
 
 def test_tool_outside_pending_without_nodes_is_reported() -> None:
@@ -325,3 +334,12 @@ def test_sandbox_card_matches_page_28() -> None:
 def test_page_28_lists_sandbox_tool() -> None:
     page = next(p for p in _load_coverage()["pages"] if p["page"] == 28)
     assert "tool-sandbox" in page["nodes"]
+
+
+def test_page_27_reason_says_it_introduces_sandbox() -> None:
+    page_27 = next(e for e in _load_coverage()["pages"] if e["page"] == 27)
+    assert page_27["class"] == "no_tool"
+    assert page_27["reason"] == (
+        "repite el ejemplo de la p. 23 y presenta la Caja de arena; "
+        "el ejercicio vive en p. 28-29"
+    )

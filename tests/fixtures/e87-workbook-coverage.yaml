@@ -88,7 +88,7 @@ pages:
     content: "Actividades diferenciadoras: prompt · S87.6"
   - page: 27
     class: no_tool
-    reason: "repite el ejemplo de la p. 23 (abogados); la Caja de arena vive en p. 28-29"
+    reason: "repite el ejemplo de la p. 23 y presenta la Caja de arena; el ejercicio vive en p. 28-29"
   - page: 28
     class: tool
     nodes: [tool-sandbox]
