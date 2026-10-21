@@ -138,7 +138,6 @@ def test_triangulated_rule(tool: str) -> None:
 # independent family before S87.8/S87.9 copy its tips; remove it when fixed.
 SHORTFALL: dict[str, int] = {
     "vision-summary": 1,
-    "oppp-vision-boards": 2,
 }
 
 
