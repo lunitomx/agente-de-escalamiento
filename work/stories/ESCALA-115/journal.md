@@ -41,3 +41,11 @@
 - Las 3 desviaciones (`FieldName` snake_case, `summary_es`, guarda de `pending: []`) se aceptan.
 - R1: `FROZEN_PENDING` sigue en 7..36. La prueba general de cobertura pasa con una página en `pending`; solo la atrapa la prueba de esta hoja (PAT-239). Arreglo de una línea.
 - R2 (previo, fuera del diff): 13 hojas sin `guide` muestran preguntas en inglés; la de ciclo de efectivo muestra un dict crudo.
+
+## Phase: review (2026-10-21)
+
+- R1 aplicada: `FROZEN_PENDING = frozenset()`. Antes, con la p. 34 en `pending`, las pruebas del mapa real pasaban (hueco confirmado). Después fallan con "p. 34: fuera de la lista congelada". Archivo real restaurado: 23 de 23 verdes. Commit 813f2d95.
+- Puertas: suite completa 3798 pasan, 5 omitidas; ruff check y pyright limpios. `ruff format --check` marca 10 archivos fuera de esta historia (ya estaban así en la base).
+- AR: drift sin hallazgos nuevos en `coaching/worksheet`; atestación `gate-ar-story` escrita.
+- Retrospectiva en `stories/s87.8-retrospective.md`. Patrones nuevos PAT-244 y PAT-245; PAT-241 y PAT-239 reforzados (+1). Artefacto retro emitido para ESCALA-115.
+- Seguimiento R2: 13 hojas sin `guide` muestran preguntas en inglés; la de ciclo de efectivo muestra un dict crudo.
