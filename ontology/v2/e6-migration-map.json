@@ -502,7 +502,7 @@
       "legacy_id": null,
       "legacy_path": "conocimiento/registry/worksheets.yaml",
       "legacy_type": null,
-      "sha256": "d51793de21cc12dca50ff84cb7682a13845ab5b4b2bea673bb3e9293cbe22a8d"
+      "sha256": "c10062465cf9be967d9a3e41bc64ef86ec4b6bda5c406140cf345720f9dd9500"
     },
     {
       "canonical_id": null,
@@ -671,6 +671,22 @@
       "legacy_path": "conocimiento/strategy/worksheets/opsp.yaml",
       "legacy_type": "worksheet",
       "sha256": "7366cf6a18e3414513d42fa19e2d3a563a8c27590ac1619a49ced66b82d314f7"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "worksheet-sandbox",
+      "legacy_path": "conocimiento/strategy/worksheets/sandbox.yaml",
+      "legacy_type": "worksheet",
+      "sha256": "749106014eeb00cc6d767f8f9bb24034b57bb7be688893baca7ee9c660abe83c"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "worksheet-strategy-canvas",
+      "legacy_path": "conocimiento/strategy/worksheets/strategy-canvas.yaml",
+      "legacy_type": "worksheet",
+      "sha256": "7a37d0c51bc513259e288f5d19727583fc12640fd190b50639f58a7f3c343f92"
     },
     {
       "canonical_id": null,
