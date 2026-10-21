@@ -517,3 +517,11 @@ def test_vision_summary_does_not_copy_the_workbook() -> None:
         WORKBOOK.read_text(encoding="utf-8")
     )
     assert not copied, sorted(" ".join(s) for s in copied)[:3]
+
+
+def test_vision_summary_pages_are_covered_and_nothing_is_pending() -> None:
+    coverage = _load(COVERAGE)
+    pages = {int(e["page"]): e for e in coverage["pages"]}
+    for number in (34, 35, 36):
+        assert "worksheet-vision-summary" in pages[number].get("nodes", []), number
+    assert not coverage.get("pending")

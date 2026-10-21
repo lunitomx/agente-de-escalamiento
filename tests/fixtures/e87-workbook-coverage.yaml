@@ -135,12 +135,15 @@ pages:
     content: "Tableros de visión y su prompt · S87.9"
   - page: 34
     class: tool
+    nodes: [worksheet-vision-summary]
     content: "Prompt de 10 tareas semanales · S87.8"
   - page: 35
     class: tool
+    nodes: [worksheet-vision-summary]
     content: "Compromiso '¿A qué te comprometes?' · S87.8"
   - page: 36
     class: tool
+    nodes: [worksheet-vision-summary]
     content: "Vision Summary · S87.8"
   - page: 37
     class: no_tool
@@ -148,7 +151,4 @@ pages:
   - page: 38
     class: no_tool
     reason: "aviso de derechos"
-pending:
-  - 34
-  - 35
-  - 36
+pending: []

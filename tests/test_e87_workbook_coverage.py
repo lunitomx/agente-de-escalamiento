@@ -260,9 +260,13 @@ def test_real_map_is_clean() -> None:
 
 def test_real_pending_is_one_page_per_line() -> None:
     lines = COVERAGE_FILE.read_text(encoding="utf-8").splitlines()
+    pending = _load_coverage()["pending"]
+    if not pending:
+        assert "pending: []" in lines
+        return
     start = lines.index("pending:")
     items = [line for line in lines[start + 1 :] if line.startswith("  - ")]
-    assert len(items) == len(_load_coverage()["pending"])
+    assert len(items) == len(pending)
 
 
 # --- Tarea 5 · cero imágenes ----------------------------------------------
