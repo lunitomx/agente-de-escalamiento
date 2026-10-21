@@ -1,0 +1,123 @@
+id: worksheet-vision-summary
+type: worksheet
+name: Vision Summary Worksheet
+name_es: Resumen de visión
+decision: strategy
+ontology_ref: tool.vision-summary
+summary: >
+  Junta en una página tus valores, propósito, Cliente central, promesas, meta
+  grande, prioridades y números de cada semana. Cierra con un compromiso para
+  las próximas 10 semanas.
+relationships:
+  - type: belongs-to
+    target: decision-strategy
+  - type: requires
+    target: concept-core-customer
+tags: [strategy, worksheet, vision-summary, one-page]
+metadata:
+  fields:
+    - valores
+    - proposito
+    - promesas
+    - meta-grande
+    - prioridades-3-5-anos
+    - prioridades-ano
+    - prioridades-trimestre
+    - kpis
+    - prioridades-personales
+    - compromiso
+  output: "Tu visión en una página y un compromiso para las próximas 10 semanas"
+  difficulty: intermediate
+  time_estimate: "1-2 hours"
+  frequency: quarterly
+derived_from:
+  - sheet: worksheet-core-customer
+    fields: [quien-es, necesidad]
+    into: customer
+    title: "Cliente central"
+guide:
+  steps:
+    - id: valores
+      maps_to: []
+      question: "¿Cuáles son tus 3 a 5 valores?"
+      how: "Piensa en tus mejores personas. Escribe lo que las hace distintas, no palabras que diría cualquier empresa."
+      example: "Tortillería El Sol: la masa sale antes de las 7; si algo sale mal, se repone sin pedir explicaciones; el que ve el problema lo arregla."
+    - id: proposito
+      maps_to: [purpose]
+      question: "¿Para qué existe tu empresa?"
+      how: "Escribe qué haces y pregunta '¿por qué importa?' varias veces. Quédate con la respuesta que seguiría siendo cierta si cambias de producto."
+      example: "Tortillería El Sol: que ninguna fonda de la colonia se quede sin comida caliente a la hora de la comida."
+    - id: promesas
+      maps_to: [differentiator]
+      question: "¿Qué le prometes a tu Cliente central y cómo lo mides?"
+      how: "Si ya llenaste tu hoja de Promesa de marca, copia aquí la promesa principal y su medida. Si no, escribe de 1 a 3 promesas con un número cada una."
+      example: "Tortillería El Sol: masa antes de las 7 a. m. o no la pagas; medida: entregas tarde por semana."
+    - id: meta-grande
+      maps_to: [future_direction]
+      question: "¿Cuál es tu meta grande a 10-25 años?"
+      how: "Un número con fecha, en la unidad que mueve tu negocio: sucursales, clientes o pedidos."
+      example: "Tortillería El Sol: 400 fondas surtidas cada día en Jalisco para 2040."
+    - id: prioridades-3-5-anos
+      maps_to: [future_direction]
+      question: "¿Qué tiene que ser verdad en 3 a 5 años?"
+      how: "Escribe de 3 a 5 logros que te acercan a la meta grande. Cada uno con un número."
+      example: "Tortillería El Sol: 6 sucursales; reparto propio en 3 municipios; 120 fondas con pedido fijo."
+    - id: prioridades-ano
+      maps_to: []
+      question: "¿Cuáles son tus 3 a 5 prioridades de este año?"
+      how: "Elige las que más te acercan a tu meta de 3 a 5 años. Cada una con una medida de 'hecho'."
+      example: "Tortillería El Sol: abrir la sucursal 4; 60 fondas con pedido fijo; comprar el segundo molino."
+    - id: prioridades-trimestre
+      maps_to: []
+      question: "¿Cuáles son las 3 a 5 prioridades de este trimestre y quién es dueño de cada una?"
+      how: "Una sola persona y una fecha por prioridad. Marca la que manda sobre las demás."
+      example: "Tortillería El Sol: (manda) firmar el local de la sucursal 4, Ana, 30 de junio; sumar 15 fondas nuevas, Luis, 30 de junio."
+    - id: kpis
+      maps_to: []
+      question: "¿Qué 3 a 5 números revisas cada semana?"
+      how: "Para cada número, define antes cuándo está en verde, en amarillo o en rojo."
+      example: "Tortillería El Sol: entregas antes de las 7 (verde 98 % o más, rojo menos de 90 %); kilos vendidos por día; fondas activas."
+    - id: prioridades-personales
+      maps_to: []
+      question: "¿Cuáles son tus 1 a 3 prioridades personales de este trimestre?"
+      how: "Lo que tú, como dueño, vas a hacer para que el trimestre salga. Una medida para cada una."
+      example: "Tortillería El Sol: firmar el local de la sucursal 4; dejar de repartir yo los lunes."
+    - id: compromiso
+      maps_to: []
+      question: "¿A qué te comprometes en las próximas 10 semanas?"
+      how: "Una frase con lo que harás y cuándo. Agrega qué harás si algo te frena: 'si pasa X, haré Y'."
+      example: "Tortillería El Sol: cada lunes a las 8 reviso los 3 números con Ana; si el local se atrasa, busco otro en 2 semanas."
+tips:
+  - text: "Elige de 3 a 5 valores viendo a tus mejores personas. 'Honestidad' o 'respeto' los dice cualquiera; escribe lo que te hace distinto y contrata y despide por ellos."
+    source: "work/research/e87-tips/vision-summary.md#f1"
+    step: valores
+  - text: "Escribe qué haces y pregunta '¿por qué importa?' hasta cinco veces. Tu propósito debe seguir vigente aunque mañana cambies de productos."
+    source: "work/research/e87-tips/vision-summary.md#f2"
+    step: proposito
+  - text: "Escribe tu meta a 10-25 años como un número con fecha y en la unidad que mueve tu negocio (ej. sucursales, clientes, pedidos). Así sabes si ya llegaste."
+    source: "work/research/e87-tips/vision-summary.md#f3"
+    step: meta-grande
+  - text: "Escoge de 3 a 5 prioridades del trimestre y una que manda. Cada una con un solo dueño y una medida de 'hecho'. Si todo es prioridad, nada lo es."
+    source: "work/research/e87-tips/vision-summary.md#f4"
+    step: prioridades-trimestre
+  - text: "Define antes cuándo un KPI está en verde, amarillo o rojo. Revísalo cada semana en tu junta; si está en rojo, dilo ahí mismo y no al cierre del trimestre."
+    source: "work/research/e87-tips/vision-summary.md#f5"
+    step: kpis
+  - text: "Junto a tu compromiso anota el obstáculo principal y un plan: 'Si pasa X, entonces haré Y'."
+    source: "work/research/e87-tips/oppp-vision-boards.md#f4"
+    step: compromiso
+ai_prompt:
+  text: "Con mi resumen de visión, mis prioridades del trimestre y mis números, escribe 10 tareas, una por semana, para las próximas 10 semanas. Que cada una me tome menos de una hora y casi no cueste dinero. Ponle dueño, fecha y cómo sabré que quedó hecha. Al final pregúntame a cuál me comprometo primero."
+view:
+  layout: cards
+  sections:
+    - title: "Quiénes somos"
+      steps: [valores, proposito, promesas]
+    - title: "Hacia dónde vamos"
+      steps: [meta-grande, prioridades-3-5-anos]
+    - title: "Este año y este trimestre"
+      steps: [prioridades-ano, prioridades-trimestre, kpis]
+    - title: "Tus prioridades personales"
+      steps: [prioridades-personales]
+    - title: "Tu compromiso de 10 semanas"
+      steps: [compromiso]
