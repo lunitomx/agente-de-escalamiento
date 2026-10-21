@@ -361,3 +361,15 @@ constraints:
   - "Cada paso de guía trae ejemplo real; cada hoja trae al menos 3 tips con fuente de S87.3"
   - "Tests de tablero E84 (coaching/dashboard/boards/tests) sin cambios de expectativa"
 ```
+
+## Addendum 2026-10-20 — C2: citas de página y frontera pública (decisión del orquestador, durante S87.1)
+
+`governance/public-boundary.yaml` prohíbe la llave raíz `source` en los yaml de `conocimiento/` y los términos Scaling Up, Gazelles, Verne y Rockefeller Habits en `conocimiento/`, `coaching/`, `escala-skills/` y `escala_server/`. El diseño original pedía `source: {workbook, pages}` en cada nodo y `ai_prompt.page`. Eso choca con la regla.
+
+Decisión (reemplaza C2, CA5 y CA6 donde contradigan):
+
+1. **El mapa de páginas vive fuera del contenido público:** `tests/fixtures/e87-workbook-coverage.yaml` (`tests/` es `not_eligible`).
+2. **Los nodos, las hojas y `ai_prompt` no llevan números de página.** Se quitan `source.pages` y `ai_prompt.page` del contrato `ToolGuide`.
+3. **Una página sale de `pending`** cuando su entrada en el mapa nombra un id de nodo u hoja que existe en `conocimiento/` (y, si es hoja, está en el registro). Cada historia de herramienta edita el mapa en `tests/fixtures/`, no los nodos.
+4. **Las fuentes de los tips que se copian a una hoja pública pasan la regla de vocabulario.** Nada de URLs ni nombres de scalingup.com o Gazelles en `conocimiento/`. Esas fuentes se quedan en `work/research/e87-tips/`. La hoja cita la ancla de investigación (`work/research/e87-tips/<tool>.md#fN`) o una fuente pública que pase la regla.
+5. **Cada historia que toca `conocimiento/` regenera `ontology/v2/e6-migration-map.json`** (y su conteo en `tests/test_e6_migration.py`) en lugar de resolver conflictos a mano.
