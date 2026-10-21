@@ -259,3 +259,15 @@ def test_brand_promise_owner_path_saves_and_opens_the_view(
     assert get_completed_ids(tmp_path) == [BP]
     md = Path(view["md"]).read_text(encoding="utf-8")
     assert "Tu pedido llega antes de las 7:00" in md
+
+
+def test_final_review_shows_each_line_of_a_multi_line_answer(tmp_path: Path) -> None:
+    answers = {**BP_ANSWERS, "promesas-de-apoyo": "Masa del día\nUn solo WhatsApp"}
+    _run_bp(tmp_path, "start")
+    _run_bp(tmp_path, "step")
+    last: dict[str, Any] = {}
+    for step_id, answer in answers.items():
+        last = _run_bp(tmp_path, "step", fields={step_id: answer})
+    out = last["output"]
+    assert "### Revisión Final" in out
+    assert "Masa del día  \n  Un solo WhatsApp\n" in out
