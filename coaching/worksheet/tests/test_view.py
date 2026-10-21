@@ -272,3 +272,38 @@ def test_derived_blocks_missing_and_optional() -> None:
         "Llena la hoja Cliente central con /escala-worksheet worksheet-core-customer"
     )
     assert blocks[1].items[0].label == "promesa-principal"
+
+
+def test_vision_summary_view_has_derived_block_sections_and_prompt() -> None:
+    from coaching.worksheet.guide import parse_guide
+    from coaching.worksheet.view import DerivedSources, derived_blocks
+
+    sheet = find_worksheet("worksheet-vision-summary")
+    assert sheet is not None
+    content = load_worksheet_content(sheet)
+    guide = parse_guide(content)
+    assert guide is not None
+    sources: DerivedSources = {
+        "worksheet-core-customer": (
+            _core_customer(),
+            {"quien-es": "Fondas a 3 km", "necesidad": "Tortilla a las 13:00"},
+        )
+    }
+    view = build_view(
+        content,
+        {"compromiso": "Cada lunes reviso"},
+        DAY,
+        derived_blocks(guide, sources),
+    )
+    assert view.layout == "cards"
+    assert [b.title for b in view.blocks] == [
+        "Cliente central",
+        "Quiénes somos",
+        "Hacia dónde vamos",
+        "Este año y este trimestre",
+        "Tus prioridades personales",
+        "Tu compromiso de 10 semanas",
+    ]
+    md = render_markdown(view)
+    assert md.index("Prompt para tu asistente de IA") > md.index("Cada lunes reviso")
+    assert "Resumen de visión" in render_html(view)
