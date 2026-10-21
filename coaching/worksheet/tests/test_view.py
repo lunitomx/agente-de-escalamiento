@@ -157,3 +157,40 @@ def test_save_view_writes_html_and_md(tmp_path: Path) -> None:
     assert all(p.is_file() for p in paths)
     assert re.search(r"Falta", paths[1].read_text(encoding="utf-8"))
     assert str(tmp_path) not in paths[0].read_text(encoding="utf-8")
+
+
+def _bridged() -> dict[str, Any]:
+    content = _core_customer()
+    steps = [dict(s) for s in content["guide"]["steps"]]
+    steps[3]["next_sheet"] = {"id": "worksheet-sandbox", "title": "Caja de arena"}
+    return {**content, "guide": {"steps": steps}}
+
+
+def test_next_sheet_shows_after_the_answer() -> None:
+    view = build_view(_bridged(), _answers(), DAY)
+    item = view.blocks[1].items[0]
+    assert item.next_step == "Siguiente paso: llena Caja de arena"
+    page = render_html(view)
+    answer = "<p class='answer'>Dueños de fondas a 3 km"
+    bridge = "<p class='next'>Siguiente paso: llena Caja de arena</p>"
+    assert page.index(answer) < page.index(bridge)
+    md = render_markdown(view)
+    assert (
+        "- **¿Quién es tu Cliente central, en 10 a 20 palabras?**: "
+        "Dueños de fondas a 3 km que no pueden quedarse sin tortilla.\n"
+        "- Siguiente paso: llena Caja de arena\n"
+    ) in md
+
+
+def test_next_sheet_shows_even_when_the_answer_is_missing() -> None:
+    view = build_view(_bridged(), {}, DAY)
+    page = render_html(view)
+    assert page.index("Falta: ¿Quién es") < page.index("Siguiente paso: llena")
+    assert "- Siguiente paso: llena Caja de arena" in render_markdown(view)
+
+
+def test_step_without_next_sheet_shows_no_bridge() -> None:
+    view = build_view(_core_customer(), _answers(), DAY)
+    assert all(i.next_step is None for b in view.blocks for i in b.items)
+    assert "Siguiente paso" not in render_html(view)
+    assert "Siguiente paso" not in render_markdown(view)
