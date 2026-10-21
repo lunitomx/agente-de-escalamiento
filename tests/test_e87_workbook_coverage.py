@@ -7,9 +7,11 @@ E87 no agregue archivos bajo `.scaleup/`.
 
 from __future__ import annotations
 
+import subprocess
 from pathlib import Path
 from typing import Any
 
+import pytest
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -79,6 +81,20 @@ def check_coverage(
             if node in index and number not in index[node]:
                 errors.append(f"p. {number}: {node} no cita la página")
     return errors
+
+
+def find_images(dirs: list[Path]) -> list[Path]:
+    """Archivos de imagen o PDF bajo `dirs` (los que no existen se ignoran)."""
+    found: list[Path] = []
+    for base in dirs:
+        if base.is_dir():
+            found += [p for p in base.rglob("*") if p.suffix.lower() in IMAGE_SUFFIXES]
+    return sorted(found)
+
+
+def new_files(actual: list[str], frozen: set[str]) -> list[str]:
+    """Archivos de `actual` que no están en la lista congelada."""
+    return sorted(set(actual) - frozen)
 
 
 # --- Tarea 1 · índice de nodos -------------------------------------------
@@ -221,3 +237,47 @@ def test_real_pending_is_one_page_per_line() -> None:
     start = lines.index("pending:")
     items = [line for line in lines[start + 1 :] if line.startswith("  - ")]
     assert len(items) == len(_load_coverage()["pending"])
+
+
+# --- Tarea 5 · cero imágenes ----------------------------------------------
+
+IMAGE_SUFFIXES = frozenset({".pdf", ".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"})
+IMAGE_DIRS = [ROOT / "conocimiento", ROOT / "escala-skills", ROOT / "templates"]
+
+
+def test_find_images_reports_png(tmp_path: Path) -> None:
+    (tmp_path / "hojas").mkdir()
+    (tmp_path / "hojas" / "p10.PNG").write_bytes(b"x")
+    (tmp_path / "hojas" / "bmc.yaml").write_text("id: x\n", encoding="utf-8")
+    assert find_images([tmp_path, tmp_path / "no-existe"]) == [
+        tmp_path / "hojas" / "p10.PNG"
+    ]
+
+
+def test_no_workbook_images_in_repo() -> None:
+    assert find_images(IMAGE_DIRS) == []
+
+
+# --- Tarea 6 · .scaleup/ congelado ----------------------------------------
+
+SCALEUP_FROZEN = ROOT / "tests" / "fixtures" / "e87-scaleup-files.txt"
+
+
+def test_new_files_reports_only_additions() -> None:
+    assert new_files(["a", "c"], {"a", "b"}) == ["c"]
+    assert new_files(["a"], {"a", "b"}) == []
+
+
+def test_no_new_files_under_scaleup() -> None:
+    try:
+        result = subprocess.run(
+            ["git", "ls-files", ".scaleup"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+    except (OSError, subprocess.CalledProcessError) as exc:
+        pytest.skip(f"git no disponible para listar .scaleup/: {exc}")
+    frozen = set(SCALEUP_FROZEN.read_text(encoding="utf-8").split())
+    assert new_files(result.stdout.split(), frozen) == []
