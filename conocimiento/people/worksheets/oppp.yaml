@@ -4,27 +4,80 @@ name: One-Page Personal Plan (OPPP) Worksheet
 name_es: Hoja de Trabajo Plan Personal de Una Pagina
 decision: people
 summary: >
-  The OPPP template: four columns covering personal purpose, key relationships, goals,
-  and quarterly priorities. Uses the 5Fs (Faith, Family, Friends, Fitness, Finance) as
-  life-dimension reminders. Long-term thinking (25-year vision) feeds medium-term targets
-  (3-year), which feed annual goals, which feed quarterly actions. Completed by every
-  team member to align personal and professional purpose.
+  The OPPP template: eight life areas (relationship, family, friends, health, work,
+  money, fun, spiritual) filled across four rows: the 10-25 year vision, this year's
+  goals, what to start doing and what to stop doing. A vision board closes the sheet:
+  for each dream, an image, the main obstacle and an if-then plan. Completed by every
+  team member to align personal and professional purpose with the company plan.
 relationships:
   - type: belongs-to
     target: decision-people
   - type: implements
     target: tool-oppp
-tags: [people, worksheet, personal-plan, OPPP, alignment, goals, 5Fs]
+tags: [people, worksheet, personal-plan, OPPP, alignment, goals, vision-board]
 metadata:
   fields:
     - "Name and Date"
-    - "Column 1 — Personal Purpose: long-term vision (25 years), 3-year picture"
-    - "Column 2 — Roles and Relationships: key people to nurture (family, mentors, team)"
-    - "Column 3 — Goals: 1-year targets across 5Fs (Faith, Family, Friends, Fitness, Finance)"
-    - "Column 4 — Priorities: this quarter's 3-5 personal rocks"
-    - "Achievements: define what 'making a difference' looks like"
-    - "Stop doing: time/energy drains to eliminate"
-  output: "Personal strategic plan aligned with company direction and individual purpose"
+    - "Row 1 — 10-25 years: the life you want in each of the eight areas"
+    - "Row 2 — One year: what you will achieve this year in each area"
+    - "Row 3 — Start: what you will start doing in each area"
+    - "Row 4 — Stop: what you will stop doing in each area"
+    - "Areas: relationship, family, friends, health, work, money, fun, spiritual"
+    - "Vision board: per dream, an image, the main obstacle and an if-then plan"
+  output: "Personal plan in eight areas and four rows, plus a vision board, aligned with the company plan"
   difficulty: beginner
   time_estimate: "1-2 hours first time, 30 min quarterly update"
   frequency: quarterly
+guide:
+  steps:
+    - id: vision-10-25-anos
+      question: "¿Cómo quieres que sea tu vida en 10 a 25 años, en cada una de las 8 áreas?"
+      how: "Escribe una línea por área: relación, familia, amigos, salud, trabajo, dinero, diversión y espiritual. Describe algo que se pueda ver, no un deseo general."
+      example: "Tortillería El Sol: familia, 'mis hijos dirigen dos sucursales y comemos juntos cada domingo'; salud, 'corro un medio maratón a los 60'."
+    - id: metas-un-ano
+      question: "¿Qué vas a lograr este año en cada área?"
+      how: "Una meta por área: relación, familia, amigos, salud, trabajo, dinero, diversión y espiritual. Cada meta se puede contar o ver al cierre del año."
+      example: "Tortillería El Sol: familia, 'cenar con ellos cada domingo'; dinero, 'ahorrar 3 meses de gastos de la casa'."
+    - id: empezar
+      question: "¿Qué vas a empezar a hacer en cada área?"
+      how: "Un hábito nuevo por área: relación, familia, amigos, salud, trabajo, dinero, diversión y espiritual. Di cuándo y cada cuánto lo harás."
+      example: "Tortillería El Sol: salud, 'caminar 30 minutos a las 6 am, lunes a viernes'; amigos, 'comida con mis compadres el primer sábado del mes'."
+    - id: dejar
+      question: "¿Qué vas a dejar de hacer en cada área?"
+      how: "Una cosa que dejas por área: relación, familia, amigos, salud, trabajo, dinero, diversión y espiritual. Pregunta si la empezarías hoy; si no, va aquí."
+      example: "Tortillería El Sol: trabajo, 'dejar de contestar WhatsApp del negocio después de las 9 pm'."
+    - id: tablero-de-vision
+      question: "Para cada sueño: ¿qué imagen lo representa, cuál es el obstáculo principal y qué harás si aparece?"
+      how: "Por cada sueño escribe tres cosas: la imagen que lo representa, el obstáculo más probable y un plan con la forma 'si pasa X, haré Y'."
+      example: "Tortillería El Sol: salud, foto de un medio maratón; obstáculo 'salgo tarde de la tortillería'; plan 'si cierro después de las 8, corro a las 6 am'."
+tips:
+  - text: "'Pasar más tiempo con mi familia' no se cumple. 'Cenar con ellos cada domingo' sí. Escribe cada casilla como algo que se puede ver o contar."
+    source: "work/research/e87-tips/oppp-vision-boards.md#f1"
+    step: metas-un-ano
+  - text: "Comparte tu plan con una persona de confianza y mándale un avance corto cada semana. Escribir y rendir cuentas sube mucho lo que logras."
+    source: "work/research/e87-tips/oppp-vision-boards.md#f2"
+    step: null
+  - text: "Por cada cosa que empiezas, anota una que dejas. Pregunta: si hoy no lo hiciera, ¿lo empezaría? Si la respuesta es no, va en la fila de dejar."
+    source: "work/research/e87-tips/oppp-vision-boards.md#f3"
+    step: dejar
+  - text: "No te quedes solo con la foto del sueño. Junto a cada imagen anota el obstáculo principal y un plan: 'Si pasa X, entonces haré Y'."
+    source: "work/research/e87-tips/oppp-vision-boards.md#f4"
+    step: tablero-de-vision
+  - text: "No dejes relación, familia y amigos para el final. Agenda tiempo fijo con ellos como agendas tus juntas: es lo que más predice salud y felicidad."
+    source: "work/research/e87-tips/oppp-vision-boards.md#f5"
+    step: vision-10-25-anos
+ai_prompt:
+  text: "Toma una foto de tu plan escrito a mano o pega el texto. Pídele a la IA que lo pase en limpio por área y por fila. Luego pídele que lo escriba como una carta desde dentro de tres años, en presente, como si ya hubiera pasado."
+view:
+  layout: canvas
+  sections:
+    - title: "En 10 a 25 años"
+      steps: [vision-10-25-anos]
+    - title: "Este año"
+      steps: [metas-un-ano]
+    - title: "Empezar"
+      steps: [empezar]
+    - title: "Dejar"
+      steps: [dejar]
+    - title: "Tablero de visión"
+      steps: [tablero-de-vision]
