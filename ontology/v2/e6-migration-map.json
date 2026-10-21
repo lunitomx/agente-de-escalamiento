@@ -438,7 +438,7 @@
       "legacy_id": "tool-oppp",
       "legacy_path": "conocimiento/people/tools/oppp.yaml",
       "legacy_type": "tool",
-      "sha256": "5bc9881817d95625cd0bb0175ccee6a1f5cce2533cc188c106ee4893bfa783b4"
+      "sha256": "1c680665fa6beea746948878fd0f7a6c3ae235618b36cf118ec1bb27f8dca65a"
     },
     {
       "canonical_id": null,
@@ -486,7 +486,7 @@
       "legacy_id": "worksheet-oppp",
       "legacy_path": "conocimiento/people/worksheets/oppp.yaml",
       "legacy_type": "worksheet",
-      "sha256": "0ff7eae9ac914880ce18e20c0f4aa827c49d27c9b1ac3fc11a9c692ce7381403"
+      "sha256": "64183426fd497699a2464afb4db3f45dffca4c24a7f51abf618cd319d85fc761"
     },
     {
       "canonical_id": null,
