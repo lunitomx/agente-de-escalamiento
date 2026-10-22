@@ -6,18 +6,20 @@ project:
   test_command: "uv run pytest"
   lint_command: "uv run ruff check coaching escala_server validators scripts tests"
   type_check_command: "uv run pyright"
-  format_command: "uv run ruff format --check coaching escala_server validators scripts tests"
-  code_file_count: 104
+  format_command: "uv run ruff format --check coaching escala_server validators scripts
+    tests"
+  code_file_count: 943
 branches:
   development: main
   main: main
 agents:
   types:
-    - codex
+  - codex
 graph:
   document_sources:
-    - README.md
-    - governance/**/*.md
-    - work/epics/*/scope.md
-    - work/roadmaps/**/*.md
+  - README.md
+  - governance/**/*.md
+  - work/epics/*/scope.md
+  - work/roadmaps/**/*.md
 protocol_compliance: []
+ide: {}
