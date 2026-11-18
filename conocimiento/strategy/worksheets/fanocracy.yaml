@@ -54,6 +54,9 @@ guide:
       question: "¿Qué 5 acciones empiezas en los próximos 30 días?"
       how: "Una por línea, con dueño y fecha. Incluye lo que vas a regalar."
       example: "Tortillería El Sol: 1) salsa gratis a pedido fijo, Ana, 5 de mayo; 2) visita al molino, Luis, 18 de mayo; 3) receta de la semana en Facebook, Ana, cada lunes; 4) maíz azul por pedido, Luis, 20 de mayo; 5) preguntar a 3 fans qué mejorar, yo, 30 de mayo."
+      next_sheet:
+        id: worksheet-life-purpose
+        title: "Tu propósito de vida"
 tips:
   - text: "Pregunta a tus clientes cómo se sienten contigo, no solo si quedaron satisfechos. Un cliente satisfecho se va por un descuento; un fan no."
     source: "work/research/e88-tips/fanocracy.md#f3"

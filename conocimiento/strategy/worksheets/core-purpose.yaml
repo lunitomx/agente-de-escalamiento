@@ -64,6 +64,9 @@ guide:
       question: "¿Tu propósito pasa la prueba?"
       how: "Revisa 5 cosas: va más allá del dinero, no cambia, mueve al equipo, ayuda ante obstáculos, se repite de memoria."
       example: "Tortillería El Sol: Luis, el repartidor, lo dice de memoria. Una tortillería industrial no lo firmaría, porque no le vende a fondas. Seguiría vigente si mañana vendemos tamales."
+      next_sheet:
+        id: worksheet-bhag
+        title: "Meta grande (BHAG)"
 tips:
   - text: "Escribe qué haces y pregunta '¿por qué importa?' hasta cinco veces. Tu propósito debe seguir vigente aunque mañana cambies de productos."
     source: "work/research/e87-tips/vision-summary.md#f2"
