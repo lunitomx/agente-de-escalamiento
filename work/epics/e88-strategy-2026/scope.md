@@ -169,3 +169,65 @@ constraints:
   - "Sin nodos nuevos en ontology/v2/"
   - "Todo implementable al 22-nov-2026"
 ```
+
+## Implementation Plan
+
+> Agregado por `/rai-epic-plan` — 2026-11-18. Sin velocidad calibrada para esta épica; referencia: E87 fusionó 9 historias en una tarde. Fechas = puntos de control, no estimaciones.
+
+### Estrategia
+
+Riesgo primero + dependencias. El mayor riesgo es el cambio al motor (S88.1: `extra_prompts`, `next_sheet` en `save`): va primero. S88.2 (investigación) y S88.3 (2 hojas desde borradores) no tocan el motor y corren en paralelo.
+
+Ruta crítica: `S88.1 → S88.4 → S88.6 → instalación en la Mac de Eduardo`.
+
+### Secuencia
+
+| Orden | Historia | Tamaño | Depende de | Hito | Por qué aquí / qué habilita |
+|:-----:|----------|:------:|------------|------|------------------------------|
+| 1 | S88.1 (ESCALA-120) | 5 | — | M1 | Riesgo: único cambio de motor. Habilita prompts extra (S88.4, S88.5) y «Siguiente hoja» (S88.6). |
+| 1 | S88.2 (ESCALA-121) | 3 | — | M1 | Sin código de motor; fuentes que S88.4 necesita. |
+| 1 | S88.3 (ESCALA-122) | 3 | — | M1 | Borradores listos; victoria rápida, sube conteos 21→23. |
+| 2 | S88.5 (ESCALA-124) | 3 | S88.1 | M2 | Prompts 2026 sobre hojas existentes + reabrir hoja completada. |
+| 2 | S88.4 (ESCALA-123) | 5 | S88.1, S88.2, S88.3 | M2 | 3 hojas nuevas; necesita `extra_prompts` y fuentes. Conteos 23→26. |
+| 3 | S88.6 (ESCALA-125) | 5 | S88.3, S88.4, S88.5 | M3 | Integra: cadena `next_sheet`, mapa 24 páginas, prueba de punta a punta. |
+
+Fusiones en serie: S88.3 → S88.2 → S88.1 (orden de llegada); luego S88.5 → S88.4; luego S88.6. Tras cada fusión, la siguiente rama trae la rama destino y regenera el mapa E6.
+
+### Hitos
+
+| Hito | Historias | Fecha meta | Criterio verificable | Demo |
+|------|-----------|------------|----------------------|------|
+| M1: Motor + base | S88.1, S88.2, S88.3 | jue 19-nov | Suite verde; `start worksheet-swt` muestra el prompt de inicio y las tendencias; 23 hojas en registro. | SWT guiada con tendencias 2026. |
+| M2: 10 ejercicios con hoja | S88.4, S88.5 | vie 20-nov | 26 hojas; 10 prompts 2026 presentes; reabrir hoja completada con respaldo. | Cada ejercicio abre su hoja. |
+| M3: Recorrido integrado | S88.6 | dom 22-nov mañana | Prueba de punta a punta verde; 24/24 páginas; épica en `main` en GitHub. | Recorrido completo en orden con «Siguiente hoja». |
+| M4: Instalado | cierre | dom 22-nov | En la Mac de Eduardo `/escala-update`; `list` = 26 hojas; `start worksheet-swt` muestra «Arranque con IA». | Eduardo lo ve en su ESCALA. |
+
+M3 es el punto de integración real: corre el motor con archivos reales (sin mocks) por las 9 hojas.
+
+### Flujos paralelos
+
+```text
+S88.1 (motor) ──┬──► S88.5 ──────────┐
+S88.2 (fuentes) ┼──► S88.4 ──────────┼──► S88.6 ──► instalación
+S88.3 (hojas) ──┘                    │
+```
+
+### Seguimiento
+
+| Historia | Tamaño | Estado | Real | Notas |
+|----------|:------:|:------:|:----:|-------|
+| S88.1 | 5 | Pendiente | | |
+| S88.2 | 3 | Pendiente | | |
+| S88.3 | 3 | Pendiente | | |
+| S88.4 | 5 | Pendiente | | |
+| S88.5 | 3 | Pendiente | | |
+| S88.6 | 5 | Pendiente | | |
+
+### Riesgos de secuencia
+
+| Riesgo | Prob./Impacto | Mitigación |
+|--------|:-------------:|------------|
+| Choques en `e6-migration-map.json` y conteos al fusionar en paralelo | A / M | Fusiones en serie; regenerar tras traer la rama destino. |
+| S88.1 se alarga y bloquea S88.4/S88.5 | M / A | Va primero; si el viernes no está, S88.5 sale sin prompts extra (solo `ai_prompt`). |
+| Pipeline de historia rechaza «Historia» (A43) o el fan-out falla (A53) | M / M | Copiar `.raise/pipelines/story.yaml` a cada worktree; si el fan-out falla, correr `rai-story-*` a mano por historia. |
+| Sábado 21 ocupado (reunión Suggar) | A / M | M2 el viernes; si S88.6 no empezó el sábado, se recorta primero el mapa de 24 páginas. |
