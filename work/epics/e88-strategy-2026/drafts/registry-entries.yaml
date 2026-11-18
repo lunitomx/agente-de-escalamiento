@@ -1,0 +1,32 @@
+
+  - id: worksheet-core-purpose
+    decision: strategy
+    name: Core Purpose Worksheet
+    name_es: "Propósito central"
+    node_path: strategy/worksheets/core-purpose.yaml
+    prerequisites: []
+    outputs:
+      - core purpose statement of 3 to 7 words
+      - drafts in the four purpose types
+    difficulty: advanced
+    time_estimate: "1-2 hours"
+    time_es: "1-2 horas"
+    summary_es: "Encuentra por qué existe tu empresa más allá del dinero. Pregunta cinco veces por qué importa lo que haces y termina en una frase de 3 a 7 palabras."
+    frequency: annual
+    tags: [strategy, core-purpose, purpose]
+
+  - id: worksheet-bhag
+    decision: strategy
+    name: BHAG Worksheet
+    name_es: "Meta grande"
+    node_path: strategy/worksheets/bhag.yaml
+    prerequisites: [worksheet-core-purpose]
+    outputs:
+      - one-sentence 10-30 year goal with number and date
+      - human impact of the goal
+    difficulty: advanced
+    time_estimate: "1-2 hours"
+    time_es: "1-2 horas"
+    summary_es: "Junta lo que te apasiona, en lo que puedes ser el mejor y el número que mueve tu negocio. Sale una meta medible a 10-30 años que pide un salto."
+    frequency: annual
+    tags: [strategy, bhag, long-term, vision]

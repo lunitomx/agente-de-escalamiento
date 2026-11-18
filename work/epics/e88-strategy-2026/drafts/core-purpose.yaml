@@ -1,0 +1,92 @@
+id: worksheet-core-purpose
+type: worksheet
+name: Core Purpose Worksheet
+name_es: Propósito central
+decision: strategy
+summary: >
+  Encuentra por qué existe tu empresa, más allá de ganar dinero. Escribe qué
+  haces, pregunta cinco veces por qué importa, revisa la historia del fundador
+  y prueba borradores de cuatro tipos. Termina en una frase de 3 a 7 palabras
+  que tu equipo repite de memoria.
+relationships:
+  - type: belongs-to
+    target: decision-strategy
+  - type: implements
+    target: concept-core-purpose
+  - type: feeds-into
+    target: concept-bhag
+tags: [strategy, worksheet, core-purpose, purpose, why]
+metadata:
+  fields:
+    - que-hace
+    - cinco-porques
+    - fundador
+    - si-desaparecemos
+    - cuatro-tipos
+    - una-palabra
+    - proposito
+    - prueba
+  output: "Tu propósito central en una frase de 3 a 7 palabras, probado con tu equipo"
+  difficulty: advanced
+  time_estimate: "1-2 hours"
+  frequency: annually
+guide:
+  steps:
+    - id: que-hace
+      question: "¿Qué hace tu empresa?"
+      how: "Una o dos frases simples. Di qué vendes y a quién, sin adjetivos."
+      example: "Tortillería El Sol: hacemos masa y tortilla de maíz nixtamalizado y la llevamos a fondas de la colonia antes de las 7."
+    - id: cinco-porques
+      question: "¿Por qué es importante lo que haces? Pregúntalo cinco veces."
+      how: "Escribe una respuesta por línea. Cada '¿por qué?' se hace sobre la respuesta anterior."
+      example: "Tortillería El Sol: 1) las fondas abren a las 8 y sin masa no venden; 2) un día sin vender les cuesta la renta y clientes; 3) esas fondas son el ingreso de familias del barrio; 4) si una fonda cierra, el barrio pierde dónde comer bien y barato; 5) queremos que el negocio de comida de barrio siga vivo."
+    - id: fundador
+      question: "¿Qué pasión o propósito tenía el fundador al empezar la empresa?"
+      how: "Pregúntale al fundador por qué empezó. Si eres tú, pregúntate por qué le dedicas aquí tu energía."
+      example: "Tortillería El Sol: Don Rafa empezó en 1994. La fonda de su mamá cerró porque nadie le surtía masa buena a tiempo."
+    - id: si-desaparecemos
+      question: "¿Qué pasaría si tu empresa desapareciera mañana? ¿A qué cliente le cambiaste la vida?"
+      how: "Piensa en quién lo notaría primero. Nombra un cliente real y di qué cambió, con un número."
+      example: "Tortillería El Sol: unas 45 fondas abrirían tarde mañana. Doña Lupe, de la fonda La Güera, pasó de 40 a 70 comidas al día."
+    - id: cuatro-tipos
+      question: "¿Cómo sonaría tu propósito en cada uno de los cuatro tipos?"
+      how: "Escribe un borrador por tipo: servicio a otros, verdad y conocimiento, belleza y excelencia, y cambiar el mundo."
+      example: "Tortillería El Sol: servicio, 'que ninguna fonda abra sin masa'; verdad, 'que el barrio coma maíz de verdad'; excelencia, 'la tortilla perfecta cada mañana'; cambiar el mundo, 'que la fonda de barrio siga viva'."
+    - id: una-palabra
+      question: "¿Qué palabra sola resume tu propósito?"
+      how: "Escribe 3 opciones de una palabra. Sirven para ver qué idea se repite en tus borradores."
+      example: "Tortillería El Sol: barrio, puntualidad, maíz."
+    - id: proposito
+      question: "¿Cuál es tu propósito central, en una frase de 3 a 7 palabras?"
+      how: "Escoge en equipo entre tus borradores. Que inspire y que nunca se cumpla del todo."
+      example: "Tortillería El Sol: que la fonda de barrio siga viva."
+    - id: prueba
+      question: "¿Tu propósito pasa la prueba?"
+      how: "Revisa 5 cosas: va más allá del dinero, no cambia, mueve al equipo, ayuda ante obstáculos, se repite de memoria."
+      example: "Tortillería El Sol: Luis, el repartidor, lo dice de memoria. Una tortillería industrial no lo firmaría, porque no le vende a fondas. Seguiría vigente si mañana vendemos tamales."
+tips:
+  - text: "Escribe qué haces y pregunta '¿por qué importa?' hasta cinco veces. Tu propósito debe seguir vigente aunque mañana cambies de productos."
+    source: "work/research/e87-tips/vision-summary.md#f2"
+    step: cinco-porques
+  - text: "Pregúntate qué perdería el mundo si tu empresa desapareciera mañana. Esa respuesta te acerca a tu propósito."
+    source: "conocimiento/strategy/concepts/core-purpose.yaml"
+    step: si-desaparecemos
+  - text: "Debes poder decir tu propósito en menos de un minuto y que todo tu equipo lo repita igual. Si necesitas una presentación para explicarlo, todavía no está."
+    source: "conocimiento/strategy/concepts/core-purpose.yaml"
+    step: prueba
+  - text: "Elige 3 acciones del día a día que muestren tu propósito. Enséñalas a cada persona nueva desde su primer día."
+    source: "conocimiento/people/concepts/culture.yaml"
+    step: proposito
+ai_prompt:
+  text: "Ayúdame a encontrar mi propósito central: la razón más alta por la que existimos, más allá de ganar dinero. Que tenga de 3 a 7 palabras, que inspire y que nunca se cumpla del todo. Entrevístame con una pregunta a la vez: por qué empezó esta empresa, por qué le dedico aquí mi energía creativa, qué pasaría si desapareciéramos y qué cliente cambió su vida de forma medible gracias a nosotros. Después escribe 8 opciones, 2 de cada tipo: servicio a otros, verdad y conocimiento, belleza y excelencia, y cambiar el mundo. Agrega 3 opciones de una sola palabra. Dime cuál podría repetir mi equipo de memoria. Si un competidor puede poner su nombre en la frase, no sirve."
+view:
+  layout: cards
+  sections:
+    - title: "Qué haces y por qué importa"
+      steps: [que-hace, cinco-porques]
+    - title: "De dónde viene"
+      steps: [fundador, si-desaparecemos]
+    - title: "Tus borradores"
+      steps: [cuatro-tipos, una-palabra]
+    - title: "Tu propósito central"
+      steps: [proposito, prueba]

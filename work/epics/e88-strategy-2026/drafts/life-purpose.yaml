@@ -1,0 +1,66 @@
+id: worksheet-life-purpose
+type: worksheet
+name: Life Purpose Worksheet
+name_es: Tu propósito de vida
+decision: people
+summary: >
+  Tu porqué personal, no el de la empresa. Escribe lo que te apasiona, tus
+  fortalezas y con quién y a qué te gusta jugar. Con eso, redacta y declara
+  el propósito de tu vida.
+relationships:
+  - type: belongs-to
+    target: decision-people
+  - type: feeds-into
+    target: worksheet-oppp
+tags: [people, worksheet, life-purpose, personal, why]
+metadata:
+  fields:
+    - pasion
+    - poderes
+    - juego
+    - proposito
+  output: "Una frase que declara el propósito de tu vida, hecha con tus propias palabras"
+  difficulty: beginner
+  time_estimate: "1 hour"
+  frequency: annually
+guide:
+  steps:
+    - id: pasion
+      question: "¿Qué te apasiona?"
+      how: "Escribe 3 cosas que te encanta hacer, aunque nadie te pague. Incluye lo que casi te obsesiona."
+      example: "Tortillería El Sol: me apasiona el maíz criollo, enseñar el oficio a los jóvenes y cocinar para mi familia."
+    - id: poderes
+      question: "¿Cuáles son tus poderes (tus fortalezas)?"
+      how: "Escribe 3 cosas que haces mejor que la mayoría. Si dudas, pregunta qué te piden siempre a ti."
+      example: "Tortillería El Sol: arreglo cualquier máquina tortilladora, convenzo a una fonda en una plática y no se me olvida un nombre."
+    - id: juego
+      question: "¿Con quién y a qué te gusta jugar?"
+      how: "Escribe 3 respuestas. Cada una dice con quién y qué hacen juntos."
+      example: "Tortillería El Sol: futbol los domingos con mis hijos; dominó con mis compadres; pescar con mi papá en Chapala."
+    - id: proposito
+      question: "El propósito de mi vida es…"
+      how: "Imagina tu mundo perfecto. Escribe un borrador de cómo ayudas a que exista. Usa palabras de los tres pasos anteriores."
+      example: "Tortillería El Sol: el propósito de mi vida es que mi colonia coma bien y que los jóvenes aprendan un oficio que les dé de comer."
+tips:
+  - text: "Cuando escribas tu propósito, pregúntate '¿por qué importa?' hasta 5 veces. Para cuando la respuesta ya no cambie."
+    source: "work/research/e87-tips/vision-summary.md#f2"
+    step: proposito
+  - text: "Escribe con quién, no solo qué. Las relaciones cercanas pesan más en una buena vida que el dinero o el éxito."
+    source: "work/research/e87-tips/oppp-vision-boards.md#f5"
+    step: juego
+  - text: "'Soy bueno con la gente' no se ve. 'Convenzo a una fonda en una plática' sí. Escribe cada fortaleza como algo que se puede ver."
+    source: "work/research/e87-tips/oppp-vision-boards.md#f1"
+    step: poderes
+ai_prompt:
+  text: "No me digas cuál es mi propósito de vida: tu trabajo es preguntar, no responder. Entrevístame con una pregunta a la vez y recorre los cuatro círculos del ikigai: lo que amo, aquello en lo que soy bueno, lo que el mundo necesita y aquello por lo que me pueden pagar. Haz al menos 3 preguntas por círculo. Si te doy una respuesta ensayada, no la aceptes y vuelve a preguntar. Solo al terminar los cuatro círculos, dame 3 posibles frases de mi porqué, hechas solo con mis propias palabras. Luego dime en qué partes mi vida está fuera del centro y qué distancia hay entre mi porqué y el rumbo real de mi negocio."
+view:
+  layout: canvas
+  sections:
+    - title: "Pasión"
+      steps: [pasion]
+    - title: "Poder"
+      steps: [poderes]
+    - title: "Juego"
+      steps: [juego]
+    - title: "Tu propósito de vida"
+      steps: [proposito]
