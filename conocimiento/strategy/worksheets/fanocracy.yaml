@@ -1,0 +1,79 @@
+id: worksheet-fanocracy
+type: worksheet
+name: Fanocracy Marketing Worksheet
+name_es: De clientes a fans
+decision: strategy
+summary: >
+  Encuentra quién ya es fan de tu negocio y qué recibe de ti además del
+  producto. Califica tu marketing en 9 principios para hacer fans y elige 5
+  acciones para los próximos 30 días.
+relationships:
+  - type: belongs-to
+    target: decision-strategy
+tags: [strategy, worksheet, marketing, fans, fanocracy]
+metadata:
+  fields:
+    - quien-te-ama
+    - que-reciben
+    - principios
+    - clientes-a-fans
+    - fans-a-clientes
+    - regalo
+    - acciones-30-dias
+  output: "Tus fans de hoy, tu calificación en 9 principios y 5 acciones para los próximos 30 días"
+  difficulty: beginner
+  time_estimate: "1 hour"
+  frequency: annually
+guide:
+  steps:
+    - id: quien-te-ama
+      question: "¿Quién ya es fan de tu negocio?"
+      how: "Piensa quién te recomienda sin pedírselo y a quién le dolería que cerraras. Escribe nombres."
+      example: "Tortillería El Sol: Doña Lupe, de la fonda La Güera, nos mandó 4 fondas nuevas este año sin que se lo pidiéramos; el comedor de la fábrica de muebles dice que sin nosotros no tiene comida a tiempo."
+    - id: que-reciben
+      question: "¿Qué reciben de ti que no es el producto?"
+      how: "Pregunta a 3 fans por qué te siguen comprando. Anota lo que no es producto: trato, confianza, favores."
+      example: "Tortillería El Sol: el repartidor conoce a cada cocinera por su nombre; si la masa se atrasa, avisamos por WhatsApp antes de las 6; fiamos un día a la fonda que tuvo una mala semana."
+    - id: principios
+      question: "¿Cómo calificas tu marketing en los 9 principios para hacer fans?"
+      how: "Califica cada principio del 1 al 5. Usa como prueba tu sitio web, tus redes y lo que pasa en el mostrador. Los 9 son: acércate más de lo normal; suelta lo que creas; da más de lo que te toca; que tu marca sea más que un producto; elige bien a tus influencers; quita barreras; escucha para volver a lo humano; di la verdad aunque duela; forma un equipo que también sea fan."
+      example: "Tortillería El Sol: acércate 4; suelta lo que creas 1; da más 4; más que un producto 2; influencers 1; quita barreras 3; escucha 3; di la verdad 4; equipo fan 2."
+    - id: clientes-a-fans
+      question: "¿Cómo puedes convertir a tus clientes en fans?"
+      how: "Toma 2 o 3 principios donde sacaste 1 o 2. Escribe una acción concreta para cada uno."
+      example: "Tortillería El Sol: subir cada semana a Facebook la receta de una fonda cliente, con su foto y su nombre; invitar a las cocineras a ver el molino un sábado en la mañana."
+    - id: fans-a-clientes
+      question: "¿Cómo puedes convertir a tus fans en clientes?"
+      how: "Piensa en quién habla bien de ti pero te compra poco. Escribe qué le falta y qué le ofrecerás."
+      example: "Tortillería El Sol: los vecinos que siguen nuestro Facebook y solo compran un kilo los domingos; les ofrecemos tortilla de maíz azul por pedido para sus fiestas."
+    - id: regalo
+      question: "¿Qué cobras hoy que podrías regalar?"
+      how: "Busca algo que te cueste poco y que tu fan valore mucho. Escribe cuánto te cuesta al mes."
+      example: "Tortillería El Sol: la salsa verde para las fondas con pedido fijo; nos cuesta unos $1,800 al mes."
+    - id: acciones-30-dias
+      question: "¿Qué 5 acciones empiezas en los próximos 30 días?"
+      how: "Una por línea, con dueño y fecha. Incluye lo que vas a regalar."
+      example: "Tortillería El Sol: 1) salsa gratis a pedido fijo, Ana, 5 de mayo; 2) visita al molino, Luis, 18 de mayo; 3) receta de la semana en Facebook, Ana, cada lunes; 4) maíz azul por pedido, Luis, 20 de mayo; 5) preguntar a 3 fans qué mejorar, yo, 30 de mayo."
+tips:
+  - text: "Pregunta a tus clientes cómo se sienten contigo, no solo si quedaron satisfechos. Un cliente satisfecho se va por un descuento; un fan no."
+    source: "work/research/e88-tips/fanocracy.md#f3"
+    step: que-reciben
+  - text: "Ve a ver a tus mejores clientes en persona este mes. Si no puedes, manda un video corto tuyo mirando a la cámara, no un correo."
+    source: "work/research/e88-tips/fanocracy.md#f1"
+    step: clientes-a-fans
+  - text: "Organiza algo donde tus clientes se conozcan entre sí: un desayuno, un grupo, un taller. Los fans que se conocen te recomiendan más."
+    source: "work/research/e88-tips/fanocracy.md#f2"
+    step: acciones-30-dias
+ai_prompt:
+  text: "Usa el método Fanocracy de David Meerman Scott. Hazme 3 preguntas, una a la vez, sobre quién ya nos quiere: quién nos recomienda sin que se lo pidan, a quién le dolería de verdad que desapareciéramos y qué reciben de nosotros que no es el producto. Luego califica mi marketing con sus principios: acercarse más de lo normal, soltar lo que creamos, dar más de lo que toca, construir una identidad más allá del producto, quitar barreras, escuchar para volver a lo humano y decir la verdad aunque duela. Usa mi sitio web como prueba. Al final dame 5 acciones que pueda empezar en 30 días, incluida una cosa que hoy cobro y podría regalar."
+view:
+  layout: cards
+  sections:
+    - title: "Tus fans hoy"
+      steps: [quien-te-ama, que-reciben]
+    - title: "Cómo vas en los 9 principios"
+      steps: [principios]
+    - title: "De cliente a fan y de fan a cliente"
+      steps: [clientes-a-fans, fans-a-clientes]
+    - title: "Tus próximos 30 días"
+      steps: [regalo, acciones-30-dias]

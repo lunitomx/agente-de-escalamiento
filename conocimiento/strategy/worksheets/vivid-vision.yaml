@@ -1,0 +1,153 @@
+id: worksheet-vivid-vision
+type: worksheet
+name: Vivid Vision Worksheet
+name_es: Visión vívida
+decision: strategy
+summary: >
+  Elige una fecha de 3 a 5 años y describe tu empresa como si ya estuvieras
+  ahí: números, equipo, cultura, clientes y lo que dicen de ti. Con eso, la IA
+  te ayuda a escribirla en presente y a convertirla en un cartel para la pared.
+relationships:
+  - type: belongs-to
+    target: decision-strategy
+  - type: requires
+    target: concept-bhag
+  - type: feeds-into
+    target: worksheet-vision-summary
+tags: [strategy, worksheet, vivid-vision, vision, 3-5-years]
+metadata:
+  fields:
+    - fecha-vision
+    - meta-grande
+    - ingresos
+    - tamano-equipo
+    - cultura
+    - prensa
+    - noticias-locales
+    - blog-revista
+    - equipo-ama
+    - clientes-describen
+    - clientes-amigos
+    - logro-tuyo
+    - logro-equipo
+    - mejor-que-nadie
+    - oficina-cultura
+    - zona-servicio
+    - clientes-sienten
+  output: "Tu empresa descrita en presente, en una fecha de 3 a 5 años, lista para escribirla y pegarla en la pared"
+  difficulty: intermediate
+  time_estimate: "1-2 hours"
+  frequency: annually
+derived_from:
+  - sheet: worksheet-bhag
+    fields: [meta-grande]
+    into: meta-grande
+    title: "Meta grande (BHAG)"
+    required: false
+guide:
+  steps:
+    - id: fecha-vision
+      question: "¿En qué fecha exacta, dentro de 3 a 5 años, vas a imaginar tu empresa?"
+      how: "Escribe día, mes y año. Cierra los ojos e imagina ese día: tu lugar, tu equipo, tus socios y clientes."
+      example: "Tortillería El Sol: 30 de noviembre de 2029."
+    - id: meta-grande
+      question: "¿Cuál es tu meta grande a 10-30 años?"
+      how: "Si ya llenaste tu hoja Meta grande (BHAG), aquí la ves. Si no, escribe un número con fecha."
+      example: "Tortillería El Sol: 400 fondas surtidas cada día en Jalisco para 2040."
+    - id: ingresos
+      question: "En esa fecha, ¿cuánto vendes al año?"
+      how: "Escribe una sola cifra en pesos. Usa la que de verdad imaginas, no la que suena bien."
+      example: "Tortillería El Sol: 45 millones de pesos al año."
+    - id: tamano-equipo
+      question: "¿Cuántas personas hay en tu equipo?"
+      how: "Escribe el número total. Si ayuda, sepáralo por área."
+      example: "Tortillería El Sol: 68 personas; 48 en las 6 sucursales, 14 en reparto y 6 en oficina."
+    - id: cultura
+      question: "¿Cómo describe tu gente la cultura de la empresa?"
+      how: "Escribe lo que diría alguien de tu equipo a un amigo. Usa cosas que se puedan ver."
+      example: "Tortillería El Sol: 'aquí el que ve un problema lo arregla, y los viernes comemos todos juntos'."
+    - id: prensa
+      question: "¿Qué dice la prensa de tu negocio?"
+      how: "Escribe el titular y una línea de la nota."
+      example: "Tortillería El Sol: 'La tortillería que surte a 120 fondas antes de las 7 de la mañana'."
+    - id: noticias-locales
+      question: "¿Qué dicen de tu empresa las noticias de tu ciudad?"
+      how: "Piensa en el periódico o el noticiero local. Escribe qué contarían de ti."
+      example: "Tortillería El Sol: el noticiero de Guadalajara cuenta que dimos empleo a 20 jóvenes de la colonia."
+    - id: blog-revista
+      question: "¿Qué dice de ti tu blog o revista favorita?"
+      how: "Elige un medio que lees. Escribe el título del artículo que te gustaría ver."
+      example: "Tortillería El Sol: una revista de restaurantes dice 'el maíz de El Sol cambió el menú de las fondas'."
+    - id: equipo-ama
+      question: "¿Qué le encanta a tu equipo de la visión y el rumbo?"
+      how: "Escribe 2 o 3 cosas que tu gente diría con orgullo."
+      example: "Tortillería El Sol: que pueden crecer a encargado de sucursal; que la masa es de maíz de la región."
+    - id: clientes-describen
+      question: "¿Cómo describen tus clientes trabajar contigo?"
+      how: "Escribe la frase que diría tu mejor cliente, con sus palabras."
+      example: "Tortillería El Sol: 'nunca me han dejado sin tortilla a la hora de la comida'."
+    - id: clientes-amigos
+      question: "¿Qué les cuentan tus clientes a sus mejores amigos?"
+      how: "Escribe la recomendación tal como la diría tu cliente."
+      example: "Tortillería El Sol: 'pídele a El Sol; si llega tarde, ese día no te cobran'."
+    - id: logro-tuyo
+      question: "¿De qué logro estás más orgulloso tú?"
+      how: "Uno solo. Escribe qué pasó y por qué te importa."
+      example: "Tortillería El Sol: abrir la sexta sucursal sin pedir un crédito."
+    - id: logro-equipo
+      question: "¿De qué logro está más orgulloso tu equipo?"
+      how: "Uno solo. Escribe cómo lo contaría tu equipo."
+      example: "Tortillería El Sol: un año entero sin una entrega tarde."
+    - id: mejor-que-nadie
+      question: "¿Qué haces mejor que nadie?"
+      how: "Escribe una cosa que tu cliente no encuentra igual con otro proveedor."
+      example: "Tortillería El Sol: tortilla caliente en la fonda antes de las 7 de la mañana, todos los días."
+    - id: oficina-cultura
+      question: "Describe con detalle tu lugar de trabajo y su ambiente."
+      how: "Describe lo que ves, oyes y hueles al entrar. Incluye un momento típico del día."
+      example: "Tortillería El Sol: huele a maíz recién cocido; en la pared está el tablero de entregas del día; a las 6 suena la primera prensa."
+    - id: zona-servicio
+      question: "¿Dónde das servicio?"
+      how: "Nombra ciudades, municipios o colonias. Si ayuda, di hasta cuántos kilómetros."
+      example: "Tortillería El Sol: Guadalajara, Zapopan y Tlaquepaque."
+    - id: clientes-sienten
+      question: "¿Quiénes son tus clientes y cómo se sienten contigo?"
+      how: "Di quién es tu cliente y qué siente contigo. Luego imprime tu visión y pégala donde tu equipo la vea."
+      example: "Tortillería El Sol: fondas y comedores de obra; se sienten tranquilos porque la tortilla siempre llega."
+tips:
+  - text: "Escribe lo que alguien vería al entrar a tu empresa ese día: qué dicen los clientes, cómo trabaja el equipo, qué se siente. 'Ser líderes en calidad' no se puede ver."
+    source: "work/research/e88-tips/vivid-vision.md#f1"
+    step: oficina-cultura
+  - text: "Empieza con la fecha: 'Es 31 de diciembre de 2029 y…'. Escribe en presente, como si ya hubiera pasado. 'Vamos a intentar' no se ve."
+    source: "work/research/e88-tips/vivid-vision.md#f2"
+    step: fecha-vision
+  - text: "Una visión guardada en tu cajón no alinea a nadie. Dásela a todo tu equipo, y también a proveedores y socios clave, para que cada quien decida cómo ayuda."
+    source: "work/research/e88-tips/vivid-vision.md#f3"
+    step: clientes-sienten
+ai_prompt:
+  text: "Escribe mi Visión vívida: una imagen clara y atractiva de mi negocio dentro de exactamente 3 años (o 5, si le va mejor a mi industria). Escríbela en presente, como si yo la estuviera recorriendo. Antes, entrevístame con una pregunta a la vez: cómo es el equipo, qué dicen de nosotros los clientes, cuáles son los números, cómo es mi semana y por qué nos conocen. Luego escribe unas 1,000 palabras sobre cultura, ambiente de trabajo, marketing, ventas, operaciones, finanzas, tecnología, experiencia del cliente y mi papel. Que sea concreta, que se pueda ver y sentir, con mi voz y no con voz de consultor. Termina con las 5 cosas que más riesgo tienen de nunca pasar y pregúntame por cuál pelearía."
+extra_prompts:
+  - title: "Hazla un cartel de pared"
+    text: "Convierte esto en una sola hoja: un título, seis encabezados de sección y una o dos oraciones en cada uno."
+    at: end
+  - title: "Hazla visual"
+    text: "Escribe 4 descripciones para crear imágenes con escenas de esta visión: la oficina, el equipo, un momento con un cliente y aquello por lo que nos conocen. Luego crea las imágenes."
+    at: end
+  - title: "Ponla a prueba"
+    text: "Léela como si fueras mi mejor cliente y luego como mi empleado más nuevo. ¿Qué no le creyó ninguno de los dos? Corrige eso antes de que alguien más la vea."
+    at: end
+view:
+  layout: canvas
+  sections:
+    - title: "Tu fecha y tu meta grande"
+      steps: [fecha-vision, meta-grande]
+    - title: "Tus números"
+      steps: [ingresos, tamano-equipo]
+    - title: "Lo que dicen de ti"
+      steps: [prensa, noticias-locales, blog-revista]
+    - title: "Tu equipo y tu cultura"
+      steps: [cultura, equipo-ama, oficina-cultura, logro-equipo]
+    - title: "Tus clientes"
+      steps: [clientes-describen, clientes-amigos, clientes-sienten, zona-servicio]
+    - title: "De qué estás orgulloso"
+      steps: [logro-tuyo, mejor-que-nadie]

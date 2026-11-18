@@ -475,6 +475,14 @@
     {
       "canonical_id": null,
       "disposition": "await-domain-evidence",
+      "legacy_id": "worksheet-life-purpose",
+      "legacy_path": "conocimiento/people/worksheets/life-purpose.yaml",
+      "legacy_type": "worksheet",
+      "sha256": "7950dc78454a2a527756469f7b591aa87f4834e97cfc3df7dcded5a2de90a8f2"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
       "legacy_id": "worksheet-love-loathe",
       "legacy_path": "conocimiento/people/worksheets/love-loathe.yaml",
       "legacy_type": "worksheet",
@@ -502,7 +510,7 @@
       "legacy_id": null,
       "legacy_path": "conocimiento/registry/worksheets.yaml",
       "legacy_type": null,
-      "sha256": "c582d43fd11cc5df203315eeb377cd89aca99406439ca878928ee3f5c93f2b89"
+      "sha256": "50595988c191ded531743f459ef6473619dadc6599cf2d832f4817b6e3f1eae8"
     },
     {
       "canonical_id": null,
@@ -683,6 +691,14 @@
     {
       "canonical_id": null,
       "disposition": "await-domain-evidence",
+      "legacy_id": "worksheet-fanocracy",
+      "legacy_path": "conocimiento/strategy/worksheets/fanocracy.yaml",
+      "legacy_type": "worksheet",
+      "sha256": "474c733037390b3448ed637f654fb2421c7d56b484d71b25582427727aba83d9"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
       "legacy_id": "worksheet-opsp",
       "legacy_path": "conocimiento/strategy/worksheets/opsp.yaml",
       "legacy_type": "worksheet",
@@ -719,6 +735,14 @@
       "legacy_path": "conocimiento/strategy/worksheets/vision-summary.yaml",
       "legacy_type": "worksheet",
       "sha256": "8b7f4782bf887b85e3b74bc6a9566f4f09e31809fdea1f8c773708ef3931d505"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "worksheet-vivid-vision",
+      "legacy_path": "conocimiento/strategy/worksheets/vivid-vision.yaml",
+      "legacy_type": "worksheet",
+      "sha256": "f79b7b30d751a020ecc74c3b7549e8ca789fee2757f9221072b861286e4e5d32"
     }
   ],
   "legacy_root": "conocimiento",
