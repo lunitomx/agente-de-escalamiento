@@ -1,3 +1,10 @@
+---
+epic_id: E88
+title: Strategy 2026 — los 10 ejercicios del Workbook EOA 2026 con su prompt en español
+status: en-curso
+jira_key: "ESCALA-119"
+created: 2026-11-18
+---
 # E88: Strategy 2026 — scope
 
 jira_key: ESCALA-119
