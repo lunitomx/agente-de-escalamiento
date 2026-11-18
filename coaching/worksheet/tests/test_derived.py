@@ -138,10 +138,7 @@ SANDBOX_QUESTIONS = {
 
 def _missing_sandbox(field: str) -> str:
     """The "Falta" line for a sandbox field: its question and the sheet's name."""
-    return (
-        f"Falta: {SANDBOX_QUESTIONS[field]} Llena la hoja Caja de arena "
-        "con /escala-worksheet worksheet-sandbox"
-    )
+    return f"Falta: {SANDBOX_QUESTIONS[field]} Llena la hoja Caja de arena."
 
 
 def _seed_saved(base: Path, saved: dict[str, dict[str, str]]) -> dict[Path, bytes]:

@@ -240,7 +240,7 @@ def test_save_names_the_next_sheet_of_the_last_step(tmp_path: Path) -> None:
     result = _save(tmp_path)
     assert result["errors"] == []
     assert result["output"].splitlines()[-1] == (
-        "Siguiente hoja: Hoja B. Escribe `/escala-worksheet worksheet-b` para seguir."
+        "Siguiente hoja: Hoja B. Para seguir, di «sigamos con Hoja B»."
     )
     assert result["artifacts"]["next_sheet"] == {"id": "worksheet-b", "title": "Hoja B"}
 
