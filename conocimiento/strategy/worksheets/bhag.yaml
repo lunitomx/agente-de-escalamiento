@@ -1,0 +1,106 @@
+id: worksheet-bhag
+type: worksheet
+name: BHAG Worksheet
+name_es: Meta grande (BHAG)
+decision: strategy
+summary: >
+  Escribe tu meta grande, peluda y audaz: una sola frase, medible, a 10-30
+  años, que no salga de seguir creciendo al ritmo de hoy. Nace de juntar lo que
+  te apasiona, en lo que puedes ser el mejor y el número que mueve tu negocio.
+relationships:
+  - type: belongs-to
+    target: decision-strategy
+  - type: implements
+    target: concept-bhag
+  - type: requires
+    target: concept-core-purpose
+  - type: requires
+    target: concept-brand-promise
+  - type: requires
+    target: concept-core-customer
+  - type: requires
+    target: tool-profit-per-x
+tags: [strategy, worksheet, bhag, long-term, vision]
+metadata:
+  fields:
+    - pasion
+    - mejor-en
+    - cliente-x
+    - borradores
+    - impacto
+    - meta-grande
+    - prueba
+  output: "Tu meta grande en una frase, con número, fecha y su impacto en personas"
+  difficulty: advanced
+  time_estimate: "1-2 hours"
+  frequency: annually
+derived_from:
+  - sheet: worksheet-core-purpose
+    fields: [proposito]
+    into: pasion
+    title: "Propósito central"
+    required: false
+  - sheet: worksheet-brand-promise
+    fields: [promesa-principal]
+    into: mejor-en
+    title: "Promesa de marca"
+    required: false
+  - sheet: worksheet-core-customer
+    fields: [quien-es]
+    into: cliente-x
+    title: "Cliente central"
+    required: false
+guide:
+  steps:
+    - id: pasion
+      question: "¿Qué te apasiona de verdad? (tu propósito)"
+      how: "Si ya llenaste tu hoja de Propósito central, cópialo aquí. Si no, escribe por qué existe tu empresa."
+      example: "Tortillería El Sol: que la fonda de barrio siga viva."
+    - id: mejor-en
+      question: "¿En qué puedes ser el mejor del mundo? (tu promesa de marca)"
+      how: "Escribe lo que haces mejor que nadie y tu cliente puede comprobar. Si ya tienes Promesa de marca, úsala."
+      example: "Tortillería El Sol: masa de maíz nixtamalizado entregada en la puerta antes de las 7, todos los días."
+    - id: cliente-x
+      question: "¿A quién le vendes y a quién beneficias? ¿Cuál es tu X?"
+      how: "Nombra a tu cliente. Luego elige la X que mejor explica tu utilidad: por cliente, sucursal, pedido o persona."
+      example: "Tortillería El Sol: fondas y cocinas económicas de barrio en Jalisco. Nuestra X: utilidad por fonda surtida cada día."
+    - id: borradores
+      question: "¿Cómo sonaría tu meta grande en distintos tipos?"
+      how: "Escribe un borrador por tipo: un número a alcanzar, un enemigo común, un modelo a seguir y un cambio interno."
+      example: "Tortillería El Sol: número, '400 fondas surtidas cada día en Jalisco para 2040'; enemigo, 'ninguna fonda de Guadalajara con tortilla de bolsa en 2035'; modelo, 'la tortillería que toda fonda de Jalisco conoce por nombre'; cambio interno, '20 sucursales que funcionan sin el dueño'."
+    - id: impacto
+      question: "¿Qué significa tu meta en personas?"
+      how: "Si tu meta es de dinero o de volumen, tradúcela a la vida de alguien. Haz la cuenta con números."
+      example: "Tortillería El Sol: 400 fondas con 150 comidas al día son 60,000 comidas calientes diarias y 400 familias que viven de su fonda."
+    - id: meta-grande
+      question: "¿Cuál es tu meta grande, en una sola frase?"
+      how: "Escoge en equipo un borrador. Debe tener número, fecha a 10-30 años y una línea de llegada clara."
+      example: "Tortillería El Sol: 400 fondas surtidas cada día en Jalisco para 2040."
+    - id: prueba
+      question: "¿Tu meta grande pide un salto o sale sola si sigues igual?"
+      how: "Calcula a dónde llegas creciendo al ritmo de hoy. Si ya llegas a la meta, no es grande."
+      example: "Tortillería El Sol: hoy surtimos 45 fondas y sumamos 10 por año. A ese ritmo llegamos a 185 en 2040. Llegar a 400 pide reparto propio y sucursales."
+tips:
+  - text: "Escribe tu meta grande como un número con fecha y en la unidad que mueve tu negocio (ej. sucursales, clientes, pedidos). Así sabes si ya llegaste."
+    source: "work/research/e87-tips/vision-summary.md#f3"
+    step: meta-grande
+  - text: "Antes del número, elige tu X: la unidad que mueve tu negocio (utilidad por cliente, por sucursal, por pedido). Escribe tu meta en esa misma unidad."
+    source: "work/research/e88-tips/bhag.md#f3"
+    step: cliente-x
+  - text: "Escribe un borrador de cada tipo: un número con fecha, un rival a vencer, una empresa que admiras y un cambio grande por dentro. Luego elige uno."
+    source: "work/research/e88-tips/bhag.md#f2"
+    step: borradores
+  - text: "Si ya ves cómo llegar creciendo al ritmo de hoy, tu meta no es grande. Pide un salto, pero tu equipo debe creer que se puede."
+    source: "work/research/e88-tips/bhag.md#f1"
+    step: prueba
+ai_prompt:
+  text: "Con mi propósito central y todo lo que hemos platicado en esta conversación, arma mi meta grande: a 10-30 años, en una sola frase, medible, con una línea de llegada clara y que no sea solo seguir creciendo al ritmo de hoy. Primero hazme 3 preguntas, una a la vez: en qué podríamos ser los mejores del mundo, qué nos apasiona de verdad y cuál es el número que mueve nuestro negocio. Después escribe 5 opciones de distintos tipos: un número a alcanzar, un enemigo común, un modelo a seguir y un cambio interno. Si alguna es una meta de dinero, tradúcela a impacto en personas. Dale a cada una una probabilidad honesta de lograrse. Al final, argumenta en contra de la que yo diga que me gusta."
+view:
+  layout: cards
+  sections:
+    - title: "Tus tres círculos"
+      steps: [pasion, mejor-en, cliente-x]
+    - title: "Tus borradores"
+      steps: [borradores, impacto]
+    - title: "Tu meta grande"
+      steps: [meta-grande, prueba]

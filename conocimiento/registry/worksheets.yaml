@@ -3,9 +3,9 @@ type: registry
 name: Worksheet Registry
 name_es: Registro de Hojas de Trabajo
 description: >
-  Central index of all 21 worksheets across the 4 ESCALA decisions.
+  Central index of all 23 worksheets across the 4 ESCALA decisions.
   Enables deterministic lookup by decision, prerequisite, or output type.
-total_worksheets: 21
+total_worksheets: 23
 worksheets:
 
   # ── PEOPLE (4) ─────────────────────────────────────────────────────────────
@@ -74,7 +74,7 @@ worksheets:
     frequency: annual
     tags: [people, team, growth, hiring]
 
-  # ── STRATEGY (10) ──────────────────────────────────────────────────────────
+  # ── STRATEGY (12) ──────────────────────────────────────────────────────────
 
   - id: worksheet-opsp
     decision: strategy
@@ -248,6 +248,38 @@ worksheets:
     summary_es: "Junta en una página tus valores, propósito, promesas, meta grande, prioridades y números de cada semana, y cierra con un compromiso para las próximas 10 semanas."
     frequency: quarterly
     tags: [strategy, vision-summary, one-page]
+
+  - id: worksheet-core-purpose
+    decision: strategy
+    name: Core Purpose Worksheet
+    name_es: "Propósito central"
+    node_path: strategy/worksheets/core-purpose.yaml
+    prerequisites: []
+    outputs:
+      - core purpose statement of 3 to 7 words
+      - drafts in the four purpose types
+    difficulty: advanced
+    time_estimate: "1-2 hours"
+    time_es: "1-2 horas"
+    summary_es: "Encuentra por qué existe tu empresa más allá del dinero. Pregunta cinco veces por qué importa lo que haces y termina en una frase de 3 a 7 palabras."
+    frequency: annual
+    tags: [strategy, core-purpose, purpose]
+
+  - id: worksheet-bhag
+    decision: strategy
+    name: BHAG Worksheet
+    name_es: "Meta grande (BHAG)"
+    node_path: strategy/worksheets/bhag.yaml
+    prerequisites: [worksheet-core-purpose]
+    outputs:
+      - one-sentence 10-30 year goal with number and date
+      - human impact of the goal
+    difficulty: advanced
+    time_estimate: "1-2 hours"
+    time_es: "1-2 horas"
+    summary_es: "Junta lo que te apasiona, en lo que puedes ser el mejor y el número que mueve tu negocio. Sale una meta medible a 10-30 años que pide un salto."
+    frequency: annual
+    tags: [strategy, bhag, long-term, vision]
 
   # ── EXECUTION (4) ──────────────────────────────────────────────────────────
 

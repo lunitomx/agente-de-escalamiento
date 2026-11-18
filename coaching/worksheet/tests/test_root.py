@@ -17,7 +17,7 @@ from coaching.worksheet import (
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-EXPECTED_WORKSHEETS = 21
+EXPECTED_WORKSHEETS = 23
 
 
 def _seed_client(base: Path) -> None:
