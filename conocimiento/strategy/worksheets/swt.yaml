@@ -74,6 +74,10 @@ tips:
     step: fortalezas
 ai_prompt:
   text: "Haz un análisis de fortalezas, debilidades y tendencias de mi negocio. Las fortalezas y las debilidades son de adentro: dame 5 de cada una, pensando en competidores, equipo, dinero para crecer, base de clientes y distribución. Las tendencias son de afuera y ahí está el dinero de verdad: dame 12 que cubran mi industria, tecnología, mi región, el mundo, cultura, medios, política y educación, cada una con una señal real que la respalde. Ordénalas por qué tan fuerte nos pegarían en los próximos 3 años y marca si cada una es amenaza, oportunidad o las dos. Luego hazme 3 preguntas, una a la vez, sobre las tendencias que estoy ignorando porque actuar sobre ellas me resulta incómodo."
+extra_prompts:
+  - title: "Arranque con IA"
+    at: start
+    text: "Estoy en un taller de estrategia. Vamos a hacer varios ejercicios en un solo chat. Usa todo lo que te diga; no me hagas repetir. Mi negocio:\n- Giro: [giro]\n- Ventas al año: ~$[monto] | Personas: [número]\n- Cómo gana dinero, en una oración: [modelo]\n- Mi sitio web: [URL] | Dos competidores: [URL], [URL]\n- Lo que quiero hoy: [una estrategia simple / algo que de verdad me haga distinto / una meta más grande]\nLee mi sitio y los de mis competidores. Dime en 3 o 4 oraciones qué ves: para quién decimos que somos, qué prometemos y dónde sonamos igual que todos. Luego espera. Te voy a pegar un prompt por ejercicio. Usa lo que ya sabes. Si te falta algo, pregúntame; no adivines. Cuando te pida que me entrevistes, hazme una pregunta a la vez."
 view:
   layout: cards
   sections:

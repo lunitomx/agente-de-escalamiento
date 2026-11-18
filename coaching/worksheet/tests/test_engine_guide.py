@@ -482,10 +482,6 @@ CORE_CUSTOMER_SAVED = {
     "quien-es": "Dueños de fondas a 3 km de la sucursal",
     "necesidad": "Tortilla caliente a las 13:00",
 }
-MISSING_CORE_CUSTOMER = (
-    "Falta: ¿Quién es tu Cliente central, en 10 a 20 palabras? "
-    "Llena la hoja Cliente central con /escala-worksheet worksheet-core-customer"
-)
 
 
 def _vision(base: Path, action: str, **extra: Any) -> dict[str, Any]:
@@ -542,7 +538,7 @@ def test_vision_summary_end_to_end_with_core_customer(
     text = review["output"]
     assert "### Revisión Final" in text
     assert "**¿A qué te comprometes en las próximas 10 semanas?**" in text
-    assert "**Prompt para tu asistente de IA:** Con mi resumen de visión" in text
+    assert "**Prompt para tu asistente de IA:** Con todo lo de este chat" in text
     assert "confirmar" in text
     assert get_completed_ids(tmp_path) == [SHEET]
 
@@ -581,14 +577,16 @@ def test_vision_summary_end_to_end_with_core_customer(
     assert seeded.read_bytes() == before
 
 
-def test_vision_summary_shows_missing_core_customer(tmp_path: Path) -> None:
+def test_vision_summary_leaves_out_an_unsaved_core_customer(tmp_path: Path) -> None:
+    """S88.5: Cliente central is optional; unsaved, its block is not shown."""
     out = _vision(tmp_path, "start")["output"]
     assert "Esto ya llenaste:" not in out
-    assert "#### Cliente central" in out
-    assert MISSING_CORE_CUSTOMER in out
+    assert "#### Cliente central" not in out
+    assert "Falta:" not in out
     _fill_vision(tmp_path)
     result = _vision(tmp_path, "save")
     assert result["errors"] == []
     md = Path(result["artifacts"]["view"]["md"]).read_text(encoding="utf-8")
-    assert MISSING_CORE_CUSTOMER in md
+    assert "Falta:" not in md
+    assert "Cliente central" not in md
     assert "Que ninguna fonda se quede sin comida caliente" in md

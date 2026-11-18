@@ -514,7 +514,7 @@ def test_vision_summary_passes_the_contract() -> None:
             ["quien-es", "necesidad"],
             "customer",
             "Cliente central",
-            True,
+            False,
         )
     ]
 

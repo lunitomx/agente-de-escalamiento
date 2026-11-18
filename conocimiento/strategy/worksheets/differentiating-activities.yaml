@@ -63,7 +63,7 @@ tips:
     source: "work/research/e87-tips/differentiating-activities.md#f4"
     step: actividades-elegidas
 ai_prompt:
-  text: "Con mi Cliente central, mi Promesa de marca y mis 2 o 3 competidores, propón 5 actividades en personas, producto, operaciones y términos que me hagan distinto. Explica cómo se refuerzan entre sí y qué tendría que dejar de hacer."
+  text: "Michael Porter dice que la estrategia es una posición única y valiosa que se construye con actividades distintas. Hazme 3 preguntas, una a la vez, sobre cómo entregamos de verdad: qué nota el cliente, qué nunca ve y dónde hacemos las cosas por el camino difícil a propósito. Luego compara mis respuestas con los sitios de mis competidores y nombra de 3 a 5 actividades que me podrían hacer distinto. Para cada una dime: ¿el cliente la ve?, ¿es difícil de copiar?, ¿refuerza a las demás? Tacha las que todos hacen aunque suenen bonito. Al final dime qué crea la combinación —la ventaja y la barrera para la competencia— y las 2 cosas que tendría que dejar de hacer para que sean reales."
 view:
   layout: cards
   sections:
