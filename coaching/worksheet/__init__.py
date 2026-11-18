@@ -601,7 +601,7 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
         )
         content = load_worksheet_content(worksheet, base)
         try:
-            _steps_and_tips(worksheet, content, base)
+            saved_steps, _ = _steps_and_tips(worksheet, content, base)
         except _GuideError as exc:
             return _contract_error(str(exc))
 
@@ -642,12 +642,23 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
         )
         html_path, md_path = save_view(base, view)
 
+        output = (
+            f"✅ **{name_es(worksheet)}** guardada como completada.\n"
+            f"Vista lista: {html_path}"
+        )
+        extra: dict[str, Any] = {}
+        bridge = saved_steps[-1].next_sheet if saved_steps else None
+        if bridge is not None:
+            output += (
+                f"\nSiguiente hoja: {bridge.title}. "
+                f"Escribe `/escala-worksheet {bridge.id}` para seguir."
+            )
+            extra["next_sheet"] = {"id": bridge.id, "title": bridge.title}
+
         return {
-            "output": (
-                f"✅ **{name_es(worksheet)}** guardada como completada.\n"
-                f"Vista lista: {html_path}"
-            ),
+            "output": output,
             "artifacts": {
+                **extra,
                 "worksheet": worksheet,
                 "completed_data": completed_data,
                 "state_path": str(state_path),

@@ -219,3 +219,36 @@ def test_view_without_extra_prompts_is_unchanged() -> None:
     plain = build_view(_sheet(), {"uno": "Fondas"}, DAY)
     assert plain.extra_prompts == []
     assert render_markdown(plain).count("## ") == 3
+
+
+# --- T4: save names the next sheet ------------------------------------------
+
+
+def _save(base: Path) -> dict[str, Any]:
+    _call(base, "start")
+    _call(base, "step")
+    _call(base, "step", uno="Fondas")
+    _call(base, "step", dos="Masa")
+    return run(
+        {"action": "save", "worksheet_name": "worksheet-a", "base_path": str(base)}
+    )
+
+
+def test_save_names_the_next_sheet_of_the_last_step(tmp_path: Path) -> None:
+    last = {**_step("dos"), "next_sheet": {"id": "worksheet-b", "title": "Hoja B"}}
+    _install(tmp_path, _sheet(guide={"steps": [_step("uno"), last]}))
+    result = _save(tmp_path)
+    assert result["errors"] == []
+    assert result["output"].splitlines()[-1] == (
+        "Siguiente hoja: Hoja B. Escribe `/escala-worksheet worksheet-b` para seguir."
+    )
+    assert result["artifacts"]["next_sheet"] == {"id": "worksheet-b", "title": "Hoja B"}
+
+
+def test_save_without_next_sheet_is_unchanged(tmp_path: Path) -> None:
+    first = {**_step("uno"), "next_sheet": {"id": "worksheet-b", "title": "Hoja B"}}
+    _install(tmp_path, _sheet(guide={"steps": [first, _step("dos")]}))
+    result = _save(tmp_path)
+    assert "Siguiente hoja" not in result["output"]
+    assert len(result["output"].splitlines()) == 2
+    assert "next_sheet" not in result["artifacts"]
