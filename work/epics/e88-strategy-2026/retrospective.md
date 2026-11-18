@@ -60,3 +60,4 @@ Cierre fuera del pipeline, igual que E87. La corrida de la épica (b36b69d9) que
 
 - `coaching/progress/` todavía sugiere `/escala-worksheet` en su resumen de avance. No está en el recorrido del Strategy Day.
 - **Lección:** el brief de cada agente debe dar la ruta del PDF del cuaderno. El agente de S88.6 no la tenía y marcó 5 páginas como no documentadas.
+- **Ensayo de las 8 hojas (18-nov-2026).** S88.9 (ESCALA-128) arregló 2 hallazgos: el Resumen de visión ya no pide «Cliente central» y muestra lo ya llenado. Actividades diferenciadoras tenía la misma falla y también se arregló. Las 10 tendencias 2026 quedan con sus nombres en inglés. La ruta visible al guardar y el cierre del día quedan para después del lunes (ESCALA-129).

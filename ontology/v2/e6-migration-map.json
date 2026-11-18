@@ -510,7 +510,7 @@
       "legacy_id": null,
       "legacy_path": "conocimiento/registry/worksheets.yaml",
       "legacy_type": null,
-      "sha256": "50595988c191ded531743f459ef6473619dadc6599cf2d832f4817b6e3f1eae8"
+      "sha256": "38b8e77617975667c48f3584548c9cda132541ecac2ef8fa3a9ea5333784eb97"
     },
     {
       "canonical_id": null,
@@ -686,7 +686,7 @@
       "legacy_id": "worksheet-differentiating-activities",
       "legacy_path": "conocimiento/strategy/worksheets/differentiating-activities.yaml",
       "legacy_type": "worksheet",
-      "sha256": "df44fccdc0ab98eb542ea96c22f9fa13d1b84d813aac3cd53e141595ce9ab826"
+      "sha256": "4120a233aecc235e9f86ac85110d9ceb177447d3487382f2c95e059dd090c8a9"
     },
     {
       "canonical_id": null,
@@ -734,7 +734,7 @@
       "legacy_id": "worksheet-vision-summary",
       "legacy_path": "conocimiento/strategy/worksheets/vision-summary.yaml",
       "legacy_type": "worksheet",
-      "sha256": "8b7f4782bf887b85e3b74bc6a9566f4f09e31809fdea1f8c773708ef3931d505"
+      "sha256": "9b479c43b7741c2e9e22937613969a02a0c7299096191257571b70d81b65933b"
     },
     {
       "canonical_id": null,

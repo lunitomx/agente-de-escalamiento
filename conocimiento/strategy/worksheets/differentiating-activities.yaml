@@ -18,6 +18,12 @@ metadata:
   difficulty: advanced
   time_estimate: "1-2 hours"
   frequency: annually
+derived_from:
+  - sheet: worksheet-core-customer
+    fields: [quien-es, necesidad]
+    into: competidores
+    title: "Cliente central"
+    required: false
 guide:
   steps:
     - id: competidores
