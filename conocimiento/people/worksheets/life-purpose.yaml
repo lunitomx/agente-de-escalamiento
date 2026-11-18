@@ -41,6 +41,9 @@ guide:
       question: "El propósito de mi vida es…"
       how: "Imagina tu mundo perfecto. Escribe un borrador de cómo ayudas a que exista. Usa palabras de los tres pasos anteriores."
       example: "Tortillería El Sol: el propósito de mi vida es que mi colonia coma bien y que los jóvenes aprendan un oficio que les dé de comer."
+      next_sheet:
+        id: worksheet-vision-summary
+        title: "Resumen de visión"
 tips:
   - text: "No es solo filosofía: en estudios con miles de adultos, quienes tienen un propósito claro vivieron más. Vale la pena dedicarle una hora."
     source: "work/research/e88-tips/life-purpose.md#f1"

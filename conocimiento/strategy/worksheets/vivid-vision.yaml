@@ -114,6 +114,9 @@ guide:
       question: "¿Quiénes son tus clientes y cómo se sienten contigo?"
       how: "Di quién es tu cliente y qué siente contigo. Luego imprime tu visión y pégala donde tu equipo la vea."
       example: "Tortillería El Sol: fondas y comedores de obra; se sienten tranquilos porque la tortilla siempre llega."
+      next_sheet:
+        id: worksheet-fanocracy
+        title: "De clientes a fans"
 tips:
   - text: "Escribe lo que alguien vería al entrar a tu empresa ese día: qué dicen los clientes, cómo trabaja el equipo, qué se siente. 'Ser líderes en calidad' no se puede ver."
     source: "work/research/e88-tips/vivid-vision.md#f1"

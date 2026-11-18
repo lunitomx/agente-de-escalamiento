@@ -80,6 +80,9 @@ guide:
       question: "¿Tu meta grande pide un salto o sale sola si sigues igual?"
       how: "Calcula a dónde llegas creciendo al ritmo de hoy. Si ya llegas a la meta, no es grande."
       example: "Tortillería El Sol: hoy surtimos 45 fondas y sumamos 10 por año. A ese ritmo llegamos a 185 en 2040. Llegar a 400 pide reparto propio y sucursales."
+      next_sheet:
+        id: worksheet-vivid-vision
+        title: "Visión vívida"
 tips:
   - text: "Escribe tu meta grande como un número con fecha y en la unidad que mueve tu negocio (ej. sucursales, clientes, pedidos). Así sabes si ya llegaste."
     source: "work/research/e87-tips/vision-summary.md#f3"

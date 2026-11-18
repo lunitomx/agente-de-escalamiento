@@ -52,6 +52,9 @@ guide:
       question: "¿Qué dejas de hacer para sostener esas actividades?"
       how: "Para cada actividad, escribe una cosa que no haces por ella."
       example: "Ferretería La Llave: no vende jardinería ni decoración; no compite en precio de pintura."
+      next_sheet:
+        id: worksheet-core-purpose
+        title: "Propósito central"
 tips:
   - text: "Una actividad sola se copia en meses. Elige 3 a 5 que se apoyen entre sí: si mejoras una, mejora otra. Copiar el conjunto completo es lo difícil."
     source: "work/research/e87-tips/differentiating-activities.md#f1"

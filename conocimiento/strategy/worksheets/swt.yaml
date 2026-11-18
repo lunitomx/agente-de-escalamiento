@@ -62,6 +62,9 @@ guide:
         Toma una tendencia y júntala con una fortaleza: ¿qué puedes aprovechar?
         Júntala con una debilidad: ¿qué tienes que proteger? Escribe 2 o 3 ideas.
       example: "Tortillería El Sol: pago con el celular + reparto propio: pedidos por WhatsApp con pago adelantado para las fondas."
+      next_sheet:
+        id: worksheet-differentiating-activities
+        title: "Actividades diferenciadoras"
 tips:
   - text: "Para cada tendencia, escribe una señal concreta que ya viste: una noticia, un cliente, un dato. Sin señal, es una opinión, no una tendencia."
     source: "work/research/e88-tips/swt.md#f1"

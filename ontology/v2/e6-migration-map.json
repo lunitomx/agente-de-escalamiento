@@ -478,7 +478,7 @@
       "legacy_id": "worksheet-life-purpose",
       "legacy_path": "conocimiento/people/worksheets/life-purpose.yaml",
       "legacy_type": "worksheet",
-      "sha256": "7950dc78454a2a527756469f7b591aa87f4834e97cfc3df7dcded5a2de90a8f2"
+      "sha256": "193f19d30d9bd3436ecdbfc04bd5c4a6c1002075d5bdfb87ba55571bb5fd9bf3"
     },
     {
       "canonical_id": null,
@@ -646,7 +646,7 @@
       "legacy_id": "worksheet-bhag",
       "legacy_path": "conocimiento/strategy/worksheets/bhag.yaml",
       "legacy_type": "worksheet",
-      "sha256": "a8cece7e85eb2fe9755c86f8206f28448f1ea3470d6019287c06a75bdd36d8c8"
+      "sha256": "c302d9cc84e0a1fd0ec3d9da0378418ab5226f8e8fb83bf5693e09d7114cd08b"
     },
     {
       "canonical_id": null,
@@ -678,7 +678,7 @@
       "legacy_id": "worksheet-core-purpose",
       "legacy_path": "conocimiento/strategy/worksheets/core-purpose.yaml",
       "legacy_type": "worksheet",
-      "sha256": "86481b17d84e1a8abe1bfaf00a6e1766af30ea3948880305b2d0a980d42174c5"
+      "sha256": "afe28c37e7947d016d2e456b310a83b21aafee1baa81707189f53a46e2938780"
     },
     {
       "canonical_id": null,
@@ -686,7 +686,7 @@
       "legacy_id": "worksheet-differentiating-activities",
       "legacy_path": "conocimiento/strategy/worksheets/differentiating-activities.yaml",
       "legacy_type": "worksheet",
-      "sha256": "94c3c19a490aa48872efd1443654aeced9582f88407083f7bf2a9d861b2ebeea"
+      "sha256": "df44fccdc0ab98eb542ea96c22f9fa13d1b84d813aac3cd53e141595ce9ab826"
     },
     {
       "canonical_id": null,
@@ -694,7 +694,7 @@
       "legacy_id": "worksheet-fanocracy",
       "legacy_path": "conocimiento/strategy/worksheets/fanocracy.yaml",
       "legacy_type": "worksheet",
-      "sha256": "474c733037390b3448ed637f654fb2421c7d56b484d71b25582427727aba83d9"
+      "sha256": "80013e597e32fe2f40a8d6a01bda81b18b30d96e4d3d2c236ce70dabcc6dd377"
     },
     {
       "canonical_id": null,
@@ -726,7 +726,7 @@
       "legacy_id": "worksheet-swt",
       "legacy_path": "conocimiento/strategy/worksheets/swt.yaml",
       "legacy_type": "worksheet",
-      "sha256": "50a14be1f0988fe8ca15a0ccd22ee9d49f442fd12722cf346eaeb2e6bbe8d2e1"
+      "sha256": "60d690600b1611957e21ab1abd5c700ba083cac4b27d084303bef99d25a022bc"
     },
     {
       "canonical_id": null,
@@ -742,7 +742,7 @@
       "legacy_id": "worksheet-vivid-vision",
       "legacy_path": "conocimiento/strategy/worksheets/vivid-vision.yaml",
       "legacy_type": "worksheet",
-      "sha256": "f79b7b30d751a020ecc74c3b7549e8ca789fee2757f9221072b861286e4e5d32"
+      "sha256": "1972089e109cd598c07d00448228c30efa0aa266f88950444a37835aa3c35401"
     }
   ],
   "legacy_root": "conocimiento",

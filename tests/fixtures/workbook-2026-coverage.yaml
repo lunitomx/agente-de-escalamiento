@@ -1,0 +1,114 @@
+# E88 · Mapa de cobertura del workbook Strategy 2026 (S88.6).
+# Cada página es `tool` (vive en uno o más nodos de conocimiento/) o `no_tool` (con reason).
+# `exercises`: los 10 ejercicios en el orden del taller; `prompt` es el título del
+# prompt de arranque de la hoja o `main` (el `ai_prompt` de la hoja).
+# Fuente de las páginas: agenda en work/epics/e88-strategy-2026/scope.md
+# («Los 10 ejercicios»). Las páginas sin fuente en el repo van `no_tool` con razón
+# honesta, sin inventar qué traen.
+# Vive en tests/ porque es procedencia del workbook: no es contenido público.
+# Prueba: tests/test_e88_workbook_coverage.py
+workbook: strategy-2026
+total_pages: 24
+exercises:
+  - {n: 1, name: "AI Setup", sheet: worksheet-swt, prompt: "Arranque con IA"}
+  - {n: 2, name: "SWT con tendencias 2026/27", sheet: worksheet-swt, prompt: main}
+  - {n: 3, name: "Actividades diferenciadoras", sheet: worksheet-differentiating-activities, prompt: main}
+  - {n: 4, name: "Propósito de la empresa", sheet: worksheet-core-purpose, prompt: main}
+  - {n: 5, name: "Meta grande (BHAG)", sheet: worksheet-bhag, prompt: main}
+  - {n: 6, name: "Vivid Vision", sheet: worksheet-vivid-vision, prompt: main}
+  - {n: 7, name: "Fanocracy", sheet: worksheet-fanocracy, prompt: main}
+  - {n: 8, name: "Personal Why", sheet: worksheet-life-purpose, prompt: main}
+  - {n: 9, name: "Resumen de visión", sheet: worksheet-vision-summary, prompt: "Tu día en una sola hoja"}
+  - {n: 10, name: "Make Change Stick", sheet: worksheet-vision-summary, prompt: main}
+pages:
+  - page: 1
+    class: no_tool
+    reason: "no figura en la agenda de los 10 ejercicios; contenido no documentado en el repo"
+  - page: 2
+    class: no_tool
+    reason: "agenda del taller con los 10 ejercicios (sin ejercicio)"
+  - page: 3
+    class: no_tool
+    reason: "no figura en la agenda de los 10 ejercicios; contenido no documentado en el repo"
+  - page: 4
+    class: tool
+    nodes: [worksheet-swt]
+    content: "ejercicio 1 · AI Setup (prompt de arranque de SWT) · S88.5"
+  - page: 5
+    class: tool
+    nodes: [worksheet-swt]
+    content: "ejercicio 2 · SWT y lista de tendencias 2026/27 · S88.1"
+  - page: 6
+    class: tool
+    nodes: [worksheet-swt]
+    content: "ejercicio 2 · SWT · S88.1"
+  - page: 7
+    class: tool
+    nodes: [worksheet-differentiating-activities]
+    content: "ejercicio 3 · Actividades diferenciadoras · S88.5"
+  - page: 8
+    class: tool
+    nodes: [worksheet-differentiating-activities]
+    content: "ejercicio 3 · Actividades diferenciadoras · S88.5"
+  - page: 9
+    class: tool
+    nodes: [worksheet-core-purpose]
+    content: "ejercicio 4 · Propósito de la empresa · S88.3"
+  - page: 10
+    class: tool
+    nodes: [worksheet-core-purpose]
+    content: "ejercicio 4 · Propósito de la empresa · S88.3"
+  - page: 11
+    class: tool
+    nodes: [worksheet-core-purpose, worksheet-bhag]
+    content: "fin del ejercicio 4 e inicio del 5 · S88.3"
+  - page: 12
+    class: tool
+    nodes: [worksheet-bhag]
+    content: "ejercicio 5 · Meta grande · S88.3"
+  - page: 13
+    class: tool
+    nodes: [worksheet-bhag]
+    content: "ejercicio 5 · Meta grande · S88.3"
+  - page: 14
+    class: tool
+    nodes: [worksheet-bhag, worksheet-vivid-vision]
+    content: "fin del ejercicio 5 e inicio del 6 · S88.3, S88.4"
+  - page: 15
+    class: tool
+    nodes: [worksheet-vivid-vision]
+    content: "ejercicio 6 · Vivid Vision · S88.4"
+  - page: 16
+    class: tool
+    nodes: [worksheet-vivid-vision]
+    content: "ejercicio 6 · Vivid Vision · S88.4"
+  - page: 17
+    class: tool
+    nodes: [worksheet-fanocracy]
+    content: "ejercicio 7 · Fanocracy · S88.4"
+  - page: 18
+    class: tool
+    nodes: [worksheet-fanocracy, worksheet-life-purpose]
+    content: "fin del ejercicio 7 e inicio del 8 · S88.4"
+  - page: 19
+    class: tool
+    nodes: [worksheet-life-purpose]
+    content: "ejercicio 8 · Personal Why · S88.4"
+  - page: 20
+    class: tool
+    nodes: [worksheet-vision-summary]
+    content: "ejercicios 9 y 10 · Resumen de visión y Make Change Stick · S88.5"
+  - page: 21
+    class: no_tool
+    reason: "no figura en la agenda de los 10 ejercicios; contenido no documentado en el repo"
+  - page: 22
+    class: tool
+    nodes: [worksheet-vision-summary]
+    content: "ejercicio 9 · Resumen de visión · S88.5"
+  - page: 23
+    class: no_tool
+    reason: "no figura en la agenda de los 10 ejercicios; contenido no documentado en el repo"
+  - page: 24
+    class: no_tool
+    reason: "no figura en la agenda de los 10 ejercicios; contenido no documentado en el repo"
+pending: []
