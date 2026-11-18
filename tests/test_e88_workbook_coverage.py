@@ -121,3 +121,16 @@ def test_next_sheet_titles_are_the_registry_names() -> None:
         worksheet = find_worksheet(following)
         assert worksheet is not None, following
         assert bridge == (following, name_es(worksheet)), current
+
+
+def test_no_page_is_left_as_undocumented() -> None:
+    """S88.8: las 24 páginas se leyeron del cuaderno real; ninguna razón dice «no documentado»."""
+    for page in load_coverage()["pages"]:
+        assert "no documentado" not in str(page.get("reason", "")), page["page"]
+
+
+def test_commitment_page_maps_to_the_vision_summary() -> None:
+    """S88.8: la página del compromiso hasta la próxima reunión es el ejercicio 10."""
+    pages = {page["page"]: page for page in load_coverage()["pages"]}
+    assert pages[21]["class"] == "tool"
+    assert pages[21]["nodes"] == ["worksheet-vision-summary"]

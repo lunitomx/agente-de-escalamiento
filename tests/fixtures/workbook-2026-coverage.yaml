@@ -23,13 +23,13 @@ exercises:
 pages:
   - page: 1
     class: no_tool
-    reason: "no figura en la agenda de los 10 ejercicios; contenido no documentado en el repo"
+    reason: "portada y propósito del cuaderno (leído del PDF, S88.8); sin ejercicio"
   - page: 2
     class: no_tool
     reason: "agenda del taller con los 10 ejercicios (sin ejercicio)"
   - page: 3
     class: no_tool
-    reason: "no figura en la agenda de los 10 ejercicios; contenido no documentado en el repo"
+    reason: "introducción: historias de empresas grandes que empezaron con un primer movimiento raro y la definición de estrategia (leído del PDF, S88.8); sin ejercicio"
   - page: 4
     class: tool
     nodes: [worksheet-swt]
@@ -99,16 +99,17 @@ pages:
     nodes: [worksheet-vision-summary]
     content: "ejercicios 9 y 10 · Resumen de visión y Make Change Stick · S88.5"
   - page: 21
-    class: no_tool
-    reason: "no figura en la agenda de los 10 ejercicios; contenido no documentado en el repo"
+    class: tool
+    nodes: [worksheet-vision-summary]
+    content: "ejercicio 10 · compromiso hasta la próxima reunión del grupo de seguimiento, con un Resumen de visión de ejemplo (leído del PDF, S88.8)"
   - page: 22
     class: tool
     nodes: [worksheet-vision-summary]
     content: "ejercicio 9 · Resumen de visión · S88.5"
   - page: 23
     class: no_tool
-    reason: "no figura en la agenda de los 10 ejercicios; contenido no documentado en el repo"
+    reason: "hoja de notas en blanco (leído del PDF, S88.8)"
   - page: 24
     class: no_tool
-    reason: "no figura en la agenda de los 10 ejercicios; contenido no documentado en el repo"
+    reason: "aviso de derechos de autor y contacto (leído del PDF, S88.8)"
 pending: []
