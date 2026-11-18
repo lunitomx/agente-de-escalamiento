@@ -38,6 +38,8 @@ Usa el `id` de la hoja que aparece en la tabla de `list`. También sirve su nomb
 - Nueva: `{"action": "start", "worksheet_name": "worksheet-core-customer", "base_path": "."}`
 - En progreso: `{"action": "resume", "worksheet_name": "worksheet-core-customer", "base_path": "."}`
 
+Si la hoja ya está completada, `start` la reabre: guarda la versión anterior como `<id>-AAAAMMDD-HHMMSS.yaml` y empieza en el paso 1. La primera línea de `output` dice dónde quedó el respaldo; muéstrala. `resume` sobre una hoja completada pide usar `start`.
+
 Muestra `output` tal como viene. En una hoja guiada cada paso trae:
 
 - la pregunta,
