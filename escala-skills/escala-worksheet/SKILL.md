@@ -70,7 +70,7 @@ JSON: `{"action": "save", "worksheet_name": "worksheet-core-customer", "base_pat
 
 Solo `save` marca la hoja como completada. Escribe la vista (`.html` y su gemelo `.md`).
 
-Si `output` termina con "Siguiente hoja: <título>", muéstrala. Ofrece empezarla con `/escala-worksheet <id>`; `artifacts.next_sheet` trae el `id` y el `title`. Empieza la siguiente hoja solo si el dueño dice que sí.
+Si `output` termina con "Siguiente hoja: <título>", muéstrala. Ofrece empezarla con el procedimiento interno `escala-worksheet` y el `id` de `artifacts.next_sheet` (trae `id` y `title`). Empieza la siguiente hoja solo si el dueño dice que sí.
 
 ### Step 5: Abrir la vista
 
