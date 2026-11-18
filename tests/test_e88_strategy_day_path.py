@@ -72,9 +72,14 @@ def _assert_path(
         title = name_es(worksheet)
         assert saved["artifacts"]["next_sheet"] == {"id": following, "title": title}
         assert f"Siguiente hoja: {title}." in saved["output"], sheet
+        assert f"di «sigamos con {title}»" in saved["output"], sheet
     last = walked[-1][2]
     assert "next_sheet" not in last["artifacts"]
     assert "Siguiente hoja" not in last["output"]
+    for sheet, started, saved in walked:
+        # S88.7: el dueño nunca ve un comando con diagonal (regla S86.1).
+        assert "/escala" not in started["output"], sheet
+        assert "/escala" not in saved["output"], sheet
     for sheet, _, saved in walked:
         view = saved["artifacts"]["view"]
         assert Path(view["html"]).is_file(), sheet
@@ -131,3 +136,13 @@ def test_swt_already_completed_is_reopened_and_the_path_goes_on(
     _assert_path(tmp_path, walked)
     new = read_yaml(tmp_path / FOLDER / "worksheet-swt.yaml")
     assert new["fields"]["ideas"] == "Respuesta de ideas"
+
+
+def test_list_and_unstarted_save_show_no_slash_command(tmp_path: Path) -> None:
+    """S88.7: la lista de hojas y el aviso de hoja sin empezar no muestran comandos."""
+    listed = _call(tmp_path, "worksheet-swt", "list")
+    assert "/escala" not in listed["output"]
+    assert "di el nombre de la hoja" in listed["output"]
+    unstarted = _call(tmp_path, "worksheet-swt", "step")
+    assert unstarted["errors"], unstarted
+    assert all("/escala" not in error for error in unstarted["errors"])

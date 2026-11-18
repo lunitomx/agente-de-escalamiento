@@ -406,8 +406,7 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
         lines.extend(
             [
                 "",
-                "Para empezar: `/escala-worksheet [nombre]`",
-                "Para reanudar: mismo comando si ya empezaste",
+                "Para empezar o reanudar una hoja, di el nombre de la hoja.",
             ]
         )
 
@@ -579,7 +578,7 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
                 "output": "",
                 "artifacts": {},
                 "errors": [
-                    f"Worksheet '{ws_name}' no iniciado. Usa /escala-worksheet {ws_name} primero"
+                    f"La hoja '{ws_name}' no se ha empezado. Empiézala primero."
                 ],
             }
 
@@ -690,7 +689,7 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
         if bridge is not None:
             output += (
                 f"\nSiguiente hoja: {bridge.title}. "
-                f"Escribe `/escala-worksheet {bridge.id}` para seguir."
+                f"Para seguir, di «sigamos con {bridge.title}»."
             )
             extra["next_sheet"] = {"id": bridge.id, "title": bridge.title}
 

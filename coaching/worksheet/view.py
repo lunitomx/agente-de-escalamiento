@@ -139,11 +139,12 @@ def _item(step: GuideStep, answers: dict[str, Any]) -> ViewItem:
 def missing_source_text(question: str, sheet_name: str, sheet_id: str) -> str:
     """What the canvas says when a field of a source sheet is not saved (D4).
 
-    The owner reads the step's question and the sheet's Spanish name; the id
-    appears only inside the command.
+    The owner reads the step's question and the sheet's Spanish name; no
+    command and no id (S86.1: the owner never sees a slash command).
     """
     ask = question if question.endswith(("?", ".", "!")) else f"{question}."
-    return f"Falta: {ask} Llena la hoja {sheet_name} con /escala-worksheet {sheet_id}"
+    del sheet_id  # kept in the signature for callers; not shown to the owner
+    return f"Falta: {ask} Llena la hoja {sheet_name}."
 
 
 DerivedSources = dict[str, tuple[dict[str, Any], dict[str, Any] | None]]

@@ -269,7 +269,7 @@ def test_derived_blocks_missing_and_optional() -> None:
     assert first[1].answer is None
     assert first[1].missing == (
         "Falta: ¿Qué necesidad de tu Cliente central llena tu producto o servicio? "
-        "Llena la hoja Cliente central con /escala-worksheet worksheet-core-customer"
+        "Llena la hoja Cliente central."
     )
     assert blocks[1].items[0].label == "promesa-principal"
 
