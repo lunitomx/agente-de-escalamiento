@@ -1,14 +1,12 @@
 id: worksheet-swt
 type: worksheet
 name: SWT Analysis Worksheet
-name_es: Hoja de Trabajo de Analisis SWT
+name_es: Fortalezas, debilidades y tendencias (SWT)
 decision: strategy
 summary: >
-  The SWT worksheet guides the leadership team through a structured analysis of
-  internal strengths and weaknesses, and external trends. Unlike SWOT, SWT drops
-  Opportunities (derived from Trends × Strengths) and focuses on what's real now.
-  Output feeds the bottom strip of the OPSP. Usually completed in the annual planning
-  session before setting the year's priorities.
+  Mira primero afuera y luego adentro. Revisa las tendencias que vienen en los
+  próximos 3 años, nombra tus fortalezas y tus debilidades, y cruza una tendencia
+  con una fortaleza o una debilidad para sacar ideas para tu plan del año.
 relationships:
   - type: belongs-to
     target: decision-strategy
@@ -16,13 +14,72 @@ relationships:
     target: tool-swt
 tags: [strategy, worksheet, SWT, analysis, planning, annual]
 metadata:
-  fields:
-    - "Strengths: top 3-5 internal capabilities that differentiate us"
-    - "Weaknesses: top 3-5 internal gaps that limit growth or create risk"
-    - "Trends: top 3-5 external forces shaping industry (macro, competitive, tech)"
-    - "Key insight: which trends amplify strengths? which expose weaknesses?"
-    - "OPSP input: top 1-2 items per category for the OPSP bottom strip"
-  output: "SWT summary for OPSP + informed annual priorities"
+  output: "Tendencias con su señal, 3 a 5 fortalezas, 3 a 5 debilidades e ideas que cruzan una tendencia con lo que tienes adentro"
   difficulty: intermediate
-  time_estimate: "2-3 hours leadership session"
+  time_estimate: "2-3 horas con tu equipo directivo"
   frequency: annually
+guide:
+  steps:
+    - id: tendencias-2026
+      question: "¿Cuáles de las 10 tendencias de 2026 tocan tu negocio?"
+      how: >-
+        Lee las 10 y elige 2 o 3. Para cada una, escribe si es amenaza,
+        oportunidad o las dos, y cómo te pega.
+        (1) Agents doing the work, not just drafting it: agentes de IA que hacen el trabajo, no solo el borrador.
+        (2) Who owns your face/voice: likeness fight in music & film: la pelea por quién es dueño de tu cara y tu voz.
+        (3) GLP-1s rewriting food, alcohol, and retail: medicamentos como Ozempic cambian lo que la gente come, bebe y compra.
+        (4) Healthspan as the new status symbol: vivir sano más años es el nuevo lujo.
+        (5) The friendship recession and the return of third places: la gente tiene menos amigos y vuelve al café, al club y a la plaza.
+        (6) Phones out of schools, and the analog revival: celulares fuera de la escuela y regreso a lo análogo.
+        (7) Birth rates become a boardroom and policy question: nacen menos niños y eso ya se discute en empresas y gobiernos.
+        (8) The sandwich generation gets squeezed on both ends: quien cuida a sus hijos y a sus papás al mismo tiempo.
+        (9) Live and in person carries the price premium: lo presencial y en vivo se cobra más caro.
+        (10) Trust shifts from institutions to individuals: la gente confía más en personas que en instituciones.
+      example: "Tortillería El Sol: (5) oportunidad: las fondas del barrio se llenan los domingos; abrir un mostrador con café y tacos en la mañana."
+    - id: tendencias
+      question: "¿Qué otras tendencias ves venir en los próximos 3 años?"
+      how: >-
+        Recorre estas categorías: industria, tecnología, región, mundo, cultura,
+        salud, medios, política, espiritualidad, moda, música y arte, tele y cine,
+        humor, familia y educación. Escribe de 3 a 5 tendencias, cada una con una
+        señal que ya viste.
+      example: "Tortillería El Sol: más clientes pagan con el celular; ya 4 de cada 10 nos piden transferencia."
+    - id: fortalezas
+      question: "¿Qué haces mejor que tu competencia?"
+      how: >-
+        Escribe de 3 a 5 fortalezas de adentro. Piensa en tu equipo, tu
+        tecnología, tu rapidez para cambiar, tu ejecución y tus márgenes.
+      example: "Tortillería El Sol: molino de piedra propio; la masa sale lista antes de las 7 a. m."
+    - id: debilidades
+      question: "¿Qué te frena por dentro?"
+      how: >-
+        Escribe de 3 a 5 debilidades de adentro. Piensa en tus competidores, tu
+        equipo, tu dinero para crecer, tu base de clientes y tu distribución.
+      example: "Tortillería El Sol: el 60 % de la venta viene de 5 fondas; si cierra una, lo sentimos."
+    - id: ideas
+      question: "¿Qué ideas salen al cruzar una tendencia con lo que tienes adentro?"
+      how: >-
+        Toma una tendencia y júntala con una fortaleza: ¿qué puedes aprovechar?
+        Júntala con una debilidad: ¿qué tienes que proteger? Escribe 2 o 3 ideas.
+      example: "Tortillería El Sol: pago con el celular + reparto propio: pedidos por WhatsApp con pago adelantado para las fondas."
+tips:
+  - text: "Para cada tendencia, escribe una señal concreta que ya viste: una noticia, un cliente, un dato. Sin señal, es una opinión, no una tendencia."
+    source: "work/research/e88-tips/swt.md#f1"
+    step: tendencias-2026
+  - text: "Escribe 3 a 5 cambios que pueden mover tu negocio en 3 a 5 años. Para cada uno, anota una señal que puedas medir y revísala en tu planeación trimestral."
+    source: "work/research/e87-tips/sandbox.md#f4"
+    step: tendencias
+  - text: "'Buen servicio' o 'calidad' no cuentan: tu competencia también los dice y los copia. Escribe algo que haces distinto, no solo mejor."
+    source: "work/research/e87-tips/differentiating-activities.md#f4"
+    step: fortalezas
+ai_prompt:
+  text: "Haz un análisis de fortalezas, debilidades y tendencias de mi negocio. Las fortalezas y las debilidades son de adentro: dame 5 de cada una, pensando en competidores, equipo, dinero para crecer, base de clientes y distribución. Las tendencias son de afuera y ahí está el dinero de verdad: dame 12 que cubran mi industria, tecnología, mi región, el mundo, cultura, medios, política y educación, cada una con una señal real que la respalde. Ordénalas por qué tan fuerte nos pegarían en los próximos 3 años y marca si cada una es amenaza, oportunidad o las dos. Luego hazme 3 preguntas, una a la vez, sobre las tendencias que estoy ignorando porque actuar sobre ellas me resulta incómodo."
+view:
+  layout: cards
+  sections:
+    - title: "Lo que pasa afuera"
+      steps: [tendencias-2026, tendencias]
+    - title: "Lo que tienes adentro"
+      steps: [fortalezas, debilidades]
+    - title: "Tus ideas"
+      steps: [ideas]

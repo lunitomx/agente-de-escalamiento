@@ -47,6 +47,8 @@ Muestra `output` tal como viene. En una hoja guiada cada paso trae:
 
 Si `errors` dice que la hoja no cumple el contrato, muéstralo y detente.
 
+Algunas hojas traen prompts para el paso 1, cada uno con su título en negritas (ej. **Arranque con IA:**). Salen antes de "Antes de empezar". Muéstralos tal como vienen; el dueño los pega en su asistente de IA antes de llenar la hoja.
+
 El Lienzo de estrategia (`worksheet-strategy-canvas`) lee las hojas guardadas del dueño y no las cambia. Su paso 1 muestra "Esto ya llenaste:" y cada pieza que falta con el comando para llenarla.
 
 ### Step 3: Avanzar un paso
@@ -67,6 +69,8 @@ Después de la última respuesta, `output` trae la **Revisión Final**: cada pre
 JSON: `{"action": "save", "worksheet_name": "worksheet-core-customer", "base_path": "."}`
 
 Solo `save` marca la hoja como completada. Escribe la vista (`.html` y su gemelo `.md`).
+
+Si `output` termina con "Siguiente hoja: <título>", muéstrala. Ofrece empezarla con el procedimiento interno `escala-worksheet` y el `id` de `artifacts.next_sheet` (trae `id` y `title`). Empieza la siguiente hoja solo si el dueño dice que sí.
 
 ### Step 5: Abrir la vista
 

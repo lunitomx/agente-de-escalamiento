@@ -95,6 +95,20 @@ class AiPrompt(BaseModel):
     text: Text
 
 
+class ExtraPrompt(BaseModel):
+    """Another prompt of the sheet (S88.1 D1): at step 1 or after the main one.
+
+    ``ai_prompt`` stays the main prompt; these come before (``start``) or
+    after it (``end``). No page numbers: ``extra=forbid`` rejects ``page``.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    title: Text
+    text: Text
+    at: Literal["start", "end"] = "end"
+
+
 class ViewSection(BaseModel):
     """A block of the view, grouping step ids."""
 
@@ -139,6 +153,9 @@ class ToolGuide(BaseModel):
     guide: Guide
     tips: list[Tip] = Field(min_length=3)
     ai_prompt: AiPrompt | None = None
+    extra_prompts: list[ExtraPrompt] = Field(
+        default_factory=lambda: list[ExtraPrompt]()
+    )
     view: ViewSpec = Field(default_factory=ViewSpec)
     derived_from: list[DerivedSource] = Field(
         default_factory=lambda: list[DerivedSource]()

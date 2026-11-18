@@ -11,7 +11,7 @@ from pydantic import ValidationError
 
 from ..core import read_yaml, write_yaml, ensure_dir
 from . import engine
-from .guide import GuideStep, Tip, parse_guide, source_label
+from .guide import ExtraPrompt, GuideStep, Tip, parse_guide, source_label
 from .view import (
     AI_PROMPT_TITLE,
     DerivedSources,
@@ -271,10 +271,38 @@ def _ai_prompt_text(content: dict[str, Any]) -> str | None:
     return guide.ai_prompt.text
 
 
+def _extra_prompts(content: dict[str, Any], at: str) -> list[ExtraPrompt]:
+    """The sheet's extra prompts shown ``at`` start or end (S88.1 D2, D3).
+
+    Call after ``_steps_and_tips`` validated the guide.
+    """
+    guide = parse_guide(content)
+    if guide is None:
+        return []
+    return [p for p in guide.extra_prompts if p.at == at]
+
+
+def _prompt_line(prompt: ExtraPrompt) -> str:
+    return f"**{prompt.title}:** {prompt.text}"
+
+
+def _start_prompt_lines(content: dict[str, Any]) -> list[str]:
+    """Step 1 lines for the ``start`` prompts; empty when the sheet has none."""
+    lines: list[str] = []
+    for prompt in _extra_prompts(content, "start"):
+        lines += [_prompt_line(prompt), ""]
+    return lines
+
+
 def _review_lines(
-    steps: list[GuideStep], answers: dict[str, Any], ai_prompt: str | None = None
+    steps: list[GuideStep],
+    answers: dict[str, Any],
+    ai_prompt: str | None = None,
+    end_prompts: list[ExtraPrompt] | None = None,
 ) -> list[str]:
     """Final review: each question with its answer, then ask to confirm.
+
+    The ``end`` prompts follow the main prompt, each with its own title.
 
     Nothing is completed here; only ``save`` marks the sheet and writes the view.
     """
@@ -291,6 +319,8 @@ def _review_lines(
         lines.append(f"- {label_heading(step.question)} {shown}")
     if ai_prompt is not None:
         lines += ["", f"**{AI_PROMPT_TITLE}:** {ai_prompt}"]
+    for prompt in end_prompts or []:
+        lines += ["", _prompt_line(prompt)]
     lines += [
         "",
         "Responde 'confirmar' para guardar la hoja y abrir tu vista.",
@@ -412,6 +442,7 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
                     "",
                 ]
             )
+            lines += _start_prompt_lines(content)
             derived = _derived_view_blocks(content, base)
             if derived:
                 filled = any(i.answer is not None for b in derived for i in b.items)
@@ -448,7 +479,12 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
                 )
             else:
                 lines.extend(
-                    _review_lines(steps, saved_fields, _ai_prompt_text(content))
+                    _review_lines(
+                        steps,
+                        saved_fields,
+                        _ai_prompt_text(content),
+                        _extra_prompts(content, "end"),
+                    )
                 )
 
         write_yaml(
@@ -532,7 +568,12 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
                 "Completa este campo con tu información.",
             )
         else:
-            lines = _review_lines(steps, saved_fields, _ai_prompt_text(content))
+            lines = _review_lines(
+                steps,
+                saved_fields,
+                _ai_prompt_text(content),
+                _extra_prompts(content, "end"),
+            )
 
         return {
             "output": "\n".join(lines),
@@ -560,7 +601,7 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
         )
         content = load_worksheet_content(worksheet, base)
         try:
-            _steps_and_tips(worksheet, content, base)
+            saved_steps, _ = _steps_and_tips(worksheet, content, base)
         except _GuideError as exc:
             return _contract_error(str(exc))
 
@@ -601,12 +642,23 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
         )
         html_path, md_path = save_view(base, view)
 
+        output = (
+            f"✅ **{name_es(worksheet)}** guardada como completada.\n"
+            f"Vista lista: {html_path}"
+        )
+        extra: dict[str, Any] = {}
+        bridge = saved_steps[-1].next_sheet if saved_steps else None
+        if bridge is not None:
+            output += (
+                f"\nSiguiente hoja: {bridge.title}. "
+                f"Escribe `/escala-worksheet {bridge.id}` para seguir."
+            )
+            extra["next_sheet"] = {"id": bridge.id, "title": bridge.title}
+
         return {
-            "output": (
-                f"✅ **{name_es(worksheet)}** guardada como completada.\n"
-                f"Vista lista: {html_path}"
-            ),
+            "output": output,
             "artifacts": {
+                **extra,
                 "worksheet": worksheet,
                 "completed_data": completed_data,
                 "state_path": str(state_path),
