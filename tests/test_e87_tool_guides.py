@@ -38,7 +38,7 @@ EIGHT_AREAS = (
     "diversión",
     "espiritual",
 )
-ANCHOR_SOURCE_RE = re.compile(r"^(work/research/e87-tips/[a-z0-9-]+\.md)#(f\d+)$")
+ANCHOR_SOURCE_RE = re.compile(r"^(work/research/e8[78]-tips/[a-z0-9-]+\.md)#(f\d+)$")
 YAML_BLOCK_RE = re.compile(r"```yaml\n(.*?)\n```", re.DOTALL)
 
 
@@ -68,6 +68,26 @@ def _findings(research: Path) -> dict[str, dict[str, Any]]:
         if isinstance(data, dict) and "id" in data:
             found[str(data["id"])] = data
     return found
+
+
+def _anchor_problem(source: str, root: Path) -> str | None:
+    """Return why an anchored tip source is not acceptable, or None if it is.
+
+    Sources that are not research anchors return None; the caller checks them
+    against the public vocabulary instead.
+    """
+    match = ANCHOR_SOURCE_RE.match(source)
+    if match is None:
+        return None
+    research = root / match.group(1)
+    if not research.is_file():
+        return f"{source} no existe"
+    if f'<a id="{match.group(2)}"></a>' not in research.read_text(encoding="utf-8"):
+        return f"ancla inexistente {source}"
+    finding = _findings(research).get(match.group(2))
+    if finding is None or finding.get("triangulated") is not True:
+        return f"{source} no está triangulado"
+    return None
 
 
 def test_core_customer_passes_the_contract() -> None:
@@ -248,21 +268,34 @@ def test_tip_sources_are_triangulated_anchors_or_clean(sheet: Path) -> None:
     assert guide is not None
     terms = [t.lower() for t in _forbidden_terms()]
     for tip in guide.tips:
-        match = ANCHOR_SOURCE_RE.match(tip.source)
-        if match:
-            research = ROOT / match.group(1)
-            assert research.is_file(), f"{sheet.name}: {tip.source}"
-            assert f'<a id="{match.group(2)}"></a>' in research.read_text(
-                encoding="utf-8"
-            ), f"{sheet.name}: ancla inexistente {tip.source}"
-            finding = _findings(research)[match.group(2)]
-            assert finding["triangulated"] is True, (
-                f"{sheet.name}: {tip.source} no está triangulado"
-            )
+        if ANCHOR_SOURCE_RE.match(tip.source):
+            problem = _anchor_problem(tip.source, ROOT)
+            assert problem is None, f"{sheet.name}: {problem}"
         else:
             lowered = tip.source.lower()
             hits = [t for t in terms if t in lowered]
             assert not hits, f"{sheet.name}: fuente con término prohibido"
+
+
+def test_anchor_pattern_accepts_e88_research() -> None:
+    match = ANCHOR_SOURCE_RE.match("work/research/e88-tips/fanocracy.md#f1")
+    assert match is not None
+    assert match.group(1) == "work/research/e88-tips/fanocracy.md"
+    assert match.group(2) == "f1"
+    assert ANCHOR_SOURCE_RE.match("work/research/e87-tips/bmc.md#f2") is not None
+    assert ANCHOR_SOURCE_RE.match("work/research/e89-tips/x.md#f1") is None
+
+
+def test_e88_finding_without_triangulated_fails(tmp_path: Path) -> None:
+    research = tmp_path / "work" / "research" / "e88-tips" / "x.md"
+    research.parent.mkdir(parents=True)
+    research.write_text(
+        '<a id="f1"></a>\n### f1 · prueba\n\n```yaml\nid: f1\ntip: "x"\n```\n',
+        encoding="utf-8",
+    )
+    problem = _anchor_problem("work/research/e88-tips/x.md#f1", tmp_path)
+    assert problem is not None
+    assert "no está triangulado" in problem
 
 
 def test_guided_sheet_has_no_root_source_key() -> None:
