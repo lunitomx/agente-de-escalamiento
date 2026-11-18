@@ -1,7 +1,7 @@
 ---
 epic_id: E88
 title: Strategy 2026 — los 10 ejercicios del Workbook EOA 2026 con su prompt en español
-status: en-curso
+status: cerrada
 jira_key: "ESCALA-119"
 created: 2026-11-18
 ---
@@ -53,8 +53,11 @@ Diseño: `design.md` (secciones 2–9 y Machine). Borradores: `drafts/` de esta 
 | S88.4 | ESCALA-123 | Hojas de Vivid Vision, Personal Why y Fanocracy | 5 | S88.1, S88.2, S88.3 (conteos) |
 | S88.5 | ESCALA-124 | Prompts 2026: AI Setup, Actividades, Resumen de visión y Make Change Stick; reabrir una hoja ya completada | 3 | S88.1 |
 | S88.6 | ESCALA-125 | Recorrido del Strategy Day 2026 en orden y mapa de cobertura de las 24 páginas | 5 | S88.3, S88.4, S88.5 |
+| S88.7 | ESCALA-126 | Las hojas ya no muestran comandos al dueño (salió de la retro de S88.6) | 1 | S88.6 |
 
-Orden: S88.1 ∥ S88.2 ∥ S88.3 → S88.5, S88.4 → S88.6.
+Orden: S88.1 ∥ S88.2 ∥ S88.3 → S88.5, S88.4 → S88.6 → S88.7.
+
+**Estado (2026-11-18):** 7 de 7 historias fusionadas a main (31b8ccee) y «Finalizada» en Jira. Instalado y verificado en la ESCALA de Eduardo: 26 hojas, «Arranque con IA» en SWT. Retro: `retrospective.md`.
 
 Fusiones en serie, una a la vez. Cada historia trae la rama destino a su rama, regenera el mapa E6 (design.md sección 7) y corre la suite completa antes de fusionarse.
 
