@@ -10,7 +10,7 @@ question: "¿Cómo se escribe una meta grande a 10-30 años que sea audaz pero c
 
 Pregunta: ¿qué separa una meta grande que une al equipo de un número inventado?
 Fuentes abiertas el 2026-11-18: Collins y Porras (HBR, 1996, copia pública en
-PDF), la página de los tres círculos de Jim Collins, Rhythm Systems y Verne
+PDF), el texto de Jim Collins sobre los tres círculos, Rhythm Systems y Verne
 Harnish (familia Scaling Up), Asana, Mind Tools y See, Sitkin y Miller (HBR
 2017, resumen de CU Denver). Nota: Collins y Porras dicen 10 a 30 años; Rhythm
 y Asana dicen 10 a 25. La épica E88 usa 10-30. El tip del número con fecha ya
