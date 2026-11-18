@@ -3,7 +3,7 @@ Worksheet module — load from ontology, guide step by step, validate, save.
 """
 
 import sys
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
@@ -121,6 +121,9 @@ def get_completed_ids(base_path: Path | None = None) -> list[str]:
     """Get IDs of worksheets saved with ``status: completed``.
 
     An in-progress state file is not completed; counting it blocked ``resume``.
+    Only each sheet's own ``<id>.yaml`` counts: a backup
+    ``<id>-AAAAMMDD-HHMMSS.yaml`` names another file, so a reopened sheet
+    shows as open until it is saved again (S88.5).
     """
     wdir = (
         (base_path / ".escala" / "my-company" / "worksheets")
@@ -133,6 +136,8 @@ def get_completed_ids(base_path: Path | None = None) -> list[str]:
     for f in sorted(wdir.glob("*.yaml")):
         data = read_yaml(f)
         sheet_id = str(data.get("worksheet_id") or f.stem)
+        if sheet_id != f.stem:
+            continue
         if data.get("status") == "completed" and sheet_id not in completed:
             completed.append(sheet_id)
     return completed
@@ -328,6 +333,33 @@ def _review_lines(
     return lines
 
 
+def _backup_completed(state_path: Path) -> tuple[Path, str] | None:
+    """Move a completed sheet to ``<id>-AAAAMMDD-HHMMSS.yaml``; nothing is deleted.
+
+    Returns the backup path and the date it was completed, or None when the
+    file is missing or not completed.
+    """
+    if not state_path.exists():
+        return None
+    existing = read_yaml(state_path)
+    if not existing or existing.get("status") != "completed":
+        return None
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    backup_path = (
+        state_path.parent / f"{state_path.stem}-{timestamp}{state_path.suffix}"
+    )
+    state_path.rename(backup_path)
+    return backup_path, str(existing.get("completed") or "")
+
+
+def _shown_path(path: Path, base: Path) -> str:
+    """The path relative to the owner's folder when it is inside it."""
+    try:
+        return path.relative_to(base).as_posix()
+    except ValueError:
+        return str(path)
+
+
 def _contract_error(message: str) -> dict[str, Any]:
     return {"output": "", "artifacts": {}, "errors": [message]}
 
@@ -398,17 +430,24 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
                 ],
             }
 
-        completed = get_completed_ids(base)
-        if worksheet["id"] in completed:
-            return {
-                "output": f"La hoja **{name_es(worksheet)}** ya está completada. Usa `/escala-worksheet list` para ver otros.",
-                "artifacts": {"worksheet": worksheet, "status": "completed"},
-                "errors": [],
-            }
-
         state_path = (
             base / ".escala" / "my-company" / "worksheets" / f"{worksheet['id']}.yaml"
         )
+        completed = get_completed_ids(base)
+        reopened: tuple[Path, str] | None = None
+        if worksheet["id"] in completed:
+            if action == "resume":
+                return {
+                    "output": (
+                        "Esta hoja ya está completada. "
+                        f"Escribe `start {worksheet['id']}` para hacer una versión nueva."
+                    ),
+                    "artifacts": {"worksheet": worksheet, "status": "completed"},
+                    "errors": [],
+                }
+            # ``start`` reopens it: the completed file is kept as a backup.
+            reopened = _backup_completed(state_path)
+
         state = read_yaml(state_path)
         if state and action == "resume":
             current_step = state.get("current_step", 0)
@@ -424,7 +463,16 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
             return _contract_error(str(exc))
         total_steps = len(steps) + 2  # information + steps + final review
 
-        lines = [
+        lines: list[str] = []
+        if reopened is not None:
+            backup_path, completed_on = reopened
+            lines += [
+                f"Ya llenaste esta hoja el {completed_on}. "
+                f"Guardé esa versión en {_shown_path(backup_path, base)}. "
+                "Empiezas una versión nueva.",
+                "",
+            ]
+        lines += [
             f"## {name_es(worksheet)}",
             "",
             f"**Decisión:** {_decision_es(worksheet)}",
@@ -507,6 +555,7 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
                 "current_step": current_step,
                 "total_steps": total_steps,
                 "state_path": str(state_path),
+                "backup_path": str(reopened[0]) if reopened else None,
             },
             "errors": [],
         }
@@ -613,24 +662,14 @@ def run(context: dict[str, Any]) -> dict[str, Any]:
             "worksheet_name": worksheet["name"],
             "decision": worksheet.get("decision"),
             "fields": fields,
-            "completed": str(__import__("datetime").datetime.now().date()),
+            "completed": str(datetime.now().date()),
             "status": "completed",
         }
         ensure_dir(state_path.parent)
 
         # Back up a previously completed worksheet before overwriting it.
-        backup_path: Path | None = None
-        if state_path.exists():
-            existing = read_yaml(state_path)
-            if existing and existing.get("status") == "completed":
-                timestamp = (
-                    __import__("datetime").datetime.now().strftime("%Y%m%d-%H%M%S")
-                )
-                backup_path = (
-                    state_path.parent
-                    / f"{state_path.stem}-{timestamp}{state_path.suffix}"
-                )
-                state_path.rename(backup_path)
+        backup = _backup_completed(state_path)
+        backup_path = backup[0] if backup else None
 
         write_yaml(state_path, completed_data)
 
