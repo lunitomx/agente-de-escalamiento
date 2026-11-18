@@ -298,6 +298,34 @@ def test_e88_finding_without_triangulated_fails(tmp_path: Path) -> None:
     assert "no está triangulado" in problem
 
 
+E88_RESEARCH = ROOT / "work" / "research" / "e88-tips"
+E88_TOPICS = ("vivid-vision", "life-purpose", "fanocracy")
+
+
+def _families(finding: dict[str, Any]) -> set[str]:
+    """Independent source families of a finding (PAT-226): family, else origin."""
+    sources: list[dict[str, Any]] = finding.get("sources") or []
+    return {str(s.get("family") or s["origin"]) for s in sources}
+
+
+@pytest.mark.parametrize("topic", E88_TOPICS)
+def test_e88_research_files_are_triangulated(topic: str) -> None:
+    research = E88_RESEARCH / f"{topic}.md"
+    assert research.is_file(), research
+    text = research.read_text(encoding="utf-8")
+    findings = _findings(research)
+    assert len(findings) >= 3, f"{topic}: menos de 3 hallazgos"
+    for fid, finding in findings.items():
+        assert f'<a id="{fid}"></a>' in text, f"{topic}: falta ancla {fid}"
+        assert f"### {fid} " in text, f"{topic}: falta título {fid}"
+        assert finding["triangulated"] is True, f"{topic}#{fid}"
+        assert len(_families(finding)) >= 2, f"{topic}#{fid}: una sola familia"
+        for source in finding["sources"]:
+            assert str(source["url"]).startswith("https://"), f"{topic}#{fid}"
+            assert source["title"], f"{topic}#{fid}"
+    assert "workbook_pages" not in text, f"{topic}: cita páginas del workbook"
+
+
 def test_guided_sheet_has_no_root_source_key() -> None:
     for sheet in _guided_sheets():
         assert "source" not in _load(sheet), sheet.name
