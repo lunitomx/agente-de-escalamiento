@@ -11,7 +11,7 @@ Cierre fuera del pipeline, igual que E87. La corrida de la épica (b36b69d9) que
 - Hojas nuevas: Propósito central, Meta grande (BHAG), Visión vívida, De clientes a fans y Tu propósito de vida.
 - Prompts 2026: «Arranque con IA» en SWT, más los de Actividades diferenciadoras y Resumen de visión. Al empezar una hoja completada, la reabre y guarda un respaldo con fecha.
 - Recorrido del Strategy Day en orden, de la SWT al Resumen de visión. Se prueba de punta a punta, incluso con la SWT ya completada.
-- Mapa de cobertura 2026: 24 de 24 páginas y 10 de 10 ejercicios, con `pending: []`. Las páginas 1, 3, 21, 23 y 24 no están documentadas en el repo; quedan «sin herramienta» con esa razón.
+- Mapa de cobertura 2026: 24 de 24 páginas y 10 de 10 ejercicios, con `pending: []`. Las páginas 1, 3, 21, 23 y 24 se leyeron del PDF del cuaderno en S88.8: la 21 es el compromiso del ejercicio 10 (va a Resumen de visión); 1, 3, 23 y 24 son portada, introducción, notas y derechos de autor.
 - S88.7: el dueño ya no ve `/escala-worksheet` al guardar, al listar, en la vista ni en el aviso de hoja sin empezar.
 - Instalado y verificado en la ESCALA de Eduardo el 2026-11-18 a las 18:11 UTC, con el hash dce86ea1 y luego 31b8ccee. La lista muestra 26 hojas y la SWT muestra «Arranque con IA».
 
@@ -35,7 +35,7 @@ Cierre fuera del pipeline, igual que E87. La corrida de la épica (b36b69d9) que
 - **Receta del mapa E6.** Se regeneró con `--repo . --output` en cada fusión. Ningún conflicto del json se resolvió a mano.
 - **El motor ya tenía `next_sheet`.** S88.6 fue solo datos y pruebas.
 - **Instalación probada en la Mac real**, no solo en el repo. Así salió que la copia instalada estaba 99 cambios atrás y con un cambio local en conflicto.
-- **Cosas sin documentar quedaron marcadas, no inventadas** (5 páginas).
+- **Cosas sin documentar quedaron marcadas, no inventadas** (5 páginas). Pero el PDF sí estaba en la Mac: S88.8 las leyó y la página 21 resultó ser ejercicio.
 
 ## Qué falló
 
@@ -59,4 +59,4 @@ Cierre fuera del pipeline, igual que E87. La corrida de la épica (b36b69d9) que
 ## Pendiente fuera de la épica
 
 - `coaching/progress/` todavía sugiere `/escala-worksheet` en su resumen de avance. No está en el recorrido del Strategy Day.
-- Las páginas 1, 3, 21, 23 y 24 se pueden documentar si Eduardo dice qué traen.
+- **Lección:** el brief de cada agente debe dar la ruta del PDF del cuaderno. El agente de S88.6 no la tenía y marcó 5 páginas como no documentadas.
