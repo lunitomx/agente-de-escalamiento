@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
 import pytest
 from pydantic import ValidationError
 
+from coaching.core import write_yaml
+from coaching.worksheet import run
 from coaching.worksheet.guide import parse_guide
 
 
@@ -78,3 +81,84 @@ def test_extra_prompt_defaults_to_end() -> None:
 def test_bad_extra_prompt_is_rejected(prompt: dict[str, Any]) -> None:
     with pytest.raises(ValidationError):
         parse_guide(_sheet(extra_prompts=[prompt]))
+
+
+# --- T2: the chat ------------------------------------------------------------
+
+
+def _install(base: Path, sheet: dict[str, Any]) -> None:
+    """Register ``sheet`` as the only sheet of a client knowledge root."""
+    knowledge = base / ".escala" / "knowledge"
+    write_yaml(
+        knowledge / "registry" / "worksheets.yaml",
+        {
+            "worksheets": [
+                {
+                    "id": sheet["id"],
+                    "name": sheet["name"],
+                    "decision": "strategy",
+                    "node_path": "strategy/worksheets/a.yaml",
+                }
+            ]
+        },
+    )
+    write_yaml(knowledge / "strategy" / "worksheets" / "a.yaml", sheet)
+
+
+def _call(base: Path, action: str, **fields: str) -> str:
+    return str(
+        run(
+            {
+                "action": action,
+                "worksheet_name": "worksheet-a",
+                "base_path": str(base),
+                "fields": fields,
+            }
+        )["output"]
+    )
+
+
+def test_start_prompt_shows_in_step_1_before_the_checklist(tmp_path: Path) -> None:
+    _install(tmp_path, _sheet(extra_prompts=[START, END]))
+    out = _call(tmp_path, "start")
+    start = "**Arranque con IA:** Pega esto una vez."
+    assert start in out
+    assert out.index("### Paso 1") < out.index(start)
+    assert out.index(start) < out.index("Antes de empezar")
+    assert "Hazla visual" not in out
+
+
+def test_start_prompt_is_not_in_later_steps_nor_review(tmp_path: Path) -> None:
+    _install(tmp_path, _sheet(extra_prompts=[START]))
+    _call(tmp_path, "start")
+    step_2 = _call(tmp_path, "step")
+    _call(tmp_path, "step", uno="Fondas")
+    review = _call(tmp_path, "step", dos="Masa")
+    assert "### Revisión Final" in review
+    for out in (step_2, review):
+        assert "Arranque con IA" not in out
+
+
+def test_end_prompt_follows_the_main_one_in_the_review(tmp_path: Path) -> None:
+    _install(tmp_path, _sheet(extra_prompts=[START, END]))
+    _call(tmp_path, "start")
+    _call(tmp_path, "step")
+    _call(tmp_path, "step", uno="Fondas")
+    review = _call(tmp_path, "step", dos="Masa")
+    main = "**Prompt para tu asistente de IA:** Prompt principal."
+    end = "**Hazla visual:** Haz un cartel."
+    assert review.index(main) < review.index(end)
+    assert review.index(end) < review.index("Responde 'confirmar'")
+
+
+def test_review_without_extra_prompts_is_unchanged(tmp_path: Path) -> None:
+    _install(tmp_path, _sheet())
+    _call(tmp_path, "start")
+    _call(tmp_path, "step")
+    _call(tmp_path, "step", uno="Fondas")
+    review = _call(tmp_path, "step", dos="Masa")
+    assert review.splitlines()[-3:] == [
+        "**Prompt para tu asistente de IA:** Prompt principal.",
+        "",
+        "Responde 'confirmar' para guardar la hoja y abrir tu vista.",
+    ]
