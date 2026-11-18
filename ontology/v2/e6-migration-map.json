@@ -502,7 +502,7 @@
       "legacy_id": null,
       "legacy_path": "conocimiento/registry/worksheets.yaml",
       "legacy_type": null,
-      "sha256": "351110b5437af0723ced5e8c685dfcb859274924bea8bbf4e5e27920053a7f21"
+      "sha256": "c582d43fd11cc5df203315eeb377cd89aca99406439ca878928ee3f5c93f2b89"
     },
     {
       "canonical_id": null,
@@ -635,6 +635,14 @@
     {
       "canonical_id": null,
       "disposition": "await-domain-evidence",
+      "legacy_id": "worksheet-bhag",
+      "legacy_path": "conocimiento/strategy/worksheets/bhag.yaml",
+      "legacy_type": "worksheet",
+      "sha256": "a8cece7e85eb2fe9755c86f8206f28448f1ea3470d6019287c06a75bdd36d8c8"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
       "legacy_id": "worksheet-bmc",
       "legacy_path": "conocimiento/strategy/worksheets/bmc.yaml",
       "legacy_type": "worksheet",
@@ -655,6 +663,14 @@
       "legacy_path": "conocimiento/strategy/worksheets/core-customer.yaml",
       "legacy_type": "worksheet",
       "sha256": "023226ec82a0edfb725b6cc11c87d2d75b16123f87fedf1d6d3ebad36c69ee48"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "worksheet-core-purpose",
+      "legacy_path": "conocimiento/strategy/worksheets/core-purpose.yaml",
+      "legacy_type": "worksheet",
+      "sha256": "86481b17d84e1a8abe1bfaf00a6e1766af30ea3948880305b2d0a980d42174c5"
     },
     {
       "canonical_id": null,
