@@ -470,6 +470,7 @@ VISION_SUMMARY_STEPS = [
 ONTOLOGY_RELEASE = ROOT / "ontology" / "v2" / "releases" / "s64.1.json"
 WORKBOOK = ROOT / "metodologias_parsed" / "strategy_workbook.md"
 WORD_RE = re.compile(r"[a-záéíóúñü0-9]+")
+SHEET_ID_RE = re.compile(r"worksheet-[a-z0-9-]+")
 
 
 def _e65_vision_fields() -> set[str]:
@@ -510,12 +511,34 @@ def test_vision_summary_passes_the_contract() -> None:
         (d.sheet, d.fields, d.into, d.title, d.required) for d in guide.derived_from
     ] == [
         (
+            "worksheet-swt",
+            ["tendencias-2026"],
+            "prioridades-3-5-anos",
+            "Fortalezas, debilidades y tendencias (SWT)",
+            False,
+        ),
+        (
+            "worksheet-differentiating-activities",
+            ["actividades-elegidas"],
+            "promesas",
+            "Actividades diferenciadoras",
+            False,
+        ),
+        (
+            "worksheet-core-purpose",
+            ["proposito"],
+            "proposito",
+            "Propósito central",
+            False,
+        ),
+        ("worksheet-bhag", ["meta-grande"], "meta-grande", "Meta grande", False),
+        (
             "worksheet-core-customer",
             ["quien-es", "necesidad"],
             "customer",
             "Cliente central",
             False,
-        )
+        ),
     ]
 
 
@@ -564,7 +587,8 @@ def test_vision_summary_ends_in_commitment_and_ten_week_prompt() -> None:
 
 
 def test_vision_summary_uses_plain_spanish_names() -> None:
-    text = VISION_SUMMARY.read_text(encoding="utf-8")
+    # Los ids de hoja (worksheet-bhag) no los ve el dueño; solo el texto.
+    text = SHEET_ID_RE.sub("", VISION_SUMMARY.read_text(encoding="utf-8"))
     for term in ("BHAG", "Rocks", "OPSP", *_forbidden_terms()):
         assert term.lower() not in text.lower(), term
 

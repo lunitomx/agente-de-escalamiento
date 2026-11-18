@@ -89,7 +89,11 @@ def test_vision_summary_prompts_are_2026() -> None:
 def test_vision_summary_core_customer_is_optional_and_goal_is_10_to_30() -> None:
     guide = _guide(VISION)
     assert [(d.sheet, d.required) for d in guide.derived_from] == [
-        ("worksheet-core-customer", False)
+        ("worksheet-swt", False),
+        ("worksheet-differentiating-activities", False),
+        ("worksheet-core-purpose", False),
+        ("worksheet-bhag", False),
+        ("worksheet-core-customer", False),
     ]
     goal = next(s for s in guide.guide.steps if s.id == "meta-grande")
     assert "10-30 años" in goal.question
@@ -107,7 +111,8 @@ def test_owner_text_of_the_three_sheets_is_clean() -> None:
             assert not PAGE_RE.search(text), (path.name, text[:40])
             for term in _forbidden_terms():
                 assert term not in text.lower(), (path.name, term)
-    vision = VISION.read_text(encoding="utf-8")
+    # Los ids de hoja (worksheet-bhag) no los ve el dueño; solo el texto.
+    vision = re.sub(r"worksheet-[a-z0-9-]+", "", VISION.read_text(encoding="utf-8"))
     assert "bhag" not in vision.lower()
     assert not SHEET_PAGE_RE.search(vision)
 

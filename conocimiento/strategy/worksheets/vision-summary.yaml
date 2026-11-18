@@ -31,6 +31,26 @@ metadata:
   time_estimate: "1-2 hours"
   frequency: quarterly
 derived_from:
+  - sheet: worksheet-swt
+    fields: [tendencias-2026]
+    into: prioridades-3-5-anos
+    title: "Fortalezas, debilidades y tendencias (SWT)"
+    required: false
+  - sheet: worksheet-differentiating-activities
+    fields: [actividades-elegidas]
+    into: promesas
+    title: "Actividades diferenciadoras"
+    required: false
+  - sheet: worksheet-core-purpose
+    fields: [proposito]
+    into: proposito
+    title: "Propósito central"
+    required: false
+  - sheet: worksheet-bhag
+    fields: [meta-grande]
+    into: meta-grande
+    title: "Meta grande"
+    required: false
   - sheet: worksheet-core-customer
     fields: [quien-es, necesidad]
     into: customer
@@ -46,7 +66,7 @@ guide:
     - id: proposito
       maps_to: [purpose]
       question: "¿Para qué existe tu empresa?"
-      how: "Escribe qué haces y pregunta '¿por qué importa?' varias veces. Quédate con la respuesta que seguiría siendo cierta si cambias de producto."
+      how: "Si ya llenaste Propósito central, copia tu propósito de arriba. Si no, escribe qué haces y pregunta '¿por qué importa?' varias veces. Quédate con la respuesta que seguiría siendo cierta si cambias de producto."
       example: "Tortillería El Sol: que ninguna fonda de la colonia se quede sin comida caliente a la hora de la comida."
     - id: promesas
       maps_to: [differentiator]
@@ -56,7 +76,7 @@ guide:
     - id: meta-grande
       maps_to: [future_direction]
       question: "¿Cuál es tu meta grande a 10-30 años?"
-      how: "Un número con fecha, en la unidad que mueve tu negocio: sucursales, clientes o pedidos."
+      how: "Si ya llenaste Meta grande, copia tu meta de arriba. Si no, escribe un número con fecha, en la unidad que mueve tu negocio: sucursales, clientes o pedidos."
       example: "Tortillería El Sol: 400 fondas surtidas cada día en Jalisco para 2040."
     - id: prioridades-3-5-anos
       maps_to: [future_direction]

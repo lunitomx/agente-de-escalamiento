@@ -198,7 +198,7 @@ worksheets:
     name: Differentiating Activities Worksheet
     name_es: "Actividades diferenciadoras"
     node_path: strategy/worksheets/differentiating-activities.yaml
-    prerequisites: [worksheet-core-customer]
+    prerequisites: []
     outputs:
       - 3 to 5 differentiating activities
       - competitor comparison on 4 axes
@@ -253,7 +253,8 @@ worksheets:
     name_es: "Resumen de visión"
     node_path: strategy/worksheets/vision-summary.yaml
     prerequisites:
-      - worksheet-core-customer
+      - worksheet-core-purpose
+      - worksheet-bhag
     outputs:
       - one-page vision summary
       - 10-week commitment
