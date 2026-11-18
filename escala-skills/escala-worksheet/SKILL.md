@@ -84,6 +84,29 @@ Lee `artifacts.view` del resultado de `save`: `{html, md, open_cmd}`.
 
 La vista dice "Falta: …" en cada paso sin respuesta, con cómo llenarlo. Así el dueño ve qué le queda.
 
+## Strategy Day 2026
+
+El taller de estrategia tiene 10 ejercicios en 8 hojas. Van en este orden:
+
+| # | Ejercicio | Hoja (`id`) |
+|---|-----------|-------------|
+| 1 | Arranque con IA | `worksheet-swt` (prompt «Arranque con IA», en el Paso 1) |
+| 2 | Fortalezas, debilidades y tendencias | `worksheet-swt` |
+| 3 | Actividades diferenciadoras | `worksheet-differentiating-activities` |
+| 4 | Propósito central | `worksheet-core-purpose` |
+| 5 | Meta grande | `worksheet-bhag` |
+| 6 | Visión vívida | `worksheet-vivid-vision` |
+| 7 | De clientes a fans | `worksheet-fanocracy` |
+| 8 | Tu propósito de vida | `worksheet-life-purpose` |
+| 9 | Tu día en una sola hoja | `worksheet-vision-summary` (prompt del Paso 1) |
+| 10 | Diez tareas para que el cambio se quede | `worksheet-vision-summary` |
+
+- Si el dueño dice que está en el taller de estrategia, empieza con `worksheet-swt`.
+- Cada hoja termina con "Siguiente hoja". Sigue el Step 4: ofrece la siguiente y espera su sí.
+- La última hoja, `worksheet-vision-summary`, no trae "Siguiente hoja". Ahí termina el taller.
+- Si una hoja ya está completada, `start` guarda la versión anterior y empieza una nueva. Dile al dueño dónde quedó la anterior.
+- Los prompts de las hojas son para un solo chat con su asistente de IA. Recuérdale que los pegue en el mismo chat, en orden.
+
 ## Output
 
 | Item | Destino |
