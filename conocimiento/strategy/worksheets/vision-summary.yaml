@@ -5,8 +5,8 @@ name_es: Resumen de visión
 decision: strategy
 ontology_ref: tool.vision-summary
 summary: >
-  Junta en una página tus valores, propósito, Cliente central, promesas, meta
-  grande, prioridades y números de cada semana. Cierra con un compromiso para
+  Junta en una sola hoja tus valores, propósito, promesas, meta grande,
+  prioridades y números de cada semana. Cierra con un compromiso para
   las próximas 10 semanas.
 relationships:
   - type: belongs-to
@@ -26,7 +26,7 @@ metadata:
     - kpis
     - prioridades-personales
     - compromiso
-  output: "Tu visión en una página y un compromiso para las próximas 10 semanas"
+  output: "Tu visión en una sola hoja y un compromiso para las próximas 10 semanas"
   difficulty: intermediate
   time_estimate: "1-2 hours"
   frequency: quarterly
@@ -35,6 +35,7 @@ derived_from:
     fields: [quien-es, necesidad]
     into: customer
     title: "Cliente central"
+    required: false
 guide:
   steps:
     - id: valores
@@ -49,12 +50,12 @@ guide:
       example: "Tortillería El Sol: que ninguna fonda de la colonia se quede sin comida caliente a la hora de la comida."
     - id: promesas
       maps_to: [differentiator]
-      question: "¿Qué le prometes a tu Cliente central y cómo lo mides?"
+      question: "¿Qué le prometes a tu cliente y cómo lo mides?"
       how: "Si ya llenaste tu hoja de Promesa de marca, copia aquí la promesa principal y su medida. Si no, escribe de 1 a 3 promesas con un número cada una."
       example: "Tortillería El Sol: masa antes de las 7 a. m. o no la pagas; medida: entregas tarde por semana."
     - id: meta-grande
       maps_to: [future_direction]
-      question: "¿Cuál es tu meta grande a 10-25 años?"
+      question: "¿Cuál es tu meta grande a 10-30 años?"
       how: "Un número con fecha, en la unidad que mueve tu negocio: sucursales, clientes o pedidos."
       example: "Tortillería El Sol: 400 fondas surtidas cada día en Jalisco para 2040."
     - id: prioridades-3-5-anos
@@ -94,7 +95,7 @@ tips:
   - text: "Escribe qué haces y pregunta '¿por qué importa?' hasta cinco veces. Tu propósito debe seguir vigente aunque mañana cambies de productos."
     source: "work/research/e87-tips/vision-summary.md#f2"
     step: proposito
-  - text: "Escribe tu meta a 10-25 años como un número con fecha y en la unidad que mueve tu negocio (ej. sucursales, clientes, pedidos). Así sabes si ya llegaste."
+  - text: "Escribe tu meta a 10-30 años como un número con fecha y en la unidad que mueve tu negocio (ej. sucursales, clientes, pedidos). Así sabes si ya llegaste."
     source: "work/research/e87-tips/vision-summary.md#f3"
     step: meta-grande
   - text: "Escoge de 3 a 5 prioridades del trimestre y una que manda. Cada una con un solo dueño y una medida de 'hecho'. Si todo es prioridad, nada lo es."
@@ -107,7 +108,11 @@ tips:
     source: "work/research/e87-tips/oppp-vision-boards.md#f4"
     step: compromiso
 ai_prompt:
-  text: "Con mi resumen de visión, mis prioridades del trimestre y mis números, escribe 10 tareas, una por semana, para las próximas 10 semanas. Que cada una me tome menos de una hora y casi no cueste dinero. Ponle dueño, fecha y cómo sabré que quedó hecha. Al final pregúntame a cuál me comprometo primero."
+  text: "Con todo lo de este chat, dame 10 tareas semanales, una por semana. Que cada una tome menos de una hora y cueste poco o nada, y que lleve mi estrategia del papel a algo que mi equipo sienta. Ordénalas para que los primeros logros generen confianza. Dime las 3 tareas que debo terminar antes de mi próxima reunión con mi grupo de seguimiento, y los 3 resultados que tendré amarrados en esta misma fecha del próximo trimestre. Luego crea las 10 tareas como archivo .ics, cada semana el [DÍA] a las [HORA], con por qué importa y cómo se ve terminada en la descripción. Si no puedes crear el archivo, dame una tabla que pueda pegar en mi calendario."
+extra_prompts:
+  - title: "Tu día en una sola hoja"
+    at: start
+    text: "Junta todo lo de hoy en una sola hoja que le pueda dar a mi equipo: mi propósito, mi meta grande, mi visión en 5 puntos, mis 3 a 5 actividades diferenciadoras y las 3 tendencias a las que le apuesto. Escríbelo con mis palabras, sin palabras técnicas. Luego dime con honestidad qué partes se contradicen, cuál es un deseo que todavía no me he ganado y cuál haría más daño si me equivoco. Al final ordena mis aprendizajes por el impacto real si los ejecuto, y por cuál es el que mi equipo resistiría más en silencio."
 view:
   layout: cards
   sections:
