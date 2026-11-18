@@ -3,12 +3,12 @@ type: registry
 name: Worksheet Registry
 name_es: Registro de Hojas de Trabajo
 description: >
-  Central index of all 23 worksheets across the 4 ESCALA decisions.
+  Central index of all 26 worksheets across the 4 ESCALA decisions.
   Enables deterministic lookup by decision, prerequisite, or output type.
-total_worksheets: 23
+total_worksheets: 26
 worksheets:
 
-  # ── PEOPLE (4) ─────────────────────────────────────────────────────────────
+  # ── PEOPLE (5) ─────────────────────────────────────────────────────────────
 
   - id: worksheet-face
     decision: people
@@ -74,7 +74,22 @@ worksheets:
     frequency: annual
     tags: [people, team, growth, hiring]
 
-  # ── STRATEGY (12) ──────────────────────────────────────────────────────────
+  - id: worksheet-life-purpose
+    decision: people
+    name: Life Purpose Worksheet
+    name_es: "Tu propósito de vida"
+    node_path: people/worksheets/life-purpose.yaml
+    prerequisites: []
+    outputs:
+      - personal life purpose statement
+    difficulty: beginner
+    time_estimate: "1 hour"
+    time_es: "1 hora"
+    summary_es: "Escribe lo que te apasiona, tus fortalezas y con quién te gusta jugar. Con eso declara el propósito de tu vida."
+    frequency: annual
+    tags: [people, life-purpose, personal, why]
+
+  # ── STRATEGY (14) ──────────────────────────────────────────────────────────
 
   - id: worksheet-opsp
     decision: strategy
@@ -280,6 +295,38 @@ worksheets:
     summary_es: "Junta lo que te apasiona, en lo que puedes ser el mejor y el número que mueve tu negocio. Sale una meta medible a 10-30 años que pide un salto."
     frequency: annual
     tags: [strategy, bhag, long-term, vision]
+
+  - id: worksheet-vivid-vision
+    decision: strategy
+    name: Vivid Vision Worksheet
+    name_es: "Visión vívida"
+    node_path: strategy/worksheets/vivid-vision.yaml
+    prerequisites: []
+    outputs:
+      - 3-5 year vivid vision of the company, written in present tense
+    difficulty: intermediate
+    time_estimate: "1-2 hours"
+    time_es: "1-2 horas"
+    summary_es: "Describe tu empresa en una fecha de 3 a 5 años, en presente: números, equipo, cultura, clientes y lo que dicen de ti."
+    frequency: annual
+    tags: [strategy, vivid-vision, vision, 3-5-years]
+
+  - id: worksheet-fanocracy
+    decision: strategy
+    name: Fanocracy Marketing Worksheet
+    name_es: "De clientes a fans"
+    node_path: strategy/worksheets/fanocracy.yaml
+    prerequisites: []
+    outputs:
+      - who your fans are today
+      - score on 9 fan principles
+      - 5 moves for the next 30 days
+    difficulty: beginner
+    time_estimate: "1 hour"
+    time_es: "1 hora"
+    summary_es: "Encuentra quién ya es fan de tu negocio, califica tu marketing en 9 principios y elige 5 acciones para los próximos 30 días."
+    frequency: annual
+    tags: [strategy, marketing, fans, fanocracy]
 
   # ── EXECUTION (4) ──────────────────────────────────────────────────────────
 
