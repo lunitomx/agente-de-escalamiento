@@ -18,7 +18,7 @@ from datetime import date
 from pathlib import Path
 from typing import Any, Literal, cast
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from coaching.dashboard.boards.render import (
     BASE_CSS,
@@ -64,6 +64,16 @@ class ViewBlock(BaseModel):
     items: list[ViewItem]
 
 
+class ViewPrompt(BaseModel):
+    """An extra prompt as shown: before the blocks (start) or after the main one (end)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    title: str
+    text: str
+    at: Literal["start", "end"]
+
+
 class SheetView(BaseModel):
     """What the HTML and the Markdown both show, in the same order."""
 
@@ -75,6 +85,7 @@ class SheetView(BaseModel):
     made_on: date
     blocks: list[ViewBlock]
     ai_prompt: str | None = None
+    extra_prompts: list[ViewPrompt] = Field(default_factory=lambda: list[ViewPrompt]())
 
 
 AI_PROMPT_TITLE = "Prompt para tu asistente de IA"
@@ -214,6 +225,10 @@ def build_view(
         made_on=made_on,
         blocks=blocks,
         ai_prompt=safe_text(prompt.text) if prompt is not None else None,
+        extra_prompts=[
+            ViewPrompt(title=safe_text(p.title), text=safe_text(p.text), at=p.at)
+            for p in (guide.extra_prompts if guide is not None else [])
+        ],
     )
 
 
@@ -263,16 +278,28 @@ def _html_block(block: ViewBlock) -> str:
     return f"<section class='card'><h2>{e(block.title)}</h2>{''.join(items)}</section>"
 
 
+def _html_prompt(title: str, text: str) -> str:
+    e = html.escape
+    return (
+        f"<section class='card prompt'><h2>{e(title)}</h2>"
+        f"<p class='answer'>{e(text)}</p></section>"
+    )
+
+
+def _view_prompts(view: SheetView, at: str) -> list[tuple[str, str]]:
+    """(title, text) of the prompts shown ``at`` start or end, in order (S88.1 D4)."""
+    shown = [(p.title, p.text) for p in view.extra_prompts if p.at == at]
+    if at == "end" and view.ai_prompt is not None:
+        shown.insert(0, (AI_PROMPT_TITLE, view.ai_prompt))
+    return shown
+
+
 def render_html(view: SheetView) -> str:
     """Self-contained HTML: inline CSS, no script, no external reference."""
     e = html.escape
     blocks = "".join(_html_block(block) for block in view.blocks)
-    prompt = (
-        f"<section class='card prompt'><h2>{e(AI_PROMPT_TITLE)}</h2>"
-        f"<p class='answer'>{e(view.ai_prompt)}</p></section>"
-        if view.ai_prompt is not None
-        else ""
-    )
+    start = "".join(_html_prompt(t, x) for t, x in _view_prompts(view, "start"))
+    prompt = "".join(_html_prompt(t, x) for t, x in _view_prompts(view, "end"))
     if view.layout == "canvas":
         main_open, body = "<main class='wide'>", f"<div class='canvas'>{blocks}</div>"
     else:
@@ -284,7 +311,7 @@ def render_html(view: SheetView) -> str:
         f"</head><body>{main_open}"
         f"<p class='local'>{e(LOCAL_ONLY)}</p>"
         f"<h1>{e(view.title)}</h1><p class='muted'>{e(_subtitle(view))}</p>"
-        f"{body}{prompt}"
+        f"{start}{body}{prompt}"
         "</main></body></html>\n"
     )
 
@@ -313,14 +340,11 @@ def markdown_blocks(blocks: list[ViewBlock], heading: str = "##") -> list[str]:
 def render_markdown(view: SheetView) -> str:
     """The same content as the HTML, for the chat and the ``.md`` twin."""
     lines = [f"> {LOCAL_ONLY}", "", f"# {view.title}", "", _subtitle(view), ""]
+    for title, text in _view_prompts(view, "start"):
+        lines += [f"## {title}", "", html.escape(text, quote=False), ""]
     lines += markdown_blocks(view.blocks)
-    if view.ai_prompt is not None:
-        lines += [
-            f"## {AI_PROMPT_TITLE}",
-            "",
-            html.escape(view.ai_prompt, quote=False),
-            "",
-        ]
+    for title, text in _view_prompts(view, "end"):
+        lines += [f"## {title}", "", html.escape(text, quote=False), ""]
     return "\n".join(lines)
 
 

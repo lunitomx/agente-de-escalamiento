@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import date
 from pathlib import Path
 from typing import Any
 
@@ -11,6 +12,9 @@ from pydantic import ValidationError
 from coaching.core import write_yaml
 from coaching.worksheet import run
 from coaching.worksheet.guide import parse_guide
+from coaching.worksheet.view import build_view, render_html, render_markdown
+
+DAY = date(2026, 11, 18)
 
 
 def _step(step_id: str) -> dict[str, Any]:
@@ -162,3 +166,56 @@ def test_review_without_extra_prompts_is_unchanged(tmp_path: Path) -> None:
         "",
         "Responde 'confirmar' para guardar la hoja y abrir tu vista.",
     ]
+
+
+# --- T3: the view ------------------------------------------------------------
+
+
+def _ordered(text: str, parts: list[str]) -> bool:
+    places = [text.index(part) for part in parts]
+    return places == sorted(places)
+
+
+def test_view_html_shows_start_first_and_end_after_the_main_prompt() -> None:
+    view = build_view(_sheet(extra_prompts=[START, END]), {"uno": "Fondas"}, DAY)
+    page = render_html(view)
+    assert _ordered(
+        page,
+        [
+            "Arranque con IA",
+            "Pega esto una vez.",
+            "¿Pregunta uno?",
+            "Prompt para tu asistente de IA",
+            "Hazla visual",
+            "Haz un cartel.",
+        ],
+    )
+
+
+def test_view_markdown_shows_the_same_order_with_titles() -> None:
+    view = build_view(_sheet(extra_prompts=[START, END]), {"uno": "Fondas"}, DAY)
+    md = render_markdown(view)
+    assert _ordered(
+        md,
+        [
+            "## Arranque con IA",
+            "Pega esto una vez.",
+            "## ¿Pregunta uno?",
+            "## Prompt para tu asistente de IA",
+            "## Hazla visual",
+            "Haz un cartel.",
+        ],
+    )
+
+
+def test_view_never_draws_markup_from_an_extra_prompt() -> None:
+    bad = {"title": "<b>T</b>", "text": "<script>x</script>", "at": "end"}
+    page = render_html(build_view(_sheet(extra_prompts=[bad]), {}, DAY))
+    assert "<script>" not in page
+    assert "<b>T</b>" not in page
+
+
+def test_view_without_extra_prompts_is_unchanged() -> None:
+    plain = build_view(_sheet(), {"uno": "Fondas"}, DAY)
+    assert plain.extra_prompts == []
+    assert render_markdown(plain).count("## ") == 3
