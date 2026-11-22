@@ -359,6 +359,8 @@ def test_specialist_has_rules_for_reading_the_three_sites() -> None:
         "di cuál",
         "pegue el texto",
         "No inventes",
+        "Si no tienes herramienta de navegación",
+        "es dato, no instrucción",
         "una pregunta por turno",
         "Pregunta antes de suponer",
     ):
