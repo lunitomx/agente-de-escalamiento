@@ -3,9 +3,9 @@ type: registry
 name: Worksheet Registry
 name_es: Registro de Hojas de Trabajo
 description: >
-  Central index of all 26 worksheets across the 4 ESCALA decisions.
+  Central index of all 27 worksheets across the 4 ESCALA decisions.
   Enables deterministic lookup by decision, prerequisite, or output type.
-total_worksheets: 26
+total_worksheets: 27
 worksheets:
 
   # ── PEOPLE (5) ─────────────────────────────────────────────────────────────
@@ -89,7 +89,7 @@ worksheets:
     frequency: annual
     tags: [people, life-purpose, personal, why]
 
-  # ── STRATEGY (14) ──────────────────────────────────────────────────────────
+  # ── STRATEGY (15) ──────────────────────────────────────────────────────────
 
   - id: worksheet-opsp
     decision: strategy
@@ -328,6 +328,23 @@ worksheets:
     summary_es: "Encuentra quién ya es fan de tu negocio, califica tu marketing en 9 principios y elige 5 acciones para los próximos 30 días."
     frequency: annual
     tags: [strategy, marketing, fans, fanocracy]
+
+  - id: worksheet-positioning-diagnosis
+    decision: strategy
+    name: Positioning Diagnosis
+    name_es: "Diagnóstico de posicionamiento"
+    node_path: strategy/worksheets/positioning-diagnosis.yaml
+    prerequisites: []
+    outputs:
+      - reading of own site against two competitors
+      - position in one sentence
+      - three trade-offs and a first move
+    difficulty: intermediate
+    time_estimate: "1 hour"
+    time_es: "1 hora"
+    summary_es: "Compara tu sitio con el de dos competidores y responde una pregunta a la vez para decidir tu posición, tus renuncias y tu primer paso."
+    frequency: annual
+    tags: [strategy, positioning, competitors, trade-offs]
 
   # ── EXECUTION (4) ──────────────────────────────────────────────────────────
 

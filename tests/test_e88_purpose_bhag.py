@@ -229,7 +229,7 @@ def test_purpose_and_big_goal_are_registered() -> None:
     assert bhag["node_path"] == "strategy/worksheets/bhag.yaml"
     assert bhag["name_es"] == "Meta grande (BHAG)"
     assert bhag["prerequisites"] == ["worksheet-core-purpose"]
-    assert registry["total_worksheets"] == len(registry["worksheets"]) == 26
+    assert registry["total_worksheets"] == len(registry["worksheets"]) == 27
 
 
 # --- the owner walks both sheets ---------------------------------------------

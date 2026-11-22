@@ -1,0 +1,109 @@
+id: worksheet-positioning-diagnosis
+type: worksheet
+name: Positioning Diagnosis
+name_es: Diagnóstico de posicionamiento
+decision: strategy
+summary: >
+  Compara tu sitio web con el de dos competidores y descubre dónde dicen lo
+  mismo. Luego responde una pregunta a la vez: qué haces distinto, a qué
+  renuncias, a dónde se van tu tiempo y tu dinero. Terminas con tu posición
+  en una oración y un primer paso.
+relationships:
+  - type: belongs-to
+    target: decision-strategy
+  - type: implements
+    target: concept-strategic-positioning
+  - type: implements
+    target: concept-resource-allocation
+tags: [strategy, worksheet, positioning, competitors, trade-offs, resource-allocation]
+metadata:
+  fields:
+    - negocio
+    - sitios
+    - lectura-de-sitios
+    - mejor-o-distinto
+    - tipo-de-posicion
+    - renuncias
+    - encaje
+    - continuidad
+    - tiempo-y-dinero
+    - solo-esta-vez
+    - motivacion
+    - decision
+  output: "Tu posición en una oración, tres renuncias y un primer paso con dueño y fecha"
+  difficulty: intermediate
+  time_estimate: "1 hour"
+  frequency: annually
+guide:
+  steps:
+    - id: negocio
+      question: "¿Qué vende tu negocio, a quién y de qué tamaño es?"
+      how: "Escribe tu giro, tu modelo de negocio en una oración y el tamaño en rangos: ventas y personas."
+      example: "Tortillería El Sol: hacemos tortilla y masa de maíz. Vendemos por kilo y con entrega diaria a fondas y comedores de la zona. Ventas de 5 a 10 millones de pesos al año; entre 10 y 20 personas."
+    - id: sitios
+      question: "¿Cuál es tu sitio web y cuáles son los sitios de dos competidores?"
+      how: "Escribe las tres direcciones completas. Elige a los dos competidores con los que más te comparan tus clientes."
+      example: "Tortillería El Sol: el nuestro es tortilleriaelsol.example. Los competidores: tortilleriaelcomal.example y masaexpress.example. Son los dos nombres que mencionan las fondas cuando nos piden precio."
+    - id: lectura-de-sitios
+      question: "¿Qué ve un cliente al comparar los tres sitios?"
+      how: "Tu asistente lee los tres sitios y escribe la lectura. Tú corriges lo que no sea cierto."
+      example: "Tortillería El Sol: los tres sitios le hablan a 'familias y negocios' y prometen 'tortilla recién hecha'. Los tres usan casi la misma frase: 'calidad y tradición'. Solo nuestro sitio menciona la entrega antes de las 6 de la mañana, y lo hace hasta abajo. Un cliente nuevo no ve por qué elegirnos."
+    - id: mejor-o-distinto
+      question: "De lo que presumes hoy, ¿qué es hacer lo mismo mejor y qué es hacer algo distinto?"
+      how: "Haz dos listas. Lo que un competidor puede copiar en un año va en la primera."
+      example: "Tortillería El Sol: lo mismo pero mejor: máquina nueva, menos merma, maíz de buen proveedor. Distinto: entregamos antes de las 6 de la mañana y hacemos la masa a la medida de cada cocina."
+    - id: tipo-de-posicion
+      question: "¿Tu posición nace de lo que vendes, de a quién atiendes o de cómo llegas a él?"
+      how: "Elige una: pocos productos muy bien hechos, todo para un tipo de cliente, o llegar donde otros no llegan."
+      example: "Tortillería El Sol: todo para un tipo de cliente. Atendemos a cocinas que abren temprano: fondas y comedores. Les damos tortilla, masa, totopo y entrega, aunque no seamos los más baratos en ninguno."
+    - id: renuncias
+      question: "¿A qué clientes, productos o pedidos les dices que no?"
+      how: "Escribe tres cosas que dejas de hacer por tu posición. Si no duele ninguna, no es renuncia."
+      example: "Tortillería El Sol: no vendemos en mostrador después de las 2 de la tarde; no surtimos a supermercados; no hacemos tortilla de harina. La de harina duele: nos la piden cada semana."
+    - id: encaje
+      question: "¿Qué actividades tuyas se refuerzan entre sí?"
+      how: "Anota de tres a cinco actividades y cómo una ayuda a la otra. Copiar una sola no basta."
+      example: "Tortillería El Sol: el turno arranca a las 3 de la mañana; por eso la ruta sale a las 5; por eso el pedido se cierra un día antes por WhatsApp; por eso casi no sobra masa. Un competidor que solo copie la ruta llega tarde o con producto de ayer."
+    - id: continuidad
+      question: "¿Cuánto tiempo llevas sosteniendo esa posición y qué la ha movido?"
+      how: "Escribe desde cuándo y las veces que cambiaste de rumbo. Mejorar cómo lo haces no cuenta como cambio."
+      example: "Tortillería El Sol: llevamos 6 años con las cocinas que abren temprano. Hace 2 años probamos vender a supermercados; duró 8 meses y descuidamos la ruta. Cambiar la máquina fue mejora, no cambio de rumbo."
+    - id: tiempo-y-dinero
+      question: "¿A dónde se fueron tu tiempo y tu dinero los últimos 3 meses?"
+      how: "Revisa tu agenda y tus gastos. Anota las tres cosas que más se llevaron. Compara con tu posición."
+      example: "Tortillería El Sol: mi tiempo se fue en cobrar, en un pedido grande para una fiesta y en arreglar la camioneta. El dinero, en la camioneta y en un anuncio para público general. Solo la camioneta sirve a las cocinas que abren temprano."
+    - id: solo-esta-vez
+      question: "¿Qué excepción de 'solo esta vez' se te volvió costumbre?"
+      how: "Piensa en pedidos, descuentos o clientes que aceptaste porque costaba poco. Suma cuántas veces pasó este año."
+      example: "Tortillería El Sol: aceptamos pedidos para fiestas en fin de semana 'solo esta vez'. Este año fueron 14. Cada uno parecía barato, pero juntos nos costaron dos lunes con entregas tarde."
+    - id: motivacion
+      question: "¿Qué mueve a tu equipo además del sueldo?"
+      how: "Pregunta a dos personas qué aprendieron este año y de qué se sienten responsables. Anota sus palabras."
+      example: "Tortillería El Sol: Juan, de la ruta: 'aprendí a armar la ruta yo solo; las fondas me avisan a mí si falta algo'. Marta, de la masa: 'nadie me ha dicho si mi masa sale bien; solo me buscan cuando sale mal'."
+    - id: decision
+      question: "¿Cuál es tu posición en una oración y qué haces primero?"
+      how: "Escribe para quién eres, qué resuelves y a qué renuncias. Agrega un primer paso con dueño y fecha."
+      example: "Tortillería El Sol: somos la tortillería de las cocinas que abren temprano; llegamos antes de las 6 y renunciamos al mostrador de tarde, a los supermercados y a las fiestas. Primer paso: subir la entrega antes de las 6 al inicio del sitio. Dueña: Ana. Fecha: 15 de enero."
+tips:
+  - text: "Si tu posición no te obliga a decir que no a algo, todavía no elegiste. Escribe primero la renuncia que más te duele."
+    source: "work/research/e88-tips/positioning.md#f1"
+    step: renuncias
+  - text: "Tu estrategia real es a dónde van tu tiempo y tu dinero cada semana. Compara tu agenda con lo que dices que eres."
+    source: "work/research/e88-tips/positioning.md#f2"
+    step: tiempo-y-dinero
+  - text: "El sueldo evita la queja, pero no enciende a nadie. Da a cada persona algo de qué ser responsable y dile cuando lo hace bien."
+    source: "work/research/e88-tips/positioning.md#f3"
+    step: motivacion
+ai_prompt:
+  text: "Actúa como mi asesor de estrategia. Lee mi sitio web y los de dos competidores que te voy a dar. En 3 o 4 oraciones dime a quién le habla cada uno, qué promete y dónde decimos casi lo mismo. Si un sitio no abre, dímelo y no inventes. Después entrevístame con una pregunta a la vez y pregunta antes de suponer. Quiero saber: qué hago distinto y qué solo hago mejor, a qué clientes o pedidos les digo que no, qué actividades mías se refuerzan entre sí, a dónde se fueron mi tiempo y mi dinero los últimos 3 meses, qué excepción de 'solo esta vez' se me volvió costumbre y qué mueve a mi equipo además del sueldo. Al final dame mi posición en una oración, tres renuncias y un primer paso con dueño y fecha."
+view:
+  layout: cards
+  sections:
+    - title: "Tu negocio y los tres sitios"
+      steps: [negocio, sitios, lectura-de-sitios]
+    - title: "Qué te hace distinto"
+      steps: [mejor-o-distinto, tipo-de-posicion, renuncias, encaje, continuidad]
+    - title: "A dónde va tu esfuerzo"
+      steps: [tiempo-y-dinero, solo-esta-vez, motivacion]
+    - title: "Tu decisión"
+      steps: [decision]

@@ -1,0 +1,33 @@
+id: concept-strategic-positioning
+type: concept
+name: Strategic Positioning
+name_es: Posicionamiento estratégico
+decision: strategy
+summary: >
+  Idea de Michael E. Porter, dicha con nuestras palabras. La eficiencia operativa es
+  hacer lo mismo que tus competidores, pero mejor: es necesaria, y se copia. La
+  estrategia es hacer algo distinto, o hacerlo de otra forma. Una posición puede nacer
+  de tres lugares: de la variedad (pocos productos muy bien hechos), de las necesidades
+  (todo para un tipo de cliente) o del acceso (llegar a clientes a los que otros no
+  llegan). Una posición pide renuncia: decir que no a clientes, productos o pedidos.
+  Se sostiene por el encaje: varias actividades que se refuerzan entre sí son más
+  difíciles de copiar que una sola. Y pide continuidad: años en el mismo rumbo, con
+  mejora constante en cómo se hace.
+relationships:
+  - type: belongs-to
+    target: decision-strategy
+  - type: feeds-into
+    target: concept-differentiating-activities
+  - type: feeds-into
+    target: concept-brand-promise
+tags: [strategy, positioning, trade-offs, fit, operational-effectiveness, Porter]
+metadata:
+  difficulty: intermediate
+  application: >
+    Haz cinco preguntas. Uno: de lo que presumes, ¿qué es eficiencia operativa y qué es
+    distinto? Dos: ¿tu posición nace de la variedad, de las necesidades de un cliente o
+    del acceso? Tres: ¿qué renuncia te duele? Si ninguna duele, no elegiste. Cuatro:
+    ¿qué actividades tienen encaje y se ayudan una a la otra? Cinco: ¿cuántos años de
+    continuidad llevas? Ejemplo: una tortillería que surte a cocinas que abren temprano
+    renuncia al mostrador de tarde; su turno de madrugada, su ruta y su pedido del día
+    anterior se refuerzan entre sí.

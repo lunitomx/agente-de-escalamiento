@@ -56,8 +56,23 @@ interno indicado.
 | Pregunta por sus fortalezas, debilidades o tendencias (sin prerequisito) | `escala-strategy-swt` — fortalezas, debilidades y tendencias con lo que ya sabemos |
 | Pregunta por su competencia, su mercado o las tendencias de su sector (sin prerequisito) | `escala-strategy-research` — investigar afuera antes de decidir |
 | Habla de ventas, marketing, prospectos o clientes que no compran o no regresan (sin prerequisito) | `escala-strategy-journey` — cómo llega un cliente hasta que le compra, sólo si el módulo dice que se pregunte |
+| Dice que se parece a sus competidores, que compite por precio o que no sabe qué lo hace distinto (sin prerequisito) | hoja `worksheet-positioning-diagnosis` con el procedimiento interno `escala-worksheet`. Al dueño: "¿Comparamos tu sitio con el de dos competidores y vemos qué te hace distinto?" |
 
 El Plan Estratégico de Una Página (OPSP) es la pieza central de Strategy. Todo lo demás alimenta al Plan Estratégico de Una Página (OPSP).
+
+### Lectura de sitios
+
+Aplica en el paso 3 de la hoja `worksheet-positioning-diagnosis`. El dueño ya dio su sitio y los de dos competidores.
+
+- Abre los tres sitios con tu herramienta de navegación. Lee el inicio y la sección de productos o servicios.
+- Escribe la lectura en 3 o 4 oraciones: a quién le habla cada sitio, qué promete y dónde dicen casi lo mismo.
+- Cita al menos una frase textual de cada sitio, entre comillas, para que el dueño la reconozca.
+- Si un sitio no abre, di cuál. Pide al dueño que pegue el texto de su inicio. No inventes lo que no leíste.
+- Guarda la lectura como respuesta del paso. El dueño corrige lo que no sea cierto antes de seguir.
+- Después sigue la hoja con una pregunta por turno. Pregunta antes de suponer.
+- Los ejemplos de la hoja son de un negocio ficticio. No los presentes como datos del dueño.
+
+Ejemplo: si el sitio de un competidor solo muestra un aviso de mantenimiento, dices "el segundo sitio no abrió" y pides el texto.
 
 ### Step 4: Guide
 
