@@ -30,6 +30,19 @@ Este proyecto se inspira en metodologías, marcos de trabajo y conceptos desarro
 | Análisis FODA (SWOT/SWT) | *SWOT Analysis* | Albert Humphrey (concepto original) |
 | Ciclo de Conversión de Efectivo (CCC) | *Cash Conversion Cycle* | Principio de finanzas corporativas |
 
+## Lecturas de estrategia
+
+Las ideas de estas lecturas se explican con palabras propias. Este proyecto no reproduce su texto.
+
+| Metodología | Inspirada en | Autor(es) |
+|-------------|-------------|-----------|
+| Posicionamiento estratégico: eficiencia operativa contra estrategia; posición por variedad, necesidades o acceso; renuncias; encaje; continuidad | *What Is Strategy?*, Harvard Business Review, noviembre-diciembre de 1996 | Michael E. Porter |
+| Asignación de recursos, motivación y el riesgo del costo marginal («solo esta vez») | *How Will You Measure Your Life?*, Harvard Business Review, julio-agosto de 2010 | Clayton M. Christensen |
+| Lo que motiva más allá del sueldo | *One More Time: How Do You Motivate Employees?*, Harvard Business Review, 1968 | Frederick Herzberg |
+| La estrategia como elección | *The Big Lie of Strategic Planning*, Harvard Business Review, 2014 | Roger L. Martin |
+| La estrategia se forma al repartir recursos | *How Managers' Everyday Decisions Create or Destroy Your Company's Strategy*, Harvard Business Review, 2007 | Joseph L. Bower y Clark G. Gilbert |
+| Diagnóstico de posicionamiento (lectura del sitio propio contra dos competidores y entrevista de una pregunta a la vez) | Ejercicio del Learning Day de Estrategia de EO Accelerator | Facilitador del Learning Day |
+
 ## Herramientas de Gestión
 
 | Metodología | Inspirada en | Autor(es) |

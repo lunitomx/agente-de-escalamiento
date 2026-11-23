@@ -510,7 +510,7 @@
       "legacy_id": null,
       "legacy_path": "conocimiento/registry/worksheets.yaml",
       "legacy_type": null,
-      "sha256": "38b8e77617975667c48f3584548c9cda132541ecac2ef8fa3a9ea5333784eb97"
+      "sha256": "889925fbfc2f73f213a75dcbf8d5272cbb04e4dfb3d04756cad5b711d1f1e0b4"
     },
     {
       "canonical_id": null,
@@ -559,6 +559,22 @@
       "legacy_path": "conocimiento/strategy/concepts/differentiating-activities.yaml",
       "legacy_type": "concept",
       "sha256": "ea63306406dc4fa0d12b034a79b75f38f995b46bcee719a571a8cdea079893da"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "concept-resource-allocation",
+      "legacy_path": "conocimiento/strategy/concepts/resource-allocation.yaml",
+      "legacy_type": "concept",
+      "sha256": "36fec3f7cbabc2db737b894decc36028f837d6513ccdeb712b375be5ae6abd29"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "concept-strategic-positioning",
+      "legacy_path": "conocimiento/strategy/concepts/strategic-positioning.yaml",
+      "legacy_type": "concept",
+      "sha256": "a4ad191ccc3634b74e4616f87173022c2439a0dfba42ca03a3bfb4d0002ea921"
     },
     {
       "canonical_id": null,
@@ -703,6 +719,14 @@
       "legacy_path": "conocimiento/strategy/worksheets/opsp.yaml",
       "legacy_type": "worksheet",
       "sha256": "7366cf6a18e3414513d42fa19e2d3a563a8c27590ac1619a49ced66b82d314f7"
+    },
+    {
+      "canonical_id": null,
+      "disposition": "await-domain-evidence",
+      "legacy_id": "worksheet-positioning-diagnosis",
+      "legacy_path": "conocimiento/strategy/worksheets/positioning-diagnosis.yaml",
+      "legacy_type": "worksheet",
+      "sha256": "038d219d39b8ca16c7124061a35a5ff3adf8ed3c50939786763dc4e513207e5a"
     },
     {
       "canonical_id": null,

@@ -1,0 +1,30 @@
+id: concept-resource-allocation
+type: concept
+name: Resource Allocation
+name_es: Asignación de recursos
+decision: strategy
+summary: >
+  Idea de Clayton M. Christensen, dicha con nuestras palabras. La estrategia real de un
+  negocio no es la que está escrita: es a dónde van su tiempo y su dinero cada semana.
+  Lo urgente y de resultado rápido se lleva los recursos si nadie lo vigila, y lo que
+  construye a largo plazo se queda sin nada. Hay un riesgo parecido en las excepciones:
+  aceptar algo fuera de tu posición «solo esta vez» parece barato porque solo miras el
+  costo marginal de ese pedido. La suma de excepciones es el costo completo, y termina
+  por cambiar lo que eres. La tercera idea es sobre las personas: lo que más motiva no
+  es el sueldo, sino aprender, tener responsabilidad y recibir reconocimiento.
+relationships:
+  - type: belongs-to
+    target: decision-strategy
+  - type: requires
+    target: concept-strategic-positioning
+tags: [strategy, resource-allocation, marginal-cost, motivation, Christensen]
+metadata:
+  difficulty: intermediate
+  application: >
+    Revisa tu agenda y tus gastos de los últimos 3 meses. Anota las tres cosas que más
+    tiempo y dinero se llevaron y compáralas con tu posición. Luego cuenta las veces que
+    dijiste «solo esta vez» en el año: el costo marginal de cada una fue bajo; la suma
+    no. Por último, pregunta a dos personas qué aprendieron y de qué son responsables:
+    eso es lo que las motiva. Ejemplo: una tortillería acepta 14 pedidos de fiesta en un
+    año; cada uno parecía barato y juntos causaron entregas tarde a sus clientes de
+    siempre.

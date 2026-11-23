@@ -349,7 +349,7 @@ def test_three_sheets_are_registered() -> None:
         assert entry["node_path"] == node_path
         assert entry["name_es"] == name_es
         assert entry["prerequisites"] == []
-    assert registry["total_worksheets"] == len(registry["worksheets"]) == 26
+    assert registry["total_worksheets"] == len(registry["worksheets"]) == 27
 
 
 # --- the owner walks the three sheets ----------------------------------------
